@@ -24,6 +24,8 @@
 #include "../../KeePassLibCpp/PwManager.h"
 #include "../../KeePassLibCpp/PasswordGenerator/PasswordGenerator.h"
 
+#include "SprEngine/SprEngine.h"
+
 #include <string>
 
 #define OLF_OPEN 0
@@ -45,9 +47,8 @@ typedef struct _AV_APP_INFO
 } AV_APP_INFO;
 
 #ifndef _WIN32_WCE
-// If pReferenceSource is not NULL, lptString will first be dereferenced
-// before being copied to the clipboard
-void CopyStringToClipboard(const TCHAR *lptString, CPwManager *pReferenceSource);
+void CopyStringToClipboard(const TCHAR *lptString, PW_ENTRY *pEntryContext,
+	CPwManager *pDatabaseContext);
 void ClearClipboardIfOwner();
 
 void RegisterOwnClipboardData(unsigned char* pData, unsigned long dwDataSize);
@@ -116,12 +117,13 @@ std::basic_string<TCHAR> WU_ExpandEnvironmentVars(LPCTSTR lpSrc);
 
 BOOL WU_IsAbsolutePath(LPCTSTR lpPath);
 
-void WU_FillPlaceholders(CString* pString);
+void WU_FillPlaceholders(CString* pString, const SPR_CONTENT_FLAGS* pcf);
 
 BOOL WU_FlushStorageBuffers(TCHAR tchDriveLetter, BOOL bOnlyIfRemovable);
 BOOL WU_FlushStorageBuffersEx(LPCTSTR lpFileOnStorage, BOOL bOnlyIfRemovable);
 
 std::basic_string<TCHAR> WU_GetCurrentDirectory();
+void WU_SetCurrentDirectory(LPCTSTR lpDirectory);
 std::basic_string<TCHAR> WU_FreeDriveIfCurrent(TCHAR tchDriveLetter);
 
 PWG_ERROR PwgGenerateWithExtVerify(std::vector<TCHAR>& vOutPassword,
@@ -134,5 +136,7 @@ void WU_GetUserApplications(std::vector<AV_APP_INFO>& vStorage);
 BOOL WU_CreateDirectoryTree(LPCTSTR lpDirPath);
 
 // void WU_MouseClick(bool bRightClick);
+
+bool WU_IsCommandLineURL(const CString& strURL);
 
 #endif

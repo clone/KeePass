@@ -23,6 +23,7 @@
 #include "../../KeePassLibCpp/SysDefEx.h"
 #include "BCMenu.h"
 #include "XPStyleButtonST.h"
+#include "AutoRichEditCtrlFx.h"
 #include <string>
 #include <vector>
 
@@ -229,5 +230,10 @@ BOOL NewGUI_SetIcon(BCMenu& rMenu, UINT uCommand, int nResourceID);
 
 int CALLBACK NgslCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 void NewGUI_SortList(CListCtrl* pListCtrl);
+
+void NewGUI_AppendToRichEditCtrl(CAutoRichEditCtrlFx* pCtrl, LPCTSTR lpAppend,
+	bool bScrollToBottom);
+
+void NewGUI_DeselectAllItems(CListCtrl* pCtrl);
 
 #endif // ___NEW_GUI_COMMON___

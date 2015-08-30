@@ -162,6 +162,7 @@ protected:
 	afx_msg void OnUrlFieldInsIE();
 	afx_msg void OnUrlFieldInsFirefox();
 	afx_msg void OnUrlFieldInsOpera();
+	afx_msg void OnAutoTypeInsertDefaultSequence();
 	afx_msg void OnAutoTypeSelectTargetWindow();
 	afx_msg void OnInsertFieldReferenceInTitleField();
 	afx_msg void OnInsertFieldReferenceInUserNameField();

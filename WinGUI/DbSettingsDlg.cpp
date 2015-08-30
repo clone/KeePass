@@ -108,7 +108,7 @@ void CDbSettingsDlg::OnOK()
 	// Check if the user has entered something valid, otherwise fix it
 	CString str;
 	GetDlgItem(IDC_EDIT_KEYENC)->GetWindowText(str);
-	str.Trim();
+	str = str.Trim();
 	if(str.GetLength() > 10) m_dwNumKeyEnc = 0xFFFFFFFE; // Set to max
 	else if(str.GetLength() == 10)
 	{

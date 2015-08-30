@@ -280,6 +280,8 @@ public:
 	static BOOL m_bDisableUnsafeAtStart;
 	static BOOL m_bUseLocalTimeFormat;
 	static PW_GEN_SETTINGS_EX m_pgsAutoProfile;
+	static CString m_strDefaultAutoTypeSequence;
+	static BOOL m_bSortAutoTypeSelItems;
 
 private:
 	int m_nClipboardMethod;
@@ -303,6 +305,7 @@ private:
 	BOOL m_bDeleteBackupsOnSave;
 	BOOL m_bDisableAutoType;
 	BOOL m_bLockOnWinLock;
+	BOOL m_bClearClipOnDbClose;
 
 	BOOL m_bExiting;
 	BOOL m_bIsLocking;
@@ -324,6 +327,7 @@ private:
 	BOOL m_bSaveOnLATMod;
 	BOOL m_bStartMinimized;
 	BOOL m_bQuickFindIncBackup;
+	BOOL m_bQuickFindIncExpired;
 	BOOL m_bCheckForUpdate;
 	BOOL m_bFocusResAfterQuickFind;
 
@@ -436,7 +440,6 @@ private:
 
 	CRemoteControl m_remoteControl;
 
-	CString m_strDefaultAutoTypeSequence;
 	BOOL m_bAutoTypeIEFix;
 
 	CString m_strWindowTitleSuffix;
@@ -456,7 +459,6 @@ private:
 		const CPrivateConfigEx& cConfig);
 
 	void RegisterRestoreHotKey(BOOL bRegister);
-
 	void DropToBackgroundIfOptionEnabled();
 
 	LONG m_lNormalWndPosX;
@@ -716,6 +718,7 @@ protected:
 	afx_msg void OnUpdateInfoAbout(CCmdUI *pCmdUI);
 	afx_msg void OnInfoChkForUpd();
 	afx_msg void OnUpdateViewHide(CCmdUI *pCmdUI);
+	afx_msg void OnQuickFindSelChange();
 	//}}AFX_MSG
 
 	afx_msg void OnPluginMessage(UINT nID);
@@ -735,8 +738,6 @@ protected:
 	afx_msg LRESULT OnWTSSessionChange(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnQuickFindSelChange();
 };
 
 //{{AFX_INSERT_LOCATION}}

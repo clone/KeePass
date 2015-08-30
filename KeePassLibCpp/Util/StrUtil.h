@@ -52,16 +52,16 @@ void FixURL(CString *pstrURL);
 
 // If pReferenceSource is not NULL, it'll be used to dereference
 // lpReplaceWith before replacing lpFind
-BOOL SeqReplace(CString& str, LPCTSTR lpFind, LPCTSTR lpReplaceWith,
-	BOOL bMakeSimString, BOOL bCmdQuotes, BOOL bRemoveMeta, PW_ENTRY* peEntryInfo,
-	CPwManager* pReferenceSource, DWORD dwRecursionLevel);
+// BOOL SeqReplace(CString& str, LPCTSTR lpFind, LPCTSTR lpReplaceWith,
+//	BOOL bMakeSimString, BOOL bCmdQuotes, BOOL bRemoveMeta, PW_ENTRY* peEntryInfo,
+//	CPwManager* pReferenceSource, DWORD dwRecursionLevel);
 
 // Replace placeholders in pString by data in pEntry
-void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes,
-	CPwManager* pDataSource, DWORD dwRecursionLevel);
+// void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes,
+//	CPwManager* pDataSource, DWORD dwRecursionLevel);
 
-BOOL FillRefPlaceholders(CString& str, BOOL bMakeSimString, BOOL bCmdQuotes,
-	CPwManager* pDataSource, DWORD dwRecursionLevel);
+// BOOL FillRefPlaceholders(CString& str, BOOL bMakeSimString, BOOL bCmdQuotes,
+//	CPwManager* pDataSource, DWORD dwRecursionLevel);
 
 CString CsRemoveMeta(CString *psString);
 
@@ -105,7 +105,6 @@ DWORD szlen(const char *pszString);
 char *szcpy(char *szDestination, const char *szSource);
 
 CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart, DWORD dwInstance);
-CString TagSimString(LPCTSTR lpString);
 
 // C_FN_SHARE void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath);
 
@@ -138,7 +137,7 @@ LPCTSTRCMPEX StrCmpGetNaturalMethodOrFallback();
 /////////////////////////////////////////////////////////////////////////////
 // Wide character stream
 
-class WCharStream
+class WCharStream : boost::noncopyable
 {
 public:
 	WCharStream(LPCWSTR lpData);
@@ -148,6 +147,26 @@ public:
 private:
 	LPCWSTR m_lpData;
 	DWORD m_dwPosition;
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// Wide character stream
+
+class CStringBuilderEx : boost::noncopyable
+{
+public:
+	CStringBuilderEx();
+
+	void Append(TCHAR tch);
+	void Append(LPCTSTR lpString);
+
+	std::basic_string<TCHAR> ToString() const;
+
+	CStringBuilderEx& operator+=(TCHAR tch) { this->Append(tch); return *this; }
+	CStringBuilderEx& operator+=(LPCTSTR lp) { this->Append(lp); return *this; }
+
+private:
+	std::vector<TCHAR> m_vBuf;
 };
 
 #endif

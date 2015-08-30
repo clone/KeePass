@@ -31,6 +31,7 @@
 
 #include "WinUtil.h"
 #include "CmdLine/Executable.h"
+#include "SprEngine/SprEngine.h"
 #include "PrivateConfig.h"
 #include "AppLocator.h"
 #include "../Plugins/PluginMgr.h"
@@ -57,9 +58,8 @@ static UINT g_uCfIgnoreID = 0; // ID of CFN_CLIPBOARD_VIEWER_IGNORE
 #define CF_TTEXTEX CF_TEXT
 #endif
 
-// If pReferenceSource is not NULL, lptString will first be dereferenced
-// before being copied to the clipboard
-void CopyStringToClipboard(const TCHAR *lptString, CPwManager *pReferenceSource)
+void CopyStringToClipboard(const TCHAR *lptString, PW_ENTRY *pEntryContext,
+	CPwManager *pDatabaseContext)
 {
 	if(OpenClipboard(NULL) == FALSE) { ASSERT(FALSE); return; }
 	if(EmptyClipboard() == FALSE) { ASSERT(FALSE); return; }
@@ -71,8 +71,7 @@ void CopyStringToClipboard(const TCHAR *lptString, CPwManager *pReferenceSource)
 	}
 
 	CString strData = lptString;
-	if(pReferenceSource != NULL)
-		FillRefPlaceholders(strData, FALSE, FALSE, pReferenceSource, 0);
+	strData = SprCompile(strData, false, pEntryContext, pDatabaseContext, false, false);
 
 	size_t uDataSize = static_cast<size_t>(strData.GetLength()) * sizeof(TCHAR);
 	if(uDataSize == 0) // No string to copy => empty clipboard only
@@ -177,8 +176,7 @@ void CopyDelayRenderedClipboardData(const TCHAR *lptString, CPwManager *pReferen
 	SetClipboardIgnoreFormat();
 
 	CString strData = lptString;
-	if(pReferenceSource != NULL)
-		FillRefPlaceholders(strData, FALSE, FALSE, pReferenceSource, 0);
+	strData = SprCompile(strData, false, NULL, pReferenceSource, false, false);
 
 	const size_t cch = static_cast<size_t>(strData.GetLength());
 	HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, (cch + 1) * sizeof(TCHAR));
@@ -199,9 +197,7 @@ void CopyDelayRenderedClipboardData(const TCHAR *lptString, CPwManager *pReferen
 void SetClipboardIgnoreFormat()
 {
 	if(g_uCfIgnoreID == 0)
-	{
 		g_uCfIgnoreID = RegisterClipboardFormat(CFN_CLIPBOARD_VIEWER_IGNORE);
-	}
 
 	if(g_uCfIgnoreID != 0) // Registered
 	{
@@ -396,13 +392,14 @@ BOOL OpenUrlInNewBrowser(LPCTSTR lpURL)
 
 BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 {
-	CString strURL;
+	ASSERT(lpURL != NULL); if(lpURL == NULL) return FALSE;
+	CString strURL = WU_ExpandEnvironmentVars(lpURL).c_str();
+
+	strURL = strURL.TrimLeft(_T(" \t\r\n"));
+
 	BOOL bResult = FALSE;
 
-	ASSERT(lpURL != NULL); if(lpURL == NULL) return FALSE;
-	strURL = WU_ExpandEnvironmentVars(lpURL).c_str();
-
-	if(strURL.Find(_T("ssh:")) >= 0)
+	if(strURL.Find(_T("ssh:")) == 0)
 	{
 		TCHAR tszKey[MAX_PATH << 1];
 		_tcscpy_s(tszKey, _countof(tszKey), _T("PUTTY.EXE -ssh "));
@@ -433,7 +430,7 @@ BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 		// Execute the ssh client
 		bResult = ((TWinExec(tszKey, KPSW_SHOWDEFAULT) > 31) ? TRUE : FALSE);
 	}
-	else if(strURL.Find(_T("telnet:")) >= 0)
+	else if(strURL.Find(_T("telnet:")) == 0)
 	{
 		TCHAR tszKey[MAX_PATH << 1];
 		_tcscpy_s(tszKey, _countof(tszKey), _T("PUTTY.EXE "));
@@ -493,6 +490,13 @@ void OpenUrlEx(LPCTSTR lpURL, HWND hParent)
 			TWinExec(&strURL.c_str()[6], KPSW_SHOWDEFAULT);
 		}
 	}
+	else if(_tcsncmp(strURL.c_str(), _T("\\\\"), 2) == 0)
+	{
+		if(_tcslen(strURL.c_str()) > 2)
+		{
+			TWinExec(&strURL.c_str()[2], KPSW_SHOWDEFAULT);
+		}
+	}
 	else ShellExecute(NULL, NULL, strURL.c_str(), NULL, NULL, KPSW_SHOWDEFAULT);
 }
 
@@ -502,11 +506,16 @@ void OpenUrlShellExec(LPCTSTR lpURL, HWND hParent)
 	ASSERT(lpURL != NULL); if(lpURL == NULL) return;
 
 	CString strURL = lpURL;
-	strURL.TrimLeft(_T(" \t\r\n"));
+	strURL = strURL.TrimLeft(_T(" \t\r\n"));
 	if(strURL.GetLength() == 0) return;
 
-	if(strURL.Left(6) == _T("cmd://"))
+	CString strLower = strURL;
+	strLower = strLower.MakeLower();
+
+	if(strLower.Left(6) == _T("cmd://"))
 		OpenUrlProcess(strURL.Right(strURL.GetLength() - 6), hParent);
+	else if(strLower.Left(2) == _T("\\\\"))
+		OpenUrlProcess(strURL, hParent);
 	else // Standard method
 		WU_SysExecute(strURL, NULL, hParent);
 }
@@ -519,7 +528,7 @@ void OpenUrlProcess(LPCTSTR lpURL, HWND hParent)
 	CString strLine = lpURL, strFile, strParam;
 	BOOL bFile = FALSE, bParam = FALSE;
 
-	strLine.TrimLeft(_T(" \t\r\n"));
+	strLine = strLine.TrimLeft(_T(" \t\r\n"));
 
 	if(strLine.Left(1) == _T("\""))
 	{
@@ -706,33 +715,28 @@ C_FN_SHARE int _OpenLocalFile(LPCTSTR szFile, int nMode)
 
 BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD dwBufLen)
 {
-	CString strSample;
-	CString strFilter;
-
 	ASSERT(lpSuffix != NULL); if(lpSuffix == NULL) return FALSE;
 	ASSERT(lpStoreBuf != NULL); if(lpStoreBuf == NULL) return FALSE;
 	ASSERT(dwBufLen != 0); if(dwBufLen == 0) return FALSE;
 
-	strSample = _T("*.");
+	CString strSample = _T("*.");
 	strSample += lpSuffix;
 
-	strFilter = TRL("All Files");
+	CString strFilter = TRL("All Files");
 	strFilter += _T(" (*.*)|*.*||");
 
 	DWORD dwFlags = 0;
 	if(bOpenMode == FALSE)
 	{
-		dwFlags |= OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+		dwFlags |= (OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT);
 		dwFlags |= OFN_EXTENSIONDIFFERENT;
-		// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
-		dwFlags |= 0x00080000 | 0x00800000 | OFN_NOREADONLYRETURN;
+		dwFlags |= (OFN_EXPLORER | OFN_ENABLESIZING | OFN_NOREADONLYRETURN);
 	}
 	else
 	{
-		dwFlags |= OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
-		// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
-		dwFlags |= 0x00080000 | 0x00800000;
-		dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+		dwFlags |= (OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT);
+		dwFlags |= (OFN_EXPLORER | OFN_ENABLESIZING);
+		dwFlags |= (OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY);
 	}
 
 	CFileDialog dlg(bOpenMode, lpSuffix, strSample, dwFlags, strFilter, NULL);
@@ -798,8 +802,7 @@ std::vector<std::basic_string<TCHAR> > WU_GetFileNames(BOOL bOpenMode,
 		}
 	}
 
-	if((bNoChangeDir == TRUE) && (strDir.size() > 0))
-		::SetCurrentDirectory(strDir.c_str());
+	if(bNoChangeDir == TRUE) WU_SetCurrentDirectory(strDir.c_str());
 
 	return v;
 }
@@ -1108,11 +1111,11 @@ BOOL WU_IsAbsolutePath(LPCTSTR lpPath)
 	return FALSE;
 }
 
-void WU_FillPlaceholders(CString* pString)
+void WU_FillPlaceholders(CString* pString, const SPR_CONTENT_FLAGS* pcf)
 {
 	ASSERT(pString != NULL); if(pString == NULL) return;
 
-	AppLocator::FillPlaceholders(pString);
+	AppLocator::FillPlaceholders(pString, pcf);
 }
 
 BOOL WU_FlushStorageBuffers(TCHAR tchDriveLetter, BOOL bOnlyIfRemovable)
@@ -1148,7 +1151,7 @@ BOOL WU_FlushStorageBuffers(TCHAR tchDriveLetter, BOOL bOnlyIfRemovable)
 	}
 	else bResult = FALSE;
 
-	if(strDir.size() > 0) { VERIFY(SetCurrentDirectory(strDir.c_str())); }
+	WU_SetCurrentDirectory(strDir.c_str());
 
 	VERIFY(CloseHandle(hDevice));
 	return bResult;
@@ -1178,6 +1181,14 @@ std::basic_string<TCHAR> WU_GetCurrentDirectory()
 	return std::basic_string<TCHAR>(tszDir);
 }
 
+void WU_SetCurrentDirectory(LPCTSTR lpDirectory)
+{
+	if(lpDirectory == NULL) { ASSERT(FALSE); return; }
+	if(lpDirectory[0] == 0) return;
+
+	VERIFY(SetCurrentDirectory(lpDirectory));
+}
+
 std::basic_string<TCHAR> WU_FreeDriveIfCurrent(TCHAR tchDriveLetter)
 {
 	std::basic_string<TCHAR> strEmpty;
@@ -1195,7 +1206,7 @@ std::basic_string<TCHAR> WU_FreeDriveIfCurrent(TCHAR tchDriveLetter)
 	if(GetTempPath(SI_REGSIZE - 1, tszTemp) == 0) { ASSERT(FALSE); return strEmpty; }
 	VERIFY(WU_CreateDirectoryTree(tszTemp));
 
-	VERIFY(SetCurrentDirectory(tszTemp));
+	WU_SetCurrentDirectory(&tszTemp[0]);
 	return strDir;
 }
 
@@ -1315,3 +1326,23 @@ BOOL WU_CreateDirectoryTree(LPCTSTR lpDirPath)
 	inputClick.mi.dwExtraInfo = GetMessageExtraInfo();
 	VERIFY(SendInput(1, &inputClick, sizeof(INPUT)) == 1);
 } */
+
+bool WU_IsCommandLineURL(const CString& strURL)
+{
+	const int nLength = strURL.GetLength();
+
+	if(nLength >= 6)
+	{
+		CString strTemp = strURL.Left(6);
+		strTemp = strTemp.MakeLower();
+
+		if(strTemp == _T("cmd://")) return true;
+	}
+
+	if(nLength >= 2)
+	{
+		if(strURL.Left(2) == _T("\\\\")) return true; // UNC path support
+	}
+
+	return false;
+}

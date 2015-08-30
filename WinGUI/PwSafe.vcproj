@@ -2908,6 +2908,26 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="SprEngine"
+				>
+				<File
+					RelativePath=".\Util\SprEngine\SprEncoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Util\SprEngine\SprEncoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Util\SprEngine\SprEngine.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Util\SprEngine\SprEngine.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="NewGUI"

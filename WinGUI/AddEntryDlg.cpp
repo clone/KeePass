@@ -142,6 +142,7 @@ BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	ON_COMMAND(ID_URLFIELD_INS_IE, &CAddEntryDlg::OnUrlFieldInsIE)
 	ON_COMMAND(ID_URLFIELD_INS_FIREFOX, &CAddEntryDlg::OnUrlFieldInsFirefox)
 	ON_COMMAND(ID_URLFIELD_INS_OPERA, &CAddEntryDlg::OnUrlFieldInsOpera)
+	ON_COMMAND(ID_POPUP_AUTOTYPE_INSERTDEFAULT, &CAddEntryDlg::OnAutoTypeInsertDefaultSequence)
 	ON_COMMAND(ID_POPUP_AUTOTYPE_SELTARGET, &CAddEntryDlg::OnAutoTypeSelectTargetWindow)
 	ON_COMMAND(ID_INSERTFIELDREFERENCE_INTITLEFIELD, &CAddEntryDlg::OnInsertFieldReferenceInTitleField)
 	ON_COMMAND(ID_INSERTFIELDREFERENCE_INUSERNAMEFIELD, &CAddEntryDlg::OnInsertFieldReferenceInUserNameField)
@@ -718,19 +719,14 @@ BOOL CAddEntryDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 
 void CAddEntryDlg::OnSetAttachBtn() 
 {
-	DWORD dwFlags;
-	CString strFilter;
-
 	UpdateData(TRUE);
 
-	strFilter = TRL("All Files");
+	CString strFilter = TRL("All Files");
 	strFilter += _T(" (*.*)|*.*||");
 
-	dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
-	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
-	dwFlags |= 0x00080000 | 0x00800000;
-	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	
+	const DWORD dwFlags = (OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT | OFN_EXPLORER |
+		OFN_ENABLESIZING | OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY);
+
 	CFileDialog dlg(TRUE, NULL, NULL, dwFlags, strFilter, this);
 	if(dlg.DoModal() == IDOK)
 	{
@@ -1056,6 +1052,7 @@ void CAddEntryDlg::OnBnClickedEntryToolsBtn()
 	VERIFY(NewGUI_SetIcon(menu, ID_POPUP_URLFIELDFEATURES, IDB_TB_ABOUT));
 	VERIFY(NewGUI_SetIcon(menu, ID_URLFIELD_INS_USERNAME, IDB_TB_COPYUSER));
 	VERIFY(NewGUI_SetIcon(menu, ID_URLFIELD_INS_PASSWORD, IDB_TB_COPYPW));
+	VERIFY(NewGUI_SetIcon(menu, ID_POPUP_AUTOTYPE_INSERTDEFAULT, IDB_AUTOTYPE));
 	VERIFY(NewGUI_SetIcon(menu, ID_POPUP_AUTOTYPE_SELTARGET, IDB_WINPROPS_SMALL));
 
 	BCMenu *pSub = NewGUI_GetBCMenu(menu.GetSubMenu(0));
@@ -1065,6 +1062,7 @@ void CAddEntryDlg::OnBnClickedEntryToolsBtn()
 	if(CPwSafeDlg::m_bMiniMode == TRUE)
 	{
 		NewGUI_RemoveMenuCommand(pSub, ID_POPUP_AUTOTYPE);
+		NewGUI_RemoveMenuCommand(pSub, ID_POPUP_AUTOTYPE_INSERTDEFAULT);
 		NewGUI_RemoveMenuCommand(pSub, ID_POPUP_AUTOTYPE_SELTARGET);
 
 		NewGUI_RemoveInvalidSeparators(pSub, FALSE);
@@ -1191,6 +1189,14 @@ BOOL CALLBACK _Lcl_AED_EnumWindowsProc(HWND hWnd, LPARAM lParam)
 	return TRUE;
 }
 
+void CAddEntryDlg::OnAutoTypeInsertDefaultSequence()
+{
+	CString strNew = _T("Auto-Type: ");
+	strNew += CPwSafeDlg::m_strDefaultAutoTypeSequence;
+
+	NewGUI_AppendToRichEditCtrl(&m_reNotes, strNew, true);
+}
+
 void CAddEntryDlg::OnAutoTypeSelectTargetWindow()
 {
 	std::vector<std::basic_string<TCHAR> > vWindows;
@@ -1208,16 +1214,8 @@ void CAddEntryDlg::OnAutoTypeSelectTargetWindow()
 	{
 		CString strNew = _T("Auto-Type-Window: ");
 		strNew += dlg.GetEnteredText();
-		strNew += _T("\r\n");
 
-		CString strText;
-		m_reNotes.GetWindowText(strText);
-		if(strText.GetLength() > 0) strNew += _T("\r\n");
-
-		strNew += strText;
-
-		m_reNotes.SetRTF(CString(), SF_TEXT); // Force scrolling
-		m_reNotes.SetRTF(strNew, SF_TEXT);
+		NewGUI_AppendToRichEditCtrl(&m_reNotes, strNew, true);
 	}
 }
 
@@ -1312,13 +1310,8 @@ void CAddEntryDlg::OnInsertFieldReferenceInUrlField()
 
 void CAddEntryDlg::OnInsertFieldReferenceInNotesField()
 {
-	CString str;
-	m_reNotes.GetWindowText(str);
-
 	CString strNew = GetEntryFieldRef();
-
-	if(str.GetLength() > 0) m_reNotes.SetWindowText(str + CString(_T("\r\n")) + strNew);
-	else m_reNotes.SetWindowText(strNew);
+	NewGUI_AppendToRichEditCtrl(&m_reNotes, strNew, true);
 }
 
 #pragma warning(pop)

@@ -31,6 +31,7 @@ COptionsAutoTypeDlg::COptionsAutoTypeDlg(CWnd* pParent /*=NULL*/)
 	, m_bAlternative(FALSE)
 	, m_strDefaultSeq(_T(""))
 	, m_bIEFix(FALSE)
+	, m_bSortAutoTypeSelItems(TRUE)
 {
 }
 
@@ -52,6 +53,8 @@ void COptionsAutoTypeDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDOK, m_btnOK);
 	DDX_Control(pDX, IDCANCEL, m_btnCancel);
 	DDX_Control(pDX, IDC_HOTKEY_AUTOTYPE, m_hkAutoType);
+	DDX_Control(pDX, IDC_CHECK_SORTATITEMS, m_cbSortATItems);
+	DDX_Check(pDX, IDC_CHECK_SORTATITEMS, m_bSortAutoTypeSelItems);
 }
 
 BEGIN_MESSAGE_MAP(COptionsAutoTypeDlg, CDialog)
@@ -100,6 +103,7 @@ void COptionsAutoTypeDlg::EnableChildControls()
 	m_tbDefaultSeq.EnableWindow(bActive);
 	m_cbIEFix.EnableWindow(bActive);
 	m_hkAutoType.EnableWindow(bActive);
+	m_cbSortATItems.EnableWindow(bActive);
 
 	m_btnOK.EnableWindow((m_strDefaultSeq.GetLength() > 0) ? TRUE : FALSE);
 }

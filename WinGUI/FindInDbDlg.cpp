@@ -35,6 +35,7 @@ static char THIS_FILE[] = __FILE__;
 CFindInDbDlg::CFindInDbDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CFindInDbDlg::IDD, pParent),
 	m_bRegex(FALSE)
+	, m_bExcludeExpired(FALSE)
 {
 	//{{AFX_DATA_INIT(CFindInDbDlg)
 	m_bAdditional = TRUE;
@@ -67,6 +68,7 @@ void CFindInDbDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_GROUPNAME, m_bGroupName);
 	DDX_Check(pDX, IDC_CHECK_EXCLUDEBACKUPS, m_bExcludeBackups);
 	DDX_Check(pDX, IDC_CHECK_REGEX, m_bRegex);
+	DDX_Check(pDX, IDC_CHECK_EXCLUDEEXPIRED, m_bExcludeExpired);
 	//}}AFX_DATA_MAP
 }
 

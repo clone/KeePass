@@ -70,6 +70,8 @@ public:
 	CXPStyleButtonST m_btnOK;
 	CXPStyleButtonST m_btnCancel;
 	CHotKeyCtrl m_hkAutoType;
+	CButton m_cbSortATItems;
+	BOOL m_bSortAutoTypeSelItems;
 
 private:
 	void EnableChildControls();

@@ -749,14 +749,15 @@ void CPasswordDlg::OnBnClickedBrowseKeyFile()
 	CString strFilter = TRL("All Files");
 	strFilter += _T(" (*.*)|*.*||");
 
-	DWORD dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
-	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
-	dwFlags |= 0x00080000 | 0x00800000;
+	DWORD dwFlags = (OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT | OFN_EXPLORER |
+		OFN_ENABLESIZING);
 
 	if(m_bLoadMode == TRUE)
-		dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+		dwFlags |= (OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY);
 	else
 		dwFlags |= OFN_HIDEREADONLY;
+
+	std::basic_string<TCHAR> strDir = WU_GetCurrentDirectory();
 
 	CFileDialog dlg(m_bLoadMode, NULL, NULL, dwFlags, strFilter, this);
 	if(dlg.DoModal() == IDOK)
@@ -771,12 +772,13 @@ void CPasswordDlg::OnBnClickedBrowseKeyFile()
 		cbi.cchTextMax = static_cast<int>(_tcslen(cbi.pszText));
 		cbi.iImage = cbi.iSelectedImage = 28;
 		cbi.iIndent = 0;
-		int nx = m_cbDiskList.InsertItem(&cbi);
+		const int nx = m_cbDiskList.InsertItem(&cbi);
 
 		// m_cbDiskList.SelectString(-1, (LPCTSTR)strFile);
 		m_cbDiskList.SetCurSel(nx);
 	}
 
+	WU_SetCurrentDirectory(strDir.c_str());
 	UpdateData(FALSE);
 }
 

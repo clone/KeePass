@@ -25,6 +25,8 @@
 
 #include <boost/utility.hpp>
 
+#include "SprEngine/SprEngine.h"
+
 class AppLocator : boost::noncopyable
 {
 private:
@@ -32,7 +34,7 @@ private:
 	~AppLocator();
 
 public:
-	static void FillPlaceholders(CString* pString);
+	static void FillPlaceholders(CString* pString, const SPR_CONTENT_FLAGS* pcf);
 
 private:
 	static void GetPaths();

@@ -1,6 +1,7 @@
 ; KeePass Password Safe Installation Script
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 ; Thanks to Lubos Stanek for creating a template for this installer.
+; Thanks to Hilbrand Edskes for installer improvements.
 
 #define MyAppName "KeePass"
 #define MyAppFullName "KeePass Password Safe"
@@ -10,8 +11,8 @@
 #define MyAppUrlName "KeePass.url"
 #define MyAppHelpName "KeePass.chm"
 
-#define KeeVersionStr "1.12"
-#define KeeVersionWin "1.1.2.0"
+#define KeeVersionStr "1.13"
+#define KeeVersionWin "1.1.3.0"
 
 #define KeeDevPeriod "2003-2008"
 

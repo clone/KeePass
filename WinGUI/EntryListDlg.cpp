@@ -89,7 +89,7 @@ BOOL CEntryListDlg::OnInitDialog()
 	m_banner.SetCaption(m_strBannerCaption);
 
 	CString strWindowText = m_strBannerTitle;
-	if(m_nDisplayMode == ELDMODE_LIST) strWindowText = PWM_PRODUCT_NAME;
+	if(m_nDisplayMode == ELDMODE_LIST_ATITEMS) strWindowText = PWM_PRODUCT_NAME;
 	SetWindowText(strWindowText);
 
 	m_cList.SetImageList(m_pImgList, LVSIL_SMALL);
@@ -97,7 +97,7 @@ BOOL CEntryListDlg::OnInitDialog()
 	int nColWidth = 160;
 	int aColWidths[5];
 
-	if(m_nDisplayMode != ELDMODE_LIST)
+	if(m_nDisplayMode != ELDMODE_LIST_ATITEMS)
 	{
 		aColWidths[0] = nColWidth / 2 + 37;
 		aColWidths[1] = nColWidth - 8 - 6;
@@ -105,7 +105,7 @@ BOOL CEntryListDlg::OnInitDialog()
 		aColWidths[3] = nColWidth / 2;
 		aColWidths[4] = nColWidth / 2;
 	}
-	else
+	else // ELDMODE_LIST_ATITEMS
 	{
 		aColWidths[0] = nColWidth / 2 + 37;
 		aColWidths[1] = nColWidth - 8 + 50 - 6;
@@ -129,7 +129,7 @@ BOOL CEntryListDlg::OnInitDialog()
 	PW_ENTRY *p;
 	DWORD i;
 
-	if(m_nDisplayMode == ELDMODE_LIST)
+	if(m_nDisplayMode == ELDMODE_LIST_ATITEMS)
 	{
 		GetDlgItem(IDC_STATIC_LISTTEXT)->SetWindowText(TRL("Click on an entry to auto-type it."));
 		m_btClose.SetWindowText(TRL("&Cancel"));
@@ -201,9 +201,9 @@ BOOL CEntryListDlg::OnInitDialog()
 		}
 	}
 
-	if(m_nDisplayMode == ELDMODE_LIST)
+	if(m_nDisplayMode == ELDMODE_LIST_ATITEMS)
 	{
-		NewGUI_SortList(&m_cList);
+		if(CPwSafeDlg::m_bSortAutoTypeSelItems == TRUE) NewGUI_SortList(&m_cList);
 
 		if(m_cList.GetItemCount() != 0)
 			m_cList.SetItemState(0, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);

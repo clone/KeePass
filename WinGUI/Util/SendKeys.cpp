@@ -251,7 +251,7 @@ void CSendKeys::SendKeyDown(BYTE VKey, WORD NumTimes, bool GenUpMsg, bool bDelay
         else */
         {
           KEYBOARDSTATE_t KeyboardState;
-          NumState = GetKeyState(VK_NUMLOCK) & 1 ? true : false;
+          NumState = ((GetKeyState(VK_NUMLOCK) & 1) ? true : false);
           GetKeyboardState(&KeyboardState[0]);
           if (NumState)
             KeyboardState[VK_NUMLOCK] &= ~1;
@@ -458,6 +458,7 @@ bool CSendKeys::SendKeys(LPCTSTR KeysString, bool Wait)
         {
           p = KeyString + 4;
           MKey = (WORD)_ttoi(p);
+		  NumTimes = 1;
         }
         else if (_tcsnicmp(KeyString, _T("BEEP"), 4) == 0)
         {

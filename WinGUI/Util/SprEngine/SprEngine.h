@@ -17,17 +17,25 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___KEEPASS_LIBRARY_API_H___
-#define ___KEEPASS_LIBRARY_API_H___
+#ifndef ___SPR_ENGINE_H___
+#define ___SPR_ENGINE_H___
 
-#include "APIDefEx.h"
+#pragma once
 
-// Library build number (independent of underlying KeePass version)
-#define KEEPASS_LIBRARY_BUILD 0x0000004F
+#include "../../../KeePassLibCpp/PwManager.h"
 
-KP_SHARE DWORD GetKeePassVersion();
-KP_SHARE LPCTSTR GetKeePassVersionString();
+#define SPRE_MAX_DEPTH     12
+#define SPRE_MAX_PATH_LEN 512
 
-KP_SHARE DWORD GetLibraryBuild();
+typedef struct _SPR_CONTENT_FLAGS
+{
+	bool bMakeAutoTypeSequence;
+	bool bMakeCmdQuotes;
+} SPR_CONTENT_FLAGS;
 
-#endif
+CString SprCompile(LPCTSTR lpText, bool bIsAutoTypeSequence, PW_ENTRY* pEntry,
+	CPwManager* pDatabase, bool bEscapeForAutoType, bool bEscapeQuotesForCommandLine);
+
+CString SprTransformContent(LPCTSTR lpContent, const SPR_CONTENT_FLAGS* pcf);
+
+#endif // ___SPR_ENGINE_H___

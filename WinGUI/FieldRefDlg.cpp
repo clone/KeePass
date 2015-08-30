@@ -221,7 +221,7 @@ void CFieldRefDlg::OnBnClickedOk()
 	if((strId.Find(_T('{')) >= 0) || (strId.Find(_T('}')) >= 0) ||
 		(strId.Find(_T('\r')) >= 0) || (strId.Find(_T('\n')) >= 0))
 	{
-		MessageBox(TRL("The selected field, that identifies the source entry, contains disallowed characters (like '{', '}', newline characters, ...)."),
+		MessageBox(TRL("The selected field, which identifies the source entry, contains illegal characters (like '{', '}', newline characters, ...)."),
 			PWM_PRODUCT_NAME_SHORT, MB_ICONWARNING | MB_OK);
 		return;
 	}

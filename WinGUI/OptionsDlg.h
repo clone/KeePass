@@ -66,6 +66,7 @@ public:
 	DWORD m_dwATHotKey;
 	CString m_strDefaultAutoTypeSequence;
 	BOOL m_bAutoTypeIEFix;
+	BOOL m_bSortAutoTypeSelItems;
 
 	static void NotifyAssocChanged();
 
@@ -84,6 +85,7 @@ public:
 	BOOL m_bSingleInstance;
 	BOOL m_bSingleClickTrayIcon;
 	BOOL m_bQuickFindIncBackup;
+	BOOL m_bQuickFindIncExpired;
 	BOOL m_bMinimizeBeforeAT;
 	BOOL m_bDeleteBackupsOnSave;
 	BOOL m_bShowFullPath;
@@ -99,6 +101,7 @@ public:
 	BOOL m_bFocusResAfterQuickFind;
 	BOOL m_bAlwaysAllowIpc;
 	BOOL m_bDropToBackOnCopy;
+	BOOL m_bClearClipOnDbClose;
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };

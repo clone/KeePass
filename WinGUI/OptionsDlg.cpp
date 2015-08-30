@@ -235,7 +235,9 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Use local date/time format instead of ISO notation"), &m_bUseLocalTimeFormat, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Register Ctrl-Alt-K hot key (brings the KeePass window to front)"), &m_bRegisterRestoreHotKey, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Include backup entries in quick searches (toolbar)"), &m_bQuickFindIncBackup, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Include expired entries in quick searches (toolbar)"), &m_bQuickFindIncExpired, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Focus entry list after a successful quick search (toolbar)"), &m_bFocusResAfterQuickFind, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Clear clipboard when closing/locking the database"), &m_bClearClipOnDbClose, NULL, OL_LINK_NULL);
 
 	AddTcItem(TRL(OPTSZ_SECURITY), 29);
 	AddTcItem(TRL(OPTSZ_GUI), 6);
@@ -489,6 +491,7 @@ void COptionsDlg::OnBtnAutoType()
 	dlg.m_dwATHotKey = m_dwATHotKey;
 	dlg.m_strDefaultAutoTypeSequence = m_strDefaultAutoTypeSequence;
 	dlg.m_bAutoTypeIEFix = m_bAutoTypeIEFix;
+	dlg.m_bSortAutoTypeSelItems = m_bSortAutoTypeSelItems;
 
 	if(dlg.DoModal() == IDOK)
 	{
@@ -497,5 +500,6 @@ void COptionsDlg::OnBtnAutoType()
 		m_dwATHotKey = dlg.m_dwATHotKey;
 		m_strDefaultAutoTypeSequence = dlg.m_strDefaultAutoTypeSequence;
 		m_bAutoTypeIEFix = dlg.m_bAutoTypeIEFix;
+		m_bSortAutoTypeSelItems = ((dlg.m_bSortAutoTypeSelItems == FALSE) ? FALSE : TRUE);
 	}
 }

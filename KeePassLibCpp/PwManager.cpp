@@ -36,7 +36,7 @@ static PW_TIME g_pwTimeNever = { 2999, 12, 28, 23, 59, 59 };
 static char g_pNullString[4] = { 0, 0, 0, 0 };
 
 #ifdef _UNICODE
-// #error Unicode builds are not supported. Switch to ANSI configuration.
+#pragma message("Unicode builds are not supported. It is recommended to switch to ANSI configuration.")
 #endif
 
 CPwManager::CPwManager()

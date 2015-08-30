@@ -520,7 +520,7 @@ LPCTSTR CPwSafeApp::GetPasswordFont()
 BOOL CPwSafeApp::ProcessControlCommands()
 {
 	CString strCmdLine = (LPCTSTR)GetCommandLine();
-	strCmdLine.Trim(_T("\"' \t\r\n\\$%"));
+	strCmdLine = strCmdLine.Trim(_T("\"' \t\r\n\\$%"));
 	strCmdLine = strCmdLine.MakeLower();
 
 	if(strCmdLine.GetLength() >= 6)

@@ -191,17 +191,27 @@ C_FN_SHARE void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 		BYTE bt;
 		if((ch >= _T('0')) && (ch <= _T('9')))
 			bt = static_cast<BYTE>(ch - _T('0'));
-		else
+		else if((ch >= _T('a')) && (ch <= _T('f')))
 			bt = static_cast<BYTE>(ch - _T('a') + 0x0A);
-		ASSERT(bt < 0x10);
+		else
+		{
+			ASSERT((ch >= _T('A')) && (ch <= _T('F')));
+			bt = static_cast<BYTE>(ch - _T('A') + 0x0A);
+		}
+		
 		bt <<= 4;
 
 		ch = ptszSource[(i << 1) + 1];
 
 		if((ch >= _T('0')) && (ch <= _T('9')))
 			bt |= static_cast<BYTE>(ch - _T('0'));
-		else
+		else if((ch >= _T('a')) && (ch <= _T('f')))
 			bt |= static_cast<BYTE>(ch - _T('a') + 0x0A);
+		else
+		{
+			ASSERT((ch >= _T('A')) && (ch <= _T('F')));
+			bt |= static_cast<BYTE>(ch - _T('A') + 0x0A);
+		}
 
 		pUuid[i] = bt;
 	}
@@ -209,7 +219,7 @@ C_FN_SHARE void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 
 // If pReferenceSource is not NULL, it'll be used to dereference
 // lpReplaceWith before replacing lpFind
-BOOL SeqReplace(CString& str, LPCTSTR lpFind, LPCTSTR lpReplaceWith,
+/* BOOL SeqReplace(CString& str, LPCTSTR lpFind, LPCTSTR lpReplaceWith,
 	BOOL bMakeSimString, BOOL bCmdQuotes, BOOL bRemoveMeta, PW_ENTRY* peEntryInfo,
 	CPwManager* pReferenceSource, DWORD dwRecursionLevel)
 {
@@ -261,9 +271,9 @@ BOOL SeqReplace(CString& str, LPCTSTR lpFind, LPCTSTR lpReplaceWith,
 	}
 
 	return bReplaced;
-}
+} */
 
-void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes,
+/* void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes,
 	CPwManager* pDataSource, DWORD dwRecursionLevel)
 {
 	ASSERT(pString != NULL); if(pString == NULL) return;
@@ -288,9 +298,11 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 			bCmdQuotes, FALSE, pEntry, pDataSource, dwRecursionLevel);
 
 		pDataSource->UnlockEntryPassword(pEntry);
-		b |= SeqReplace(str, _T("{PASSWORD}"), pEntry->pszPassword, bMakeSimString,
-			bCmdQuotes, FALSE, pEntry, pDataSource, dwRecursionLevel);
+		CString strPwCopy = pEntry->pszPassword;
 		pDataSource->LockEntryPassword(pEntry);
+		b |= SeqReplace(str, _T("{PASSWORD}"), strPwCopy, bMakeSimString,
+			bCmdQuotes, FALSE, pEntry, pDataSource, dwRecursionLevel);
+		EraseCString(&strPwCopy);
 
 		CString strNotes = ((pEntry->pszAdditional != NULL) ? pEntry->pszAdditional : _T(""));
 		strNotes = CsRemoveMeta(&strNotes);
@@ -318,7 +330,7 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 
 			if(uch > 0x7E)
 			{
-				str += _T("(%{NUMPAD0}");
+				str += _T("%({NUMPAD0}");
 
 				CString strTemp;
 				strTemp.Format(_T("%u"), uch);
@@ -338,9 +350,9 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 	}
 
 	*pString = str;
-}
+} */
 
-BOOL FillRefPlaceholders(CString& str, BOOL bMakeSimString, BOOL bCmdQuotes,
+/* BOOL FillRefPlaceholders(CString& str, BOOL bMakeSimString, BOOL bCmdQuotes,
 	CPwManager* pDataSource, DWORD dwRecursionLevel)
 {
 	ASSERT(pDataSource != NULL); if(pDataSource == NULL) return FALSE;
@@ -412,7 +424,7 @@ BOOL FillRefPlaceholders(CString& str, BOOL bMakeSimString, BOOL bCmdQuotes,
 	}
 
 	return bReplaced;
-}
+} */
 
 CString CsRemoveMeta(CString *psString)
 {
@@ -599,40 +611,7 @@ CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart,
 		}
 	}
 
-	str.Trim();
-	return str;
-}
-
-CString TagSimString(LPCTSTR lpString)
-{
-	CString str;
-
-	ASSERT(lpString != NULL); if(lpString == NULL) return str;
-
-	for(int i = 0; i < (int)_tcslen(lpString); ++i)
-	{
-		const TCHAR tch = lpString[i];
-
-		switch(tch)
-		{
-			case _T('+'): str += _T("{PLUS}"); break;
-			case _T('@'): str += _T("{AT}"); break;
-			// case _T('~'): str += _T("{TILDE}"); break;
-			case _T('~'): str += _T("(%{NUMPAD0}{NUMPAD1}{NUMPAD2}{NUMPAD6})"); break;
-			case _T('^'): str += _T("(%{NUMPAD0}{NUMPAD9}{NUMPAD4})"); break;
-			case _T('\''): str += _T("(%{NUMPAD0}{NUMPAD3}{NUMPAD9})"); break;
-			case _T('"'): str += _T("(%{NUMPAD0}{NUMPAD3}{NUMPAD4})"); break;
-			case _T('´'): str += _T("(%{NUMPAD0}{NUMPAD1}{NUMPAD8}{NUMPAD0})"); break;
-			case _T('`'): str += _T("(%{NUMPAD0}{NUMPAD9}{NUMPAD6})"); break;
-			case _T('%'): str += _T("{PERCENT}"); break;
-			case _T('{'): str += _T("{LEFTBRACE}"); break;
-			case _T('}'): str += _T("{RIGHTBRACE}"); break;
-			case _T('('): str += _T("{LEFTPAREN}"); break;
-			case _T(')'): str += _T("{RIGHTPAREN}"); break;
-			default: str += tch; break;
-		}
-	}
-
+	str = str.Trim();
 	return str;
 }
 
@@ -670,7 +649,7 @@ TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource)
 	}
 	else
 	{
-		size_t sizeNewBuffer = _tcslen(tszSource) + 1;
+		const size_t sizeNewBuffer = _tcslen(tszSource) + 1;
 		ptsz = new TCHAR[sizeNewBuffer];
 		if(ptsz != NULL) _tcscpy_s(ptsz, sizeNewBuffer, tszSource); // Clone
 	}
@@ -765,10 +744,39 @@ WCharStream::WCharStream(LPCWSTR lpData)
 
 WCHAR WCharStream::ReadChar()
 {
-	WCHAR tValue = m_lpData[m_dwPosition];
+	const WCHAR tValue = m_lpData[m_dwPosition];
 
 	if(tValue == 0) return 0;
 
 	++m_dwPosition;
 	return tValue;
+}
+
+CStringBuilderEx::CStringBuilderEx()
+{
+}
+
+void CStringBuilderEx::Append(TCHAR tch)
+{
+	m_vBuf.push_back(tch);
+}
+
+void CStringBuilderEx::Append(LPCTSTR lpString)
+{
+	ASSERT(lpString != NULL); if(lpString == NULL) return;
+
+	DWORD i = 0;
+	while(lpString[i] != 0)
+	{
+		m_vBuf.push_back(lpString[i]);
+		++i;
+	}
+}
+
+std::basic_string<TCHAR> CStringBuilderEx::ToString() const
+{
+	std::vector<TCHAR> vCopy(m_vBuf);
+	vCopy.push_back(0);
+
+	return std::basic_string<TCHAR>(&vCopy[0]);
 }

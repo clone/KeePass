@@ -41,6 +41,7 @@
 #include "Util/CmdLine/Executable.h"
 #include "Util/UpdateCheck.h"
 #include "Util/RestartManagerEx.h"
+#include "Util/SprEngine/SprEngine.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "NewGUI/XHyperLink.h"
 #include "NewGUI/XPStyleButtonST.h"
@@ -91,12 +92,15 @@ BOOL CPwSafeDlg::m_bUnintrusiveMiniMode = FALSE;
 BOOL CPwSafeDlg::m_bSecureEdits = TRUE;
 BOOL CPwSafeDlg::m_bUseLocalTimeFormat = TRUE;
 BOOL CPwSafeDlg::m_bDisableUnsafeAtStart = FALSE;
+BOOL CPwSafeDlg::m_bSortAutoTypeSelItems = TRUE;
+
+PW_GEN_SETTINGS_EX CPwSafeDlg::m_pgsAutoProfile;
+
+CString CPwSafeDlg::m_strDefaultAutoTypeSequence;
 
 const UINT WM_REG_TASKBARCREATED = ::RegisterWindowMessage(_T("TaskbarCreated"));
 const UINT WM_REG_PROCESSMAILSLOT = ::RegisterWindowMessage(_T("KeePassProcessMailslot"));
 const UINT WM_REG_KEEPASSCONTROL = ::RegisterWindowMessage(_T("KeePassControl"));
-
-PW_GEN_SETTINGS_EX CPwSafeDlg::m_pgsAutoProfile;
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -187,6 +191,8 @@ CPwSafeDlg::CPwSafeDlg(CWnd* pParent /*=NULL*/)
 	//{{AFX_DATA_INIT(CPwSafeDlg)
 	//}}AFX_DATA_INIT
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	m_pThemeHelper = NULL;
 
 	m_bExiting = FALSE;
 	m_bIsLocking = FALSE;
@@ -789,6 +795,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bSecureEdits = cConfig.GetBool(PWMKEY_SECUREEDITS, TRUE);
 	m_bSingleClickTrayIcon = cConfig.GetBool(PWMKEY_SINGLECLICKTRAY, FALSE);
 	m_bQuickFindIncBackup = cConfig.GetBool(PWMKEY_QUICKFINDINCBK, TRUE);
+	m_bQuickFindIncExpired = cConfig.GetBool(PWMKEY_QUICKFINDINCEXP, TRUE);
 	m_bDeleteBackupsOnSave = cConfig.GetBool(PWMKEY_DELETEBKONSAVE, FALSE);
 	m_bDisableAutoType = cConfig.GetBool(PWMKEY_DISABLEAUTOTYPE, FALSE);
 	m_bCopyURLs = cConfig.GetBool(PWMKEY_COPYURLS, FALSE);
@@ -797,6 +804,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bFocusResAfterQuickFind = cConfig.GetBool(PWMKEY_FOCUSRESAFTERQUICKFIND, FALSE);
 	m_bAutoTypeIEFix = cConfig.GetBool(PWMKEY_AUTOTYPEIEFIX, TRUE);
 	m_bDropToBackOnCopy = cConfig.GetBool(PWMKEY_DROPTOBACKONCOPY, FALSE);
+	m_bSortAutoTypeSelItems = cConfig.GetBool(PWMKEY_SORTAUTOTYPESELITEMS, TRUE);
 
 	m_bShowToolBar = cConfig.GetBool(PWMKEY_SHOWTOOLBAR, TRUE);
 	m_bShowFullPath = cConfig.GetBool(PWMKEY_SHOWFULLPATH, FALSE);
@@ -806,6 +814,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 
 	m_bCheckForUpdate = cConfig.GetBool(PWMKEY_CHECKFORUPDATE, FALSE);
 	m_bLockOnWinLock = cConfig.GetBool(PWMKEY_LOCKONWINLOCK, FALSE);
+	m_bClearClipOnDbClose = cConfig.GetBool(PWMKEY_CLEARCLIPONDBCLOSE, TRUE);
 
 	m_remoteControl.InitStatic(&m_mgr, this->m_hWnd);
 	m_remoteControl.SetAlwaysAllowFullAccess(cConfig.GetBool(PWMKEY_ALWAYSALLOWIPC, FALSE));
@@ -1095,7 +1104,6 @@ BOOL CPwSafeDlg::OnInitDialog()
 	NewGUI_SetHeaderOrder(m_cList.m_hWnd, m_aHeaderOrder, 11);
 
 	m_pThemeHelper = new CThemeHelperST();
-	ASSERT(m_pThemeHelper != NULL);
 	NewGUI_SetThemeHelper((void *)m_pThemeHelper);
 
 	NewGUI_ToolBarButton(&m_btnTbNew, IDB_TB_NEW, IDB_TB_NEW);
@@ -1332,7 +1340,8 @@ BOOL CPwSafeDlg::OnInitDialog()
 
 			if(m_bFileOpen == FALSE)
 			{
-				if(m_bUnintrusiveMiniMode == FALSE) OnFileExit();
+				OnFileExit();
+				return FALSE;
 			}
 			else if(m_strFile.GetLength() == 0)
 				_GetNewDbFileInUserDir(strLoadedIniLastDb, cConfig);
@@ -1567,6 +1576,7 @@ const TCHAR *CPwSafeDlg::_GetCmdAccelExt(const TCHAR *psz)
 	if(_tcsicmp(psz, _T("&Delete Entry")) == 0) return _T("Ctrl+D");
 	if(_tcsicmp(psz, _T("Se&lect All")) == 0) return _T("Ctrl+A");
 	if(_tcsicmp(psz, _T("&Find in Database...")) == 0) return _T("Ctrl+F");
+	if(_tcsicmp(psz, _T("Find in t&his Group...")) == 0) return _T("Ctrl+Shift+F");
 	if(_tcsicmp(psz, _T("Add Password &Group...")) == 0) return _T("Ctrl+G");
 	if(_tcsicmp(psz, _T("Open &URL(s)")) == 0) return _T("Ctrl+U");
 	if(_tcsicmp(psz, _T("Copy &Password to Clipboard")) == 0) return _T("Ctrl+C");
@@ -1999,8 +2009,9 @@ void CPwSafeDlg::CleanUp()
 
 	if(m_nClipboardCountdown >= 0)
 	{
-		ClearClipboardIfOwner();
 		m_nClipboardCountdown = -1; // Disable clipboard clear countdown
+
+		if(m_bClearClipOnDbClose == TRUE) ClearClipboardIfOwner();
 	}
 
 	_DeleteTemporaryFiles();
@@ -2094,6 +2105,7 @@ void CPwSafeDlg::SaveOptions()
 	pcfg.SetBool(PWMKEY_SECUREEDITS, m_bSecureEdits);
 	pcfg.SetBool(PWMKEY_SINGLECLICKTRAY, m_bSingleClickTrayIcon);
 	pcfg.SetBool(PWMKEY_QUICKFINDINCBK, m_bQuickFindIncBackup);
+	pcfg.SetBool(PWMKEY_QUICKFINDINCEXP, m_bQuickFindIncExpired);
 	pcfg.SetBool(PWMKEY_DELETEBKONSAVE, m_bDeleteBackupsOnSave);
 	pcfg.SetBool(PWMKEY_DISABLEAUTOTYPE, m_bDisableAutoType);
 	pcfg.SetBool(PWMKEY_COPYURLS, m_bCopyURLs);
@@ -2101,6 +2113,7 @@ void CPwSafeDlg::SaveOptions()
 	pcfg.SetBool(PWMKEY_FOCUSRESAFTERQUICKFIND, m_bFocusResAfterQuickFind);
 	pcfg.SetBool(PWMKEY_ALWAYSALLOWIPC, m_remoteControl.GetAlwaysAllowFullAccess());
 	pcfg.SetBool(PWMKEY_DROPTOBACKONCOPY, m_bDropToBackOnCopy);
+	pcfg.SetBool(PWMKEY_SORTAUTOTYPESELITEMS, m_bSortAutoTypeSelItems);
 
 	pcfg.SetBool(PWMKEY_SHOWTITLE, m_bShowTitle);
 	pcfg.SetBool(PWMKEY_SHOWUSER, m_bShowUserName);
@@ -2134,6 +2147,7 @@ void CPwSafeDlg::SaveOptions()
 	pcfg.SetBool(PWMKEY_ALLOWSAVEIFMODIFIEDONLY, m_bAllowSaveIfModifiedOnly);
 	pcfg.SetBool(PWMKEY_CHECKFORUPDATE, m_bCheckForUpdate);
 	pcfg.SetBool(PWMKEY_LOCKONWINLOCK, m_bLockOnWinLock);
+	pcfg.SetBool(PWMKEY_CLEARCLIPONDBCLOSE, m_bClearClipOnDbClose);
 	pcfg.SetBool(PWMKEY_ENABLEREMOTECTRL, m_remoteControl.IsEnabled());
 
 	NewGUI_GetHeaderOrder(m_cList.m_hWnd, m_aHeaderOrder, 11);
@@ -2643,28 +2657,27 @@ void CPwSafeDlg::AdjustColumnWidths()
 
 void CPwSafeDlg::_List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEntry, PW_TIME *ptNow)
 {
-	LV_ITEM lvi;
-	DWORD i, t;
-	CString strTemp;
-	DWORD uImageId;
-
 	if((dwInsertPos == DWORD_MAX) && (bIsNewEntry == TRUE))
 		dwInsertPos = static_cast<DWORD>(m_cList.GetItemCount());
 
-	BOOL bIsTAN = CPwUtil::IsTANEntry(pwe);
+	const BOOL bIsTAN = CPwUtil::IsTANEntry(pwe);
 	BOOL bValidTANIndex = TRUE;
 
 	if(bIsTAN == FALSE) m_bTANsOnly = FALSE;
 
+	LV_ITEM lvi;
 	ZeroMemory(&lvi, sizeof(LV_ITEM));
-	lvi.iItem = (int)dwInsertPos;
+	lvi.iItem = static_cast<int>(dwInsertPos);
 	lvi.iSubItem = 0;
 
 	// Set 'expired' image if necessary
+	DWORD uImageId;
 	if(_pwtimecmp(&pwe->tExpire, ptNow) <= 0) uImageId = 45;
 	else uImageId = pwe->uImageId;
 
-	lvi.mask = LVIF_TEXT | LVIF_IMAGE;
+	CString strTemp;
+
+	lvi.mask = (LVIF_TEXT | LVIF_IMAGE);
 	if((m_bShowTitle == TRUE) || (bIsTAN == TRUE))
 	{
 		if((bIsTAN == FALSE) || (m_bShowTANIndices == FALSE))
@@ -2675,7 +2688,7 @@ void CPwSafeDlg::_List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEnt
 
 			if(pwe->pszUserName[0] != 0)
 			{
-				for(i = 0; ; ++i)
+				for(DWORD i = 0; ; ++i)
 				{
 					const TCHAR tch = pwe->pszUserName[i];
 
@@ -2698,8 +2711,8 @@ void CPwSafeDlg::_List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEnt
 			lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strTemp);
 		}
 	}
-	else
-		lvi.pszText = g_pNullString;
+	else lvi.pszText = g_pNullString;
+
 	lvi.iImage = uImageId;
 
 	if(bIsNewEntry == TRUE)
@@ -2714,7 +2727,7 @@ void CPwSafeDlg::_List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEnt
 		// Hide usernames behind ******** if the user has selected this option
 		if(m_bUserStars == TRUE)
 		{
-			lvi.pszText = PWM_PASSWORD_STRING;
+			lvi.pszText = const_cast<LPTSTR>(PWM_PASSWORD_STRING);
 			m_cList.SetItem(&lvi);
 		}
 		else // Don't hide, display them
@@ -2742,7 +2755,7 @@ void CPwSafeDlg::_List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEnt
 		// Hide passwords behind ******** if the user has selected this option
 		if(m_bPasswordStars == TRUE)
 		{
-			lvi.pszText = PWM_PASSWORD_STRING;
+			lvi.pszText = const_cast<LPTSTR>(PWM_PASSWORD_STRING);
 			m_cList.SetItem(&lvi);
 		}
 		else // Don't hide, display them
@@ -2764,9 +2777,11 @@ void CPwSafeDlg::_List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEnt
 	{
 		// Remove newline and break character for better display
 		strTemp = pwe->pszAdditional;
-		for(t = 0; t < (DWORD)strTemp.GetLength(); t++)
+		for(DWORD t = 0; t < (DWORD)strTemp.GetLength(); ++t)
+		{
 			if((strTemp.GetAt(t) == _T('\r')) || (strTemp.GetAt(t) == _T('\n')))
 				strTemp.SetAt(t, _T(' '));
+		}
 		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strTemp);
 	}
 	else
@@ -3436,30 +3451,28 @@ void CPwSafeDlg::OnPwlistCopyPw()
 	if(_CallPlugins(KPM_PW_COPY, 0, 0) == FALSE) { m_bDisplayDialog = FALSE; return; }
 	m_bDisplayDialog = FALSE;
 
-	DWORD dwIndex = _ListSelToEntryIndex();
-	PW_ENTRY *p;
-
+	const DWORD dwIndex = _ListSelToEntryIndex();
 	ASSERT(dwIndex != DWORD_MAX); if(dwIndex == DWORD_MAX) return;
 
-	p = m_mgr.GetEntry(dwIndex);
+	PW_ENTRY *p = m_mgr.GetEntry(dwIndex);
 	ASSERT_ENTRY(p); if(p == NULL) return;
 
 	if(m_nClipboardMethod == CM_TIMED)
 	{
 		m_mgr.UnlockEntryPassword(p);
-		CopyStringToClipboard(p->pszPassword, &m_mgr);
+		CopyStringToClipboard(p->pszPassword, p, &m_mgr);
 		m_mgr.LockEntryPassword(p);
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 
-		m_nClipboardCountdown = (int)m_dwClipboardSecs;
+		m_nClipboardCountdown = static_cast<int>(m_dwClipboardSecs);
 	}
 	else if(m_nClipboardMethod == CM_ENHSECURE)
 	{
 		m_nClipboardState = CLIPBOARD_DELAYED_PASSWORD;
 		MakeClipboardDelayRender(m_hWnd, &m_hwndNextViewer);
 
-		CString str;
-		str = TRL("Field copied to clipboard."); str += _T(" ");
+		CString str = TRL("Field copied to clipboard.");
+		str += _T(" ");
 		str += TRL("Waiting for paste command.");
 		SetStatusTextEx(str);
 	}
@@ -3497,7 +3510,7 @@ void CPwSafeDlg::OnTimer(WPARAM nIDEvent)
 	{
 		if(m_nClipboardCountdown != -1)
 		{
-			m_nClipboardCountdown--;
+			--m_nClipboardCountdown;
 
 			if(m_nClipboardCountdown == -1)
 			{
@@ -3505,9 +3518,7 @@ void CPwSafeDlg::OnTimer(WPARAM nIDEvent)
 				ClearClipboardIfOwner();
 			}
 			else if(m_nClipboardCountdown == 0)
-			{
 				SetStatusTextEx(TRL("Clipboard cleared."));
-			}
 			else
 			{
 				CString str;
@@ -3522,7 +3533,7 @@ void CPwSafeDlg::OnTimer(WPARAM nIDEvent)
 			{
 				if(m_nLockCountdown != 0)
 				{
-					m_nLockCountdown--;
+					--m_nLockCountdown;
 					if(m_nLockCountdown == 0)
 					{
 						if(m_bExitInsteadOfLockAT == FALSE)
@@ -3543,7 +3554,7 @@ void CPwSafeDlg::OnTimer(WPARAM nIDEvent)
 
 		if(m_nFileRelockCountdown != -1)
 		{
-			m_nFileRelockCountdown--;
+			--m_nFileRelockCountdown;
 
 			if(m_nFileRelockCountdown == -1)
 			{
@@ -3595,7 +3606,7 @@ void CPwSafeDlg::OnDblclkPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 	case 4:
 		strData = p->pszAdditional;
 		strData = CsRemoveMeta(&strData);
-		CopyStringToClipboard(strData, &m_mgr);
+		CopyStringToClipboard(strData, p, &m_mgr);
 		EraseCString(&strData);
 		m_nClipboardCountdown = static_cast<int>(m_dwClipboardSecs);
 		SetStatusTextEx(TRL("Field copied to clipboard."));
@@ -3603,41 +3614,41 @@ void CPwSafeDlg::OnDblclkPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case 5:
 		_PwTimeToStringEx(p->tCreation, strData, CPwSafeDlg::m_bUseLocalTimeFormat);
-		CopyStringToClipboard(strData, NULL);
+		CopyStringToClipboard(strData, NULL, NULL);
 		m_nClipboardCountdown = static_cast<int>(m_dwClipboardSecs);
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		DropToBackgroundIfOptionEnabled();
 		break;
 	case 6:
 		_PwTimeToStringEx(p->tLastMod, strData, CPwSafeDlg::m_bUseLocalTimeFormat);
-		CopyStringToClipboard(strData, NULL);
+		CopyStringToClipboard(strData, NULL, NULL);
 		m_nClipboardCountdown = static_cast<int>(m_dwClipboardSecs);
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		DropToBackgroundIfOptionEnabled();
 		break;
 	case 7:
 		_PwTimeToStringEx(p->tLastAccess, strData, CPwSafeDlg::m_bUseLocalTimeFormat);
-		CopyStringToClipboard(strData, NULL);
+		CopyStringToClipboard(strData, NULL, NULL);
 		m_nClipboardCountdown = static_cast<int>(m_dwClipboardSecs);
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		DropToBackgroundIfOptionEnabled();
 		break;
 	case 8:
 		_PwTimeToStringEx(p->tExpire, strData, CPwSafeDlg::m_bUseLocalTimeFormat);
-		CopyStringToClipboard(strData, NULL);
+		CopyStringToClipboard(strData, NULL, NULL);
 		m_nClipboardCountdown = static_cast<int>(m_dwClipboardSecs);
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		DropToBackgroundIfOptionEnabled();
 		break;
 	case 9:
 		_UuidToString(p->uuid, &strData);
-		CopyStringToClipboard(strData, NULL);
+		CopyStringToClipboard(strData, NULL, NULL);
 		m_nClipboardCountdown = static_cast<int>(m_dwClipboardSecs);
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		DropToBackgroundIfOptionEnabled();
 		break;
 	case 10:
-		CopyStringToClipboard(p->pszBinaryDesc, &m_mgr);
+		CopyStringToClipboard(p->pszBinaryDesc, p, &m_mgr);
 		m_nClipboardCountdown = static_cast<int>(m_dwClipboardSecs);
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		DropToBackgroundIfOptionEnabled();
@@ -3655,8 +3666,6 @@ void CPwSafeDlg::OnRclickGroupList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NotifyUserActivity();
 
-	POINT pt;
-
 	UNREFERENCED_PARAMETER(pNMHDR);
 	*pResult = 0;
 
@@ -3666,9 +3675,10 @@ void CPwSafeDlg::OnRclickGroupList(NMHDR* pNMHDR, LRESULT* pResult)
 	if(_CallPlugins(KPM_GROUPLIST_RCLICK, (LPARAM)pNMHDR, 0) == FALSE)
 		{ m_bDisplayDialog = FALSE; return; }
 
+	POINT pt;
 	GetCursorPos(&pt);
 
-	UINT uFlags;
+	UINT uFlags = 0;
 	POINT ptClient = pt;
 	m_cGroups.ScreenToClient(&ptClient);
 	// HTREEITEM hItem = m_cGroups.HitTest(CPoint(ptClient), &uFlags);
@@ -3710,7 +3720,7 @@ void CPwSafeDlg::OnPwlistCopyUser()
 			return;
 		}
 
-		CopyStringToClipboard(p->pszUserName, &m_mgr);
+		CopyStringToClipboard(p->pszUserName, p, &m_mgr);
 		m_nClipboardCountdown = static_cast<int>(m_dwClipboardSecs);
 	}
 	else if(m_nClipboardMethod == CM_ENHSECURE)
@@ -3731,54 +3741,37 @@ void CPwSafeDlg::ParseAndOpenURLWithEntryInfo(LPCTSTR lpURL, PW_ENTRY *pEntry)
 	if((pEntry != NULL) && (lpURL != NULL))
 	{
 		CString strURL = lpURL;
-		BOOL bParseTwoTimes = FALSE;
 
 		if(strURL.GetLength() != 0)
 		{
 			CString strOverride;
 			strOverride = ExtractParameterFromString(pEntry->pszAdditional, _T("url-override:"), 0);
 			if(strOverride.GetLength() != 0)
-			{
 				strURL = strOverride;
-				bParseTwoTimes = TRUE;
-			}
 			else if(m_strURLOverride.GetLength() != 0)
 			{
 				if(IsUnsafeAllowed(this->m_hWnd) == TRUE)
 				{
-					BOOL bIsSpecialURL = FALSE;
-
-					if(strURL.GetLength() >= 6)
-					{
-						CString strTemp = strURL.Left(6);
-						strTemp = strTemp.MakeLower();
-
-						if(strTemp == _T("cmd://")) bIsSpecialURL = TRUE;
-					}
-
-					if(bIsSpecialURL == FALSE)
-					{
-						strURL = m_strURLOverride;
-						bParseTwoTimes = TRUE;
-					}
+					if(WU_IsCommandLineURL(strURL) == false)
+						strURL = m_strURLOverride; // Apply override
 				}
 			}
 
-			WU_FillPlaceholders(&strURL);
+			const bool bCmdQuotes = WU_IsCommandLineURL(strURL);
 
-			const BOOL bCmdQuotes = ((strURL.Left(6) == _T("cmd://")) ? TRUE : FALSE);
+			strURL = SprCompile(strURL, false, pEntry, &m_mgr, false, bCmdQuotes);
 
-			ParseURL(&strURL, pEntry, FALSE, bCmdQuotes, &m_mgr, 0);
-			if(bParseTwoTimes == TRUE) ParseURL(&strURL, pEntry, FALSE, bCmdQuotes, &m_mgr, 0);
+			strURL = strURL.TrimLeft(_T(" \t\r\n"));
 
-			strURL.TrimLeft(_T(" \t\r\n"));
-			FixURL(&strURL);
+			if(WU_IsCommandLineURL(strURL) == false) FixURL(&strURL);
 
 			if(strURL.GetLength() != 0)
 			{
 				if(m_bUsePuttyForURLs == TRUE)
 				{
-					if(OpenUrlUsingPutty(strURL, pEntry->pszUserName) == FALSE)
+					CString strUser = SprCompile(pEntry->pszUserName, false, pEntry,
+						&m_mgr, false, true);
+					if(OpenUrlUsingPutty(strURL, strUser) == FALSE)
 						OpenUrlEx(strURL, this->m_hWnd);
 				}
 				else OpenUrlEx(strURL, this->m_hWnd);
@@ -3793,7 +3786,6 @@ void CPwSafeDlg::OnPwlistVisitUrl()
 
 	PW_ENTRY *p;
 	DWORD dwGroupId = GetSelectedGroupId();
-	CString strURL;
 	BOOL bLaunched = FALSE;
 
 	ASSERT(dwGroupId != DWORD_MAX); if(dwGroupId == DWORD_MAX) return;
@@ -3826,38 +3818,34 @@ void CPwSafeDlg::OnPwlistVisitUrl()
 	}
 	else // m_bCopyURLs == TRUE
 	{
-		DWORD dwSelectedEntry = GetSelectedEntry();
+		const DWORD dwSelectedEntry = GetSelectedEntry();
 		ASSERT(dwSelectedEntry != DWORD_MAX); if(dwSelectedEntry == DWORD_MAX) return;
 
-		DWORD dwEntryIndex = _ListSelToEntryIndex(dwSelectedEntry);
+		const DWORD dwEntryIndex = _ListSelToEntryIndex(dwSelectedEntry);
 		ASSERT(dwEntryIndex != DWORD_MAX); if(dwEntryIndex == DWORD_MAX) return;
 
 		p = m_mgr.GetEntry(dwEntryIndex);
 		ASSERT_ENTRY(p); if(p == NULL) return;
 
-		strURL = p->pszURL;
+		CString strURL = p->pszURL;
 
-		WU_FillPlaceholders(&strURL);
+		const bool bCmdQuotes = WU_IsCommandLineURL(strURL);
 
-		// FixURL(&strURL);
-		ParseURL(&strURL, p, FALSE, (strURL.Left(6) == _T("cmd://")) ? TRUE : FALSE, &m_mgr, 0);
+		strURL = SprCompile(strURL, false, p, &m_mgr, false, bCmdQuotes);
 
-		if(strURL.GetLength() >= 6)
+		if(WU_IsCommandLineURL(strURL))
 		{
-			if(strURL.Left(6) == _T("cmd://"))
+			if(m_bUsePuttyForURLs == TRUE)
 			{
-				if(m_bUsePuttyForURLs == TRUE)
-				{
-					if(OpenUrlUsingPutty(strURL, p->pszUserName) == FALSE)
-						OpenUrlEx(strURL, this->m_hWnd);
-				}
-				else OpenUrlEx(strURL, this->m_hWnd);
-
-				bLaunched = TRUE;
+				CString strUser = SprCompile(p->pszUserName, false, p, &m_mgr, false, true);
+				if(OpenUrlUsingPutty(strURL, strUser) == FALSE)
+					OpenUrlEx(strURL, this->m_hWnd);
 			}
-			else CopyStringToClipboard(strURL, NULL); // Dereferenced already
+			else OpenUrlEx(strURL, this->m_hWnd);
+
+			bLaunched = TRUE;
 		}
-		else CopyStringToClipboard(strURL, NULL); // Dereferenced already
+		else CopyStringToClipboard(strURL, NULL, NULL); // Dereferenced already
 
 		EraseCString(&strURL);
 
@@ -4223,13 +4211,12 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile, const T
 {
 	NotifyUserActivity();
 
-	CString strFile, strFilter, strText;
+	CString strFile, strText;
 	DWORD dwFlags;
 	INT_PTR nRet = IDCANCEL;
 	int nOpenAttempts, nAllowedAttempts, nErr;
 	const TCHAR *pSuffix = _T("");
 	CPasswordDlg *pDlgPass = NULL;
-	PWDB_REPAIR_INFO repairInfo;
 	CPwManager *pMgr;
 	DWORD_PTR dwOpFlags = 0;
 	DWORD_PTR aOpParams[7];
@@ -4237,6 +4224,7 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile, const T
 	if(pDbMgr == NULL) pMgr = &m_mgr;
 	else pMgr = pDbMgr;
 
+	PWDB_REPAIR_INFO repairInfo;
 	ZeroMemory(&repairInfo, sizeof(PWDB_REPAIR_INFO));
 
 	if(bOpenLocked == TRUE) dwOpFlags |= 1;
@@ -4250,14 +4238,12 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile, const T
 	aOpParams[6] = dwOpFlags;
 	if(_CallPlugins(KPM_OPENDB_PRE, (LPARAM)&aOpParams[0], 0) == FALSE) return;
 
-	strFilter = TRL("KeePass Password Safe Files");
+	CString strFilter = TRL("KeePass Password Safe Files");
 	strFilter += _T(" (*.kdb/*.pwd)|*.kdb;*.pwd|");
 	strFilter += TRL("All Files");
 	strFilter += _T(" (*.*)|*.*||");
 
-	dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
-	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
-	dwFlags |= 0x00080000 | 0x00800000;
+	dwFlags = (OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT | OFN_EXPLORER | OFN_ENABLESIZING);
 	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST; // | OFN_HIDEREADONLY
 	if(m_bFileReadOnly == TRUE) dwFlags |= OFN_READONLY;
 	if(pDbMgr != NULL) dwFlags |= OFN_NOCHANGEDIR;
@@ -4416,19 +4402,34 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile, const T
 								strMessage += TRL("User name:");
 								strMessage += _T(" ");
 								strMessage += strLockingUser.c_str();
-								strMessage += _T(".\r\n\r\n");
+								strMessage += _T(".");
 							}
 
-							strMessage += TRL("Open the file in read-only mode?");
-							strMessage += _T("\r\n\r\n");
-							strMessage += TRL("Click [Yes] to open the file in read-only mode.");
-							strMessage += _T("\r\n");
-							strMessage += TRL("Click [No] to open the file in normal writing mode.");
+							CVistaTaskDialog vtd(this->m_hWnd, AfxGetInstanceHandle(), true);
+							vtd.SetContent(strMessage);
+							vtd.SetMainInstruction(TRL("Open the file in read-only mode?"));
+							vtd.SetWindowTitle(PWM_PRODUCT_NAME);
+							vtd.SetIcon(V_MTDI_QUESTION);
 
-							const int nOpenRet = MessageBox(strMessage, TRL("Open the file in read-only mode?"),
-								MB_YESNO | MB_ICONQUESTION);
+							vtd.AddButton(TRL("Read-only"), TRL("Open the file in read-only mode. Changes to the database can be saved to a different file."), IDYES);
+							vtd.AddButton(TRL("Normal"), TRL("Take ownership of the file and open it in normal writing mode."), IDNO);
 
-							if(nOpenRet == IDYES) m_bFileReadOnly = TRUE;
+							int nOpenRet = vtd.ShowDialog(NULL);
+							if(nOpenRet < 0) // No task dialog support?
+							{
+								strMessage += _T("\r\n\r\n");
+								strMessage += TRL("Open the file in read-only mode?");
+								strMessage += _T("\r\n\r\n");
+								strMessage += TRL("Click [Yes] to open the file in read-only mode.");
+								strMessage += _T("\r\n");
+								strMessage += TRL("Click [No] to open the file in normal writing mode.");
+
+								nOpenRet = MessageBox(strMessage, TRL("Open the file in read-only mode?"),
+									MB_YESNO | MB_ICONQUESTION);
+							}
+
+							if((nOpenRet == IDYES) || (nOpenRet == IDOK))
+								m_bFileReadOnly = TRUE;
 							else
 							{
 								m_bFileReadOnly = FALSE;
@@ -4869,7 +4870,7 @@ void CPwSafeDlg::OnFileClose()
 	m_cQuickFind.ResetContent();
 	ASSERT(m_cQuickFind.GetWindowTextLength() == 0);
 
-	if((m_bMenuExit == TRUE) || (m_bMiniMode == FALSE))
+	if(((m_bMenuExit == TRUE) || (m_bMiniMode == FALSE)) && (m_bClearClipOnDbClose == TRUE))
 		ClearClipboardIfOwner();
 
 	if(m_bFileReadOnly == FALSE)
@@ -4949,6 +4950,7 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_bSingleClickTrayIcon = m_bSingleClickTrayIcon;
 	dlg.m_dwDefaultExpire = m_dwDefaultExpire;
 	dlg.m_bQuickFindIncBackup = m_bQuickFindIncBackup;
+	dlg.m_bQuickFindIncExpired = m_bQuickFindIncExpired;
 	dlg.m_bMinimizeBeforeAT = ((m_nAutoTypeMethod == ATM_MINIMIZE) ? TRUE : FALSE);
 	dlg.m_bDeleteBackupsOnSave = m_bDeleteBackupsOnSave;
 	dlg.m_bShowFullPath = m_bShowFullPath;
@@ -4958,6 +4960,7 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_bAllowSaveIfModifiedOnly = m_bAllowSaveIfModifiedOnly;
 	dlg.m_bCheckForUpdate = m_bCheckForUpdate;
 	dlg.m_bLockOnWinLock = m_bLockOnWinLock;
+	dlg.m_bClearClipOnDbClose = m_bClearClipOnDbClose;
 	dlg.m_bEnableRemoteCtrl = m_remoteControl.IsEnabled();
 	dlg.m_bUseLocalTimeFormat = CPwSafeDlg::m_bUseLocalTimeFormat;
 	dlg.m_bRegisterRestoreHotKey = m_bRegisterRestoreHotKey;
@@ -4966,6 +4969,7 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_strDefaultAutoTypeSequence = m_strDefaultAutoTypeSequence;
 	dlg.m_bAutoTypeIEFix = m_bAutoTypeIEFix;
 	dlg.m_bDropToBackOnCopy = m_bDropToBackOnCopy;
+	dlg.m_bSortAutoTypeSelItems = m_bSortAutoTypeSelItems;
 
 	if(_CallPlugins(KPM_OPTIONS_PRE, 0, 0) == FALSE)
 		{ m_bDisplayDialog = FALSE; return; }
@@ -4996,6 +5000,7 @@ void CPwSafeDlg::OnSafeOptions()
 		m_bSecureEdits = dlg.m_bSecureEdits;
 		m_bSingleClickTrayIcon = dlg.m_bSingleClickTrayIcon;
 		m_bQuickFindIncBackup = dlg.m_bQuickFindIncBackup;
+		m_bQuickFindIncExpired = dlg.m_bQuickFindIncExpired;
 		m_bDeleteBackupsOnSave = dlg.m_bDeleteBackupsOnSave;
 		m_bShowFullPath = dlg.m_bShowFullPath;
 		m_bDisableAutoType = dlg.m_bDisableAutoType;
@@ -5003,10 +5008,12 @@ void CPwSafeDlg::OnSafeOptions()
 		m_bAllowSaveIfModifiedOnly = dlg.m_bAllowSaveIfModifiedOnly;
 		m_bCheckForUpdate = dlg.m_bCheckForUpdate;
 		m_bLockOnWinLock = dlg.m_bLockOnWinLock;
+		m_bClearClipOnDbClose = dlg.m_bClearClipOnDbClose;
 		m_bFocusResAfterQuickFind = dlg.m_bFocusResAfterQuickFind;
 		m_strDefaultAutoTypeSequence = dlg.m_strDefaultAutoTypeSequence;
 		m_bAutoTypeIEFix = dlg.m_bAutoTypeIEFix;
 		m_bDropToBackOnCopy = dlg.m_bDropToBackOnCopy;
+		m_bSortAutoTypeSelItems = dlg.m_bSortAutoTypeSelItems;
 
 		m_remoteControl.SetAlwaysAllowFullAccess(dlg.m_bAlwaysAllowIpc);
 		m_remoteControl.EnableRemoteControl(dlg.m_bEnableRemoteCtrl);
@@ -5045,8 +5052,8 @@ void CPwSafeDlg::OnSafeOptions()
 			m_bDisableUnsafe = dlg.m_bDisableUnsafe;
 		}
 
-		if(dlg.m_bLockAfterTime == TRUE) m_nLockTimeDef = (long)dlg.m_nLockAfter;
-		else m_nLockTimeDef = -1;
+		if(dlg.m_bLockAfterTime == FALSE) m_nLockTimeDef = -1;
+		else m_nLockTimeDef = static_cast<long>(dlg.m_nLockAfter);
 
 		if(dlg.m_strFontSpec != m_strFontSpec)
 		{
@@ -5081,6 +5088,7 @@ void CPwSafeDlg::OnSafeOptions()
 				m_bRestartApplication = TRUE;
 				m_bDisplayDialog = FALSE;
 				OnFileExit(); // Also calls SaveOptions!
+				return;
 			}
 		}
 
@@ -5417,10 +5425,9 @@ CString CPwSafeDlg::GetExportFile(int nFormat, LPCTSTR lpBaseFileName, BOOL bFix
 	strFilter = TRL("All Files");
 	strFilter += _T(" (*.*)|*.*||");
 
-	dwFlags = OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+	dwFlags = (OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT);
 	dwFlags |= OFN_EXTENSIONDIFFERENT;
-	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
-	dwFlags |= 0x00080000 | 0x00800000 | OFN_NOREADONLYRETURN;
+	dwFlags |= (OFN_EXPLORER | OFN_ENABLESIZING | OFN_NOREADONLYRETURN);
 
 	CFileDialog dlg(FALSE, lp, strSample, dwFlags, strFilter, this);
 	if(dlg.DoModal() == IDOK) { m_bDisplayDialog = FALSE; return dlg.GetPathName(); }
@@ -5698,6 +5705,8 @@ void CPwSafeDlg::OnPwlistFind()
 	_Find(DWORD_MAX);
 }
 
+#define CPSDFM_CONTINUE { cnt = dw + 1; if(cnt >= dwMaxItems) break; continue; }
+
 void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 {
 	CFindInDbDlg dlg;
@@ -5759,8 +5768,7 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 
 		while(true)
 		{
-			const DWORD dw = m_mgr.Find(dlg.m_strFind, dlg.m_bCaseSensitive,
-				dwFlags, cnt);
+			const DWORD dw = m_mgr.Find(dlg.m_strFind, dlg.m_bCaseSensitive, dwFlags, cnt);
 
 			if(dw == DWORD_MAX) break;
 			else
@@ -5769,30 +5777,30 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 				ASSERT_ENTRY(p);
 				if(p == NULL) break;
 
-				if(p->uGroupId != dwGroupId)
+				if(p->uGroupId != dwGroupId) // Not in 'Search Results' group
 				{
 					const DWORD dwGroupInx = m_mgr.GetGroupByIdN(p->uGroupId);
 					ASSERT(dwGroupInx != DWORD_MAX);
 
+					// Only accept entries that are stored in the specified group
 					if((dwFindGroupIndex == DWORD_MAX) || (dwFindGroupIndex == dwGroupInx))
 					{
-						if(dlg.m_bExcludeBackups == TRUE)
+						if(dlg.m_bExcludeBackups != FALSE)
 						{
 							if(_tcscmp(m_mgr.GetGroup(dwGroupInx)->pszGroupName, PWS_BACKUPGROUP) == 0)
-							{
-								cnt = dw + 1;
-								if((DWORD)cnt >= dwMaxItems) break;
-								continue;
-							}
+								CPSDFM_CONTINUE;
+
 							if(_tcscmp(m_mgr.GetGroup(dwGroupInx)->pszGroupName, PWS_BACKUPGROUP_SRC) == 0)
-							{
-								cnt = dw + 1;
-								if((DWORD)cnt >= dwMaxItems) break;
-								continue;
-							}
+								CPSDFM_CONTINUE;
 						}
 
-						// The entry could get reallocated by AddEntry, therefor
+						if(dlg.m_bExcludeExpired != FALSE)
+						{
+							if(_pwtimecmp(&tNow, &p->tExpire) > 0)
+								CPSDFM_CONTINUE;
+						}
+
+						// The entry could get reallocated by AddEntry, therefore
 						// save it to a local CString object
 						m_mgr.UnlockEntryPassword(p);
 						CString strTemp = p->pszPassword;
@@ -5808,7 +5816,7 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 			}
 
 			cnt = dw + 1;
-			if((DWORD)cnt >= dwMaxItems) break;
+			if(cnt >= dwMaxItems) break;
 		}
 
 		_Groups_SaveView();
@@ -5848,7 +5856,7 @@ void CPwSafeDlg::OnPwlistFindInGroup()
 {
 	NotifyUserActivity();
 	if(_CallPlugins(KPM_PWLIST_FIND_IN_GROUP_PRE, 0, 0) == FALSE) return;
-	DWORD dwCurGroup = GetSelectedGroupId();
+	const DWORD dwCurGroup = GetSelectedGroupId();
 	if(dwCurGroup == DWORD_MAX) return;
 	_Find(dwCurGroup);
 }
@@ -5907,7 +5915,8 @@ void CPwSafeDlg::OnPwlistDuplicate()
 			VERIFY(m_mgr.AddEntry(&pwTemplate));
 			m_mgr.LockEntryPassword(&pwTemplate);
 
-			PW_ENTRY *pNew = m_mgr.GetLastEditedEntry(); ASSERT_ENTRY(pNew);
+			PW_ENTRY *pNew = m_mgr.GetLastEditedEntry();
+			ASSERT_ENTRY(pNew);
 			if(pNew != NULL)
 			{
 				std::vector<BYTE> vUuid(16);
@@ -5919,9 +5928,17 @@ void CPwSafeDlg::OnPwlistDuplicate()
 
 	m_bModified = TRUE;
 
-	_SortListIfAutoSort();
-	if(m_nAutoSort == 0) UpdatePasswordList();
+	// if(m_nAutoSort == 0) UpdatePasswordList();
+	// else _SortListIfAutoSort();
+	for(size_t iNew = 0; iNew < vUuids.size(); ++iNew)
+	{
+		PW_ENTRY *peToAdd = m_mgr.GetEntryByUuid(&(vUuids[iNew][0]));
+		if(peToAdd == NULL) { ASSERT(FALSE); continue; }
 
+		_List_SetEntry(static_cast<DWORD>(m_cList.GetItemCount()), peToAdd, TRUE, &tNow);
+	}
+
+	NewGUI_DeselectAllItems(&m_cList);
 	for(size_t iFocus = 0; iFocus < vUuids.size(); ++iFocus) // Select all copies
 	{
 		const DWORD dwListItem = _EntryUuidToListPos(&(vUuids[iFocus][0]));
@@ -8696,8 +8713,6 @@ void CPwSafeDlg::OnPwlistSaveAttach()
 	NotifyUserActivity();
 
 	DWORD dwFlags;
-	CString strSample;
-	CString strFilter;
 	PW_ENTRY *pEntry;
 	DWORD dwSelectedInx = _ListSelToEntryIndex();
 
@@ -8717,15 +8732,14 @@ void CPwSafeDlg::OnPwlistSaveAttach()
 		return;
 	}
 
-	strSample = pEntry->pszBinaryDesc;
+	CString strSample = pEntry->pszBinaryDesc;
 
-	strFilter = TRL("All Files");
+	CString strFilter = TRL("All Files");
 	strFilter += _T(" (*.*)|*.*||");
 
-	dwFlags = OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+	dwFlags = (OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT);
 	dwFlags |= OFN_EXTENSIONDIFFERENT;
-	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
-	dwFlags |= 0x00080000 | 0x00800000 | OFN_NOREADONLYRETURN;
+	dwFlags |= (OFN_EXPLORER | OFN_ENABLESIZING | OFN_NOREADONLYRETURN);
 	
 	CFileDialog dlg(FALSE, NULL, strSample, dwFlags, strFilter, this);
 	if(dlg.DoModal() == IDOK)
@@ -8831,7 +8845,7 @@ void CPwSafeDlg::OnFileShowDbInfo()
 	const DWORD dwOldKeyEncRounds = dlg.m_dwNumKeyEnc;
 
 	CString strName = m_mgr.GetPropertyString(PWP_DEFAULT_USER_NAME).c_str();
-	dlg.m_strDefaultUserName = (LPCTSTR)strName; // Copy
+	dlg.m_strDefaultUserName = strName; // Copy
 
 	if(_CallPlugins(KPM_FILE_DBSETTINGS_PRE, 0, 0) == FALSE)
 		{ m_bDisplayDialog = FALSE; return; }
@@ -9175,9 +9189,13 @@ void CPwSafeDlg::_DoQuickFind(LPCTSTR lpText)
 			ASSERT_ENTRY(p);
 			if(p == NULL) break;
 
-			if(p->uGroupId != dwGroupId)
+			const bool bTimeValid = ((m_bQuickFindIncExpired != FALSE) ||
+				(_pwtimecmp(&tNow, &p->tExpire) <= 0));
+
+			if(p->uGroupId != dwGroupId) // Not in 'Search Results' group
 			{
-				if((m_bQuickFindIncBackup == TRUE) || ((p->uGroupId != dwBackup1) && (p->uGroupId != dwBackup2)))
+				if(((m_bQuickFindIncBackup != FALSE) || ((p->uGroupId != dwBackup1) &&
+					(p->uGroupId != dwBackup2))) && bTimeValid)
 				{
 					ASSERT(m_mgr.GetGroupByIdN(p->uGroupId) != DWORD_MAX);
 
@@ -9197,7 +9215,7 @@ void CPwSafeDlg::_DoQuickFind(LPCTSTR lpText)
 		}
 
 		cnt = dw + 1;
-		if((DWORD)cnt >= dwMaxItems) break;
+		if(cnt >= dwMaxItems) break;
 	}
 
 	_Groups_SaveView();
@@ -9445,9 +9463,7 @@ void CPwSafeDlg::_AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSe
 		else str = m_strDefaultAutoTypeSequence;
 	}
 
-	WU_FillPlaceholders(&str);
-
-	ParseURL(&str, pEntry, TRUE, FALSE, &m_mgr, 0);
+	str = SprCompile(str, true, pEntry, &m_mgr, true, false);
 
 	if((m_bAutoTypeIEFix == TRUE) && (lpTargetWindowName != NULL) &&
 		((_tcsstr(lpTargetWindowName, _T("Windows Internet Explorer")) != NULL) ||
@@ -9712,7 +9728,7 @@ BOOL CPwSafeDlg::RegisterGlobalHotKey(int nHotKeyID, DWORD dwHotKey, BOOL bRelea
 		{
 			str += _T("\r\n\r\n");
 			str += TRL("Most probably another application has reserved this hot key already."); str += _T("\r\n\r\n");
-			str += TRL("You can choose a different hot key combination in 'Tools - Options - Setup'.");
+			str += TRL("You can choose a different hot key combination in 'Tools' - 'Options' - 'Advanced' - 'Auto-Type'.");
 
 			// Show a (global!) warning window
 			::MessageBox(::GetDesktopWindow(), str, _T("KeePass"), MB_OK | MB_ICONWARNING);
@@ -9775,7 +9791,7 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 		CEntryListDlg dlg;
 		PW_UUID_STRUCT pwUuid;
 
-		dlg.m_nDisplayMode = ELDMODE_LIST;
+		dlg.m_nDisplayMode = ELDMODE_LIST_ATITEMS;
 		dlg.m_pMgr = &m_mgr;
 		dlg.m_pImgList = &m_ilIcons;
 		dlg.m_bPasswordStars = m_bPasswordStars;
@@ -10225,7 +10241,7 @@ CString CPwSafeDlg::_GetSecureEditTipText(const TCHAR *tszBase)
 	ASSERT(tszBase != NULL); if(tszBase == NULL) return CString(_T(""));
 
 	str = TRL_VAR(tszBase);
-	str.TrimRight(_T(':'));
+	str = str.TrimRight(_T(':'));
 	str += _T("\r\n(");
 	str += TRL("Press Shift-Home or Shift-End to clear this edit control");
 	str += _T(")");
@@ -10330,7 +10346,7 @@ void CPwSafeDlg::OnImportKeePass()
 	CPwManager mgrImport;
 	_OpenDatabase(&mgrImport, NULL, NULL, NULL, FALSE, NULL, FALSE);
 
-	if(strDir.size() > 0) ::SetCurrentDirectory(strDir.c_str());
+	WU_SetCurrentDirectory(strDir.c_str());
 
 	m_bDisplayDialog = TRUE;
 

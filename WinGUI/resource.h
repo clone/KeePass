@@ -311,6 +311,8 @@
 #define IDC_RADIO_IDURL                 1290
 #define IDC_RADIO_IDNOTES               1291
 #define IDC_RADIO_IDUUID                1292
+#define IDC_CHECK_SORTATITEMS           1293
+#define IDC_CHECK_EXCLUDEEXPIRED        1294
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -526,6 +528,7 @@
 #define ID_INSERTFIELDREFERENCE_INURLFIELD 33033
 #define ID_INSERTFIELDREFERENCE_INPASSWORDFIELD 33034
 #define ID_INSERTFIELDREFERENCE_INNOTESFIELD 33035
+#define ID_POPUP_AUTOTYPE_INSERTDEFAULT 33037
 
 // Next default values for new objects
 // 
@@ -533,8 +536,8 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        244
-#define _APS_NEXT_COMMAND_VALUE         33036
-#define _APS_NEXT_CONTROL_VALUE         1293
+#define _APS_NEXT_COMMAND_VALUE         33038
+#define _APS_NEXT_CONTROL_VALUE         1295
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -34,7 +34,7 @@
 #include "../../KeePassLibCpp/Util/MemUtil.h"
 
 static BOOL g_bImgButtons = 0;
-static CThemeHelperST *g_pThemeHelper = NULL;
+static CThemeHelperST* g_pThemeHelper = NULL;
 
 static COLORREF m_crBannerStart = RGB(151, 154, 173); // = RGB(235, 235, 255);
 static COLORREF m_crBannerEnd = RGB(27, 27, 37); // = RGB(192, 192, 255);
@@ -628,4 +628,36 @@ void NewGUI_SortList(CListCtrl* pListCtrl)
 
 	VERIFY(ListView_SortItemsEx(pListCtrl->m_hWnd, NgslCompareFunc,
 		(LPARAM)&spParam) != FALSE);
+}
+
+void NewGUI_AppendToRichEditCtrl(CAutoRichEditCtrlFx* pCtrl, LPCTSTR lpAppend,
+	bool bScrollToBottom)
+{
+	if(pCtrl == NULL) { ASSERT(FALSE); return; }
+	if(lpAppend == NULL) { ASSERT(FALSE); return; }
+	if(lpAppend[0] == 0) return;
+
+	CString strText;
+	pCtrl->GetWindowText(strText);
+	if(strText.GetLength() > 0) strText += _T("\r\n\r\n");
+
+	strText += lpAppend;
+
+	pCtrl->SetRTF(strText, SF_TEXT);
+
+	if(bScrollToBottom) pCtrl->SendMessage(WM_VSCROLL, SB_BOTTOM, NULL);
+}
+
+void NewGUI_DeselectAllItems(CListCtrl* pCtrl)
+{
+	if(pCtrl == NULL) { ASSERT(FALSE); return; }
+
+	for(int i = 0; i < pCtrl->GetItemCount(); ++i)
+	{
+		const UINT uState = pCtrl->GetItemState(i, LVIS_SELECTED);
+		if((uState & LVIS_SELECTED) != 0)
+		{
+			VERIFY(pCtrl->SetItemState(i, 0, LVIS_SELECTED));
+		}
+	}
 }

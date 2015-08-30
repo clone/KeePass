@@ -17,17 +17,11 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___KEEPASS_LIBRARY_API_H___
-#define ___KEEPASS_LIBRARY_API_H___
+#ifndef ___SPR_AUTOTYPE_ENCODING_H___
+#define ___SPR_AUTOTYPE_ENCODING_H___
 
-#include "APIDefEx.h"
+CString SprMakeAutoTypeSequence(LPCTSTR lpText);
 
-// Library build number (independent of underlying KeePass version)
-#define KEEPASS_LIBRARY_BUILD 0x0000004F
+CString SprMakeCmdQuotes(LPCTSTR lpText);
 
-KP_SHARE DWORD GetKeePassVersion();
-KP_SHARE LPCTSTR GetKeePassVersionString();
-
-KP_SHARE DWORD GetLibraryBuild();
-
-#endif
+#endif // ___SPR_AUTOTYPE_ENCODING_H___

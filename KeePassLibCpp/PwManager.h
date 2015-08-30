@@ -36,11 +36,11 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.12")
+#define PWM_VERSION_STR  _T("1.13")
 #else
-#define PWM_VERSION_STR  _T("1.12 Unicode")
+#define PWM_VERSION_STR  _T("1.13 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01010200
+#define PWM_VERSION_DW   0x01010300
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
@@ -142,6 +142,7 @@
 #define PWMKEY_DEFAULTEXPIRE    _T("KeeDefaultExpire")
 #define PWMKEY_AUTOPWGEN        _T("KeeAutoPwGen")
 #define PWMKEY_QUICKFINDINCBK   _T("KeeQuickFindIncBackup")
+#define PWMKEY_QUICKFINDINCEXP  _T("KeeQuickFindIncExpired")
 #define PWMKEY_AUTOTYPEMETHOD   _T("KeeAutoTypeMethod")
 #define PWMKEY_DELETEBKONSAVE   _T("KeeDeleteBackupsOnSave")
 #define PWMKEY_SHOWFULLPATH     _T("KeeShowFullPath")
@@ -174,6 +175,8 @@
 #define PWMKEY_FOCUSRESAFTERQUICKFIND _T("KeeFocusResultsAfterQuickFind")
 #define PWMKEY_AUTOTYPEIEFIX    _T("KeeAutoTypeIEFix")
 #define PWMKEY_DROPTOBACKONCOPY _T("KeeDropToBackOnCopy")
+#define PWMKEY_SORTAUTOTYPESELITEMS _T("KeeSortAutoTypeSelItems")
+#define PWMKEY_CLEARCLIPONDBCLOSE   _T("KeeClearClipboardOnDbClose")
 
 #define PWMKEY_GENPROFILE       _T("KeeGenProfile")
 #define PWMKEY_GENPROFILEAUTO   _T("KeeGenProfileAuto")

@@ -48,6 +48,7 @@ public:
 	BOOL	m_bGroupName;
 	BOOL	m_bExcludeBackups;
 	BOOL	m_bRegex;
+	BOOL	m_bExcludeExpired;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CFindInDbDlg)

@@ -261,13 +261,13 @@ BEGIN
     LTEXT           "Hint: It is best to use both mouse and keyboard random sources.",IDC_STATIC,7,199,265,9,WS_DISABLED
 END
 
-IDD_FIND_DLG DIALOGEX 0, 0, 231, 163
+IDD_FIND_DLG DIALOGEX 0, 0, 231, 177
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Find"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "&Find",IDOK,105,142,58,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,166,142,58,14
+    DEFPUSHBUTTON   "&Find",IDOK,105,156,58,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,166,156,58,14
     LTEXT           "Find what:",IDC_STATIC_SEARCHTHIS,7,9,54,8
     EDITTEXT        IDC_EDIT_FINDTEXT,65,7,159,14,ES_AUTOHSCROLL
     CONTROL         "Regular expression",IDC_CHECK_REGEX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,65,25,159,10
@@ -278,10 +278,12 @@ BEGIN
     CONTROL         "N&otes",IDC_CHECK_NOTES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,87,65,131,10
     CONTROL         "&Password",IDC_CHECK_PASSWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,78,72,10
     CONTROL         "&Group name",IDC_CHECK_GROUPNAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,87,78,131,10
-    GROUPBOX        "Options",IDC_STATIC,7,97,217,40
+    GROUPBOX        "Options",IDC_STATIC,7,97,217,53
     CONTROL         "&Case sensitive",IDC_CHECK_CASESENSITIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,109,205,10
     CONTROL         "Exclude entries in the '&Backup' group",IDC_CHECK_EXCLUDEBACKUPS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,204,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,122,204,10
+    CONTROL         "Exclude &expired entries",IDC_CHECK_EXCLUDEEXPIRED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,135,204,10
 END
 
 IDD_LANGUAGES_DLG DIALOGEX 0, 0, 460, 212
@@ -546,13 +548,13 @@ BEGIN
     PUSHBUTTON      "&Help",IDC_BTN_HELP,7,125,58,14
 END
 
-IDD_OPTIONS_AUTOTYPE_DLG DIALOGEX 0, 0, 309, 151
+IDD_OPTIONS_AUTOTYPE_DLG DIALOGEX 0, 0, 309, 167
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Auto-Type"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,187,130,56,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,246,130,56,14
+    DEFPUSHBUTTON   "&OK",IDOK,187,146,56,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,246,146,56,14
     CONTROL         "Enable auto-type features",IDC_CHECK_ENABLEAT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,295,10
     CONTROL         "Use alternative auto-type method (minimize window)",IDC_CHECK_ALTERNATIVE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,20,295,10
@@ -561,7 +563,9 @@ BEGIN
     LTEXT           "Default auto-type sequence for standard entries:",IDC_STATIC,7,76,295,8
     EDITTEXT        IDC_EDIT_STDSEQ,7,87,295,14,ES_AUTOHSCROLL
     CONTROL         "Prepend special initialization sequence for Internet Explorer windows",IDC_CHECK_IEFIX,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,110,295,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,111,295,10
+    CONTROL         "Sort items in the auto-type entry selection dialog",IDC_CHECK_SORTATITEMS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,124,295,10
 END
 
 IDD_FIELDREF_DLG DIALOGEX 0, 0, 418, 273
@@ -666,7 +670,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 224
         TOPMARGIN, 7
-        BOTTOMMARGIN, 156
+        BOTTOMMARGIN, 170
     END
 
     IDD_LANGUAGES_DLG, DIALOG
@@ -770,7 +774,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 302
         TOPMARGIN, 7
-        BOTTOMMARGIN, 144
+        BOTTOMMARGIN, 160
     END
 
     IDD_FIELDREF_DLG, DIALOG
@@ -790,8 +794,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,2,0
- PRODUCTVERSION 1,1,2,0
+ FILEVERSION 1,1,3,0
+ PRODUCTVERSION 1,1,3,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -808,13 +812,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.12"
-            VALUE "FileVersion", "1.1.2.0"
+            VALUE "FileDescription", "KeePass Password Safe 1.13"
+            VALUE "FileVersion", "1.1.3.0"
             VALUE "InternalName", "PwSafe"
             VALUE "LegalCopyright", "Copyright (c) 2003-2008 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.12"
-            VALUE "ProductVersion", "1.1.2.0"
+            VALUE "ProductName", "KeePass Password Safe 1.13"
+            VALUE "ProductVersion", "1.1.3.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -965,7 +969,7 @@ BEGIN
         MENUITEM "&Edit/View Entry...",         ID_PWLIST_EDIT
         MENUITEM "Dupli&cate Entry",            ID_PWLIST_DUPLICATE
         MENUITEM "&Delete Entry",               ID_PWLIST_DELETE
-        MENUITEM "&Mass Modify (All Selected)...", ID_PWLIST_MASSMODIFY
+        MENUITEM "&Modify All Selected...",     ID_PWLIST_MASSMODIFY
         MENUITEM "Se&lect All",                 ID_PWLIST_SELECTALL
         MENUITEM SEPARATOR
         MENUITEM "&Find in Database...",        ID_PWLIST_FIND
@@ -1135,6 +1139,7 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "Auto-Type: Help",             ID_POPUP_AUTOTYPE
+        MENUITEM "Auto-Type: Customize Sequence", ID_POPUP_AUTOTYPE_INSERTDEFAULT
         MENUITEM "Auto-Type: Select Target Window...", ID_POPUP_AUTOTYPE_SELTARGET
         MENUITEM SEPARATOR
         POPUP "Insert Field Reference"
@@ -1300,31 +1305,32 @@ IDB_AUTOTYPE            BITMAP                  "res\\autotype.bmp"
 
 IDR_ACCEL_MAIN ACCELERATORS 
 BEGIN
-    "A",            ID_PWLIST_SELECTALL,    VIRTKEY, CONTROL, NOINVERT
-    "B",            ID_PWLIST_COPYUSER,     VIRTKEY, CONTROL, NOINVERT
-    "C",            ID_PWLIST_COPYPW,       VIRTKEY, CONTROL, NOINVERT
-    "D",            ID_PWLIST_DELETE,       VIRTKEY, CONTROL, NOINVERT
-    "E",            ID_PWLIST_EDIT,         VIRTKEY, CONTROL, NOINVERT
-    "F",            ID_PWLIST_FIND,         VIRTKEY, CONTROL, NOINVERT
-    "G",            ID_SAFE_ADDGROUP,       VIRTKEY, CONTROL, NOINVERT
-    "H",            ID_VIEW_HIDESTARS,      VIRTKEY, CONTROL, NOINVERT
-    "I",            ID_FILE_SHOWDBINFO,     VIRTKEY, CONTROL, NOINVERT
-    "J",            ID_VIEW_HIDEUSERS,      VIRTKEY, CONTROL, NOINVERT
-    "K",            ID_PWLIST_DUPLICATE,    VIRTKEY, CONTROL, NOINVERT
+    "Z",            ID_EXTRAS_GENPW,        VIRTKEY, CONTROL, NOINVERT
+    "W",            ID_FILE_CLOSE,          VIRTKEY, CONTROL, NOINVERT
+    "X",            ID_FILE_EXIT,           VIRTKEY, CONTROL, NOINVERT
     "L",            ID_FILE_LOCK,           VIRTKEY, CONTROL, NOINVERT
-    "M",            ID_SAFE_OPTIONS,        VIRTKEY, CONTROL, NOINVERT
     "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
     "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL, NOINVERT
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
-    "U",            ID_PWLIST_VISITURL,     VIRTKEY, CONTROL, NOINVERT
-    "V",            ID_PWLIST_AUTOTYPE,     VIRTKEY, CONTROL, NOINVERT
+    "I",            ID_FILE_SHOWDBINFO,     VIRTKEY, CONTROL, NOINVERT
     VK_F1,          ID_INFO_README,         VIRTKEY, NOINVERT
     VK_F1,          ID_INFO_README,         VIRTKEY, ALT, NOINVERT
-    "W",            ID_FILE_CLOSE,          VIRTKEY, CONTROL, NOINVERT
-    "X",            ID_FILE_EXIT,           VIRTKEY, CONTROL, NOINVERT
     "Y",            ID_PWLIST_ADD,          VIRTKEY, CONTROL, NOINVERT
-    "Z",            ID_EXTRAS_GENPW,        VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_PWLIST_AUTOTYPE,     VIRTKEY, CONTROL, NOINVERT
+    "C",            ID_PWLIST_COPYPW,       VIRTKEY, CONTROL, NOINVERT
+    "B",            ID_PWLIST_COPYUSER,     VIRTKEY, CONTROL, NOINVERT
+    "D",            ID_PWLIST_DELETE,       VIRTKEY, CONTROL, NOINVERT
+    "K",            ID_PWLIST_DUPLICATE,    VIRTKEY, CONTROL, NOINVERT
+    "E",            ID_PWLIST_EDIT,         VIRTKEY, CONTROL, NOINVERT
+    "F",            ID_PWLIST_FIND,         VIRTKEY, CONTROL, NOINVERT
+    "A",            ID_PWLIST_SELECTALL,    VIRTKEY, CONTROL, NOINVERT
+    "U",            ID_PWLIST_VISITURL,     VIRTKEY, CONTROL, NOINVERT
+    "G",            ID_SAFE_ADDGROUP,       VIRTKEY, CONTROL, NOINVERT
+    "M",            ID_SAFE_OPTIONS,        VIRTKEY, CONTROL, NOINVERT
+    "H",            ID_VIEW_HIDESTARS,      VIRTKEY, CONTROL, NOINVERT
+    "J",            ID_VIEW_HIDEUSERS,      VIRTKEY, CONTROL, NOINVERT
+    "F",            ID_PWLIST_FINDINGROUP,  VIRTKEY, SHIFT, CONTROL, NOINVERT
 END
 
 

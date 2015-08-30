@@ -34,15 +34,18 @@ AppLocator::~AppLocator()
 {
 }
 
-void AppLocator::FillPlaceholders(CString* pString)
+void AppLocator::FillPlaceholders(CString* pString, const SPR_CONTENT_FLAGS* pcf)
 {
 	ASSERT(pString != NULL); if(pString == NULL) return;
 
 	AppLocator::GetPaths();
 
-	pString->Replace(_T("{INTERNETEXPLORER}"), m_strIEPath.c_str());
-	pString->Replace(_T("{FIREFOX}"), m_strFirefoxPath.c_str());
-	pString->Replace(_T("{OPERA}"), m_strOperaPath.c_str());
+	pString->Replace(_T("{INTERNETEXPLORER}"), SprTransformContent(
+		m_strIEPath.c_str(), pcf));
+	pString->Replace(_T("{FIREFOX}"), SprTransformContent(
+		m_strFirefoxPath.c_str(), pcf));
+	pString->Replace(_T("{OPERA}"), SprTransformContent(
+		m_strOperaPath.c_str(), pcf));
 }
 
 void AppLocator::GetPaths()
