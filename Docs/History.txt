@@ -1,3 +1,33 @@
+12/07/01 - 1.23
+- When trying to delete entries, the confirmation dialog now
+  shows a short summary of the entries that will be deleted
+- Added date/time placeholders: {DT_SIMPLE}, {DT_YEAR},
+  {DT_MONTH}, {DT_DAY}, {DT_HOUR}, {DT_MINUTE}, {DT_SECOND},
+  {DT_UTC_SIMPLE}, {DT_UTC_YEAR}, {DT_UTC_MONTH}, {DT_UTC_DAY},
+  {DT_UTC_HOUR}, {DT_UTC_MINUTE}, {DT_UTC_SECOND}
+
+- Improved UI update when using a TAN entry
+- The last modification time of a TAN entry is now updated when
+  using it
+- Improved behavior when trying to shutdown the system while
+  KeePass is running
+- KeePass does not block the system shutdown anymore when a
+  dialog is displayed but no database is opened
+- LNGX files aren't shown in the translation selection dialog
+  anymore
+- Improved KDB data validation
+- Improved multi-byte to Unicode and Unicode to multi-byte
+  string conversions (less memory is required now)
+- Changed versioning scheme in file version information blocks
+  from digit- to component-based
+- Upgraded installer
+- Various code optimizations
+- Minor other improvements
+
+- HTML export: XML special characters in URL links and
+  attachment names are now encoded
+- HTML export: group trees are not encoded twice anymore
+
 12/04/20 - 1.22
 - Auto-Type window definitions in custom window-sequence pairs
   are now Spr-compiled (i.e. placeholders, environment

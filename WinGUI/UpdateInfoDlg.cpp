@@ -184,19 +184,32 @@ void CUpdateInfoDlg::FillComponentList()
 
 CString CUpdateInfoDlg::FormatVersion(UINT64 qwVersion, LPCTSTR lpName)
 {
+	UNREFERENCED_PARAMETER(lpName);
+
 	CString str;
 	if(qwVersion == 0) return str;
 
-	const DWORD dwHi = static_cast<DWORD>(qwVersion >> 32);
-	const DWORD dwLo = static_cast<DWORD>(qwVersion & DWORD_MAX);
-	if((lpName != NULL) && (_tcscmp(lpName, PWM_PRODUCT_NAME_SHORT) == 0))
-	{
-		str.Format(_T("%u.%u%u"), dwHi >> 16, dwHi & 0xFFFF, dwLo >> 16);
-		if((dwLo & 0xFFFF) != 0)
-			str += static_cast<TCHAR>(_T('a') + static_cast<TCHAR>(dwLo & 0xFFFF));
-		return str;
-	}
+	// const DWORD dwHi = static_cast<DWORD>(qwVersion >> 32);
+	// const DWORD dwLo = static_cast<DWORD>(qwVersion & DWORD_MAX);
+	// if((lpName != NULL) && (_tcscmp(lpName, PWM_PRODUCT_NAME_SHORT) == 0))
+	// {
+	//	str.Format(_T("%u.%u%u"), dwHi >> 16, dwHi & 0xFFFF, dwLo >> 16);
+	//	if((dwLo & 0xFFFF) != 0)
+	//		str += static_cast<TCHAR>(_T('a') + static_cast<TCHAR>(dwLo & 0xFFFF));
+	//	return str;
+	// }
 
-	str.Format(_T("%u.%u.%u.%u"), dwHi >> 16, dwHi & 0xFFFF, dwLo >> 16, dwLo & 0xFFFF);
+	const DWORD dwA = static_cast<DWORD>(qwVersion >> 48);
+	const DWORD dwB = static_cast<DWORD>((qwVersion >> 32) & 0xFFFF);
+	const DWORD dwC = static_cast<DWORD>((qwVersion >> 16) & 0xFFFF);
+	const DWORD dwD = static_cast<DWORD>(qwVersion & 0xFFFF);
+
+	if((dwC == 0) && (dwD == 0))
+		str.Format(_T("%u.%u"), dwA, dwB);
+	else if(dwD == 0)
+		str.Format(_T("%u.%u.%u"), dwA, dwB, dwC);
+	else
+		str.Format(_T("%u.%u.%u.%u"), dwA, dwB, dwC, dwD);
+
 	return str;
 }

@@ -22,8 +22,8 @@
 
 #pragma once
 
-// #include "StrUtil.h"
-// #include "../PwManager.h"
+#include "../PwManager.h"
+#include "StrUtil.h"
 
 // LPTSTR PwEntryToString(const PW_ENTRY *lpEntry);
 // BOOL StringToPwEntry(PW_ENTRY *pEntry, LPCTSTR lpEntryString);
@@ -44,5 +44,15 @@
 // CString PwEntryToString(PW_ENTRY *lpEntry, CPwManager* lpContext);
 // bool StringToPwEntry(PW_ENTRY *lpEntry, LPCTSTR lpEntryString);
 // #endif // _MFC_VER
+
+class CEntryUtil : boost::noncopyable
+{
+private:
+	CEntryUtil();
+
+public:
+	static std::basic_string<TCHAR> CreateSummaryList(CPwManager* pMgr,
+		const std::vector<DWORD>& vEntryIndices);
+};
 
 #endif // ___ENTRY_UTIL_H___

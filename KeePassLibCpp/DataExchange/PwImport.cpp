@@ -47,11 +47,9 @@ char *CPwImport::FileToMemory(const TCHAR *pszFile, unsigned long *pFileSize)
 	unsigned long uFileSize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	char *pData = new char[uFileSize + 3];
+	char *pData = new char[uFileSize + 32];
 	if(pData == NULL) { fclose(fp); fp = NULL; return NULL; }
-	pData[uFileSize] = 0; // Terminate buffer
-	pData[uFileSize + 1] = 0;
-	pData[uFileSize + 2] = 0;
+	memset(&pData[uFileSize], 0, 32);
 
 	fread(pData, 1, uFileSize, fp);
 	fclose(fp); fp = NULL;
@@ -78,10 +76,11 @@ DWORD CPwImport::ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwG
 	pData = CPwImport::FileToMemory(pszFile, &uFileSize);
 	if(pData == NULL) return FALSE;
 
-	pProcessed = new char[uFileSize + 2];
+	pProcessed = new char[uFileSize + 32];
 	if(pProcessed == NULL) { SAFE_DELETE_ARRAY(pData); return 0; }
+	memset(&pProcessed[uFileSize], 0, 32);
 
-	// Last character mustn't be an escape character
+	// Last character must not be an escape character
 	if(pData[uFileSize - 1] == '\\') pData[uFileSize - 1] = 0;
 
 	if(uFileSize > 3)
@@ -190,11 +189,11 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 		bUnicodeMode = true;
 	}
 
-	while(1) // Processing the file
+	while(true) // Processing the file
 	{
 		str.Empty();
 
-		while(1) // Loading one line to CString
+		while(true) // Loading one line to CString
 		{
 			++i;
 			if(i >= uFileSize) break;
@@ -279,7 +278,7 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 				strFxCategory.size() : strFxFolder.size()));
 			strLastCategory = strLastCategory.Trim();
 
-			while(1)
+			while(true)
 			{
 				strLastCategory = strLastCategory.Left(strLastCategory.GetLength() - 1);
 				if(strLastCategory.GetLength() == 0) break;
@@ -386,11 +385,11 @@ BOOL CPwImport::ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr)
 			(static_cast<unsigned char>(pData[2]) == 0xBF))
 			i += 3; // Skip UTF-8 initialization characters
 
-	while(1) // Processing the file
+	while(true) // Processing the file
 	{
 		str.Empty();
 
-		while(1) // Loading one line to CString
+		while(true) // Loading one line to CString
 		{
 			++i;
 			if(i >= uFileSize) break;
@@ -524,7 +523,7 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 			(static_cast<unsigned char>(pData[2]) == 0xBF))
 			i += 3; // Skip UTF-8 initialization characters
 
-	while(1)
+	while(true)
 	{
 		if((pData[i] == '\t') && (bInNotes == FALSE))
 		{
@@ -701,7 +700,7 @@ void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamS
 
 	ASSERT(pStream != NULL);
 
-	while(1)
+	while(true)
 	{
 		if(p >= pEnd) break;
 		pTitle = p;

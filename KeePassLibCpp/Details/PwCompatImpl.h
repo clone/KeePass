@@ -69,9 +69,9 @@ public:
 	static BOOL OpenDatabaseV2(CPwManager* pMgr, const TCHAR *pszFile);
 
 private:
-	static BOOL ReadGroupFieldV2(CPwManager* pMgr, USHORT usFieldType,
+	static bool ReadGroupFieldV2(CPwManager* pMgr, USHORT usFieldType,
 		DWORD dwFieldSize, BYTE *pData, PW_GROUP *pGroup);
-	static BOOL ReadEntryFieldV2(CPwManager* pMgr, USHORT usFieldType,
+	static bool ReadEntryFieldV2(CPwManager* pMgr, USHORT usFieldType,
 		DWORD dwFieldSize, BYTE *pData, PW_ENTRY *pEntry);
 };
 

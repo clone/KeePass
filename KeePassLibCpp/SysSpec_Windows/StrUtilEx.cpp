@@ -22,61 +22,30 @@
 #include "../Util/StrUtil.h"
 #include "../Util/AppUtil.h"
 
-char *_StringToAnsi(const WCHAR *lptString)
+char* _StringToAnsi(const WCHAR* lpwString)
 {
-	if(lptString == NULL) { ASSERT(FALSE); return NULL; }
+	if(lpwString == NULL) { ASSERT(FALSE); return NULL; }
 
-	char *p;
-	int nChars;
-
-#ifdef _UNICODE
-	nChars = lstrlen(lptString) + 1;
-	p = new char[nChars * 2 + 2];
-	p[0] = 0; p[1] = 0;
-	VERIFY(WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lptString, -1, p,
-		nChars, NULL, NULL) != ERROR_INSUFFICIENT_BUFFER);
-#else
-	nChars = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lptString, -1, NULL, 0, NULL, NULL);
-	p = new char[nChars * 2 + 2];
-	p[0] = 0; p[1] = 0;
-	VERIFY(WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lptString,
-		-1, p, nChars, NULL, NULL) != ERROR_INSUFFICIENT_BUFFER);
-#endif
+	const int nChars = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK,
+		lpwString, -1, NULL, 0, NULL, NULL);
+	char* p = new char[nChars + 2];
+	p[0] = 0; p[1] = 0; p[nChars] = 0; p[nChars + 1] = 0;
+	VERIFY(WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lpwString,
+		-1, p, nChars, NULL, NULL) == nChars);
 
 	return p;
 }
 
-WCHAR *_StringToUnicode(const char *pszString)
+WCHAR* _StringToUnicode(const char* pszString)
 {
 	if(pszString == NULL) { ASSERT(FALSE); return NULL; }
 
-	int nChars;
-	WCHAR *p;
-
-#ifdef _UNICODE
-	// Determine the correct buffer size by calling the function itself with 0 as buffer size (see docs)
-	nChars = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, NULL, 0);
-
-	p = new WCHAR[nChars + 2];
-	p[0] = 0; p[1] = 0;
-
-	// Jan 9th 2004: DonAngel {
-	// This was ASSERTing for string. All debugging did not given good results, so I decided to remove
-	// the verification. This could be a bug in MultiByteToWideChar, because thou it was returning
-	// ERROR_INSUFFICIENT_BUFFER, the convertion was OK!?
-	// The problem should be investigated later, but for now - I prefer to remove the ASSERT
-	// VERIFY(MultiByteToWideChar(CP_ACP, 0, pszString, -1, p, nChars) !=
-	//	ERROR_INSUFFICIENT_BUFFER);
-	// Jan 9th 2004: DonAngel }
-
-	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, p, nChars);
-#else
-	nChars = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, NULL, 0);
-	p = new WCHAR[nChars * 2 + 2];
-	p[0] = 0; p[1] = 0;
-	VERIFY(MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, p, nChars) !=
-		ERROR_INSUFFICIENT_BUFFER);
-#endif
+	const int nChars = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString,
+		-1, NULL, 0);
+	WCHAR* p = new WCHAR[nChars + 2];
+	p[0] = 0; p[1] = 0; p[nChars] = 0; p[nChars + 1] = 0;
+	VERIFY(MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString,
+		-1, p, nChars) == nChars);
 
 	return p;
 }

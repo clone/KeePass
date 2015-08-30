@@ -19,7 +19,9 @@
 
 #include "StdAfx.h"
 #include "EntryUtil.h"
-// #include "StrUtil.h"
+#include "PwUtil.h"
+#include "TranslateEx.h"
+#include <boost/lexical_cast.hpp>
 // #include "Base64.h"
 // #include "../SDK/Details/KpDefs.h"
 
@@ -360,3 +362,58 @@ bool StringToPwEntry(PW_ENTRY *lpEntry, LPCTSTR lpEntryString)
 }
 #endif // _MFC_VER
 */
+
+CEntryUtil::CEntryUtil()
+{
+}
+
+std::basic_string<TCHAR> CEntryUtil::CreateSummaryList(CPwManager* pMgr,
+	const std::vector<DWORD>& vEntryIndices)
+{
+	std::basic_string<TCHAR> strEmpty;
+	if(pMgr == NULL) { ASSERT(FALSE); return strEmpty; }
+	if(vEntryIndices.size() == 0) return strEmpty;
+
+	const size_t uMaxEntries = 10;
+	size_t uSummaryShow = min(uMaxEntries, vEntryIndices.size());
+	if(uSummaryShow == (vEntryIndices.size() - 1)) --uSummaryShow; // Plural msg
+
+	CStringBuilderEx sb;
+	for(size_t i = 0; i < uSummaryShow; ++i)
+	{
+		PW_ENTRY* pe = pMgr->GetEntry(vEntryIndices[i]);
+		if(pe == NULL) { ASSERT(FALSE); continue; }
+
+		if(sb.GetLength() > 0) sb.Append(_T("\r\n"));
+
+		sb.Append(_T("- "));
+		std::basic_string<TCHAR> strItem = SU_CompactWith3Dots(pe->pszTitle, 39);
+		sb.Append(strItem.c_str());
+
+		if(CPwUtil::IsTANEntry(pe) != FALSE)
+		{
+			std::basic_string<TCHAR> strTanID = SU_CompactWith3Dots(pe->pszUserName, 39);
+			if(strTanID.size() > 0)
+			{
+				sb.Append(_T(" (#"));
+				sb.Append(strTanID.c_str());
+				sb.Append(_T(")"));
+			}
+		}
+	}
+
+	if(uSummaryShow != vEntryIndices.size())
+	{
+		const std::basic_string<TCHAR> strCount =
+			boost::lexical_cast<std::basic_string<TCHAR> >(static_cast<int>(
+			vEntryIndices.size() - uSummaryShow));
+
+		CString strMore = TRL("{PARAM} more entries");
+		VERIFY(strMore.Replace(_T("{PARAM}"), strCount.c_str()) == 1);
+
+		sb.Append(_T("\r\n- "));
+		sb.Append(strMore);
+	}
+
+	return sb.ToString();
+}

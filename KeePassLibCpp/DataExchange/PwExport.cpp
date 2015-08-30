@@ -119,7 +119,7 @@ void CPwExport::SetNewLineSeq(BOOL bWindows)
 
 void CPwExport::_ExpStr(LPCTSTR lpString)
 {
-	if(_tcslen(lpString) != 0)
+	if(_tcslen(lpString) > 0)
 	{
 		UTF8_BYTE *pUtf8String = _StringToUTF8(lpString);
 
@@ -292,7 +292,7 @@ CString CPwExport::MakeGroupTreeString(DWORD dwGroupId, bool bXmlEncode) const
 BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPORT_OPTIONS *pOptions, CPwManager *pStoreMgr)
 {
 	FILE *fp = NULL;
-	DWORD i, j, dwThisId, dwNumberOfGroups, dwInvalidId1, dwInvalidId2;
+	DWORD i, j, dwThisId, dwNumberOfGroups;
 	PW_ENTRY *p;
 	PW_GROUP *pg;
 	BYTE aInitUTF8[3] = { 0xEF, 0xBB, 0xBF };
@@ -323,8 +323,8 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 	m_pOptions = pOptions;
 
 	dwNumberOfGroups = m_pMgr->GetNumberOfGroups();
-	dwInvalidId1 = m_pMgr->GetGroupId(PWS_BACKUPGROUP_SRC);
-	dwInvalidId2 = m_pMgr->GetGroupId(PWS_BACKUPGROUP);
+	const DWORD dwInvalidId1 = m_pMgr->GetGroupId(PWS_BACKUPGROUP_SRC);
+	const DWORD dwInvalidId2 = m_pMgr->GetGroupId(PWS_BACKUPGROUP);
 
 	if(dwGroupId != DWORD_MAX)
 	{
@@ -333,7 +333,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 
 		usLevel = m_pMgr->GetGroup(i)->usLevel;
 
-		while(1)
+		while(true)
 		{
 			pg = m_pMgr->GetGroup(i);
 			ASSERT(pg != NULL); if(pg == NULL) break;
@@ -348,7 +348,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 	}
 	else
 	{
-		for(i = 0; i < dwNumberOfGroups; i++)
+		for(i = 0; i < dwNumberOfGroups; ++i)
 		{
 			pg = m_pMgr->GetGroup(i);
 			ASSERT(pg != NULL); if(pg == NULL) continue;
@@ -376,32 +376,32 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 		_ExpStr(_T("<html><head>"));
 		_ExpStr(_T("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"));
 		_ExpStr(_T("<title>"));
-		_ExpStr(TRL("Password List"));
+		_ExpXmlStr(TRL("Password List"));
 		_ExpStr(_T("</title></head><body>"));
 		_ExpStr(m_pszNewLine);
 		_ExpStr(_T("<h1>"));
-		_ExpStr(TRL("Password List"));
+		_ExpXmlStr(TRL("Password List"));
 		_ExpStr(_T("</h1>"));
 		_ExpStr(m_pszNewLine);
 		_ExpStr(_T("<table width=\"100%\" border=\"1px\" cellspacing=\"0\" cellpadding=\"1\"><tr><th>"));
 
 		_ExpSetSep(_T("</th><th>"));
 		_ExpResetSkip();
-		_ExpStrIf(pOptions->bGroup, TRL("Password Groups"));
-		_ExpStrIf(pOptions->bGroupTree, TRL("Group Tree"));
-		_ExpStrIf(pOptions->bTitle, TRL("Title"));
-		_ExpStrIf(pOptions->bUserName, TRL("User Name"));
-		_ExpStrIf(pOptions->bURL, TRL("URL"));
-		_ExpStrIf(pOptions->bPassword, TRL("Password"));
-		_ExpStrIf(pOptions->bNotes, TRL("Notes"));
-		_ExpStrIf(pOptions->bUUID, TRL("UUID"));
-		_ExpStrIf(pOptions->bImage, TRL("Icon"));
-		_ExpStrIf(pOptions->bCreationTime, TRL("Creation Time"));
-		_ExpStrIf(pOptions->bLastAccTime, TRL("Last Access"));
-		_ExpStrIf(pOptions->bLastModTime, TRL("Last Modification"));
-		_ExpStrIf(pOptions->bExpireTime, TRL("Expires"));
-		_ExpStrIf(pOptions->bAttachment, TRL("Attachment Description"));
-		_ExpStrIf(pOptions->bAttachment, TRL("Attachment"));
+		_ExpXmlStrIf(pOptions->bGroup, TRL("Password Groups"));
+		_ExpXmlStrIf(pOptions->bGroupTree, TRL("Group Tree"));
+		_ExpXmlStrIf(pOptions->bTitle, TRL("Title"));
+		_ExpXmlStrIf(pOptions->bUserName, TRL("User Name"));
+		_ExpXmlStrIf(pOptions->bURL, TRL("URL"));
+		_ExpXmlStrIf(pOptions->bPassword, TRL("Password"));
+		_ExpXmlStrIf(pOptions->bNotes, TRL("Notes"));
+		_ExpXmlStrIf(pOptions->bUUID, TRL("UUID"));
+		_ExpXmlStrIf(pOptions->bImage, TRL("Icon"));
+		_ExpXmlStrIf(pOptions->bCreationTime, TRL("Creation Time"));
+		_ExpXmlStrIf(pOptions->bLastAccTime, TRL("Last Access"));
+		_ExpXmlStrIf(pOptions->bLastModTime, TRL("Last Modification"));
+		_ExpXmlStrIf(pOptions->bExpireTime, TRL("Expires"));
+		_ExpXmlStrIf(pOptions->bAttachment, TRL("Attachment Description"));
+		_ExpXmlStrIf(pOptions->bAttachment, TRL("Attachment"));
 
 		_ExpStr(_T("</th></tr>"));
 		_ExpStr(m_pszNewLine);
@@ -455,17 +455,17 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 
 	DWORD uNumEntries = m_pMgr->GetNumberOfEntries();
 
-	for(j = 0; j < (DWORD)aGroupIds.size(); j++)
+	for(j = 0; j < static_cast<DWORD>(aGroupIds.size()); ++j)
 	{
 		dwThisId = aGroupIds[j];
 
 		if(m_pOptions->bExportBackups == FALSE)
 		{
 			if(dwThisId == dwInvalidId1) continue;
-			else if(dwThisId == dwInvalidId2) continue;
+			if(dwThisId == dwInvalidId2) continue;
 		}
 
-		for(i = 0; i < uNumEntries; i++)
+		for(i = 0; i < uNumEntries; ++i)
 		{
 			p = m_pMgr->GetEntry(i);
 			ASSERT_ENTRY(p);
@@ -614,14 +614,14 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 				_ExpResetSkip();
 
 				_ExpHtmlStrIf(pOptions->bGroup, pg->pszGroupName);
-				_ExpHtmlStrIf(pOptions->bGroupTree, strGroupTree);
+				_ExpStrIf(pOptions->bGroupTree, strGroupTree); // Is encoded already
 				_ExpHtmlStrIf(pOptions->bTitle, p->pszTitle);
 				_ExpHtmlStrIf(pOptions->bUserName, p->pszUserName);
 
 				if((pOptions->bURL == TRUE) && (_tcslen(p->pszURL) != 0))
 				{
 					_ExpStrIf(pOptions->bURL, _T("<a href=\""));
-					_ExpStr(p->pszURL);
+					_ExpXmlStr(p->pszURL); // Use XML encoding, no &nbsp; when empty
 					_ExpStr(_T("\">"));
 					_ExpHtmlStr(p->pszURL);
 					_ExpStr(_T("</a>"));
@@ -639,12 +639,12 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 				_ExpHtmlStrIf(pOptions->bExpireTime, strExpireTime);
 
 				if(p->pszBinaryDesc[0] != 0)
-					_ExpStrIf(pOptions->bAttachment, p->pszBinaryDesc);
+					_ExpHtmlStrIf(pOptions->bAttachment, p->pszBinaryDesc);
 				else
 					_ExpHtmlStrIf(pOptions->bAttachment, _T(""));
 
 				if((p->uBinaryDataLen != 0) && (pbEncodedAttachment != NULL))
-					_ExpStrIf(pOptions->bAttachment, (LPCTSTR)pbEncodedAttachment);
+					_ExpHtmlStrIf(pOptions->bAttachment, (LPCTSTR)pbEncodedAttachment);
 				else
 					_ExpHtmlStrIf(pOptions->bAttachment, _T(""));
 
@@ -661,7 +661,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 				if((pOptions->bGroup == TRUE) && (strGroupTree.GetLength() != 0))
 				{
 					_ExpStrIf(pOptions->bGroupTree, _T(" tree=\""));
-					_ExpStrIf(pOptions->bGroupTree, (LPCTSTR)strGroupTree);
+					_ExpStrIf(pOptions->bGroupTree, (LPCTSTR)strGroupTree); // Is encoded
 					_ExpStrIf(pOptions->bGroupTree, _T("\""));
 				}
 				_ExpStrIf(pOptions->bGroup, _T(">"));

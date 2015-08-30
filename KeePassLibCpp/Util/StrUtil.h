@@ -64,8 +64,8 @@ void FixURL(CString *pstrURL);
 CString CsRemoveMeta(CString *psString);
 
 // String conversion functions
-char *_StringToAnsi(const WCHAR *lptString);
-WCHAR *_StringToUnicode(const char *pszString);
+char* _StringToAnsi(const WCHAR* lptString);
+WCHAR* _StringToUnicode(const char* pszString);
 
 std::basic_string<WCHAR> _StringToUnicodeStl(const TCHAR *pszString);
 
@@ -129,6 +129,8 @@ CString SU_ConvertNewLines(LPCTSTR lpText, LPCTSTR lpNewLineSeq);
 
 void SU_Split(std::vector<std::basic_string<TCHAR>>& vOut, const std::basic_string<TCHAR>& strData,
 	LPCTSTR lpSplitChars);
+
+std::basic_string<TCHAR> SU_CompactWith3Dots(LPCTSTR lpString, size_t uMaxChars);
 
 /////////////////////////////////////////////////////////////////////////////
 // Natural string comparison API

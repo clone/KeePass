@@ -24,6 +24,7 @@
 #include "Rijndael.h"
 #include "TwofishClass.h"
 #include "ARCFour.h"
+#include "../Util/StrUtil.h"
 
 static const char g_szVectABCX[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -226,6 +227,15 @@ UINT32 TestCryptoImpl()
 	ARCFourCrypt(aTemp2, 32, (const UINT8 *)"abcdef", 6);
 	if(memcmp(aHash, aTemp2, 32) != 0) uTestMask |= TI_ERR_ARCFOUR_CRYPT;
 	if(memcmp(aHash, aTemp, 32) == 0) uTestMask |= TI_ERR_ARCFOUR_CRYPT;
+
+#ifdef DEBUG
+	WCHAR* pw = _StringToUnicode("Test567890123");
+	char* pa = _StringToAnsi(pw);
+	ASSERT(strcmp(pa, "Test567890123") == 0);
+	ASSERT(wcscmp(pw, L"Test567890123") == 0);
+	SAFE_DELETE_ARRAY(pa);
+	SAFE_DELETE_ARRAY(pw);
+#endif
 
 	// A return value of zero means no error
 	return uTestMask;

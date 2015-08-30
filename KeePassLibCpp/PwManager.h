@@ -37,11 +37,12 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.22")
+#define PWM_VERSION_STR  _T("1.23")
 #else
-#define PWM_VERSION_STR  _T("1.22 Unicode")
+#define PWM_VERSION_STR  _T("1.23 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01020200
+#define PWM_VERSION_DW   0x01170000
+#define PWM_VERSION_QW   0x0001001700000000ULL
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
@@ -357,13 +358,13 @@ typedef struct _PMS_SIMPLE_UI_STATE
 	DWORD dwReserved16;
 } PMS_SIMPLE_UI_STATE;
 
+#pragma pack()
+
 typedef struct _PWDB_META_STREAM
 {
 	std::basic_string<TCHAR> strName;
 	std::vector<BYTE> vData;
 } PWDB_META_STREAM;
-
-#pragma pack()
 
 typedef std::basic_string<TCHAR> std_string;
 typedef std::pair<std::basic_string<TCHAR>, std::basic_string<TCHAR> > CustomKvp;
@@ -510,9 +511,9 @@ private:
 	void _AllocGroups(DWORD uGroups);
 	void _DeleteGroupList(BOOL bFreeStrings);
 
-	BOOL ReadGroupField(USHORT usFieldType, DWORD dwFieldSize,
+	bool ReadGroupField(USHORT usFieldType, DWORD dwFieldSize,
 		const BYTE *pData, PW_GROUP *pGroup);
-	BOOL ReadEntryField(USHORT usFieldType, DWORD dwFieldSize,
+	bool ReadEntryField(USHORT usFieldType, DWORD dwFieldSize,
 		const BYTE *pData, PW_ENTRY *pEntry);
 
 	BOOL _AddAllMetaStreams();

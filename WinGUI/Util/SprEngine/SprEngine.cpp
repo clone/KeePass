@@ -116,6 +116,36 @@ CString SprCompileInternal(LPCTSTR lpText, PW_ENTRY* pEntry, CPwManager* pDataba
 	SprFillPlaceholder(str, _T("{CLEARFIELD}"),
 		_T("{DELAY 150}{HOME}(+{END}){DEL}{DELAY 150}"), NULL);
 
+	CTime t = CTime::GetCurrentTime();
+	CString strT = t.Format(_T("%Y%m%d%H%M%S"));
+	SprFillPlaceholder(str, _T("{DT_SIMPLE}"), strT, NULL);
+	strT = t.Format(_T("%Y"));
+	SprFillPlaceholder(str, _T("{DT_YEAR}"), strT, NULL);
+	strT = t.Format(_T("%m"));
+	SprFillPlaceholder(str, _T("{DT_MONTH}"), strT, NULL);
+	strT = t.Format(_T("%d"));
+	SprFillPlaceholder(str, _T("{DT_DAY}"), strT, NULL);
+	strT = t.Format(_T("%H"));
+	SprFillPlaceholder(str, _T("{DT_HOUR}"), strT, NULL);
+	strT = t.Format(_T("%M"));
+	SprFillPlaceholder(str, _T("{DT_MINUTE}"), strT, NULL);
+	strT = t.Format(_T("%S"));
+	SprFillPlaceholder(str, _T("{DT_SECOND}"), strT, NULL);
+	strT = t.FormatGmt(_T("%Y%m%d%H%M%S"));
+	SprFillPlaceholder(str, _T("{DT_UTC_SIMPLE}"), strT, NULL);
+	strT = t.FormatGmt(_T("%Y"));
+	SprFillPlaceholder(str, _T("{DT_UTC_YEAR}"), strT, NULL);
+	strT = t.FormatGmt(_T("%m"));
+	SprFillPlaceholder(str, _T("{DT_UTC_MONTH}"), strT, NULL);
+	strT = t.FormatGmt(_T("%d"));
+	SprFillPlaceholder(str, _T("{DT_UTC_DAY}"), strT, NULL);
+	strT = t.FormatGmt(_T("%H"));
+	SprFillPlaceholder(str, _T("{DT_UTC_HOUR}"), strT, NULL);
+	strT = t.FormatGmt(_T("%M"));
+	SprFillPlaceholder(str, _T("{DT_UTC_MINUTE}"), strT, NULL);
+	strT = t.FormatGmt(_T("%S"));
+	SprFillPlaceholder(str, _T("{DT_UTC_SECOND}"), strT, NULL);
+
 	SprFillRefPlaceholders(str, pDatabase, pcf, dwRecursionLevel, vRefsCache);
 
 	return str;

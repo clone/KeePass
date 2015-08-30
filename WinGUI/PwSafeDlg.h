@@ -155,6 +155,8 @@ public:
 	void _ChangeLockState(BOOL bLocked);
 
 	DWORD GetSelectedEntry();
+	std::vector<DWORD> GetSelectedEntriesUIIndices();
+	std::vector<DWORD> GetSelectedEntriesMgrIndices();
 	DWORD GetSelectedEntriesCount();
 	DWORD GetSelectedGroupId();
 

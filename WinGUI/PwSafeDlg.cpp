@@ -34,6 +34,7 @@
 #include "../KeePassLibCpp/Crypto/KeyTransform_BCrypt.h"
 #include "../KeePassLibCpp/Util/MemUtil.h"
 #include "../KeePassLibCpp/Util/StrUtil.h"
+#include "../KeePassLibCpp/Util/EntryUtil.h"
 #include <boost/regex/mfc.hpp>
 #include "../KeePassLibCpp/Util/AppUtil.h"
 #include "Util/WinUtil.h"
@@ -2630,6 +2631,28 @@ DWORD CPwSafeDlg::GetSelectedEntry()
 	return static_cast<DWORD>(m_cList.GetNextSelectedItem(posFirstItem));
 }
 
+std::vector<DWORD> CPwSafeDlg::GetSelectedEntriesUIIndices()
+{
+	std::vector<DWORD> v;
+	if(m_bFileOpen == FALSE) return v;
+
+	POSITION pos = m_cList.GetFirstSelectedItemPosition();
+	while(pos != NULL)
+	{
+		v.push_back(static_cast<DWORD>(m_cList.GetNextSelectedItem(pos)));
+	}
+
+	return v;
+}
+
+std::vector<DWORD> CPwSafeDlg::GetSelectedEntriesMgrIndices()
+{
+	std::vector<DWORD> v = GetSelectedEntriesUIIndices();
+	for(size_t i = 0; i < v.size(); ++i)
+		v[i] = _ListSelToEntryIndex(v[i]);
+	return v;
+}
+
 DWORD CPwSafeDlg::GetSelectedEntriesCount()
 {
 	NotifyUserActivity();
@@ -3423,8 +3446,18 @@ void CPwSafeDlg::OnPwlistDelete()
 	if(_CallPlugins(KPM_DELETE_ENTRY_PRE, 0, 0) == FALSE)
 		{ _SetDisplayDialog(false); return; }
 
+	const std::vector<DWORD> vIdx = GetSelectedEntriesMgrIndices();
+	const std::basic_string<TCHAR> strList = CEntryUtil::CreateSummaryList(&m_mgr, vIdx);
+
+	std::basic_string<TCHAR> strContent = TRL("This will remove all selected entries unrecoverably!");
+	if(strList.size() > 0)
+	{
+		strContent += _T("\r\n\r\n");
+		strContent += strList;
+	}
+
 	CVistaTaskDialog dlgTask(this->m_hWnd, AfxGetInstanceHandle(), false);
-	dlgTask.SetContent(TRL("This will remove all selected entries unrecoverably!"));
+	dlgTask.SetContent(strContent.c_str());
 	dlgTask.SetMainInstruction(TRL("Are you sure you want to delete all selected entries?"));
 	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
 	dlgTask.SetIcon(MTDI_QUESTION);
@@ -3438,6 +3471,11 @@ void CPwSafeDlg::OnPwlistDelete()
 		str = TRL("This will remove all selected entries unrecoverably!");
 		str += _T("\r\n\r\n");
 		str += TRL("Are you sure you want to delete all selected entries?");
+		if(strList.size() > 0)
+		{
+			str += _T("\r\n\r\n");
+			str += strList.c_str();
+		}
 		nMsg = MessageBox(str, TRL("Delete Entries Confirmation"), MB_ICONQUESTION | MB_YESNO);
 	}
 	if((nMsg == IDCANCEL) || (nMsg == IDNO)) { _SetDisplayDialog(false); return; }
@@ -3678,7 +3716,7 @@ void CPwSafeDlg::OnPwlistCopyPw()
 	}
 
 	_TouchEntry(GetSelectedEntry(), FALSE);
-	_UpdateToolBar();
+	_UpdateToolBar(TRUE);
 }
 
 void CPwSafeDlg::OnTimer(WPARAM nIDEvent)
@@ -10022,6 +10060,7 @@ void CPwSafeDlg::_AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSe
 
 	EraseCString(&str);
 	if(bRefreshView == TRUE) RefreshPasswordList();
+	_UpdateToolBar(TRUE);
 }
 
 void CPwSafeDlg::OnPwlistAutoType()
@@ -10598,10 +10637,12 @@ void CPwSafeDlg::OnDrawClipboard()
 
 BOOL CPwSafeDlg::OnQueryEndSession()
 {
+	if(_IsDisplayingDialog() && (m_bFileOpen == TRUE))
+		return FALSE;
+
 	SaveOptions();
 	OnFileClose();
 
-	if(_IsDisplayingDialog()) return FALSE;
 	return TRUE;
 }
 
@@ -11474,6 +11515,8 @@ void CPwSafeDlg::_PostUseTANEntry(DWORD dwListIndex, DWORD dwEntryIndex)
 	if(CPwUtil::IsTANEntry(p) == TRUE) // If it is a TAN entry, expire it
 	{
 		_GetCurrentPwTime(&p->tExpire);
+		p->tLastAccess = p->tExpire;
+		p->tLastMod = p->tExpire;
 		m_bModified = TRUE;
 
 		if(m_bDeleteTANsAfterUse == TRUE)

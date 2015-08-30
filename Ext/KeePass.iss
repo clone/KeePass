@@ -11,8 +11,8 @@
 #define MyAppUrlName "KeePass.url"
 #define MyAppHelpName "KeePass.chm"
 
-#define KeeVersionStr "1.22"
-#define KeeVersionWin "1.2.2.0"
+#define KeeVersionStr "1.23"
+#define KeeVersionWin "1.23.0.0"
 
 #define KeeDevPeriod "2003-2012"
 
@@ -25,7 +25,7 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 AppCopyright=Copyright (c) {#KeeDevPeriod} {#MyAppPublisher}
-MinVersion=4.1,4.0
+MinVersion=5.0
 DefaultDirName={pf}\{#MyAppFullName}
 DefaultGroupName={#MyAppFullName}
 AllowNoIcons=yes

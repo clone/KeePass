@@ -113,10 +113,7 @@ public:
 	/// @see DeleteObject
 	STDMETHOD(DeleteArray)(void* pArray) = 0;
 
-	/// Get the KeePass version as word.
-	/// The version is encoded as 0xAABBCCDD, where AA is the major version,
-	/// BBCC the minor version and DD the build number.
-	/// Example: 0x01010400 is version 1.14.
+	/// Get the KeePass version as integer.
 	STDMETHOD_(DWORD, GetVersion)() = 0;
 
 	/// Get the KeePass version as string.

@@ -828,6 +828,22 @@ void SU_Split(std::vector<std::basic_string<TCHAR>>& vOut, const std::basic_stri
 }
 #pragma warning(pop)
 
+std::basic_string<TCHAR> SU_CompactWith3Dots(LPCTSTR lpString, size_t uMaxChars)
+{
+	std::basic_string<TCHAR> str;
+	if(lpString == NULL) { ASSERT(FALSE); return str; }
+	if(uMaxChars == 0) return str;
+
+	str = lpString;
+	if(str.size() <= uMaxChars) return str;
+
+	if(uMaxChars <= 3) return str.substr(0, uMaxChars);
+
+	str = str.substr(0, uMaxChars - 3);
+	str += _T("...");
+	return str;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // WCharStream class
 

@@ -76,6 +76,9 @@
 //	return this->OpenDatabaseEx(pszFile, pRepair, NULL);
 // }
 
+#define PWMOD_CHECK_AVAIL(w_Cnt_p) { if((static_cast<UINT64>(pos) + static_cast<UINT64>( \
+	w_Cnt_p)) > static_cast<UINT64>(uFileSize)) { ASSERT(FALSE); _OPENDB_FAIL; } }
+
 // If bIgnoreCorrupted is TRUE the manager will try to ignore all database file
 // errors, i.e. try to read as much as possible instead of breaking out at the
 // first error.
@@ -90,7 +93,6 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *p
 	sha256_ctx sha32;
 	UINT8 uFinalKey[32];
 	char *p;
-	char *pStart;
 	USHORT usFieldType;
 	DWORD dwFieldSize;
 	PW_GROUP pwGroupTemplate;
@@ -119,10 +121,10 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *p
 		{ fclose(fp); return PWE_INVALID_FILEHEADER; }
 
 	// Allocate enough memory to hold the complete file
-	uAllocated = uFileSize + 16 + 1 + 8 + 4; // 16 = encryption buffer space, 1+8 = string terminating NULL (UTF-8), 4 unused
+	uAllocated = uFileSize + 16 + 1 + 64 + 4; // 16 = encryption buffer space, 1+64 = string terminating NULLs, 4 unused
 	pVirtualFile = new char[uAllocated];
 	if(pVirtualFile == NULL) { fclose(fp); return PWE_NO_MEM; }
-	memset(&pVirtualFile[uFileSize + 17 - 1], 0, 1 + 8);
+	memset(&pVirtualFile[uFileSize + 16], 0, 1 + 64);
 
 	fread(pVirtualFile, 1, uFileSize, fp);
 	fclose(fp);
@@ -201,7 +203,7 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *p
 		if(((uFileSize - sizeof(PW_DBHEADER)) % 16) != 0)
 		{
 			uFileSize -= sizeof(PW_DBHEADER); ASSERT((uFileSize & 0xF) != 0);
-			uFileSize &= ~0xF;
+			uFileSize &= ~0xFUL;
 			uFileSize += sizeof(PW_DBHEADER);
 		}
 
@@ -279,61 +281,68 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *p
 	NewDatabase(); // Create a new database and initialize internal structures
 
 	// Add groups from the memory file to the internal structures
-	unsigned long uCurGroup;
-	BOOL bRet;
 	pos = sizeof(PW_DBHEADER);
-	pStart = &pVirtualFile[pos];
-	for(uCurGroup = 0; uCurGroup < hdr.dwGroups; )
+	// char *pStart = &pVirtualFile[pos];
+	DWORD uCurGroup = 0;
+	while(uCurGroup < hdr.dwGroups)
 	{
 		p = &pVirtualFile[pos];
 
-		if(pRepair != NULL) { if(IsBadReadPtr(p, 2) != FALSE) { _OPENDB_FAIL; } }
+		PWMOD_CHECK_AVAIL(2);
+		// if(pRepair != NULL) { if(IsBadReadPtr(p, 2) != FALSE) { _OPENDB_FAIL; } }
 		memcpy(&usFieldType, p, 2);
 		p += 2; pos += 2;
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
+		// if(pos >= uFileSize) { _OPENDB_FAIL; }
 
-		if(pRepair != NULL) { if(IsBadReadPtr(p, 4) != FALSE) { _OPENDB_FAIL; } }
+		PWMOD_CHECK_AVAIL(4);
+		// if(pRepair != NULL) { if(IsBadReadPtr(p, 4) != FALSE) { _OPENDB_FAIL; } }
 		memcpy(&dwFieldSize, p, 4);
 		p += 4; pos += 4;
-		if(pos >= (uFileSize + dwFieldSize)) { _OPENDB_FAIL; }
+		// if(pos >= (uFileSize + dwFieldSize)) { _OPENDB_FAIL; }
 
-		if(pRepair != NULL) { if(IsBadReadPtr(p, dwFieldSize) != FALSE) { _OPENDB_FAIL; } }
-		bRet = ReadGroupField(usFieldType, dwFieldSize, (BYTE *)p, &pwGroupTemplate);
-		if((usFieldType == 0xFFFF) && (bRet == TRUE))
-			uCurGroup++; // Now and ONLY now the counter gets increased
+		PWMOD_CHECK_AVAIL(dwFieldSize);
+		// if(pRepair != NULL) { if(IsBadReadPtr(p, dwFieldSize) != FALSE) { _OPENDB_FAIL; } }
+		if(!ReadGroupField(usFieldType, dwFieldSize, (BYTE *)p,
+			&pwGroupTemplate)) { _OPENDB_FAIL; }
+		if(usFieldType == 0xFFFF)
+			++uCurGroup; // Now and ONLY now the counter gets increased
 
 		p += dwFieldSize;
-		if(p < pStart) { _OPENDB_FAIL; }
+		// if(p < pStart) { _OPENDB_FAIL; }
 		pos += dwFieldSize;
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
+		// if(pos >= uFileSize) { _OPENDB_FAIL; }
 	}
 	SAFE_DELETE_ARRAY(pwGroupTemplate.pszGroupName);
 
 	// Get the entries
-	unsigned long uCurEntry;
-	for(uCurEntry = 0; uCurEntry < hdr.dwEntries; )
+	DWORD uCurEntry = 0;
+	while(uCurEntry < hdr.dwEntries)
 	{
 		p = &pVirtualFile[pos];
 
-		if(pRepair != NULL) { if(IsBadReadPtr(p, 2) != FALSE) { _OPENDB_FAIL; } }
+		PWMOD_CHECK_AVAIL(2);
+		// if(pRepair != NULL) { if(IsBadReadPtr(p, 2) != FALSE) { _OPENDB_FAIL; } }
 		memcpy(&usFieldType, p, 2);
 		p += 2; pos += 2;
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
+		// if(pos >= uFileSize) { _OPENDB_FAIL; }
 
-		if(pRepair != NULL) { if(IsBadReadPtr(p, 4) != FALSE) { _OPENDB_FAIL; } }
+		PWMOD_CHECK_AVAIL(4);
+		// if(pRepair != NULL) { if(IsBadReadPtr(p, 4) != FALSE) { _OPENDB_FAIL; } }
 		memcpy(&dwFieldSize, p, 4);
 		p += 4; pos += 4;
-		if(pos >= (uFileSize + dwFieldSize)) { _OPENDB_FAIL; }
+		// if(pos >= (uFileSize + dwFieldSize)) { _OPENDB_FAIL; }
 
-		if(pRepair != NULL) { if(IsBadReadPtr(p, dwFieldSize) != FALSE) { _OPENDB_FAIL; } }
-		bRet = ReadEntryField(usFieldType, dwFieldSize, (BYTE *)p, &pwEntryTemplate);
-		if((usFieldType == 0xFFFF) && (bRet == TRUE))
-			uCurEntry++; // Now and ONLY now the counter gets increased
+		PWMOD_CHECK_AVAIL(dwFieldSize);
+		// if(pRepair != NULL) { if(IsBadReadPtr(p, dwFieldSize) != FALSE) { _OPENDB_FAIL; } }
+		if(!ReadEntryField(usFieldType, dwFieldSize, (BYTE *)p,
+			&pwEntryTemplate)) { _OPENDB_FAIL; }
+		if(usFieldType == 0xFFFF)
+			++uCurEntry; // Now and ONLY now the counter gets increased
 
 		p += dwFieldSize;
-		if(p < pStart) { _OPENDB_FAIL; }
+		// if(p < pStart) { _OPENDB_FAIL; }
 		pos += dwFieldSize;
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
+		// if(pos >= uFileSize) { _OPENDB_FAIL; }
 	}
 	SAFE_DELETE_ARRAY(pwEntryTemplate.pszTitle);
 	SAFE_DELETE_ARRAY(pwEntryTemplate.pszURL);
@@ -349,7 +358,7 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *p
 	mem_erase((unsigned char *)pVirtualFile, uAllocated);
 	SAFE_DELETE_ARRAY(pVirtualFile);
 
-	DWORD dwRemovedStreams = _LoadAndRemoveAllMetaStreams(true);
+	const DWORD dwRemovedStreams = _LoadAndRemoveAllMetaStreams(true);
 	if(pRepair != NULL) pRepair->dwRecognizedMetaStreamCount = dwRemovedStreams;
 	VERIFY(DeleteLostEntries() == 0);
 	FixGroupTree();
@@ -743,14 +752,13 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 	return PWE_SUCCESS;
 }
 
-BOOL CPwManager::ReadGroupField(USHORT usFieldType, DWORD dwFieldSize,
+#define PWMRF_CHECK_AVAIL(w_Cnt_q) { if(dwFieldSize < static_cast<DWORD>(w_Cnt_q)) { \
+	ASSERT(FALSE); return false; } else { ASSERT(dwFieldSize == static_cast<DWORD>(w_Cnt_q)); } }
+
+bool CPwManager::ReadGroupField(USHORT usFieldType, DWORD dwFieldSize,
 	const BYTE *pData, PW_GROUP *pGroup)
 {
 	BYTE aCompressedTime[5];
-
-#ifdef NDEBUG
-	UNREFERENCED_PARAMETER(dwFieldSize);
-#endif
 
 	switch(usFieldType)
 	{
@@ -758,6 +766,7 @@ BOOL CPwManager::ReadGroupField(USHORT usFieldType, DWORD dwFieldSize,
 		// Ignore field
 		break;
 	case 0x0001:
+		PWMRF_CHECK_AVAIL(4);
 		memcpy(&pGroup->uGroupId, pData, 4);
 		break;
 	case 0x0002:
@@ -766,28 +775,35 @@ BOOL CPwManager::ReadGroupField(USHORT usFieldType, DWORD dwFieldSize,
 		pGroup->pszGroupName = _UTF8ToString((UTF8_BYTE *)pData);
 		break;
 	case 0x0003:
+		PWMRF_CHECK_AVAIL(5);
 		memcpy(aCompressedTime, pData, 5);
 		CPwUtil::TimeToPwTime(aCompressedTime, &pGroup->tCreation);
 		break;
 	case 0x0004:
+		PWMRF_CHECK_AVAIL(5);
 		memcpy(aCompressedTime, pData, 5);
 		CPwUtil::TimeToPwTime(aCompressedTime, &pGroup->tLastMod);
 		break;
 	case 0x0005:
+		PWMRF_CHECK_AVAIL(5);
 		memcpy(aCompressedTime, pData, 5);
 		CPwUtil::TimeToPwTime(aCompressedTime, &pGroup->tLastAccess);
 		break;
 	case 0x0006:
+		PWMRF_CHECK_AVAIL(5);
 		memcpy(aCompressedTime, pData, 5);
 		CPwUtil::TimeToPwTime(aCompressedTime, &pGroup->tExpire);
 		break;
 	case 0x0007:
+		PWMRF_CHECK_AVAIL(4);
 		memcpy(&pGroup->uImageId, pData, 4);
 		break;
 	case 0x0008:
+		PWMRF_CHECK_AVAIL(2);
 		memcpy(&pGroup->usLevel, pData, 2);
 		break;
 	case 0x0009:
+		PWMRF_CHECK_AVAIL(4);
 		memcpy(&pGroup->dwFlags, pData, 4);
 		break;
 	case 0xFFFF:
@@ -796,13 +812,15 @@ BOOL CPwManager::ReadGroupField(USHORT usFieldType, DWORD dwFieldSize,
 		RESET_PWG_TEMPLATE(pGroup);
 		break;
 	default:
-		return FALSE; // Field unsupported
+		ASSERT(FALSE);
+		break;
 	}
 
-	return TRUE; // Field supported
+	return true;
 }
 
-BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, const BYTE *pData, PW_ENTRY *pEntry)
+bool CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize,
+	const BYTE *pData, PW_ENTRY *pEntry)
 {
 	BYTE aCompressedTime[5];
 
@@ -812,12 +830,15 @@ BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, const BYT
 		// Ignore field
 		break;
 	case 0x0001:
+		PWMRF_CHECK_AVAIL(16);
 		memcpy(pEntry->uuid, pData, 16);
 		break;
 	case 0x0002:
+		PWMRF_CHECK_AVAIL(4);
 		memcpy(&pEntry->uGroupId, pData, 4);
 		break;
 	case 0x0003:
+		PWMRF_CHECK_AVAIL(4);
 		memcpy(&pEntry->uImageId, pData, 4);
 		break;
 	case 0x0004:
@@ -848,22 +869,22 @@ BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, const BYT
 		pEntry->pszAdditional = _UTF8ToString((UTF8_BYTE *)pData);
 		break;
 	case 0x0009:
-		ASSERT(dwFieldSize == 5);
+		PWMRF_CHECK_AVAIL(5);
 		memcpy(aCompressedTime, pData, 5);
 		CPwUtil::TimeToPwTime(aCompressedTime, &pEntry->tCreation);
 		break;
 	case 0x000A:
-		ASSERT(dwFieldSize == 5);
+		PWMRF_CHECK_AVAIL(5);
 		memcpy(aCompressedTime, pData, 5);
 		CPwUtil::TimeToPwTime(aCompressedTime, &pEntry->tLastMod);
 		break;
 	case 0x000B:
-		ASSERT(dwFieldSize == 5);
+		PWMRF_CHECK_AVAIL(5);
 		memcpy(aCompressedTime, pData, 5);
 		CPwUtil::TimeToPwTime(aCompressedTime, &pEntry->tLastAccess);
 		break;
 	case 0x000C:
-		ASSERT(dwFieldSize == 5);
+		PWMRF_CHECK_AVAIL(5);
 		memcpy(aCompressedTime, pData, 5);
 		CPwUtil::TimeToPwTime(aCompressedTime, &pEntry->tExpire);
 		break;
@@ -896,8 +917,9 @@ BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, const BYT
 		RESET_PWE_TEMPLATE(pEntry);
 		break;
 	default:
-		return FALSE; // Field unsupported
+		ASSERT(FALSE);
+		break;
 	}
 
-	return TRUE; // Field processed
+	return true;
 }

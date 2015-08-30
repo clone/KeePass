@@ -118,24 +118,29 @@ BOOL CLanguagesDlg::OnInitDialog()
 	lvi.pszText = (LPTSTR)(LPCTSTR)strTemp;
 	m_listLang.SetItem(&lvi);
 
-	CFileFind ff;
-	CString csTmp;
-	BOOL chk_w = FALSE;
 	TCHAR szCurrentlyLoaded[MAX_PATH * 2];
-
 	_tcscpy_s(szCurrentlyLoaded, _countof(szCurrentlyLoaded), GetCurrentTranslationTable());
 
 	std_string strFilter = Executable::instance().getPathOnly();
 	strFilter += _T("*.lng");
 
-	chk_w = ff.FindFile(strFilter.c_str(), 0);
-	while(chk_w == TRUE)
+	CFileFind ff;
+	BOOL chk_w = ff.FindFile(strFilter.c_str(), 0);
+	while(chk_w != FALSE)
 	{
 		chk_w = ff.FindNextFile();
 
-		csTmp = ff.GetFileTitle();
-		csTmp = csTmp.MakeLower();
-		if((csTmp != _T("standard")) && (csTmp != _T("english")))
+		// Ignore KeePass 2.x LNGX files (these are found even though
+		// "*.lng" is specified as file mask)
+		CString strFileName = ff.GetFileName();
+		strFileName = strFileName.MakeLower();
+		if((strFileName.GetLength() >= 5) && (strFileName.Right(5) ==
+			_T(".lngx")))
+			continue;
+
+		CString strID = ff.GetFileTitle();
+		strID = strID.MakeLower();
+		if((strID != _T("standard")) && (strID != _T("english")))
 		{
 			VERIFY(LoadTranslationTable((LPCTSTR)ff.GetFileTitle()));
 

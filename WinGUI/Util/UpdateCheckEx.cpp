@@ -240,12 +240,9 @@ void CUpdateCheckEx::GetInstalledComponents(UC_COMPONENTS_LIST& vList,
 {
 	vList.clear();
 
-	const UINT64 qwVersion = PWM_VERSION_DW;
 	UC_COMPONENT_INFO kp;
 	kp.strName = PWM_PRODUCT_NAME_SHORT;
-	kp.qwVerInstalled = ((((((qwVersion >> 24) & 0xFF) << 16) |
-		((qwVersion >> 16) & 0xFF)) << 32) |
-		((((qwVersion >> 8) & 0xFF) << 16) | (qwVersion & 0xFF)));
+	kp.qwVerInstalled = PWM_VERSION_QW;
 	vList.push_back(kp);
 
 	const CPluginManager& pm = CPluginManager::Instance();
