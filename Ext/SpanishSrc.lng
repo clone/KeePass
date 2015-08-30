@@ -1,5 +1,5 @@
 |~LANGUAGENAME||Spanish (Español para España y Latinoamérica)|
-|~LANGUAGEVERSION||0.99b|
+|~LANGUAGEVERSION||0.99c|
 |~LANGUAGEAUTHOR||Marcel Trujillo|
 |~LANGUAGEAUTHOREMAIL||marcelito@gmail.com|
 |&OK||&OK|
@@ -28,7 +28,6 @@
 |&Find||&Encontrar|
 |Find a string in the password list||Encontrar una secuencia en la lista de contraseñas|
 |Find text in password list||Encontrar un texto en la lista de contraseñas|
-|Database Format Version:||Versión de la Base de Datos:|
 |About KeePass...||Acerca de KeePass...|
 |Password Groups||Grupos de Contraseña|
 |Title||Título|
@@ -37,7 +36,6 @@
 |Password||Contraseña|
 |Notes||Comentarios|
 |Ready.||Listo.|
-|Either enter the password/passphrase or select the password disk's drive.||Introduzca una contraseña/frase o seleccione la unidad en donde se encuentra la contraseña.|
 |Enter password:||Introduzca la contraseña:|
 |Select the password disk drive where the key will be stored:||Seleccione la unidad en donde la clave será guardada:|
 |Create a new password database - Enter master key||Crear una nueva contraseña de la base de datos - Introduzca una clave maestra|
@@ -67,8 +65,6 @@
 |Underline character '_'||Caracter subrayado '_'|
 |Minus '-'||Menos '-'|
 |Space ' '||Espacio ' '|
-|Special characters (!, §, $, %, &, ...)||Caracteres especiales (!, §, $, %, &, ...)|
-|Higher ANSI characters (Â, ©, É, µ, ½, ...)||Caracteres ANSI extendidos (Â, ©, É, µ, ½, ...)|
 |Special brackets ('{', '}', '[', ...)||Paréntesis, llaves y corchetes ('{', '}', '[', ...)|
 |Group:||Grupo:|
 |Title:||Título:|
@@ -114,7 +110,6 @@
 |&Save Database||&Guardar Base de Datos|
 |Save Database &As...||Guardar Base de Datos &como...|
 |Change &Master Key For This Database...||&Cambiar la clave maestra para esta Base de Datos...|
-|&Print Complete Password List||&Imprimir lista completa de contraseñas|
 |&Lock Workspace||&Bloquear área de trabajo|
 |&Unlock Workspace||&Desbloquear área de trabajo|
 |&Lock/Unlock Workspace||&Bloquear/Desbloquear área de trabajo|
@@ -149,14 +144,13 @@
 |Password &Generator||&Generador de Contraseñas|
 |&About KeePass...||&Acerca de KeePass...|
 |&Minimize/Maximize Window To/From Tray||Minimizar/Maximizar Ventana de/hacia la Bandeja del Sistema|
-|%u.%u.%u.%u, compatible with %u.%u.x.x||%u.%u.%u.%u, compatible con %u.%u.x.x|
 |Version ||Versión |
 |Password and repeated password aren't identical!||¡La contraseña y la contraseña repetida no son idénticas!|
 |Stop||Detener|
 |Enter a group name!||¡Introduzca un nombre de grupo!|
 |You must generate some random values using the random mouse input box or the edit field before you can close this dialog.||Usted debe generar valores aleatorios utilizando la entrada aleatoria del mouse o el cuadro de edición antes de poder cerrar este diálogo.|
 |No random input||Sin entrada aleatoria|
-|EITHER enter a password/passphrase OR select a key disk drive.||Introduzca una contraseña/frase o seleccione la unidad en donde se encuentra la contraseña.|
+|EITHER enter a password/passphrase OR select a key disk drive.||Introduzca una contraseña/frase O seleccione la unidad en donde se encuentra la clave.|
 |The password must consist of at least one character!||¡La contraseña debe tener al menos un caracter!|
 |Select at least one of the options in the list above!||¡Seleccione al menos una de las opciones de la lista superior!|
 |The following self-tests failed:||Las siguientes pruebas fallaron:|
@@ -210,7 +204,6 @@
 |Please restart KeePass manually.||Por favor reinicie KeePass manualmente.|
 |CSV files||Archivos CSV|
 |Text files||Archivos Texto|
-|An error occured while importing the CSV file. File cannot be imported.||Un error ocurrió mientras se exportaba el archivo CSV. El archivo no fue importado.|
 |An error occured while importing the file. File cannot be imported.||Un error ocurrió mientras se exportaba el archivo. El archivo no fue importado.|
 |Select &Font||Seleccionar &Fuente|
 |&Get more languages...||&Obtener más idiomas...|
@@ -318,7 +311,7 @@
 |Make sure a writable medium is inserted.||Asegúrese que ha insertado un medio con posibilidad de escritura.|
 |Maybe it's read-only or the storage media has been removed.||Tal vez el medio está configurado en "sólo lectura" o ha sido removido.|
 |Not enough free disk space!||No hay suficiente espacio libre en el disco.|
-|Number of key encryption rounds:||Número de claves de encriptación ronda:|
+|Number of key encryption rounds:||Número de veces que será encriptada la clave:|
 |Password List||Lista de Contraseñas|
 |Quality:||Calidad:|
 |Setup||Configuración|
@@ -330,7 +323,6 @@
 |Unsafe operations are disabled.||Operaciones inseguras están deshabilitadas.|
 |Would you like to exit anyway?||¿Desea salir de todos modos?|
 |You have changed an option that requires restarting KeePass to get active.||Usted a cambiado una opción que requiere reiniciar KeePass para que tenga efecto.|
-|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.||Su clave es encriptada varias veces para obtener la clave de encriptación final de la base de datos. Esto añade un factor constante y hace que los ataques de fuerza bruta sean más difíciles.|
 |bits||bits|
 |%u of %u selected||%u de %u seleccionada(s)|
 |&CSV File...||Archivo &CSV...|
@@ -374,7 +366,6 @@
 |N&o Auto-Sort||N&o Auto-Ordenar|
 |Open &Help File||Abrir Arc&hivo de Ayuda|
 |Perform Auto-&Type||Realizar Auto-Escri&tura|
-|Pr&int Group||Impr&imir Grupo|
 |Repeat master key||Repetir clave maestra|
 |Repeat the master key for this database.||Repetir la clave maestra para esta base de datos.|
 |Save key-file manually to...||Guardar archivo de clave manualmente en...|
@@ -414,7 +405,6 @@
 |Invalid/wrong key||Clave inválida/incorrecta|
 |It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.||Es probable que el plugin sea compatible, pero también es posible que haga fallar al KeePass.|
 |KeePass - Save Before Close/Lock?||KeePass - ¿Guardar antes de Cerrar/Bloquear?|
-|Most probably an other application has reserved this hot key already.||Parece que otra aplicación ya se ha reservado esta hot-key.|
 |Never expires||Nunca expira|
 |Number the TANs consecutively, starting from this value||Número de TANs consecutivas, empezando desde este valor|
 |Plugin||Plugin|
@@ -427,7 +417,6 @@
 |This plugin will be enabled after you restart KeePass.||Este plugin será activado después de que reinicie el KeePass.|
 |Timed: copy data to the clipboard and clear it automatically after some seconds||Temporizado: copiar la información al portapapeles y borrarlo automáticamente luego de unos segundos|
 |Too few memory (RAM) available||Muy poca memoria (RAM) disponible|
-|Unable to register a global hot key.||Imposible registrar una hot-key global.|
 |Unknown error||Error desconocido|
 |Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.||¡Advertencia! Es posible que esta opción no funcione correctamente en su sistema, especialmente si usted está utilizando algún programa de portapapeles avanzado o algo similar.|
 |You can choose an other hot key combination in 'Edit - Options - Setup'.||Usted puede seleccionar otra combinación para la hot-key en 'Editar - Opciones - Configuración'.|
@@ -463,3 +452,26 @@
 |Select a new font for the list controls:||Seleccionar una nueva fuente para la lista de controles:|
 |Show grid lines in password entry list||Mostrar líneas cuadriculadas en la lista de contraseñas|
 |Start minimized and locked||Iniciar minimizado y bloqueado|
+|&Print...||Im&primir...|
+|1 month||1 mes|
+|1 week||1 semana|
+|2 weeks||2 semanas|
+|3 months||3 meses|
+|By default, new entries expire in the following number of days:||Por defecto, las nuevas entradas expiran en el siguiente número de días:|
+|Calculate rounds for a 1-second delay on this computer||Calcular el número de vueltas que causarán un retraso de 1 segundo en esta computadora|
+|Cannot register the global hot key.||No se puede registrar la hot-key global.|
+|Click to expire the entry in %u days||Click para expirar la entrada en %u días|
+|Enter the passphrase and/or select the key-disk's drive.||Introduzca la frase de contraseña y/o seleccione la unidad con la clave.|
+|Exclude entries in the '&Backup' group||Excluir entradas en el grupo '&Respaldo'|
+|Field has been pasted.||El campo ha sido pegado.|
+|Higher ANSI characters||Caracteres ANSI extendidos|
+|Limit to single instance||Permitir una única instancia|
+|Most probably another application has reserved this hot key already.||Probablemente otra aplicación ya tiene asignada esta hot-key.|
+|Paste operation completed.||Operación de pegado completada.|
+|Pr&int Group...||Impr&imir Grupo...|
+|Single left click instead of double-click for default tray icon action||Click único en vez de doble-click para ejecutar desde el icono en la bandeja de sistema|
+|Special characters||Caracteres especiales|
+|The program is distributed under the terms of the GNU General Public License v2 or later.||El programa es distribuido bajo los términos de la GNU General Public License v2 o posterior.|
+|Use more secure password edit controls||Usar controles de edición de contraseña más seguros|
+|Waiting for paste command.||Esperando por comando de pegado.|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.||Su clave es encriptada varias veces con la finalidad de aumentar su seguridad, haciéndola más resistente a ataques de diccionario.|

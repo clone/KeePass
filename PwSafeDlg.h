@@ -58,7 +58,8 @@
 #define ICOIDX_RAMDISK 20
 #define ICOIDX_NODRIVE 21
 
-#define PWS_DEFAULT_SPLITTER_Y 270
+// #define PWS_DEFAULT_SPLITTER_Y 270
+#define PWS_DEFAULT_SPLITTER_Y 10
 
 #define PWS_TAN_ENTRY      TRL("<TAN>")
 #define PWS_NEW_ATTACHMENT _T(":: ")
@@ -193,7 +194,7 @@ public:
 		m_dwOldListParameters = dw;
 	}
 
-	void _RemoveSearchGroup();
+	BOOL _RemoveSearchGroup();
 
 	void _SelChangeView(UINT uID);
 	void _List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEntry, PW_TIME *ptNow);
@@ -276,6 +277,7 @@ public:
 	BOOL m_bUsePuttyForURLs;
 	BOOL m_bSaveOnLATMod;
 	BOOL m_bStartMinimized;
+	BOOL m_bQuickFindIncBackup;
 
 	CStatusBarCtrl m_sbStatus;
 	BOOL m_bShowToolBar;
@@ -298,6 +300,7 @@ public:
 	BOOL m_bEntryView;
 	BOOL m_bColAutoSize;
 	int m_nAutoSort;
+	BOOL m_bAutoPwGen;
 
 	HICON m_hTrayIconNormal;
 	HICON m_hTrayIconLocked;
@@ -611,6 +614,7 @@ protected:
 	afx_msg void OnExtrasPluginMgr();
 	afx_msg LRESULT OnHotKey(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnImportGetMore();
+	afx_msg void OnInfoDonate();
 	//}}AFX_MSG
 
 	afx_msg void OnPluginMessage(UINT nID);

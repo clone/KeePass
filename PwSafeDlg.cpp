@@ -401,6 +401,7 @@ BEGIN_MESSAGE_MAP(CPwSafeDlg, CDialog)
 	ON_COMMAND(ID_EXTRAS_PLUGINMGR, OnExtrasPluginMgr)
 	ON_MESSAGE(WM_HOTKEY, OnHotKey)
 	ON_COMMAND(ID_IMPORT_GETMORE, OnImportGetMore)
+	ON_COMMAND(ID_INFO_DONATE, OnInfoDonate)
 	//}}AFX_MSG_MAP
 
 	ON_COMMAND_RANGE(WM_PLUGINS_FIRST, WM_PLUGINS_LAST, OnPluginMessage)
@@ -672,6 +673,8 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bBackupEntries = cConfig.GetBool(PWMKEY_BACKUPENTRIES, FALSE);
 	m_bSecureEdits = cConfig.GetBool(PWMKEY_SECUREEDITS, TRUE);
 	m_bSingleClickTrayIcon = cConfig.GetBool(PWMKEY_SINGLECLICKTRAY, FALSE);
+	m_bAutoPwGen = cConfig.GetBool(PWMKEY_AUTOPWGEN, TRUE);
+	m_bQuickFindIncBackup = cConfig.GetBool(PWMKEY_QUICKFINDINCBK, TRUE);
 
 	m_bShowToolBar = cConfig.GetBool(PWMKEY_SHOWTOOLBAR, TRUE);
 
@@ -951,7 +954,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	VERIFY(m_tip.Create(this));
 	m_tip.AddTool(GetDlgItem(IDC_EDIT_QUICKFIND), TRL("Find a string in the password list"));
 
-	int px, py, dx, dy, idScreenNow, idScreenSaved; // Restore window position
+	int px, py, dx, dy; // Restore window position
 	cConfig.Get(PWMKEY_WINDOWPX, szTemp);
 	if(_tcslen(szTemp) > 0) px = _ttoi(szTemp); else px = -1;
 	cConfig.Get(PWMKEY_WINDOWPY, szTemp);
@@ -960,18 +963,16 @@ BOOL CPwSafeDlg::OnInitDialog()
 	if(_tcslen(szTemp) > 0) dx = _ttoi(szTemp); else dx = -1;
 	cConfig.Get(PWMKEY_WINDOWDY, szTemp);
 	if(_tcslen(szTemp) > 0) dy = _ttoi(szTemp); else dy = -1;
-	cConfig.Get(PWMKEY_SCREENID, szTemp);
-	if(_tcslen(szTemp) > 0) idScreenSaved = _ttoi(szTemp); else idScreenSaved = -1;
 
 	if((px == 3000) && (py == 3000)) { px = 0; py = 0; }
-
-	idScreenNow = GetSystemMetrics(SM_CXSCREEN) ^ (GetSystemMetrics(SM_CYSCREEN) << 12);
+	if(px > GetSystemMetrics(SM_CXSCREEN)) px = 0;
+	if(py > GetSystemMetrics(SM_CYSCREEN)) py = 0;
 
 	m_lSplitterPosHoriz = GUI_GROUPLIST_EXT + 1;
-	m_lSplitterPosVert = ((rectClient.bottom - rectClient.top - PWS_DEFAULT_SPLITTER_Y) * 3) / 4;
+	m_lSplitterPosVert = (rectClient.bottom - rectClient.top - PWS_DEFAULT_SPLITTER_Y) / 4;
 	ASSERT(m_lSplitterPosVert > 0);
 
-	if((px != -1) && (py != -1) && (dx != -1) && (dy != -1) && (idScreenNow == idScreenSaved))
+	if((px != -1) && (py != -1) && (dx != -1) && (dy != -1))
 	{
 		if(px < -20) px = 0;
 		if(py < -20) py = 0;
@@ -1009,7 +1010,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	
 	cConfig.Get(PWMKEY_SPLITTERY, szTemp);
 	if(_tcslen(szTemp) != 0) m_lSplitterPosVert = _ttol(szTemp);
-	else m_lSplitterPosVert = PWS_DEFAULT_SPLITTER_Y;
+	// else m_lSplitterPosVert = PWS_DEFAULT_SPLITTER_Y; // Set above already
 
 	// if(m_bAlwaysOnTop == TRUE)
 	//	SetWindowPos(&wndTopMost, 0, 0, 0, 0,
@@ -1772,6 +1773,8 @@ void CPwSafeDlg::SaveOptions()
 	pcfg.SetBool(PWMKEY_BACKUPENTRIES, m_bBackupEntries);
 	pcfg.SetBool(PWMKEY_SECUREEDITS, m_bSecureEdits);
 	pcfg.SetBool(PWMKEY_SINGLECLICKTRAY, m_bSingleClickTrayIcon);
+	pcfg.SetBool(PWMKEY_AUTOPWGEN, m_bAutoPwGen);
+	pcfg.SetBool(PWMKEY_QUICKFINDINCBK, m_bQuickFindIncBackup);
 
 	pcfg.SetBool(PWMKEY_SHOWTITLE, m_bShowTitle);
 	pcfg.SetBool(PWMKEY_SHOWUSER, m_bShowUserName);
@@ -1812,11 +1815,7 @@ void CPwSafeDlg::SaveOptions()
 
 	if((m_bMinimized == FALSE) && (m_bMaximized == FALSE))
 	{
-		int idScreen;
 		RECT rect;
-		idScreen = GetSystemMetrics(SM_CXSCREEN) ^ (GetSystemMetrics(SM_CYSCREEN) << 12);
-		_itot(idScreen, szTemp, 10);
-		pcfg.Set(PWMKEY_SCREENID, szTemp);
 
 		GetWindowRect(&rect);
 		_itot(rect.left, szTemp, 10);
@@ -2470,6 +2469,7 @@ void CPwSafeDlg::OnPwlistAdd()
 	dlg.m_nIconId = 0;
 	dlg.m_bEditMode = FALSE;
 	dlg.m_dwDefaultExpire = m_dwDefaultExpire;
+	dlg.m_bAutoPwGen = m_bAutoPwGen;
 	dwInitialGroup = uGroupId; // ID
 
 	if(m_dwDefaultExpire == 0) m_mgr._GetNeverExpireTime(&dlg.m_tExpire);
@@ -2883,9 +2883,16 @@ void CPwSafeDlg::OnClickGroupList(NMHDR* pNMHDR, LRESULT* pResult)
 	HTREEITEM h = m_cGroups.HitTest(CPoint(pt));
 	m_cGroups.SelectItem(h); // Select the item the user pointed to
 
+	// Remove the search group because we cannot handle it like a normal group
 	_Groups_SaveView(TRUE);
-	_RemoveSearchGroup(); // Remove the search group because we cannot handle it like a normal group
-	_Groups_RestoreView();
+	DWORD dwCachedFirst = m_dwGroupsSaveFirstVisible;
+	DWORD dwCachedSelected = (h != NULL) ? m_cGroups.GetItemData(h) : DWORD_MAX;
+	if(_RemoveSearchGroup() == TRUE)
+	{
+		m_dwGroupsSaveFirstVisible = dwCachedFirst;
+		m_dwGroupsSaveSelected = dwCachedSelected;
+		_Groups_RestoreView();
+	}
 
 	UpdatePasswordList();
 	_UpdateToolBar();
@@ -2895,8 +2902,7 @@ void CPwSafeDlg::OnPwlistCopyPw()
 {
 	NotifyUserActivity();
 	m_bDisplayDialog = TRUE;
-	if(_CALLPLUGINS(KPM_PW_COPY, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+	if(_CALLPLUGINS(KPM_PW_COPY, 0, 0) == FALSE) { m_bDisplayDialog = FALSE; return; }
 	m_bDisplayDialog = FALSE;
 
 	DWORD dwIndex = _ListSelToEntryIndex();
@@ -3586,11 +3592,11 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile, const TCHAR *pszPassword, c
 					if(pszKeyFile != NULL)
 					{
 						pDlgPass->m_bKeyFile = TRUE;
-						pDlgPass->m_lpInitialKey = _tcsdup(pszKeyFile);
+						pDlgPass->m_lpKey = _tcsdup(pszKeyFile);
 
 						if(pszPassword != NULL)
 						{
-							pDlgPass->m_lpInitialKey2 = _tcsdup(pszPassword);
+							pDlgPass->m_lpKey2 = _tcsdup(pszPassword);
 							pDlgPass->m_bKeyMethod = PWM_KEYMETHOD_AND;
 						}
 						else pDlgPass->m_bKeyMethod = PWM_KEYMETHOD_OR;
@@ -3598,7 +3604,7 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile, const TCHAR *pszPassword, c
 					else // pszKeyFile == NULL
 					{
 						pDlgPass->m_bKeyFile = FALSE;
-						pDlgPass->m_lpInitialKey = _tcsdup(pszPassword);
+						pDlgPass->m_lpKey = _tcsdup(pszPassword);
 						pDlgPass->m_bKeyMethod = PWM_KEYMETHOD_OR;
 					}
 				}
@@ -3664,6 +3670,7 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile, const TCHAR *pszPassword, c
 					dwEntryPos = _EntryUuidToListPos(m_mgr.m_aLastSelectedEntryUuid);
 					if(dwEntryPos != DWORD_MAX) m_cList.SetItemState((int)dwEntryPos, LVIS_SELECTED, LVIS_SELECTED);
 
+					SetStatusTextEx(TRL("Ready."));
 					break;
 				}
 			}
@@ -3686,7 +3693,7 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile, const TCHAR *pszPassword, c
 		_CALLPLUGINS(KPM_OPENDB_POST, 0, 0);
 	}
 
-	_UpdateToolBar();
+	_UpdateToolBar(TRUE);
 	NotifyUserActivity();
 	m_cList.SetFocus();
 }
@@ -3999,6 +4006,8 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_bSecureEdits = m_bSecureEdits;
 	dlg.m_bSingleClickTrayIcon = m_bSingleClickTrayIcon;
 	dlg.m_dwDefaultExpire = m_dwDefaultExpire;
+	dlg.m_bAutoPwGen = m_bAutoPwGen;
+	dlg.m_bQuickFindIncBackup = m_bQuickFindIncBackup;
 
 	if(_CALLPLUGINS(KPM_OPTIONS_PRE, 0, 0) == FALSE)
 		{ m_bDisplayDialog = FALSE; return; }
@@ -4028,6 +4037,8 @@ void CPwSafeDlg::OnSafeOptions()
 		m_bCheckForInstance = dlg.m_bSingleInstance;
 		m_bSecureEdits = dlg.m_bSecureEdits;
 		m_bSingleClickTrayIcon = dlg.m_bSingleClickTrayIcon;
+		m_bAutoPwGen = dlg.m_bAutoPwGen;
+		m_bQuickFindIncBackup = dlg.m_bQuickFindIncBackup;
 
 		if(dlg.m_bDefaultExpire == FALSE) m_dwDefaultExpire = 0;
 		else m_dwDefaultExpire = dlg.m_dwDefaultExpire;
@@ -5447,7 +5458,10 @@ void CPwSafeDlg::OnFileLock()
 			// SetWindowText(strExtended);
 			// m_systray.SetTooltipText(strExtended); // Done in _OpenDatabase already
 			// m_systray.SetIcon(m_hTrayIconLocked);
-			MessageBox(TRL("Workspace cannot be unlocked!"), TRL("Password Safe"), MB_ICONINFORMATION | MB_OK);
+
+			// MessageBox(TRL("Workspace cannot be unlocked!"), TRL("Password Safe"), MB_ICONINFORMATION | MB_OK);
+			SetStatusTextEx(TRL("Workspace cannot be unlocked!"));
+
 			m_bDisplayDialog = FALSE; return;
 		}
 
@@ -5634,7 +5648,7 @@ LRESULT CPwSafeDlg::OnUpdateClipboard(WPARAM wParam, LPARAM lParam)
 		iSpinner = 0; // Stop posting WM_MY_UPDATECLIPBOARD messages
 
 	return 0;
-};
+}
 
 void CPwSafeDlg::OnViewHide()
 {
@@ -6231,7 +6245,7 @@ void CPwSafeDlg::_ShowToolBar(BOOL bShow)
 	GetDlgItem(IDC_STATIC_TBSEP4)->ShowWindow(nCommand); GetDlgItem(IDC_STATIC_TBSEP5)->ShowWindow(nCommand);
 }
 
-void CPwSafeDlg::_RemoveSearchGroup()
+BOOL CPwSafeDlg::_RemoveSearchGroup()
 {
 	DWORD dwSearchGroupId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
 
@@ -6244,8 +6258,12 @@ void CPwSafeDlg::_RemoveSearchGroup()
 			m_mgr.DeleteGroupById(dwSearchGroupId); // Remove from password manager
 			UpdateGroupList();
 			ShowEntryDetails(NULL);
+
+			return TRUE;
 		}
 	}
+
+	return FALSE;
 }
 
 void CPwSafeDlg::OnPwlistMassModify()
@@ -7665,11 +7683,15 @@ void CPwSafeDlg::_ShowExpiredEntries(BOOL bShowIfNone, BOOL bShowExpired, BOOL b
 	{
 		DWORD i;
 		BOOL bAtLeastOneExpired = FALSE;
+		DWORD dwInvalidGroup1 = m_mgr.GetGroupId(PWS_BACKUPGROUP_SRC);
+		DWORD dwInvalidGroup2 = m_mgr.GetGroupId(PWS_BACKUPGROUP);
 
 		for(i = 0; i < m_mgr.GetNumberOfEntries(); i++)
 		{
 			pe = m_mgr.GetEntry(i);
-			ASSERT(pe != NULL);
+			ASSERT(pe != NULL); if(pe == NULL) continue;
+
+			if((pe->uGroupId == dwInvalidGroup1) || (pe->uGroupId == dwInvalidGroup2)) continue;
 
 			if(bShowExpired == TRUE)
 			{
@@ -7915,6 +7937,9 @@ void CPwSafeDlg::_DoQuickFind()
 	ASSERT((dwGroupId != DWORD_MAX) && (dwGroupId != 0));
 	if((dwGroupId == DWORD_MAX) || (dwGroupId == 0)) return;
 
+	DWORD dwBackup1 = m_mgr.GetGroupId(PWS_BACKUPGROUP);
+	DWORD dwBackup2 = m_mgr.GetGroupId(PWS_BACKUPGROUP_SRC);
+
 	while(1)
 	{
 		dw = m_mgr.Find((LPCTSTR)m_strQuickFind, FALSE, dwFlags, cnt);
@@ -7928,18 +7953,21 @@ void CPwSafeDlg::_DoQuickFind()
 
 			if(p->uGroupId != dwGroupId)
 			{
-				dwGroupInx = m_mgr.GetGroupByIdN(p->uGroupId);
-				ASSERT(dwGroupInx != DWORD_MAX);
+				if((m_bQuickFindIncBackup == TRUE) || ((p->uGroupId != dwBackup1) && (p->uGroupId != dwBackup2)))
+				{
+					dwGroupInx = m_mgr.GetGroupByIdN(p->uGroupId);
+					ASSERT(dwGroupInx != DWORD_MAX);
 
-				// The entry could get reallocated by AddEntry, therefor
-				// save it to a local CString object
-				m_mgr.UnlockEntryPassword(p);
-				strTemp = p->pszPassword;
-				m_mgr.LockEntryPassword(p);
+					// The entry could get reallocated by AddEntry, therefore
+					// save it to a local CString object
+					m_mgr.UnlockEntryPassword(p);
+					strTemp = p->pszPassword;
+					m_mgr.LockEntryPassword(p);
 
-				_List_SetEntry(m_cList.GetItemCount(), p, TRUE, &tNow);
+					_List_SetEntry(m_cList.GetItemCount(), p, TRUE, &tNow);
 
-				EraseCString(&strTemp); // Destroy the plaintext password
+					EraseCString(&strTemp); // Destroy the plaintext password
+				}
 			}
 		}
 
@@ -8158,34 +8186,35 @@ void CPwSafeDlg::_AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus)
 
 	if(bLoseFocus == TRUE)
 	{
-		HWND hMe = ::GetForegroundWindow();
+		HWND hWnd = ::GetWindow(this->m_hWnd, GW_HWNDFIRST);
+		LONG lStyle;
+		WINDOWPLACEMENT wp;
 
-		SetWindowPos(&CWnd::wndBottom, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
-
-		if(m_bMinimized == FALSE)
-		{
-			if(m_bMinimizeToTray == FALSE)
-			{
-				ShowWindow(SW_MINIMIZE);
-				m_bMinimized = TRUE;
-			}
-			else if(m_bShowWindow == TRUE)
-			{
-				ShowWindow(SW_MINIMIZE);
-				OnViewHide();
-			}
-		}
-
-		HWND h;
-		DWORD dwStartTime = timeGetTime();
+		ZeroMemory(&wp, sizeof(WINDOWPLACEMENT));
+		wp.length = sizeof(WINDOWPLACEMENT);
 
 		while(1)
 		{
-			h = ::GetForegroundWindow();
-			if(h != hMe) break;
+			if(hWnd != this->m_hWnd)
+			{
+				lStyle = ::GetWindowLong(hWnd, GWL_STYLE);
+				::GetWindowPlacement(hWnd, &wp);
 
-			if((timeGetTime() - dwStartTime) > 750) break;
+				if(((lStyle & WS_VISIBLE) == WS_VISIBLE) && (wp.showCmd != SW_SHOWMINIMIZED))
+				{
+					TCHAR tszWindowBuf[256];
+					::GetWindowText(hWnd, tszWindowBuf, 255);
+
+					if(tszWindowBuf[0] != 0) break;
+				}
+			}
+
+			hWnd = ::GetWindow(hWnd, GW_HWNDNEXT);
+			if(hWnd == NULL) break;
 		}
+
+		SetWindowPos(&CWnd::wndBottom, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+		if(hWnd != NULL) ::SetForegroundWindow(hWnd);
 	}
 
 	Sleep(50);
@@ -8199,7 +8228,14 @@ void CPwSafeDlg::_AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus)
 	sk.SendKeyUp(VK_LMENU); sk.SendKeyUp(VK_RMENU); sk.SendKeyUp(VK_MENU);
 	sk.SendKeyUp(VK_LWIN); sk.SendKeyUp(VK_RWIN);
 
-	sk.SendKeys((LPCTSTR)str, false);
+	MSG msgClearWait;
+	while(::PeekMessage(&msgClearWait, 0, WM_KEYFIRST, WM_KEYLAST, PM_REMOVE))
+	{
+		::TranslateMessage(&msgClearWait);
+		::DispatchMessage(&msgClearWait);
+	}
+
+	sk.SendKeys((LPCTSTR)str, true);
 
 	if((bLoseFocus == TRUE) && (m_bAlwaysOnTop == TRUE))
 		SetWindowPos(&CWnd::wndTopMost, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
@@ -8475,6 +8511,9 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 
 				if((pe->uGroupId == dwInvalidId1) || (pe->uGroupId == dwInvalidId2)) continue;
 
+				strWindowExp = ExtractParameterFromString(pe->pszAdditional, _T("auto-type-window:"));
+				if(strWindowExp.GetLength() != 0) continue;
+
 				strWindowExp = pe->pszTitle;
 				nSubLen = strWindowExp.GetLength();
 
@@ -8624,6 +8663,8 @@ BOOL CPwSafeDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	DWORD dwLen, dwPasswordLen, dwKeyFileLen;
 	CString strData, strPassword, strKeyFile, strFile;
 
+	NotifyUserActivity();
+
 	if(pCopyDataStruct->lpData != NULL)
 	{
 		dwLen = (DWORD)_tcslen((LPCTSTR)pCopyDataStruct->lpData);
@@ -8655,7 +8696,15 @@ BOOL CPwSafeDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 			_OpenDatabase(strFile, NULL, strKeyFile, FALSE, NULL);
 		else
 			_OpenDatabase(strFile, NULL, NULL, FALSE, NULL);
+
+		if((m_bMinimized == TRUE) || (m_bShowWindow == FALSE)) OnViewHide();
 	}
 
 	return TRUE;
+}
+
+void CPwSafeDlg::OnInfoDonate() 
+{
+	NotifyUserActivity();
+	ShellExecute(NULL, _T("open"), _T("http://keepass.sourceforge.net/donate.php"), NULL, NULL, SW_SHOW);
 }

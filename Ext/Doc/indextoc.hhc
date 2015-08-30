@@ -21,6 +21,10 @@
 			<param name="Local" value="install.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="First Steps Tutorial">
+			<param name="Local" value="first.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Features Overview">
 			<param name="Local" value="features.html">
 			</OBJECT>
@@ -62,7 +66,7 @@
 			<param name="Local" value="autotype.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="The URL Field">
+			<param name="Name" value="URL Field Features">
 			<param name="Local" value="autourl.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
@@ -81,6 +85,10 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="File Formats (CSV/XML)">
 			<param name="Local" value="filefmts.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Secure Edit Controls">
+			<param name="Local" value="secureedits.html">
 			</OBJECT>
 	</UL>
 </UL>

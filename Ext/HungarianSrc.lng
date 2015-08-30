@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Magyar|
-|~LANGUAGEVERSION|             |0.99b|
+|~LANGUAGEVERSION|             |0.99c|
 |~LANGUAGEAUTHOR|              |documan|
 |~LANGUAGEAUTHOREMAIL|         |documan at mailbox dot hu|
 
@@ -34,7 +34,6 @@
 |Find a string in the password list|           |Sztring keresése a jelszólistában|
 |Find text in password list|   |Szöveg keresése a jelszólistában|
 
-|Database Format Version:|     |Adatbázis Formátum Verzió:|
 |About KeePass...|             |A KeePass névjegye...|
 
 |Password Groups|              |Jelszó csoportok|
@@ -46,8 +45,6 @@
 
 |Ready.|                       |Kész.|
 
-|Either enter the password/passphrase or select the password disk's drive.|
-    |Vagy adj meg egy jelszót vagy válassz egy jelszó lemez meghajtót.|
 |Enter password:|              |Add meg a jelszót:|
 |Select the password disk drive where the key will be stored:|
     |Válaszd ki a jelszó meghajtóját, ahol a kulcs tárolva lesz:|
@@ -93,10 +90,6 @@
     |Minusz '-'|
 |Space ' '|
     |Szóköz ' '|
-|Special characters (!, §, $, %, &, ...)|
-    |Speciális karakterek (!, §, $, %, &, ...)|
-|Higher ANSI characters (Â, ©, É, µ, ½, ...)|
-    |Felsõbb ANSI karakterek (Â, ©, É, µ, ½, ...)|
 |Special brackets ('{', '}', '[', ...)|
     |Speciális zárójelek ('{', '}', '[', ...)|
 
@@ -160,7 +153,6 @@
 |&Save Database|               |Adatbázis &mentése|
 |Save Database &As...|         |Adatbázis mentése mint...|
 |Change &Master Key For This Database...|      |Az adatbázis &mester kulcsának megváltoztatása...|
-|&Print Complete Password List|                |A teljes jelszólista nyomtatása|
 |&Export To|                   |&Exportálás|
 |&Lock Workspace|              |Munkafelület le&zárása|
 |&Unlock Workspace|            |Munkafelület fel&oldása|
@@ -173,7 +165,6 @@
 |Add Password Su&bgroup...|    |Jelszó &alcsoport létrehozása|
 |Modif&y Password Group...|    |Jelszó csoport &módosítása...|
 |&Delete Password Group...|    |Jelszó csoport &törlése...|
-|Pr&int Group|                 |Csoport nyomtatása|
 |Export Group To &HTML...|     |Csoport exportálása &HTML-ként...|
 |Export Group To &XML...|      |Csoport exportálása &XML-ként...|
 |Export Group To &CSV...|      |Csoport exportálása &CSV-ként...|
@@ -216,8 +207,6 @@
 |&Minimize/Maximize Window To/From Tray|
     |Kis méret / Elõzõ méret|
 
-|%u.%u.%u.%u, compatible with %u.%u.x.x|
-    |%u.%u.%u.%u, kompatibilis a %u.%u.x.x verzióval|
 |Version | |Verzió |
 
 |Password and repeated password aren't identical!|
@@ -324,8 +313,6 @@
 
 |CSV files|                    |CSV fájlok|
 |Text files|                   |Szövegfájlok|
-|An error occured while importing the CSV file. File cannot be imported.|
-    |Hiba történt a CVS fájl importálásakor. A fájl nem importálható.|
 |An error occured while importing the file. File cannot be imported.|
     |Hiba történt a fájl importálásakor. A fájl nem importálható.|
 |&CSV File...|                 |&CVS fájl...|
@@ -488,8 +475,6 @@
 |Database Settings|                       |Adatbázis beállítások|
 |Here you can configure the current database.| |Itt tudod konfigurálni az aktuális adatbázist.|
 |Database Summary|                        |Adatbázis összefoglaló|
-|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
-    |Ez a kulcs több alkalommal is titkosítva lett a végleges adatbázis titkosító kulcs elkészülte elõtt. Ez biztosítja az állandósági tényezõt és megnehezíti a nyers-erejû támadásokat.|
 |The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
     |Minél nagyobb ez a szám, annál nehezebb a dolga a támadónak. Ugyanakkor minél nagyobb a szám, annál lassabb lesz az adatbázis betöltése és mentése.|
 |Number of key encryption rounds:|        |Titkosítási fordulók száma:|
@@ -562,7 +547,6 @@
 |Invalid/wrong key| |Érvénytelen/rossz kulcs|
 |It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.| |Elõfordulhat hogy a bõvítmény kompatibilis, de akár a KeePass leállását is okozhatja.|
 |KeePass - Save Before Close/Lock?| |KeePass - Mentsek Bezárás/Lezárás elõtt?|
-|Most probably an other application has reserved this hot key already.| |Valószínûleg más alkalmazás már használja ezt a billentyûparancsot.|
 |Never expires| |Soha nem jár le|
 |Number the TANs consecutively, starting from this value| |A TANok számozása értelemszerûen, ettõl az értéktõl kezdve|
 |Plugin| |Bõvítmény|
@@ -575,7 +559,6 @@
 |This plugin will be enabled after you restart KeePass.| |A bõvítmény a KeePass következõ indításakor kerül engedélyezésre.|
 |Timed: copy data to the clipboard and clear it automatically after some seconds| |Idõzített: az adatot vágólapra másolja, majd automatikusan törli onnan néhány másodperc elteltével.|
 |Too few memory (RAM) available| |Túl kevés memória (RAM) áll rendelkezésre|
-|Unable to register a global hot key.| |A globális billentyûparancsot nem lehet regisztrálni.|
 |Unknown error| |Ismeretlen hiba|
 |Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.| |Figyelem! Lehetséges, hogy ez az opció nem fog megfelelõen mûködni a te rendszereden, különösen ha egyéb vágólap-javító vagy hasonló eszközt használsz.|
 |You can choose an other hot key combination in 'Edit - Options - Setup'.| |Választhatsz egy másik billentyûparancsot a 'Szerkesztés - Opciók - Telepítés' menüpont alatt.|
@@ -614,3 +597,26 @@
 |Show grid lines in password entry list| |Keret kijelzése a jelszóbejegyzések listájában|
 |Start minimized and locked| |Indítás a tálcára kicsinyítve és lezárva|
 
+|&Print...| |&Nyomtatás...|
+|1 month| |1 hónap|
+|1 week| |1 hét|
+|2 weeks| |2 hét|
+|3 months| |3 hónap|
+|By default, new entries expire in the following number of days:| |Alapértelmezésként az új bejegyzések a következõ idõszak elteltével járnak le:|
+|Calculate rounds for a 1-second delay on this computer| |Fordulók kiszámolása 1-másodperces késés esetén ezen a gépen|
+|Cannot register the global hot key.| |A globális billentyûparancsot nem lehet regisztrálni.|
+|Click to expire the entry in %u days| |Klikk ide és a bejegyzés %u nap múlva lejár|
+|Enter the passphrase and/or select the key-disk's drive.| |Add meg a jelszót és/vagy válaszd ki a kulcs-lemez meghajtóját.|
+|Exclude entries in the '&Backup' group| |A '&Biztonsági mentés' csoport bejegyzéseinek kihagyása|
+|Field has been pasted.| |A mezõ be lett illesztve.|
+|Higher ANSI characters| |Magasabb ANSI karakterek|
+|Limit to single instance| |Korlátozás egyetlen példányra|
+|Most probably another application has reserved this hot key already.| |Valószínûleg más alkalmazás már regisztrálta ezt a billentyûparancsot.|
+|Paste operation completed.| |A beillesztési mûvelet befejezõdött.|
+|Pr&int Group...| |Csoprt &nyomtatása...|
+|Single left click instead of double-click for default tray icon action| |Egy klikk használata a dupla klikk helyett a tálca ikonja esetén|
+|Special characters| |Speciális karakterek|
+|The program is distributed under the terms of the GNU General Public License v2 or later.| |A program a GNU General Public License v2 vagy ennél késõbbi verziójának feltételei mellett került kiadásra.|
+|Use more secure password edit controls| |Még biztonságosabb jelszó szerkesztõ elemek használata|
+|Waiting for paste command.| |Várakozás a beillesztés parancsra.|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.| |Ez a kulcs több alkalommal is titkosítva lett a végleges adatbázis titkosító kulcs elkészülte elõtt. Ez biztosítja az állandósági tényezõt és megnehezíti a nyers-erejû támadásokat.|

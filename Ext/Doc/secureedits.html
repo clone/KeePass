@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Secure Edit Controls</title>
+	<link rel="stylesheet" type="text/css" href="default.css" />
+</head>
+<body>
+
+<table class="tablebox"><tr><td class="boxtitle">
+<img src="images/menunews.gif" width="31px" height="21px" class="singleimg">
+Secure Edit Controls</td></tr></table>
+<br />
+
+KeePass was the first password manager featuring more secure edit controls. The
+edit controls used in KeePass are resistant to password revealers and password
+control spies. Additionally, the entered passwords are protected against
+memory dumping attacks: the passwords aren't even visible in the process memory space
+of KeePass!<br />
+<br />
+KeePass uses secure edit controls only when the hiding behind asterisks option
+is turned on! If you show the passwords in plaintext, they won't be protected
+(secure edit controls are just disabled then, replaced by standard Windows edit
+controls). In unprotected mode, secure edit controls behave like normal
+Windows edit controls (no selection limitation, etc.).<br />
+<br />
+<br />
+<b>Selection Limitation</b><br />
+<br />
+A 'natural' limitation of these secure edit controls is that you can't select
+a range of characters. You for example cannot select 3 characters and replace
+them by the current contents of the clipboard using the paste command.<br />
+<br />
+If you want to delete all the contents of a secure edit control, press
+<i>Shift-Home</i> or <i>Shift-End</i>. This will remove all entered characters.<br />
+<br />
+<br />
+<b>Technical background</b><br />
+<br />
+If you want to know more about how it's working internally,
+read this article (by the KeePass author) about secure edit controls:<br />
+<br />
+<a href="http://www.codeproject.com/editctrl/SecEditEx.asp" target="_blank">http://www.codeproject.com/editctrl/SecEditEx.asp</a>.<br />
+
+</body>
+</html>

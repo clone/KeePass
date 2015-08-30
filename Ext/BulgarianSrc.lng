@@ -1,4 +1,4 @@
-|~LANGUAGEVERSION| |0.99b|
+|~LANGUAGEVERSION| |0.99c|
 |~LANGUAGEAUTHOR|     |DonAngel|
 |~LANGUAGEAUTHOREMAIL| |public@doncho.net|
 |~LANGUAGENAME|       |Български|
@@ -34,7 +34,6 @@
 |Find a string in the password list|           |Търсене на текст в списъка с пароли|
 |Find text in password list|   |Търси текст в списъка с пароли|
 
-|Database Format Version:|     |Версия на базата данни:|
 |About KeePass...|             |За KeePass...|
 
 |Password Groups|              |Групи пароли|
@@ -46,8 +45,6 @@
 
 |Ready.|                       |Готов.|
 
-|Either enter the password/passphrase or select the password disk's drive.|
-    |Моля въведете паролата или изберете устройството, съдържащо файла с парола.|
 |Enter password:|              |Въведете парола:|
 |Select the password disk drive where the key will be stored:|
     |Изберете устройството,където ключът ще се запази:|
@@ -91,10 +88,6 @@
     |Минус '-'|
 |Space ' '|
     |Интервал ' '|
-|Special characters (!, §, $, %, &, ...)|
-    |Специални символи (!, §, $, %, &, ...)|
-|Higher ANSI characters (В, ©, Й, µ, Ѕ, ...)|
-    |Крайните ANSI символи (кирлиица?) (В, ©, Й, µ, Ѕ, ...)|
 |Special brackets ('{', '}', '[', ...)|
     |Специални скоби ('{', '}', '[', ...)|
 
@@ -158,7 +151,6 @@
 |&Save Database|               |&Запис на базата с данни|
 |Save Database &As...|         |Запис на базата с данни &като...|
 |Change &Master Key For This Database...|      |&Смяна на главният ключ на базата с данни|
-|&Print Complete Password List|                |Отпечатване на целият списък с пароли|
 |&Lock Workspace|              |Заключване на програмата|
 |&Unlock Workspace|            |Отключване на програмата|
 
@@ -199,8 +191,6 @@
 |&Minimize/Maximize Window To/From Tray|
     |Скрива/показва на/от лентата с икони|
 
-|%u.%u.%u.%u, compatible with %u.%u.x.x|
-    |%u.%u.%u.%u, съвместима с %u.%u.x.x|
 |Version |                     |Версия |
 
 |Password and repeated password aren't identical!|
@@ -304,8 +294,6 @@
 
 |CSV files|                    |CSV-Файлове|
 |Text files|                   |Текстови файлове|
-|An error occured while importing the CSV file. File cannot be imported.|
-    |Възникна грешка при импортиране на CSV файлът. Файлът не може да бъде импортиран.|
 |An error occured while importing the file. File cannot be imported.|
     |Възникна грешка при импортиране на файла. Файлът не може да бъде импортиран.|
 |Select &Font|                 |Избор на &шрифт|
@@ -483,9 +471,6 @@
     |Желаете ли изход въпреки това?|
 |You have changed an option that requires restarting KeePass to get active.|
     |Сменена е настройка, която изисква рестартиране на KeePass, за да стане активна.|
-|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
-    |Вашият ключ се криптира няколко пъти при създаването на ключът за базата данни. Това прибавя константно забавяне, но и прави атаката с груба сила много по-трудна.|
-
 |bits|
     |бита|
 
@@ -674,8 +659,6 @@
 	|KeePass - Да се запише ли преди затваряне/заключване?|
 |Modif&y Password Group...|
 	|Пром&яна на групата с пароли...|
-|Most probably an other application has reserved this hot key already.|
-	|Най-вероятно друга програма вече е запазила тези клавиши.|
 |N&o Auto-Sort|
 	|Б&ез Авто-сортировка|
 |Never expires|
@@ -692,8 +675,6 @@
 	|Мениджър на разширенията|
 |Plugin has been designed for:|
 	|Това разширение служи за:|
-|Pr&int Group|
-	|Пе&чат на група|
 |Repeat master key|
 	|Повтаряне на главния ключ|
 |Repeat the master key for this database.|
@@ -722,8 +703,6 @@
 	|Старо: копиране на данните в клипбоарда и автоматично изчиствате след няколко секунди|
 |Too few memory (RAM) available|
 	|Твърде малко свободна памет (RAM)|
-|Unable to register a global hot key.|
-	|Не може да се регистрира глобалния горещ клавиш.|
 |Unknown error|
 	|Непозната грешка|
 |Visit &KeePass Homepage|
@@ -801,3 +780,73 @@
 	|Показва линии на клетките в списъка с паролите|
 |Start minimized and locked|
 	|Стартиране минимизиран и заключен|
+
+|&Print...|
+	|&Печат...|
+
+|1 month|
+	|1 месец|
+
+|1 week|
+	|1 седмица|
+
+|2 weeks|
+	|2 седмици|
+
+|3 months|
+	|3 месеца|
+
+|By default, new entries expire in the following number of days:|
+	|Стандартно, новите записи изтичат след:|
+
+|Calculate rounds for a 1-second delay on this computer|
+	|Закръглявания за 1-секундното забавяне на този компютър|
+
+|Cannot register the global hot key.|
+	|Не може да се регистрира горещият клавиш.|
+
+|Click to expire the entry in %u days|
+	|Избери за изтичане на записа след %u дни|
+
+|Enter the passphrase and/or select the key-disk's drive.|
+	|Въвеждане на ключовата дума и/или избиране на устройството на ключ-файла.|
+
+|Exclude entries in the '&Backup' group|
+	|Изключване на записите в група '&Резерв'|
+
+|Field has been pasted.|
+	|Полето беше вмъкнато.|
+
+|Higher ANSI characters|
+	|Специални ANSI символи|
+
+|Limit to single instance|
+	|Само едно копие на програмата|
+
+|Most probably another application has reserved this hot key already.|
+	|Вероятно друга стартирана програма вече държи клавишната комбинация.|
+
+|Paste operation completed.|
+	|Вмъкването приключи.|
+
+|Pr&int Group...|
+	|П&ечат на група...|
+
+|Single left click instead of double-click for default tray icon action|
+	|Единичен ляв клик вместо двоен клик при действията с иконката до часовника|
+
+|Special characters|
+	|Специални символи|
+
+|The program is distributed under the terms of the GNU General Public License v2 or later.|
+	|Тази програма се разпространява под условията на лицензът GNU General Public License v2 или следващи|
+
+|Use more secure password edit controls|
+	|Използване на по-сигурни полета за паролата|
+
+|Waiting for paste command.|
+	|Изчакване на команда за вмъкване.|
+
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
+	|Вашият ключ се криптира няколко пъти, преди да се произведе финалния ключ за базата данни. Това прибавя допълнителна трудност при опит за отгатване на вашия ключ чрез речник.|
+

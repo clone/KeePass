@@ -51,8 +51,6 @@ public:
 
 	LPCTSTR m_lpPreSelectPath;
 
-	LPTSTR m_lpInitialKey;
-	LPTSTR m_lpInitialKey2;
 	LPTSTR m_lpKey;
 	LPTSTR m_lpKey2;
 	BOOL m_bKeyFile;

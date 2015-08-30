@@ -155,6 +155,9 @@ void CEntryPropertiesDlg::OnOK()
 		}
 	}
 
+	if(m_editDate.GetWindowTextLength() == 0) m_editDate.SetDate(2999, 12, 28);
+	if(m_editTime.GetWindowTextLength() == 0) m_editTime.SetTime(23, 59, 59);
+
 	m_tExpire.shYear = (USHORT)m_editDate.GetYear();
 	m_tExpire.btMonth = (BYTE)m_editDate.GetMonth();
 	m_tExpire.btDay = (BYTE)m_editDate.GetDay();

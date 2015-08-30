@@ -3,7 +3,7 @@
 |&Close|                        |&Sulge|
 |Password Safe|                 |Paroolihoidja|
 
-|&Generate Random Password|     |&Genrereeri juhuslik parool|
+|&Generate Random Password|     |&Generereeri juhuslik parool|
 |&Pick One|                     |&Vali ikoon|
 |&Gen|                          |&Gen|
 
@@ -12,7 +12,7 @@
 |Network|                       |Võrk|
 |Internet|                      |Internet|
 |eMail|                         |Elektronpost|
-|Homebanking|                   |Homebanking|
+|Homebanking|                   |Internetipangandu|
 |Entry|                         |Sissekanne|
 
 |&Title|                        |&Tiitel|
@@ -28,10 +28,7 @@
 |Find a string in the password list|
     |Leia sõna paroolinimekirjast|
 |Find text in password list|    |Leia tekst paroolinimekirjast|
-
-|Database Format Version:|      |Andmebaasi formaat:|
 |About KeePass...|              |KeePass tiitelandmed...|
-
 |Password Groups|               |Parooligrupid|
 |Title|                         |Tiitel|
 |UserName|                      |Kasutajanimi|
@@ -40,8 +37,8 @@
 |Notes|                         |Märkused|
 |Ready.|                        |Valmis.|
 
-|Either enter the password/passphrase or select the password disk's drive.|
-    |Sisestage põhiparool või valige parooliketas.|
+|Enter the passphrase and/or select the key-disk's drive.|
+    |Sisestage põhiparool ja/või valige parooliketas.|
 |Enter password:|               |Sisesta parool:|
 |and|                           |ja|
 |Select the password disk drive where the key will be stored:|
@@ -59,7 +56,7 @@
 |Select the password disk drive to load the key from:|
     |Valige parooliketas, kust laetakse põhiparool:|
 |Open database - Enter master key|
-    |Andmebaasi avamine - sisetage põhiparool|
+    |Andmebaasi avamine - sisestage põhiparool|
 |Enter master key|              |Sisesta põhiparool|
 |Enter the master key for this database.|
     |Sisesta selle andmebaasi põhiparool.|
@@ -74,7 +71,7 @@
 |Number of characters:|         |Parooli pikkus:|
 |Your new password:|            |Sinu uus parool on:|
 |&Generate|                     |&Genereeri|
-|&Accept|                       |&Aksepteeri|
+|&Accept|                       |&Aktsepteeri|
 |Upper alphabetic characters (A, B, C, ...)|
     |Suurtähed (A, B, C, ...)|
 |Lower alphabetic characters (a, b, c, ...)|
@@ -87,10 +84,10 @@
     |Miinus '-'|
 |Space ' '|
     |Tühik ' '|
-|Special characters (!, §, $, %, &, ...)|
-    |Erimärgid (!, §, $, %, &, ...)|
-|Higher ANSI characters (Â, ©, É, µ, ½, ...)|
-    |ANSI suurtähed (Â, ©, É, µ, ½, ...)|
+|Special characters|
+    |Erimärgid|
+|Higher ANSI characters|
+    |Suuremad ANSI tähemärgid|
 |Special brackets ('{', '}', '[', ...)|
     |Sulud ('{', '}', '[', ...)|
 
@@ -156,8 +153,6 @@
 |Save Database &As...|          |Salvesta andmebaas uue nimega...|
 |Change &Master Key For This Database...|
     |&Muuda selle andmebaasi põhiparool...|
-|&Print Complete Password List|
-    |&Prindi välja kõik paroolid|
 |&Lock Workspace|               |&Lukusta töökeskkond|
 |&Unlock Workspace|             |&Ava töökeskkond|
 |E&xit|                         |&Välju|
@@ -168,7 +163,7 @@
 |Add Password &Group...|        |Lisa parooligrupp...|
 |Modif&y Password Group...|     |&Muuda parooligruppi...|
 |&Delete Password Group...|     |Kustuta parooligrupp...|
-|Pr&int Group|                  |&Prindi grupp...|
+|Pr&int Group...|               |&Prindi grupp...|
 |Export Group To &HTML...|      |Ekspordi grupp &HTML formaadis...|
 |Export Group To &XML...|       |Ekspordi grupp &XML formaadis...|
 |Export Group To &CSV...|       |Ekspordi grupp &CSV formaadis...|
@@ -208,8 +203,6 @@
 |&Minimize/Maximize Window To/From Tray|
     |Minimeeri/maksimeeri aken tegumiribale|
 
-|%u.%u.%u.%u, compatible with %u.%u.x.x|
-    |%u.%u.%u.%u, sobib ka %u.%u.x.x|
 |Version |                      |Versioon |
 
 |Password and repeated password aren't identical!|
@@ -290,9 +283,9 @@
     |Programmi käivitamisel ava automaatselt viimati kasutatud andmebaas|
 |Automatically save database on exit|
     |Programmi sulgemisel salvesta automaatselt muudatused|
-|GUI: Display images on buttons|
+|Display images on buttons|
     |Kuva ikoone nuppudel|
-|GUI: Show grid lines in password entry list|
+|Show grid lines in password entry list|
     |Kuva ruudustikku paroolide nimekirjas|
 |Workspace cannot be unlocked!|
     |Töökeskonna avamine ebaõnnestus!|
@@ -319,13 +312,11 @@
 
 |CSV files|                     |CSV failid|
 |Text files|                    |Teksti failid|
-|An error occured while importing the CSV file. File cannot be imported.|
-    |Tekkis figa CSV faili importimisel. Faili importimine ebaõnnestus|
 |An error occured while importing the file. File cannot be imported.|
     |Faili importimisel tekkis viga! Importimine ebaõnnestus.|
 |Select &Font|                  |Valige &font|
-|Select a new font for the list controls.|
-    |Valige uus font nimekirja kuvamiseks.|
+|Select a new font for the list controls:|
+    |Valige uus font nimekirja juhtelementide kuvamiseks:|
 
 |&Get more languages...|        |Tõmba internetist keelefaile juurde...|
 |Start and Exit|                |Käivitus ja sulgemine|
@@ -340,22 +331,17 @@
 |Encryption algorithm to use (for this database):|
     |Kasutatav krüpteerimisalgoritm (selle andmebaasi jaoks):|
 |Advanced Encryption Standard (AES) (128-bit block cipher using 256-bit key)|
-    |Advanced Encryption Standard (AES) (128-bitine blokk-siffer kasutades 256-bitist võtit)|
+    |Advanced Encryption Standard (AES) (128-bitine blokk-šiffer kasutades 256-bitist võtit)|
 |Twofish (128-bit block cipher using 256-bit key)|
-    |Twofish (128-bitine blokk-siffer kasutade 256-bitist võtit)|
+    |Twofish (128-bitine blokk-šiffer kasutade 256-bitist võtit)|
 |Security|                      |Turvalisus|
 |KeePass is OSI Certified Open Source Software.|
     |KeePass on OSI Sertifitseeritud Avatud Koodiga Tarkvara.|
-|KeePass usage:|                |KeePass kasutus:|
-|db = Path to database you wish to open on KeePass startup|
-    |db = viit andmebaasile, mida soovite programmi käivitamisel avada|
 |Automatically lock workspace after the following number of seconds:|
     |Aeg, mille möödumisel lukustatakse töökeskkond automaatselt (sekundites):|
 |&Group Name|                   |&Grupi nimi|
 |Every second row has a different background color. Use this color:|
     |Iga teine rida on teise värviga. Kasuta seda värvi:|
-|Start:|                        |Progarammi käivitamine:|
-|Exit:|                         |Programmi sulgemine:|
 |Default|                       |Standard|
 |More Colors...|                |Rohkem värve...|
 |Search results|                |Otsingutulemused|
@@ -378,9 +364,9 @@
 |Visit KeePass Homepage|        |KeePass kodulehekülg|
 |Field copied to clipboard.|    |Andmed kopeeritud lõikelauale.|
 
-|A key-file already exists on this drive. Do you want to overwrite it?|
-    |Võtmefail juba eksisteerib antud kettal. Kas soovite selle üle kirjutada?|
-|Overwrite?|                    |Ülekirjutada?|
+|A key-file already exists on this drive. Do you want to overwrite or reuse it?|
+    |Võtmefail juba eksisteerib antud kettal. Kas soovite selle üle kirjutada või seda uuesti kasutada?|
+|Overwrite?|                    |Üle kirjutada?|
 |Expires:|                      |Vananeb:|
 |&Delete Selected Entries|      |Kustuta valitud sissekanded|
 |&Mass Modify (All Selected)...|
@@ -466,7 +452,7 @@
 |Close button [X] minimizes the main window instead of terminating the application|
     |Sulgemise nupp [X] minimeerib põhiakna, mitte ei sulge seda|
 |Show &Entry View|              |Näita sissekande infot|
-|GUI: Automatically resize table columns when resizing the main window|
+|Automatically resize table columns when resizing the main window|
     |Muuda automaatselt ka veergude suurust kui muudetakse põhiakna suurust|
 
 |&Only the following characters:|
@@ -504,7 +490,7 @@
 |Make sure a writable medium is inserted.|
     |Kontrolli üle kas kirjutamist võimaldav andmekandja on ikka sisestatud.|
 |Maybe it's read-only or the storage media has been removed.|
-    |Võib- olla on tegemist kirjutamist mittevõimaldava andmekandajaga, või on andmekandja eemaldatud.|
+    |Võib-olla on tegemist kirjutamist mittevõimaldava andmekandajaga, või on andmekandja eemaldatud.|
 |Not enough free disk space!|   |Pole piisavalt tühja kettaruumi!|
 |Number of key encryption rounds:|
     |Võtme krüpteerimise raundide arv:|
@@ -524,8 +510,8 @@
     |Kas tee soovite ikkagi väljuda?|
 |You have changed an option that requires restarting KeePass to get active.|
     |Sa oled muutnud seadet, mille jõustumiseks peate KeePassi taaskäivitama.|
-|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
-    |Teie põhiparool krüpteeritakse mitu korda, enne kui leitakse tegelik võti andmebaasi krüpteerimiseks. See meetod tagab konstantse aja faktori ja teeb nn. toore jõu (brute-force) rünnaku palju raskemaks.|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
+    |Teie põhiparool krüpteeritakse mitu korda, enne kui leitakse tegelik võti andmebaasi krüpteerimiseks. See meetod tagab konstantse aja faktori ja teeb parooli äraarvamise ja sõnastikrünnaku palju raskemaks.|
 |bits|                          |bitti|
 
 |%u of %u selected|             |%u - %u-st valitud|
@@ -603,16 +589,16 @@
 |Do you want to load the plugin?|
     |Kas soovid plugina kasutusele võtta?|
 |Enabled, loaded|               |Lubatud, kasutusel|
-|Encryption/decryption error|   |Krüpteerimise/dekrüpteerimise vifa|
+|Encryption/decryption error|   |Krüpteerimise/dekrüpteerimise viga|
 |Enhanced: allow pasting only once and protect against clipboard spies|
     |Täiustatud: luba ainult üks kord kleepida ja kaitse lõikelaua nuhkide eest|
 |Error code|                    |Vea kood|
 |Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations.|
     |Faililaiendi .kdb assotsiatsiooni muutmine ebaõnnestus. Kontrolli kas sul ikka on õigus regsitrisse kirjutada ja failide assotsiatsioone muuta.|
 |File access error: failed to open file in read mode|
-    |Faili avamise viga: faili avamine lugemise reziimis ebaõnnestus|
+    |Faili avamise viga: faili avamine lugemise režiimis ebaõnnestus|
 |File access error: failed to open file in write mode|
-    |Faili avamise vaiga: faili avamine kirjutamise reziimis ebaõnnestus|
+    |Faili avamise vaiga: faili avamine kirjutamise režiimis ebaõnnestus|
 |File error: error while reading from the file|
     |Faili avamise viga: viga failist lugemisel|
 |File error: error while writing to the file|
@@ -625,7 +611,7 @@
 |Here you can configure all installed KeePass plugins.|
     |Siin on võimalik seadistada kõiki installeeritud pluginaid.|
 |If you notice any problems with this enhanced method, just switch back to the timed clipboard clearing method.|
-    |Kui märkad mingeid probleeme seaoses täiustatud meetodiga, siis võta selle asemel kasutusel ajastatud meetod.|
+    |Kui märkad mingeid probleeme seoses täiustatud meetodiga, siis võta selle asemel kasutusel ajastatud meetod.|
 |Internal error|                |Programmisisene viga|
 |Invalid parameter|             |Vigane parameeter|
 |Invalid random source|         |Vigane juhuslikkuse allikas|
@@ -636,14 +622,14 @@
     |On võimalik et plugin sobib täielikult, kuid samuti on võimalik, et see tekitab krahhi KeePass programmis.|
 |KeePass - Save Before Close/Lock?|
     |KeePass - salvesta enne sulgemist/lukustamist?|
-|Most probably an other application has reserved this hot key already.|
+|Most probably another application has reserved this hot key already.|
     |Tõenaoliselt on mingi teine programm juba võtnud selle kiirklahvide kombinatsiooni kasutusele.|
 |Never expires|                 |Ei aegu kunagi|
 |Number the TANs consecutively, starting from this value|
-    |Nummerda TAN-id järjest, alustates sellest numbrist|
+    |Nummerda TAN-id järjest, alustades sellest numbrist|
 |Plugin|                        |Plugin|
 |Plugin Manager|                |Pluginate haldur|
-|Plugin has been designed for:| |Plugin on disainutud selle versiooni jaoks:|
+|Plugin has been designed for:| |Plugin on disainitud selle versiooni jaoks:|
 |Success|                       |Edu|
 |Therefore save all data before you continue.|
     |Seetõttu salvesta kõik info enne jätkamist.|
@@ -657,18 +643,81 @@
     |Ajastatud: kopeeri andmed lõikelauale ja tühjenda lõikelaud teatud sekundite jooksul|
 |Too few memory (RAM) available|
     |Liige vähe mälu (RAM) on saadaval|
-|Unable to register a global hot key.|
-    |Globaalse kiirklahvi kombinatsiooni regisreerimine ebaõnnestus.|
 |Unknown error|                 |Tundmatu viga|
 |Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.|
-    |Hoiatud! On võimalik, et see meetod ei tööta korralikult sinu arvutis, eriti kui kasutate lõikelaua halduseks spetsiaalseid programme või muud sarnast.|
+    |Hoiatus! On võimalik, et see meetod ei tööta korralikult sinu arvutis, eriti kui kasutate lõikelaua halduseks spetsiaalseid programme või muud sarnast.|
 |You can choose an other hot key combination in 'Edit - Options - Setup'.|
     |Sa võid valida teise kiirklahvi kombinatsiooni menüüst 'Muuda - Seaded - Seaded' alt.|
 |You've selected the AND key mode, so you must enter a password AND select a key-file.|
-    |Sa oled valinud reziimi kus tuleb sisestada nii parool kui ka võtmefail.|
+    |Sa oled valinud režiimi kus tuleb sisestada nii parool kui ka võtmefail.|
 |cannot be loaded!|             |ei ole võimalik avada!|
 
+|Advanced|                      |Edasijõudnutele|
+|Backup|                        |Varukoopa|
+|Click [Cancel] to abort changing the key.|
+    |Vajuta [Katkesta] kui soovid võtme vahetamise pooleli jätta.|
+|Click [No] to reuse the selected key-file for this database.|
+    |Vajuta [Ei] kui soovid valitud võtmefaili uuesti kasutada käesoleva andmebaasi jaoks.|
+|Click [Yes] to overwrite the key-file.|
+    |Vajuta [Jah] kui soovid võtmefaili ülekirjutada.|
+|Failed to create backup of this entry!|
+    |Sellest sissekandest varukoopia tegemine ebaõnnestus!|
+|Immediately after opening a database|
+    |Kohe pärast andmebaasi avamist|
+|Integration|
+    |Integratsioon|
+|Start minimized and locked|    |Käivita programm minimeeritult ja lukustatult|
+|Save backups of modified entries into the 'Backup' group|
+    |Salvesta varukoopiad muudetud sissekannetest 'Varukoopia' grupis|
+|Show entries that will expire soon (if any)|
+    |Näita sissekandeid (paroole), mis vananevad lähiajal (kui neid leidub)|
+|Show expired entries (if any)| |Näita vananenud sissekandeid (kui neid leidub)|
+|Start KeePass at Windows startup (for current user)|
+    |Käivita KeePass koos Windowsiga automaatselt (käesoleva kasutaja jaoks)|
+|Unable to create/remove the auto-start key of KeePass in the Windows registry!|
+    |Ei ole võimalik luua/kustutada KeePassi automaatkäivitamiseks vajalikku sissekannet süsteemi registris!|
+    
+|&Get more import plugins...|   |&Tõmba importimise pluginaid juurde...|
+|&Print...|                     |&Prindi...|
+|1 month|                       |1 kuuga|
+|1 week|                        |1 nädalaga|
+|2 weeks|                       |2 nädalaga|
+|3 months|                      |3 kuuga|
+|By default, new entries expire in the following number of days:|
+    |Vaikimisi vananevad uued sissekanded järgmise arvu päevadega:|
+|Calculate rounds for a 1-second delay on this computer|
+    |Arvuta raundide arv 1-sekundiliseks viiteks sellel arvutil|
+|Cannot register the global hot key.|
+    |Ei ole võimalik registreerida globaalset kiirklahvide kombinatsiooni.|
+|Click to expire the entry in %u days|
+    |Klõpsa kui soovid, et sissekanne vananeks %u päevaga|
+|Encode/replace newline characters by '\n'|
+    |Kodeeri/asenda uue rea sümbolid '\n'-ga|
+|Exclude entries in the '&Backup' group|
+    |Jäta otsingust välja '&Varukoopia' gruppi kuuluvad sissekanded|
+|Export Options|                |Eksportimise seaded|
+|Export backup entries (entries in the 'Backup' group)|
+    |Ekspordi varusissekanded (sissekanded 'Varukoopia' grupis)|
+|Field has been pasted.|        |Väli on kleebitud.|
+|Fields to export|              |Väljad, mida eksportida|
+|Group Tree|                    |Gruppide puu|
+|Here you can customize the exported files.|
+    |Siin võid seadistada eksporditavaid faile.|
+|Icon|                          |Ikoon|
+|Limit to single instance|      |Piirdu ühe töötava programmi eksemplariga|
+|Master key has been changed!|  |Põhiparool on muudetud!|
+|Paste operation completed.|    |Kleepimise operatsioon on lõpetatud.|
+|Save the database now in order to get the new key applied.|
+    |Salvesta andmebaas selleks et uus võti võetaks kohe kasutusele.|
+|Single left click instead of double-click for default tray icon action|
+    |Üks hiireklõps kahe klõpsu asemel süsteemisalve ikoonil|
+|The program is distributed under the terms of the GNU General Public License v2 or later.|
+    |Programmi levitatakse GNU Üldise Avaliku Litsentsi versioon 2 või uuema alusel.|
+|Use more secure password edit controls|
+    |Kasuta turvalisemaid parooli muutmise juhtelemente|
+|Waiting for paste command.|    |Oodatakse kleepimise käsku.|
+
 |~LANGUAGENAME|                 |Estonian|
-|~LANGUAGEVERSION|              |0.98b|
+|~LANGUAGEVERSION|              |0.99c|
 |~LANGUAGEAUTHOR|               |Andri Viiand|
 |~LANGUAGEAUTHOREMAIL|          |andriv@users.sourceforge.net, http://sourceforge.net/users/andriv|

@@ -349,10 +349,22 @@ BOOL CPwSafeApp::ParseCurrentCommandLine(CString *psFile, LPCTSTR *lpPassword, L
 	{
 		if((_tcsnicmp(__argv[i], _T("-pw:"), 4) == 0) && (_tcslen(__argv[i]) > 4))
 			*lpPassword = &__argv[i][4];
+		else if((_tcsnicmp(__argv[i], _T("/pw:"), 4) == 0) && (_tcslen(__argv[i]) > 4))
+			*lpPassword = &__argv[i][4];
 		else if((_tcsnicmp(__argv[i], _T("-keyfile:"), 9) == 0) && (_tcslen(__argv[i]) > 9))
+			*lpKeyFile = &__argv[i][9];
+		else if((_tcsnicmp(__argv[i], _T("/keyfile:"), 9) == 0) && (_tcslen(__argv[i]) > 9))
 			*lpKeyFile = &__argv[i][9];
 		else if((_tcsnicmp(__argv[i], _T("-preselect:"), 11) == 0) && (_tcslen(__argv[i]) > 11))
 			*lpPreSelectPath = &__argv[i][11];
+		else if((_tcsnicmp(__argv[i], _T("/preselect:"), 11) == 0) && (_tcslen(__argv[i]) > 11))
+			*lpPreSelectPath = &__argv[i][11];
+		else if((_tcsnicmp(__argv[i], _T("-ext:"), 5) == 0) && (_tcslen(__argv[i]) > 5))
+		{ // Ignore this parameter
+		}
+		else if((_tcsnicmp(__argv[i], _T("/ext:"), 5) == 0) && (_tcslen(__argv[i]) > 5))
+		{ // Ignore this parameter
+		}
 		else
 		{
 			if(bFirst != TRUE) *psFile += _T(" ");

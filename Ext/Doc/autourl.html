@@ -17,35 +17,44 @@ Index:
 <li><a href="#cmdln" target="_self">Executing command-lines</a></li>
 <li><a href="#subst" target="_self">Substitutions</a></li>
 </ul>
-<br />
+<br /><br />
 
 <a name="stdcp"></a>
 <table class="tablebox"><tr><td class="boxtitle">
 &nbsp;Standard Capabilities</td></tr></table>
 <br />
 The URL field can execute any valid URL, for which you have defined a protocol handler. On most
-systems at least the http://, ftp:// and mailto: protocols are defined, but KeePass supports
+systems at least the <code>http://</code>, <code>ftp://</code> and <code>mailto:</code>
+protocols are defined, but KeePass supports
 all registered protocols the Internet Explorer supports.<br />
 <br />
-So, if you globally (i.e. using the Windows Explorer) register PuTTY for ssh:// URLs,
-KeePass will automatically use PuTTY for ssh:// URLs, too. KeePass uses the same
-settings as the Windows and Internet Explorer does.<br />
-<br /><br />
+So, if you globally (i.e. using the Windows Explorer) register PuTTY for <code>ssh://</code> URLs,
+KeePass will automatically use PuTTY for <code>ssh://</code> URLs, too. KeePass uses the same
+settings as Windows and Internet Explorer do.<br />
+<br /><br /><br />
 
 <a name="cmdln"></a>
 <table class="tablebox"><tr><td class="boxtitle">
 &nbsp;Executing command-lines</td></tr></table>
 <br />
 Instead of an URL, you can also execute command-lines. To tell KeePass that the data you entered
-is a command-line, prefix it using cmd://. So, if you would like to execute
+is a command-line, prefix it using <code>cmd://</code>. If you would like to execute
 Notepad, your URL could look like this:<br />
 <br />
 <b>cmd://C:\WinNT\Notepad.exe C:\Test\MyTestFile.txt</b><br />
 <br />
-The virtual cmd:// protocol also supports parameters for executed applications, in contrast to
-the file:// protocol. This was the main reason why cmd:// was introduced, with file:// you
-aren't able to pass any parameters to started applications.<br />
-<br /><br />
+The virtual <code>cmd://</code> protocol also supports parameters for executed
+applications, in contrast to
+the <code>file://</code> protocol. This was the main reason why <code>cmd://</code>
+was introduced, with <code>file://</code> you
+aren't able to pass any parameters to started applications. Use the <code>cmd://</code>
+protocol instead.<br />
+<br />
+The paths for the <code>cmd://</code> protocol don't need to be encoded. For example,
+you do not have to replace space characters by <code><b>%20</b></code>, as it is normally
+required for other URLs. KeePass just cuts away the <code>cmd://</code> virtual
+protocol prefix and passes the remaining command-line to Windows.<br />
+<br /><br /><br />
 
 <a name="subst"></a>
 <table class="tablebox"><tr><td class="boxtitle">

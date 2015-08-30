@@ -53,7 +53,7 @@ CPasswordDlg::CPasswordDlg(CWnd* pParent /*=NULL*/)
 	m_strDescriptiveName = _T("");
 	m_bOnce = FALSE;
 	m_hWindowIcon = NULL;
-	m_lpPreSelectPath = m_lpInitialKey = m_lpKey = m_lpKey2 = NULL;
+	m_lpPreSelectPath = m_lpKey = m_lpKey2 = NULL;
 }
 
 void CPasswordDlg::DoDataExchange(CDataExchange* pDX)
@@ -308,57 +308,47 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	if(m_lpInitialKey != NULL)
-	{
-		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_lpInitialKey);
-		m_pEditPw.SetPassword(m_lpInitialKey);
-		m_pEditPw.DeletePassword(m_lpInitialKey); m_lpInitialKey = NULL;
-	}
-	else
-	{
-		m_pEditPw.SetPassword(m_lpInitialKey);
-		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), _T(""));
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), _T(""));
 
-		if(m_lpPreSelectPath != NULL)
+	if(m_lpPreSelectPath != NULL)
+	{
+		int i, nSpecLen = _tcslen(m_lpPreSelectPath);
+		CString strCBI;
+		BOOL bFound = FALSE;
+
+		for(i = 0; i < m_cbDiskList.GetCount(); i++)
 		{
-			int i, nSpecLen = _tcslen(m_lpPreSelectPath);
-			CString strCBI;
-			BOOL bFound = FALSE;
+			m_cbDiskList.GetLBText(i, strCBI);
+			if(strCBI.GetLength() < nSpecLen) continue;
 
-			for(i = 0; i < m_cbDiskList.GetCount(); i++)
+			if(_tcsnicmp((LPCTSTR)strCBI, m_lpPreSelectPath, nSpecLen) == 0)
 			{
-				m_cbDiskList.GetLBText(i, strCBI);
-				if(strCBI.GetLength() < nSpecLen) continue;
-
-				if(_tcsnicmp((LPCTSTR)strCBI, m_lpPreSelectPath, nSpecLen) == 0)
-				{
-					m_cbDiskList.SetCurSel(i);
-					OnSelChangeComboDiskList();
-					bFound = TRUE;
-					break;
-				}
-			}
-
-			if(bFound == FALSE)
-			{
-				COMBOBOXEXITEM cbi;
-				ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
-				cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
-				cbi.iItem = m_cbDiskList.GetCount();
-				cbi.pszText = (LPTSTR)m_lpPreSelectPath;
-				cbi.cchTextMax = (int)_tcslen(cbi.pszText);
-				cbi.iImage = cbi.iSelectedImage = 28;
-				cbi.iIndent = 0;
-				int nx = m_cbDiskList.InsertItem(&cbi);
-
-				m_cbDiskList.SetCurSel(nx);
+				m_cbDiskList.SetCurSel(i);
 				OnSelChangeComboDiskList();
+				bFound = TRUE;
+				break;
 			}
-
-			m_bKeyMethod = TRUE;
-			UpdateData(FALSE);
-			EnableClientWindows();
 		}
+
+		if(bFound == FALSE)
+		{
+			COMBOBOXEXITEM cbi;
+			ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
+			cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
+			cbi.iItem = m_cbDiskList.GetCount();
+			cbi.pszText = (LPTSTR)m_lpPreSelectPath;
+			cbi.cchTextMax = (int)_tcslen(cbi.pszText);
+			cbi.iImage = cbi.iSelectedImage = 28;
+			cbi.iIndent = 0;
+			int nx = m_cbDiskList.InsertItem(&cbi);
+
+			m_cbDiskList.SetCurSel(nx);
+			OnSelChangeComboDiskList();
+		}
+
+		m_bKeyMethod = TRUE;
+		UpdateData(FALSE);
+		EnableClientWindows();
 	}
 
 	m_pEditPw.SetFocus();

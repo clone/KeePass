@@ -1,7 +1,7 @@
-05-4-7 16:29|~LANGUAGENAME|
+05-5-16 18:18|~LANGUAGENAME|
 |¼òÌåÖĞÎÄ|
 |~LANGUAGEVERSION|
-|0.99b|
+|0.99c|
 |~LANGUAGEAUTHOR|
 |ñ¼ĞËÇ¿ (Leo Dou)|
 |~LANGUAGEAUTHOREMAIL|
@@ -58,8 +58,6 @@
 |ÔÚÃÜÂëÁĞ±íÖĞ²éÕÒÒ»¸ö×Ö´®|
 |Find text in password list|
 |ÔÚÃÜÂëÁĞ±íÖĞ²éÕÒ|
-|Database Format Version:|
-|Êı¾İ¿â¸ñÊ½°æ±¾£º|
 |About KeePass...|
 |¹ØÓÚ KeePass...|
 |Password Groups|
@@ -76,8 +74,8 @@
 |±¸×¢|
 |Ready.|
 |¾ÍĞ÷¡£|
-|Either enter the password/passphrase or select the password disk's drive.|
-|ÊäÈëÃÜÂë»òÑ¡ÔñÃÜ³×ÅÌ¡£|
+|Enter the passphrase and/or select the key-disk's drive.|
+|ÊäÈëÃÜÂë²¢/»òÑ¡ÔñÃÜ³×ÅÌ¡£|
 |Enter password:|
 |ÊäÈëÃÜÂë£º|
 |Select the password disk drive where the key will be stored:|
@@ -138,10 +136,10 @@
 |¼õºÅ '-'|
 |Space ' '|
 |¿Õ¸ñ ' '|
-|Special characters (!, §, $, %, &, ...)|
-|ÌØÊâ×Ö·û (!, §, $, %, &, ...)|
-|Higher ANSI characters (Â, ©, É, µ, ½, ...)|
-|¸ßÎ»ANSI×Ö·û (Â, ©, É, µ, ½, ...)|
+|Special characters|
+|ÌØÊâ×Ö·û|
+|Higher ANSI characters|
+|¸ßÎ»ANSI×Ö·û|
 |Special brackets ('{', '}', '[', ...)|
 |À¨ºÅ ('{', '}', '[', ...)|
 |Group:|
@@ -153,7 +151,7 @@
 |URL:|
 |ÍøÖ·£º|
 |Icon:|
-|Í¼±ê£º|
+|Í¼±ê|
 |Password:|
 |ÃÜÂë£º|
 |Repeat Password:|
@@ -234,8 +232,8 @@
 |Áí´æÎª(&A)...|
 |Change &Master Key For This Database...|
 |¸ü¸Ä¹ÜÀíÃÜÂë/ÃÜ³×(&M)...|
-|&Print Complete Password List|
-|´òÓ¡È«²¿ÃÜÂëÇåµ¥(&P)|
+|&Print...|
+|´òÓ¡(&P)...|
 |&Export To|
 |µ¼³ö(&E)|
 |&Lock Workspace|
@@ -256,7 +254,7 @@
 |ĞŞ¸ÄÈº×é(&Y)...|
 |&Delete Password Group...|
 |É¾³ıÈº×é(&D)...|
-|Pr&int Group|
+|Pr&int Group...|
 |´òÓ¡Èº×é(&I)...|
 |Export Group To &HTML...|
 |Êä³öÈº×éµ½HTMLÎÄ¼ş(&H)...|
@@ -326,8 +324,6 @@
 |Êı¾İ¿âÉèÖÃ(&D)...|
 |&Minimize/Maximize Window To/From Tray|
 |ÏÔÊ¾´°¿Ú/×îĞ¡»¯ÖÁÍĞÅÌ(&M)|
-|%u.%u.%u.%u, compatible with %u.%u.x.x|
-|%u.%u.%u.%u£¬Óë %u.%u.x.x ¼æÈİ|
 |Version |
 |°æ±¾ |
 |Password and repeated password aren't identical!|
@@ -371,7 +367,7 @@
 |Clipboard cleared.|
 |¼ôÌù°åÒÑÇå¿Õ¡£|
 |Field copied to clipboard. Clipboard will be cleared in %d seconds.|
-|ÒÑ¸´ÖÆµ½¼ôÌù°å¡£¼ôÌù°å½«ÔÚ %d ÃëºóÇå¿Õ¡£|
+|×Ö¶ÎÒÑ¸´ÖÆµ½¼ôÌù°å¡£¼ôÌù°å½«ÔÚ %d ÃëºóÇå¿Õ¡£|
 |Failed to set the master key!|
 |ÉèÖÃ¹ÜÀíÃÜÂë/ÃÜ³×Ê§°Ü£¡|
 |File cannot be opened!|
@@ -456,8 +452,6 @@
 |CSVÎÄ¼ş|
 |Text files|
 |ÎÄ±¾ÎÄ¼ş|
-|An error occured while importing the CSV file. File cannot be imported.|
-|ÔÚµ¼ÈëCSVÎÄ¼şÊ±·¢Éú´íÎó¡£ÎÄ¼şÎŞ·¨µ¼Èë¡£|
 |An error occured while importing the file. File cannot be imported.|
 |ÔÚµ¼ÈëÎÄ¼şÊ±·¢Éú´íÎó¡£ÎÄ¼şÎŞ·¨µ¼Èë¡£|
 |&CSV File...|
@@ -542,7 +536,7 @@
 |Visit KeePass Homepage|
 |·ÃÎÊ KeePass Ö÷Ò³|
 |Field copied to clipboard.|
-|ÒÑ¸´ÖÆµ½¼ôÌù°å¡£|
+|×Ö¶ÎÒÑ¸´ÖÆµ½¼ôÌù°å¡£|
 |A key-file already exists on this drive. Do you want to overwrite or reuse it?|
 |¸ÃÅÌÒÑÓĞÒ»¸öÃÜ³×ÎÄ¼ş£¬ÄãÏë¸²¸ÇËü»¹ÊÇÊ¹ÓÃËü£¿|
 |Click [Yes] to overwrite the key-file.|
@@ -564,7 +558,7 @@
 |Change entry icon:|
 |¸Ä±ä¼ÇÂ¼Í¼±ê£º|
 |Change expiration time:|
-|¸Ä±äÊ§Ğ§Ê±¼ä£º|
+|¸Ä±äÊ§Ğ§Ê±¼ä|
 |Mass Modify|
 |ÅúÁ¿ĞŞ¸Ä|
 |Change fields of all selected entries|
@@ -700,11 +694,11 @@
 |Not enough free disk space!|
 |´ÅÅÌ¿Õ¼ä²»×ã£¡|
 |Disable unsafe (security-critical) operations like exports, etc.|
-|½ûÖ¹²»°²È«µÄ²Ù×÷£¨ÑÏÖØÓ°Ïì°²È«µÄ£©£¬±ÈÈçµ¼³ö£¬µÈ¡£|
+|½ûÖ¹²»°²È«µÄ²Ù×÷£¨ÑÏÖØÓ°Ïì°²È«µÄ£©£¬±ÈÈçµ¼³öµÈ¡£|
 |Unsafe operations are disabled.|
 |²»°²È«µÄ²Ù×÷ÒÑ±»½ûÖ¹¡£|
 |To execute this operation you must enable unsafe operations in the options dialog.|
-|ÒªÖ´ĞĞ¸Ã²Ù×÷£¬Äã±ØĞë×÷¡°Ñ¡Ïî¡±ÖĞÉè¶¨ÔÊĞí²»°²È«µÄ²Ù×÷¡£|
+|ÒªÖ´ĞĞ¸Ã²Ù×÷£¬Äã±ØĞëÔÚ¡°Ñ¡Ïî¡±ÖĞÉè¶¨ÔÊĞí²»°²È«µÄ²Ù×÷¡£|
 |You have changed an option that requires restarting KeePass to get active.|
 |ÄúËùĞŞ¸ÄµÄÑ¡ÏîĞèÒªÖØÆô KeePass ²ÅÄÜÉúĞ§¡£|
 |Expired Entries|
@@ -723,8 +717,8 @@
 |ÔÚ´ËÅäÖÃµ±Ç°Êı¾İ¿â¡£|
 |Database Summary|
 |Êı¾İ¿â¸ÅÒª|
-|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
-|ÄãµÄÃÜ³×±»¼ÓÃÜÊı´ÎÀ´ĞÎ³É×îÖÕµÄÊı¾İ¿âÃÜ³×£¬ÕâÔö¼ÓÁËÊ±¼äµÄÒòËØÀ´ÓĞĞ§¶Ô¿¹±©Á¦ÆÆ½â¡£|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
+|ÄãµÄÃÜ³×±»¼ÓÃÜÊı´ÎÀ´ĞÎ³É×îÖÕµÄÊı¾İ¿âÃÜ³×£¬ÕâÔö¼ÓÁËÊ±¼äµÄÒòËØÀ´ÓĞĞ§¶Ô¿¹²Â½âºÍ´ÊµäÀàÆÆ½â¡£|
 |The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
 |£¨Êı×ÖÔ½´ó±©Á¦ÆÆ½âÔ½À§ÄÑ£¬µ«Ò²½«Ê¹´ò¿ªºÍ±£´æÊı¾İ¿âµÄÊ±¼ä¼Ó³¤¡££©|
 |Number of key encryption rounds:|
@@ -860,17 +854,16 @@
 |»ñÈ¡¸ü¶àµÄ²å¼ş...|
 |Global auto-type hot key combination:|
 |È«¾Ö×Ô¶¯ÊäÈë¿ì½İ¼ü£º|
-|Unable to register a global hot key.|
+|Cannot register the global hot key.|
 |ÎŞ·¨×¢²áÈ«¾Ö¿ì½İ¼ü¡£|
-|Most probably an other application has reserved this hot key already.|
-|¿ÉÄÜÆäËüÓ¦ÓÃ³ÌĞòÒÑ¾­ÆôÓÃÁË¸Ã¿ì½İ¼ü¡£|
+|Most probably another application has reserved this hot key already.|
+|¿ÉÄÜÆäËüÓ¦ÓÃ³ÌĞòÒÑ¾­Õ¼ÓÃÁË¸Ã¿ì½İ¼ü¡£|
 |You can choose an other hot key combination in 'Edit - Options - Setup'.|
 |Äã¿ÉÒÔÔÚ¡°±à¼­-Ñ¡Ïî-ÉèÖÃ¡±ÖĞÑ¡ÔñÆäËüµÄ¿ì½İ¼ü¡£|
 |and|
 |ÒÔ¼°|
 |You've selected the AND key mode, so you must enter a password AND select a key-file.|
 |ÄãÒÑ¾­Ñ¡ÔñÁË¡°ÒÔ¼°¡±Ä£Ê½£¬ÇëÊäÈëÃÜÂë²¢Ñ¡ÔñÃÜ³×ÎÄ¼ş¡£|
-
 |Timed: copy data to the clipboard and clear it automatically after some seconds|
 |¶¨Ê±Çå¿Õ£º¸´ÖÆÊı¾İµ½¼ôÌù°å£¬²¢ÔÚÒ»¶ÎÊ±¼äºó×Ô¶¯Çå³ı|
 |Enhanced: allow pasting only once and protect against clipboard spies|
@@ -918,7 +911,7 @@
 |Save the database now in order to get the new key applied.|
 |±£´æÊı¾İ¿âÒÔÊ¹ĞÂµÄÃÜ³×ÉúĞ§¡£|
 |Fields to export|
-|µ¼³öµÄµ¥Ôª|
+|µ¼³öµÄ×Ö¶Î|
 |Icon|
 |Í¼±ê|
 |Group Tree|
@@ -933,3 +926,33 @@
 |µ¼³ö±¸·İ¼ÇÂ¼(¡°±¸·İ¡±Èº×éÖĞµÄ¼ÇÂ¼)|
 |&Get more import plugins...|
 |»ñÈ¡¸ü¶àµÄµ¼Èë²å¼ş(&G)...|
+|1 month|
+|1 ÔÂ|
+|1 week|
+|1 ÖÜ|
+|2 weeks|
+|2 ÖÜ|
+|3 months|
+|3 ÔÂ|
+|By default, new entries expire in the following number of days:|
+|Ä¬ÈÏÇé¿öÏÂ£¬ĞÂµÄ¼ÇÂ¼ÔÚÒÔÏÂÌìÊıºóÊ§Ğ§:|
+|Calculate rounds for a 1-second delay on this computer|
+|¼ÆËã±¾»úÒ»ÃëÑÓ³ÙÊ±¼äµÄÑ­»·¼ÓÃÜ´ÎÊı|
+|Click to expire the entry in %u days|
+|µ¥»÷Ê¹¼ÇÂ¼ÔÚ %u ÌìºóÊ§Ğ§|
+|Exclude entries in the '&Backup' group|
+|²»°üÀ¨ÔÚ¡°±¸·İ¡±Èº×éÖĞµÄ¼ÇÂ¼(&B)|
+|Field has been pasted.|
+|×Ö¶ÎÒÑÕ³Ìù¡£|
+|Limit to single instance|
+|Ö»ÔÊĞíÔËĞĞÒ»¸öKeePass½ø³Ì|
+|Paste operation completed.|
+|Õ³ÌùÍê³É¡£|
+|Single left click instead of double-click for default tray icon action|
+|´ÓÍĞÅÌÍ¼±êºô³öÖ÷´°¿ÚÊ±Ä¬ÈÏÊ¹ÓÃµ¥»÷×ó¼ü·½Ê½£¨¶ø·ÇË«»÷£©|
+|The program is distributed under the terms of the GNU General Public License v2 or later.|
+|±¾³ÌĞòµÄ·¢²¼×ñÑ­ GNU Í¨ÓÃ¹«¹²ÊÚÈ¨Ğí¿É V2 »òĞÂ°æµÄÌõ¿î¡£|
+|Use more secure password edit controls|
+|Ê¹ÓÃ¸ü°²È«µÄÃÜÂë±à¼­¿Ø¼ş|
+|Waiting for paste command.|
+|µÈ´ıÕ³ÌùÃüÁî¡£|

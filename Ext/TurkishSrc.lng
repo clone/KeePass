@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Türkçe <Turkish>|
-|~LANGUAGEVERSION|             |0.99b|
+|~LANGUAGEVERSION|             |0.99c|
 |~LANGUAGEAUTHOR|              |Erhan BURHAN|
 |~LANGUAGEAUTHOREMAIL|         |<texas@xposta.com>|
 
@@ -19,7 +19,7 @@
 |eMail|                        |E-mail|
 |Homebanking|                  |Banka|
 
-|Entry|                        |Giriþ|
+|Entry|                        |Kayýt|
 
 |&Title|                       |&Baþlýk|
 |User &Name|                   |&Kullanýcý Adý|
@@ -34,7 +34,6 @@
 |Find a string in the password list|           |Parola listesinde bir dize bul|
 |Find text in password list|   |Parola listesinde bir metin bul|
 
-|Database Format Version:|     |Veritabaný biçim versiyonu:|
 |About KeePass...|             |KeePass Hakkýnda...|
 
 |Password Groups|              |Parola Grubu|
@@ -46,7 +45,7 @@
 
 |Ready.|                       |Hazýr.|
 
-|Either enter the password/passphrase or select the password disk's drive.|
+|Enter the passphrase and/or select the key-disk's drive.|
     |Parolayý giriniz ya da parolanýn bulunduðu disk sürücüyü seçiniz.|
 |Enter password:|              |Parola giriniz:|
 
@@ -94,10 +93,10 @@
     |Eksi '-'|
 |Space ' '|
     |Boþluk ' '|
-|Special characters (!, §, $, %, &, ...)|
-    |Özel karakterler (!, §, $, %, &, ...)|
-|Higher ANSI characters (Â, ©, É, µ, ½, ...)|
-    |Yüksek ANSI karakterler (Â, ©, É, µ, ½, ...)|
+|Special characters|
+    |Özel karakterler|
+|Higher ANSI characters|
+    |Yüksek ANSI karakterler|
 |Special brackets ('{', '}', '[', ...)|
     |Özel ayraçlar ('{', '}', '[', ...)|
 
@@ -111,10 +110,10 @@
 |Notes:|                       |Notlar:|
 |***|                          |***|
 
-|Add Entry|                    |Giriþ ekle|
-|Add a new password entry|     |Yeni bir parola giriþi ekler|
-|Edit Entry|                   |Giriþi düzenle|
-|Modify a password entry|      |Bir parola giriþini düzenler|
+|Add Entry|                    |Kayýt ekle|
+|Add a new password entry|     |Yeni bir parola kaydý ekler|
+|Edit Entry|                   |Kaydý düzenle|
+|Modify a password entry|      |Bir parola kaydýný düzenler|
 
 |Group Name:|                  |Grup ismi:|
 
@@ -161,7 +160,7 @@
 |&Save Database|               |Veritabanýný &kaydet|
 |Save Database &As...|         |Veritabanýný &farklý kaydet...|
 |Change &Master Key For This Database...|      |Veritabanýnýn ana anahtarýný &deðiþtir...|
-|&Print Complete Password List|                |Bütün parola listesini &yazdýr|
+|&Print...|                    |&Yazdýr...|
 |&Export To|                    |Dýþarýya &ver|
 |&Lock Workspace|              |Çalýþma alanýný &kilitle|
 |&Unlock Workspace|            |Çalýþma alanýnýn kilidini &aç|
@@ -174,7 +173,7 @@
 |Add Password Su&bgroup...|    |&Alt parola grubu ekle...|
 |Modif&y Password Group...|    |Parola grubunu &düzenle...|
 |&Delete Password Group...|    |Parola grubunu &sil...|
-|Pr&int Group|                 |Grubu &yazdýr...|
+|Pr&int Group...|              |Grubu &yazdýr...|
 |Export Group To &HTML...|     |Grubu &HTML olarak dýþarýya ver...|
 |Export Group To &XML...|      |Grubu &XML olarak dýþarýya ver...|
 |Export Group To &CSV...|      |Grubu &CSV olarak dýþarýya ver...|
@@ -184,14 +183,14 @@
 |Open &URL(s)|                 |&Web adresini (URL) aç|
 |&Find In Database...|         |&Veritabaný içerisinde bul...|
 |Find In T&his Group...|       |Bu &grup içerisinde bul...|
-|&Add Entry...|                |Giriþ &ekle...|
-|&Edit/View Entry...|          |Giriþi &görüntüle/düzenle...|
-|&Delete Entry|                |Giriþi &sil|
-|Dupli&cate Entry|             |Giriþin &kopyasýný çýkar|
-|Move Entry To &Top|           |Giriþi en üste taþý|
-|Move Entry &One Up|           |Giriþi bir yukarýya taþý|
-|Mo&ve Entry One Down|         |Giriþi bir aþaðýya taþý|
-|Move Entry To &Bottom|        |Giriþi en alta taþý|
+|&Add Entry...|                |Kayýt &ekle...|
+|&Edit/View Entry...|          |Kaydý &görüntüle/düzenle...|
+|&Delete Entry|                |Kaydý &sil|
+|Dupli&cate Entry|             |Kaydýn &kopyasýný çýkar|
+|Move Entry To &Top|           |Kaydý en üste taþý|
+|Move Entry &One Up|           |Kaydý bir yukarýya taþý|
+|Mo&ve Entry One Down|         |Kaydý bir aþaðýya taþý|
+|Move Entry To &Bottom|        |Kaydý en alta taþý|
 
 |Move Group To &Top|           |Grubu en &üstte taþý|
 |Move Group One &Up|           |Grubu bir &yukarýya taþý|
@@ -217,8 +216,6 @@
 |&Minimize/Maximize Window To/From Tray|
     |&Pencereyi bildirim alanýna küçült/ekraný kapla |
 
-|%u.%u.%u.%u, compatible with %u.%u.x.x|
-    |%u.%u.%u.%u, %u.%u.x.x ile uyumlu|
 |Version |                     |Versiyon |
 
 |Password and repeated password aren't identical!|
@@ -304,7 +301,7 @@
 |Display images on buttons|
     |GUI: Butonlarýn üzerinde resimleri göster|
 |Show grid lines in password entry list|
-    |GUI: Parola giriþi listesinde ýzgara çizgilerini göster|
+    |GUI: Parola kaydý listesinde ýzgara çizgilerini göster|
 |Workspace cannot be unlocked!|
     |Çalýþma alaný kilitlenemez!|
 |Workspace locked|
@@ -330,8 +327,6 @@
 
 |CSV files|                    |CSV dosyalarý|
 |Text files|                   |Metin Dosyalarý|
-|An error occured while importing the CSV file. File cannot be imported.|
-    |CSV dosyasý içeriye alýnýyorken bir hata oluþtu. Dosya içeriye alýnamaz.|
 |An error occured while importing the file. File cannot be imported.|
     |Dosya içeriye alýnýyorken bir hata oluþtu. Dosya içeriye alýnamaz.|
 |&CSV File...|                 |&CSV dosyasý...|
@@ -402,15 +397,15 @@
 
 |Overwrite?|                   |Üzerine yazýlsýn mý?|
 |Expires:|                     |Süre sonu :|
-|&Delete Selected Entries|     |&Seçili giriþi sil|
+|&Delete Selected Entries|     |&Seçili kaydý sil|
 |&Mass Modify (All Selected)...|               |Topluca &deðiþtir (hepsi seçili)...|
 |Change group:|                |Grubu deðiþtir:|
-|Change entry icon:|           |Giriþ simgesini deðiþtir:|
+|Change entry icon:|           |Kayýt simgesini deðiþtir:|
 |Change expiration time:|      |Süre sonunu deðiþtir:|
 |Mass Modify|                  |Topluca deðiþtir|
-|Change fields of all selected entries|        |Seçili olan tüm giriþlerin alanlarýný deðiþtir|
+|Change fields of all selected entries|        |Seçili olan tüm kayýtlarýn alanlarýný deðiþtir|
 |Show &Columns|                |&Kolonlarý göster|
-|Show &Entry View|             |&Giriþ görünümünü göster|
+|Show &Entry View|             |&Kayýt görünümünü göster|
 
 |Automatically resize table columns when resizing the main window|
     |Ana pencerenin boyutlarý deðiþtirildiðinde tablo kolonlarýný otomatik olarak yeninden boyutlandýr|
@@ -425,10 +420,10 @@
 |TAN Wizard|                   |TAN Sihirbazý|
 
 |Using this wizard you can easily add TAN entries.|
-    |Bu sihirbazý kullanarak kolayca TAN giriþleri ekleyebilirsiniz.|
+    |Bu sihirbazý kullanarak kolayca TAN kayýtlarý ekleyebilirsiniz.|
 
 |Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-alphanumerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only alphanumerical 'substrings' are added as TAN entries.|
-    |Aþaðýdaki düzenleme penceresine TAN giriþlerinizi yapýþtýrabilirsiniz. Biçimleme gerçekten de önemli, deðildir.  Biçimleme gerçekten de önemli, deðildir. Sayýsal olmayan tüm karakterler (mesela yeni satýrlar, sekmeler, boþluklar, vb ) yok sayýlýr. Sadece sayýsal olmayan 'alt çizgiler' TAN giriþleri olarak eklenir.|
+    |Aþaðýdaki düzenleme penceresine TAN kayýtlarýnýzý yapýþtýrabilirsiniz. Biçimleme gerçekten de önemli deðildir. Sayýsal olmayan tüm karakterler (mesela yeni satýrlar, sekmeler, boþluklar, vb ) yok sayýlýr. Sadece sayýsal olmayan 'alt çizgiler' TAN kayýtlarý olarak eklenir.|
 
 |<TAN>|                        |<TAN>|
 |Print Pre&view...|            |Baský &önizleme...|
@@ -462,10 +457,10 @@
 |Open file and set as attachment...|      |Dosya aç veya bir ek dosya belirle...|
 |Save attached file to disk...|           |Ek dosyayý diske kaydet...|
 
-|There already is a file attached with this entry.|           |Bu giriþe baðlý zaten bir ek dosya var.|
+|There already is a file attached with this entry.|           |Bu kayda baðlý zaten bir ek dosya var.|
 |Do you want to overwrite the current attachment?|            |Kullanýmda olan ek dosya üzerine yazmak istiyor musunuz?|
 |&Save Attached File To...|    |Ek dosyaya &kaydet...|
-|There is no file attached with this entry.|                  |Bu giriþe baðlý ek dosya bulunmuyor.|
+|There is no file attached with this entry.|                  |Bu kayda baðlý ek dosya bulunmuyor.|
 |Remove the currently attached file|      |Kullanýmda olan ek dosyayý sil|
 
 |Close button [X] minimizes the main window instead of terminating the application|
@@ -500,16 +495,16 @@
     |Bu iþlemi yürütmek için Seçenekler penceresindeki güvensiz iþlemler seçeneðini devre dýþý býrakmalýsýnýz.|
 |You have changed an option that requires restarting KeePass to get active.|
     |KeePass programýnýn yeniden baþlatýlmasýný gerektirecek bir iþlem yaptýnýz.|
-|Expired Entries|                         |Süresi bitmiþ giriþler|
-|This is a list of all expired entries|   |Bu liste süresi bitmiþ bütün giriþleri gösterir.|
-|Show All &Expired Entries...|            |Süresi &bitmiþ bütün giriþleri göster...|
-|Click on an entry to jump to it.|        |Geçiþ yapmak istediðiniz giriþin üzerine týklayýn.|
+|Expired Entries|                         |Süresi bitmiþ kayýtlar|
+|This is a list of all expired entries|   |Bu liste süresi bitmiþ bütün kayýtlarý gösterir.|
+|Show All &Expired Entries...|            |Süresi &bitmiþ tüm kayýtlarý göster...|
+|Click on an entry to jump to it.|        |Geçiþ yapmak istediðiniz kaydýn üzerine týklayýn.|
 |Quality:|                                |Kalite:|
 |Database Settings|                       |Veritabaný Ayarlarý|
 |Here you can configure the current database.| |Þu anda kullanýmda olan veritabanýný buradan yapýlandýrabilirsiniz.|
 |Database Summary|                        |Veritabaný Özeti|
-|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
-    |Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
+    |Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
 |The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
     |The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
 |Number of key encryption rounds:|        |Number of key encryption rounds:|
@@ -517,21 +512,21 @@
 |Personal &Vault TXT File...|             |Kiþisel &Vault TXT dosyasý...|
 |Imported from Password Safe|             |Imported from Password Safe|
 |Remember last opened file|               |Son açýlan dosyayý hatýrla|
-|Total number of groups / entries|        |Gruplarýn / giriþlerin toplam sayýsý|
-|Total: %u groups / %u entries|           |Toplam: %u grup, %u giriþ|
-|%u of %u selected|                       |%u giriþ seçili (toplam %u)|
-|Number of selected entries (number of entries in the list)| |Seçili giriþlerin sayýsý (listedeki giriþ sayýsý)|
+|Total number of groups / entries|        |Gruplarýn / kayýtlarýn toplam sayýsý|
+|Total: %u groups / %u entries|           |Toplam: %u grup, %u kayýt|
+|%u of %u selected|                       |%u kayýt seçili (toplam %u)|
+|Number of selected entries (number of entries in the list)| |Seçili kayýtlarýn sayýsý (listedeki kayýt sayýsý)|
 |Status|                                  |Durum|
 |The database file has been modified!|    |Veritabaný dosyasý deðiþtirilmiþ!|
 |Most probably someone has changed the file while you were editing it.| |Büyük ihtimalle size dosyasyý düzenliyorken bir baþkasýný onu deðiþtirdi.|
 |Do you want to overwrite it?|            |Üzerine yazmak istiyor musunuz?|
 |The group you selected cannot store entries. Please select an other group.|
-    |Seçtiðiniz gruba giriþler eklenemez. Lütfen baþka bir grup seçiniz.|
+    |Seçtiðiniz gruba kayýtlar eklenemez. Lütfen baþka bir grup seçiniz.|
 |This will remove all selected entries unrecoverably!|
-    |Bu iþlem bütün giriþleri geri dönüþümsüz bir þekilde silecektir!|
+    |Bu iþlem bütün kayýtlarý geri dönüþümsüz bir þekilde silecektir!|
 |Are you sure you want to delete all selected entries?|
-    |Seçili olan tüm giriþler gerçekten silinsin istiyor musunuz?|
-|Delete Entries Confirmation|             |Giriþleri Silmeyi Doðrula|
+    |Seçili olan tüm kayýtlar gerçekten silinsin istiyor musunuz?|
+|Delete Entries Confirmation|             |Kayýtlarý Silmeyi Doðrula|
 |Use PuTTY for ssh: and telnet: URLs|     |ssh: ve telnet: adresleri için PuTTY kullan|
 |Mark database as modified on last-access time change|
     |Son eriþim zamanýný, düzenleme zamaný olarak deðiþtir.|
@@ -539,7 +534,7 @@
 |Auto-&Sort Password List|                |Parola listesini otomatik &sýrala|
 |N&o Auto-Sort|                           |Otomatik sýralama &yok|
 |Auto-sorting of the password list is enabled, you cannot move entries manually.|
-    |Parola listesini otomatik sýralama etkin, giriþleri kendiniz taþýyamazsýnýz.|
+    |Parola listesini otomatik sýralama etkin, kayýtlarý kendiniz taþýyamazsýnýz.|
 |Perform Auto-&Type|                      |Þimdi &otomatik yaz|
 |Auto-sorting of the password list is enabled, you cannot sort the list manually now.|
     |Parola listesini otomatik sýralama etkin, þu andan itibaren listeyi kendiniz sýralayamazsýnýz.|
@@ -594,9 +589,9 @@
 |Invalid/corrupted file structure|        |Geçersiz/bozuk dosya yapýsý|
 |Encryption/decryption error|             |Þifreleme/Deþifreleme hatasý|
 |Get more plugins...|                     |Daha fazla eklenti al...|
-|Global auto-type hot key combination:|   |Otomatik tipli genel kýsa tuþ kombinasyonu:|
-|Unable to register a global hot key.|    |Genel bir kýsa tuþu kaydettirmek olanaksýz|
-|Most probably an other application has reserved this hot key already.|
+|Global auto-type hot key combination:|   |Otomatik türdeki genel kýsa tuþ kombinasyonu:|
+|Cannot register the global hot key.|     |Genel kýsa tuþ kayýt olamaz.|
+|Most probably another application has reserved this hot key already.|
     |Büyük ihtimalle bir baþka uygulama bu kýsa tuþu kendisi için ayýrmýþ.|
 |You can choose an other hot key combination in 'Edit - Options - Setup'.|
     |'Düzen - Seçenekler - Ýliþkilendirme' menüsünden bir baþka kýsayol seçebilirsiniz.|
@@ -623,18 +618,18 @@
 |Start minimized and locked|              |Simge durumunda ve kilitli olarak baþlat|
 |Immediately after opening a database|    |Bir veritabanýný açtýktan sonra hemen|
 |Show expired entries (if any)|
-    |Süresi bitmiþ giriþleri göster (eðer varsa)|
+    |Süresi bitmiþ kayýtlarý göster (eðer varsa)|
 |Show entries that will expire soon (if any)|
-    |Yakýnda süresi bitecek giriþleri göster (eðer varsa)|
+    |Yakýnda süresi bitecek kayýtlarý göster (eðer varsa)|
 |Integration|                             |Entegrasyon|
 |Start KeePass at Windows startup (for current user)|
     |KeePass, Windows baþlangýcýnda çalýþsýn (güncel kullanýcý için)|
 |Unable to create/remove the auto-start key of KeePass in the Windows registry!|
     |Windows kayýt defterinde kayýtlý KeePass'ýn otomatik baþlatma anahtarýný oluþturmak/kaldýrmak olanaksýz!|
-|Backup|                                  |Yedekleme|
+|Backup|                                  |Yedek|
 |Save backups of modified entries into the 'Backup' group|
-    |Deðiþtirilmiþ giriþleri yedeklerini 'Yedek' grubuna kaydet|
-|Failed to create backup of this entry!|  |Bu giriþin yedeðini oluþturma iþlemi baþarýsýz!|
+    |Deðiþtirilmiþ kayýtlarýn yedeklerini 'Yedek' grubuna kaydet|
+|Failed to create backup of this entry!|  |Bu kaydýn yedeðini oluþturma iþlemi baþarýsýz!|
 |Master key has been changed!|            |Ana anahtar deðiþtirildi!|
 |Save the database now in order to get the new key applied.|
     |Yeni anahtarý uygulamak için veritabanýný þimdi kaydet.|
@@ -645,5 +640,24 @@
 |Here you can customize the exported files.| |Dýþarýya aktarýlmýþ dosyalarý buradan özelleþtirebilirsiniz.|
 |Encode/replace newline characters by '\n'| |Yeni satýr karakterlerini '\n' ile deðiþtir/kodla|
 |Export backup entries (entries in the 'Backup' group)|
-    |Yedek giriþleri dýþarýya ver ('Yedek' grubundaki tüm giriþler)|
+    |Yedek kayýtlarý dýþarýya ver ('Yedek' grubundaki tüm kayýtlar)|
 |&Get more import plugins...|             |Ýçeriye daha fazla eklenti &al|
+
+|Field has been pasted.|                  |Alan yapýþtýrýldý.|
+|Waiting for paste command.|    |Yapýþtýr komutu için bekliyor.|
+|Paste operation completed.|              |Yapýþtýrma iþlemi tamamlandý.|
+|Limit to single instance|                |Bir kereliðine limit koy|
+|Use more secure password edit controls|  |Daha güvenli parola düzenleme kontrolleri kullan|
+|Single left click instead of double-click for default tray icon action|
+    |Bildirim alaný simgesini harekete geçirmek için çift týklamak yerine bir kere sol týkla|
+|Exclude entries in the '&Backup' group|  |'&Yedek' grubundaki kayýtlarý yoksay|
+|By default, new entries expire in the following number of days:|
+    |Yeni kayýtlarýn süresi varsayýlan olarak aþaðýdaki gün sonunda bitsin:|
+|Click to expire the entry in %u days|    |%u günde kaydýn süresini bitirmek için týklayýn|
+|Calculate rounds for a 1-second delay on this computer|  |Calculate rounds for a 1-second delay on this computer|
+|The program is distributed under the terms of the GNU General Public License v2 or later.|
+    |Bu program GNU-General Public License v2 veya daha yükseðinin koþullarý altýnda daðýtýlmýþtýr.|
+|1 week|                                     |1 hafta|
+|2 weeks|                                    |2 hafta|
+|1 month|                                    |1 ay|
+|3 months|                                   |3 ay|

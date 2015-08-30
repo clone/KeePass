@@ -397,10 +397,6 @@ SOURCE=.\res\unlocked.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\res\wizard.bmp
-# End Source File
-# Begin Source File
-
 SOURCE=.\res\world.ico
 # End Source File
 # End Group

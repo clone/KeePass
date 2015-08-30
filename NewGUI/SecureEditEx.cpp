@@ -33,6 +33,8 @@
 // - EnableSecureMode now doesn't just clear the control, it converts the
 //   entered password
 // - Made DeletePassword, SetMemoryEx and DeleteTPtr static public functions
+// - Shift-Home and Shift-End don't clear the control any more when being in
+//   non-protected mode
 //
 // 2005-04-17: v1.0
 // - First release
@@ -362,17 +364,20 @@ void CSecureEditEx::_EncryptBuffer(BOOL bEncrypt)
 
 void CSecureEditEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
-	if((nChar == VK_HOME) || (nChar == VK_END))
+	if(m_bSecMode == TRUE)
 	{
-		SHORT shShift = GetKeyState(VK_SHIFT);
-		shShift |= GetKeyState(VK_LSHIFT);
-		shShift |= GetKeyState(VK_RSHIFT);
-
-		if((shShift & 0x8000) != 0)
+		if((nChar == VK_HOME) || (nChar == VK_END))
 		{
-			_DeleteAll();
-			SetWindowText(_T(""));
-			SetSel(0, 0, FALSE);
+			SHORT shShift = GetKeyState(VK_SHIFT);
+			shShift |= GetKeyState(VK_LSHIFT);
+			shShift |= GetKeyState(VK_RSHIFT);
+
+			if((shShift & 0x8000) != 0)
+			{
+				_DeleteAll();
+				SetWindowText(_T(""));
+				SetSel(0, 0, FALSE);
+			}
 		}
 	}
 

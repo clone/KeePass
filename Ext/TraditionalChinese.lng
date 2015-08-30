@@ -1,7 +1,7 @@
 |~LANGUAGENAME|
 |ÁcÅé¤¤¤å(»OÆW)|
 |~LANGUAGEVERSION|
-|0.99b - 1|
+|0.99c - 2|
 |~LANGUAGEAUTHOR|
 |°ª²»¤¸ (Kao Shiang-Yuan)|
 |~LANGUAGEAUTHOREMAIL|
@@ -58,8 +58,6 @@
 |¦b±K½X²M³æ¤¤§ä¤@­Ó¦r¦ê|
 |Find text in password list|
 |¦b±K½X²M³æ¤¤§ä¤å¦r|
-|Database Format Version:|
-|¸ê®Æ®w®æ¦¡ª©¥»¡G|
 |About KeePass...|
 |Ãö©óKeePass...|
 |Password Groups|
@@ -76,8 +74,8 @@
 |³Æµù|
 |Ready.|
 |´Nºü¡C|
-|Either enter the password/passphrase or select the password disk's drive.|
-|¿ï¾Ü¿é¤J±K½X©Î¿ï¾Ü±K½XºÐ¤ù¡C|
+|Enter the passphrase and/or select the key-disk's drive.|
+|¿é¤J±K½X¤Î/©Î¿ï¾ÜÆ_°ÍºÐ¤ù©Ò¦bªººÏºÐ¾÷¡C|
 |Enter password:|
 |¿é¤J±K½X¡G|
 |Select the password disk drive where the key will be stored:|
@@ -138,10 +136,6 @@
 |´î¸¹ '-'|
 |Space ' '|
 |ªÅ¥Õ ' '|
-|Special characters (!, §, $, %, &, ...)|
-|¯S®í¦r¤¸ (!, ? $, %, &, ...)|
-|Higher ANSI characters (Â, ©, É, µ, ½, ...)|
-|§ó°ªªºANSI¦r¤¸ (? ? ? ? ? ...)|
 |Special brackets ('{', '}', '[', ...)|
 |¬A¸¹ ('{', '}', '[', ...)|
 |Group:|
@@ -193,13 +187,13 @@
 |Random keyboard input|
 |¥ÎÁä½L§@¬°ÀH¾÷¶Ã¼Æ¸ê®Æ¨Ó·½|
 |Just hack some random keys into the edit box above.|
-|¦b¤W­±ªº¤è¶ô¤ºÀH«K¥´¤@¨Ç¦r¡C|
+|¦b¤W­±ªº¤è¶ô¤ºÀH«K¶Ã¥´¤@¨Ç¦r¡C|
 |You don't have to remember the keys you type in. They are used to generate a random value.|
-|±z¤£»Ý­n°O±o±z¿é¤Jªº¦r¡C¥¦­Ì¬O¥Î¨Ó²£¥ÍÀH¾÷¶Ã¼Æ¸ê®Æ¡C|
+|±z¤£»Ý­n°O±o±z¿é¤J¤F¤°»ò¡C¥¦­Ì¬O¥Î¨Ó²£¥ÍÀH¾÷¶Ã¼Æ¸ê®Æ¡C|
 |So, the more the better. The different, the better.|
-|©Ò¥H¡A·U¦h·U¦n¡A·U½ÆÂø·U¦n¡C|
+|©Ò¥H¡A·U¦h¡A·U½ÆÂø·U¦n¡C|
 |The random the better.|
-|·U½ÆÂø¡A·UÀH«K¡A·U¨S¦³³W«h·U¦n¡C|
+|·UÀH¾÷¡A·U¨S¦³³W«h·U¦n¡C|
 |Get Random|
 |¨ú±oÀH¾÷¶Ã¼Æ¸ê®Æ|
 |Get random data for key generation|
@@ -234,8 +228,8 @@
 |¥t¦s¸ê®Æ®w(&A)...|
 |Change &Master Key For This Database...|
 |¬°¦¹¸ê®Æ®wÅÜ§ó¥DÆ_°Í(&M)...|
-|&Print Complete Password List|
-|¦C¦L¥þ³¡ªº±K½X²M³æ(&P)|
+|&Print...|
+|¦C¦L(&P)...|
 |&Export To|
 |¶×¥X¨ì(&E)|
 |&Lock Workspace|
@@ -256,8 +250,8 @@
 |ÅÜ§ó±K½X¸s²Õ(&Y)...|
 |&Delete Password Group...|
 |§R°£±K½X¸s²Õ(&D)...|
-|Pr&int Group|
-|¦C¦L¸s²Õ(&I)|
+|Pr&int Group...|
+|¸s²Õ¦C¦L(&I)...|
 |Export Group To &HTML...|
 |ºô­¶(&HTML)...|
 |Export Group To &XML...|
@@ -326,8 +320,6 @@
 |¸ê®Æ®w³]©w(&D)...|
 |&Minimize/Maximize Window To/From Tray|
 |³Ì¤p¤Æ/³Ì¤j¤Æµøµ¡|
-|%u.%u.%u.%u, compatible with %u.%u.x.x|
-|%u.%u.%u.%u¡A»P%u.%u.x.x¬Û®e|
 |Version |
 |ª©¥»|
 |Password and repeated password aren't identical!|
@@ -452,8 +444,6 @@
 |CSVÀÉ®×|
 |Text files|
 |¤å¦rÀÉ®×|
-|An error occured while importing the CSV file. File cannot be imported.|
-|¦b¶×¤JCSVÀÉ®×®Éµo¥Í¿ù»~¡CÀÉ®×µLªk¶×¤J¡C|
 |An error occured while importing the file. File cannot be imported.|
 |¦b¶×¤JÀÉ®×®Éµo¥Í¿ù»~¡CÀÉ®×µLªk¶×¤J¡C|
 |&CSV File...|
@@ -621,7 +611,7 @@
 |Move Group One &Left|
 |¦V¥ª²¾°Ê(&L)|
 |Move Group One &Right|
-|¦V¥ª²¾°Ê(&R)|
+|¦V¥k²¾°Ê(&R)|
 |Hide &UserNames Behind Asterisks (***)|
 |¥Î¬P¸¹ÁôÂÃ¥ÎªÌ¦WºÙ(&U)|
 |Attachment:|
@@ -706,12 +696,12 @@
 |±z¥i¥H¦b¦¹³]©w¥Ø«e¶}±Òªº¸ê®Æ®w¡C|
 |Database Summary|
 |¸ê®Æ®w·§Æ[|
-|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
-|±zªºÆ_°Í³Q¥[±K¼Æ¦¸¥HÀ±¸É³Ì²×ªº¸ê®Æ®w¥[±KÆ_°Í¡C³o¼W¥[¤F®É¶¡ªº¦]¯À¦Ó¨Ï¼É¤O¯}¸Ñ§ó¥[§xÃø¡C|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
+|±zªºÆ_°Í³Q¥[±K¼Æ¦¸¡A¦¨¬°³Ì²×ªº¸ê®Æ®w¥[±KÆ_°Í¡C³o¼W¥[¤F®É¶¡ªº¦]¯À¦Ó¨Ï²q´ú±K½X»P¦r¨å§ðÀ»§ó¥[§xÃø¡C|
 |The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
 |¼Æ¦r·U°ª«h·UÃø³Q¨Ï¥Î¼É¤Oªk¯}¸Ñ¡A¦ý±N©µªø¸ê®Æ®w¶}±Ò»PÀx¦sªº®É¶¡¡C|
 |Number of key encryption rounds:|
-|Æ_°Í¥[±K¦¸¼Æ¡G|
+|Æ_°Í´`Àô¥[±K¦¸¼Æ¡G|
 |bits|
 |¦ì¤¸|
 |Personal &Vault TXT File...|
@@ -773,41 +763,41 @@
 |Change password of this database - Enter new master key|
 |ÅÜ§ó³o­Ó¸ê®Æ®wªº±K½X - ¿é¤J·sªº¥DÆ_°Í|
 |Plugin|
-|ÂX¥R®M¥ó|
+|Plug-in|
 |cannot be loaded!|
 |µLªk¸ü¤J¡I|
 |Plugin Manager|
-|ÂX¥R®M¥óºÞ²z­û|
+|Plug-inºÞ²z­û|
 |&Plugin Manager|
-|ÂX¥R®M¥óºÞ²z­û(&P)|
+|Plug-inºÞ²z­û(&P)|
 |Here you can configure all installed KeePass plugins.|
-|±z¥i¥H¦b¦¹³]©w©Ò¦³¦w¸ËªºKeePassÂX¥R®M¥ó¡C|
+|±z¥i¥H¦b¦¹³]©w©Ò¦³¤w¦w¸ËªºPlug-in¡C|
 |This plugin has been designed for a different application version and may be incompatible with this one.|
-|³o­ÓÂX¥R®M¥ó¬O³Q³]­pµ¹¥t¤@­Óª©¥»ªºÀ³¥Îµ{¦¡¡A¥i¯à¤£¬Û®e¡C|
+|³o­ÓPlug-in¬O³Q³]­pµ¹¥t¤@­Óª©¥»ªºÀ³¥Îµ{¦¡¡A¥i¯à¤£¬Û®e¡C|
 |Application version:|
 |À³¥Îµ{¦¡ª©¥»¡G|
 |Plugin has been designed for:|
-|ÂX¥R®M¥ó¬O³Q³]­pµ¹¡G|
+|Plug-in¬O³Q³]­pµ¹¡G|
 |It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.|
-|³o­Ó®M¥ó¥i¯à»PKeePass¬Û®e¡A¦ý¤]¦³¥i¯à¨ÏKeePass·í±¼¡C|
+|³o­ÓPlug-in¥i¯à»PKeePass¬Û®e¡A¦ý¤]¦³¥i¯à¨ÏKeePass·í±¼¡C|
 |Therefore save all data before you continue.|
 |©Ò¥H½Ð¦bÄ~Äò¤§«eÀx¦s©Ò¦³¸ê®Æ¡C|
 |Do you want to load the plugin?|
-|±z§Æ±æ¸ü¤J¦¹ÂX¥R®M¥ó¶Ü¡H|
+|±z§Æ±æ¸ü¤J³o­ÓPlug-in¶Ü¡H|
 |This plugin will be disabled after you restart KeePass.|
-|¦¹ÂX¥R®M¥ó±N¦b±z­«·s±Ò°ÊKeePass«á°±¥Î¡C|
+|³o­ÓPlug-in±N¦b±z­«·s±Ò°ÊKeePass«á°±¥Î¡C|
 |Enabled, loaded|
 |¤w±Ò¥Î¡A¤w¸ü¤J|
 |Disabled, not loaded|
 |¤w°±¥Î¡A¥¼¸ü¤J|
 |This plugin will be enabled after you restart KeePass.|
-|¦¹ÂX¥R®M¥ó±N¦b±z­«·s±Ò°ÊKeePass«á±Ò¥Î¡C|
+|³o­ÓPlug-in±N¦b±z­«·s±Ò°ÊKeePass«á±Ò¥Î¡C|
 |&Enable|
 |±Ò¥Î(&E)|
 |&Disable|
 |°±¥Î(&D)|
 |About &Plugin...|
-|Ãö©óÂX¥R®M¥ó(&P)...|
+|Ãö©óPlug-in(&P)...|
 |An error occured|
 |µo¥Í¿ù»~|
 |Error code|
@@ -839,13 +829,11 @@
 |Encryption/decryption error|
 |¥[/¸Ñ±K¿ù»~|
 |Get more plugins...|
-|¨ú±o§ó¦hÂX¥R®M¥ó...|
+|¨ú±o§ó¦hPlug-in...|
 |Global auto-type hot key combination:|
 |¥þ°ì¦Û°Ê¿é¤J§Ö³tÁä¡G|
-|Unable to register a global hot key.|
-|µLªkµù¥U¥þ°ì§Ö³tÁä¡C|
-|Most probably an other application has reserved this hot key already.|
-|«Ü¦³¥i¯à¬O¦]¬°¨ä¥¦À³¥Îµ{¦¡±µ¦¬¤F³o­Ó§Ö³tÁä¡C|
+|Most probably another application has reserved this hot key already.|
+|«Ü¦³¥i¯à¬O¥t¤@­ÓÀ³¥Îµ{¦¡±µ¦¬¤F³o­Ó§Ö³tÁä¡C|
 |You can choose an other hot key combination in 'Edit - Options - Setup'.|
 |±z¥i¥H¦b¡u	½s¿è¡v¡u¿ï¶µ¡v¡u²ÕÂ´¡v¤¤¿ï¾Ü¨ä¥¦ªº§Ö³tÁä¡C|
 |and|
@@ -873,7 +861,7 @@
 |Help:|
 |»¡©ú¡G|
 |&Get more import plugins...|
-|¨ú±o§ó¦h¶×¤J¥ÎªºÂX¥R®M¥ó(&G)|
+|¨ú±o§ó¦h¶×¤J¥ÎªºPlug-in(&G)|
 |A key-file already exists on this drive. Do you want to overwrite or reuse it?|
 |³o­ÓºÏºÐ¤W¤w¸g¦³Æ_°ÍÀÉ®×¡C±z·Q­n±N¥¦ÂÐ»\©Î¨Ï¥Î¥¦¡H|
 |Advanced|
@@ -930,3 +918,39 @@
 |±Ò°Ê®É³Ì¤p¤Æ¨ÃÂê©w|
 |Unable to create/remove the auto-start key of KeePass in the Windows registry!|
 |µLªk¦bWindowsµn¿ý¤¤«Ø¥ß/²¾°£¦Û°Ê±Ò°Ê³]©w|
+|1 month|
+|1­Ó¤ë|
+|1 week|
+|1¬P´Á|
+|2 weeks|
+|2¬P´Á|
+|3 months|
+|3­Ó¤ë|
+|By default, new entries expire in the following number of days:|
+|¨Ì·Ó¹w³]­È¡A·sªº¶µ¥Ø±N¦b´X¤Ñ«á¹O´Á¡G|
+|Cannot register the global hot key.|
+|µLªkµù¥U¥þ°ì§Ö³tÁä¡C|
+|Click to expire the entry in %u days|
+|ÂI¿ï±z§Æ±æ¦b%u¤Ñ¥H«á¹O´Áªº¶µ¥Ø|
+|Exclude entries in the '&Backup' group|
+|±Æ°£¦b'³Æ¥÷'¸s²Õ¤¤ªº¶µ¥Ø(&B)|
+|Field has been pasted.|
+|Äæ¦ì¤w¶K¤W¡C|
+|Higher ANSI characters|
+|§ó°ªªºANSI¦r¤¸|
+|Limit to single instance|
+|¨¾¤î¦P®É°õ¦æ¦h­ÓKeePass|
+|Paste operation completed.|
+|§¹¦¨¶K¤W¡C|
+|Single left click instead of double-click for default tray icon action|
+|±q³qª¾°Ï°ì(¨t²Î¤u¨ã¦C)¥s¥XKeePass®É¡A¥u»ÝÂI¤@¦¸(­ì¥»»Ý­n³sÂI¨â¦¸)|
+|Special characters|
+|¯S®í¦r¤¸|
+|Calculate rounds for a 1-second delay on this computer|
+|­pºâ¦b³o¥x¹q¸£©µ¿ð¤@¬íªº´`Àô¥[±K¦¸¼Æ|
+|The program is distributed under the terms of the GNU General Public License v2 or later.|
+|³o­Óµ{¦¡¬O¦bGNU³q¥Î¤½¦@±ÂÅv²Ä2ª©©Î§ó·sª©¥»ªº³W½d¤U´²§G¡C|
+|Use more secure password edit controls|
+|¨Ï¥Î§ó¦w¥þªº±K½X½s¿è±±¨î¶µ|
+|Waiting for paste command.|
+|¥¿¦bµ¥«Ý¶K¤W«ü¥O¡C|

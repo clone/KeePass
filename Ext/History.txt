@@ -1,3 +1,35 @@
+05/06/04 - 1.00
+- Changed window activation routine for the Auto-Type command
+- Minor improvement to the checkboxes in the advanced options
+- Added short 'first steps' KeePass usage tutorial to the CHM
+- Extended and updated CHM manual
+- The automatic random password generation for new entries is
+  optional now
+- Moved 'workspace cannot be unlocked' message to the status
+  bar (instead of displaying it in a message box)
+- Improved window repositioning code (window position and size
+  is now remembered over different desktop screen resolutions)
+- Added option to exclude backup entries in quick searches
+- Fixed default Y-splitter position (used when no INI present)
+- Fixed a bug which caused the toolbar to be displayed
+  incorrectly after a second database has been opened when
+  being in single-instance mode and having the first db locked
+- Fixed a bug which could make KeePass show an empty expired
+  entry list dialog when opening a new database
+- Fixed a bug that could crash KeePass when changing the UI
+  language while the single instance option is enabled
+- Shift-Home and Shift-End don't clear secure edit controls any
+  more when being in non-protected mode
+- Clearing out the date/time fields completely results in
+  default values instead of invalid dates/times
+- You cannot enter invalid dates/times any more
+- Renamed the long traying command string to "Tray/Untray"
+- Added -ext: command-line parameter; parameters that start
+  with -ext: are not parsed by KeePass and can therefore be
+  used by plugins for example
+- Added 6 and 12 months to pre-defined expiry intervals list
+- Several minor UI improvements
+
 05/05/14 - 0.99c
 - Added new secure edit controls (if enabled, no password edit
   control spies can read out the text of the control; the

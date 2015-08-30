@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |0.99b|
+|~LANGUAGEVERSION|             |1.0|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -202,7 +202,7 @@
 |Show &URL Column|             |Spalte '&URL' anzeigen|
 |Show &Password Column|        |Spalte '&Passwort' anzeigen|
 |Show Note&s Column|           |Spalte '&Kommentare' anzeigen|
-|Main Window &Always On Top|   |Hauptfenster &immer im Vordergrund|
+|&Always On Top|               |&Immer im Vordergrund|
 |Hide &Passwords Behind Asterisks (***)|       |Passwörter hinter Sternchen &verstecken (***)|
 
 |Password &Generator|          |Passwort-&Generator|
@@ -212,8 +212,7 @@
 
 |&Database Settings...|        |&Datenbank-Einstellungen...|
 
-|&Minimize/Maximize Window To/From Tray|
-    |Umschalten Hauptfenster/Tray|
+|&Tray/Untray|                 |&Umschalten Hauptfenster/Tray|
 
 |Version |                     |Version |
 
@@ -656,3 +655,8 @@
 |2 weeks|                                    |2 Wochen|
 |1 month|                                    |1 Monat|
 |3 months|                                   |3 Monate|
+|6 months|                                   |6 Monate|
+|1 year|                                     |1 Jahr|
+|Automatically generate random passwords for new entries| |Automatisch zufällige Passwörter für neue Einträge generieren|
+|Include backup entries in quick searches (toolbar)|  |Backup-Einträge in Quick-Finds (Toolbar) aufführen|
+|&Donate...|                                 |&Spenden...|

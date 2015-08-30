@@ -1506,7 +1506,7 @@ BOOL BCMenu::LoadToolbar(UINT nToolBar)
 	BOOL returnflag=FALSE;
 	CToolBar bar;
 	int xoffset=-1,xset;
-	
+
 	CWnd* pWnd = AfxGetMainWnd();
 	if (pWnd == NULL)pWnd = CWnd::GetDesktopWindow();
 	bar.Create(pWnd);

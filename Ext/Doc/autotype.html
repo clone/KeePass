@@ -16,25 +16,25 @@ Auto-Type feature</td></tr></table>
 <li><a href="#autowindow">Global auto-type hotkey, defining the target window</a></li>
 <li><a href="#autoexample">An example</a></li>
 </ul>
-<br />
 
 <a name="autobasic"></a>
 <hr class="separator" />
 
-KeePass offers an "Auto-Type" feature. This feature allows you to define a sequence
-of keypresses, which the program can automatically perform for you. The default
-auto-type sequence is:<br />
+KeePass features an "auto-type" functionality. This feature allows you to define
+a sequence of keypresses, which KeePass can automatically perform for you.<br />
+<br />
+The default auto-type sequence is:<br />
 <br />
 <b>{USERNAME}{TAB}{PASSWORD}{ENTER}</b><br />
 <br />
 If you don't define your own auto-type sequence, this sequence is sent. {USERNAME}
 is replaced by the username field contents of the currently selected entry.
-{TAB} simulates a TAB keypress, {PASSWORD} enters your password and {ENTER} finally
-simulates an ENTER keypress.<br />
+{TAB} simulates a TAB keypress, {PASSWORD} enters the password of the entry and
+{ENTER} finally simulates an ENTER keypress.<br />
 <br />
-But you can define your own Auto-Type sequence: simply write the sequence into the
-<b>notes field</b> of the entry, prefixed with &quot;AutoType:&quot;. Your notes could
-look something like this:<br />
+But you can freely define your own Auto-Type sequence: simply write the sequence into the
+<b>notes field</b> of the entry, prefixed with &quot;<code>Auto-Type:</code>&quot;.
+Your notes could look something like this:<br />
 <br />
 <pre>You can write any notes here.
 My e-mail I used to register: test@nowhere.com
@@ -44,8 +44,8 @@ My e-mail I used to register: test@nowhere.com
 Here you can continue with your notes if you wish...</pre>
 
 As you can see, the only important thing is that the auto-type sequence is prefixed
-using "Auto-Type:" and is one single line. An auto-type sequence cannot be defined
-using two lines. If you define two auto-type sequences, the first one is used.<br />
+using "<code>Auto-Type:</code>" and is one single line. An auto-type sequence cannot be defined
+using two or more lines. If you define two auto-type sequences, the first one is used.<br />
 <br />
 KeePass supports the following tags that are automatically substituted by their
 field contents:
@@ -112,7 +112,7 @@ Additionally, some special commands are supported:
 <tr><td class="boxcontent" width="50%">{VKEY X}</td><td class="boxcontent" width="50%">Sends the VKEY of value X.</td></tr>
 <tr><td class="boxcontent" width="50%">{BEEP X Y}</td><td class="boxcontent" width="50%">Beeps with a frequency of X and a duration of Y milliseconds.</td></tr>
 <tr><td class="boxcontent" width="50%">{DELAY X}</td><td class="boxcontent" width="50%">Delays X milliseconds.</td></tr>
-<tr><td class="boxcontent" width="50%">{DELAY=X}</td><td class="boxcontent" width="50%">Sets the default delay to X milliseconds for all following keys.</td></tr>
+<tr><td class="boxcontent" width="50%">{DELAY=X}</td><td class="boxcontent" width="50%">Sets the default delay to X milliseconds for all following keypresses.</td></tr>
 <tr><td class="boxcontent" width="50%">{APPACTIVATE WindowTitle}</td><td class="boxcontent" width="50%">Activates the window "WindowTitle".</td></tr>
 </table></center>
 <br /><br />
@@ -134,12 +134,12 @@ Presses the tab key, enters the password and presses return.<br />
 <table class="tablebox"><tr><td class="boxtitle">
 &nbsp;Global Auto-Type Hotkey, Defining The Target Window</td></tr></table>
 <br />
-KeePass supports a global hotkey, which executes the auto-type sequence for an entry as described above. When
+KeePass supports a global hotkey, which executes the auto-type sequence of an entry as described above. When
 the hotkey is pressed, KeePass looks through all entries and compares their auto-type window associations
-with the actual current window title. If one matches, KeePass executes the auto-type sequence of that
+with the actual current/active window title. If one matches, KeePass executes the auto-type sequence of that
 entry.<br />
 <br />
-Similar to the auto-type sequence string in the notes field above, you can define the matching window:
+Similarly to the auto-type sequence string in the notes field above, you can define the matching window:
 
 <pre>You can write any notes here.
 My e-mail I used to register: test@nowhere.com
@@ -153,11 +153,11 @@ If you now have a window open that starts with &quot;SourceForge.net&quot; and p
 auto-type hotkey combination, KeePass performs the auto-type sequence above.<br />
 <br />
 The default Auto-Type-Window string is <b>*{TITLE}*</b>. So, if you don't define your
-own Auto-Type-Window string, KeePass will compare the titles of your entries with
+own <code>Auto-Type-Window</code> string, KeePass will compare the titles of your entries with
 the actual window title and if an entry title is a substring of the window title,
 that entry is auto-typed.<br />
 <br />
-As you can see, you can use simple wildcards:<br />
+As you can see in the example above, you can use simple wildcards:<br />
 <br />
 <center><table class="tablebox75">
 <tr><td class="smallboxtitle" width="25%">String with wildcard</td><td class="smallboxtitle" width="75%">Meaning</td></tr>
@@ -167,30 +167,34 @@ As you can see, you can use simple wildcards:<br />
 <tr><td class="boxcontent" width="25%">*STRING*</td><td class="boxcontent" width="75%">Matches all window titles that have &quot;STRING&quot; somewhere in the window title. This includes the string being directly at the start or at the end of the window title.</td></tr>
 </table></center>
 <br />
-Other wildcards aren't supported. The * wildcard cannot be in the middle of a string.<br />
+Other wildcards aren't supported. The * wildcard must not be in the middle of a string.<br />
 <br />
-For example, this is invalid: &quot;*Windows*Explorer*&quot;. This won't match &quot;Windows Explorer&quot;,
-it will only match &quot;Windows*Explorer&quot;, i.e. the middle * character is treated as * instead of a wildcard.<br />
+For example, this is invalid: &quot;<code>*Windows*Explorer*</code>&quot;.
+This won't match &quot;<code>Windows Explorer</code>&quot;,
+it will only match &quot;<code>Windows*Explorer</code>&quot;,
+i.e. the middle * character is treated as '*' character instead of a wildcard.<br />
 <br /><br /><br />
 
 <a name="autoexample"></a>
 <table class="tablebox"><tr><td class="boxtitle">
 &nbsp;An example</td></tr></table>
 <br />
-Now let's have a look at a real-world example: logging in at SourceForge.net. Write the following into the notes field:
+Now let's have a look at a real-world example: logging in at SourceForge.net. Write the following into the notes field
+of your SourceForge.net entry:
 
 <pre>Auto-Type: {USERNAME}{TAB}{PASSWORD}{ENTER}
 Auto-Type-Window: SourceForge.net*</pre>
 
-Assume you have set the global auto-type hotkey to Ctrl-Alt-A in the options dialog (you can change the hotkey there).
+Assume you have set the global auto-type hotkey to <i>Ctrl-Alt-A</i> in the options dialog (you can change the hotkey there).
 KeePass is running in the background, you have opened your database and the workspace is unlocked.<br />
 <br />
 When you now navigate to SourceForge.net and are being prompted for your username and password, just click into the
-username field and press Ctrl-Alt-A. KeePass enters the username and password for you! Can it be easier?<br />
+username field and press <i>Ctrl-Alt-A</i>. KeePass enters the username and password for you! Can it be easier?<br />
 <br />
 And last but not least: since we have used a wildcard, it'll won't just work in one browser window, it'll even work
 with different browsers! Mozilla Firefox and Internet Explorer both put the page title first in the window title, followed
-by the product name (i.e. &quot;SourceForge.net - Internet Explorer&quot; and &quot;SourceForge.net - Mozilla Firefox&quot;).
+by the product name (i.e. <i>&quot;SourceForge.net - Internet Explorer&quot;</i> and
+<i>&quot;SourceForge.net - Mozilla Firefox&quot;</i>).
 That means, that the sequence above will work for both browsers. Most other browsers create
 their window titles in the same way and the window definition sequence will work with them, too.<br />
 <br /><br /><br />
@@ -198,9 +202,10 @@ their window titles in the same way and the window definition sequence will work
 <table class="tablebox"><tr><td class="boxtitle">
 &nbsp;Thanks and acknowledgements</td></tr></table>
 <br />
-KeePass uses the CSendKeys engine, which can be found here:
+KeePass uses the <code>CSendKeys</code> engine, which can be found here:
 <a href="http://www.codeproject.com/cpp/sendkeys_cpp_Article.asp"
-target="_blank">http://www.codeproject.com/cpp/sendkeys_cpp_Article.asp</a>. Thanks to Lallous!<br />
+target="_blank">http://www.codeproject.com/cpp/sendkeys_cpp_Article.asp</a>. Thanks to Lallous
+for creating this nice C++ class!<br />
 <br />
 
 </body>

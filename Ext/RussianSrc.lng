@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Russian|
-|~LANGUAGEVERSION|             |0.99b|
+|~LANGUAGEVERSION|             |0.99c|
 |~LANGUAGEAUTHOR|              |Varrey|
 |~LANGUAGEAUTHOREMAIL|         |varrey@hotmail.com|
 
@@ -34,7 +34,6 @@
 |Find a string in the password list|           |Поиск строки в списке паролей|
 |Find text in password list|   |Поиск текста в списке паролей|
 
-|Database Format Version:|     |Версия формата базы паролей:|
 |About KeePass...|             |О программе...|
 
 |Password Groups|              |Группы паролей|
@@ -46,8 +45,8 @@
 
 |Ready.|                       |Готов.|
 
-|Either enter the password/passphrase or select the password disk's drive.|
-    |Введите пароль или выберите диск с паролем.|
+|Enter the passphrase and/or select the key-disk's drive.|
+    |Введите пароль и/или выберите диск с паролем.|
 |Enter password:|              |Введите пароль:|
 
 |Select the password disk drive where the key will be stored:|
@@ -88,16 +87,11 @@
     |Строчные буквы (a, b, c, ...)|
 |Numerical characters (1, 2, 3, ...)|
     |Цифры (1, 2, 3, ...)|
-|Underline character '_'|
-    |Символ подчеркивания '_'|
-|Minus '-'|
-    |Знак минуса '-'|
-|Space ' '|
-    |Пробел ' '|
-|Special characters (!, §, $, %, &, ...)|
-    |Специальные символы (!, §, $, %, &, ...)|
-|Higher ANSI characters (В, ©, Й, µ, Ѕ, ...)|
-    |ANSI-символы второй половины таблицы (В, ©, Й, µ, Ѕ, ...)|
+|Underline character '_'| |Символ подчеркивания '_'|
+|Minus '-'|               |Знак минуса '-'|
+|Space ' '|               |Пробел ' '|
+|Special characters|      |Специальные символы|
+|Higher ANSI characters|  |ANSI-символы второй половины таблицы|
 |Special brackets ('{', '}', '[', ...)|
     |Символы скобок ('{', '}', '[', ...)|
 
@@ -161,7 +155,7 @@
 |&Save Database|               |&Сохранить базу паролей|
 |Save Database &As...|         |Сохранить &как...|
 |Change &Master Key For This Database...|      |&Изменить основной пароль...|
-|&Print Complete Password List|                |&Распечатать полный список паролей|
+|&Print...|                    |&Распечатать...|
 |&Export To|                   |&Экспортировать в|
 |&Lock Workspace|              |За&блокировать|
 |&Unlock Workspace|            |Сн&ять блокировку|
@@ -174,7 +168,7 @@
 |Add Password Su&bgroup...|    |&Добавить подгруппу...|
 |Modif&y Password Group...|    |Изм&енить группу...|
 |&Delete Password Group...|    |&Удалить группу...|
-|Pr&int Group|                 |&Распечатать группу...|
+|Pr&int Group...|              |&Распечатать группу...|
 |Export Group To &HTML...|     |Экспортировать группу в &HTML...|
 |Export Group To &XML...|      |Экспортировать группу в &XML...|
 |Export Group To &CSV...|      |Экспортировать группу в &CSV...|
@@ -217,8 +211,6 @@
 |&Minimize/Maximize Window To/From Tray|
     |Сворачивать в системную панель|
 
-|%u.%u.%u.%u, compatible with %u.%u.x.x|
-    |%u.%u.%u.%u, совместима с %u.%u.x.x|
 |Version |                     |Версия |
 
 |Password and repeated password aren't identical!|
@@ -329,8 +321,6 @@
 
 |CSV files|                    |CSV файлы|
 |Text files|                   |Тесктовые файлы|
-|An error occured while importing the CSV file. File cannot be imported.|
-    |Произошла ошибка во время импорта CSV файла. Невозможно проимпортировать файл.|
 |An error occured while importing the file. File cannot be imported.|
     |Произошла ошибка во время импорта файла. Невозможно проимпортировать файл.|
 |&CSV File...|                 |&CSV файл...|
@@ -484,7 +474,7 @@
 |Make sure a writable medium is inserted.||Проверьте, вставлен ли диск для записи.|
 |Not enough free disk space!|             |Недостаточно свободного места!|
 |Disable unsafe (security-critical) operations like exports, etc.|
-    |Запретить небезопасные операции типа экспорта и пр.|
+    |Запрещать небезопасные операции типа экспорта и пр.|
 |Unsafe operations are disabled.|         |Небезопасные операции запрещены.|
 |To execute this operation you must enable unsafe operations in the options dialog.|
     |Для выполнения этой операции вы должны разрешить небезопасные операции в диалоге настроек.|
@@ -498,11 +488,11 @@
 |Database Settings|                       |Настройки базы паролей|
 |Here you can configure the current database.| |Здесь вы можете изменить настройки текущей базы паролей.|
 |Database Summary|                        |Сводка по базе паролей|
-|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
-    |Ваш парой шифруется несколько раз до получения окончательного ключа шифрования базы паролей. Это затрудняет использование brute-force атак.|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
+    |Ваш парой шифруется несколько раз до получения окончательного ключа шифрования базы паролей. Это затрудняет использование оценочных атак и атак по словарю.|
 |The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
     |Чем выше это число, тем затруднительней brute-force атаки. Но чем больше это число, тем дольше загружается и сохраняется база паролей.|
-|Number of key encryption rounds:|        |Количисвто циклов шифрования:|
+|Number of key encryption rounds:|        |Количество циклов шифрования:|
 |bits|                                    |бит|
 |Personal &Vault TXT File...|             |Personal &Vault TXT файл...|
 |Imported from Password Safe|             |Проимпортированно из Password Safe|
@@ -576,7 +566,7 @@
 |It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.|
     |Возможно модуль совместим, но также возможно, что он приведет к аварийному завершению KeePass.|
 |KeePass - Save Before Close/Lock?| |KeePass - сохранить перед закрытием/блокировкой?|
-|Most probably an other application has reserved this hot key already.|
+|Most probably another application has reserved this hot key already.|
     |Вероятнее всего другое приложение уже зарезервировало эту "горячую" клавишу.|
 |Never expires|        |Никогда не истекает|
 |Number the TANs consecutively, starting from this value| |Нумеровать TANы последовательно, начиная с указанного значения|
@@ -592,7 +582,7 @@
 |Timed: copy data to the clipboard and clear it automatically after some seconds|
     |Временной: автоматически очищает буфер обмена через несколько секунд после вставки|
 |Too few memory (RAM) available|    |Очень мало памяти (ОЗУ)|
-|Unable to register a global hot key.| |Невозможно зарегистрировать глобальную "горячую" клавишу.|
+|Cannot register the global hot key.| |Невозможно зарегистрировать глобальную "горячую" клавишу.|
 |Unknown error|        |Неизвестная ошибка|
 |Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.|
     |Внимание! Этот режим может не работать в вашей системе, особенно если вы используете программы для расширения возможностей буфера обмена.|
@@ -630,3 +620,26 @@
 |Icon| |Значок|
 |Master key has been changed!| |Основной пароль был изменен!|
 |Save the database now in order to get the new key applied.| |Сохраните базу паролей для применения нового основного пароля.|
+
+|1 month|  |1 месяц|
+|1 week|   |1 неделя|
+|2 weeks|  |2 недели|
+|3 months| |3 месяца|
+|By default, new entries expire in the following number of days:|
+    |По умолчанию, срок действия для новых записей будет истекать через (дней):|
+|Calculate rounds for a 1-second delay on this computer|
+    |Подсчитать количество циклов для 1-секундного интервала на этом компьютере|
+|Click to expire the entry in %u days|
+    |Установить окончание через %u дней|
+|Exclude entries in the '&Backup' group|
+    |Не искать в группе 'Резервирование'|
+|Field has been pasted.|     |Поле вставлено.|
+|Limit to single instance|   |Ограничивать одним экземпляром|
+|Paste operation completed.| |Операция вставки завершена.|
+|Single left click instead of double-click for default tray icon action|
+    |Одиночный щелчок мышью вместо двойного для действия по умолчанию для значка в системной панели|
+|The program is distributed under the terms of the GNU General Public License v2 or later.|
+    |Эта программа распространяется по принципу GNU General Public License v2 или выше.|
+|Use more secure password edit controls|
+    |Использовать более безопасные поля ввода паролей|
+|Waiting for paste command.| |Ожидание операции вставки.|

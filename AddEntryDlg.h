@@ -56,6 +56,7 @@ public:
 	DWORD m_dwEntryIndex;
 	int m_nGroupId;
 	int m_nIconId;
+	BOOL m_bAutoPwGen;
 
 	CString m_strNotes;
 	PW_TIME m_tExpire;
@@ -128,6 +129,8 @@ protected:
 	afx_msg void OnExpires2Weeks();
 	afx_msg void OnExpires1Month();
 	afx_msg void OnExpires3Months();
+	afx_msg void OnExpires6Months();
+	afx_msg void OnExpires12Months();
 	//}}AFX_MSG
 
 	afx_msg LRESULT OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam);

@@ -193,7 +193,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Start KeePass at Windows startup (for current user)"), &m_bStartWithWindows, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Single left click instead of double-click for default tray icon action"), &m_bSingleClickTrayIcon, NULL, OL_LINK_NULL);
 
-	m_olAdvanced.AddGroupText(TRL(""), 0);
+	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Start and Exit"), 7);
 	m_olAdvanced.AddCheckItem(TRL("Remember last opened file"), &m_bRememberLast, &m_bOpenLastDb, OL_LINK_SAME_TRIGGER_FALSE);
 	m_olAdvanced.AddCheckItem(TRL("Automatically open last used database on startup"), &m_bOpenLastDb, &m_bRememberLast, OL_LINK_SAME_TRIGGER_TRUE);
@@ -201,14 +201,19 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Automatically save database on exit"), &m_bAutoSave, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Limit to single instance"), &m_bSingleInstance, NULL, OL_LINK_NULL);
 
-	m_olAdvanced.AddGroupText(TRL(""), 0);
+	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Immediately after opening a database"), 8);
 	m_olAdvanced.AddCheckItem(TRL("Show expired entries (if any)"), &m_bAutoShowExpired, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Show entries that will expire soon (if any)"), &m_bAutoShowExpiredSoon, NULL, OL_LINK_NULL);
 
-	m_olAdvanced.AddGroupText(TRL(""), 0);
+	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Backup"), 10);
 	m_olAdvanced.AddCheckItem(TRL("Save backups of modified entries into the 'Backup' group"), &m_bBackupEntries, NULL, OL_LINK_NULL);
+
+	m_olAdvanced.AddGroupText(_T(""), 0);
+	m_olAdvanced.AddGroupText(TRL("Advanced"), 11);
+	m_olAdvanced.AddCheckItem(TRL("Automatically generate random passwords for new entries"), &m_bAutoPwGen, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Include backup entries in quick searches (toolbar)"), &m_bQuickFindIncBackup, NULL, OL_LINK_NULL);
 
 	TCITEM tci;
 	ZeroMemory(&tci, sizeof(TCITEM));

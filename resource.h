@@ -393,14 +393,18 @@
 #define ID_EXPIRES_2WEEKS               32974
 #define ID_EXPIRES_1MONTH               32975
 #define ID_EXPIRES_3MONTHS              32976
+#define ID_BUTTON32977                  32977
+#define ID_INFO_DONATE                  32978
+#define ID_EXPIRES_6MONTHS              32979
+#define ID_EXPIRES_12MONTHS             32980
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        217
-#define _APS_NEXT_COMMAND_VALUE         32977
+#define _APS_NEXT_RESOURCE_VALUE        219
+#define _APS_NEXT_COMMAND_VALUE         32984
 #define _APS_NEXT_CONTROL_VALUE         1201
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

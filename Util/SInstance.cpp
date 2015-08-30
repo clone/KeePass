@@ -276,7 +276,7 @@ HWND CInstanceChecker::ActivatePreviousInstance(LPCTSTR lpCmdLine, DWORD dwCopyD
         //Restore the focus to the previous instance and bring it to the foreground
         if (wndPrev.IsIconic())
           wndPrev.ShowWindow(SW_RESTORE);
-        pWndChild->SetForegroundWindow();
+        if(pWndChild != NULL) pWndChild->SetForegroundWindow();
 
         if (lpCmdLine)
         {  

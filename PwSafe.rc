@@ -732,8 +732,8 @@ IDI_PLUGINS             ICON    DISCARDABLE     "res\\plugins.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,9,9,3
- PRODUCTVERSION 0,9,9,3
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -750,15 +750,15 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.sourceforge.net\0"
             VALUE "CompanyName", "Dominik Reichl\0"
-            VALUE "FileDescription", "KeePass Password Safe v0.99c\0"
-            VALUE "FileVersion", "0, 9, 9, 3\0"
+            VALUE "FileDescription", "KeePass Password Safe v1.00\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "PwSafe\0"
             VALUE "LegalCopyright", "Copyright (c) 2003-2005 Dominik Reichl\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "KeePass.exe\0"
             VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "KeePass Password Safe v0.99c\0"
-            VALUE "ProductVersion", "0, 9, 9, 3\0"
+            VALUE "ProductName", "KeePass Password Safe v1.00\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -825,7 +825,7 @@ BEGIN
         MENUITEM "Show &ToolBar",               ID_VIEW_SHOWTOOLBAR, CHECKED
         MENUITEM "Show &Entry View",            ID_VIEW_ENTRYVIEW, CHECKED
         MENUITEM SEPARATOR
-        MENUITEM "Main Window &Always On Top",  ID_VIEW_ALWAYSONTOP, CHECKED
+        MENUITEM "&Always On Top",              ID_VIEW_ALWAYSONTOP, CHECKED
         MENUITEM SEPARATOR
         MENUITEM "Hide &UserNames Behind Asterisks (***)", ID_VIEW_HIDEUSERS
         , CHECKED
@@ -889,6 +889,7 @@ BEGIN
     POPUP "&?"
     BEGIN
         MENUITEM "Visit &KeePass Homepage",     ID_INFO_HOMEPAGE
+        MENUITEM "&Donate...",                  ID_INFO_DONATE
         MENUITEM SEPARATOR
         MENUITEM "Open &Help File",             ID_INFO_README
         MENUITEM "Open &License File",          ID_INFO_LICENSE
@@ -984,7 +985,7 @@ IDR_SYSTRAY_MENU MENU DISCARDABLE
 BEGIN
     POPUP "Submenu"
     BEGIN
-        MENUITEM "&Minimize/Maximize Window To/From Tray", ID_VIEW_HIDE
+        MENUITEM "&Tray/Untray",                ID_VIEW_HIDE
         MENUITEM SEPARATOR
         MENUITEM "&Add Entry...",               ID_PWLIST_ADD
         MENUITEM SEPARATOR
@@ -1055,8 +1056,12 @@ BEGIN
     BEGIN
         MENUITEM "1 week",                      ID_EXPIRES_1WEEK
         MENUITEM "2 weeks",                     ID_EXPIRES_2WEEKS
+        MENUITEM SEPARATOR
         MENUITEM "1 month",                     ID_EXPIRES_1MONTH
         MENUITEM "3 months",                    ID_EXPIRES_3MONTHS
+        MENUITEM "6 months",                    ID_EXPIRES_6MONTHS
+        MENUITEM SEPARATOR
+        MENUITEM "1 year",                      ID_EXPIRES_12MONTHS
     END
 END
 
@@ -1156,6 +1161,7 @@ BEGIN
     BUTTON      ID_SAFE_EXPORTGROUP_TXT
     BUTTON      ID_PWLIST_AUTOTYPE
     BUTTON      ID_EXTRAS_PLUGINMGR
+    BUTTON      ID_INFO_DONATE
 END
 
 IDR_CLIENTICONS TOOLBAR DISCARDABLE  16, 16
@@ -1211,7 +1217,6 @@ END
 IDR_OPTIONICONS TOOLBAR DISCARDABLE  16, 16
 BEGIN
     BUTTON      ID_BUTTON32961
-    SEPARATOR
     BUTTON      ID_BUTTON32962
     BUTTON      ID_BUTTON32963
     BUTTON      ID_BUTTON32964
@@ -1222,6 +1227,7 @@ BEGIN
     BUTTON      ID_BUTTON32969
     BUTTON      ID_BUTTON32970
     BUTTON      ID_BUTTON32971
+    BUTTON      ID_BUTTON32977
 END
 
 

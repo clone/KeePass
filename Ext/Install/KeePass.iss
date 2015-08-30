@@ -6,9 +6,9 @@
 ; The name of the application should remain consistent across languages
 #define CrossAppName "KeePass"
 #define CrossAppFullName "KeePass Password Safe"
-#define KeeVersion "0.99c"
+#define KeeVersion "1.00"
 ; VersionInfo cannot contain letters, use 3rd number
-#define KeeVVersion "0.9.9.3"
+#define KeeVVersion "1.0.0.1"
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl; LicenseFile: License.txt

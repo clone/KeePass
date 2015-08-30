@@ -29,8 +29,8 @@
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
 
 // When making a Windows build, don't forget to update the verinfo resource
-#define PWM_VERSION_STR  _T("0.99c")
-#define PWM_VERSION_DW   0x00090903
+#define PWM_VERSION_STR  _T("1.0")
+#define PWM_VERSION_DW   0x01000001
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -72,7 +72,6 @@
 #define PWMKEY_WINDOWPY   _T("KeeWindowPY")
 #define PWMKEY_WINDOWDX   _T("KeeWindowDX")
 #define PWMKEY_WINDOWDY   _T("KeeWindowDY")
-#define PWMKEY_SCREENID   _T("KeeLastScreenId")
 #define PWMKEY_COLWIDTH0  _T("KeeColumnWidth0")
 #define PWMKEY_COLWIDTH1  _T("KeeColumnWidth1")
 #define PWMKEY_COLWIDTH2  _T("KeeColumnWidth2")
@@ -119,6 +118,8 @@
 #define PWMKEY_SECUREEDITS      _T("KeeSecureEditControls")
 #define PWMKEY_SINGLECLICKTRAY  _T("KeeSingleClickTrayIcon")
 #define PWMKEY_DEFAULTEXPIRE    _T("KeeDefaultExpire")
+#define PWMKEY_AUTOPWGEN        _T("KeeAutoPwGen")
+#define PWMKEY_QUICKFINDINCBK   _T("KeeQuickFindIncBackup")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32

@@ -67,7 +67,8 @@ the file in UTF-8 when exporting data to a CSV file. Other encodings aren't supp
 entry modification time, expiration time, icon, entry file attachments, etc. aren't supported.
 Use a different file format (like XML) if you need to transfer this information.</li>
 <li>The strings must be enclosed in quotes (&quot;), unquoted strings aren't allowed.</li>
-<li>Quotes (") in strings are encoded as <code>\"</code>. Backslashes (\) are encoded as <code>\\</code>.</li>
+<li>Quotes (") in strings are encoded as <code>\"</code>. Backslashes (\) are encoded as <code>\\</code>.
+Unencoded quotes are not supported and will lead to an importing error message!</li>
 <li>Multi-line comments and strings are realized through normal line-breaks. They are <i>not</i> encoded by \n or
 something like this.</li>
 </ul>

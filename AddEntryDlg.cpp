@@ -63,6 +63,7 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 	m_strNotes = _T("");
 	m_lpPassword = m_lpRepeatPw = NULL;
 	m_dwDefaultExpire = 0;
+	m_bAutoPwGen = TRUE;
 }
 
 void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
@@ -121,6 +122,8 @@ BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	ON_COMMAND(ID_EXPIRES_2WEEKS, OnExpires2Weeks)
 	ON_COMMAND(ID_EXPIRES_1MONTH, OnExpires1Month)
 	ON_COMMAND(ID_EXPIRES_3MONTHS, OnExpires3Months)
+	ON_COMMAND(ID_EXPIRES_6MONTHS, OnExpires6Months)
+	ON_COMMAND(ID_EXPIRES_12MONTHS, OnExpires12Months)
 	//}}AFX_MSG_MAP
 
 	ON_REGISTERED_MESSAGE(WM_XHYPERLINK_CLICKED, OnXHyperLinkClicked)
@@ -297,20 +300,28 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	if(m_bEditMode == FALSE) // Generate a pseudo-random password
 	{
-		CNewRandom *pRand = new CNewRandom();
-		CBase64Codec base64;
-		ASSERT(pRand != NULL);
-		DWORD dwSize = 32;
-		BYTE pbRandom[16], pbString[32];
-		pRand->Initialize(); // Get system entropy
-		pRand->GetRandomBuffer(pbRandom, 16);
-		VERIFY(base64.Encode(pbRandom, 16, pbString, &dwSize));
-		SAFE_DELETE(pRand);
-		pbString[strlen((char *)pbString) - 3] = 0;
-		m_pEditPw.SetPassword((char *)(pbString + 1));
-		m_pRepeatPw.SetPassword((char *)(pbString + 1));
-		mem_erase(pbRandom, 16); mem_erase(pbString, 32);
-		UpdateData(FALSE);
+		if(m_bAutoPwGen == TRUE)
+		{
+			CNewRandom *pRand = new CNewRandom();
+			CBase64Codec base64;
+			ASSERT(pRand != NULL);
+			DWORD dwSize = 32;
+			BYTE pbRandom[16], pbString[32];
+			pRand->Initialize(); // Get system entropy
+			pRand->GetRandomBuffer(pbRandom, 16);
+			VERIFY(base64.Encode(pbRandom, 16, pbString, &dwSize));
+			SAFE_DELETE(pRand);
+			pbString[strlen((char *)pbString) - 3] = 0;
+			m_pEditPw.SetPassword((char *)(pbString + 1));
+			m_pRepeatPw.SetPassword((char *)(pbString + 1));
+			mem_erase(pbRandom, 16); mem_erase(pbString, 32);
+			UpdateData(FALSE);
+		}
+		else
+		{
+			m_pEditPw.SetPassword(_T(""));
+			m_pRepeatPw.SetPassword(_T(""));
+		}
 	}
 
 	UpdateControlsStatus();
@@ -365,6 +376,9 @@ void CAddEntryDlg::CleanUp()
 void CAddEntryDlg::OnOK() 
 {
 	UpdateData(TRUE);
+
+	if(m_editDate.GetWindowTextLength() == 0) m_editDate.SetDate(2999, 12, 28);
+	if(m_editTime.GetWindowTextLength() == 0) m_editTime.SetTime(23, 59, 59);
 
 	ASSERT(m_lpPassword == NULL); if(m_lpPassword != NULL) CSecureEditEx::DeletePassword(m_lpPassword);
 	m_lpPassword = m_pEditPw.GetPassword();
@@ -760,6 +774,16 @@ void CAddEntryDlg::OnExpires1Month()
 void CAddEntryDlg::OnExpires3Months() 
 {
 	SetExpireDays(91);
+}
+
+void CAddEntryDlg::OnExpires6Months() 
+{
+	SetExpireDays(182);
+}
+
+void CAddEntryDlg::OnExpires12Months() 
+{
+	SetExpireDays(365);
 }
 
 #pragma warning(pop)
