@@ -22,6 +22,7 @@
 #include <winuser.h>
 #include <mmsystem.h>
 #include <set>
+#include <boost/regex/mfc.hpp>
 
 #include "PwSafe.h"
 #include "PwSafeDlg.h"
@@ -36,8 +37,8 @@
 #include "../KeePassLibCpp/Util/StrUtil.h"
 #include "../KeePassLibCpp/Util/EntryUtil.h"
 #include "../KeePassLibCpp/Util/PopularPasswords.h"
-#include <boost/regex/mfc.hpp>
 #include "../KeePassLibCpp/Util/AppUtil.h"
+#include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "Util/WinUtil.h"
 #include "Util/SendKeysEx.h"
 #include "Util/FileLock.h"
@@ -46,8 +47,8 @@
 #include "Util/UpdateCheckEx.h"
 #include "Util/RestartManagerEx.h"
 #include "Util/KeySourcesPool.h"
+#include "Util/ShutdownBlocker.h"
 #include "Util/SprEngine/SprEngine.h"
-#include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "NewGUI/XHyperLink.h"
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/SecureEditEx.h"
@@ -57,6 +58,7 @@
 // #include "NewGUI/VistaMenu/VistaMenu.h"
 #include "NewGUI/NewDialogsEx.h"
 #include "NewGUI/NewColorizerEx.h"
+#include "NewGUI/DwmUtil.h"
 #include "Plugins/KpApiImpl.h"
 
 #include "PasswordDlg.h"
@@ -251,6 +253,7 @@ CPwSafeDlg::CPwSafeDlg(CWnd* pParent /*=NULL*/)
 
 	m_lNormalWndPosX = m_lNormalWndPosY = 0;
 	m_lNormalWndSizeW = m_lNormalWndSizeH = -1;
+	ZeroMemory(&m_szLastContent, sizeof(SIZE));
 
 	m_clrIcoStoreMain = DWORD_MAX;
 	m_hIcoStoreMain = NULL;
@@ -525,6 +528,9 @@ BEGIN_MESSAGE_MAP(CPwSafeDlg, CDialog)
 
 	ON_MESSAGE(WM_WTSSESSION_CHANGE, OnWTSSessionChange)
 
+	ON_MESSAGE(WM_DWMSENDICONICTHUMBNAIL, OnDwmSendIconicThumbnail)
+	ON_MESSAGE(WM_DWMSENDICONICLIVEPREVIEWBITMAP, OnDwmSendIconicLivePreviewBitmap)
+
 	ON_REGISTERED_MESSAGE(WM_REG_TASKBARCREATED, OnTaskbarCreated)
 	ON_REGISTERED_MESSAGE(WM_REG_TASKBARBUTTONCREATED, OnTaskbarButtonCreated)
 	ON_REGISTERED_MESSAGE(WM_REG_PROCESSMAILSLOT, OnProcessMailslot)
@@ -654,6 +660,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bDragging = FALSE;
 	m_iDisplayDialog = 0;
 	m_iDisplayMenu = 0;
+	m_iUIHintsBlocked = 0;
 	m_hDraggingGroup = NULL;
 	// m_bDraggingEntry = FALSE;
 	m_bMenuExit = FALSE;
@@ -1200,6 +1207,8 @@ BOOL CPwSafeDlg::OnInitDialog()
 	CMsgRelayWnd::AddRelayedMessage(WM_ENDSESSION);
 	CMsgRelayWnd::AddRelayedMessage(WM_COPYDATA);
 	CMsgRelayWnd::AddRelayedMessage(WM_WTSSESSION_CHANGE);
+	CMsgRelayWnd::AddRelayedMessage(WM_DWMSENDICONICTHUMBNAIL);
+	CMsgRelayWnd::AddRelayedMessage(WM_DWMSENDICONICLIVEPREVIEWBITMAP);
 	CMsgRelayWnd::AddRelayedMessage(WM_REG_TASKBARCREATED);
 	CMsgRelayWnd::AddRelayedMessage(WM_REG_TASKBARBUTTONCREATED);
 	CMsgRelayWnd::AddRelayedMessage(WM_REG_PROCESSMAILSLOT);
@@ -1238,13 +1247,18 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_hAccel = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCEL_MAIN));
 	ASSERT(m_hAccel != NULL);
 
-	VERIFY(m_tip.Create(this, 0x40));
+	// VERIFY(m_tipN.Create(this, 0));
+	// m_tipN.AddTool(&m_btnTbLock, _T(" "));
+	// m_btnTbLock.ActivateTooltip(FALSE); // Prevent duplicate tooltips
+	// m_tipN.Activate(TRUE);
+
+	VERIFY(m_tipB.Create(this, TTS_BALLOON));
 	CString strQFHint = TRL("Type to search the database");
 	strQFHint += _T(" (");
 	strQFHint += TRL("Ctrl");
 	strQFHint += _T("+E)");
-	m_tip.AddTool(&m_cQuickFind, strQFHint);
-	m_tip.Activate(TRUE);
+	m_tipB.AddTool(&m_cQuickFind, strQFHint);
+	m_tipB.Activate(TRUE);
 
 	NewGUI_SetCueBanner_CB(m_cQuickFind.m_hWnd, TRL("Search..."));
 
@@ -1441,7 +1455,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 
 	m_uACP = GetACP();
 
-	m_sessionNotify.Register(this->m_hWnd);
+	VERIFY(m_sessionNotify.Register(this->m_hWnd));
 
 	CUpdateCheckEx::EnsureConfigured(&m_bCheckForUpdate, &m_bCheckForUpdateCfg,
 		this->m_hWnd, AfxGetInstanceHandle());
@@ -2023,6 +2037,7 @@ void CPwSafeDlg::OnSize(UINT nType, int cx, int cy)
 		_UpdateTrayIcon();
 	}
 
+	_UpdatePeekPreview();
 	_UpdateToolBar();
 	_SaveWindowPositionAndSize(NULL);
 }
@@ -2432,6 +2447,7 @@ void CPwSafeDlg::SaveOptions()
 void CPwSafeDlg::_SaveWindowPositionAndSize(CPrivateConfigEx* pConfig)
 {
 	RECT rect;
+	ZeroMemory(&rect, sizeof(RECT));
 	GetWindowRect(&rect);
 
 	if((m_bMinimized == FALSE) && (m_bTrayed == FALSE) && (m_bWasMaximized == FALSE))
@@ -2440,6 +2456,14 @@ void CPwSafeDlg::_SaveWindowPositionAndSize(CPrivateConfigEx* pConfig)
 		m_lNormalWndPosY = rect.top;
 		m_lNormalWndSizeW = rect.right - rect.left;
 		m_lNormalWndSizeH = rect.bottom - rect.top;
+	}
+
+	if((m_bMinimized == FALSE) && (m_bTrayed == FALSE))
+	{
+		const SIZE sz = NewGUI_GetWindowContentSize(this->m_hWnd);
+		if((sz.cx > 0) && (sz.cy > 0))
+			memcpy(&m_szLastContent, &sz, sizeof(SIZE));
+		else { ASSERT(FALSE); }
 	}
 
 	if((pConfig != NULL) && (m_lNormalWndSizeW >= 0) && (m_lNormalWndSizeH >= 0))
@@ -4559,6 +4583,8 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
 			m_menu.SetMenuText(ID_FILE_LOCK, strExtended, MF_BYCOMMAND);
 			SetStatusTextEx(CString(TRL("Workspace locked")) + _T("."));
 			m_btnTbLock.SetTooltipText(RemoveAcceleratorTipEx(TRL("&Unlock Workspace")));
+			// m_tipN.UpdateTipText(RemoveAcceleratorTipEx(TRL("&Unlock Workspace")),
+			//	&m_btnTbLock);
 		}
 		else
 		{
@@ -4623,9 +4649,9 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
 					}
 				}
 
-				CString strKeyFilePath;
-				if((pDlgPass->m_bKeyFile != FALSE) && (pDlgPass->m_lpKey != NULL))
-					strKeyFilePath = pDlgPass->m_lpKey;
+				// CString strKeyFilePath;
+				// if((pDlgPass->m_bKeyFile != FALSE) && (pDlgPass->m_lpKey != NULL))
+				//	strKeyFilePath = pDlgPass->m_lpKey;
 
 				if(pDlgPass->m_bKeyMethod == PWM_KEYMETHOD_OR)
 					nErr = pMgr->SetMasterKey(pDlgPass->m_lpKey, pDlgPass->m_bKeyFile,
@@ -4652,7 +4678,8 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
 				CTaskbarListEx::SetProgressState(this->m_hWnd, TBPF_NOPROGRESS);
 
 				if(nErr == PWE_SUCCESS) // Set or clear key source
-					CKeySourcesPool::Set(GetShortestAbsolutePath(strFile), strKeyFilePath);
+					CKeySourcesPool::Set(GetShortestAbsolutePath(strFile),
+						pMgr->GetKeySource());
 
 				if(bIgnoreCorrupted == TRUE)
 				{
@@ -4766,6 +4793,8 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
 					if(_tcslen(pSuffix) != 0) { strText += _T("\t"); strText += pSuffix; }
 					m_menu.SetMenuText(ID_FILE_LOCK, strText, MF_BYCOMMAND);
 					m_btnTbLock.SetTooltipText(RemoveAcceleratorTipEx(TRL("&Lock Workspace")));
+					// m_tipN.UpdateTipText(RemoveAcceleratorTipEx(TRL(
+					//	"&Lock Workspace")), &m_btnTbLock);
 
 					UpdateGroupList();
 
@@ -4943,12 +4972,16 @@ void CPwSafeDlg::OnFileSave()
 
 	_PreDatabaseWrite();
 
+	// SetStatusTextEx(TRL("Saving database..."));
 	CTaskbarListEx::SetProgressState(this->m_hWnd, TBPF_INDETERMINATE);
+	CShutdownBlocker sdb(this->m_hWnd, TRL("Saving database..."));
 
 	BYTE vWrittenHash[32];
 	const int nErr = m_mgr.SaveDatabase(m_strFile, &vWrittenHash[0]);
 
+	sdb.Release();
 	CTaskbarListEx::SetProgressState(this->m_hWnd, TBPF_NOPROGRESS);
+	// SetStatusTextEx(TRL("Ready."));
 
 	if(nErr != PWE_SUCCESS)
 	{
@@ -5023,12 +5056,16 @@ void CPwSafeDlg::OnFileSaveAs()
 
 		_PreDatabaseWrite();
 
+		// SetStatusTextEx(TRL("Saving database..."));
 		CTaskbarListEx::SetProgressState(this->m_hWnd, TBPF_INDETERMINATE);
+		CShutdownBlocker sdb(this->m_hWnd, TRL("Saving database..."));
 
 		BYTE vWrittenHash[32];
 		const int nErr = m_mgr.SaveDatabase(strFile, &vWrittenHash[0]);
 
+		sdb.Release();
 		CTaskbarListEx::SetProgressState(this->m_hWnd, TBPF_NOPROGRESS);
+		// SetStatusTextEx(TRL("Ready."));
 
 		if(nErr != PWE_SUCCESS)
 			CNewDialogsEx::ShowError(this->m_hWnd, nErr, PWFF_DATALOSS_WITHOUT_SAVE);
@@ -6289,7 +6326,7 @@ void CPwSafeDlg::OnPwlistDuplicate()
 
 			memset(pwTemplate.uuid, 0, 16); // We need a new UUID
 			pwTemplate.tCreation = tNow; // Set new times
-			pwTemplate.tLastMod = tNow;
+			// pwTemplate.tLastMod = tNow;
 			pwTemplate.tLastAccess = tNow;
 
 			std::basic_string<TCHAR> strTitle = pwTemplate.pszTitle;
@@ -6942,11 +6979,12 @@ void CPwSafeDlg::OnFileLock()
 		m_menu.SetMenuText(ID_FILE_LOCK, strExtended, MF_BYCOMMAND);
 		SetStatusTextEx(CString(TRL("Workspace locked")) + _T("."));
 		m_btnTbLock.SetTooltipText(RemoveAcceleratorTipEx(TRL("&Unlock Workspace")));
+		// m_tipN.UpdateTipText(RemoveAcceleratorTipEx(TRL("&Unlock Workspace")),
+		//	&m_btnTbLock);
 
 		// _UpdateTitleBar(); // Updated by _UpdateToolBar()
 
 		ShowEntryDetails(NULL);
-		NewGUI_EnableWindowPeekPreview(this->m_hWnd, false);
 
 		if(m_bTrayed == FALSE) // Prevent focus loss (discussion 110f28cf)
 		{
@@ -6980,6 +7018,8 @@ void CPwSafeDlg::OnFileLock()
 		strExtended += _GetCmdAccelExt(_T("&Lock Workspace"));
 		m_menu.SetMenuText(ID_FILE_LOCK, strExtended, MF_BYCOMMAND);
 		m_btnTbLock.SetTooltipText(RemoveAcceleratorTipEx(TRL("&Lock Workspace")));
+		// m_tipN.UpdateTipText(RemoveAcceleratorTipEx(TRL("&Lock Workspace")),
+		//	&m_btnTbLock);
 
 		// m_cGroups.SelectSetFirstVisible((HTREEITEM)m_nLockedViewParams[0]);
 		// m_cGroups.SelectItem((HTREEITEM)m_nLockedViewParams[1]);
@@ -7009,11 +7049,10 @@ void CPwSafeDlg::OnFileLock()
 			ShowEntryDetails(p); // NULL is allowed
 		}
 
-		NewGUI_EnableWindowPeekPreview(this->m_hWnd, true);
-
 		m_cList.SetFocus();
 	}
 
+	_UpdatePeekPreview();
 	_UpdateTrayIcon();
 	_UpdateToolBar(TRUE);
 	_SetDisplayDialog(false);
@@ -7403,7 +7442,8 @@ BOOL CPwSafeDlg::PreTranslateMessage(MSG* pMsg)
 		if(m_bLockOnWinLock != FALSE) _ChangeLockState(TRUE);
 	}
 
-	m_tip.RelayEvent(pMsg);
+	// m_tipN.RelayEvent(pMsg);
+	m_tipB.RelayEvent(pMsg);
 
 	return CDialog::PreTranslateMessage(pMsg);
 }
@@ -9557,7 +9597,7 @@ void CPwSafeDlg::_HandleEntryDrop(DWORD dwDropType, HTREEITEM hTreeItem)
 			if(dwDropType == DROPEFFECT_MOVE)
 			{
 				p->tLastAccess = tNow;
-				p->tLastMod = tNow;
+				// p->tLastMod = tNow;
 				p->uGroupId = dwToGroupId;
 			}
 			else if(dwDropType == DROPEFFECT_COPY)
@@ -9571,8 +9611,9 @@ void CPwSafeDlg::_HandleEntryDrop(DWORD dwDropType, HTREEITEM hTreeItem)
 				ZeroMemory(pwT.uuid, 16 * sizeof(BYTE)); // Create new UUID
 				pwT.uGroupId = dwToGroupId; // Set group ID
 				pwT.pszPassword = const_cast<LPTSTR>((LPCTSTR)strPasswordCopy);
+				pwT.tCreation = tNow;
 				pwT.tLastAccess = tNow;
-				pwT.tLastMod = tNow;
+				// pwT.tLastMod = tNow;
 				m_mgr.AddEntry(&pwT); // Add as new entry
 
 				EraseCString(&strPasswordCopy);
@@ -10788,7 +10829,7 @@ CString CPwSafeDlg::_GetSecureEditTipText(const TCHAR *tszBase)
 	str = TRL_VAR(tszBase);
 	str = str.TrimRight(_T(':'));
 	str += _T("\r\n(");
-	str += TRL("Press Shift-Home or Shift-End to clear this edit control");
+	str += TRL("Press Shift+Home or Shift+End to clear this edit control");
 	str += _T(")");
 	return str;
 }
@@ -11261,10 +11302,13 @@ void CPwSafeDlg::SetViewHideState(BOOL bReqVisible, BOOL bPreferTray)
 	else // Hide the window
 	{
 		_SaveWindowPositionAndSize(NULL);
+		_UIBlockHints(true); // Prevent drawing bug in peek preview
 
 		if((m_bMinimizeToTray == TRUE) || (bPreferTray == TRUE))
 			SetTrayState(TRUE);
 		else ShowWindow(SW_MINIMIZE);
+
+		_UIBlockHints(false);
 	}
 }
 
@@ -11616,15 +11660,11 @@ void CPwSafeDlg::_SetDisplayMenu(bool bDisplay)
 	ASSERT(m_iDisplayMenu >= 0);
 }
 
-void CPwSafeDlg::_AssertDisplayCounts(int cDialogs, int cMenus)
+void CPwSafeDlg::_AssertStateStacksEmpty()
 {
-#ifdef _DEBUG
-	ASSERT(m_iDisplayDialog == cDialogs);
-	ASSERT(m_iDisplayMenu == cMenus);
-#else
-	UNREFERENCED_PARAMETER(cDialogs);
-	UNREFERENCED_PARAMETER(cMenus);
-#endif
+	ASSERT(m_iDisplayDialog == 0);
+	ASSERT(m_iDisplayMenu == 0);
+	ASSERT(m_iUIHintsBlocked == 0);
 }
 
 void CPwSafeDlg::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
@@ -11652,4 +11692,63 @@ void CPwSafeDlg::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 	}
 
 	CDialog::OnActivate(nState, pWndOther, bMinimized);
+}
+
+LRESULT CPwSafeDlg::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(wParam);
+
+	CDwmUtil::SetIconicThumbnail(this->m_hWnd, lParam);
+	return 0;
+}
+
+LRESULT CPwSafeDlg::OnDwmSendIconicLivePreviewBitmap(WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
+	CDwmUtil::SetIconicPreview(this->m_hWnd, m_szLastContent);
+	return 0;
+}
+
+void CPwSafeDlg::_UpdatePeekPreview()
+{
+	bool b = ((IsIconic() == FALSE) || (m_bLocked == FALSE));
+	CDwmUtil::EnableWindowPeekPreview(this->m_hWnd, b);
+}
+
+void CPwSafeDlg::_UIBlockHints(bool bBlock)
+{
+	bool bUpdateState;
+
+	if(bBlock)
+	{
+		bUpdateState = (m_iUIHintsBlocked == 0);
+		++m_iUIHintsBlocked;
+	}
+	else
+	{
+		if(m_iUIHintsBlocked <= 0) { ASSERT(FALSE); return; }
+		--m_iUIHintsBlocked;
+		bUpdateState = (m_iUIHintsBlocked == 0);
+	}
+
+	if(bUpdateState)
+	{
+		const bool bBlocked = (m_iUIHintsBlocked > 0);
+
+		m_btnTbLock.ActivateTooltip(bBlocked ? FALSE : TRUE);
+
+		if(bBlocked)
+		{
+			// Prevent a drawing bug that can occur when minimizing
+			// the main window and viewing it using peek preview
+			CToolTipCtrl& tt = m_btnTbLock.GetToolTipCtrl();
+			if(tt.m_hWnd != NULL)
+			{
+				tt.Pop();
+				tt.Update();
+			}
+		}
+	}
 }

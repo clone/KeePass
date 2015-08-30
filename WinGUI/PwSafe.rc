@@ -160,8 +160,8 @@ BEGIN
     EDITTEXT        IDC_EDIT_PASSWORD,7,17,176,14,ES_PASSWORD | ES_AUTOHSCROLL
     LTEXT           "Master Password:",IDC_STATIC_ENTERPW,7,7,196,8
     CONTROL         "***",IDC_CHECK_STARS,"Button",BS_AUTOCHECKBOX | BS_CENTER | BS_VCENTER | BS_PUSHLIKE | WS_TABSTOP,185,17,18,14
-    CONTROL         "Progress1",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",0x0,7,32,144,9,WS_EX_STATICEDGE
-    RTEXT           "9999 bits",IDC_STATIC_PASSBITS,153,33,30,8
+    CONTROL         "Progress1",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",0x0,7,32,144,10
+    RTEXT           "0 ch.",IDC_STATIC_PWQINFO,153,33,30,8,0,WS_EX_RIGHT
     CONTROL         "&Use master password and key file",IDC_CHECK_KEYMETHOD_AND,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,49,196,10
     LTEXT           "<>",IDC_STATIC_SELDISK,7,66,196,8
@@ -194,8 +194,8 @@ BEGIN
     EDITTEXT        IDC_EDIT_REPEATPW,67,77,219,14,ES_PASSWORD | ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_RANDOMPW_BTN,287,77,21,14
     LTEXT           "Quality:",IDC_STATIC,7,92,58,8
-    CONTROL         "Progress1",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",0x0,67,91,187,9,WS_EX_STATICEDGE
-    RTEXT           "1024 bits",IDC_STATIC_PASSBITS,256,92,30,8
+    CONTROL         "Progress1",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",0x0,67,91,186,10
+    RTEXT           "0 ch.",IDC_STATIC_PWQINFO,256,92,30,8,0,WS_EX_RIGHT
     LTEXT           "URL:",IDC_STATIC,7,108,57,8
     EDITTEXT        IDC_EDIT_URL,67,105,241,14,ES_AUTOHSCROLL
     COMBOBOX        IDC_COMBO_URL,67,105,241,181,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_SORT | NOT WS_VISIBLE | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
@@ -518,9 +518,9 @@ BEGIN
     EDITTEXT        IDC_EDIT_PW,14,257,196,14,ES_AUTOHSCROLL
     CONTROL         "***",IDC_CHECK_HIDEPW,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,210,257,19,14
     PUSHBUTTON      "&Generate",IDC_GENERATE_BTN,233,257,58,14
-    CONTROL         "",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",0x0,14,272,164,9,WS_EX_STATICEDGE
-    RTEXT           "9999 bits",IDC_STATIC_PASSBITS,180,272,30,8
-    GROUPBOX        "Generated password",IDC_STATIC,7,246,291,40
+    CONTROL         "",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",0x0,14,272,164,10
+    RTEXT           "0 ch.",IDC_STATIC_PWQINFO,180,273,30,8,0,WS_EX_RIGHT
+    GROUPBOX        "Generated password",IDC_STATIC,7,246,291,41
     PUSHBUTTON      "&Help",IDC_BTN_HELP,7,293,58,14
 END
 
@@ -844,8 +844,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,27,0,0
- PRODUCTVERSION 1,27,0,0
+ FILEVERSION 1,28,0,0
+ PRODUCTVERSION 1,28,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -862,13 +862,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.27"
-            VALUE "FileVersion", "1.27.0.0"
+            VALUE "FileDescription", "KeePass Password Safe 1.28"
+            VALUE "FileVersion", "1.28.0.0"
             VALUE "InternalName", "PwSafe"
-            VALUE "LegalCopyright", "Copyright (c) 2003-2014 Dominik Reichl"
+            VALUE "LegalCopyright", "Copyright (C) 2003-2014 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.27"
-            VALUE "ProductVersion", "1.27.0.0"
+            VALUE "ProductName", "KeePass Password Safe 1.28"
+            VALUE "ProductVersion", "1.28.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -1388,6 +1388,13 @@ END
 //
 
 IDR_MOSTPOPULARPWS      KPDATA                  "res\\MostPopularPasswords.bin"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// PNG
+//
+
+IDB_MAIN                PNG                     "res\\KeePass.png"
 
 /////////////////////////////////////////////////////////////////////////////
 //

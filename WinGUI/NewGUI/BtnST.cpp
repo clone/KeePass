@@ -5,7 +5,7 @@
 
 #include "StdAfx.h"
 #include "BtnST.h"
-#include "../resource.h"
+#include "../Resource.h"
 #include "../PwSafeDlg.h"
 
 #ifdef	BTNST_USE_SOUND

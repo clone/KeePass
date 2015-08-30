@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2008-2014, Dominik Reichl
+  Copyright (C) 2008-2014 Dominik Reichl
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -135,16 +135,21 @@ public:
 	/// Calling this method is only required if you want to use a hash
 	/// context multiple times (immediately call it after the
 	/// IKpUtilities::SHA256Final method).
+	/// @param pContext Context, created by IKpUtilities::SHA256CreateContext.
 	STDMETHOD(SHA256Init)(void* pContext) = 0;
 
 	/// Hash data.
 	/// Note this method can be called multiple times consecutively to
 	/// hash large data step by step.
+	/// @param pContext Context, created by IKpUtilities::SHA256CreateContext.
+	/// @param pData Data to hash.
+	/// @param dwDataLength Number of bytes to hash from pData.
 	STDMETHOD(SHA256Hash)(void* pContext, const BYTE* pData, DWORD dwDataLength) = 0;
 
 	/// Finalize a hash.
 	/// Finish the hashing process and store the final hash value in pOutHashBuf.
 	/// Note that you still have to delete the hash context using IKpAPI::DeleteObject.
+	/// @param pContext Context, created by IKpUtilities::SHA256CreateContext.
 	/// @param pOutHashBuf Address of a buffer that will receive the hash value.
 	/// Must be able to hold at least 32 bytes.
 	STDMETHOD(SHA256Final)(void* pContext, BYTE* pOutHashBuf) = 0;

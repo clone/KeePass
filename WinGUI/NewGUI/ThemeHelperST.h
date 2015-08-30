@@ -53,6 +53,9 @@ typedef HRESULT(WINAPI *PFNCLOSETHEMEDATA)(HTHEME hTheme);
 typedef HRESULT(WINAPI *PFNDRAWTHEMEBACKGROUND)(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT* pRect,  const RECT* pClipRect);
 typedef HRESULT(WINAPI *PFNDRAWTHEMEPARENTBACKGROUND)(HWND hWnd, HDC hdc, RECT* pRect);
 typedef HRESULT(WINAPI *PFNDRAWTHEMETEXT)(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, LPCWSTR pszText, int iCharCount, DWORD dwTextFlags, DWORD dwTextFlags2, const RECT* pRect);
+typedef HRESULT(WINAPI *PFNGETTHEMEBACKGROUNDCONTENTRECT)(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, LPCRECT pBoundingRect, LPRECT pContentRect);
+typedef BOOL(WINAPI *PFNISTHEMEPARTDEFINED)(HTHEME hTheme, int iPartId, int iStateId);
+typedef BOOL(WINAPI *PFNISTHEMEBACKGROUNDPARTIALLYTRANSPARENT)(HTHEME hTheme, int iPartId, int iStateId);
 typedef BOOL(WINAPI *PFNISAPPTHEMED)();
 typedef BOOL(WINAPI *PFNISTHEMEACTIVE)();
 
@@ -66,6 +69,9 @@ public:
 	HRESULT CloseThemeData(HTHEME hTheme);
 	HRESULT DrawThemeBackground(HTHEME hTheme, HWND hWnd, HDC hdc, int iPartId, int iStateId, const RECT* pRect, const RECT* pClipRect);
 	HRESULT DrawThemeText(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, LPCWSTR pszText, int iCharCount, DWORD dwTextFlags, DWORD dwTextFlags2, const RECT* pRect);
+	HRESULT GetThemeBackgroundContentRect(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, LPCRECT pBoundingRect, LPRECT pContentRect);
+	BOOL IsThemePartDefined(HTHEME hTheme, int iPartId, int iStateId);
+	BOOL IsThemeBackgroundPartiallyTransparent(HTHEME hTheme, int iPartId, int iStateId);
 	BOOL IsThemeActive();
 	BOOL IsAppThemed();
 
@@ -76,6 +82,9 @@ private:
 	PFNDRAWTHEMEPARENTBACKGROUND pfnDrawThemeParentBackground;
 	PFNDRAWTHEMEBACKGROUND pfnDrawThemeBackground;
 	PFNDRAWTHEMETEXT pfnDrawThemeText;
+	PFNGETTHEMEBACKGROUNDCONTENTRECT pfnGetThemeBackgroundContentRect;
+	PFNISTHEMEPARTDEFINED pfnIsThemePartDefined;
+	PFNISTHEMEBACKGROUNDPARTIALLYTRANSPARENT pfnIsThemeBackgroundPartiallyTransparent;
 	PFNISAPPTHEMED pfnIsAppThemed;
 	PFNISTHEMEACTIVE pfnIsThemeActive;
 

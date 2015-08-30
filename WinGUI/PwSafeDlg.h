@@ -24,10 +24,12 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
+#include "../KeePassLibCpp/SysDefEx.h"
 #include "../KeePassLibCpp/PwManager.h"
 #include "../KeePassLibCpp/DataExchange/PwExport.h"
 #include "../KeePassLibCpp/PasswordGenerator/PasswordGenerator.h"
 
+#include <afxwin.h>
 #include <map>
 #include <set>
 
@@ -46,8 +48,6 @@
 #include "Util/SInstance.h"
 #include "Util/SessionNotify.h"
 #include "Util/RemoteControl.h"
-#include "../KeePassLibCpp/SysDefEx.h"
-#include "afxwin.h"
 
 #define GUI_GROUPLIST_EXT 170
 // Standard Windows Dialog GUI_SPACER = 11
@@ -143,7 +143,8 @@ public:
 	void _SetDisplayDialog(bool bDisplay);
 	bool _IsDisplayingMenu();
 	void _SetDisplayMenu(bool bDisplay);
-	void _AssertDisplayCounts(int cDialogs, int cMenus);
+	void _AssertStateStacksEmpty();
+	void _UIBlockHints(bool bBlock);
 
 	void ParseAndOpenURLWithEntryInfo(LPCTSTR lpURL, PW_ENTRY *pEntry);
 	void _AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSeq,
@@ -363,6 +364,7 @@ private:
 
 	volatile int m_iDisplayDialog;
 	volatile int m_iDisplayMenu;
+	int m_iUIHintsBlocked;
 
 	CSessionNotify m_sessionNotify;
 
@@ -422,7 +424,8 @@ private:
 
 	BCMenu m_popmenu;
 	BCMenu m_menuColView;
-	CToolTipCtrl m_tip;
+	// CToolTipCtrl m_tipN; // Normal
+	CToolTipCtrl m_tipB; // Balloon
 
 	CFont m_fListFont;
 	CSystemTrayEx m_systray;
@@ -538,6 +541,8 @@ private:
 	void _PostUseTANEntry(DWORD dwListIndex, DWORD dwEntryIndex);
 	void _PreDatabaseWrite();
 
+	void _UpdatePeekPreview();
+
 	inline void _SetAutoLockTimeout(long lSeconds);
 	inline UINT64 _GetCurrentTimeUtc();
 
@@ -545,6 +550,7 @@ private:
 	LONG m_lNormalWndPosY;
 	LONG m_lNormalWndSizeW;
 	LONG m_lNormalWndSizeH;
+	SIZE m_szLastContent;
 
 public:
 	//{{AFX_DATA(CPwSafeDlg)
@@ -820,6 +826,8 @@ protected:
 	afx_msg LRESULT OnProcessMailslot(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnKeePassControlMessage(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnWTSSessionChange(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnDwmSendIconicLivePreviewBitmap(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()
 };

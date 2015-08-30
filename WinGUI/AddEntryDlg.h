@@ -23,7 +23,7 @@
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/AMSEdit.h"
 #include "NewGUI/AutoRichEditCtrlFx.h"
-#include "NewGUI/GradientProgressCtrl.h"
+#include "NewGUI/QualityProgressCtrl.h"
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/SecureEditEx.h"
 #include "NewGUI/CustomComboBoxEx.h"
@@ -97,7 +97,7 @@ public:
 	CXPStyleButtonST	m_btSelDefExpires;
 	CXPStyleButtonST	m_btSetToDefaultExpire;
 	CCustomComboBoxEx	m_cbGroups;
-	CGradientProgressCtrl	m_cPassQuality;
+	CQualityProgressCtrl	m_cPassQuality;
 	CXPStyleButtonST	m_btRemoveAttachment;
 	CXPStyleButtonST	m_btSaveAttachment;
 	CXPStyleButtonST	m_btSetAttachment;

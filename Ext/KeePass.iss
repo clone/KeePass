@@ -11,9 +11,9 @@
 #define MyAppUrlName "KeePass.url"
 #define MyAppHelpName "KeePass.chm"
 
-#define KeeVersionStr "1.27"
-#define KeeVersionWin "1.27.0.0"
-#define KeeVersionWinShort "1.27"
+#define KeeVersionStr "1.28"
+#define KeeVersionWin "1.28.0.0"
+#define KeeVersionWinShort "1.28"
 
 #define KeeDevPeriod "2003-2014"
 
@@ -30,7 +30,7 @@ MinVersion=5.0
 DefaultDirName={pf}\{#MyAppFullName}
 DefaultGroupName={#MyAppFullName}
 AllowNoIcons=yes
-LicenseFile=..\Docs\License_Install.txt
+LicenseFile=..\Docs\License.txt
 OutputDir=..\Build\WinGUI_Distrib
 OutputBaseFilename={#MyAppName}-{#KeeVersionStr}-Setup
 Compression=lzma2/ultra

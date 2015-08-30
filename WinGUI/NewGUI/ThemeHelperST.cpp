@@ -22,6 +22,11 @@ CThemeHelperST::CThemeHelperST()
 		pfnDrawThemeParentBackground = (PFNDRAWTHEMEPARENTBACKGROUND)GetProcAddress(m_hDLL, "DrawThemeParentBackground");
 		pfnDrawThemeBackground = (PFNDRAWTHEMEBACKGROUND)GetProcAddress(m_hDLL, "DrawThemeBackground");
 		pfnDrawThemeText = (PFNDRAWTHEMETEXT)GetProcAddress(m_hDLL, "DrawThemeText");
+		pfnGetThemeBackgroundContentRect = (PFNGETTHEMEBACKGROUNDCONTENTRECT)
+			GetProcAddress(m_hDLL, "GetThemeBackgroundContentRect");
+		pfnIsThemePartDefined = (PFNISTHEMEPARTDEFINED)GetProcAddress(m_hDLL, "IsThemePartDefined");
+		pfnIsThemeBackgroundPartiallyTransparent = (PFNISTHEMEBACKGROUNDPARTIALLYTRANSPARENT)
+			GetProcAddress(m_hDLL, "IsThemeBackgroundPartiallyTransparent");
 		pfnIsAppThemed = (PFNISAPPTHEMED)GetProcAddress(m_hDLL, "IsAppThemed");
 		pfnIsThemeActive = (PFNISTHEMEACTIVE)GetProcAddress(m_hDLL, "IsThemeActive");
 	}
@@ -32,6 +37,9 @@ CThemeHelperST::CThemeHelperST()
 		pfnDrawThemeParentBackground = NULL;
 		pfnDrawThemeBackground = NULL;
 		pfnDrawThemeText = NULL;
+		pfnGetThemeBackgroundContentRect = NULL;
+		pfnIsThemePartDefined = NULL;
+		pfnIsThemeBackgroundPartiallyTransparent = NULL;
 		pfnIsAppThemed = NULL;
 		pfnIsThemeActive = NULL;
 	}
@@ -44,6 +52,9 @@ CThemeHelperST::~CThemeHelperST()
 	pfnDrawThemeParentBackground = NULL;
 	pfnDrawThemeBackground = NULL;
 	pfnDrawThemeText = NULL;
+	pfnGetThemeBackgroundContentRect = NULL;
+	pfnIsThemePartDefined = NULL;
+	pfnIsThemeBackgroundPartiallyTransparent = NULL;
 	pfnIsAppThemed = NULL;
 	pfnIsThemeActive = NULL;
 
@@ -76,6 +87,26 @@ HRESULT CThemeHelperST::DrawThemeText(HTHEME hTheme, HDC hdc, int iPartId, int i
 {
 	if(pfnDrawThemeText != NULL) return pfnDrawThemeText(hTheme, hdc, iPartId, iStateId, pszText, iCharCount, dwTextFlags, dwTextFlags2, pRect);
 	return E_FAIL;
+}
+
+HRESULT CThemeHelperST::GetThemeBackgroundContentRect(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, LPCRECT pBoundingRect, LPRECT pContentRect)
+{
+	if(pfnGetThemeBackgroundContentRect != NULL)
+		return pfnGetThemeBackgroundContentRect(hTheme, hdc, iPartId, iStateId, pBoundingRect, pContentRect);
+	return E_FAIL;
+}
+
+BOOL CThemeHelperST::IsThemePartDefined(HTHEME hTheme, int iPartId, int iStateId)
+{
+	if(pfnIsThemePartDefined != NULL) return pfnIsThemePartDefined(hTheme, iPartId, iStateId);
+	return FALSE;
+}
+
+BOOL CThemeHelperST::IsThemeBackgroundPartiallyTransparent(HTHEME hTheme, int iPartId, int iStateId)
+{
+	if(pfnIsThemeBackgroundPartiallyTransparent != NULL)
+		return pfnIsThemeBackgroundPartiallyTransparent(hTheme, iPartId, iStateId);
+	return FALSE;
 }
 
 BOOL CThemeHelperST::IsAppThemed()

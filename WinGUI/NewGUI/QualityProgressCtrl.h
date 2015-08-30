@@ -17,18 +17,45 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___IMAGE_UTIL_EX_H___
-#define ___IMAGE_UTIL_EX_H___
+#ifndef ___QUALITY_PROGRESS_CTRL_H___
+#define ___QUALITY_PROGRESS_CTRL_H___
 
 #pragma once
 
 #include "../../KeePassLibCpp/SysDefEx.h"
+#include "../../KeePassLibCpp/Util/StrUtil.h"
 #include <gdiplus.h>
-#include <vector>
 
-std::vector<BYTE> NewGUI_SaveIcon(HICON hIcon);
+// CQualityProgressCtrl
 
-bool NewGUI_ExtractVistaIcon(HICON hIcon, Gdiplus::Bitmap** pOutBmp);
-bool NewGUI_ExtractVistaIcon(const std::vector<BYTE>& v, Gdiplus::Bitmap** pOutBmp);
+class CQualityProgressCtrl : public CProgressCtrl
+{
+	DECLARE_DYNAMIC(CQualityProgressCtrl)
 
-#endif // ___IMAGE_UTIL_EX_H___
+public:
+	CQualityProgressCtrl();
+	virtual ~CQualityProgressCtrl();
+
+	void SetProgressText(LPCTSTR lpText)
+	{
+		if(lpText != NULL) m_strProgressText = lpText;
+		else m_strProgressText = _T("");
+
+		Invalidate();
+	}
+
+protected:
+	DECLARE_MESSAGE_MAP()
+
+private:
+	void PaintText(HDC hDC, Gdiplus::Graphics* pg, const Gdiplus::Rect& rectDraw);
+	bool PaintThemeBackground(HDC hDC, const RECT& rectClient, Gdiplus::Rect& rectDraw);
+
+	std::basic_string<TCHAR> m_strProgressText;
+
+public:
+	afx_msg void OnPaint();
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+};
+
+#endif // ___QUALITY_PROGRESS_CTRL_H___

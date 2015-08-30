@@ -2267,7 +2267,7 @@
 		</Filter>
 		<Filter
 			Name="Resource Files"
-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe;png"
 			>
 			<File
 				RelativePath=".\res\autotype.bmp"
@@ -2319,6 +2319,10 @@
 			</File>
 			<File
 				RelativePath="res\infoiconex.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\KeePass.png"
 				>
 			</File>
 			<File
@@ -2743,6 +2747,14 @@
 			</File>
 			<File
 				RelativePath=".\Util\SessionNotify.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\ShutdownBlocker.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\ShutdownBlocker.h"
 				>
 			</File>
 			<File
@@ -3518,6 +3530,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NewGUI\DwmUtil.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\DwmUtil.h"
+				>
+			</File>
+			<File
 				RelativePath=".\NewGUI\FontUtil.cpp"
 				>
 			</File>
@@ -3531,78 +3551,6 @@
 			</File>
 			<File
 				RelativePath=".\NewGUI\GlobalWindowManager.h"
-				>
-			</File>
-			<File
-				RelativePath="NewGUI\GradientProgressCtrl.cpp"
-				>
-				<FileConfiguration
-					Name="Debug Unicode|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug Unicode|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Unicode|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Unicode|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="NewGUI\GradientProgressCtrl.h"
 				>
 			</File>
 			<File
@@ -3875,6 +3823,14 @@
 			</File>
 			<File
 				RelativePath="NewGUI\OptionsList.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\QualityProgressCtrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\QualityProgressCtrl.h"
 				>
 			</File>
 			<File

@@ -363,7 +363,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	m_reNotes.SetRTF(m_strNotes, SF_TEXT);
 #endif
 
-	m_tipSecClear.Create(this, 0x40);
+	m_tipSecClear.Create(this, TTS_BALLOON);
 	m_tipSecClear.AddTool(&m_pEditPw, CPwSafeDlg::_GetSecureEditTipText(_T("Enter Password:")));
 	m_tipSecClear.AddTool(&m_pRepeatPw, CPwSafeDlg::_GetSecureEditTipText(_T("Enter Password:")));
 	m_tipSecClear.SetMaxTipWidth(630);
@@ -455,7 +455,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	}
 
 	LPTSTR lpTemp = m_pEditPw.GetPassword();
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lpTemp);
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PWQINFO), lpTemp);
 	CSecureEditEx::DeletePassword(lpTemp); lpTemp = NULL;
 
 	CString strTest;
@@ -693,7 +693,7 @@ void CAddEntryDlg::OnRandomPwBtn()
 	UpdateData(FALSE);
 
 	LPTSTR lpCur = m_pEditPw.GetPassword();
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lpCur);
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PWQINFO), lpCur);
 	CSecureEditEx::DeletePassword(lpCur); lpCur = NULL;
 }
 
@@ -915,7 +915,7 @@ void CAddEntryDlg::OnChangeEditPassword()
 	UpdateData(TRUE);
 
 	LPTSTR lp = m_pEditPw.GetPassword();
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lp);
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PWQINFO), lp);
 	CSecureEditEx::DeletePassword(lp); lp = NULL;
 }
 

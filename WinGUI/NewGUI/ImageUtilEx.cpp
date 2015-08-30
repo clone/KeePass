@@ -69,14 +69,23 @@ std::vector<BYTE> NewGUI_SaveIcon(HICON hIcon)
 
 bool NewGUI_ExtractVistaIcon(HICON hIcon, Bitmap** pOutBmp)
 {
-	if(hIcon == NULL) { ASSERT(FALSE); return false; }
 	if(pOutBmp == NULL) { ASSERT(FALSE); return false; }
 	*pOutBmp = NULL;
 
+	if(hIcon == NULL) { ASSERT(FALSE); return false; }
+
 	std::vector<BYTE> v = NewGUI_SaveIcon(hIcon);
+	return NewGUI_ExtractVistaIcon(v, pOutBmp);
+}
+
+bool NewGUI_ExtractVistaIcon(const std::vector<BYTE>& v, Bitmap** pOutBmp)
+{
+	if(pOutBmp == NULL) { ASSERT(FALSE); return false; }
+	*pOutBmp = NULL;
 
 	const size_t SizeICONDIR = 6;
 	const size_t SizeICONDIRENTRY = 16;
+	if(v.size() < SizeICONDIR) { ASSERT(FALSE); return false; }
 
 	const size_t cImages = *(WORD *)&v[4];
 	for(size_t i = 0; i < cImages; ++i)

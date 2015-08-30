@@ -27,6 +27,7 @@
 #include "../KeePassLibCpp/Util/StrUtil.h"
 #include "../KeePassLibCpp/Crypto/MemoryProtectionEx.h"
 #include "../KeePassLibCpp/Crypto/KeyTransform_BCrypt.h"
+#include "Util/ShutdownBlocker.h"
 #include "Util/WinUtil.h"
 #include "Util/CmdLine/CmdArgs.h"
 #include "Util/CmdLine/Executable.h"
@@ -37,6 +38,7 @@
 #include "NewGUI/TaskbarListEx/TaskbarListEx.h"
 #include "NewGUI/GradientUtil.h"
 #include "NewGUI/FontUtil.h"
+#include "NewGUI/DwmUtil.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -216,6 +218,7 @@ BOOL CPwSafeApp::InitInstance()
 	InitializeCriticalSection(&g_csLockTimer);
 	NSCAPI_Initialize(); // Initialize natural string comparison API
 	CTaskbarListEx::Initialize();
+	CDwmUtil::Initialize();
 
 	dlg.DoModal(); // IDOK, IDCANCEL; not NewGUI_DoModal
 
@@ -225,8 +228,9 @@ BOOL CPwSafeApp::InitInstance()
 	KP_ASSERT_REFS(CKpDatabaseImpl::Instance(), 1);
 	KP_ASSERT_REFS(CKpUtilitiesImpl::Instance(), 1);
 	KP_ASSERT_REFS(CKpCommandLineImpl::Instance(), 1);
-	dlg._AssertDisplayCounts(0, 0);
+	dlg._AssertStateStacksEmpty();
 
+	CDwmUtil::Release();
 	CTaskbarListEx::Release(false);
 	NSCAPI_Exit(); // Clean up natural string comparison API
 	DeleteCriticalSection(&g_csLockTimer);
@@ -237,12 +241,17 @@ BOOL CPwSafeApp::InitInstance()
 
 void CPwSafeApp::_App_CleanUp()
 {
-	NewGUI_TerminateGDIPlus();
-	NewGUI_CleanUp();
+#ifdef _DEBUG
+	ASSERT(CShutdownBlocker::GetInstance() == NULL);
+#endif
+
 	CFontUtil::Release();
 	CGradientUtil::Release();
 	CKpCommandLineImpl::ClearStatic();
 	CMemoryProtectionEx::Release();
+
+	NewGUI_CleanUp();
+	NewGUI_TerminateGDIPlus();
 }
 
 int CPwSafeApp::ExitInstance()

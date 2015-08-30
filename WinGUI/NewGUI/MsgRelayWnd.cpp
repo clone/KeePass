@@ -43,12 +43,17 @@ void CMsgRelayWnd::AddRelayedMessage(UINT uMessage)
 
 LRESULT CMsgRelayWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	if(m_bRelayEnabled != FALSE) // Relaying enabled
+	if((m_bRelayEnabled != FALSE) && (m_hRelayTarget != NULL) &&
+		(m_hRelayTarget != this->m_hWnd))
 	{
 		if(std::find(m_vRelayedMessages.begin(), m_vRelayedMessages.end(),
 			message) != m_vRelayedMessages.end())
 		{
-			::PostMessage(m_hRelayTarget, message, wParam, lParam);
+			// Prefer sending the message with waiting, such that we do
+			// not return too early from messages like WM_QUERYENDSESSION
+
+			// ::PostMessage(m_hRelayTarget, message, wParam, lParam);
+			return ::SendMessage(m_hRelayTarget, message, wParam, lParam);
 		}
 	}
 

@@ -127,8 +127,8 @@ std::basic_string<TCHAR> SU_GetQuotedPath(const std::basic_string<TCHAR>& strPat
 
 CString SU_ConvertNewLines(LPCTSTR lpText, LPCTSTR lpNewLineSeq);
 
-void SU_Split(std::vector<std::basic_string<TCHAR>>& vOut, const std::basic_string<TCHAR>& strData,
-	LPCTSTR lpSplitChars);
+void SU_Split(std::vector<std::basic_string<TCHAR> >& vOut,
+	const std::basic_string<TCHAR>& strData, LPCTSTR lpSplitChars);
 
 std::basic_string<TCHAR> SU_CompactWith3Dots(LPCTSTR lpString, size_t uMaxChars);
 

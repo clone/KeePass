@@ -50,7 +50,7 @@ FullPathName::FullPathName(const std_string& pathName)
     if(length<MAX_PATH) fullPathName = stackFullPathName;
 
     else { // Result does not fit in stackFullPathName, so use buffer on heap:
-        heapFullPathName = SmartCharPtr(new TCHAR[length]);
+        heapFullPathName.reset(new TCHAR[length]);
         const DWORD dw = GetFullPathName(pathName.c_str(), length, heapFullPathName.get(), &filePart);
         if(dw==0) {
             m_state = INVALID_PATH; // Function failed.

@@ -23,7 +23,7 @@
 #include "BCMenu.h"
 #include "BtnST.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
-#include "GradientProgressCtrl.h"
+#include "QualityProgressCtrl.h"
 #include "KCSideBannerWnd.h"
 #include "XHyperLink.h"
 #include "XPStyleButtonST.h"
@@ -248,26 +248,24 @@ BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
 	return TRUE;
 }
 
-void NewGUI_ConfigQualityMeter(void *pWnd)
+void NewGUI_ConfigQualityMeter(CQualityProgressCtrl *pWnd)
 {
-	CGradientProgressCtrl *p = (CGradientProgressCtrl *)pWnd;
-
-	ASSERT(p != NULL); if(p == NULL) return;
-	p->SetStartColor(RGB(255, 128, 0));
-	p->SetEndColor(RGB(0, 255, 0));
-	p->SetStep(1);
-	p->SetRange(0, 128);
-	p->SetPos(0);
+	if(pWnd == NULL) { ASSERT(FALSE); return; }
+	// p->SetStartColor(RGB(255, 128, 0));
+	// p->SetEndColor(RGB(0, 255, 0));
+	pWnd->SetStep(1);
+	pWnd->SetRange(0, 128);
+	pWnd->SetPos(0);
 }
 
-void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, LPCTSTR pszPassword)
+void NewGUI_ShowQualityMeter(CQualityProgressCtrl *pProgress, CWnd *pStatic,
+	LPCTSTR pszPassword)
 {
-	CGradientProgressCtrl *pProgress = (CGradientProgressCtrl *)pProgressBar;
-	CStatic *pStatic = (CStatic *)pStaticDesc;
+	if(pProgress == NULL) { ASSERT(FALSE); return; }
+	if(pStatic == NULL) { ASSERT(FALSE); return; }
+	if(pszPassword == NULL) { ASSERT(FALSE); return; }
 
-	ASSERT(pProgress != NULL); if(pProgress == NULL) return;
-	ASSERT(pStatic != NULL); if(pStatic == NULL) return;
-
+	const size_t uLength = _tcslen(pszPassword);
 	DWORD dwBits = CPwQualityEst::EstimatePasswordBits(pszPassword);
 	if(dwBits > 9999) dwBits = 9999; // 4 characters display limit
 
@@ -275,9 +273,17 @@ void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, LPCTSTR pszP
 	strQuality.Format(_T("%u"), dwBits);
 	strQuality += _T(" ");
 	strQuality += TRL("bits");
-	pStatic->SetWindowText((LPCTSTR)strQuality);
+
+	CString strLength;
+	strLength.Format(_T("%u"), uLength);
+	strLength += _T(" ");
+	strLength += TRL("ch.");
+
 	if(dwBits > 128) dwBits = 128;
+	pProgress->SetProgressText(strQuality);
 	pProgress->SetPos((int)dwBits);
+
+	pStatic->SetWindowText(strLength);
 }
 
 void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
@@ -744,25 +750,6 @@ COLORREF NewGUI_ColorToGrayscale(COLORREF clr)
 	return RGB(l, l, l);
 }
 
-void NewGUI_EnableWindowPeekPreview(HWND hWnd, bool bEnable)
-{
-	// if(!bEnable) InvalidateRect(hWnd, NULL, TRUE);
-
-	HMODULE hDwm = LoadLibrary(DWMAPI_LIB_NAME);
-	if(hDwm == NULL) return;
-
-	LPDWMSETWINDOWATTRIBUTE lpDwmSetWindowAttribute = (LPDWMSETWINDOWATTRIBUTE)
-		GetProcAddress(hDwm, DWMAPI_SETWINDOWATTRIBUTE);
-	if(lpDwmSetWindowAttribute != NULL)
-	{
-		BOOL bDisallow = (bEnable ? FALSE : TRUE);
-		BOOST_STATIC_ASSERT(sizeof(BOOL) == 4);
-		lpDwmSetWindowAttribute(hWnd, DWMWA_DISALLOW_PEEK, &bDisallow, sizeof(BOOL));
-	}
-
-	VERIFY(FreeLibrary(hDwm));
-}
-
 void NewGUI_InitGDIPlus()
 {
 	Gdiplus::GdiplusStartupInput si;
@@ -819,3 +806,77 @@ INT_PTR NewGUI_DoModal(CDialog* pDlg)
 
 	return r;
 }
+
+SIZE NewGUI_GetWindowContentSize(HWND hWnd)
+{
+	SIZE sz;
+	ZeroMemory(&sz, sizeof(SIZE));
+
+	if(hWnd == NULL) { ASSERT(FALSE); return sz; }
+
+	RECT rect;
+	ZeroMemory(&rect, sizeof(RECT));
+	if(GetClientRect(hWnd, &rect) != FALSE)
+	{
+		sz.cx = rect.right;
+		sz.cy = rect.bottom;
+	}
+	if((sz.cx <= 0) || (sz.cy <= 0)) { ASSERT(FALSE); return sz; }
+
+	MENUBARINFO mbi;
+	ZeroMemory(&mbi, sizeof(MENUBARINFO));
+	mbi.cbSize = sizeof(MENUBARINFO);
+	if(GetMenuBarInfo(hWnd, OBJID_MENU, 0, &mbi) != FALSE)
+	{
+		if(mbi.hMenu != NULL)
+		{
+			const int dx = mbi.rcBar.right - mbi.rcBar.left;
+			const int dy = mbi.rcBar.bottom - mbi.rcBar.top;
+
+			if(dx >= dy) sz.cy += dy; // Horizontal menu bar
+			else sz.cx += dx; // Vertical menu bar
+		}
+	}
+
+	return sz;
+}
+
+/* void NewGUI_ResetFocus(CWnd* pToFocus)
+{
+	if(pToFocus == NULL) { ASSERT(FALSE); return; }
+
+	HWND h = pToFocus->m_hWnd;
+	if(h == NULL) { ASSERT(FALSE); return; }
+
+	HWND hPre = GetFocus();
+
+	bool bStdSetFocus = true;
+	if(h == hPre)
+	{
+		// Special reset for password text boxes that
+		// can show a Caps Lock balloon tip;
+		// https://sourceforge.net/p/keepass/feature-requests/1905/
+		TCHAR tszClass[256];
+		ZeroMemory(tszClass, 256 * sizeof(TCHAR));
+		if(GetClassName(h, tszClass, 254) > 0)
+		{
+			const LONG_PTR lStyle = GetWindowLongPtr(h, GWL_STYLE);
+			const LONG_PTR lReqSet = ES_PASSWORD;
+			const LONG_PTR lReqUnset = ES_READONLY;
+
+			const bool bCapsLock = ((GetKeyState(VK_CAPITAL) & 1) != 0);
+
+			if((_tcsicmp(tszClass, WC_EDIT) == 0) &&
+				((lStyle & lReqSet) == lReqSet) &&
+				((lStyle & lReqUnset) == 0) && bCapsLock)
+			{
+				SendMessage(h, WM_KILLFOCUS, 0, 0);
+				SendMessage(h, WM_SETFOCUS, 0, 0);
+
+				bStdSetFocus = false;
+			}
+		}
+	}
+
+	if(bStdSetFocus) pToFocus->SetFocus();
+} */

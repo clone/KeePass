@@ -35,6 +35,7 @@ static bool g_bAuInitialized = false;
 static bool g_bOSInitialized = false;
 static bool g_bIsWin9xSystem = false;
 static bool g_bIsAtLeastWinVistaSystem = false;
+static bool g_bIsAtLeastWin7System = false;
 
 void AU_EnsureInitialized()
 {
@@ -218,6 +219,8 @@ void Priv_AU_EnsureOSInitialized()
 
 	g_bIsWin9xSystem = (osvi.dwMajorVersion <= 4);
 	g_bIsAtLeastWinVistaSystem = (osvi.dwMajorVersion >= 6);
+	g_bIsAtLeastWin7System = ((osvi.dwMajorVersion > 6) ||
+		((osvi.dwMajorVersion == 6) && (osvi.dwMinorVersion >= 1)));
 
 	g_bOSInitialized = true;
 }
@@ -232,6 +235,12 @@ BOOL AU_IsAtLeastWinVistaSystem()
 {
 	Priv_AU_EnsureOSInitialized();
 	return (g_bIsAtLeastWinVistaSystem ? TRUE : FALSE);
+}
+
+BOOL AU_IsAtLeastWin7System()
+{
+	Priv_AU_EnsureOSInitialized();
+	return (g_bIsAtLeastWin7System ? TRUE : FALSE);
 }
 
 #ifndef _WIN32_WCE

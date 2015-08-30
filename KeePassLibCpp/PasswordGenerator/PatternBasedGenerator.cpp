@@ -60,12 +60,23 @@ PWG_ERROR PbgGenerate(std::vector<WCHAR>& vOutBuffer,
 				break;
 			}
 
-			if(!bInCharSetDef)
+			if(bInCharSetDef) pwCustomCharSet.Add(ch);
+			else
 			{
 				PbgAppendChar(vOutBuffer, ch, dwOutBufPos);
 				pwUsedCharSet.Add(ch);
 			}
-			else pwCustomCharSet.Add(ch);
+		}
+		else if(ch == L'^')
+		{
+			ch = csPattern.ReadChar();
+			if(ch == 0) // ^ at the end
+			{
+				PbgAppendChar(vOutBuffer, L'^', dwOutBufPos);
+				break;
+			}
+
+			if(bInCharSetDef) pwCustomCharSet.Remove(ch);
 		}
 		else if(ch == L'[')
 		{

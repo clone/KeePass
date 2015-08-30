@@ -1,4 +1,4 @@
-﻿"DeployProject"
+"DeployProject"
 {
 "VSVersion" = "3:800"
 "ProjectType" = "8:{978C614F-708E-4E1A-B201-565925725DBA}"
@@ -319,15 +319,15 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:KeePass 1.27"
-        "ProductCode" = "8:{1172CD32-C909-4AB0-94E3-25BD0906364D}"
-        "PackageCode" = "8:{BB1983F7-C6BC-40A2-A5BF-8F2F0DA9AF68}"
+        "ProductName" = "8:KeePass 1.28"
+        "ProductCode" = "8:{325D8824-B444-49EB-8ECE-2B63B04FBB00}"
+        "PackageCode" = "8:{A9AB64AC-A562-4783-8812-6D1AA33826A8}"
         "UpgradeCode" = "8:{87ACB11E-C921-4B94-B80E-3C4768ECC452}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.27.0"
+        "ProductVersion" = "8:1.28.0"
         "Manufacturer" = "8:Dominik Reichl"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://keepass.info/"
@@ -543,7 +543,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:KeePass: Copyright (c) 2003-2014 Dominik Reichl. The software is distributed under the terms of the GNU General Public License version 2 or later."
+                            "Value" = "8:KeePass: Copyright (C) 2003-2014 Dominik Reichl. The software is distributed under the terms of the GNU General Public License version 2 or later."
                             "DefaultValue" = "8:#1202"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -760,7 +760,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:KeePass: Copyright (c) 2003-2014 Dominik Reichl. The software is distributed under the terms of the GNU General Public License version 2 or later."
+                            "Value" = "8:KeePass: Copyright (C) 2003-2014 Dominik Reichl. The software is distributed under the terms of the GNU General Public License version 2 or later."
                             "DefaultValue" = "8:#1202"
                             "UsePlugInResources" = "11:TRUE"
                             }

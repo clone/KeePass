@@ -236,7 +236,7 @@ BOOL CPwGeneratorExDlg::OnInitDialog()
 	m_spinNumChars.SetRange(0, 1024);
 	m_spinNumChars.SetPos(512);
 
-	m_tipSecClear.Create(this, 0x40);
+	m_tipSecClear.Create(this, TTS_BALLOON);
 	m_tipSecClear.AddTool(&m_cEditPw, CPwSafeDlg::_GetSecureEditTipText(_T("Generated password")));
 	m_tipSecClear.SetMaxTipWidth(630);
 	m_tipSecClear.Activate(m_cEditPw.IsSecureModeEnabled());
@@ -272,7 +272,7 @@ BOOL CPwGeneratorExDlg::OnInitDialog()
 		UpdateDialogDataEx(FALSE, &m_pgsLast);
 	}
 
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), _T(""));
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PWQINFO), _T(""));
 	OnCheckHidePw();
 
 	if(m_bShowInTaskbar == TRUE)
@@ -488,7 +488,7 @@ void CPwGeneratorExDlg::EnableControlsEx(BOOL bSelectCustom)
 	ENSURE_ENABLED_STATE(m_cbCollectEntropy, bNoAutoProfile);
 
 	LPTSTR lpPassword = m_cEditPw.GetPassword();
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lpPassword);
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PWQINFO), lpPassword);
 
 	if(m_dwRequestedPasswords > 0)
 	{

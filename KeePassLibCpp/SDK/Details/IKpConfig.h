@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2008-2014, Dominik Reichl
+  Copyright (C) 2008-2014 Dominik Reichl
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,7 @@ struct KP_DECL_INTERFACE("6F7B9713-FC6E-4FD6-BF55-044DF9E701B0") IKpConfig :
 {
 public:
 	/// Get the string value of a configuration item.
+	/// @param pszField Name of the configuration item.
 	/// @param pszValue This output buffer must be able to hold at
 	/// least SI_REGSIZE characters (TCHARs).
 	STDMETHOD_(BOOL, Get)(LPCTSTR pszField, LPTSTR pszValue) = 0;

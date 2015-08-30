@@ -25,6 +25,7 @@
 #include "XPStyleButtonST.h"
 #include "AutoRichEditCtrlFx.h"
 #include "GlobalWindowManager.h"
+#include "QualityProgressCtrl.h"
 #include <string>
 #include <vector>
 
@@ -176,14 +177,6 @@ typedef struct _MY_GRADIENT_RECT
 #define BCM_SETSHIELD 0x160C
 #endif
 
-#define DWMAPI_LIB_NAME _T("DwmApi.dll")
-#define DWMAPI_SETWINDOWATTRIBUTE "DwmSetWindowAttribute"
-typedef HRESULT(WINAPI* LPDWMSETWINDOWATTRIBUTE)(HWND hwnd, DWORD dwAttribute,
-	LPCVOID pvAttribute, DWORD cbAttribute);
-#ifndef DWMWA_DISALLOW_PEEK
-#define DWMWA_DISALLOW_PEEK 11
-#endif
-
 void NewGUI_CleanUp();
 
 COLORREF NewGUI_GetBgColor();
@@ -197,8 +190,9 @@ void NewGUI_ToolBarButton(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1
 
 void NewGUI_SetThemeHelper(void *pThemeHelper);
 
-void NewGUI_ConfigQualityMeter(void *pWnd);
-void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, LPCTSTR pszPassword);
+void NewGUI_ConfigQualityMeter(CQualityProgressCtrl *pWnd);
+void NewGUI_ShowQualityMeter(CQualityProgressCtrl *pProgress, CWnd *pStatic,
+	LPCTSTR pszPassword);
 
 void NewGUI_TranslateCWnd(CWnd *pWnd);
 
@@ -257,8 +251,6 @@ CSize NewGUI_Scale(const CSize& rSize, CWnd* pParentWindow);
 
 COLORREF NewGUI_ColorToGrayscale(COLORREF clr);
 
-void NewGUI_EnableWindowPeekPreview(HWND hWnd, bool bEnable);
-
 void NewGUI_InitGDIPlus();
 void NewGUI_TerminateGDIPlus();
 
@@ -266,5 +258,9 @@ void NewGUI_PumpMessages(HWND hWnd = NULL, UINT wMsgFilterMin = 0,
 	UINT wMsgFilterMax = 0);
 
 INT_PTR NewGUI_DoModal(CDialog* pDlg);
+
+SIZE NewGUI_GetWindowContentSize(HWND hWnd);
+
+// void NewGUI_ResetFocus(CWnd* pToFocus);
 
 #endif // ___NEW_GUI_COMMON___

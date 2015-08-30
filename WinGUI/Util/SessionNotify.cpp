@@ -62,7 +62,15 @@ void CSessionNotify::Unregister()
 		if(m_lpWTSUnRegisterSessionNotification != NULL)
 		{
 			try { m_lpWTSUnRegisterSessionNotification(m_hTarget); }
-			catch(...) { ASSERT(FALSE); } // RPC cancelled, exception 71A
+			catch(...) { ASSERT(FALSE); } // RPC cancelled, exception 0x71A
+
+			// __try { m_lpWTSUnRegisterSessionNotification(m_hTarget); }
+			// // __except((GetExceptionCode() == 0x71A) ? EXCEPTION_EXECUTE_HANDLER :
+			// //	EXCEPTION_CONTINUE_EXECUTION)
+			// __except(EXCEPTION_EXECUTE_HANDLER)
+			// {
+			//	ASSERT(FALSE); // RPC cancelled, exception 0x71A
+			// }
 		}
 
 		m_lpWTSRegisterSessionNotification = NULL;

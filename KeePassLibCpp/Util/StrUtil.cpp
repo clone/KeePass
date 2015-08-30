@@ -812,8 +812,8 @@ CString SU_ConvertNewLines(LPCTSTR lpText, LPCTSTR lpNewLineSeq)
 
 #pragma warning(push)
 #pragma warning(disable: 4996) // SCL warning
-void SU_Split(std::vector<std::basic_string<TCHAR>>& vOut, const std::basic_string<TCHAR>& strData,
-	LPCTSTR lpSplitChars)
+void SU_Split(std::vector<std::basic_string<TCHAR> >& vOut,
+	const std::basic_string<TCHAR>& strData, LPCTSTR lpSplitChars)
 {
 	if((lpSplitChars == NULL) || (lpSplitChars[0] == 0))
 	{

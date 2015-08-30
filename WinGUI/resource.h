@@ -91,6 +91,7 @@
 #define IDD_UPDATEINFO_DLG              245
 #define IDI_LOCK_OVERLAY                246
 #define IDR_MOSTPOPULARPWS              248
+#define IDB_MAIN                        249
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -196,7 +197,7 @@
 #define IDC_CHECK_DISABLEUNSAFE         1138
 #define IDC_ENTRYLIST                   1139
 #define IDC_PROGRESS_PASSQUALITY        1140
-#define IDC_STATIC_PASSBITS             1141
+#define IDC_STATIC_PWQINFO              1141
 #define IDC_COMBO_ENCALGOS              1144
 #define IDC_EDIT_KEYENC                 1145
 #define IDC_CHECK_REMEMBERLAST          1148
@@ -550,7 +551,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        249
+#define _APS_NEXT_RESOURCE_VALUE        251
 #define _APS_NEXT_COMMAND_VALUE         33040
 #define _APS_NEXT_CONTROL_VALUE         1309
 #define _APS_NEXT_SYMED_VALUE           101

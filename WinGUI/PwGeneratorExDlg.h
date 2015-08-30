@@ -31,7 +31,7 @@
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/SecureEditEx.h"
-#include "NewGUI/GradientProgressCtrl.h"
+#include "NewGUI/QualityProgressCtrl.h"
 
 #define STR_CUSTOM_PROFILE TRL("(Custom)")
 #define STR_AUTO_PROFILE TRL("(Automatically generated passwords for new entries)")
@@ -153,7 +153,7 @@ public:
 	CSpinButtonCtrl m_spinNumChars;
 	afx_msg void OnCheckHidePw();
 	CXPStyleButtonST m_btnGenerate;
-	CGradientProgressCtrl m_cPassQuality;
+	CQualityProgressCtrl m_cPassQuality;
 	afx_msg void OnDeltaPosSpinLength(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnEnChangeEditPw();
 	BOOL m_bHidePw;

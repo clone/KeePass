@@ -290,7 +290,7 @@ BOOL CPasswordDlg::OnInitDialog()
 			m_banner.SetCaption(TRL("Enter the composite master key."));
 
 			m_cPassQuality.ShowWindow(SW_HIDE);
-			GetDlgItem(IDC_STATIC_PASSBITS)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC_PWQINFO)->ShowWindow(SW_HIDE);
 		}
 	}
 	else // m_bConfirm == TRUE
@@ -314,7 +314,7 @@ BOOL CPasswordDlg::OnInitDialog()
 			m_banner.SetTitle(TRL("Repeat Master Password"));
 
 			m_cPassQuality.ShowWindow(SW_HIDE);
-			GetDlgItem(IDC_STATIC_PASSBITS)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC_PWQINFO)->ShowWindow(SW_HIDE);
 
 			GetDlgItem(IDC_CHECK_KEYMETHOD_AND)->ShowWindow(SW_HIDE);
 		}
@@ -340,7 +340,7 @@ BOOL CPasswordDlg::OnInitDialog()
 		}
 	}
 
-	m_tipSecClear.Create(this, 0x40);
+	m_tipSecClear.Create(this, TTS_BALLOON);
 	m_tipSecClear.AddTool(&m_pEditPw, CPwSafeDlg::_GetSecureEditTipText(_T("Enter Password:")));
 	m_tipSecClear.SetMaxTipWidth(630);
 	m_tipSecClear.Activate(m_pEditPw.IsSecureModeEnabled());
@@ -355,7 +355,7 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), _T(""));
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PWQINFO), _T(""));
 
 	LPCTSTR lpSelect = m_lpPreSelectPath;
 	std_string strSugg; // Data buffer, don't move inside 'if'
@@ -472,24 +472,32 @@ void CPasswordDlg::OnOK()
 
 	if(m_bConfirm == FALSE)
 	{
+		const bool bPwEmpty = (_tcslen(m_lpKey) == 0);
+		const bool bFileEmpty = (m_cbDiskList.GetCurSel() == 0);
+
 		// Validate input
 		if(m_bKeyMethod == PWM_KEYMETHOD_OR)
 		{
-			if(!((_tcslen(m_lpKey) == 0) ^ (m_cbDiskList.GetCurSel() == 0)))
+			if(!(bPwEmpty ^ bFileEmpty))
 			{
 				MessageBox(TRL("EITHER enter a master password OR select a key file."),
 					PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONINFORMATION);
 				FreePasswords();
+
+				m_pEditPw.SetFocus();
 				return;
 			}
 		}
 		else // m_bKeyMethod == PWM_KEYMETHOD_AND
 		{
-			if((_tcslen(m_lpKey) == 0) || (m_cbDiskList.GetCurSel() == 0))
+			if(bPwEmpty || bFileEmpty)
 			{
 				MessageBox(TRL("You've selected the AND key mode, so you must enter a password AND select a key file."),
 					PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONINFORMATION);
 				FreePasswords();
+
+				if(bPwEmpty) m_pEditPw.SetFocus();
+				else m_cbDiskList.SetFocus();
 				return;
 			}
 		}
@@ -512,6 +520,8 @@ void CPasswordDlg::OnOK()
 					static_cast<unsigned int>(lMinLen));
 				MessageBox(strValMsg, PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
 				FreePasswords();
+
+				m_pEditPw.SetFocus();
 				return;
 			}
 		}
@@ -526,6 +536,8 @@ void CPasswordDlg::OnOK()
 					static_cast<unsigned int>(lMinQuality));
 				MessageBox(strValMsg, PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
 				FreePasswords();
+
+				m_pEditPw.SetFocus();
 				return;
 			}
 		}
@@ -536,6 +548,8 @@ void CPasswordDlg::OnOK()
 		{
 			MessageBox(lpValMsg, PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
 			FreePasswords();
+
+			m_pEditPw.SetFocus();
 			return;
 		}
 	}
@@ -700,7 +714,7 @@ void CPasswordDlg::OnChangeEditPassword()
 {
 	UpdateData(TRUE);
 	LPTSTR lp = m_pEditPw.GetPassword();
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lp);
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PWQINFO), lp);
 	m_pEditPw.DeletePassword(lp); lp = NULL;
 	EnableClientWindows();
 }

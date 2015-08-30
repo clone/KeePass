@@ -1,4 +1,4 @@
-﻿/*
+/*
   KeePass Password Safe - The Open-Source Password Manager
   Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
@@ -17,22 +17,38 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___KEEPASS_LIBRARY_API_H___
-#define ___KEEPASS_LIBRARY_API_H___
+#ifndef ___SHUTDOWN_BLOCKER_H___
+#define ___SHUTDOWN_BLOCKER_H___
 
-#include "APIDefEx.h"
+#pragma once
 
-// Library build number (independent of underlying KeePass version)
-#define KEEPASS_LIBRARY_BUILD 0x00000175
+#include "../../KeePassLibCpp/SysDefEx.h"
+#include <string>
+#include <boost/utility.hpp>
 
-KP_SHARE DWORD GetKeePassVersion();
-KP_SHARE LPCTSTR GetKeePassVersionString();
+typedef BOOL(WINAPI* LPSHUTDOWNBLOCKREASONCREATE)(HWND hWnd, LPCWSTR pwszReason);
+typedef BOOL(WINAPI* LPSHUTDOWNBLOCKREASONDESTROY)(HWND hWnd);
 
-KP_SHARE DWORD GetLibraryBuild();
+class CShutdownBlocker : boost::noncopyable
+{
+public:
+	CShutdownBlocker(HWND hWnd, LPCTSTR lpReason);
+	virtual ~CShutdownBlocker();
 
-KP_SHARE BOOL TransformKey256(UINT8* pBuffer256, const UINT8* pKeySeed256, UINT64 qwRounds);
-KP_SHARE UINT64 TransformKeyBenchmark256(DWORD dwTimeMs);
+	void Release();
 
-// KP_SHARE BOOL TF_ShowLangBar(UINT32 dwFlags);
-
+#ifdef _DEBUG
+	static CShutdownBlocker* GetInstance();
 #endif
+
+private:
+	HWND m_hWnd;
+	HMODULE m_hLib;
+
+	LPSHUTDOWNBLOCKREASONCREATE m_lpSdrCreate;
+	LPSHUTDOWNBLOCKREASONDESTROY m_lpSdrDestroy;
+
+	static CShutdownBlocker* g_psdbPrimary;
+};
+
+#endif // ___SHUTDOWN_BLOCKER_H___

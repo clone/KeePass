@@ -21,6 +21,7 @@
 #include "../../KeePassLibCpp/PwManager.h"
 #include "../../KeePassLibCpp/Crypto/KeyTransform.h"
 #include "LibraryAPI.h"
+// #include <Ctfutb.h>
 
 KP_SHARE DWORD GetKeePassVersion()
 {
@@ -46,3 +47,20 @@ KP_SHARE UINT64 TransformKeyBenchmark256(DWORD dwTimeMs)
 {
 	return CKeyTransform::Benchmark(dwTimeMs);
 }
+
+/* KP_SHARE BOOL TF_ShowLangBar(UINT32 dwFlags)
+{
+	ITfLangBarMgr* pMgr = NULL;
+	if(FAILED(CoCreateInstance(CLSID_TF_LangBarMgr, NULL, CLSCTX_INPROC_SERVER,
+		IID_ITfLangBarMgr, (LPVOID*)&pMgr)))
+	{
+		ASSERT(FALSE);
+		return FALSE;
+	}
+	if(pMgr == NULL) { ASSERT(FALSE); return FALSE; }
+
+	bool r = SUCCEEDED(pMgr->ShowFloating(dwFlags));
+
+	pMgr->Release();
+	return (r ? TRUE : FALSE);
+} */

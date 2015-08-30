@@ -23,7 +23,7 @@
 #include "../KeePassLibCpp/SysDefEx.h"
 #include "NewGUI/NewGUICommon.h"
 #include "NewGUI/KCSideBannerWnd.h"
-#include "NewGUI/GradientProgressCtrl.h"
+#include "NewGUI/QualityProgressCtrl.h"
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/SecureEditEx.h"
 #include "NewGUI/CustomComboBoxEx.h"
@@ -91,7 +91,7 @@ public:
 	//{{AFX_DATA(CPasswordDlg)
 	enum { IDD = IDD_PASSWORD_DLG };
 	CCustomComboBoxEx	m_cbDiskList;
-	CGradientProgressCtrl	m_cPassQuality;
+	CQualityProgressCtrl	m_cPassQuality;
 	CXPStyleButtonST	m_btStars;
 	CXPStyleButtonST	m_btOK;
 	CXPStyleButtonST	m_btCancel;

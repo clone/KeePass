@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005-2014, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2005-2014 Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@
 // - EnableSecureMode now doesn't just clear the control, it converts the
 //   entered password
 // - Made DeletePassword, SetMemoryEx and DeleteTPtr static public functions
-// - Shift-Home and Shift-End don't clear the control any more when being in
+// - Shift+Home and Shift+End don't clear the control any more when being in
 //   non-protected mode
 //
 // 2005-04-17: v1.0

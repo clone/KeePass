@@ -1,3 +1,32 @@
+14/10/01 - 1.28
+- The estimated password quality (in bits) is now displayed on
+  the quality progress bar, and right of the quality progress
+  bar the length of the password is displayed
+- Pattern-based password generator: the '^' character now
+  removes the next character from the current custom character
+  set (for example, [a^y] contains all lower-case alphanumeric
+  characters except 'y')
+- In the cases where Windows would display outdated thumbnail
+  and peek preview images for the main window, KeePass now
+  requests Windows to use a static bitmap instead (showing only
+  the KeePass logo)
+- While saving a database, a shutdown block reason is now
+  specified
+
+- Improved input control focusing in the master key dialog
+  after displaying a validation error message
+- When duplicating an entry, the last modification time is now
+  copied from the source entry
+- Improved window message relaying when KeePass is minimized to
+  tray
+- Upgraded installer
+- Upgraded to Boost libraries version 1.56.0
+- Various code optimizations
+- Minor other improvements
+
+- Key provider plugins are now remembered correctly (if the
+  option 'Remember key sources' is enabled)
+
 14/04/06 - 1.27
 - Password text boxes now use a monospace font
 - The 'Find in this Group' function now also searches in

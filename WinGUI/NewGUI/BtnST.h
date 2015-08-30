@@ -168,6 +168,8 @@ public:
 	DWORD SetSound(LPCTSTR lpszSound, HMODULE hMod = NULL, BOOL bPlayOnClick = FALSE, BOOL bPlayAsync = TRUE);
 #endif
 
+	CToolTipCtrl& GetToolTipCtrl()	{return m_ToolTip;} // Added by D. Reichl
+
 	static short GetVersionI()		{return 39;}
 	static LPCTSTR GetVersionC()	{return (LPCTSTR)_T("3.9");}
 
