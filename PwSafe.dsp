@@ -241,6 +241,10 @@ SOURCE=.\res\key_smal.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\language.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\mainfram.ico
 # End Source File
 # Begin Source File

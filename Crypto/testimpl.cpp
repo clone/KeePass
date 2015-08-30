@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -99,6 +99,7 @@ unsigned long testCryptoImpl()
 	RD_UINT8 aTemp[128];
 	RD_UINT8 aTemp2[128];
 	Rijndael rdcrypt;
+	Rijndael rddummy;
 	int i, j;
 
 	uTestMask = 0;
@@ -207,9 +208,9 @@ unsigned long testCryptoImpl()
 	memset(aHash, 0, 32);
 	memset(aTemp, 0, 32);
 	memset(aTemp2, 0, 32);
-	arcfourCrypt((BYTE *)aTemp, 32, (BYTE *)"abcdef", 6);
-	arcfourCrypt((BYTE *)aTemp2, 32, (BYTE *)"abcdef", 6);
-	arcfourCrypt((BYTE *)aTemp2, 32, (BYTE *)"abcdef", 6);
+	arcfourCrypt((unsigned char *)aTemp, 32, (BYTE *)"abcdef", 6);
+	arcfourCrypt((unsigned char *)aTemp2, 32, (BYTE *)"abcdef", 6);
+	arcfourCrypt((unsigned char *)aTemp2, 32, (BYTE *)"abcdef", 6);
 	if(memcmp(aHash, aTemp2, 32) != 0) uTestMask |= TI_ERR_ARCFOUR_CRYPT;
 	if(memcmp(aHash, aTemp, 32) == 0) uTestMask |= TI_ERR_ARCFOUR_CRYPT;
 

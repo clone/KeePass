@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -54,6 +54,7 @@ CPasswordDlg::CPasswordDlg(CWnd* pParent /*=NULL*/)
 	//}}AFX_DATA_INIT
 
 	m_bLoadMode = TRUE;
+	m_bConfirm = FALSE;
 }
 
 void CPasswordDlg::DoDataExchange(CDataExchange* pDX)
@@ -96,6 +97,7 @@ BOOL CPasswordDlg::OnInitDialog()
 	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_Button(&m_btMakePw, IDB_KEY_SMALL, IDB_KEY_SMALL);
 	NewGUI_Button(&m_btStars, -1, -1);
+	m_btStars.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 
 	m_cbDiskList.SetXImageList(&m_ilIcons);
 
@@ -196,6 +198,16 @@ BOOL CPasswordDlg::OnInitDialog()
 		{
 			// This combination isn't possible
 			ASSERT(FALSE);
+
+			// Just in case... assume we want to load something
+			lp = TRL("Select the password disk drive to load the key from:");
+			GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
+
+			SetWindowText(TRL("Open database - Enter master key"));
+			m_banner.SetTitle(TRL("Enter master key"));
+			m_banner.SetCaption(TRL("Enter the master key for this database."));
+
+			GetDlgItem(IDC_MAKEPASSWORD_BTN)->ShowWindow(SW_HIDE);
 		}
 	}
 

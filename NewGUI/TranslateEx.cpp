@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,8 @@ static DWORD m_dwNumTrlStrings = 0;
 
 static char *m_pDefString[MAX_TRANSLATION_STRINGS];
 static char *m_pTrlString[MAX_TRANSLATION_STRINGS];
+
+void _SortTrlTable();
 
 BOOL LoadTranslationTable(const char *pszTableName)
 {
@@ -138,6 +140,7 @@ BOOL LoadTranslationTable(const char *pszTableName)
 		}
 	}
 
+	ASSERT(m_dwNumTrlStrings < MAX_TRANSLATION_STRINGS);
 	ASSERT(bMode == TRL_MODE_DEF);
 	ASSERT(bScanning == FALSE);
 
@@ -149,6 +152,7 @@ BOOL LoadTranslationTable(const char *pszTableName)
 		}
 	}
 
+	_SortTrlTable();
 	m_bTableLoaded = TRUE;
 	return TRUE;
 }
@@ -162,15 +166,56 @@ BOOL FreeCurrentTranslationTable()
 	return TRUE;
 }
 
+void _SortTrlTable()
+{
+	unsigned long i, j = 0, min;
+	char *v;
+
+	if(m_dwNumTrlStrings <= 1) return;
+
+	for(i = 0; i < (m_dwNumTrlStrings - 1); i++)
+	{
+		min = i;
+
+		for(j = i + 1; j < m_dwNumTrlStrings; j++)
+		{
+			if(_tcscmp(m_pDefString[j], m_pDefString[min]) < 0)
+				min = j;
+		}
+
+		v = m_pDefString[min];
+		m_pDefString[min] = m_pDefString[i];
+		m_pDefString[i] = v;
+		v = m_pTrlString[min];
+		m_pTrlString[min] = m_pTrlString[i];
+		m_pTrlString[i] = v;
+	}
+}
+
 const char *_TRL(const char *pszDefString)
 {
-	static unsigned long i;
+	if(m_dwNumTrlStrings == 0) return pszDefString;
+	if(pszDefString == NULL) return "";
 
+	// Fast binary search on the sorted list of translation strings:
+	static int l, r, x, c;
+	l = 0; r = ((int)m_dwNumTrlStrings) - 1;
+	while(l != r)
+	{
+		x = (l + r) >> 1;
+		c = _tcscmp(m_pDefString[x], pszDefString);
+		if(c < 0) l = x + 1;
+		else r = x;
+	}
+	if(_tcscmp(m_pDefString[l], pszDefString) == 0) return m_pTrlString[l];
+	return pszDefString;
+
+	// Previous slow sequencial search (array doesn't have to be sorted):
+	/* static unsigned long i;
 	for(i = 0; i < m_dwNumTrlStrings; i++)
 	{
 		if(strcmp(m_pDefString[i], pszDefString) == 0) return m_pTrlString[i];
 	}
-
 	// String hasn't been found in the translation table -> return the input string
-	return pszDefString;
+	return pszDefString; */
 }

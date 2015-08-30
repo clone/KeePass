@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -49,13 +49,13 @@ public:
 	void SetFormat(int nFormat);
 	void SetNewLineSeq(BOOL bWindows);
 
-	BOOL ExportAll(const char *pszFile);
-	BOOL ExportGroup(const char *pszFile, int nGroup);
+	BOOL ExportAll(const TCHAR *pszFile);
+	BOOL ExportGroup(const TCHAR *pszFile, int nGroup);
 
 private:
 	CPwManager *m_pMgr;
 	int m_nFormat;
-	char *m_pszNewLine;
+	TCHAR *m_pszNewLine;
 };
 
 #endif

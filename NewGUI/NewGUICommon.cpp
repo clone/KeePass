@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -71,13 +71,27 @@ void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut)
 {
 	CShadeButtonST *p = (CShadeButtonST *)pButton;
 
-	p->SetFlat(TRUE);
-	p->SetShade(CShadeButtonST::SHS_SOFTBUMP);
-	p->SetColor(CButtonST::BTNST_COLOR_FG_OUT, RGB(0, 0, 0), TRUE);
-	p->SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 	p->DrawFlatFocus(TRUE);
+	p->SetFlat(FALSE);
+
+	if(g_bImgButtons == TRUE)
+		p->SetShade(CShadeButtonST::SHS_DIAGSHADE);
+	else
+		p->SetShade(CShadeButtonST::SHS_HBUMP, 8, 0, 255, NewGUI_GetBtnColor());
+
+	p->SetColor(CButtonST::BTNST_COLOR_FG_OUT, RGB(0, 0, 0), TRUE);
+	p->SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 0), TRUE);
+
+	// Pre 0.86 buttons
+	// p->SetFlat(TRUE);
+	// p->SetShade(CShadeButtonST::SHS_SOFTBUMP);
+	// p->SetColor(CButtonST::BTNST_COLOR_FG_OUT, RGB(0, 0, 0), TRUE);
+	// p->SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
+	// p->DrawFlatFocus(TRUE);
 
 	if(g_bImgButtons == FALSE) return;
+
+	// if(g_bImgButtons == FALSE) return;
 
 	if((nBitmapIn != -1) && (nBitmapOut != -1))
 		p->SetBitmaps(nBitmapIn, RGB(255, 0, 255), nBitmapOut, RGB(255, 0, 255));

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@
 
 #define MAX_TRANSLATION_STRINGS 300
 
-#define TRL(sp) _TRL(_T(sp))
+#define TRL(sptr) _TRL(_T(sptr))
 
 #define TRL_MODE_DEF FALSE
 #define TRL_MODE_TRL TRUE

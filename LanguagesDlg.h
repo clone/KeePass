@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,7 @@ public:
 
 	//{{AFX_DATA(CLanguagesDlg)
 	enum { IDD = IDD_LANGUAGES_DLG };
+	CShadeButtonST	m_btGetLang;
 	CListCtrl	m_listLang;
 	CShadeButtonST	m_btClose;
 	//}}AFX_DATA
@@ -62,6 +63,7 @@ protected:
 	virtual void OnOK();
 	virtual void OnCancel();
 	afx_msg void OnClickLanguagesList(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnBtnGetLanguage();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

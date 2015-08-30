@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -59,22 +59,31 @@ void CPwExport::SetFormat(int nFormat)
 
 void CPwExport::SetNewLineSeq(BOOL bWindows)
 {
-	if(bWindows == TRUE) m_pszNewLine = "\r\n";
-	else m_pszNewLine = "\n";
+	if(bWindows == TRUE) m_pszNewLine = _T("\r\n");
+	else m_pszNewLine = _T("\n");
 }
 
+#ifdef _UNICODE
+#define PWEXPSTR(sp) \
+{ \
+	char *_pa = m_pMgr->_ToAscii(sp); \
+	fwrite(_pa, 1, strlen(_pa), fp); \
+	SAFE_DELETE_ARRAY(_pa); \
+}
+#else
 #define PWEXPSTR(sp) { fwrite(sp, 1, strlen(sp), fp); }
+#endif
 
-BOOL CPwExport::ExportAll(const char *pszFile)
+BOOL CPwExport::ExportAll(const TCHAR *pszFile)
 {
 	ASSERT(pszFile != NULL);
 	return ExportGroup(pszFile, -1);
 }
 
-BOOL CPwExport::ExportGroup(const char *pszFile, int nGroup)
+BOOL CPwExport::ExportGroup(const TCHAR *pszFile, int nGroup)
 {
 	FILE *fp;
-	char sz[256];
+	TCHAR sz[256];
 	unsigned long i;
 	PW_ENTRY *p;
 	PW_GROUP *pg;
@@ -82,39 +91,39 @@ BOOL CPwExport::ExportGroup(const char *pszFile, int nGroup)
 	ASSERT(pszFile != NULL);
 	if(pszFile == NULL) return FALSE;
 	ASSERT((nGroup > -2) && (nGroup < (int)m_pMgr->GetNumberOfGroups()));
-	fp = fopen(pszFile, "wb");
+	fp = _tfopen(pszFile, _T("wb"));
 	if(fp == NULL) return FALSE;
 
 	if(m_nFormat == PWEXP_TXT)
 	{
-		PWEXPSTR("Password List");
+		PWEXPSTR(_T("Password List"));
 		PWEXPSTR(m_pszNewLine);
 		PWEXPSTR(m_pszNewLine);
-		PWEXPSTR("Title           UserName      URL              Password       Additional");
+		PWEXPSTR(_T("Title           UserName      URL              Password       Additional"));
 		PWEXPSTR(m_pszNewLine);
-		PWEXPSTR("---------------|-------------|----------------|--------------|-----------------");
+		PWEXPSTR(_T("---------------|-------------|----------------|--------------|-----------------"));
 		PWEXPSTR(m_pszNewLine);
 	}
 	else if(m_nFormat == PWEXP_HTML)
 	{
-		PWEXPSTR("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">");
+		PWEXPSTR(_T("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">"));
 		PWEXPSTR(m_pszNewLine);
-		PWEXPSTR("<html><head><title>Password List</title></head><body>");
+		PWEXPSTR(_T("<html><head><title>Password List</title></head><body>"));
 		PWEXPSTR(m_pszNewLine);
-		PWEXPSTR("<table width=\"100%\" border=\"1px\"><tr><td><b>Group</b></td><td><b>Title</b></td><td><b>UserName</b></td>");
-		PWEXPSTR("<td><b>URL</b></td><td><b>Password</b></td><td><b>Notes</b></td></tr>");
+		PWEXPSTR(_T("<table width=\"100%\" border=\"1px\"><tr><td><b>Group</b></td><td><b>Title</b></td><td><b>UserName</b></td>"));
+		PWEXPSTR(_T("<td><b>URL</b></td><td><b>Password</b></td><td><b>Notes</b></td></tr>"));
 		PWEXPSTR(m_pszNewLine);
 	}
 	else if(m_nFormat == PWEXP_XML)
 	{
-		PWEXPSTR("<?xml version=\"1.0\"?>");
+		PWEXPSTR(_T("<?xml version=\"1.0\"?>"));
 		PWEXPSTR(m_pszNewLine);
-		PWEXPSTR("<pwlist>");
+		PWEXPSTR(_T("<pwlist>"));
 		PWEXPSTR(m_pszNewLine);
 	}
 	else if(m_nFormat == PWEXP_CSV)
 	{
-		PWEXPSTR("\"Account\",\"Login Name\",\"Password\",\"Web Site\",\"Comments\"");
+		PWEXPSTR(_T("\"Account\",\"Login Name\",\"Password\",\"Web Site\",\"Comments\""));
 		PWEXPSTR(m_pszNewLine);
 	}
 	else { ASSERT(FALSE); }
@@ -133,7 +142,7 @@ BOOL CPwExport::ExportGroup(const char *pszFile, int nGroup)
 
 		if(m_nFormat == PWEXP_TXT)
 		{
-			sprintf(sz, "%-15.15s %-13.13s %-16.16s %-14.14s %-17.17s",
+			_stprintf(sz, _T("%-15.15s %-13.13s %-16.16s %-14.14s %-17.17s"),
 				p->pszTitle, p->pszUserName, p->pszURL, p->pszPassword,
 				p->pszAdditional);
 			PWEXPSTR(sz);
@@ -142,66 +151,66 @@ BOOL CPwExport::ExportGroup(const char *pszFile, int nGroup)
 		}
 		else if(m_nFormat == PWEXP_HTML)
 		{
-			PWEXPSTR("<tr><td>");
+			PWEXPSTR(_T("<tr><td>"));
 			PWEXPSTR(pg->pszGroupName);
-			PWEXPSTR("</td><td>");
+			PWEXPSTR(_T("</td><td>"));
 			PWEXPSTR(p->pszTitle);
-			PWEXPSTR("</td><td>");
+			PWEXPSTR(_T("</td><td>"));
 			PWEXPSTR(p->pszUserName);
-			PWEXPSTR("</td><td><a href=\"");
+			PWEXPSTR(_T("</td><td><a href=\""));
 			PWEXPSTR(p->pszURL);
-			PWEXPSTR("\">");
+			PWEXPSTR(_T("\">"));
 			PWEXPSTR(p->pszURL);
-			PWEXPSTR("</a></td><td>");
-			PWEXPSTR((const char *)p->pszPassword);
-			PWEXPSTR("</td><td>");
+			PWEXPSTR(_T("</a></td><td>"));
+			PWEXPSTR(p->pszPassword);
+			PWEXPSTR(_T("</td><td>"));
 			PWEXPSTR(p->pszAdditional);
-			PWEXPSTR("</td></tr>");
+			PWEXPSTR(_T("</td></tr>"));
 			PWEXPSTR(m_pszNewLine);
 		}
 		else if(m_nFormat == PWEXP_XML)
 		{
-			PWEXPSTR("<pwentry>"); PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(_T("<pwentry>")); PWEXPSTR(m_pszNewLine);
 
-			PWEXPSTR("\t<group>");
+			PWEXPSTR(_T("\t<group>"));
 			PWEXPSTR(pg->pszGroupName);
-			PWEXPSTR("</group>"); PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(_T("</group>")); PWEXPSTR(m_pszNewLine);
 
-			PWEXPSTR("\t<title>");
+			PWEXPSTR(_T("\t<title>"));
 			PWEXPSTR(p->pszTitle);
-			PWEXPSTR("</title>"); PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(_T("</title>")); PWEXPSTR(m_pszNewLine);
 
-			PWEXPSTR("\t<username>");
+			PWEXPSTR(_T("\t<username>"));
 			PWEXPSTR(p->pszUserName);
-			PWEXPSTR("</username>"); PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(_T("</username>")); PWEXPSTR(m_pszNewLine);
 
-			PWEXPSTR("\t<url>");
+			PWEXPSTR(_T("\t<url>"));
 			PWEXPSTR(p->pszURL);
-			PWEXPSTR("</url>"); PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(_T("</url>")); PWEXPSTR(m_pszNewLine);
 
-			PWEXPSTR("\t<password>");
-			PWEXPSTR((const char *)p->pszPassword);
-			PWEXPSTR("</password>"); PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(_T("\t<password>"));
+			PWEXPSTR(p->pszPassword);
+			PWEXPSTR(_T("</password>")); PWEXPSTR(m_pszNewLine);
 
-			PWEXPSTR("\t<notes>");
+			PWEXPSTR(_T("\t<notes>"));
 			PWEXPSTR(p->pszAdditional);
-			PWEXPSTR("</notes>"); PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(_T("</notes>")); PWEXPSTR(m_pszNewLine);
 
-			PWEXPSTR("</pwentry>"); PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(_T("</pwentry>")); PWEXPSTR(m_pszNewLine);
 		}
 		else if(m_nFormat == PWEXP_CSV)
 		{
-			PWEXPSTR("\"");
+			PWEXPSTR(_T("\""));
 			PWEXPSTR(p->pszTitle);
-			PWEXPSTR("\",\"");
+			PWEXPSTR(_T("\",\""));
 			PWEXPSTR(p->pszUserName);
-			PWEXPSTR("\",\"");
-			PWEXPSTR((const char *)p->pszPassword);
-			PWEXPSTR("\",\"");
+			PWEXPSTR(_T("\",\""));
+			PWEXPSTR(p->pszPassword);
+			PWEXPSTR(_T("\",\""));
 			PWEXPSTR(p->pszURL);
-			PWEXPSTR("\",\"");
+			PWEXPSTR(_T("\",\""));
 			PWEXPSTR(p->pszAdditional);
-			PWEXPSTR("\"");
+			PWEXPSTR(_T("\""));
 			PWEXPSTR(m_pszNewLine);
 		}
 		else { ASSERT(FALSE); }
@@ -214,12 +223,12 @@ BOOL CPwExport::ExportGroup(const char *pszFile, int nGroup)
 	}
 	else if(m_nFormat == PWEXP_HTML)
 	{
-		PWEXPSTR("</table></body></html>");
+		PWEXPSTR(_T("</table></body></html>"));
 		PWEXPSTR(m_pszNewLine);
 	}
 	else if(m_nFormat == PWEXP_XML)
 	{
-		PWEXPSTR("</pwlist>");
+		PWEXPSTR(_T("</pwlist>"));
 		PWEXPSTR(m_pszNewLine);
 	}
 	else if(m_nFormat == PWEXP_CSV)
@@ -227,7 +236,7 @@ BOOL CPwExport::ExportGroup(const char *pszFile, int nGroup)
 	}
 	else { ASSERT(FALSE); }
 
-	fclose(fp);
+	fclose(fp); fp = NULL;
 
 	return TRUE;
 }

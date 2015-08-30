@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -42,8 +42,11 @@ public:
 
 	CKCSideBannerWnd m_banner;
 
+	CString m_strFontSpec;
+
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };
+	CShadeButtonST	m_btSelFont;
 	CShadeButtonST	m_btCancel;
 	CShadeButtonST	m_btOK;
 	int		m_nNewlineSequence;
@@ -64,6 +67,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	virtual void OnCancel();
+	afx_msg void OnBtnSelFont();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

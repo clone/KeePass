@@ -1,3 +1,29 @@
+XX/XX/XX - 0.86
+- Added Dutch translation (thanks to Kees Koenders!)
+- Added Swedish translation (thanks to Michael Åström!)
+- You can now change the font of the password and group lists
+- KeePass remembers the last window position and size
+- KeePass remembers the column sizes of the password list
+- Added accelerators for the main window (Ctrl+X exits, Ctrl+
+  L locks the workspace, Ctrl+A adds an entry, etc... see menu)
+- Improved translation routine speed (before: sequencial search
+  n/2 (= ~110) string comparisons needed, now: binary search
+  lg n + 1 (= ~8) avg)
+- CodeWallet(Pro) text files can now be imported
+- Fixed an interface translation bug in the enter-password
+  dialog when unlocking the workspace
+- GUI: Import/Export submenu items are translated now
+- Added accelerator for item movement, Ctrl+Up moves an entry
+  one up, Ctrl+PgDown moves it to the bottom of the list, etc.
+- Pressing F1 now opens the ReadMe file
+- GUI: Disabling images of buttons now automatically disables
+  the shading, too
+- GUI: Replaced soft-shaded by linear diagonal-shaded buttons
+- The window name now indicates if the workspace is locked
+- Translations aren't included in the base package any more,
+  they are now available for download on the KeePass homepage
+- From on now a setup program for KeePass is available
+
 03/12/17 - 0.85
 - KeePass now has a Windows system tray icon which can minimize
   and maximize the main window to/from the tray; the context

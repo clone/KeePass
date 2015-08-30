@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -54,6 +54,7 @@ void CLanguagesDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CLanguagesDlg)
+	DDX_Control(pDX, IDC_BTN_GETLANGUAGE, m_btGetLang);
 	DDX_Control(pDX, IDC_LANGUAGES_LIST, m_listLang);
 	DDX_Control(pDX, IDCANCEL, m_btClose);
 	//}}AFX_DATA_MAP
@@ -62,6 +63,7 @@ void CLanguagesDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CLanguagesDlg, CDialog)
 	//{{AFX_MSG_MAP(CLanguagesDlg)
 	ON_NOTIFY(NM_CLICK, IDC_LANGUAGES_LIST, OnClickLanguagesList)
+	ON_BN_CLICKED(IDC_BTN_GETLANGUAGE, OnBtnGetLanguage)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -72,6 +74,7 @@ BOOL CLanguagesDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 	
 	NewGUI_Button(&m_btClose, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_Button(&m_btGetLang, IDB_LANGUAGE, IDB_LANGUAGE);
 
 	m_banner.Attach(this, KCSB_ATTACH_TOP);
 	m_banner.SetColBkg(RGB(255,255,255));
@@ -209,7 +212,7 @@ void CLanguagesDlg::_LoadLanguage(char *szLang)
 	CString str;
 	str = TRL("The language file has been installed.");
 	str += "\r\n\r\n";
-	str += TRL("You must restart KeePass in order to load the new language.");
+	str += TRL("You must restart KeePass in order to use the new language.");
 	str += "\r\n\r\n";
 	str += TRL("Do you wish to restart KeePass now?");
 	i = MessageBox(str,
@@ -218,4 +221,11 @@ void CLanguagesDlg::_LoadLanguage(char *szLang)
 	{
 		CDialog::OnOK();
 	}
+}
+
+void CLanguagesDlg::OnBtnGetLanguage() 
+{
+	ShellExecute(GetSafeHwnd(), "open", PWM_URL_TRL,
+		NULL, NULL, SW_SHOW);
+	OnCancel();
 }

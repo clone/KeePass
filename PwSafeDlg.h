@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -72,6 +72,8 @@ public:
 	void CleanUp();
 	void _DeleteTemporaryFiles();
 	BOOL _ParseCommandLine();
+	void _ParseSpecAndSetFont(const TCHAR *pszSpec);
+	const char *_GetCmdAccelExt(const char *psz);
 
 	void UpdateGroupList();
 	void UpdatePasswordList();
@@ -120,7 +122,9 @@ public:
 	BCMenu m_popmenu;
 
 	CImageList m_ilIcons;
+	CFont m_fListFont;
 	CSystemTrayEx m_systray;
+	HACCEL m_hAccel;
 
 	CString m_strFile;
 	BOOL m_bFileOpen;
@@ -132,6 +136,7 @@ public:
 	int m_nColumnWidths[5];
 
 	DWORD m_dwClipboardSecs;
+	CString m_strFontSpec;
 
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
@@ -141,6 +146,8 @@ public:
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CPwSafeDlg)
+	public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	//}}AFX_VIRTUAL
@@ -303,6 +310,8 @@ protected:
 	afx_msg void OnUpdateImportCsv(CCmdUI* pCmdUI);
 	afx_msg void OnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnColumnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnImportCWallet();
+	afx_msg void OnUpdateImportCWallet(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

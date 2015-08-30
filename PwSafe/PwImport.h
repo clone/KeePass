@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,8 @@
 
 #include "PwManager.h"
 
+#define DEF_CW_CATEGORY _T("----------------------------------------")
+
 class CPwImport
 {
 public:
@@ -39,9 +41,12 @@ public:
 	virtual ~CPwImport();
 
 	BOOL ImportCsvToDb(const char *pszFile, CPwManager *pMgr, DWORD dwGroupId);
+	BOOL ImportCWalletToDb(const char *pszFile, CPwManager *pMgr);
 
 private:
 	void _AddStringStreamToDb(const char *pStream, unsigned long uStreamSize);
+	char *_FileToMemory(const char *pszFile, unsigned long *pFileSize);
+	unsigned long _GetPreferredIcon(const char *pszGroup);
 
 	CPwManager *m_pLastMgr;
 	DWORD m_dwLastGroupId;

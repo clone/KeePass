@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -58,6 +58,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COptionsDlg)
+	DDX_Control(pDX, IDC_BTN_SELFONT, m_btSelFont);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_Radio(pDX, IDC_RADIO_NEWLINE_0, m_nNewlineSequence);
@@ -71,6 +72,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(COptionsDlg, CDialog)
 	//{{AFX_MSG_MAP(COptionsDlg)
+	ON_BN_CLICKED(IDC_BTN_SELFONT, OnBtnSelFont)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -82,6 +84,7 @@ BOOL COptionsDlg::OnInitDialog()
 
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_Button(&m_btSelFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
 
 	m_banner.Attach(this, KCSB_ATTACH_TOP);
 	m_banner.SetColBkg(RGB(255,255,255));
@@ -109,4 +112,51 @@ void COptionsDlg::OnOK()
 void COptionsDlg::OnCancel() 
 {
 	CDialog::OnCancel();
+}
+
+void COptionsDlg::OnBtnSelFont() 
+{
+	CString strFontSpec = m_strFontSpec;
+	CString strFace, strSize, strFlags;
+	int nChars = strFontSpec.ReverseFind(';');
+	int nSizeEnd = strFontSpec.ReverseFind(',');
+	strFace = strFontSpec.Left(nChars);
+	strSize = strFontSpec.Mid(nChars + 1, nSizeEnd - nChars - 1);
+	strFlags = strFontSpec.Right(4);
+	int nSize = atoi((LPCTSTR)strSize);
+	int nWeight = FW_NORMAL;
+	if(strFlags.GetAt(0) == '1') nWeight = FW_BOLD;
+	BYTE bItalic = (strFlags.GetAt(1) == '1') ? TRUE : FALSE;
+	BYTE bUnderlined = (strFlags.GetAt(2) == '1') ? TRUE : FALSE;
+	BYTE bStrikeOut = (strFlags.GetAt(3) == '1') ? TRUE : FALSE;
+
+	LOGFONT lf;
+	HDC hDC = GetDC()->m_hDC;
+	ASSERT(hDC != NULL);
+	if(hDC != NULL) lf.lfHeight = -MulDiv(nSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
+	else { ASSERT(FALSE); lf.lfHeight = -nSize; }
+	lf.lfWidth = 0; lf.lfEscapement = 0; lf.lfOrientation = 0;
+	lf.lfWeight = nWeight; lf.lfItalic = bItalic; lf.lfUnderline = bUnderlined;
+	lf.lfStrikeOut = bStrikeOut; lf.lfCharSet = DEFAULT_CHARSET;
+	lf.lfOutPrecision = OUT_DEFAULT_PRECIS; lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+	lf.lfQuality = DEFAULT_QUALITY; lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+	strcpy(lf.lfFaceName, (LPCTSTR)strFace);
+
+	CFontDialog dlg(&lf);
+	CString strTemp;
+
+	if(dlg.DoModal() == IDOK)
+	{
+		int dSize = dlg.GetSize();
+		dSize = (dSize >= 0) ? dSize : -dSize;
+		m_strFontSpec = dlg.GetFaceName();
+		m_strFontSpec += ";";
+		strTemp.Format("%d", dSize / 10);
+		m_strFontSpec += strTemp;
+		m_strFontSpec += ",";
+		m_strFontSpec += (dlg.IsBold() == TRUE) ? '1' : '0';
+		m_strFontSpec += (dlg.IsItalic() == TRUE) ? '1' : '0';
+		m_strFontSpec += (dlg.IsUnderline() == TRUE) ? '1' : '0';
+		m_strFontSpec += (dlg.IsStrikeOut() == TRUE) ? '1' : '0';
+	}
 }

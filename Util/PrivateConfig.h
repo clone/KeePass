@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -50,14 +50,14 @@ public:
 	CPrivateConfig();
 	virtual ~CPrivateConfig();
 
-	BOOL Set(char *pszField, PCFG_IN char *pszValue);
-	BOOL Get(char *pszField, PCFG_OUT char *pszValue);
+	BOOL Set(TCHAR *pszField, PCFG_IN TCHAR *pszValue);
+	BOOL Get(TCHAR *pszField, PCFG_OUT TCHAR *pszValue);
 
 private:
-	char m_szFile[SI_REGSIZE];
+	TCHAR m_szFile[SI_REGSIZE];
 };
 
-void _GetPathFromFile(char *pszFile, char *pszPath);
-HINSTANCE _OpenLocalFile(char *szFile, int nMode);
+void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath);
+HINSTANCE _OpenLocalFile(TCHAR *szFile, int nMode);
 
 #endif // ___PRIVATE_CONFIG_H___

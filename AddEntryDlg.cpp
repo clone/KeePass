@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -119,6 +119,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	NewGUI_Button(&m_btRandomPw, -1, -1);
 	NewGUI_Button(&m_btPickIcon, -1, -1);
 	NewGUI_Button(&m_btHidePw, -1, -1);
+	m_btHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 
 	// Set the imagelist for the group selector combo box
 	m_pGroups.SetXImageList(&m_ilIcons);

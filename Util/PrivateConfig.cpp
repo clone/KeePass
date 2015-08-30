@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -38,24 +38,24 @@ CPrivateConfig::CPrivateConfig()
 	ASSERT(SI_REGSIZE >= (MAX_PATH * 2));
 
 	GetModuleFileName(NULL, m_szFile, MAX_PATH * 2);
-	for(i = strlen(m_szFile) - 1; i > 1; i--) // Extract dir
+	for(i = _tcslen(m_szFile) - 1; i > 1; i--) // Extract dir
 	{
-		if((m_szFile[i] == '\\') || (m_szFile[i] == '/'))
+		if((m_szFile[i] == _T('\\')) || (m_szFile[i] == _T('/')))
 		{
 			m_szFile[i] = 0;
 			break;
 		}
 	}
-	strcat(m_szFile, "\\");
-	strcat(m_szFile, PWM_EXENAME);
-	strcat(m_szFile, ".ini");
+	_tcscat(m_szFile, _T("\\"));
+	_tcscat(m_szFile, PWM_EXENAME);
+	_tcscat(m_szFile, _T(".ini"));
 }
 
 CPrivateConfig::~CPrivateConfig()
 {
 }
 
-BOOL CPrivateConfig::Set(char *pszField, PCFG_IN char *pszValue)
+BOOL CPrivateConfig::Set(TCHAR *pszField, PCFG_IN TCHAR *pszValue)
 {
 	BOOL bRet = FALSE;
 
@@ -64,38 +64,49 @@ BOOL CPrivateConfig::Set(char *pszField, PCFG_IN char *pszValue)
 	if(pszField == NULL) return FALSE;
 	if(pszValue == NULL) return FALSE;
 
-	ASSERT(strlen(pszField) > 0);
-	if(strlen(pszField) == 0) return FALSE;
+	ASSERT(_tcslen(pszField) > 0);
+	if(_tcslen(pszField) == 0) return FALSE;
 
+#ifndef _WIN32_WCE
 	bRet = WritePrivateProfileString(PWM_EXENAME, pszField, pszValue, m_szFile);
+#else
+	bRet = FALSE; // This will cause an assertion, implement before using on WinCE
+#endif
+
 	ASSERT(bRet == TRUE);
 	return bRet;
 }
 
-BOOL CPrivateConfig::Get(char *pszField, PCFG_OUT char *pszValue)
+BOOL CPrivateConfig::Get(TCHAR *pszField, PCFG_OUT TCHAR *pszValue)
 {
 	BOOL bRet = FALSE;
-	char chEmpty[2] = { 0, 0 };
+	TCHAR chEmpty[2] = { 0, 0 };
 
 	ASSERT(pszField != NULL);
 	if(pszField == NULL) return FALSE;
 
 	pszValue[0] = 0; pszValue[1] = 0;
 
+#ifndef _WIN32_WCE
 	bRet = GetPrivateProfileString(PWM_EXENAME, pszField, chEmpty,
 		pszValue, SI_REGSIZE, m_szFile);
+#else
+	bRet = FALSE;
+	ASSERT(FALSE); // Implement before using on WinCE
+#endif
+
 	return bRet;
 }
 
-void _GetPathFromFile(char *pszFile, char *pszPath)
+void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath)
 {
-	unsigned int i = 0;
+	unsigned int i;
 
-	strcpy(pszPath, pszFile);
+	_tcscpy(pszPath, pszFile);
 
-	for(i = strlen(pszFile) - 1; i > 1; i--)
+	for(i = _tcslen(pszFile) - 1; i > 1; i--)
 	{
-		if((pszFile[i] == '\\') || (pszFile[i] == '/'))
+		if((pszFile[i] == _T('\\')) || (pszFile[i] == _T('/')))
 		{
 			pszPath[i] = 0;
 			pszPath[i+1] = 0;
@@ -105,37 +116,42 @@ void _GetPathFromFile(char *pszFile, char *pszPath)
 
 }
 
-HINSTANCE _OpenLocalFile(char *szFile, int nMode)
+HINSTANCE _OpenLocalFile(TCHAR *szFile, int nMode)
 {
-	char szPath[1024];
-	char szFileTempl[1024];
+	TCHAR szPath[1024];
+	TCHAR szFileTempl[1024];
 	HINSTANCE hInst = NULL;
 
 	GetModuleFileName(NULL, szFileTempl, MAX_PATH + 32);
 	_GetPathFromFile(szFileTempl, szPath);
-	strcpy(szFileTempl, szPath);
-	strcat(szFileTempl, "\\");
-	strcat(szFileTempl, szFile);
+	_tcscpy(szFileTempl, szPath);
+	_tcscat(szFileTempl, "\\");
+	_tcscat(szFileTempl, szFile);
 
+#ifndef _WIN32_WCE
 	if(nMode == OLF_OPEN)
 	{
-		hInst = ShellExecute(::GetActiveWindow(), "open", szFileTempl,
+		hInst = ShellExecute(::GetActiveWindow(), _T("open"), szFileTempl,
 			NULL, szPath, SW_SHOWNORMAL);
 	}
 	else if(nMode == OLF_PRINT)
 	{
-		hInst = ShellExecute(::GetActiveWindow(), "print", szFileTempl,
+		hInst = ShellExecute(::GetActiveWindow(), _T("print"), szFileTempl,
 			NULL, szPath, SW_SHOWNORMAL);
 	}
 	else if(nMode == OLF_EXPLORE)
 	{
-		hInst = ShellExecute(::GetActiveWindow(), "explore", szFileTempl,
+		hInst = ShellExecute(::GetActiveWindow(), _T("explore"), szFileTempl,
 			NULL, szPath, SW_SHOWNORMAL);
 	}
 	else
 	{
 		ASSERT(FALSE);
 	}
+#else
+	hInst = NULL;
+	ASSERT(FALSE); // Implement before using on WinCE
+#endif
 
 	return(hInst);
 }

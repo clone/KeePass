@@ -1,3 +1,10 @@
+// Modified version of Dr Brian Gladmans implementation of the SHA-2
+// algorithms.
+//
+// Changes:
+// - Added #include <stdafx.h> to compile with MFC projects
+// - Added _WIN32_WCE define condition
+
 /*
  ---------------------------------------------------------------------------
  Copyright (c) 2002, Dr Brian Gladman <brg@gladman.me.uk>, Worcester, UK.
@@ -125,7 +132,7 @@ extern "C"
     defined( __i386__ )  || defined( _M_I86 )  || defined( _M_IX86 )    ||   \
     defined( __OS2__ )   || defined( sun386 )  || defined( __TURBOC__ ) ||   \
     defined( vax )       || defined( vms )     || defined( VMS )        ||   \
-    defined( __VMS ) 
+    defined( __VMS )     || defined( _WIN32_WCE )
 
 #define PLATFORM_BYTE_ORDER BRG_LITTLE_ENDIAN
 

@@ -34,6 +34,8 @@
 #define IDI_OPTIONS                     156
 #define IDR_SYSTRAY_MENU                157
 #define IDI_MAINFRAME_LOW               158
+#define IDR_ACCEL_MAIN                  159
+#define IDB_LANGUAGE                    160
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -87,6 +89,8 @@
 #define IDC_CHECK_IMGBUTTONS            1062
 #define IDC_CHECK_ENTRYGRID             1063
 #define IDC_CHECK_AUTOSAVE              1064
+#define IDC_BTN_SELFONT                 1065
+#define IDC_BTN_GETLANGUAGE             1068
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -189,14 +193,15 @@
 #define ID_VIEW_HIDE                    32876
 #define ID_IMPORT_CSV                   32877
 #define ID_PWLIST_SORT                  32878
+#define ID_IMPORT_CWALLET               32879
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        159
-#define _APS_NEXT_COMMAND_VALUE         32879
-#define _APS_NEXT_CONTROL_VALUE         1065
+#define _APS_NEXT_RESOURCE_VALUE        161
+#define _APS_NEXT_COMMAND_VALUE         32880
+#define _APS_NEXT_CONTROL_VALUE         1069
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
