@@ -926,6 +926,7 @@ BOOL CPwManager::MoveGroup(int nFrom, int nTo)
 	int i;
 	int dir;
 	PW_GROUP pg;
+	DWORD j, dwId1, dwId2;
 
 	if(nFrom == nTo) TRUE;
 	if((nFrom < 0) || (nFrom >= (int)m_dwNumGroups)) return FALSE;
@@ -943,6 +944,16 @@ BOOL CPwManager::MoveGroup(int nFrom, int nTo)
 		pg = m_pGroups[i];
 		m_pGroups[i] = m_pGroups[i+dir];
 		m_pGroups[i+dir] = pg;
+
+		// Swap group IDs in password entries too
+		dwId1 = (DWORD)i; dwId2 = (DWORD)(i + dir);
+		for(j = 0; j < m_dwNumEntries; j++)
+		{
+			if(m_pEntries[j].uGroupId == dwId1)
+				m_pEntries[j].uGroupId = dwId2;
+			else if(m_pEntries[j].uGroupId == dwId2)
+				m_pEntries[j].uGroupId = dwId1;
+		}
 
 		i += dir;
 	}

@@ -14,6 +14,7 @@
 - Made random data generation using mouse input a bit faster
 - Group view is restored after editing a group
 - Added some more icons to the user image list
+- 0.83b: Fixed a small bug in the group movement routine
 
 03/11/22 - 0.82
 - Usability fix: OK and Cancel buttons have been swapped
