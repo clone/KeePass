@@ -57,8 +57,9 @@ public:
     bool         preselectIsInEffect() const {return m_isPreselect;}
     bool          readonlyIsInEffect() const {return m_isReadOnly;}
     const std_string&    getPassword() const {return m_Password;}
-	bool              lockIsInEffect() const {return m_isLock;}
-	const std_string& getUrlOverride() const {return m_urlOverride;}
+    bool              lockIsInEffect() const {return m_isLock;}
+    bool            minimizeInEffect() const {return m_isMin;}
+    const std_string& getUrlOverride() const {return m_urlOverride;}
 
 private:
     CmdArgs();
@@ -69,5 +70,6 @@ private:
     bool         m_isReadOnly;
     std_string   m_Password;  // empty() <==> not set
     bool         m_isLock;
-	std_string   m_urlOverride;
+    bool         m_isMin;
+    std_string   m_urlOverride;
 };

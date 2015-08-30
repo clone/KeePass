@@ -31,9 +31,15 @@
 #include <afxmt.h>
 #include "Resource.h"
 #include "../KeePassLibCpp/SysDefEx.h"
+#include "Util/PrivateConfigEx.h"
 
 #define MTXNAME_LOCAL  _T("KeePassApplicationMutex")
 #define MTXNAME_GLOBAL _T("KeePassAppMutexExI")
+
+#define KPCLOPT_FILEEXT_UNREG     _T("/unregisterfileext")
+#define KPCLOPT_FILEEXT_UNREG_ALT _T("-unregisterfileext")
+#define KPCLOPT_FILEEXT_REG       _T("/registerfileext")
+#define KPCLOPT_FILEEXT_REG_ALT   _T("-registerfileext")
 
 typedef BOOL(WINAPI *LPINITIALIZESECURITYDESCRIPTOR)(
 	PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD dwRevision);
@@ -41,15 +47,14 @@ typedef BOOL(WINAPI *LPSETSECURITYDESCRIPTORDACL)(
 	PSECURITY_DESCRIPTOR pSecurityDescriptor, BOOL bDaclPresent,
 	PACL pDacl, BOOL bDaclDefaulted);
 
+typedef VOID(WINAPI *LPSHCHANGENOTIFY)(LONG wEventId, UINT uFlags, LPCVOID dwItem1, LPCVOID dwItem2);
+
 /////////////////////////////////////////////////////////////////////////////
 
 class CPwSafeApp : public CWinApp
 {
 public:
 	CPwSafeApp();
-
-	static BOOL RegisterShellAssociation();
-	static BOOL UnregisterShellAssociation();
 
 	static BOOL GetStartWithWindows();
 	static BOOL SetStartWithWindows(BOOL bAutoStart);
@@ -62,7 +67,15 @@ public:
 	static TCHAR GetPasswordCharacter();
 	static LPCTSTR GetPasswordFont();
 
+	static void LoadTranslationEx(CPrivateConfigEx* pConfig);
+
 private:
+	static void ChangeKdbShellAssociation(BOOL bRegister, HWND hParent);
+
+	static BOOL RegisterShellAssociation();
+	static BOOL UnregisterShellAssociation();
+	static void NotifyAssocChanged();
+
 	static BOOL ProcessControlCommands();
 	static HANDLE CreateGlobalMutex();
 

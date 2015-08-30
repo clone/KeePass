@@ -101,10 +101,11 @@ BOOL CPluginsDlg::OnInitDialog()
 
 	RECT rect;
 	m_cList.GetWindowRect(&rect);
-	const int nWidth = (rect.right - rect.left - GetSystemMetrics(SM_CXVSCROLL) - 8) / 6;
+	const int nWidth = (rect.right - rect.left - GetSystemMetrics(SM_CXVSCROLL) - 8) / 7;
 	m_cList.InsertColumn(0, TRL("Plugin"), LVCFMT_LEFT, nWidth * 3, 0);
-	m_cList.InsertColumn(1, TRL("Author"), LVCFMT_LEFT, nWidth * 3, 1);
-	m_cList.InsertColumn(2, TRL("ID"), LVCFMT_LEFT, 0, 2);
+	m_cList.InsertColumn(1, TRL("Version"), LVCFMT_LEFT, nWidth, 1);
+	m_cList.InsertColumn(2, TRL("Author"), LVCFMT_LEFT, nWidth * 3, 2);
+	m_cList.InsertColumn(3, TRL("ID"), LVCFMT_LEFT, 0, 3);
 
 	// TCHAR tszBase[MAX_PATH]; tszBase[0] = 0; tszBase[1] = 0;
 	// GetModuleFileName(NULL, tszBase, MAX_PATH - 2);
@@ -125,11 +126,13 @@ BOOL CPluginsDlg::OnInitDialog()
 
 void CPluginsDlg::OnOK()
 {
+	m_cList.SetImageList(NULL, LVSIL_SMALL);
 	CDialog::OnOK();
 }
 
 void CPluginsDlg::OnCancel()
 {
+	m_cList.SetImageList(NULL, LVSIL_SMALL);
 	CDialog::OnCancel();
 }
 
@@ -146,20 +149,12 @@ void CPluginsDlg::UpdateGUI()
 		ZeroMemory(&lvi, sizeof(LV_ITEM));
 
 		lvi.iItem = static_cast<int>(i);
-		lvi.mask = LVIF_TEXT | LVIF_IMAGE;
-		
+		lvi.mask = (LVIF_TEXT | LVIF_IMAGE);
+
 		// lvi.iImage = ((p->bEnabled == TRUE) ? 20 : 45);
 		lvi.iImage = ((p->hinstDLL != NULL) ? 20 : 45);
 
 		CString strPlugin = p->strName.c_str();
-		LPCTSTR lpPluginVer = p->strVersion.c_str();
-		if((lpPluginVer != NULL) && (lpPluginVer[0] != 0))
-		{
-			strPlugin += _T(" (");
-			strPlugin += lpPluginVer;
-			strPlugin += _T(")");
-		}
-
 		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strPlugin);
 		m_cList.InsertItem(&lvi);
 
@@ -175,16 +170,20 @@ void CPluginsDlg::UpdateGUI()
 		//	lvi.pszText = (LPTSTR)TRL("This plugin will be enabled after you restart KeePass.");
 		// else { ASSERT(FALSE); lvi.pszText = _T(""); }
 
-		CString strAuthor = p->strAuthor.c_str();
-		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strAuthor);
-
+		CString strVersion = p->strVersion.c_str();
+		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strVersion);
 		lvi.iSubItem = 1;
 		m_cList.SetItem(&lvi);
 
+		CString strAuthor = p->strAuthor.c_str();
+		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strAuthor);
 		lvi.iSubItem = 2;
+		m_cList.SetItem(&lvi);
+
 		CString strT;
 		strT.Format(_T("%u"), p->dwPluginID);
 		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strT);
+		lvi.iSubItem = 3;
 		m_cList.SetItem(&lvi);
 	}
 }
@@ -264,7 +263,7 @@ DWORD CPluginsDlg::GetSelectedPluginID()
 			ZeroMemory(&lvi, sizeof(LV_ITEM));
 
 			lvi.iItem = i;
-			lvi.iSubItem = 2;
+			lvi.iSubItem = 3;
 			lvi.mask = LVIF_TEXT;
 			lvi.pszText = tszBuf;
 			lvi.cchTextMax = 12;

@@ -30,20 +30,20 @@ class CKeyTransform
 public:
 	CKeyTransform();
 	CKeyTransform(const CKeyTransform& cc);
-	CKeyTransform(DWORD dwRounds, UINT8 *pBuf, const UINT8 *pKey, bool *pbSucceeded);
+	CKeyTransform(UINT64 qwRounds, UINT8* pBuf, const UINT8* pKey, bool* pbSucceeded);
 	virtual ~CKeyTransform();
 
 	void operator()();
 
-	static bool Transform256(DWORD dwRounds, UINT8 *pBuffer256, const UINT8 *pKeySeed256);
+	static bool Transform256(UINT64 qwRounds, UINT8* pBuffer256, const UINT8* pKeySeed256);
 
-	static DWORD Benchmark(DWORD dwTimeMs);
+	static UINT64 Benchmark(DWORD dwTimeMs);
 
 private:
-	DWORD m_dwRounds;
-	UINT8 *m_pBuf;
-	const UINT8 *m_pKey;
-	bool *m_pbSucceeded;
+	UINT64 m_qwRounds;
+	UINT8* m_pBuf;
+	const UINT8* m_pKey;
+	bool* m_pbSucceeded;
 };
 
 class CKeyTransformBenchmark
@@ -56,11 +56,11 @@ public:
 
 	void operator()();
 
-	DWORD GetComputedRounds();
+	UINT64 GetComputedRounds();
 
 private:
 	DWORD m_dwTimeMs;
-	DWORD m_dwComputedRounds;
+	UINT64 m_qwComputedRounds;
 };
 
 #endif // ___KEY_TRANSFORM_H___

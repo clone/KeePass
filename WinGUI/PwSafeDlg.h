@@ -254,6 +254,8 @@ public:
 
 	static UINT GetKeePassControlMessageID();
 
+	static void SetLastMasterKeyDlg(HWND h);
+
 	BCMenu m_menu; // Our XP-style menu
 	BOOL m_bMenu; // Menu created?
 
@@ -274,6 +276,7 @@ public:
 	BOOL m_bFileOpen;
 	BOOL m_bModified;
 	BOOL m_bFileReadOnly;
+	BOOL m_bInitialCmdLineFile;
 
 	CPwManager m_mgr;
 
@@ -368,6 +371,7 @@ private:
 	BOOL m_bAllowSaveIfModifiedOnly;
 	BOOL m_bRegisterRestoreHotKey;
 	BOOL m_bDropToBackOnCopy;
+	BOOL m_bDeleteTANsAfterUse;
 
 	BCMenu *m_pPwListMenu;
 	BCMenu *m_pGroupListMenu;
@@ -468,6 +472,8 @@ private:
 
 	void RegisterRestoreHotKey(BOOL bRegister);
 	void DropToBackgroundIfOptionEnabled(bool bForceDrop);
+
+	void _PostUseTANEntry(DWORD dwListIndex, DWORD dwEntryIndex);
 
 	LONG m_lNormalWndPosX;
 	LONG m_lNormalWndPosY;

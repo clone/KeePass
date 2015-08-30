@@ -74,6 +74,10 @@
 #define UINT32_MAX 0xFFFFFFFF
 #endif
 
+#ifndef UINT64_MAX
+#define UINT64_MAX 0xFFFFFFFFFFFFFFFFui64
+#endif
+
 #ifndef UTF8_BYTE
 #define UTF8_BYTE BYTE
 #endif

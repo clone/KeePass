@@ -554,7 +554,8 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 
 				_ExpStrIf(pOptions->bNotes, TRL("Notes:"));
 				_ExpStrIf(pOptions->bNotes, _T(" "));
-				_ExpStrIf(pOptions->bNotes, p->pszAdditional);
+				CString strNotesConv = SU_ConvertNewLines(p->pszAdditional, m_pszNewLine);
+				_ExpStrIf(pOptions->bNotes, strNotesConv);
 				if(pOptions->bNotes == TRUE) _ExpStr(m_pszNewLine);
 
 				_ExpStrIf(pOptions->bUUID, TRL("UUID"));
@@ -628,7 +629,8 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 				else _ExpHtmlStrIf(pOptions->bURL, _T(""));
 
 				_ExpHtmlStrIf(pOptions->bPassword, p->pszPassword);
-				_ExpHtmlStrIf(pOptions->bNotes, p->pszAdditional);
+				CString strNotesConv = SU_ConvertNewLines(p->pszAdditional, m_pszNewLine);
+				_ExpHtmlStrIf(pOptions->bNotes, strNotesConv);
 				_ExpHtmlStrIf(pOptions->bUUID, strUUID);
 				_ExpHtmlStrIf(pOptions->bImage, strImage);
 				_ExpHtmlStrIf(pOptions->bCreationTime, strCreationTime);
@@ -688,7 +690,8 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 				if(pOptions->bPassword == TRUE) _ExpStr(m_pszNewLine);
 
 				_ExpStrIf(pOptions->bNotes, _T("\t<notes>"));
-				_ExpXmlStrIf(pOptions->bNotes, p->pszAdditional);
+				CString strNotesConv = SU_ConvertNewLines(p->pszAdditional, m_pszNewLine);
+				_ExpXmlStrIf(pOptions->bNotes, strNotesConv);
 				_ExpStrIf(pOptions->bNotes, _T("</notes>"));
 				if(pOptions->bNotes == TRUE) _ExpStr(m_pszNewLine);
 
@@ -758,7 +761,8 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 				_ExpCsvStrIf(pOptions->bUserName, p->pszUserName);
 				_ExpCsvStrIf(pOptions->bPassword, p->pszPassword);
 				_ExpCsvStrIf(pOptions->bURL, p->pszURL);
-				_ExpCsvStrIf(pOptions->bNotes, p->pszAdditional);
+				CString strNotesConv = SU_ConvertNewLines(p->pszAdditional, m_pszNewLine);
+				_ExpCsvStrIf(pOptions->bNotes, strNotesConv);
 				_ExpCsvStrIf(pOptions->bUUID, strUUID);
 				_ExpCsvStrIf(pOptions->bImage, strImage);
 				_ExpCsvStrIf(pOptions->bCreationTime, strCreationTime);

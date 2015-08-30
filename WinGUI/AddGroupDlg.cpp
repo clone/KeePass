@@ -99,6 +99,8 @@ BOOL CAddGroupDlg::OnInitDialog()
 		SetWindowText(TRL("Edit Group"));
 	}
 
+	m_strInitialName = m_strGroupName;
+
 	UpdateData(FALSE);
 	GetDlgItem(IDC_EDIT_GROUPNAME)->SetFocus();
 	return FALSE; // Return TRUE unless you set the focus to a control
@@ -106,22 +108,37 @@ BOOL CAddGroupDlg::OnInitDialog()
 
 void CAddGroupDlg::OnOK() 
 {
-	CString strRef = PWS_SEARCHGROUP, strTest; // PWS_SEARCHGROUP is translated
-	strRef = strRef.MakeLower();
-
 	UpdateData(TRUE);
 
 	if(m_strGroupName.GetLength() == 0)
 	{
-		MessageBox(TRL("Enter a group name!"), TRL("Stop"), MB_ICONINFORMATION);
+		MessageBox(TRL("Enter a group name!"), PWM_PRODUCT_NAME_SHORT, MB_ICONWARNING | MB_OK);
 		return;
 	}
-	strTest = m_strGroupName;
-	strTest = strTest.MakeLower();
-	if(strTest == strRef)
+
+	CString strId = m_strGroupName;
+	strId = strId.MakeLower();
+
+	CString strSearch = PWS_SEARCHGROUP; // PWS_SEARCHGROUP is translated
+	strSearch = strSearch.MakeLower();
+	CString strBackup1 = PWS_BACKUPGROUP;
+	strBackup1 = strBackup1.MakeLower();
+	CString strBackup2 = PWS_BACKUPGROUP_SRC;
+	strBackup2 = strBackup2.MakeLower();
+
+	if(m_strGroupName == m_strInitialName) { } // Always allow unchanged
+	else if(strId == strSearch)
 	{
 		MessageBox(TRL("The group you selected cannot store entries. Please select a different group."),
-			TRL("Stop"), MB_ICONWARNING | MB_OK);
+			PWM_PRODUCT_NAME_SHORT, MB_ICONWARNING | MB_OK);
+		return;
+	}
+	else if((strId == strBackup1) || (strId == strBackup2))
+	{
+		CString strResMsg = TRL("The specified name is reserved.");
+		strResMsg += _T("\r\n\r\n");
+		strResMsg += TRL("Please choose a different name.");
+		MessageBox(strResMsg, PWM_PRODUCT_NAME_SHORT, MB_ICONWARNING | MB_OK);
 		return;
 	}
 

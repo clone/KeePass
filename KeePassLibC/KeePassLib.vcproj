@@ -871,6 +871,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\KeePassLibCpp\Crypto\KeyTransform_BCrypt.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Crypto\KeyTransform_BCrypt.h"
+					>
+				</File>
+				<File
 					RelativePath="..\KeePassLibCpp\Crypto\MemoryProtectionEx.cpp"
 					>
 				</File>

@@ -239,6 +239,7 @@ typedef HRESULT(KP_API *LPKPLIBFUNC)(IKpUnknown* pAPI);
 #define KPM_KEYPROV_QUERY_INFO_FIRST 59
 #define KPM_KEYPROV_QUERY_INFO_NEXT  60
 #define KPM_KEYPROV_QUERY_KEY        61
+#define KPM_KEYPROV_QUERY_KEY_EX     70
 #define KPM_KEYPROV_FINALIZE         62
 
 #define KPM_OPTIONS_SAVE_GLOBAL      63
@@ -254,9 +255,9 @@ typedef HRESULT(KP_API *LPKPLIBFUNC)(IKpUnknown* pAPI);
 
 // The following is unused; it's always the last command ID + 1;
 // do not use this value under any circumstances (it will break
-// upward compatibility if you do!)
+// upward compatibility, if you do!)
 #if (0 == 1)
-#define KPM_NEXT                     70
+#define KPM_NEXT                     71
 #error Your build will not be upward-compatible.
 #endif
 

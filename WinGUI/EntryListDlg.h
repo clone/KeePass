@@ -32,6 +32,8 @@
 #define ELDMODE_EXPSOONEXP   3
 #define ELDMODE_LIST_ATITEMS 4
 
+DWORD _GetSoonToExpireDays();
+
 /////////////////////////////////////////////////////////////////////////////
 
 class CEntryListDlg : public CDialog

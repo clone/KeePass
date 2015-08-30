@@ -26,7 +26,7 @@
 #include "../KeePassLibCpp/Util/MemUtil.h"
 #include "../KeePassLibCpp/Util/StrUtil.h"
 #include "../KeePassLibCpp/Crypto/MemoryProtectionEx.h"
-#include "Util/PrivateConfigEx.h"
+#include "../KeePassLibCpp/Crypto/KeyTransform_BCrypt.h"
 #include "Util/WinUtil.h"
 #include "Util/CmdLine/CmdArgs.h"
 #include "Util/CmdLine/Executable.h"
@@ -127,6 +127,7 @@ BOOL CPwSafeApp::InitInstance()
 	{
 		dlg.m_bCheckForInstance = pc->GetBool(PWMKEY_SINGLEINSTANCE, FALSE);
 		CMemoryProtectionEx::SetEnabledAtStart(pc->GetBool(PWMKEY_USEDPAPIFORMEMPROT, TRUE));
+		*CKeyTransformBCrypt::GetEnabledPtr() = pc->GetBool(PWMKEY_USECNGBCRYPTFORKEYT, TRUE);
 		delete pc; pc = NULL;
 	}
 
@@ -163,13 +164,13 @@ BOOL CPwSafeApp::InitInstance()
 			else dlg.m_instanceChecker.ActivatePreviousInstance(_T(""), 0xF0FFFFF0); */
 
 			const FullPathName& database = CmdArgs::instance().getDatabase();
-			if(database.getState()==FullPathName::PATH_AND_FILENAME)			
+			if(database.getState() == FullPathName::PATH_AND_FILENAME)			
 			{
 				std_string string(database.getFullPathName());
 				DWORD dwData = 0;
 				if(!CmdArgs::instance().getPassword().empty())
 				{
-					dwData |= (DWORD)CmdArgs::instance().getPassword().length() << 16;
+					dwData |= ((DWORD)CmdArgs::instance().getPassword().length() << 16);
 					string = CmdArgs::instance().getPassword() + string;
 				}
 
@@ -231,24 +232,58 @@ int CPwSafeApp::ExitInstance()
 	return CWinApp::ExitInstance();
 }
 
+void CPwSafeApp::ChangeKdbShellAssociation(BOOL bRegister, HWND hParent)
+{
+	CPwSafeApp::LoadTranslationEx(NULL);
+
+	if(bRegister == TRUE)
+	{
+		if(CPwSafeApp::RegisterShellAssociation() == TRUE)
+		{
+			CPwSafeApp::NotifyAssocChanged();
+
+			::MessageBox(hParent, TRL("Successfully associated KeePass with .kdb files! A double-click on a .kdb file will now start KeePass automatically."),
+				PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONINFORMATION);
+		}
+		else
+		{
+			::MessageBox(hParent, TRL("Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations."),
+				PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
+		}
+	}
+	else // Unregister
+	{
+		if(CPwSafeApp::UnregisterShellAssociation() == TRUE)
+		{
+			CPwSafeApp::NotifyAssocChanged();
+
+			::MessageBox(hParent, TRL("Successfully removed association! KeePass won't be started anymore when double-clicking on a .kdb file."),
+				PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONINFORMATION);
+		}
+		else
+		{
+			::MessageBox(hParent, TRL("Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations."),
+				PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
+		}
+	}
+}
+
 BOOL CPwSafeApp::RegisterShellAssociation()
 {
-	LONG l;
 	HKEY hBase, hShell, hTemp, hTemp2;
 	// TCHAR tszTemp[MAX_PATH * 2];
 	// TCHAR tszMe[MAX_PATH * 2];
-	DWORD dw;
 
 	// VERIFY(GetModuleFileName(NULL, tszMe, MAX_PATH * 2 - 2) != 0);
 	std_string strMe = Executable::instance().getFullPathName();
 
 	// HKEY_CLASSES_ROOT/.kdb
 
-	l = RegCreateKey(HKEY_CLASSES_ROOT, _T(".kdb"), &hBase);
+	LONG l = RegCreateKey(HKEY_CLASSES_ROOT, _T(".kdb"), &hBase);
 	if(l != ERROR_SUCCESS) return FALSE;
 
 	std_string strTemp = _T("kdbfile");
-	dw = static_cast<DWORD>((strTemp.length() + 1) * sizeof(TCHAR));
+	DWORD dw = static_cast<DWORD>((strTemp.length() + 1) * sizeof(TCHAR));
 	l = RegSetValueEx(hBase, _T(""), 0, REG_SZ, (CONST BYTE *)strTemp.c_str(), dw);
 	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hBase); return FALSE; }
 
@@ -326,7 +361,7 @@ BOOL CPwSafeApp::RegisterShellAssociation()
 
 BOOL CPwSafeApp::UnregisterShellAssociation()
 {
-	HKEY hBase, hShell, hOpen, hCommand;
+	HKEY hBase, hShell, hOpen, hCommand, hDefaultIcon;
 	LONG l;
 
 	l = RegOpenKeyEx(HKEY_CLASSES_ROOT, _T(".kdb"), 0, KEY_WRITE, &hBase);
@@ -349,20 +384,48 @@ BOOL CPwSafeApp::UnregisterShellAssociation()
 	l = RegOpenKeyEx(hOpen, _T("command"), 0, KEY_WRITE, &hCommand);
 	if(l != ERROR_SUCCESS) return FALSE;
 
+	l = RegOpenKeyEx(hBase, _T("DefaultIcon"), 0, KEY_WRITE, &hDefaultIcon);
+	if(l != ERROR_SUCCESS) return FALSE;
+
 	RegDeleteValue(hCommand, _T(""));
 	VERIFY(RegCloseKey(hCommand) == ERROR_SUCCESS);
+	VERIFY(RegDeleteKey(hOpen, _T("command")) == ERROR_SUCCESS);
 
 	RegDeleteValue(hOpen, _T(""));
 	VERIFY(RegCloseKey(hOpen) == ERROR_SUCCESS);
+	VERIFY(RegDeleteKey(hShell, _T("open")) == ERROR_SUCCESS);
 
 	RegDeleteValue(hShell, _T(""));
 	VERIFY(RegCloseKey(hShell) == ERROR_SUCCESS);
+	VERIFY(RegDeleteKey(hBase, _T("shell")) == ERROR_SUCCESS);
+
+	RegDeleteValue(hDefaultIcon, _T(""));
+	VERIFY(RegCloseKey(hDefaultIcon) == ERROR_SUCCESS);
+	VERIFY(RegDeleteKey(hBase, _T("DefaultIcon")) == ERROR_SUCCESS);
 
 	RegDeleteValue(hBase, _T(""));
 	RegDeleteValue(hBase, _T("AlwaysShowExt"));
 	VERIFY(RegCloseKey(hBase) == ERROR_SUCCESS);
+	VERIFY(RegDeleteKey(HKEY_CLASSES_ROOT, _T("kdbfile")) == ERROR_SUCCESS);
 
 	return TRUE;
+}
+
+void CPwSafeApp::NotifyAssocChanged()
+{
+	HINSTANCE hShell32 = LoadLibrary(_T("Shell32.dll"));
+	if(hShell32 != NULL)
+	{
+		LPSHCHANGENOTIFY lpSHChangeNotify = (LPSHCHANGENOTIFY)GetProcAddress(
+			hShell32, "SHChangeNotify");
+
+		if(lpSHChangeNotify != NULL)
+			lpSHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+		else { ASSERT(FALSE); }
+
+		FreeLibrary(hShell32);
+	}
+	else { ASSERT(FALSE); }
 }
 
 BOOL CPwSafeApp::GetStartWithWindows()
@@ -548,6 +611,20 @@ BOOL CPwSafeApp::ProcessControlCommands()
 		return TRUE;
 	}
 
+	if((strCmdLine.Right(18) == KPCLOPT_FILEEXT_UNREG) ||
+		(strCmdLine.Right(18) == KPCLOPT_FILEEXT_UNREG_ALT))
+	{
+		ChangeKdbShellAssociation(FALSE, NULL);
+		return TRUE;
+	}
+
+	if((strCmdLine.Right(16) == KPCLOPT_FILEEXT_REG) ||
+		(strCmdLine.Right(16) == KPCLOPT_FILEEXT_REG_ALT))
+	{
+		ChangeKdbShellAssociation(TRUE, NULL);
+		return TRUE;
+	}
+
 	if((strCmdLine.Right(18) == _T("-clear-urloverride")) ||
 		(strCmdLine.Right(18) == _T("/clear-urloverride")))
 	{
@@ -629,4 +706,16 @@ HANDLE CPwSafeApp::CreateGlobalMutex()
 
 	::FreeLibrary(hInst);
 	return hMutex;
+}
+
+void CPwSafeApp::LoadTranslationEx(CPrivateConfigEx* pConfig)
+{
+	const bool bAlloc = (pConfig == NULL);
+	CPrivateConfigEx* pCfg = (bAlloc ? new CPrivateConfigEx(FALSE) : pConfig);
+
+	TCHAR szTemp[SI_REGSIZE];
+	pCfg->Get(PWMKEY_LANG, szTemp);
+	VERIFY(LoadTranslationTable(szTemp));
+
+	if(bAlloc) { delete pCfg; pCfg = NULL; }
 }

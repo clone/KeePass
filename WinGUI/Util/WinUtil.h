@@ -138,4 +138,6 @@ HRESULT WU_CreateDirectoryTree(LPCTSTR lpDirPath);
 
 bool WU_IsCommandLineURL(const CString& strURL);
 
+BOOL WU_RunElevated(LPCTSTR lpExe, LPCTSTR lpArgs, HWND hParent);
+
 #endif

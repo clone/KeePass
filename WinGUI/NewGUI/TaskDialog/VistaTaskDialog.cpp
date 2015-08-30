@@ -23,7 +23,7 @@
 
 CVistaTaskDialog::CVistaTaskDialog(HWND hParent, HINSTANCE hInstance,
 	bool bUseCommandLinks) :
-	m_lpIcon(NULL), m_hIcon(NULL)
+	m_lpIcon(NULL), m_hIcon(NULL), m_bHyperLinks(false), m_pfCallback(NULL)
 {
 	m_hParent = hParent;
 	m_hInstance = hInstance;
@@ -108,6 +108,32 @@ void CVistaTaskDialog::SetVerification(LPCTSTR lpText)
 	else m_strConfirmation = T2CW(lpText);
 }
 
+void CVistaTaskDialog::SetExpandedText(LPCTSTR lpText)
+{
+	USES_CONVERSION;
+
+	if(lpText == NULL) m_strExpandedText.clear();
+	else m_strExpandedText = T2CW(lpText);
+}
+
+void CVistaTaskDialog::SetFooter(LPCTSTR lpText)
+{
+	USES_CONVERSION;
+
+	if(lpText == NULL) m_strFooter.clear();
+	else m_strFooter = T2CW(lpText);
+}
+
+void CVistaTaskDialog::EnableHyperLinks(bool bEnable)
+{
+	m_bHyperLinks = bEnable;
+}
+
+void CVistaTaskDialog::SetCallback(V_PFTASKDIALOGCALLBACK pf)
+{
+	m_pfCallback = pf;
+}
+
 int CVistaTaskDialog::ShowDialog(BOOL* pVerificationResult)
 {
 	HMODULE hLib = LoadLibrary(_T("ComCtl32.dll"));
@@ -128,17 +154,21 @@ int CVistaTaskDialog::ShowDialog(BOOL* pVerificationResult)
 	cfg.hwndParent = m_hParent;
 	cfg.hInstance = m_hInstance;
 	// cfg.dwCommonButtons = V_TDCBF_CANCEL_BUTTON;
+	cfg.pfCallback = m_pfCallback;
 
 	if(m_strTitle.size() > 0) cfg.pszWindowTitle = m_strTitle.c_str();
 	if(m_strInstr.size() > 0) cfg.pszMainInstruction = m_strInstr.c_str();
 	if(m_strContent.size() > 0) cfg.pszContent = m_strContent.c_str();
 	if(m_strConfirmation.size() > 0) cfg.pszVerificationText = m_strConfirmation.c_str();
+	if(m_strExpandedText.size() > 0) cfg.pszExpandedInformation = m_strExpandedText.c_str();
+	if(m_strFooter.size() > 0) cfg.pszFooter = m_strFooter.c_str();
 
 	std::vector<V_TASKDIALOG_BUTTON> vButtons = MyButtonsToVStruct(m_vButtons);
 	cfg.cButtons = static_cast<UINT>(vButtons.size());
 	if(vButtons.size() > 0) cfg.pButtons = &vButtons[0];
 
 	if(m_bCommandLinks) cfg.dwFlags |= V_TDF_USE_COMMAND_LINKS;
+	if(m_bHyperLinks) cfg.dwFlags |= V_TDF_ENABLE_HYPERLINKS;
 
 	cfg.pszMainIcon = m_lpIcon;
 	if(m_hIcon != NULL)

@@ -1,3 +1,56 @@
+09/06/06 - 1.16
+- Added option to use Windows' CNG/BCrypt API for key
+  transformations (about 50% faster than the KeePass built-in
+  key transformation code; by increasing the amount of rounds
+  by 50%, you'll get the same waiting time as in 1.15, but the
+  protection against dictionary and guessing attacks is raised
+  by a factor of 1.5; option enabled by default; only Windows
+  Vista and higher)
+- Completely new update checking system that now also supports
+  checking for new plugin versions
+- Added warning when trying to open a KDBX file created by
+  KeePass 2.x (with hint about how to migrate from 2.x to 1.x)
+- Added 'KeeAutoNewDbBasePath' and 'KeeAutoNewDbBaseName'
+  configuration options (to specify the default location where
+  the database file will be stored in mini mode)
+- Added advanced option to immediately delete TAN entries after
+  using them
+- Added '-minimize' command line option
+- Added '-registerfileext' and '-unregisterfileext' command
+  line options to register/unregister the KDB file association
+- File association methods are now UAC aware
+- Added check for reserved group names (like 'Backup')
+- On Windows Vista and higher, core database manager error /
+  warning messages are displayed using modern task dialogs
+- The number of days below which entries are treated as soon to
+  expire can now be configured (see help -> customize)
+- Plugins: added new COM interface (IKpAPI2) for the main API
+  that allows querying whether the database is the one
+  initially specified on the command line
+- Key provider plugin API: new key query method that supports
+  context information
+
+- Image list handling improvements
+- When auto-locking after the specified number of seconds of
+  inactivity, KeePass minimizes to taskbar or to tray,
+  depending on the 'Minimize to tray instead of taskbar' option
+- Plugin versions are now displayed in a separate column in the
+  plugins dialog
+- When trying to open a second master key dialog or auto-type
+  entry selection dialog for a window, KeePass brings itself to
+  the foreground instead of showing a second dialog
+- Calculation of soon to expire entries is now more precise
+- Various improvements to status bar messages
+- Improved workspace locking toolbar button tooltips
+- Installer: various minor improvements
+- Various code optimizations
+- Minor other improvements
+
+- Newlines of the notes field are now encoded correctly in
+  exports when Unix mode is enabled
+- New databases do not inherit file names of previous locked
+  databases anymore
+
 09/02/13 - 1.15
 - Completely new plugin architecture (exposing a lot more
   functionality to plugins, faster, requires less memory, safer
@@ -559,7 +612,7 @@
 - The expiration time column menu item in the columns context
   menu is translated correctly now
 - Entry details view is now cleared after deleting entries
-- URL length is not limited any more
+- URL length is not limited anymore
 - Various other minor improvements and bugfixes
 
 07/04/16 - 1.07

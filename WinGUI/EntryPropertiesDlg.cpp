@@ -201,7 +201,7 @@ void CEntryPropertiesDlg::OnOK()
 		if(CPwUtil::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
 		{
 			MessageBox(TRL("The group you selected cannot store entries. Please select a different group."),
-				TRL("Stop"), MB_ICONWARNING | MB_OK);
+				PWM_PRODUCT_NAME_SHORT, MB_ICONWARNING | MB_OK);
 			return;
 		}
 	}

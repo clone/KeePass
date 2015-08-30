@@ -25,7 +25,7 @@
 
 #pragma pack(1)
 
-class CKpApiImpl : public IKpAPI
+class CKpApiImpl : public IKpAPI2
 {
 private:
 	CKpApiImpl();
@@ -85,6 +85,11 @@ public:
 	STDMETHODIMP AutoType(PW_ENTRY* pEntry, LONG_PTR lFlags);
 
 	STDMETHODIMP AddImportMenuItem(LPCTSTR lpText, UINT uId, INT nIconId);
+
+	STDMETHODIMP_(BOOL) IsInitialCommandLineFile();
+
+	STDMETHODIMP GetProperty(DWORD dwID, void* pOutValue);
+	STDMETHODIMP SetProperty(DWORD dwID, void* pNewValue);
 
 private:
 	KP_DECL_STDREFIMPL;

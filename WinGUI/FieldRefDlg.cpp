@@ -242,6 +242,8 @@ void CFieldRefDlg::OnBnClickedOk()
 	EraseCString(&str);
 
 	m_bClosing = TRUE;
+
+	m_lvEntries.SetImageList(NULL, LVSIL_SMALL);
 	OnOK();
 }
 
@@ -270,6 +272,7 @@ BOOL CFieldRefDlg::_IdMatchesMultipleTimes(LPCTSTR lpText, TCHAR tchScan)
 
 void CFieldRefDlg::OnBnClickedCancel()
 {
+	m_lvEntries.SetImageList(NULL, LVSIL_SMALL);
 	OnCancel();
 }
 

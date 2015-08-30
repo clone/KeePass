@@ -56,7 +56,7 @@ public:
 
 	std::vector<std::basic_string<TCHAR> > GetArray(LPCTSTR pszPrefix) const;
 
-	std::basic_string<TCHAR> GetSafe(const TCHAR *pszField);
+	std::basic_string<TCHAR> GetSafe(const TCHAR *pszField) const;
 
 	// Get the KeePass application data path (directory, not INI
 	// file), without a terminating separator

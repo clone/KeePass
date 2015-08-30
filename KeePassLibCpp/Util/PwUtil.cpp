@@ -226,7 +226,8 @@ CString CPwUtil::FormatError(int nErrorCode, DWORD dwFlags)
 		else str += _T("\r\n");
 	}
 
-	if((nErrorCode == PWE_INVALID_KEY) && ((dwFlags & PWFF_INVKEY_WITH_CODE) == 0))
+	if(((nErrorCode == PWE_INVALID_KEY) && ((dwFlags & PWFF_INVKEY_WITH_CODE) == 0)) ||
+		(nErrorCode == PWE_UNSUPPORTED_KDBX) || ((dwFlags & PWFF_MAIN_TEXT_ONLY) != 0))
 		str.Empty();
 
 	switch(nErrorCode)
@@ -285,6 +286,11 @@ CString CPwUtil::FormatError(int nErrorCode, DWORD dwFlags)
 		break;
 	case PWE_FILEERROR_VERIFY:
 		str += TRL("File error: error while writing to the file"); // Same as write
+		break;
+	case PWE_UNSUPPORTED_KDBX:
+		str += TRL("KeePass 1.x cannot open KDBX files.");
+		str += _T("\r\n\r\n");
+		str += TRL("Use the KeePass 2.x 'Export' feature to migrate this file");
 		break;
 	default:
 		ASSERT(FALSE);

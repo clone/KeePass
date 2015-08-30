@@ -37,21 +37,24 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.15")
+#define PWM_VERSION_STR  _T("1.16")
 #else
-#define PWM_VERSION_STR  _T("1.15 Unicode")
+#define PWM_VERSION_STR  _T("1.16 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01010500
+#define PWM_VERSION_DW   0x01010600
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
 #define PWM_DBSIG_2      0xB54BFB65
 #define PWM_DBVER_DW     0x00030002
 
+#define PWM_DBSIG_1_KDBX 0x9AA2D903
+#define PWM_DBSIG_2_KDBX 0xB54BFB66
+
 #define PWM_HOMEPAGE     _T("http://keepass.info/")
 #define PWM_URL_TRL      _T("http://keepass.info/translations.html")
 #define PWM_URL_PLUGINS  _T("http://keepass.info/plugins.html")
-#define PWM_URL_VERSION  _T("http://keepass.info/update/version1.txt")
+#define PWM_URL_VERSION  _T("http://keepass.info/update/version1x.txt")
 #define PWM_URL_DONATE   _T("http://keepass.info/donate.html")
 #define PWM_URL_HELP     _T("http://keepass.info/help/")
 
@@ -71,6 +74,7 @@
 #define PWM_HELP_PWGEN_ADV _T("help/base/pwgenerator.html#secreduc")
 #define PWM_HELP_CSV       _T("help/base/importexport.html#csv")
 #define PWM_HELP_FIELDREFS _T("help/base/fieldrefs.html")
+#define PWM_HELP_ERRORS    _T("help/v1/errors.html")
 
 #define PWMKEY_LANG       _T("KeeLanguage")
 #define PWMKEY_CLIPSECS   _T("KeeClipboardSeconds")
@@ -181,11 +185,16 @@
 #define PWMKEY_CLEARCLIPONDBCLOSE   _T("KeeClearClipboardOnDbClose")
 #define PWMKEY_USEHELPCENTER        _T("KeeUseHelpCenter")
 #define PWMKEY_USEDPAPIFORMEMPROT   _T("KeeUseDPAPIForMemoryProtection")
+#define PWMKEY_USECNGBCRYPTFORKEYT  _T("KeeUseCNGForKeyTransformations")
 #define PWMKEY_FORCEALLOWCHANGEMKEY _T("KeeForceAllowChangeMasterKey")
 #define PWMKEY_FORCEALLOWPRINTING   _T("KeeForceAllowPrinting")
 #define PWMKEY_FORCEALLOWIMPORT     _T("KeeForceAllowImport")
 #define PWMKEY_FORCEALLOWEXPORT     _T("KeeForceAllowExport")
 #define PWMKEY_DISALLOWPRINTINGPWS  _T("KeeDisallowPrintingPasswords")
+#define PWMKEY_AUTONEWDBBASEPATH    _T("KeeAutoNewDbBasePath")
+#define PWMKEY_AUTONEWDBBASENAME    _T("KeeAutoNewDbBaseName")
+#define PWMKEY_DELETETANSAFTERUSE   _T("KeeDeleteTANsAfterUse")
+#define PWMKEY_SOONTOEXPIREDAYS     _T("KeeSoonToExpireDays")
 
 #define PWMKEY_GENPROFILE       _T("KeeGenProfile")
 #define PWMKEY_GENPROFILEAUTO   _T("KeeGenProfileAuto")
@@ -271,11 +280,13 @@
 #define PWE_NOFILEACCESS_READ_KEY  15
 #define PWE_KEYPROV_INVALID_KEY    16
 #define PWE_FILEERROR_VERIFY       17
+#define PWE_UNSUPPORTED_KDBX       18
 
 // Format flags
 #define PWFF_NO_INTRO               1
 #define PWFF_INVKEY_WITH_CODE       2
 #define PWFF_DATALOSS_WITHOUT_SAVE  0x4000
+#define PWFF_MAIN_TEXT_ONLY         0x8000
 
 // Property IDs
 #define PWP_DEFAULT_USER_NAME       1

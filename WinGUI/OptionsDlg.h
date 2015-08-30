@@ -44,8 +44,6 @@
 #define OPTSZ_SETUP     "Setup"
 #define OPTSZ_ADVANCED  "Advanced"
 
-typedef VOID(WINAPI *LPSHCHANGENOTIFY)(LONG wEventId, UINT uFlags, LPCVOID dwItem1, LPCVOID dwItem2);
-
 /////////////////////////////////////////////////////////////////////////////
 
 class COptionsDlg : public CDialog
@@ -67,8 +65,6 @@ public:
 	CString m_strDefaultAutoTypeSequence;
 	BOOL m_bAutoTypeIEFix;
 	BOOL m_bSortAutoTypeSelItems;
-
-	static void NotifyAssocChanged();
 
 private:
 	void AddTcItem(LPCTSTR lpName, int iImageIndex);
@@ -102,12 +98,13 @@ public:
 	BOOL m_bAlwaysAllowIpc;
 	BOOL m_bDropToBackOnCopy;
 	BOOL m_bClearClipOnDbClose;
+	BOOL m_bDeleteTANsAfterUse;
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };
 	COptionsList	m_olAdvanced;
-	CXPStyleButtonST	m_btnDeleteAssoc;
-	CXPStyleButtonST	m_btnCreateAssoc;
+	CButton	m_btnDeleteAssoc;
+	CButton	m_btnCreateAssoc;
 	CColourPickerXP	m_btnColorRowHighlight;
 	CTabCtrl	m_tabMenu;
 	CXPStyleButtonST	m_btSelFont;

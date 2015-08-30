@@ -58,6 +58,21 @@ enum _V_TASKDIALOG_COMMON_BUTTON_FLAGS
 	V_TDCBF_CLOSE_BUTTON  = 0x0020  // Return value: IDCLOSE
 };
 
+enum _V_TASKDIALOG_NOTIFICATIONS
+{
+	V_TDN_CREATED                = 0,
+	V_TDN_NAVIGATED              = 1,
+	V_TDN_BUTTON_CLICKED         = 2,
+	V_TDN_HYPERLINK_CLICKED      = 3,
+	V_TDN_TIMER                  = 4,
+	V_TDN_DESTROYED              = 5,
+	V_TDN_RADIO_BUTTON_CLICKED   = 6,
+	V_TDN_DIALOG_CONSTRUCTED     = 7,
+	V_TDN_VERIFICATION_CLICKED   = 8,
+	V_TDN_HELP                   = 9,
+	V_TDN_EXPANDO_BUTTON_CLICKED = 10
+};
+
 enum MY_TASKDIALOG_ICON
 {
 	V_MTDI_QUESTION = 0
@@ -81,6 +96,9 @@ typedef struct _MY_V_TASKDIALOG_BUTTON
 	int nButtonID;
 	std::basic_string<WCHAR> strButtonText;
 } MY_V_TASKDIALOG_BUTTON;
+
+typedef HRESULT(CALLBACK* V_PFTASKDIALOGCALLBACK)(HWND hwnd, UINT uNotification,
+	WPARAM wParam, LPARAM lParam, LONG_PTR dwRefData);
 
 typedef struct _V_TASKDIALOGCONFIG
 {
@@ -113,7 +131,7 @@ typedef struct _V_TASKDIALOGCONFIG
 		PCWSTR pszFooterIcon;
 	};
 	PCWSTR pszFooter;
-	LPVOID pfCallback; // PFTASKDIALOGCALLBACK
+	V_PFTASKDIALOGCALLBACK pfCallback;
 	LONG_PTR lpCallbackData;
 	UINT cxWidth;
 } V_TASKDIALOGCONFIG;
@@ -137,6 +155,12 @@ public:
 	void SetIcon(MY_TASKDIALOG_ICON tdIcon);
 	void SetCommandLinks(bool bUseCommandLinks) { m_bCommandLinks = bUseCommandLinks; }
 	void SetVerification(LPCTSTR lpText);
+	void SetExpandedText(LPCTSTR lpText);
+	void SetFooter(LPCTSTR lpText);
+
+	void EnableHyperLinks(bool bEnable);
+
+	void SetCallback(V_PFTASKDIALOGCALLBACK pf);
 
 	int ShowDialog(BOOL* pVerificationResult = NULL);
 
@@ -150,11 +174,15 @@ private:
 	PCWSTR m_lpIcon;
 	HICON m_hIcon;
 	bool m_bCommandLinks;
+	bool m_bHyperLinks;
 	std::basic_string<WCHAR> m_strTitle;
 	std::basic_string<WCHAR> m_strInstr;
 	std::basic_string<WCHAR> m_strContent;
 	std::basic_string<WCHAR> m_strConfirmation;
+	std::basic_string<WCHAR> m_strExpandedText;
+	std::basic_string<WCHAR> m_strFooter;
 	std::vector<MY_V_TASKDIALOG_BUTTON> m_vButtons;
+	V_PFTASKDIALOGCALLBACK m_pfCallback;
 };
 
 #endif // ___VISTA_TASK_DIALOG_H___

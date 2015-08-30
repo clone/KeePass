@@ -60,6 +60,7 @@ STDMETHODIMP CKpApiImpl::QueryInterface(REFIID riid, void** ppvObject)
 
 	KP_SUPPORT_INTERFACE(IID_IKpUnknown, IKpUnknown);
 	KP_SUPPORT_INTERFACE(IID_IKpAPI, IKpAPI);
+	KP_SUPPORT_INTERFACE(IID_IKpAPI2, IKpAPI2);
 
 	*ppvObject = NULL;
 	return E_NOINTERFACE;
@@ -340,6 +341,27 @@ STDMETHODIMP CKpApiImpl::UpdateTranslationTable()
 STDMETHODIMP_(LPCTSTR) CKpApiImpl::Translate(LPCTSTR lpDefString)
 {
 	return _TRL(lpDefString);
+}
+
+STDMETHODIMP_(BOOL) CKpApiImpl::IsInitialCommandLineFile()
+{
+	return g_pMainDlg->m_bInitialCmdLineFile;
+}
+
+STDMETHODIMP CKpApiImpl::GetProperty(DWORD dwID, void* pOutValue)
+{
+	UNREFERENCED_PARAMETER(dwID);
+	UNREFERENCED_PARAMETER(pOutValue);
+
+	return E_NOTIMPL;
+}
+
+STDMETHODIMP CKpApiImpl::SetProperty(DWORD dwID, void* pNewValue)
+{
+	UNREFERENCED_PARAMETER(dwID);
+	UNREFERENCED_PARAMETER(pNewValue);
+
+	return E_NOTIMPL;
 }
 
 // ////////////////////////////////////////////////////////////////////////

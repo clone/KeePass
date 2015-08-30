@@ -662,3 +662,8 @@ void NewGUI_DeselectAllItems(CListCtrl* pCtrl)
 		}
 	}
 }
+
+void NewGUI_SetShield(CButton& rButton, BOOL bSetShield)
+{
+	rButton.SendMessage(BCM_SETSHIELD, 0, bSetShield);
+}

@@ -669,7 +669,7 @@ void CPwGeneratorExDlg::OnBnClickedBtnProfileCreate()
 CString CPwGeneratorExDlg::GetCurrentGenProfile()
 {
 	CString strProfile;
-	int nSel = m_cmbProfile.GetCurSel();
+	const int nSel = m_cmbProfile.GetCurSel();
 	if(nSel < 0) m_cmbProfile.GetWindowText(strProfile);
 	else m_cmbProfile.GetLBText(nSel, strProfile);
 	return strProfile;

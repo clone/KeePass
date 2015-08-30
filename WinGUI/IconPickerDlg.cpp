@@ -116,10 +116,12 @@ void CIconPickerDlg::OnOK()
 	if(f != -1) m_nSelectedIcon = f;
 	if(s != -1) m_nSelectedIcon = s;
 
+	m_cList.SetImageList(NULL, LVSIL_SMALL);
 	CDialog::OnOK();
 }
 
 void CIconPickerDlg::OnCancel() 
 {
+	m_cList.SetImageList(NULL, LVSIL_SMALL);
 	CDialog::OnCancel();
 }

@@ -111,6 +111,7 @@ TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource);
 LPTSTR _TcsCryptDupAlloc(LPCTSTR lpSource);
 
 void RemoveAcceleratorTip(CString *pString);
+CString RemoveAcceleratorTipEx(LPCTSTR lpString);
 
 // Assumes that lpSearch is lower-case when bCaseSensitive == FALSE
 // If pUseRegex is not NULL, a regular expression search will be
@@ -119,6 +120,8 @@ bool StrMatchText(LPCTSTR lpEntryData, LPCTSTR lpSearch,
 	BOOL bCaseSensitive, const boost::basic_regex<TCHAR>* pUseRegex);
 
 std::basic_string<TCHAR> SU_GetQuotedPath(const std::basic_string<TCHAR>& strPath);
+
+CString SU_ConvertNewLines(LPCTSTR lpText, LPCTSTR lpNewLineSeq);
 
 /////////////////////////////////////////////////////////////////////////////
 // Natural string comparison API

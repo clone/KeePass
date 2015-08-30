@@ -11,8 +11,8 @@
 #define MyAppUrlName "KeePass.url"
 #define MyAppHelpName "KeePass.chm"
 
-#define KeeVersionStr "1.15"
-#define KeeVersionWin "1.1.5.0"
+#define KeeVersionStr "1.16"
+#define KeeVersionWin "1.1.6.0"
 
 #define KeeDevPeriod "2003-2009"
 
@@ -25,6 +25,7 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 AppCopyright=Copyright (c) {#KeeDevPeriod} {#MyAppPublisher}
+MinVersion=4.1,4.0
 DefaultDirName={pf}\{#MyAppFullName}
 DefaultGroupName={#MyAppFullName}
 AllowNoIcons=yes
@@ -34,7 +35,7 @@ OutputBaseFilename={#MyAppName}-{#KeeVersionStr}-Setup
 Compression=lzma/ultra
 SolidCompression=yes
 InternalCompressLevel=ultra
-UninstallDisplayIcon={app}\{#MyAppName}.exe
+UninstallDisplayIcon={app}\{#MyAppExeName}
 AppMutex=KeePassApplicationMutex,Global\KeePassAppMutexExI
 ChangesAssociations=yes
 VersionInfoVersion={#KeeVersionWin}
@@ -47,6 +48,7 @@ WizardSmallImageFile=compiler:WizModernSmallImage-IS.bmp
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
 Name: brazilianportuguese; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
+Name: catalan; MessagesFile: compiler:Languages\Catalan.isl
 Name: czech; MessagesFile: compiler:Languages\Czech.isl
 Name: danish; MessagesFile: compiler:Languages\Danish.isl
 Name: dutch; MessagesFile: compiler:Languages\Dutch.isl

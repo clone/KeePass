@@ -56,7 +56,7 @@
 #endif
 
 #define LVS_EX_SI_MENU (/*LVS_EX_FLATSB|*/LVS_EX_ONECLICKACTIVATE|LVS_EX_UNDERLINEHOT)
-#define LVS_EX_SI_REPORT (/*(LVS_EX_FLATSB)*/ 0)
+#define LVS_EX_SI_REPORT (/*(LVS_EX_FLATSB)*/0)
 
 #ifndef LVBKIF_SOURCE_NONE
 #define LVBKIF_SOURCE_NONE      0x00000000
@@ -171,6 +171,10 @@ typedef struct _MY_GRADIENT_RECT
 #define TTS_BALLOON 0
 #endif
 
+#ifndef BCM_SETSHIELD
+#define BCM_SETSHIELD 0x160C
+#endif
+
 void NewGUI_CleanUp();
 
 COLORREF NewGUI_GetBgColor();
@@ -235,5 +239,7 @@ void NewGUI_AppendToRichEditCtrl(CAutoRichEditCtrlFx* pCtrl, LPCTSTR lpAppend,
 	bool bScrollToBottom);
 
 void NewGUI_DeselectAllItems(CListCtrl* pCtrl);
+
+void NewGUI_SetShield(CButton& rButton, BOOL bSetShield);
 
 #endif // ___NEW_GUI_COMMON___

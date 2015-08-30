@@ -354,7 +354,7 @@ std::vector<std::basic_string<TCHAR> > CPrivateConfigEx::GetArray(
 	return v;
 }
 
-std::basic_string<TCHAR> CPrivateConfigEx::GetSafe(const TCHAR *pszField)
+std::basic_string<TCHAR> CPrivateConfigEx::GetSafe(const TCHAR *pszField) const
 {
 	TCHAR tszTemp[SI_REGSIZE];
 

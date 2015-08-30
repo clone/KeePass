@@ -705,6 +705,15 @@ void RemoveAcceleratorTip(CString *pString)
 	pString->Trim();
 }
 
+CString RemoveAcceleratorTipEx(LPCTSTR lpString)
+{
+	if(lpString == NULL) return CString();
+
+	CString str = lpString;
+	RemoveAcceleratorTip(&str);
+	return str;
+}
+
 // Assumes that lpSearch is lower-case when bCaseSensitive == FALSE
 // If pUseRegex is not NULL, a regular expression search will be
 // performed, otherwise a simple substring matching.
@@ -761,6 +770,17 @@ std::basic_string<TCHAR> SU_GetQuotedPath(const std::basic_string<TCHAR>& strPat
 	return str.substr(iStart + 1, iEnd - iStart - 1);
 }
 #endif
+
+CString SU_ConvertNewLines(LPCTSTR lpText, LPCTSTR lpNewLineSeq)
+{
+	if(lpText == NULL) { ASSERT(FALSE); return CString(); }
+	if(lpNewLineSeq == NULL) { ASSERT(FALSE); return CString(); }
+
+	CString str = lpText;
+	str.Replace(_T("\r"), _T(""));
+	str.Replace(_T("\n"), lpNewLineSeq);
+	return str;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // WCharStream class

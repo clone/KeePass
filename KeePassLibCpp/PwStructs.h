@@ -205,6 +205,20 @@ typedef struct _KP_KEYPROV_KEY
 	DWORD_PTR dwReserved; ///< Reserved for future use, must be 0.
 } KP_KEYPROV_KEY;
 
+/// Information structure used when querying keys from key providers.
+typedef struct _KP_KEYPROV_CONTEXT
+{
+	DWORD dwSize; ///< Size of the KP_KEYPROV_CONTEXT structure.
+
+	LPCTSTR lpProviderName; ///< Name of the provider that should generate the key.
+
+	BOOL bCreatingNewKey; ///< Specifies whether a new key is being generated.
+	BOOL bConfirming; ///< Specifies whether KeePass asks the user to confirm the key.
+	BOOL bChanging;
+
+	LPCTSTR lpDescriptiveName; ///< File name or some other descriptive string.
+} KP_KEYPROV_CONTEXT;
+
 #pragma pack()
 
 #endif // ___PW_STRUCTS_H___

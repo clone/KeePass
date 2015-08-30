@@ -130,6 +130,10 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *p
 	// Extract header structure from memory file
 	memcpy(&hdr, pVirtualFile, sizeof(PW_DBHEADER));
 
+	// Check if it's a KDBX file created by KeePass 2.x
+	if((hdr.dwSignature1 == PWM_DBSIG_1_KDBX) && (hdr.dwSignature2 == PWM_DBSIG_2_KDBX))
+		{ _OPENDB_FAIL_LIGHT; return PWE_UNSUPPORTED_KDBX; }
+
 	// Check if we can open this
 	if((hdr.dwSignature1 != PWM_DBSIG_1) || (hdr.dwSignature2 != PWM_DBSIG_2))
 		{ _OPENDB_FAIL_LIGHT; return PWE_INVALID_FILESIGNATURE; }

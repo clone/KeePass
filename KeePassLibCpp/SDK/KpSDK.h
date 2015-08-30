@@ -40,6 +40,7 @@
 #include "Details/KpGuids.h"
 
 #include "Details/IKpAPI.h"
+#include "Details/IKpAPI2.h"
 #include "Details/IKpConfig.h"
 #include "Details/IKpDatabase.h"
 #include "Details/IKpPlugin.h"

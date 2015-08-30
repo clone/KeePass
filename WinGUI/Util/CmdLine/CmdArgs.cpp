@@ -44,7 +44,8 @@ const CmdArgs& CmdArgs::instance() {
     return singleton;
 }
 
-CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false), m_isLock(false) {
+CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false), m_isLock(false),
+    m_isMin(false) {
 
     // Command line options:
     const CommandLineOption keyfile    (_T("keyfile:"));
@@ -52,7 +53,8 @@ CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false), m_isLock(false) 
     const CommandLineOption readonly   (_T("readonly"));
     const CommandLineOption pw         (_T("pw:"));
     const CommandLineOption lockcw     (_T("lock"));
-	const CommandLineOption urloverride(_T("set-urloverride:"));
+    const CommandLineOption mincw      (_T("minimize"));
+    const CommandLineOption urloverride(_T("set-urloverride:"));
 
     // For each command line argument ...
     typedef CommandLineTokens::const_iterator const_iterator;
@@ -110,6 +112,11 @@ CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false), m_isLock(false) 
         // lock option:
         else if(lockcw.isOption(argument)) {
             m_isLock = true;
+            }
+
+        // minimize option:
+        else if(mincw.isOption(argument)) {
+            m_isMin = true;
             }
 
         // set-urloverride option:

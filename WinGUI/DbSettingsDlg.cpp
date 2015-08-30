@@ -129,7 +129,11 @@ void CDbSettingsDlg::OnCancel()
 void CDbSettingsDlg::OnBtnCalcRounds() 
 {
 	UpdateData(TRUE);
-	m_dwNumKeyEnc = CKeyTransform::Benchmark(1000);
+
+	const UINT64 u = CKeyTransform::Benchmark(1000);
+	m_dwNumKeyEnc = ((u <= static_cast<UINT64>(DWORD_MAX - 8)) ?
+		static_cast<DWORD>(u) : (DWORD_MAX - 8));
+
 	UpdateData(FALSE);
 }
 

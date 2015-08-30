@@ -2154,6 +2154,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\UpdateInfoDlg.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -2261,6 +2265,10 @@
 			</File>
 			<File
 				RelativePath="TanWizardDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UpdateInfoDlg.h"
 				>
 			</File>
 		</Filter>
@@ -2798,6 +2806,14 @@
 			</File>
 			<File
 				RelativePath=".\Util\UpdateCheck.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\UpdateCheckEx.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\UpdateCheckEx.h"
 				>
 			</File>
 			<File
@@ -3637,6 +3653,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NewGUI\NewDialogsEx.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\NewDialogsEx.h"
+				>
+			</File>
+			<File
 				RelativePath="NewGUI\NewGUICommon.cpp"
 				>
 				<FileConfiguration
@@ -4356,6 +4380,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\KeePassLibCpp\Crypto\KeyTransform_BCrypt.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Crypto\KeyTransform_BCrypt.h"
+					>
+				</File>
+				<File
 					RelativePath="..\KeePassLibCpp\Crypto\MemoryProtectionEx.cpp"
 					>
 				</File>
@@ -4588,6 +4620,10 @@
 					>
 					<File
 						RelativePath="..\KeePassLibCpp\SDK\Details\IKpAPI.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpAPI2.h"
 						>
 					</File>
 					<File

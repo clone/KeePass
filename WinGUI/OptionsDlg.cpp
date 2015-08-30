@@ -22,8 +22,11 @@
 #include "OptionsDlg.h"
 
 #include "NewGUI/NewGUICommon.h"
+#include "Util/WinUtil.h"
+#include "Util/CmdLine/Executable.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "../KeePassLibCpp/Crypto/MemoryProtectionEx.h"
+#include "../KeePassLibCpp/Crypto/KeyTransform_BCrypt.h"
 #include "OptionsAutoTypeDlg.h"
 
 #ifdef _DEBUG
@@ -122,9 +125,12 @@ BOOL COptionsDlg::OnInitDialog()
 	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_XPButton(m_btSelFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
-	NewGUI_XPButton(m_btnCreateAssoc, IDB_FILE, IDB_FILE);
-	NewGUI_XPButton(m_btnDeleteAssoc, IDB_CANCEL, IDB_CANCEL);
+	// NewGUI_XPButton(m_btnCreateAssoc, IDB_FILE, IDB_FILE);
+	// NewGUI_XPButton(m_btnDeleteAssoc, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_XPButton(m_btnAutoType, IDB_AUTOTYPE, IDB_AUTOTYPE);
+
+	NewGUI_SetShield(m_btnCreateAssoc, TRUE);
+	NewGUI_SetShield(m_btnDeleteAssoc, TRUE);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_OPTIONS),
@@ -215,7 +221,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Start minimized and locked"), &m_bStartMinimized, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Automatically save when closing/locking the database"), &m_bAutoSave, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Limit to single instance"), &m_bSingleInstance, NULL, OL_LINK_NULL);
-	m_olAdvanced.AddCheckItem(TRL("Check for update at KeePass startup"), &m_bCheckForUpdate, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Check for updates at KeePass startup"), &m_bCheckForUpdate, NULL, OL_LINK_NULL);
 
 	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Immediately after opening a database"), 8);
@@ -238,8 +244,10 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Include backup entries in quick searches (toolbar)"), &m_bQuickFindIncBackup, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Include expired entries in quick searches (toolbar)"), &m_bQuickFindIncExpired, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Focus entry list after a successful quick search (toolbar)"), &m_bFocusResAfterQuickFind, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Delete TAN entries immediately after using them"), &m_bDeleteTANsAfterUse, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Clear clipboard when closing/locking the database"), &m_bClearClipOnDbClose, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Use advanced memory protection (DPAPI, only Windows Vista and higher)"), CMemoryProtectionEx::GetEnabledPtr(), NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Use CNG/BCrypt for key transformations (only Windows Vista and higher)"), CKeyTransformBCrypt::GetEnabledPtr(), NULL, OL_LINK_NULL);
 
 	AddTcItem(TRL(OPTSZ_SECURITY), 29);
 	AddTcItem(TRL(OPTSZ_GUI), 6);
@@ -399,53 +407,16 @@ void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult)
 
 void COptionsDlg::OnBtnCreateAssoc() 
 {
-	if(CPwSafeApp::RegisterShellAssociation() == TRUE)
-	{
-		NotifyAssocChanged();
-
-		MessageBox(TRL("Successfully associated KeePass with .kdb files! A double-click on a .kdb file will now start KeePass automatically!"),
-			PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONINFORMATION);
-	}
-	else
-	{
-		MessageBox(TRL("Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations."),
-			PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
-	}
+	// CPwSafeApp::ChangeKdbShellAssociation(TRUE, this->m_hWnd);
+	WU_RunElevated(Executable::instance().getFullPathName().c_str(),
+		KPCLOPT_FILEEXT_REG, this->m_hWnd);
 }
 
 void COptionsDlg::OnBtnDeleteAssoc() 
 {
-	if(CPwSafeApp::UnregisterShellAssociation() == TRUE)
-	{
-		NotifyAssocChanged();
-
-		MessageBox(TRL("Successfully removed association! KeePass won't be started any more when double-clicking on a .kdb file!"),
-			PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONINFORMATION);
-	}
-	else
-	{
-		MessageBox(TRL("Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations."),
-			PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
-	}
-}
-
-void COptionsDlg::NotifyAssocChanged()
-{
-	HINSTANCE hShell32 = LoadLibrary(_T("Shell32.dll"));
-	if(hShell32 != NULL)
-	{
-		LPSHCHANGENOTIFY lpSHChangeNotify = (LPSHCHANGENOTIFY)GetProcAddress(
-			hShell32, "SHChangeNotify");
-
-		if(lpSHChangeNotify != NULL)
-		{
-			lpSHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
-		}
-		else { ASSERT(FALSE); }
-
-		FreeLibrary(hShell32);
-	}
-	else { ASSERT(FALSE); }
+	// CPwSafeApp::ChangeKdbShellAssociation(FALSE, this->m_hWnd);
+	WU_RunElevated(Executable::instance().getFullPathName().c_str(),
+		KPCLOPT_FILEEXT_UNREG, this->m_hWnd);
 }
 
 void COptionsDlg::OnRadioClipMethodSecure() 

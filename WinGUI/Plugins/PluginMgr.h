@@ -39,6 +39,8 @@ typedef struct
 	std_string strName;
 	std_string strVersion;
 	std_string strAuthor;
+
+	UINT64 qwVersion;
 } KP_PLUGIN_INSTANCE, *LPKP_PLUGIN_INSTANCE;
 
 class CPluginManager : boost::noncopyable

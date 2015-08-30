@@ -158,13 +158,12 @@ BOOL CPasswordDlg::OnInitDialog()
 	m_cbDiskList.InsertItem(&cbi);
 
 	int i;
-	CString str;
 	int j = 1;
 	
 	for(i = 0; i < 26; i++)
 	{
 		const TCHAR c = (TCHAR)(i + _T('A'));
-		str = CString(c) + _T(":\\");
+		CString str = CString(c) + _T(":\\");
 
 		const UINT uStat = GetDriveType((LPCTSTR)str);
 		if(uStat != DRIVE_NO_ROOT_DIR)
@@ -179,9 +178,9 @@ BOOL CPasswordDlg::OnInitDialog()
 			str += PWS_DEFAULT_KEY_FILENAME;
 
 			ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
-			cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
+			cbi.mask = (CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE);
 			cbi.iItem = j; j++;
-			cbi.pszText = (LPTSTR)(LPCTSTR)str;
+			cbi.pszText = const_cast<LPTSTR>((LPCTSTR)str);
 			cbi.cchTextMax = (int)_tcslen(cbi.pszText);
 			cbi.iImage = cbi.iSelectedImage = (int)idxImage;
 			cbi.iIndent = 0;
@@ -227,10 +226,9 @@ BOOL CPasswordDlg::OnInitDialog()
 		m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEYHOLE),
 			KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 
-	LPCTSTR lp;
-
 	m_btBrowseKeyFile.SetWindowText(_T(""));
 
+	LPCTSTR lp;
 	if(m_bConfirm == FALSE)
 	{
 		if(m_bLoadMode == FALSE)
@@ -268,8 +266,7 @@ BOOL CPasswordDlg::OnInitDialog()
 			lp = TRL("Select key file manually...");
 			m_btBrowseKeyFile.SetTooltipText(lp);
 
-			CString str;
-			str = TRL("Enter Composite Master Key");
+			CString str = TRL("Enter Composite Master Key");
 			if(m_strDescriptiveName.GetLength() != 0)
 				str = m_strDescriptiveName;
 			m_banner.SetTitle(str);
@@ -318,8 +315,7 @@ BOOL CPasswordDlg::OnInitDialog()
 			// This combination isn't possible
 			ASSERT(FALSE);
 
-			CString str;
-			str = TRL("Enter Composite Master Key");
+			CString str = TRL("Enter Composite Master Key");
 			if(m_strDescriptiveName.GetLength() != 0)
 				str = m_strDescriptiveName;
 			m_banner.SetTitle(str);
@@ -377,9 +373,9 @@ BOOL CPasswordDlg::OnInitDialog()
 		{
 			COMBOBOXEXITEM cbi;
 			ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
-			cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
+			cbi.mask = (CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE);
 			cbi.iItem = m_cbDiskList.GetCount();
-			cbi.pszText = (LPTSTR)m_lpPreSelectPath;
+			cbi.pszText = const_cast<LPTSTR>(m_lpPreSelectPath);
 			cbi.cchTextMax = (int)_tcslen(cbi.pszText);
 			cbi.iImage = cbi.iSelectedImage = 28;
 			cbi.iIndent = 0;
@@ -395,6 +391,7 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	PerformMiniModeAdjustments();
 
+	CPwSafeDlg::SetLastMasterKeyDlg(this->m_hWnd);
 	EnableClientWindows();
 	m_pEditPw.SetFocus();
 	return FALSE; // Return TRUE unless you set the focus to a control
@@ -452,9 +449,6 @@ void CPasswordDlg::FreePasswords()
 
 void CPasswordDlg::OnOK() 
 {
-	CString strTemp;
-	ULARGE_INTEGER aBytes[3];
-
 	UpdateData(TRUE);
 
 	ASSERT((m_lpKey == NULL) && (m_lpKey2 == NULL));
@@ -536,6 +530,7 @@ void CPasswordDlg::OnOK()
 	}
 	else // Key file provided
 	{
+		CString strTemp;
 		m_cbDiskList.GetLBText(m_cbDiskList.GetCurSel(), strTemp);
 
 		const BOOL bKeyProv = IsKeyProvider(strTemp);
@@ -544,19 +539,21 @@ void CPasswordDlg::OnOK()
 		{
 			if(strTemp.GetAt(strTemp.GetLength() - 1) == _T('\\'))
 			{
+				ULARGE_INTEGER aBytes[3];
 				if(GetDiskFreeSpaceEx((LPCTSTR)strTemp, &aBytes[0], &aBytes[1], &aBytes[2]) == FALSE)
 				{
 					strTemp = TRL("Cannot access the selected drive.");
 					strTemp += _T("\r\n\r\n");
 					strTemp += TRL("Make sure a writable medium is inserted.");
-					MessageBox(strTemp, TRL("Stop"), MB_OK | MB_ICONWARNING);
+					MessageBox(strTemp, PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
 					FreePasswords();
 					return;
 				}
 
 				if(aBytes[2].QuadPart < 128)
 				{
-					MessageBox(TRL("Not enough free disk space!"), TRL("Stop"), MB_OK | MB_ICONWARNING);
+					MessageBox(TRL("Not enough free disk space!"), PWM_PRODUCT_NAME_SHORT,
+						MB_OK | MB_ICONWARNING);
 					FreePasswords();
 					return;
 				}
@@ -571,7 +568,7 @@ void CPasswordDlg::OnOK()
 				strTemp = TRL("Cannot access the selected drive.");
 				strTemp += _T("\r\n\r\n");
 				strTemp += TRL("Make sure a writable medium is inserted.");
-				MessageBox(strTemp, TRL("Stop"), MB_OK | MB_ICONWARNING);
+				MessageBox(strTemp, PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
 				FreePasswords();
 				return;
 			}
@@ -617,7 +614,7 @@ void CPasswordDlg::OnOK()
 		if(m_bKeyMethod == PWM_KEYMETHOD_OR) m_pEditPw.DeletePassword(m_lpKey);
 		else m_lpKey2 = m_lpKey;
 
-		size_t sizeKeyBuffer = strTemp.GetLength() + 1;
+		const size_t sizeKeyBuffer = strTemp.GetLength() + 1;
 		m_lpKey = new TCHAR[sizeKeyBuffer];
 		ASSERT(m_lpKey != NULL); if(m_lpKey == NULL) { FreePasswords(); return; }
 		_tcscpy_s(m_lpKey, sizeKeyBuffer, (LPCTSTR)strTemp);
@@ -851,7 +848,24 @@ std::basic_string<TCHAR> CPasswordDlg::GetKeyFromProvider(LPCTSTR lpDisplayName)
 
 	KP_KEYPROV_KEY kpKey;
 	ZeroMemory(&kpKey, sizeof(KP_KEYPROV_KEY));
+
 	_CallPlugins(KPM_KEYPROV_QUERY_KEY, (LPARAM)lpDisplayName, (LPARAM)&kpKey);
+	if((kpKey.lpData == NULL) || (kpKey.dwDataSize == 0))
+	{
+		ZeroMemory(&kpKey, sizeof(KP_KEYPROV_KEY));
+
+		KP_KEYPROV_CONTEXT ctx;
+		ZeroMemory(&ctx, sizeof(KP_KEYPROV_CONTEXT));
+
+		ctx.dwSize = sizeof(KP_KEYPROV_CONTEXT);
+		ctx.lpProviderName = lpDisplayName;
+		ctx.bCreatingNewKey = ((m_bLoadMode == FALSE) ? TRUE : FALSE);
+		ctx.bConfirming = m_bConfirm;
+		ctx.bChanging = m_bChanging;
+		ctx.lpDescriptiveName = m_strDescriptiveName;
+
+		_CallPlugins(KPM_KEYPROV_QUERY_KEY_EX, (LPARAM)&ctx, (LPARAM)&kpKey);
+	}
 
 	if((kpKey.lpData == NULL) || (kpKey.dwDataSize == 0))
 	{

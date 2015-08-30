@@ -77,6 +77,8 @@ void CPluginManager::ClearStructure(KP_PLUGIN_INSTANCE* p)
 	p->strName = _T("");
 	p->strVersion = _T("");
 	p->strAuthor = _T("");
+
+	p->qwVersion = 0;
 }
 
 // BOOL CPluginManager::SetAppInfo(const KP_APP_INFO *pAppInfo)
@@ -158,6 +160,11 @@ bool CPluginManager::_IsValidPlugin(LPCTSTR lpFile, KP_PLUGIN_INSTANCE* pOutStru
 		pOutStruct->strName = (LPCTSTR)v.GetFileDescription();
 		pOutStruct->strVersion = (LPCTSTR)v.GetFileVersionAsString();
 		pOutStruct->strAuthor = (LPCTSTR)v.GetCompanyName();
+
+		const VS_FIXEDFILEINFO* pv = v.GetFixedFileInfo();
+		pOutStruct->qwVersion = ((pv != NULL) ? ((static_cast<UINT64>(
+			pv->dwFileVersionMS) << 32) | static_cast<UINT64>(
+			pv->dwFileVersionLS)) : 0);
 	}
 
 	return true;

@@ -50,6 +50,9 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	//}}AFX_VIRTUAL
 
+private:
+	CString m_strInitialName;
+
 protected:
 	//{{AFX_MSG(CAddGroupDlg)
 	virtual BOOL OnInitDialog();

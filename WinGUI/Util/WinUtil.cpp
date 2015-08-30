@@ -582,7 +582,7 @@ void WU_SysExecute(LPCTSTR lpFile, LPCTSTR lpParameters, HWND hParent)
 	sei.hwnd = hParent;
 	sei.lpFile = lpFile;
 	sei.lpParameters = lpParameters;
-	sei.nShow = SW_SHOWNORMAL;
+	sei.nShow = SW_SHOW;
 
 	const DWORD dwDummyErr = 0x19B5A28F;
 	const DWORD dwPrevErr = GetLastError();
@@ -1014,7 +1014,7 @@ void SafeActivateNextWindow(HWND hWndBase)
 	{
 		if(hWnd != hWndBase)
 		{
-			LONG lStyle = GetWindowLong(hWnd, GWL_STYLE);
+			const LONG lStyle = GetWindowLong(hWnd, GWL_STYLE);
 			GetWindowPlacement(hWnd, &wp);
 
 			if(((lStyle & WS_VISIBLE) == WS_VISIBLE) && (wp.showCmd != SW_SHOWMINIMIZED))
@@ -1033,7 +1033,7 @@ void SafeActivateNextWindow(HWND hWndBase)
 	{
 		SetForegroundWindow(hWnd);
 
-		DWORD dwStartTime = timeGetTime();
+		const DWORD dwStartTime = timeGetTime();
 		while(1)
 		{
 			if(GetForegroundWindow() == hWnd) break;
@@ -1363,4 +1363,23 @@ bool WU_IsCommandLineURL(const CString& strURL)
 	}
 
 	return false;
+}
+
+BOOL WU_RunElevated(LPCTSTR lpExe, LPCTSTR lpArgs, HWND hParent)
+{
+	if(lpExe == NULL) { ASSERT(FALSE); return FALSE; }
+
+	SHELLEXECUTEINFO sei;
+	ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+
+	sei.cbSize = sizeof(SHELLEXECUTEINFO);
+	sei.hwnd = hParent;
+	sei.lpFile = lpExe;
+	sei.lpParameters = lpArgs;
+	sei.nShow = SW_SHOW;
+
+	// Elevate on Windows Vista and higher
+	if(AU_IsAtLeastWinVistaSystem() == TRUE) sei.lpVerb = _T("runas");
+
+	return ShellExecuteEx(&sei);
 }

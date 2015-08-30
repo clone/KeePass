@@ -88,6 +88,7 @@
 #define IDD_OPTIONS_AUTOTYPE_DLG        242
 #define IDD_FIELDREF_DLG                243
 #define IDD_HELPSOURCE_DLG              244
+#define IDD_UPDATEINFO_DLG              245
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -319,6 +320,8 @@
 #define IDC_RADIO_HELP_ONLINE           1297
 #define IDC_STATIC_HELP_ONLINE_HINT     1298
 #define IDC_STATIC_HELPSOURCE_INTRO     1299
+#define IDC_LIST_COMPS                  1300
+#define IDC_STATIC_SUMMARY              1301
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -541,9 +544,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        245
+#define _APS_NEXT_RESOURCE_VALUE        246
 #define _APS_NEXT_COMMAND_VALUE         33040
-#define _APS_NEXT_CONTROL_VALUE         1300
+#define _APS_NEXT_CONTROL_VALUE         1302
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

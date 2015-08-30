@@ -27,6 +27,7 @@
 #include "../KeePassLibCpp/Util/StrUtil.h"
 #include "../KeePassLibCpp/Util/PwUtil.h"
 #include "NewGUI/NewGUICommon.h"
+#include "Util/PrivateConfigEx.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -94,7 +95,7 @@ BOOL CEntryListDlg::OnInitDialog()
 
 	m_cList.SetImageList(m_pImgList, LVSIL_SMALL);
 
-	int nColWidth = 160;
+	const int nColWidth = 160;
 	int aColWidths[5];
 
 	if(m_nDisplayMode != ELDMODE_LIST_ATITEMS)
@@ -121,10 +122,9 @@ BOOL CEntryListDlg::OnInitDialog()
 	m_cList.InsertColumn(4, TRL("Expires"), LVCFMT_LEFT, aColWidths[4], 4);
 	m_cList.InsertColumn(5, TRL("UUID"), LVCFMT_LEFT, 0, 5);
 
-	LPARAM dw = 0;
-	dw |= LVS_EX_SI_REPORT | LVS_EX_FULLROWSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_UNDERLINEHOT;
-	dw |= LVS_EX_HEADERDRAGDROP | LVS_EX_INFOTIP | LVS_EX_GRIDLINES;
-	m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, dw);
+	LPARAM dwStyle = (LVS_EX_SI_REPORT | LVS_EX_FULLROWSELECT | LVS_EX_ONECLICKACTIVATE |
+		LVS_EX_UNDERLINEHOT | LVS_EX_HEADERDRAGDROP | LVS_EX_INFOTIP | LVS_EX_GRIDLINES);
+	m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, dwStyle);
 
 	PW_ENTRY *p;
 	DWORD i;
@@ -166,10 +166,11 @@ BOOL CEntryListDlg::OnInitDialog()
 
 		PW_TIME tNow;
 		_GetCurrentPwTime(&tNow);
-		const DWORD dwDateNow = ((DWORD)tNow.shYear << 16) |
-			((DWORD)tNow.btMonth << 8) | ((DWORD)tNow.btDay & 0xFF);
+		const DWORD dwDateNow = ((DWORD)tNow.shYear * 13 * 32) +
+			((DWORD)tNow.btMonth * 32) + ((DWORD)tNow.btDay & 0xFF);
+		const DWORD dwSoonToExpireDays = _GetSoonToExpireDays();
 
-		for(i = 0; i < m_pMgr->GetNumberOfEntries(); i++)
+		for(i = 0; i < m_pMgr->GetNumberOfEntries(); ++i)
 		{
 			p = m_pMgr->GetEntry(i);
 			ASSERT(p != NULL); if(p == NULL) continue;
@@ -191,10 +192,10 @@ BOOL CEntryListDlg::OnInitDialog()
 			{
 				if((m_nDisplayMode == ELDMODE_SOONTOEXP) || (m_nDisplayMode == ELDMODE_EXPSOONEXP))
 				{
-					const DWORD dwDate = ((DWORD)p->tExpire.shYear << 16) |
-						((DWORD)p->tExpire.btMonth << 8) | ((DWORD)p->tExpire.btDay & 0xFF);
+					const DWORD dwDate = ((DWORD)p->tExpire.shYear * 13 * 32) +
+						((DWORD)p->tExpire.btMonth * 32) + ((DWORD)p->tExpire.btDay & 0xFF);
 
-					if((dwDate >= dwDateNow) && ((dwDate - dwDateNow) <= PWV_SOONTOEXPIRE_DAYS))
+					if((dwDate >= dwDateNow) && ((dwDate - dwDateNow) <= dwSoonToExpireDays))
 						_AddEntryToList(p, FALSE);
 				}
 			}
@@ -218,11 +219,13 @@ BOOL CEntryListDlg::OnInitDialog()
 void CEntryListDlg::OnOK() 
 {
 	SaveSelectedEntry();
+	m_cList.SetImageList(NULL, LVSIL_SMALL);
 	CDialog::OnOK();
 }
 
 void CEntryListDlg::OnCancel() 
 {
+	m_cList.SetImageList(NULL, LVSIL_SMALL);
 	CDialog::OnCancel();
 }
 
@@ -338,4 +341,14 @@ void CEntryListDlg::OnReturnEntryList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = 0;
 	OnOK();
+}
+
+DWORD _GetSoonToExpireDays()
+{
+	CPrivateConfigEx cfg(FALSE);
+
+	std::basic_string<TCHAR> str = cfg.GetSafe(PWMKEY_SOONTOEXPIREDAYS);
+	if(str.size() == 0) return PWV_SOONTOEXPIRE_DAYS;
+
+	return static_cast<DWORD>(_ttol(str.c_str()));
 }

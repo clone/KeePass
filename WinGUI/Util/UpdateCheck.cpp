@@ -18,6 +18,8 @@
 */
 
 #include "StdAfx.h"
+
+/*
 #include "UpdateCheck.h"
 #include "../../KeePassLibCpp/PwManager.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
@@ -51,10 +53,10 @@ void CheckForUpdateAsync(HWND hParent, DWORD dwCurVer, LPCTSTR lpLatestURL, BOOL
 void CFU_Report(LPCTSTR lpInfo, int nIcon)
 {
 	if(g_bCacheForeground == TRUE)
-		MessageBox(g_hCacheParent, lpInfo, TRL("Check For Update"), nIcon | MB_OK);
+		MessageBox(g_hCacheParent, lpInfo, TRL("Check For Updates"), nIcon | MB_OK);
 	else
 	{
-		std::basic_string<TCHAR> str = TRL("Check For Update");
+		std::basic_string<TCHAR> str = TRL("Check For Updates");
 		str += _T(": ");
 		str += lpInfo;
 		CKpApiImpl::Instance().SetStatusBarText(str.c_str());
@@ -120,7 +122,7 @@ DWORD WINAPI CFU_Thread(LPVOID lpParameter)
 					str += TRL("Do you want to visit the KeePass homepage now?");
 
 					int n = MessageBox(g_hCacheParent, str.c_str(),
-						TRL("Check For Update"), MB_ICONINFORMATION | MB_YESNO);
+						TRL("Check For Updates"), MB_ICONINFORMATION | MB_YESNO);
 
 					if(n == IDYES)
 						ShellExecute(g_hCacheParent, NULL, PWM_HOMEPAGE, NULL, NULL, 0);
@@ -135,7 +137,8 @@ DWORD WINAPI CFU_Thread(LPVOID lpParameter)
 		}
 		else CFU_Report(TRL("Cache error (cannot open cached file)."), MB_ICONSTOP);
 	}
-	else CFU_Report(TRL("Connect failed, cannot check for update."), MB_ICONSTOP);
+	else CFU_Report(TRL("Connect failed, cannot check for updates."), MB_ICONSTOP);
 
 	return 0;
 }
+*/
