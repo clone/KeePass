@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Auto-Type feature</title>
+	<link rel="stylesheet" type="text/css" href="default.css" />
+</head>
+<body>
+
+<table class="tablebox"><tr><td class="boxtitle">
+<img src="images/movepaper.gif" width="31px" height="21px" class="singleimg">
+Auto-Type feature</td></tr></table>
+<br />
+<ul>
+<li><a href="#autobasic">Basic information about the auto-type feature</a></li>
+<li><a href="#autowindow">Global auto-type hotkey, defining the target window</a></li>
+<li><a href="#autoexample">An example</a></li>
+</ul>
+
+<a name="autobasic"></a>
+<hr class="separator" />
+
+KeePass features an "auto-type" functionality. This feature allows you to define
+a sequence of key presses, which KeePass can automatically perform for you. The
+simulated key presses can be sent to any window of your choice (browser, ...).<br />
+<br />
+For normal entries the default auto-type sequence is:<br />
+<br />
+<b>{USERNAME}{TAB}{PASSWORD}{ENTER}</b><br />
+<br />
+For TANs the default is: <b>{PASSWORD}</b> (i.e. it just types the TAN).<br />
+<br />
+If you don't define your own auto-type sequence, these sequences are sent. {USERNAME}
+is replaced by the username field contents of the currently selected entry.
+{TAB} simulates a TAB keypress, {PASSWORD} enters the password of the entry and
+{ENTER} finally simulates an ENTER keypress.<br />
+<br />
+But you can freely define your own Auto-Type sequence: simply write the sequence into the
+<b>notes field</b> of the entry, prefixed with &quot;<code>Auto-Type:</code>&quot;.
+Your notes could look something like this:<br />
+<br />
+<pre>You can write any notes here.
+My e-mail I used to register: test@nowhere.com
+
+<b>Auto-Type: {USERNAME}{TAB}{TAB}Some fixed string{TAB}{PASSWORD}{ENTER}</b>
+
+Here you can continue with your notes if you wish...</pre>
+
+As you can see, the only important thing is that the auto-type sequence is prefixed
+using "<code>Auto-Type:</code>" and is one single line. An auto-type sequence cannot be defined
+using two or more lines. If you define two auto-type sequences, the first one is used.<br />
+<br />
+KeePass supports the following tags that are automatically substituted by their
+field contents:
+<br /><br />
+<center><table class="tablebox75">
+<tr><td class="smallboxtitle" width="50%">Field</td><td class="smallboxtitle" width="50%">Code</td></tr>
+<tr><td class="boxcontent" width="50%">Title field</td><td class="boxcontent" width="50%">{TITLE} or %TITLE%</td></tr>
+<tr><td class="boxcontent" width="50%">Username field</td><td class="boxcontent" width="50%">{USERNAME} or %USERNAME%</td></tr>
+<tr><td class="boxcontent" width="50%">URL field</td><td class="boxcontent" width="50%">{URL} or %URL%</td></tr>
+<tr><td class="boxcontent" width="50%">Password field</td><td class="boxcontent" width="50%">{PASSWORD} or %PASSWORD%</td></tr>
+<tr><td class="boxcontent" width="50%">Notes field</td><td class="boxcontent" width="50%">{NOTES} or %NOTES%</td></tr>
+</table></center>
+<br />
+In the example above, {TAB} has been substituted by a TAB keypress. The following codes
+for special keys are supported:<br />
+<br />
+<center><table class="tablebox75">
+<tr><td class="smallboxtitle" width="50%">Special key</td><td class="smallboxtitle" width="50%">Code</td></tr>
+<tr><td class="boxcontent" width="50%">Space</td><td class="boxcontent" width="50%">{SPACE}</td></tr>
+<tr><td class="boxcontent" width="50%">Backspace</td><td class="boxcontent" width="50%">{BACKSPACE}, {BS} or {BKSP}</td></tr>
+<tr><td class="boxcontent" width="50%">Break</td><td class="boxcontent" width="50%">{BREAK}</td></tr>
+<tr><td class="boxcontent" width="50%">Caps Lock</td><td class="boxcontent" width="50%">{CAPSLOCK}</td></tr>
+<tr><td class="boxcontent" width="50%">Del or Delete</td><td class="boxcontent" width="50%">{DEL} or {DELETE}</td></tr>
+<tr><td class="boxcontent" width="50%">End</td><td class="boxcontent" width="50%">{END}</td></tr>
+<tr><td class="boxcontent" width="50%">Enter</td><td class="boxcontent" width="50%">{ENTER}</td></tr>
+<tr><td class="boxcontent" width="50%">Esc</td><td class="boxcontent" width="50%">{ESC}</td></tr>
+<tr><td class="boxcontent" width="50%">Help</td><td class="boxcontent" width="50%">{HELP}</td></tr>
+<tr><td class="boxcontent" width="50%">Home</td><td class="boxcontent" width="50%">{HOME}</td></tr>
+<tr><td class="boxcontent" width="50%">Ins or Insert</td><td class="boxcontent" width="50%">{INS}</td></tr>
+<tr><td class="boxcontent" width="50%">Num Lock</td><td class="boxcontent" width="50%">{NUMLOCK}</td></tr>
+<tr><td class="boxcontent" width="50%">Scroll lock</td><td class="boxcontent" width="50%">{SCROLL}</td></tr>
+<tr><td class="boxcontent" width="50%">Page down</td><td class="boxcontent" width="50%">{PGDN}</td></tr>
+<tr><td class="boxcontent" width="50%">Page up</td><td class="boxcontent" width="50%">{PGUP}</td></tr>
+<tr><td class="boxcontent" width="50%">Print screen</td><td class="boxcontent" width="50%">{PRTSC}</td></tr>
+<tr><td class="boxcontent" width="50%">Arrow left</td><td class="boxcontent" width="50%">{LEFT}</td></tr>
+<tr><td class="boxcontent" width="50%">Arrow right</td><td class="boxcontent" width="50%">{RIGHT}</td></tr>
+<tr><td class="boxcontent" width="50%">Arrow up</td><td class="boxcontent" width="50%">{UP}</td></tr>
+<tr><td class="boxcontent" width="50%">Arrow down</td><td class="boxcontent" width="50%">{DOWN}</td></tr>
+<tr><td class="boxcontent" width="50%">F1 ... F16</td><td class="boxcontent" width="50%">{F1} ... {F16}</td></tr>
+<tr><td class="boxcontent" width="50%">Keypad add</td><td class="boxcontent" width="50%">{ADD}</td></tr>
+<tr><td class="boxcontent" width="50%">Keypad subtract</td><td class="boxcontent" width="50%">{SUBTRACT}</td></tr>
+<tr><td class="boxcontent" width="50%">Keypad multiply</td><td class="boxcontent" width="50%">{MULTIPLY}</td></tr>
+<tr><td class="boxcontent" width="50%">Keypad divide</td><td class="boxcontent" width="50%">{DIVIDE}</td></tr>
+<tr><td class="boxcontent" width="50%">+</td><td class="boxcontent" width="50%">{PLUS}</td></tr>
+<tr><td class="boxcontent" width="50%">@</td><td class="boxcontent" width="50%">{AT}</td></tr>
+<tr><td class="boxcontent" width="50%">%</td><td class="boxcontent" width="50%">{PERCENT}</td></tr>
+<tr><td class="boxcontent" width="50%">Apps</td><td class="boxcontent" width="50%">{APPS}</td></tr>
+<tr><td class="boxcontent" width="50%">^</td><td class="boxcontent" width="50%">{CARET}</td></tr>
+<tr><td class="boxcontent" width="50%">~</td><td class="boxcontent" width="50%">{TILDE}</td></tr>
+<tr><td class="boxcontent" width="50%">{ }</td><td class="boxcontent" width="50%">{LEFTBRACE} {RIGHTBRACE}</td></tr>
+<tr><td class="boxcontent" width="50%">( )</td><td class="boxcontent" width="50%">{LEFTPAREN} {RIGHTPAREN}</td></tr>
+<tr><td class="boxcontent" width="50%">Windows key left, right</td><td class="boxcontent" width="50%">{WINL} {WINR}</td></tr>
+<tr><td class="boxcontent" width="50%">Windows key</td><td class="boxcontent" width="50%">{WIN} (equ. to WINL)</td></tr>
+<tr><td class="boxcontent" width="50%">Windows key</td><td class="boxcontent" width="50%">@</td></tr>
+<tr><td class="boxcontent" width="50%">Shift</td><td class="boxcontent" width="50%">+</td></tr>
+<tr><td class="boxcontent" width="50%">Control</td><td class="boxcontent" width="50%">^</td></tr>
+<tr><td class="boxcontent" width="50%">Alt</td><td class="boxcontent" width="50%">%</td></tr>
+</table></center>
+<br />
+Additionally, some special commands are supported:
+<br /><br />
+
+<center><table class="tablebox75">
+<tr><td class="smallboxtitle" width="50%">Command syntax</td><td class="smallboxtitle" width="50%">Action</td></tr>
+<tr><td class="boxcontent" width="50%">{VKEY X}</td><td class="boxcontent" width="50%">Sends the VKEY of value X.</td></tr>
+<tr><td class="boxcontent" width="50%">{BEEP X Y}</td><td class="boxcontent" width="50%">Beeps with a frequency of X and a duration of Y milliseconds.</td></tr>
+<tr><td class="boxcontent" width="50%">{DELAY X}</td><td class="boxcontent" width="50%">Delays X milliseconds.</td></tr>
+<tr><td class="boxcontent" width="50%">{DELAY=X}</td><td class="boxcontent" width="50%">Sets the default delay to X milliseconds for all following keypresses.</td></tr>
+<tr><td class="boxcontent" width="50%">{APPACTIVATE WindowTitle}</td><td class="boxcontent" width="50%">Activates the window "WindowTitle".</td></tr>
+<tr><td class="boxcontent" width="50%">{APPDIR}</td><td class="boxcontent" width="50%">Will be replaced by the current application directory path.</td></tr>
+<tr><td class="boxcontent" width="50%">{CLEARFIELD}</td><td class="boxcontent" width="50%">Clears the contents of the edit control that currently has the focus.</td></tr>
+</table></center>
+<br /><br />
+Here are some examples:<br />
+<br />
+<b>{DELAY=50}{WIN}{UP}{UP}{UP}{ENTER}notepad{ENTER}</b><br />
+Starts Notepad.<br />
+<br />
+<b>{TITLE}{TAB}{USERNAME}{TAB}{PASSWORD}{ENTER}</b><br />
+Types the title, a tab, the username, a tab and the password of the currently selected item.<br />
+<br />
+<b>{TAB}{PASSWORD}{ENTER}</b><br />
+Presses the tab key, enters the password and presses return.<br />
+<br />
+<hr class="separator" /><br />
+<br />
+<b>Toggling checkboxes</b><br />
+<br />
+Sometimes you find checkboxes on websites (<i>&quot;Stay logged in on this computer&quot;</i> for example).
+You can toggle these checkboxes by sending a space character (<code>{SPACE}</code>)
+when auto-typing.
+An example:<br />
+<code>{USERNAME}{TAB}{PASSWORD}{TAB}{SPACE}{TAB}{ENTER}</code><br />
+If there is a webform with a username field, password field and a checkbox, this sequence would
+enter the username, the password and toggle the checkbox that follows the password control.<br />
+<br />
+<br />
+<b>Higher ANSI Characters</b><br />
+<br />
+The auto-type function supports sending of higher ANSI characters in range 126-255.<br />
+<br /><br /><br />
+
+<a name="autowindow"></a>
+<table class="tablebox"><tr><td class="boxtitle">
+&nbsp;Global Auto-Type Hotkey, Defining The Target Window</td></tr></table>
+<br />
+KeePass supports a global hotkey, which executes the auto-type sequence of an entry as described above. When
+the hotkey is pressed, KeePass looks through all entries and compares their auto-type window associations
+with the actual current/active window title. If one matches, KeePass executes the auto-type sequence of that
+entry.<br />
+<br />
+Similarly to the auto-type sequence string in the notes field above, you can define the matching window:
+
+<pre>You can write any notes here.
+My e-mail I used to register: test@nowhere.com
+
+Auto-Type: {USERNAME}{TAB}{TAB}Some fixed string{TAB}{PASSWORD}{ENTER}
+<b>Auto-Type-Window: PayPal - Welcome*</b>
+
+Here you can continue with your notes if you wish...</pre>
+
+If you now have a window open that starts with &quot;PayPal - Welcome&quot; and press the global
+auto-type hotkey combination, KeePass performs the auto-type sequence above.<br />
+<br />
+You can define as many <code>Auto-Type-Window</code> strings per entry as you wish; an entry can have multiple
+window targets.<br />
+<br />
+If multiple entries match a window, KeePass will display a selection dialog.<br />
+<br />
+The default Auto-Type-Window string is <b>*{TITLE}*</b>. So, if you don't define your
+own <code>Auto-Type-Window</code> string, KeePass will compare the titles of your entries with
+the actual window title and if an entry title is a substring of the window title,
+that entry is auto-typed.<br />
+<br />
+As you can see in the example above, you can use simple wildcards:<br />
+<br />
+<center><table class="tablebox75">
+<tr><td class="smallboxtitle" width="25%" nowrap="nowrap">String with wildcard</td><td class="smallboxtitle" width="75%">Meaning</td></tr>
+<tr><td class="boxcontent" width="25%">STRING</td><td class="boxcontent" width="75%">Matches all window titles that are named exactly &quot;STRING&quot;.</td></tr>
+<tr><td class="boxcontent" width="25%">STRING*</td><td class="boxcontent" width="75%">Matches all window titles that start with &quot;STRING&quot;.</td></tr>
+<tr><td class="boxcontent" width="25%">*STRING</td><td class="boxcontent" width="75%">Matches all window titles that end with &quot;STRING&quot;.</td></tr>
+<tr><td class="boxcontent" width="25%">*STRING*</td><td class="boxcontent" width="75%">Matches all window titles that have &quot;STRING&quot; somewhere in the window title. This includes the string being directly at the start or at the end of the window title.</td></tr>
+</table></center>
+<br />
+Other wildcards aren't supported. The * wildcard must not be in the middle of a string.<br />
+<br />
+For example, this is invalid: &quot;<code>*Windows*Explorer*</code>&quot;.
+This won't match &quot;<code>Windows Explorer</code>&quot;,
+it will only match &quot;<code>Windows*Explorer</code>&quot;,
+i.e. the middle * character is treated as '*' character instead of a wildcard.<br />
+<br /><br /><br />
+
+<a name="autoexample"></a>
+<table class="tablebox"><tr><td class="boxtitle">
+&nbsp;An example</td></tr></table>
+<br />
+Now let's have a look at a real-world example: logging in at PayPal. Write the following into the notes field
+of your PayPal entry:
+
+<pre>Auto-Type: {USERNAME}{TAB}{PASSWORD}{ENTER}
+Auto-Type-Window: PayPal - Welcome*</pre>
+
+Assume you have set the global auto-type hotkey to <i>Ctrl-Alt-A</i> in the options dialog (you can change the hotkey there).
+KeePass is running in the background, you have opened your database and the workspace is unlocked.<br />
+<br />
+When you now navigate to the PayPal website and are being prompted for your username and password,
+just click into the username field and press <i>Ctrl-Alt-A</i>. KeePass enters the
+username and password for you! Can it be easier?<br />
+<br />
+And last but not least: since we have used a wildcard, it'll won't just work in one browser window, it'll even work
+with different browsers! Mozilla Firefox and Internet Explorer both put the page title first in the window title, followed
+by the product name (i.e. <i>&quot;PayPal - Welcome - Internet Explorer&quot;</i> and
+<i>&quot;PayPal - Welcome - Mozilla Firefox&quot;</i>).
+That means, that the sequence above will work for both browsers. Most other browsers create
+their window titles in the same way and the window definition sequence will work with them, too.<br />
+<br /><br /><br />
+
+<table class="tablebox"><tr><td class="boxtitle">
+&nbsp;Thanks and acknowledgements</td></tr></table>
+<br />
+KeePass uses the <code>CSendKeys</code> engine, which can be found here:
+<a href="http://www.codeproject.com/cpp/sendkeys_cpp_Article.asp"
+target="_blank">http://www.codeproject.com/cpp/sendkeys_cpp_Article.asp</a>. Thanks to Lallous
+for creating this nice C++ class!<br />
+<br />
+<hr class="separator" />
+<small>PayPal is a registered trademark of PayPal, Inc. It is used for
+demonstration purposes only, not for advertisement.</small>
+
+</body>
+</html>
+
