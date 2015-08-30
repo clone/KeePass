@@ -1,3 +1,31 @@
+06/10/14 - 1.06
+- Locking workspace when locking Windows or switching user is
+  now optional (see Security tab, option disabled by default)
+- Improved password quality estimation algorithm
+- Improved auto-type window focusing; it is recommended that
+  you try the new default auto-type method (i.e. not the
+  alternative one)
+- Implemented remote control (feature disabled by default)
+- After performing a search and opening the Add Entry window,
+  the first top-level group is selected by default instead of
+  the search results group
+- Added a few icons to the client icons list (password list)
+- Last access time is now updated on auto-typing (both context
+  menu invokation and global auto-type hot key)
+- Improved KeePass startup performance (BCMenu)
+- Changed default button in 'Overwrite Key-File' dialog
+- Improved update-checking messages
+- Renamed "Expire Time" to "Expiration Time"
+- Improved support for empty databases
+- Fixed tab order in Add/Edit Entry dialog
+- Improved handling of Windows session ending
+- Databases are saved before logging off from Windows
+- The 'Save' toolbar button is grayed (but pressable) if the
+  database hasn't been modified
+- Strings containing quotes are now passed correctly over the
+  command-line
+- Clearified some messages
+
 06/05/19 - 1.05
 - KeePass is now developed and compiled using Visual Studio
   2005 (with MFC 8.0); older compilers and IDEs aren't

@@ -22,7 +22,7 @@
 
 #include "../SysDefEx.h"
 
-#define MAX_TRANSLATION_STRINGS 540
+#define MAX_TRANSLATION_STRINGS 556
 
 // Translate a string
 #ifndef _UNICODE

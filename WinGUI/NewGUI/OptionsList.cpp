@@ -33,6 +33,8 @@ static char THIS_FILE[] = __FILE__;
 
 COptionsList::COptionsList()
 {
+	m_bTwoColumns = FALSE;
+
 	m_ptrs.clear();
 	m_ptrsLinked.clear();
 	m_aLinkType.clear();
@@ -55,10 +57,12 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 
-void COptionsList::InitOptionListEx(CImageList *pImages)
+void COptionsList::InitOptionListEx(CImageList *pImages, BOOL bTwoColumns)
 {
 	ASSERT(pImages != NULL); if(pImages == NULL) return;
 	m_pImages = pImages;
+
+	m_bTwoColumns = bTwoColumns;
 
 	PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_SI_MENU | LVS_EX_FULLROWSELECT);
 
@@ -68,7 +72,11 @@ void COptionsList::InitOptionListEx(CImageList *pImages)
 	RECT rect;
 	GetClientRect(&rect);
 	int nWidth = rect.right - rect.left - GetSystemMetrics(SM_CXVSCROLL) - 8;
+	if(m_bTwoColumns == TRUE) nWidth /= 2;
 	InsertColumn(0, TRL("Options"), LVCFMT_LEFT, nWidth, 0);
+
+	if(m_bTwoColumns == TRUE)
+		InsertColumn(1, TRL("Value"), LVCFMT_LEFT, nWidth, 1);
 }
 
 void COptionsList::OnClick(NMHDR* pNMHDR, LRESULT* pResult) 
@@ -84,7 +92,7 @@ void COptionsList::OnClick(NMHDR* pNMHDR, LRESULT* pResult)
 	UINT nFlags = 0;
 	int nHitItem = HitTest(pointM, &nFlags);
 
-	if((nFlags & LVHT_ONITEM) && (nHitItem >= 0))
+	if(((nFlags & LVHT_ONITEM) != 0) && (nHitItem >= 0))
 	{
 		BOOL *pb = (BOOL *)m_ptrs[nHitItem];
 
@@ -199,4 +207,24 @@ void COptionsList::AddCheckItem(LPCTSTR lpItemText, BOOL *pValueStorage, BOOL *p
 	lvi.iIndent = 1;
 
 	InsertItem(&lvi);
+}
+
+void COptionsList::AddCheckItemEx(LPCTSTR lpItemText, LPCTSTR lpSubItemText, BOOL *pValueStorage, BOOL *pLinkedValue, int nLinkType)
+{
+	AddCheckItem(lpItemText, pValueStorage, pLinkedValue, nLinkType);
+	if(m_bTwoColumns == FALSE) return;
+
+	ASSERT(lpSubItemText != NULL); if(lpSubItemText == NULL) return;
+
+	LV_ITEM lvi;
+
+	ZeroMemory(&lvi, sizeof(LV_ITEM));
+
+	lvi.mask = LVIF_TEXT;
+	lvi.iItem = GetItemCount() - 1;
+	lvi.iSubItem = 1;
+	lvi.pszText = (LPTSTR)lpSubItemText;
+	lvi.cchTextMax = _tcslen(lpSubItemText);
+
+	SetItem(&lvi);
 }

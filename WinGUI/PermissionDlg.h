@@ -17,8 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___PERMISSIONS_DLG_H___
-#define ___PERMISSIONS_DLG_H___
+#pragma once
 
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/XPStyleButtonST.h"
@@ -50,7 +49,6 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	virtual void OnCancel();
-public:
 	afx_msg void OnBnClickedReadOnly();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 public:
@@ -60,5 +58,3 @@ public:
 public:
 	CString m_strApp;
 };
-
-#endif // ___PERMISSIONS_DLG_H___

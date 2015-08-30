@@ -121,7 +121,7 @@ void CAddGroupDlg::OnOK()
 	strTest.MakeLower();
 	if(strTest == strRef)
 	{
-		MessageBox(TRL("The group you selected cannot store entries. Please select an other group."),
+		MessageBox(TRL("The group you selected cannot store entries. Please select a different group."),
 			TRL("Stop"), MB_ICONWARNING | MB_OK);
 		return;
 	}

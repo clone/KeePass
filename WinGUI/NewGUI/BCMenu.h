@@ -276,7 +276,7 @@ protected:
 	// void GetFadedBitmap(CBitmap &bmp);
 	// void GetTransparentBitmap(CBitmap &bmp);
 	void GetDisabledBitmap(CBitmap &bmp,COLORREF background=0);
-	void GetShadowBitmap(CBitmap &bmp);
+	// void GetShadowBitmap(CBitmap &bmp);
 	int AddToGlobalImageList(CImageList *il,int xoffset,int nID);
 	int GlobalImageListOffset(int nID);
 	BOOL CanDraw3DImageList(int offset);

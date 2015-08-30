@@ -19,6 +19,7 @@
 
 #include "StdAfx.h"
 #include <math.h>
+#include <map>
 
 #include "PwUtil.h"
 #include "MemUtil.h"
@@ -39,7 +40,9 @@ C_FN_SHARE DWORD EstimatePasswordBits(LPCTSTR pszPassword)
 	BOOL bChSimpleSpecial = FALSE, bChExtSpecial = FALSE, bChHigh = FALSE;
 	BOOL bChEscape = FALSE;
 	TCHAR tch;
-	double dblBitsPerChar;
+	double dblBitsPerChar, dblEffectiveLength = 0.0;
+	std::map<TCHAR, unsigned int> vCharCounts;
+	std::map<int, unsigned int> vDifferences;
 
 	ASSERT(pszPassword != NULL); if(pszPassword == NULL) return 0;
 
@@ -59,6 +62,31 @@ C_FN_SHARE DWORD EstimatePasswordBits(LPCTSTR pszPassword)
 		if((tch >= _T('[')) && (tch <= _T('`'))) bChExtSpecial = TRUE;
 		if((tch >= _T('{')) && (tch <= _T('~'))) bChExtSpecial = TRUE;
 		if(tch > _T('~')) bChHigh = TRUE;
+
+		double dblDiffFactor = 1.0;
+		if(i >= 1)
+		{
+			int iDiff = (int)tch - (int)pszPassword[i - 1];
+
+			if(vDifferences.find(iDiff) == vDifferences.end())
+				vDifferences[iDiff] = 1;
+			else
+			{
+				vDifferences[iDiff] = vDifferences[iDiff] + 1;
+				dblDiffFactor /= (double)vDifferences[iDiff];
+			}
+		}
+
+		if(vCharCounts.find(tch) == vCharCounts.end())
+		{
+			vCharCounts[tch] = 1;
+			dblEffectiveLength += dblDiffFactor;
+		}
+		else
+		{
+			vCharCounts[tch] = vCharCounts[tch] + 1;
+			dblEffectiveLength += dblDiffFactor * (1.0 / (double)vCharCounts[tch]);
+		}
 	}
 
 	dwCharSpace = 0;
@@ -73,7 +101,7 @@ C_FN_SHARE DWORD EstimatePasswordBits(LPCTSTR pszPassword)
 	ASSERT(dwCharSpace != 0); if(dwCharSpace == 0) return 0;
 
 	dblBitsPerChar = log((double)dwCharSpace) / log(2.00);
-	dwBits = (DWORD)(ceil(dblBitsPerChar * (double)dwLen));
+	dwBits = (DWORD)(ceil(dblBitsPerChar * dblEffectiveLength));
 
 	ASSERT(dwBits != 0);
 	return dwBits;

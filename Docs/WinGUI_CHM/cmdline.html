@@ -2,16 +2,16 @@
 
 <html>
 <head>
-	<title>Command-Line Options</title>
+	<title>Command Line Options</title>
 	<link rel="stylesheet" type="text/css" href="default.css" />
 </head>
 <body>
 
 <table class="tablebox"><tr><td class="boxtitle">
 <img src="images/movepaper.gif" width="31px" height="21px" class="singleimg">
-Command-Line Options</td></tr></table>
+Command Line Options</td></tr></table>
 <br />
-You can pass a file path in the command-line in order to tell KeePass to open
+You can pass a file path in the command line in order to tell KeePass to open
 this file immediately after startup. Additionally, you can specify the password
 and/or key-file location for this database. Switches can be either prefixed using
 a slash (/) or a minus (-).<br />
@@ -20,7 +20,7 @@ The database file location is passed as argument. Only one database file is allo
 If the path contains a space, it must be enclosed in quotes (&quot;).<br />
 <br />
 Passwords are passed using the <code>-pw:</code> switch. In order to
-pass 'abc' as password, you would add the following argument to the command-line:
+pass 'abc' as password, you would add the following argument to the command line:
 <code>-pw:abc</code>. Note that there's no space between the ':' and the
 password.<br />
 <br />
@@ -31,7 +31,7 @@ exists. The same rules as above apply, just that you specify the key-file locati
 In order to just pre-select a drive, without specifying the concrete key-file location
 and/or password, use the <code>-preselect:</code> option. For example, if you lock
 your database with a password <i>and</i> a key-disk, but just want to type
-in the password (so, without selecting the key-drive), your command-line would
+in the password (so, without selecting the key-drive), your command line would
 look like this:
 <pre>KeePass.exe "C:\My Documents\MyDatabase.kdb" -preselect:C:\</pre>
 KeePass would then show you a prompt for the password for the database, but in
@@ -64,7 +64,7 @@ the two switches and open your database as follows:
 
 You have your database locked using a password <i>and</i> a key-disk, but only
 want to have the key-disk pre-selected (i.e. you want to get prompted for the
-password only), your command-line would look like:
+password only), your command line would look like:
 <pre>KeePass.exe "C:\My Documents\MyDatabaseWithTwo.kdb" -preselect:F:\</pre>
 
 KeePass would pre-select the drive <code>F:\</code> for you.<br />

@@ -21,6 +21,8 @@
 #define ___KEEPASS_PASSWORD_MANAGER_H___
 
 #include "SysDefEx.h"
+#include <string>
+#include <vector>
 #include "Util/NewRandom.h"
 #include "Crypto/Rijndael.h"
 
@@ -30,11 +32,11 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.05")
+#define PWM_VERSION_STR  _T("1.06")
 #else
-#define PWM_VERSION_STR  _T("1.05 Unicode")
+#define PWM_VERSION_STR  _T("1.06 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01000501
+#define PWM_VERSION_DW   0x01000601
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -137,6 +139,8 @@
 #define PWMKEY_SHOWTANINDICES   _T("KeeShowTANIndices")
 #define PWMKEY_ALLOWSAVEIFMODIFIEDONLY _T("KeeAllowSaveIfModifiedOnly")
 #define PWMKEY_CHECKFORUPDATE   _T("KeeCheckForUpdate")
+#define PWMKEY_LOCKONWINLOCK    _T("KeeLockOnWinLock")
+#define PWMKEY_ENABLEREMOTECTRL _T("KeeEnableRemoteCtrl")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -224,6 +228,10 @@ typedef struct _PW_TIME
 	BYTE btHour;   // Hour, begins with hour 0, max value is 23
 	BYTE btMinute; // Minutes, begins at 0, max value is 59
 	BYTE btSecond; // Seconds, begins at 0, max value is 59
+
+#ifdef VPF_ALIGN
+	BYTE btDummy;
+#endif
 } PW_TIME, *PPW_TIME;
 
 typedef struct _PW_DBHEADER // The database header
@@ -257,6 +265,10 @@ typedef struct _PW_GROUP // Structure containing information about one group
 	PW_TIME tExpire;
 
 	USHORT usLevel;
+
+#ifdef VPF_ALIGN
+	USHORT usDummy;
+#endif
 
 	DWORD dwFlags; // Used by KeePass internally, don't use
 } PW_GROUP, *PPW_GROUP;
@@ -321,6 +333,12 @@ typedef struct _PWDB_REPAIR_INFO
 	DWORD dwOriginalEntryCount;
 	DWORD dwRecognizedMetaStreamCount;
 } PWDB_REPAIR_INFO, *PPWDB_REPAIR_INFO;
+
+typedef struct _PWDB_META_STREAM
+{
+	std::basic_string<TCHAR> strName;
+	std::vector<BYTE> vData;
+} PWDB_META_STREAM;
 
 #pragma pack()
 
@@ -491,6 +509,8 @@ private:
 	BYTE m_pTransformedMasterKey[32]; // Master key encrypted several times
 	int m_nAlgorithm; // Algorithm used to encrypt the database
 	DWORD m_dwKeyEncRounds;
+
+	std::vector<PWDB_META_STREAM> m_vUnknownMetaStreams;
 };
 
 #endif // ___KEEPASS_PASSWORD_MANAGER_H___

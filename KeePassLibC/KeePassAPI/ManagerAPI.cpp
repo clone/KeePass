@@ -89,6 +89,20 @@ KP_SHARE PW_ENTRY *GetEntry(void *pMgr, DWORD dwIndex)
 	return p->GetEntry(dwIndex);
 }
 
+KP_SHARE BOOL GetEntryStruct(void *pMgr, DWORD dwIndex, PW_ENTRY *pe)
+{
+	DECL_MGR_B(pMgr);
+
+	const PW_ENTRY *peSource = p->GetEntry(dwIndex);
+	if((peSource != NULL) && (pe != NULL))
+	{
+		*pe = *peSource;
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
 KP_SHARE PW_ENTRY *GetEntryByGroup(void *pMgr, DWORD idGroup, DWORD dwIndex)
 {
 	DECL_MGR_P(pMgr);
@@ -131,6 +145,20 @@ KP_SHARE PW_GROUP *GetGroup(void *pMgr, DWORD dwIndex)
 {
 	DECL_MGR_P(pMgr);
 	return p->GetGroup(dwIndex);
+}
+
+KP_SHARE BOOL GetGroupStruct(void *pMgr, DWORD dwIndex, PW_GROUP *pGroup)
+{
+	DECL_MGR_B(pMgr);
+
+	PW_GROUP *pg = p->GetGroup(dwIndex);
+	if((pg != NULL) && (pGroup != NULL))
+	{
+		*pGroup = *pg;
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 KP_SHARE PW_GROUP *GetGroupById(void *pMgr, DWORD idGroup)

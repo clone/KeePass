@@ -40,7 +40,7 @@ CPP_FN_SHARE void EraseCString(CString *pString);
 CPP_FN_SHARE void FixURL(CString *pstrURL);
 
 // Replace placeholders in pString by data in pEntry
-CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString);
+CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes);
 
 CPP_FN_SHARE CString CsRemoveMeta(CString *psString);
 

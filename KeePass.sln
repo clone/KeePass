@@ -30,8 +30,8 @@ Global
 		{97E15437-C3A6-4C37-BFE5-12E6211932F1}.Debug Unicode|Win32.Build.0 = Debug|Win32
 		{97E15437-C3A6-4C37-BFE5-12E6211932F1}.Debug|Win32.ActiveCfg = Debug|Win32
 		{97E15437-C3A6-4C37-BFE5-12E6211932F1}.Debug|Win32.Build.0 = Debug|Win32
-		{97E15437-C3A6-4C37-BFE5-12E6211932F1}.Release Unicode|Win32.ActiveCfg = Release|Win32
-		{97E15437-C3A6-4C37-BFE5-12E6211932F1}.Release Unicode|Win32.Build.0 = Release|Win32
+		{97E15437-C3A6-4C37-BFE5-12E6211932F1}.Release Unicode|Win32.ActiveCfg = Release Unicode|Win32
+		{97E15437-C3A6-4C37-BFE5-12E6211932F1}.Release Unicode|Win32.Build.0 = Release Unicode|Win32
 		{97E15437-C3A6-4C37-BFE5-12E6211932F1}.Release|Win32.ActiveCfg = Release|Win32
 		{97E15437-C3A6-4C37-BFE5-12E6211932F1}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection

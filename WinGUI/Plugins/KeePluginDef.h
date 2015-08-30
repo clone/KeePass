@@ -167,6 +167,10 @@ typedef struct
 #define KPM_FILE_CHANGE_MASTER_KEY_PRE 34
 
 #define KPM_FILE_LOCK_PRE 42
+#define KPM_FILE_LOCK_CLOSE_PRE 55
+#define KPM_FILE_LOCK_CLOSE_POST 56
+#define KPM_FILE_UNLOCK_FAILED 57
+
 #define KPM_FILE_EXIT_PRE 8
 
 // Other menu commands
@@ -209,7 +213,7 @@ typedef struct
 #define KPM_GROUP_PRINT_PRE 41
 
 // The following is unused. It's always the last command ID + 1
-#define KPM_NEXT 55
+#define KPM_NEXT 58
 
 /////////////////////////////////////////////////////////////////////////////
 // KeePass query IDs (used in function KP_Query)

@@ -37,6 +37,7 @@ KP_SHARE DWORD GetNumberOfItemsInGroupN(void *pMgr, DWORD idGroup);
 
 // Access entry information
 KP_SHARE PW_ENTRY *GetEntry(void *pMgr, DWORD dwIndex);
+KP_SHARE BOOL GetEntryStruct(void *pMgr, DWORD dwIndex, PW_ENTRY *pe);
 KP_SHARE PW_ENTRY *GetEntryByGroup(void *pMgr, DWORD idGroup, DWORD dwIndex);
 KP_SHARE DWORD GetEntryByGroupN(void *pMgr, DWORD idGroup, DWORD dwIndex);
 KP_SHARE PW_ENTRY *GetEntryByUuid(void *pMgr, const BYTE *pUuid);
@@ -46,6 +47,7 @@ KP_SHARE PW_ENTRY *GetLastEditedEntry(void *pMgr);
 
 // Access group information
 KP_SHARE PW_GROUP *GetGroup(void *pMgr, DWORD dwIndex);
+KP_SHARE BOOL GetGroupStruct(void *pMgr, DWORD dwIndex, PW_GROUP *pGroup);
 KP_SHARE PW_GROUP *GetGroupById(void *pMgr, DWORD idGroup);
 KP_SHARE DWORD GetGroupByIdN(void *pMgr, DWORD idGroup);
 KP_SHARE DWORD GetGroupId(void *pMgr, const TCHAR *pszGroupName);

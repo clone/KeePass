@@ -85,6 +85,8 @@ public:
 	BOOL m_bExitInsteadOfLockAT;
 	BOOL m_bAllowSaveIfModifiedOnly;
 	BOOL m_bCheckForUpdate;
+	BOOL m_bLockOnWinLock;
+	BOOL m_bEnableRemoteCtrl;
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };

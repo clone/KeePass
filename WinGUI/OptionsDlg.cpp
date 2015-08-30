@@ -88,6 +88,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_SECUREEDITS, m_bSecureEdits);
 	DDX_Check(pDX, IDC_CHECK_DEFAULTEXPIRE, m_bDefaultExpire);
 	DDX_Text(pDX, IDC_EDIT_DEFAULTEXPIRE, m_dwDefaultExpire);
+	DDX_Check(pDX, IDC_CHECK_LOCKONWINLOCK, m_bLockOnWinLock);
 	//}}AFX_DATA_MAP
 }
 
@@ -154,6 +155,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_ROWHIGHLIGHTSEL), OPTGRP_GUI, TRUE);
 
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_LOCKMIN), OPTGRP_SECURITY, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_LOCKONWINLOCK), OPTGRP_SECURITY, TRUE);
 	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY, TRUE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_LOCKAFTERTIME), OPTGRP_SECURITY, TRUE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_LOCKSECONDS), OPTGRP_SECURITY, TRUE);
@@ -189,7 +191,7 @@ BOOL COptionsDlg::OnInitDialog()
 
 	// m_ilOptionIcons.Create(IDR_OPTIONICONS, 16, 1, RGB(255,0,255));
 	CPwSafeApp::CreateHiColorImageList(&m_ilOptionIcons, IDB_OPTIONICONS_EX, 16);
-	m_olAdvanced.InitOptionListEx(&m_ilOptionIcons);
+	m_olAdvanced.InitOptionListEx(&m_ilOptionIcons, FALSE);
 
 	m_olAdvanced.AddGroupText(TRL("Integration"), 9);
 	m_olAdvanced.AddCheckItem(TRL("Start KeePass at Windows startup (for current user)"), &m_bStartWithWindows, NULL, OL_LINK_NULL);
@@ -197,6 +199,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Use alternative auto-type method (minimize window)"), &m_bMinimizeBeforeAT, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Disable all auto-type features"), &m_bDisableAutoType, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Copy URLs to clipboard instead of launching them (exception: cmd:// URLs)"), &m_bCopyURLs, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Enable remote control (allow applications to communicate with KeePass)"), &m_bEnableRemoteCtrl, NULL, OL_LINK_NULL);
 
 	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Start and Exit"), 7);

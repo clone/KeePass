@@ -53,10 +53,12 @@ public:
 	COptionsList();
 	virtual ~COptionsList();
 
-	void InitOptionListEx(CImageList *pImages);
+	void InitOptionListEx(CImageList *pImages, BOOL bTwoColumns);
 
 	void AddGroupText(LPCTSTR lpItemText, int nIcon);
+
 	void AddCheckItem(LPCTSTR lpItemText, BOOL *pValueStorage, BOOL *pLinkedValue, int nLinkType);
+	void AddCheckItemEx(LPCTSTR lpItemText, LPCTSTR lpSubItemText, BOOL *pValueStorage, BOOL *pLinkedValue, int nLinkType);
 
 	//{{AFX_VIRTUAL(COptionsList)
 	//}}AFX_VIRTUAL
@@ -64,6 +66,8 @@ public:
 private:
 	void SetListItemCheck(int nItem, BOOL bCheck);
 	int FindItemPointer(void *p);
+
+	BOOL m_bTwoColumns;
 
 	CImageList *m_pImages;
 	std::vector<void *> m_ptrs;

@@ -20,19 +20,17 @@
 #include "StdAfx.h"
 #include "PwSafe.h"
 #include "PermissionDlg.h"
-
+#include "Util/RemoteControl.h"
 #include "NewGUI/NewGUICommon.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
-#include "Util/RemoteControl.h"
 
 IMPLEMENT_DYNAMIC(CPermissionDlg, CDialog)
 
-CPermissionDlg::CPermissionDlg(CWnd* pParent)
+CPermissionDlg::CPermissionDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CPermissionDlg::IDD, pParent)
-	, m_strApp(_T(""))
 {
 	m_nPermission = RC_PERMISSION_DENYACCESS;
-	m_nActivationCountdown = 6;
+	m_nActivationCountdown = 3;
 }
 
 CPermissionDlg::~CPermissionDlg()
@@ -70,13 +68,13 @@ BOOL CPermissionDlg::OnInitDialog()
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEYHOLE),
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("Incoming IPC Request"));
-	m_banner.SetCaption(TRL("An application wants access through inter-process communication"));
+	m_banner.SetCaption(TRL("An application requests access through inter-process communication"));
 
 	m_btnOK.EnableWindow(FALSE);
 	m_btnReadOnly.EnableWindow(FALSE);
 
 	m_btnOK.GetWindowText(m_strBtnOK);
-	m_btnReadOnly.GetWindowTextA(m_strBtnReadOnly);
+	m_btnReadOnly.GetWindowText(m_strBtnReadOnly);
 
 	CString strApp = TRL("Application");
 	strApp += _T(": ");
@@ -134,6 +132,8 @@ void CPermissionDlg::OnTimer(UINT_PTR nIDEvent)
 
 	if((nIDEvent == 1) || (nIDEvent == INITIAL_TIMER_UPDATE_ID))
 	{
+		this->ShowWindow(SW_SHOW);
+
 		if(m_nActivationCountdown == 0)
 		{
 			m_nActivationCountdown = -1;

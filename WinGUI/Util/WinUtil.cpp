@@ -420,10 +420,10 @@ C_FN_SHARE int _OpenLocalFile(LPCTSTR szFile, int nMode)
 	// _GetPathFromFile(szFileTempl, szPath);
 	// _tcscpy_s(szFileTempl, _countof(szFileTempl), szPath);
 	// _tcscat_s(szFileTempl, _countof(szFileTempl), _T("\\"));
-	std::string strPath = Executable::instance().getPathOnly();
+	std_string strPath = Executable::instance().getPathOnly();
 
 	// _tcscat_s(szFileTempl, _countof(szFileTempl), szFile);
-	std::string strFile = strPath;
+	std_string strFile = strPath;
 	strFile += szFile;
 
 #ifndef _WIN32_WCE
@@ -492,14 +492,12 @@ BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD
 
 C_FN_SHARE BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
 {
-	CString str;
-	TCHAR tszBuf[MAX_PATH * 2];
-
 	ASSERT(lpTopicFile != NULL); if(lpTopicFile == NULL) return FALSE;
 
+	TCHAR tszBuf[MAX_PATH * 2];
 	GetApplicationDirectory(tszBuf, MAX_PATH * 2 - 2, TRUE, TRUE);
 
-	str = _T("hh.exe ms-its:");
+	CString str = _T("hh.exe ms-its:");
 	str += tszBuf;
 	str += _T("/");
 	str += PWM_README_FILE;
@@ -507,7 +505,6 @@ C_FN_SHARE BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
 	str += lpTopicFile;
 
 	TWinExec(str, KPSW_SHOWDEFAULT);
-
 	return TRUE;
 }
 

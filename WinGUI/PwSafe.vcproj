@@ -1096,6 +1096,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\PermissionDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="PluginsDlg.cpp"
 				>
 				<FileConfiguration
@@ -1466,6 +1470,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PermissionDlg.h"
+				>
+			</File>
+			<File
 				RelativePath="PluginsDlg.h"
 				>
 			</File>
@@ -1647,6 +1655,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\tb_saved.bmp"
+				>
+			</File>
+			<File
 				RelativePath="res\unlocked.ico"
 				>
 			</File>
@@ -1752,6 +1764,14 @@
 			</File>
 			<File
 				RelativePath="Util\PrivateConfig.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\RemoteControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\RemoteControl.h"
 				>
 			</File>
 			<File
@@ -2995,6 +3015,22 @@
 				</File>
 				<File
 					RelativePath="..\KeePassLibCpp\Util\Base64.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\ComUtil.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\ComUtil.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\EntryUtil.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\EntryUtil.h"
 					>
 				</File>
 				<File

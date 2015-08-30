@@ -253,7 +253,7 @@ CString CPwExport::MakeGroupTreeString(DWORD dwGroupId) const
 	DWORD i;
 	USHORT usLevel;
 	PW_GROUP *pg;
-	CString str = "", strTemp;
+	CString str = _T(""), strTemp;
 
 	pg = m_pMgr->GetGroupById(dwGroupId);
 	ASSERT(pg != NULL); if(pg == NULL) return str;

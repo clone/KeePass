@@ -17,3 +17,6 @@ DEL WinGUI_Distrib\KeePass.ini
 COPY /B ..\Ext\KeePass.ini /B WinGUI_Distrib\KeePass.ini
 
 ..\3rdParty\Upx\upx.exe --best --compress-exports=0 --compress-icons=0 WinGUI_Distrib\KeePass.exe
+
+PAUSE
+CLS

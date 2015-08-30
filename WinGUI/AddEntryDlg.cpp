@@ -254,6 +254,21 @@ BOOL CAddEntryDlg::OnInitDialog()
 	ASSERT(m_nGroupId != -1); // Must have been initialized by parent
 	if(m_nGroupId != -1) m_cbGroups.SetCurSel(m_nGroupId);
 
+	CString strGroupTest;
+	m_cbGroups.GetLBText(m_cbGroups.GetCurSel(), strGroupTest);
+	if(CPwManager::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
+	{
+		for(i = 0; i < (unsigned int)m_pMgr->GetNumberOfGroups(); i++)
+		{
+			if(CPwManager::IsAllowedStoreGroup(m_pMgr->GetGroup(i)->pszGroupName, PWS_SEARCHGROUP))
+			{
+				m_cbGroups.SetCurSel(i);
+				m_nGroupId = i;
+				break;
+			}
+		}
+	}
+
 	// Configure banner control
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_ENTRY_EDIT), KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
@@ -453,7 +468,7 @@ void CAddEntryDlg::OnOK()
 	m_cbGroups.GetLBText(m_cbGroups.GetCurSel(), strGroupTest);
 	if(CPwManager::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
 	{
-		MessageBox(TRL("The group you selected cannot store entries. Please select an other group."),
+		MessageBox(TRL("The group you selected cannot store entries. Please select a different group."),
 			TRL("Stop"), MB_ICONWARNING | MB_OK);
 		return;
 	}
@@ -664,9 +679,7 @@ void CAddEntryDlg::OnSetAttachBtn()
 		if(m_strAttachment == CString(PWS_NEW_ATTACHMENT)) nRet = IDYES;
 		else if(m_strAttachment.IsEmpty() == FALSE)
 		{
-			CString strMsg;
-			
-			strMsg = TRL("There already is a file attached with this entry.");
+			CString strMsg = TRL("There already is a file attached with this entry.");
 			strMsg += _T("\r\n\r\n");
 			strMsg += TRL("Do you want to overwrite the current attachment?");
 			nRet = MessageBox(strMsg, TRL("Overwrite?"), MB_YESNO | MB_ICONQUESTION);

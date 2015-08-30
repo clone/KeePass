@@ -148,7 +148,7 @@ C_FN_SHARE void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 	}
 }
 
-CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString)
+CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes)
 {
 	CString str, strTemp;
 	int nPos;
@@ -165,7 +165,12 @@ CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimStri
 		if(nPos == -1) break;
 
 		if(bMakeSimString == FALSE)
-			str = str.Left(nPos) + pEntry->pszTitle + str.Right(str.GetLength() - nPos - 7);
+		{
+			strTemp = pEntry->pszTitle;
+			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
+			
+			str = str.Left(nPos) + strTemp + str.Right(str.GetLength() - nPos - 7);
+		}
 		else
 			str = str.Left(nPos) + TagSimString(pEntry->pszTitle) + str.Right(str.GetLength() - nPos - 7);
 	}
@@ -177,7 +182,12 @@ CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimStri
 		if(nPos == -1) break;
 
 		if(bMakeSimString == FALSE)
-			str = str.Left(nPos) + pEntry->pszUserName + str.Right(str.GetLength() - nPos - 10);
+		{
+			strTemp = pEntry->pszUserName;
+			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
+			
+			str = str.Left(nPos) + strTemp + str.Right(str.GetLength() - nPos - 10);
+		}
 		else
 			str = str.Left(nPos) + TagSimString(pEntry->pszUserName) + str.Right(str.GetLength() - nPos - 10);
 	}
@@ -189,7 +199,12 @@ CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimStri
 		if(nPos == -1) break;
 
 		if(bMakeSimString == FALSE)
-			str = str.Left(nPos) + pEntry->pszURL + str.Right(str.GetLength() - nPos - 5);
+		{
+			strTemp = pEntry->pszURL;
+			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
+
+			str = str.Left(nPos) + strTemp + str.Right(str.GetLength() - nPos - 5);
+		}
 		else
 			str = str.Left(nPos) + TagSimString(pEntry->pszURL) + str.Right(str.GetLength() - nPos - 5);
 	}
@@ -201,7 +216,12 @@ CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimStri
 		if(nPos == -1) break;
 
 		if(bMakeSimString == FALSE)
-			str = str.Left(nPos) + pEntry->pszPassword + str.Right(str.GetLength() - nPos - 10);
+		{
+			strTemp = pEntry->pszPassword;
+			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
+
+			str = str.Left(nPos) + strTemp + str.Right(str.GetLength() - nPos - 10);
+		}
 		else
 			str = str.Left(nPos) + TagSimString(pEntry->pszPassword) + str.Right(str.GetLength() - nPos - 10);
 	}
@@ -216,6 +236,9 @@ CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimStri
 		{
 			strTemp = pEntry->pszAdditional;
 			strTemp = CsRemoveMeta(&strTemp);
+
+			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
+
 			str = str.Left(nPos) + strTemp + str.Right(str.GetLength() - nPos - 7);
 			EraseCString(&strTemp);
 		}

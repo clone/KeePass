@@ -38,13 +38,16 @@ BOOL CSessionNotify::Register(HWND hWnd)
 {
 	ASSERT(m_hWTSAPI == NULL); Unregister();
 
-	m_hWTSAPI = LoadLibrary("Wtsapi32.dll");
+	m_hWTSAPI = LoadLibrary(_T("Wtsapi32.dll"));
 	if(m_hWTSAPI == NULL) return TRUE; // We're running on Win9x/Win2000?
 
 	m_hTarget = hWnd;
 
-	m_lpWTSRegisterSessionNotification = (LPWTSREGISTERSESSIONNOTIFICATION)GetProcAddress(m_hWTSAPI, _T("WTSRegisterSessionNotification"));
-	m_lpWTSUnRegisterSessionNotification = (LPWTSUNREGISTERSESSIONNOTIFICATION)GetProcAddress(m_hWTSAPI, _T("WTSUnRegisterSessionNotification"));
+	m_lpWTSRegisterSessionNotification = (LPWTSREGISTERSESSIONNOTIFICATION)GetProcAddress(m_hWTSAPI,
+		"WTSRegisterSessionNotification");
+	m_lpWTSUnRegisterSessionNotification = (LPWTSUNREGISTERSESSIONNOTIFICATION)GetProcAddress(m_hWTSAPI,
+		"WTSUnRegisterSessionNotification");
+
 	if(m_lpWTSRegisterSessionNotification != NULL)
 		return m_lpWTSRegisterSessionNotification(hWnd, 0); // 0 = NOTIFY_FOR_THIS_SESSION
 

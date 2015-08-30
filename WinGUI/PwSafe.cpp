@@ -153,7 +153,6 @@ BOOL CPwSafeApp::InitInstance()
 					string = CmdArgs::instance().getPassword() + string;
 				}
 
-
 				const FullPathName& keyfile = CmdArgs::instance().getKeyfile();
 				enum {PATH_EXISTS = FullPathName::PATH_ONLY | FullPathName::PATH_AND_FILENAME};
 				if(keyfile.getState() & PATH_EXISTS && !CmdArgs::instance().preselectIsInEffect())                
@@ -201,14 +200,14 @@ BOOL CPwSafeApp::RegisterShellAssociation()
 	DWORD dw;
 
 	// VERIFY(GetModuleFileName(NULL, tszMe, MAX_PATH * 2 - 2) != 0);
-	std::string strMe = Executable::instance().getFullPathName();
+	std_string strMe = Executable::instance().getFullPathName();
 
 	// HKEY_CLASSES_ROOT/.kdb
 
 	l = RegCreateKey(HKEY_CLASSES_ROOT, _T(".kdb"), &hBase);
 	if(l != ERROR_SUCCESS) return FALSE;
 
-	std::string strTemp = "kdbfile";
+	std_string strTemp = _T("kdbfile");
 	dw = (strTemp.length() + 1) * sizeof(TCHAR);
 	l = RegSetValueEx(hBase, _T(""), 0, REG_SZ, (CONST BYTE *)strTemp.c_str(), dw);
 	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hBase); return FALSE; }
@@ -228,7 +227,7 @@ BOOL CPwSafeApp::RegisterShellAssociation()
 	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hBase); return FALSE; }
 
 	// _tcscpy_s(tszTemp, _countof(tszTemp), _T(""));
-	strTemp = "";
+	strTemp = _T("");
 
 	dw = (strTemp.length() + 1) * sizeof(TCHAR);
 	l = RegSetValueEx(hBase, _T("AlwaysShowExt"), 0, REG_SZ, (CONST BYTE *)strTemp.c_str(), dw);
@@ -240,7 +239,7 @@ BOOL CPwSafeApp::RegisterShellAssociation()
 	// _tcscpy_s(tszTemp, _countof(tszTemp), tszMe);
 	strTemp = strMe;
 	// _tcscat_s(tszTemp, _countof(tszTemp), _T(",0"));
-	strTemp += ",0";
+	strTemp += _T(",0");
 	dw = (strTemp.length() + 1) * sizeof(TCHAR);
 	l = RegSetValueEx(hTemp, _T(""), 0, REG_SZ, (CONST BYTE *)strTemp.c_str(), dw);
 	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hTemp); RegCloseKey(hBase); return FALSE; }
@@ -266,11 +265,11 @@ BOOL CPwSafeApp::RegisterShellAssociation()
 	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) return FALSE;
 
 	// _tcscpy_s(tszTemp, _countof(tszTemp), _T("\""));
-	strTemp = "\"";
+	strTemp = _T("\"");
 	// _tcscat_s(tszTemp, _countof(tszTemp), tszMe);
 	strTemp += strMe;
 	// _tcscat_s(tszTemp, _countof(tszTemp), _T("\" \"%1\""));
-	strTemp += "\" \"%1\"";
+	strTemp += _T("\" \"%1\"");
 	dw = (strTemp.length() + 1) * sizeof(TCHAR);
 	l = RegSetValueEx(hTemp2, _T(""), 0, REG_SZ, (CONST BYTE *)strTemp.c_str(), dw);
 	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hTemp); RegCloseKey(hShell); RegCloseKey(hBase); return FALSE; }
@@ -361,7 +360,7 @@ BOOL CPwSafeApp::SetStartWithWindows(BOOL bAutoStart)
 	if(bAutoStart == TRUE)
 	{
 		// GetModuleFileName(NULL, tszBuf, 510);
-		std::string strBuf = Executable::instance().getFullPathName();
+		std_string strBuf = Executable::instance().getFullPathName();
 
 		DWORD dwSize = (strBuf.length() + 1) * sizeof(TCHAR);
 		l = RegSetValueEx(h, _T("KeePass Password Safe"), 0, REG_SZ, (LPBYTE)strBuf.c_str(), dwSize);

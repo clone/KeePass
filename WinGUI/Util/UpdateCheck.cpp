@@ -54,7 +54,7 @@ void CFU_Report(LPCTSTR lpInfo, int nIcon)
 		MessageBox(g_hCacheParent, lpInfo, TRL("Check For Update"), nIcon | MB_OK);
 	else
 	{
-		std::string str = TRL("Check For Update");
+		std::basic_string<TCHAR> str = TRL("Check For Update");
 		str += _T(": ");
 		str += lpInfo;
 		KP_Call(KPC_STATUSBARTEXT, (LPARAM)str.c_str(), 0, 0);
@@ -107,15 +107,15 @@ DWORD WINAPI CFU_Thread(LPVOID lpParameter)
 				else if(dwVer > g_dwCacheCurVer)
 					CFU_Report(TRL("New KeePass version available!"), MB_ICONINFORMATION);
 				else if(dwVer == g_dwCacheCurVer)
-					CFU_Report(TRL("You got the latest version."), MB_ICONINFORMATION);
+					CFU_Report(TRL("You have the latest version."), MB_ICONINFORMATION);
 				else if((g_dwCacheCurVer >= 0x01000001) && (dwVer == (g_dwCacheCurVer - 1)))
-					CFU_Report(TRL("You got the latest version."), MB_ICONINFORMATION);
+					CFU_Report(TRL("You have the latest version."), MB_ICONINFORMATION);
 				else // dwVer < g_dwCacheCurVer
 					CFU_Report(TRL("Loading error"), MB_ICONSTOP);
 
 				if(dwVer > g_dwCacheCurVer)
 				{
-					std::string str = TRL("New KeePass version available!");
+					std::basic_string<TCHAR> str = TRL("New KeePass version available!");
 					str += _T("\r\n\r\n");
 					str += TRL("Do you want to visit the KeePass homepage now?");
 

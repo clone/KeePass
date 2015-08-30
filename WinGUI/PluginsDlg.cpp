@@ -120,7 +120,7 @@ BOOL CPluginsDlg::OnInitDialog()
 	//		tszBase[jj + 1] = 0;
 	//		break;
 	//	}
-	std::string strBase = Executable::instance().getPathOnly();
+	std_string strBase = Executable::instance().getPathOnly();
 	VERIFY(m_pPiMgr->AddAllPlugins(strBase.c_str(), _T("*.dll"), FALSE)); // Updates existing list
 
 	UpdateGUI();

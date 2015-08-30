@@ -123,8 +123,8 @@ BOOL CLanguagesDlg::OnInitDialog()
 
 	_tcscpy_s(szCurrentlyLoaded, _countof(szCurrentlyLoaded), GetCurrentTranslationTable());
 
-	std::string strFilter = Executable::instance().getPathOnly();
-	strFilter += "*.lng";
+	std_string strFilter = Executable::instance().getPathOnly();
+	strFilter += _T("*.lng");
 
 	chk_w = ff.FindFile(strFilter.c_str(), 0);
 	while(chk_w == TRUE)
@@ -218,13 +218,13 @@ void CLanguagesDlg::_LoadLanguage(LPCTSTR szLang)
 	// }
 	// _tcscat_s(szFile, _countof(szFile), _T("\\"));
 	// _tcscat_s(szFile, _countof(szFile), szLang);
-	std::string strFile =  Executable::instance().getPathOnly();
+	std_string strFile =  Executable::instance().getPathOnly();
 	strFile += szLang;
 
 	if(_tcscmp(szLang, _T("English")) != 0)
 	{
 		// _tcscat_s(szFile, _countof(szFile), _T(".lng"));
-		strFile += ".lng";
+		strFile += _T(".lng");
 
 		_tfopen_s(&fp, strFile.c_str(), _T("rb"));
 		ASSERT(fp != NULL);

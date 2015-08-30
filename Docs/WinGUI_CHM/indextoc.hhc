@@ -77,13 +77,17 @@
 			<param name="Name" value="TAN Support">
 			<param name="Local" value="tans.html">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Single Instance Option">
+			<param name="Local" value="singleinstance.html">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Miscellaneous">
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Command-Line Options">
+			<param name="Name" value="Command Line Options">
 			<param name="Local" value="cmdline.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">

@@ -35,6 +35,9 @@ CCheckOptionsDlg::CCheckOptionsDlg(CWnd* pParent /*=NULL*/)
 	//{{AFX_DATA_INIT(CCheckOptionsDlg)
 	//}}AFX_DATA_INIT
 
+	m_bTwoColumns = FALSE;
+	m_bForceForeground = FALSE;
+
 	m_dwNumParams = 0; m_pParams = NULL; // Parent must initialize
 }
 
@@ -77,16 +80,27 @@ BOOL CCheckOptionsDlg::OnInitDialog()
 
 	// m_ilOptionIcons.Create(IDB_OPTIONICONS_EX, 16, 1, RGB(255,0,255));
 	CPwSafeApp::CreateHiColorImageList(&m_ilOptionIcons, IDB_OPTIONICONS_EX, 16);
-	m_olOptions.InitOptionListEx(&m_ilOptionIcons);
+	m_olOptions.InitOptionListEx(&m_ilOptionIcons, m_bTwoColumns);
 
 	DWORD i = 0;
 	for(i = 0; i < m_dwNumParams; i++)
 	{
 		if(m_pParams[i].pbValue == NULL)
 			m_olOptions.AddGroupText(m_pParams[i].lpString, m_pParams[i].nIcon);
+		else if(m_bTwoColumns)
+		{
+			ASSERT(m_pParams[i].lpSubString != NULL);
+			m_olOptions.AddCheckItemEx(m_pParams[i].lpString, m_pParams[i].lpSubString, m_pParams[i].pbValue, NULL, OL_LINK_NULL);
+		}
 		else
+		{
+			ASSERT(m_pParams[i].lpSubString == NULL);
 			m_olOptions.AddCheckItem(m_pParams[i].lpString, m_pParams[i].pbValue, NULL, OL_LINK_NULL);
+		}
 	}
+
+	if(m_bForceForeground == TRUE)
+		SetForegroundWindow();
 
 	return TRUE;
 }

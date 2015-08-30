@@ -51,7 +51,7 @@ public:
     BOOL UsesCmdArg(const std_string& argument) const;  // Returns true if a plugin uses argument.
 
 	std::vector<KP_PLUGIN_INSTANCE> m_plugins;
-	std::vector<std::string> m_vKnownNames;
+	std::vector<std_string> m_vKnownNames;
 
 private:
 	CPluginManager();

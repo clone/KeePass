@@ -192,7 +192,7 @@ void CEntryPropertiesDlg::OnOK()
 		m_cbGroups.GetLBText(m_cbGroups.GetCurSel(), strGroupTest);
 		if(CPwManager::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
 		{
-			MessageBox(TRL("The group you selected cannot store entries. Please select an other group."),
+			MessageBox(TRL("The group you selected cannot store entries. Please select a different group."),
 				TRL("Stop"), MB_ICONWARNING | MB_OK);
 			return;
 		}

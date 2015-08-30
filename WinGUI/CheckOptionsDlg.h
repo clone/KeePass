@@ -32,6 +32,7 @@
 typedef struct
 {
 	LPCTSTR lpString;
+	LPCTSTR lpSubString;
 	BOOL *pbValue;
 	int nIcon;
 } CHKOPT_PARAM;
@@ -44,6 +45,9 @@ public:
 	CCheckOptionsDlg(CWnd* pParent = NULL);
 
 	void CleanUp();
+
+	BOOL m_bTwoColumns;
+	BOOL m_bForceForeground;
 
 	DWORD m_dwNumParams;
 	CHKOPT_PARAM *m_pParams;

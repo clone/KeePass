@@ -800,14 +800,13 @@ void BCMenu::DrawItem_WinXP (LPDRAWITEMSTRUCT lpDIS)
 				}
 				else pDC->FillRect (rect2,&m_brSelect);
 				if(bitmap){
-					// if(CanDraw3D&&!(state&ODS_CHECKED)){
-						// CPoint ptImage1(ptImage.x+1,ptImage.y+1);
-						// CPoint ptImage2(ptImage.x-1,ptImage.y-1);
-						// bitmap->Draw(pDC,shadow_offset,ptImage1,ILD_TRANSPARENT);
-						// bitmap->Draw(pDC,xoffset,ptImage2,ILD_TRANSPARENT);
-					// }
-					// else
-					bitmap->Draw(pDC,xoffset,ptImage,ILD_TRANSPARENT);
+					if(CanDraw3D&&!(state&ODS_CHECKED)){
+						CPoint ptImage1(ptImage.x+1,ptImage.y+1);
+						CPoint ptImage2(ptImage.x-1,ptImage.y-1);
+						bitmap->Draw(pDC,shadow_offset,ptImage1,ILD_TRANSPARENT);
+						bitmap->Draw(pDC,xoffset,ptImage2,ILD_TRANSPARENT);
+					}
+					else bitmap->Draw(pDC,xoffset,ptImage,ILD_TRANSPARENT);
 				}
 			}
 			else{
@@ -2322,7 +2321,7 @@ void BCMenu::GetDisabledBitmap(CBitmap &bmp,COLORREF background)
 	ddc.SelectObject(pddcOldBmp);
 }
 
-/* void BCMenu::GetShadowBitmap(CBitmap &bmp)
+void BCMenu::GetShadowBitmap(CBitmap &bmp)
 {
 	CDC ddc;
 	COLORREF bgcol,col,shadowcol=GetSysColor(COLOR_BTNSHADOW);
@@ -2356,7 +2355,7 @@ void BCMenu::GetDisabledBitmap(CBitmap &bmp,COLORREF background)
 	}
 	ddc.SelectObject(pddcOldBmp);
 }
-*/
+
 
 BOOL BCMenu::AddBitmapToImageList(CImageList *bmplist,UINT nResourceID)
 {
@@ -2405,7 +2404,7 @@ BOOL BCMenu::AddBitmapToImageList(CImageList *bmplist,UINT nResourceID)
 		// GetFadedBitmap(bmp);
 		bmplist->Add(&bmp,GetSysColor(COLOR_3DFACE));
 		GetBitmapFromImageList(pDC,bmplist,0,bmp2);
-		// GetShadowBitmap(bmp2);
+		GetShadowBitmap(bmp2);
 		bmplist->Add(&bmp2,GetSysColor(COLOR_3DFACE));
 		GetBitmapFromImageList(pDC,bmplist,0,bmp3);
 		GetDisabledBitmap(bmp3);
@@ -2884,7 +2883,7 @@ BOOL BCMenu::ImageListDuplicate(CImageList *il,int xoffset,CImageList *newlist)
 		// GetFadedBitmap(bmp);
 		newlist->Add(&bmp,GetSysColor(COLOR_3DFACE));
 		GetBitmapFromImageList(pDC,newlist,0,bmp2);
-		// GetShadowBitmap(bmp2);
+		GetShadowBitmap(bmp2);
 		newlist->Add(&bmp2,GetSysColor(COLOR_3DFACE));
 		GetBitmapFromImageList(pDC,newlist,0,bmp3);
 		GetDisabledBitmap(bmp3);
@@ -3179,7 +3178,7 @@ int BCMenu::AddToGlobalImageList(CImageList *il,int xoffset,int nID)
 			GetBitmapFromImageList(pDC,il,xoffset,bmp);
 			// GetFadedBitmap(bmp);
 			GetBitmapFromImageList(pDC,il,xoffset,bmp2);
-			// GetShadowBitmap(bmp2);
+			GetShadowBitmap(bmp2);
 			GetBitmapFromImageList(pDC,il,xoffset,bmp3);
 			GetDisabledBitmap(bmp3);
 			pWnd->ReleaseDC(pDC);  // Release the DC

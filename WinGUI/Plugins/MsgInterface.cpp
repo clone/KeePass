@@ -44,7 +44,7 @@ C_FN_SHARE DWORD KP_API KP_Call(DWORD dwCode, LPARAM lParamW, LPARAM lParamL, LP
 			if(p != NULL)
 			{
 				if(lParamW == 0) p->AppendMenu(MF_SEPARATOR);
-				else p->AppendODMenu((LPCTSTR)lParamW,
+				else p->AppendODMenu((LPTSTR)lParamW,
 					MF_STRING | MF_OWNERDRAW,
 					(DWORD)lParamL,
 					&g_pMainDlg->m_ilIcons, lParamM);

@@ -196,6 +196,7 @@ BEGIN
     EDITTEXT        IDC_EDIT_REPEATPW,67,96,219,14,ES_PASSWORD | ES_AUTOHSCROLL
     CONTROL         "***",IDC_CHECK_HIDEPW,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,287,82,21,14
     PUSHBUTTON      "&Gen",IDC_RANDOMPW_BTN,287,96,21,14
+    CONTROL         "",IDC_RE_NOTES,"RICHEDIT",TCS_HOTTRACK | TCS_FOCUSONBUTTONDOWN | TCS_MULTISELECT | WS_BORDER | WS_VSCROLL | WS_TABSTOP,67,124,241,86
     CONTROL         "Expires:",IDC_CHECK_EXPIRES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,216,57,10
     EDITTEXT        IDC_EDIT_EXPIRE_DATE,67,215,68,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT_EXPIRE_TIME,136,215,128,14,ES_AUTOHSCROLL
@@ -213,7 +214,6 @@ BEGIN
     LTEXT           "Help:",IDC_STATIC,7,174,60,8
     LTEXT           "Auto-Type",IDC_HL_HELP_AUTOTYPE,7,197,59,8
     LTEXT           "URL",IDC_HL_HELP_URL,7,185,59,8
-    CONTROL         "",IDC_RE_NOTES,"RICHEDIT",TCS_HOTTRACK | TCS_FOCUSONBUTTONDOWN | TCS_MULTISELECT | WS_BORDER | WS_VSCROLL | WS_TABSTOP,67,124,241,86
 END
 
 IDD_ICONPICKER_DLG DIALOG  0, 0, 320, 210
@@ -323,10 +323,10 @@ BEGIN
     PUSHBUTTON      "&Get more languages...",IDC_BTN_GETLANGUAGE,7,191,125,14
 END
 
-IDD_OPTIONS_DLG DIALOG  0, 0, 394, 225
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+IDD_OPTIONS_DLG DIALOGEX 0, 0, 394, 225
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Options"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,269,204,56,14
     PUSHBUTTON      "&Cancel",IDCANCEL,331,204,56,14
@@ -334,6 +334,8 @@ BEGIN
     CONTROL         "Tab1",IDC_TAB_MENU,"SysTabControl32",WS_TABSTOP,7,7,380,192
     CONTROL         "Lock workspace when minimizing the main window",IDC_CHECK_LOCKMIN,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,128,337,10
+    CONTROL         "Lock workspace when locking Windows or switching user",IDC_CHECK_LOCKONWINLOCK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,122,353,10
     CONTROL         "Automatically lock workspace after the following number of seconds:",IDC_CHECK_LOCKAFTERTIME,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,178,336,10
     EDITTEXT        IDC_EDIT_LOCKSECONDS,19,0,40,14,ES_AUTOHSCROLL
@@ -471,6 +473,21 @@ BEGIN
     LTEXT           "If you select this option, KeePass will create new IDs for all groups and entries. Consequently no existing groups and entries of the currently opened database will be modified or overwritten.",IDC_STATIC,19,44,292,32
     LTEXT           "KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.",IDC_STATIC,19,90,292,25
     LTEXT           "KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.",IDC_STATIC,19,127,292,26
+END
+
+IDD_PERMISSION_DLG DIALOGEX 0, 0, 273, 118
+STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_NOIDLEMSG | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOPMOST
+CAPTION "KeePass Password Safe"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Full",IDOK,120,97,72,14
+    DEFPUSHBUTTON   "&Deny",IDCANCEL,194,97,72,14
+    PUSHBUTTON      "&Read-Only",IDC_READONLY,45,97,72,14
+    LTEXT           "The following application requests access to your currently opened KeePass database:",IDC_STATIC,7,7,259,17
+    LTEXT           "<>",IDC_STC_APP,7,27,259,8
+    LTEXT           "Note that the application title has been supplied by the requesting application and may therefore be incorrect (a malicious program could try to access your database).",IDC_STATIC,7,40,259,25
+    LTEXT           "Do you grant the application access to your KeePass database?",IDC_STATIC,7,71,259,19
 END
 
 
@@ -625,6 +642,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 170
     END
+
+    IDD_PERMISSION_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 266
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 111
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -635,8 +660,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,5,1
- PRODUCTVERSION 1,0,5,1
+ FILEVERSION 1,0,6,1
+ PRODUCTVERSION 1,0,6,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -653,13 +678,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.sourceforge.net"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe v1.05"
-            VALUE "FileVersion", "1, 0, 5, 1"
+            VALUE "FileDescription", "KeePass Password Safe 1.06"
+            VALUE "FileVersion", "1, 0, 6, 1"
             VALUE "InternalName", "PwSafe"
             VALUE "LegalCopyright", "Copyright (c) 2003-2006 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe v1.05"
-            VALUE "ProductVersion", "1, 0, 5, 1"
+            VALUE "ProductName", "KeePass Password Safe 1.06"
+            VALUE "ProductVersion", "1, 0, 6, 1"
         END
     END
     BLOCK "VarFileInfo"
@@ -762,7 +787,7 @@ BEGIN
             MENUITEM "Show &Creation Time Column",  ID_VIEW_CREATION, CHECKED
             MENUITEM "Show Last &Modification Time Column", ID_VIEW_LASTMOD, CHECKED
             MENUITEM "Show &Last Access Time Column", ID_VIEW_LASTACCESS, CHECKED
-            MENUITEM "Show &Expire Time Column",    ID_VIEW_EXPIRE, CHECKED
+            MENUITEM "Show &Expiration Time Column", ID_VIEW_EXPIRE, CHECKED
             MENUITEM SEPARATOR
             MENUITEM "Show UU&ID Column",           ID_VIEW_UUID, CHECKED
             MENUITEM SEPARATOR
@@ -1094,6 +1119,7 @@ IDB_CLOCK               BITMAP                  "res\\clock.bmp"
 IDB_INFOICONS_EX        BITMAP                  "res\\infoiconex.bmp"
 IDB_CLIENTICONS_EX      BITMAP                  "res\\clienticex.bmp"
 IDB_OPTIONICONS_EX      BITMAP                  "res\\optionicex.bmp"
+IDB_TB_SAVE_DISABLED    BITMAP                  "res\\tb_saved.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

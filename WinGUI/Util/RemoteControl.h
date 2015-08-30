@@ -20,12 +20,23 @@
 #ifndef ___REMOTE_CONTROL_H___
 #define ___REMOTE_CONTROL_H___
 
+#include <vector>
 #include "../../KeePassLibCpp/PwManager.h"
+#include "../../KeePassLibCpp/Util/ComUtil.h"
 
 #define RC_PERMISSION_DENYACCESS 0
-#define RC_PERMISSION_FULLACCESS 1
+#define RC_PERMISSION_UNKNOWN_CLIENT 1
 #define RC_PERMISSION_READONLYACCESS 2
-#define RC_PERMISSION_UNKNOWN_CLIENT 3
+#define RC_PERMISSION_FULLACCESS 3
+
+#define RC_MAX_CLIENTS 1024
+
+typedef struct _RC_CLIENT
+{
+	RC_STRING strID;
+	RC_STRING strName;
+	DWORD dwPermission;
+} RC_CLIENT;
 
 class CRemoteControl
 {
@@ -33,31 +44,33 @@ public:
 	CRemoteControl();
 	~CRemoteControl();
 
-	void InitStatic(CPwManager *pDefaultMgr);
+	void InitStatic(CPwManager *pDefaultMgr, HWND hWndMain);
 	void FreeStatic();
 
 	void EnableRemoteControl(BOOL bEnable);
 	BOOL IsEnabled() const;
 
-	BOOL ProcessConnectionRequest(LPCTSTR lpRequest);
-	BOOL ProcessRequest(LPCTSTR lpRequest);
+	void ProcessAllRequests();
+
+	BOOL RequiresGUIUpdate();
 
 private:
-	int GetClientPermission(CString strUser) const;
+	BOOL ProcessRequest(LPCTSTR lpIncomingRequest);
+	DWORD GetClientPermission(const RC_STRING& strUser, RC_STRING& strRetrievedName) const;
+
+	void AddEntry(const RC_STRING& strRetrievedName, const RC_QUERY& rcQuery);
+
+	void SplitFields(const RC_STRING& strAsm, std::vector<RC_STRING>& vIDs, std::vector<RC_STRING>& vValues);
 
 	BOOL m_bEnableRC;
-
-	CStringArray m_arClients;
-	CDWordArray m_arPermissions;
-
 	CPwManager *m_pDefaultMgr;
+	HWND m_hWndMain;
+
+	BOOL m_bRequiresGUIUpdate;
+
+	HANDLE m_hMailslot;
+
+	std::vector<RC_CLIENT> m_vClients;
 };
-
-UINT __cdecl RCConnectionThread(LPVOID pParam);
-
-C_FN_SHARE LPTSTR PwEntryToString(const PW_ENTRY *lpEntry);
-C_FN_SHARE BOOL StringToPwEntry(PW_ENTRY *pEntry, LPCTSTR lpEntryString);
-
-BOOL ReadPwStringItem(LPCTSTR lpEntryString, DWORD *pdwPos, CString *pStore);
 
 #endif // ___IPC_SERVER_H___

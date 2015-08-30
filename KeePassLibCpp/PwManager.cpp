@@ -901,6 +901,8 @@ void CPwManager::NewDatabase()
 
 	_AllocGroups(PWM_NUM_INITIAL_GROUPS); // Allocate some space for the new items
 	_AllocEntries(PWM_NUM_INITIAL_ENTRIES);
+
+	m_vUnknownMetaStreams.clear();
 }
 
 #define _OPENDB_FAIL_LIGHT \
@@ -1092,10 +1094,16 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, PWDB_REPAIR_INFO *pRepair)
 		ASSERT(FALSE); _OPENDB_FAIL; // This should never happen
 	}
 
-	// Check for success
+	// Check for success (non-repair mode only)
 	if(pRepair == NULL)
-		if((uEncryptedPartSize > 2147483446) || (uEncryptedPartSize == 0))
-			{ _OPENDB_FAIL_LIGHT; return PWE_INVALID_KEY; }
+	{
+		if((uEncryptedPartSize > 2147483446) || ((uEncryptedPartSize == 0) &&
+			((hdr.dwGroups != 0) || (hdr.dwEntries != 0))))
+		{
+			_OPENDB_FAIL_LIGHT;
+			return PWE_INVALID_KEY;
+		}
+	}
 
 	// Check if key is correct (with very high probability)
 	if(pRepair == NULL)
@@ -1524,7 +1532,8 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 	// Check if all went correct
 	ASSERT((uEncryptedPartSize % 16) == 0);
-	if((uEncryptedPartSize > 2147483446) || (uEncryptedPartSize == 0))
+	if((uEncryptedPartSize > 2147483446) || ((uEncryptedPartSize == 0) &&
+		(GetNumberOfGroups() != 0)))
 	{
 		ASSERT(FALSE); SAFE_DELETE_ARRAY(pVirtualFile); _LoadAndRemoveAllMetaStreams();
 		return PWE_CRYPT_ERROR;
@@ -2439,7 +2448,11 @@ BOOL CPwManager::_AddMetaStream(LPCTSTR lpMetaDataDesc, BYTE *pData, DWORD dwLen
 	ASSERT(pData != NULL); if(pData == NULL) return FALSE;
 	ASSERT(dwLength != 0); if(dwLength == 0) return TRUE;
 
+	// Database must contain at least one group
+	if(GetNumberOfGroups() == 0) return FALSE;
+
 	memset(&pe, 0, sizeof(PW_ENTRY));
+	pe.uGroupId = m_pGroups[0].uGroupId;
 	pe.pBinaryData = pData; pe.pszAdditional = (TCHAR *)lpMetaDataDesc;
 	pe.pszBinaryDesc = PMS_ID_BINDESC; pe.pszPassword = _T("");
 	pe.pszTitle = PMS_ID_TITLE; pe.pszURL = PMS_ID_URL;
@@ -2447,7 +2460,6 @@ BOOL CPwManager::_AddMetaStream(LPCTSTR lpMetaDataDesc, BYTE *pData, DWORD dwLen
 	pe.tCreation = g_pwTimeNever; pe.tExpire = g_pwTimeNever;
 	pe.tLastAccess = g_pwTimeNever; pe.tLastMod = g_pwTimeNever;
 	pe.uBinaryDataLen = dwLength;
-	if(GetNumberOfGroups() != 0) pe.uGroupId = m_pGroups[0].uGroupId;
 
 	return AddEntry(&pe);
 }
@@ -2525,7 +2537,14 @@ BOOL CPwManager::_AddAllMetaStreams()
 
 	b &= _AddMetaStream(PMS_STREAM_SIMPLESTATE, (BYTE *)&simpState, sizeof(PMS_SIMPLE_UI_STATE));
 
-	ASSERT(b == TRUE); return b;
+	// Add back all unknown meta streams
+	for(std::vector<PWDB_META_STREAM>::iterator it = m_vUnknownMetaStreams.begin();
+		it != m_vUnknownMetaStreams.end(); ++it)
+	{
+		b &= _AddMetaStream(it->strName.c_str(), &it->vData[0], it->vData.size());
+	}
+
+	return b;
 }
 
 void CPwManager::_ParseMetaStream(PW_ENTRY *p)
@@ -2549,6 +2568,14 @@ void CPwManager::_ParseMetaStream(PW_ENTRY *p)
 
 		if(p->uBinaryDataLen >= 40)
 			memcpy(m_aLastTopVisibleEntryUuid, pState->aLastTopVisibleEntryUuid, 16);
+	}
+	else // Unknown meta stream -- save it
+	{
+		PWDB_META_STREAM msUnknown;
+		msUnknown.strName = p->pszAdditional;
+		msUnknown.vData.assign(p->pBinaryData, p->pBinaryData + p->uBinaryDataLen);
+
+		m_vUnknownMetaStreams.push_back(msUnknown);
 	}
 }
 

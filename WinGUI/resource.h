@@ -71,7 +71,10 @@
 #define IDB_CLIENTICONS_EX              223
 #define IDB_OPTIONICONS_EX              224
 #define IDI_ENTRY_EDIT                  225
+#define IDB_TB_SAVE1                    225
+#define IDB_TB_SAVE_DISABLED            225
 #define IDD_IMPORT_OPTIONS_DLG          226
+#define IDD_PERMISSION_DLG              229
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -228,6 +231,10 @@
 #define IDC_STATIC_LISTTEXT             1207
 #define IDC_STATIC_PRODUCTNAME          1208
 #define IDC_RICHEDIT21                  1209
+#define IDC_CHECK1                      1212
+#define IDC_CHECK_LOCKONWINLOCK         1212
+#define IDC_READONLY                    1213
+#define IDC_STC_APP                     1214
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -424,9 +431,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        229
+#define _APS_NEXT_RESOURCE_VALUE        230
 #define _APS_NEXT_COMMAND_VALUE         33000
-#define _APS_NEXT_CONTROL_VALUE         1212
+#define _APS_NEXT_CONTROL_VALUE         1215
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

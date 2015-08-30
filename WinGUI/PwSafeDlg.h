@@ -41,6 +41,7 @@
 #include "Plugins/PluginMgr.h"
 #include "Util/SInstance.h"
 #include "Util/SessionNotify.h"
+#include "Util/RemoteControl.h"
 #include "../KeePassLibCpp/SysDefEx.h"
 
 #define _CALLPLUGINS(__c,__l,__w) CPluginManager::Instance().CallPlugins((__c),(LPARAM)(__l),(LPARAM)(__w))
@@ -259,6 +260,7 @@ public:
 	DWORD m_dwDefaultExpire;
 	BOOL m_bDeleteBackupsOnSave;
 	BOOL m_bDisableAutoType;
+	BOOL m_bLockOnWinLock;
 
 	BOOL m_bExiting;
 	BOOL m_bLocked;
@@ -402,6 +404,8 @@ public:
 	BOOL m_bShowTANIndices;
 	BOOL m_bTANsOnly;
 	DWORD m_dwPwListMode;
+
+	CRemoteControl m_remoteControl;
 
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
@@ -667,6 +671,7 @@ protected:
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 
 	afx_msg LRESULT OnTaskbarCreated(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnProcessMailslot(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnWTSSessionChange(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()

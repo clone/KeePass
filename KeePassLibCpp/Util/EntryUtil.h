@@ -17,16 +17,12 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___KEEPASS_LIBRARY_API_H___
-#define ___KEEPASS_LIBRARY_API_H___
+#ifndef ___ENTRY_UTIL_H___
+#define ___ENTRY_UTIL_H___
 
-#include "APIDefEx.h"
+// C_FN_SHARE LPTSTR PwEntryToString(const PW_ENTRY *lpEntry);
+// C_FN_SHARE BOOL StringToPwEntry(PW_ENTRY *pEntry, LPCTSTR lpEntryString);
 
-#define KEEPASS_LIBRARY_BUILD 0x00000010
+// BOOL ReadPwStringItem(LPCTSTR lpEntryString, DWORD *pdwPos, CString *pStore);
 
-KP_SHARE DWORD GetKeePassVersion();
-KP_SHARE LPCTSTR GetKeePassVersionString();
-
-KP_SHARE DWORD GetLibraryBuild();
-
-#endif
+#endif // ___ENTRY_UTIL_H___
