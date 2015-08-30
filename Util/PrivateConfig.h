@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -34,30 +34,23 @@
 #define ___PRIVATE_CONFIG_H___
 
 #include <windows.h>
+#include "SysDefEx.h"
 
 #define SI_REGSIZE 1024
 
 #define PCFG_IN const
 #define PCFG_OUT
 
-#define OLF_OPEN 0
-#define OLF_PRINT 1
-#define OLF_EXPLORE 2
-
-class CPrivateConfig
+class CPP_CLASS_SHARE CPrivateConfig
 {
 public:
-	CPrivateConfig();
+	CPrivateConfig(BOOL bReqWriteAccess);
 	virtual ~CPrivateConfig();
 
 	BOOL Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue);
 	BOOL Get(const TCHAR *pszField, PCFG_OUT TCHAR *pszValue);
 
-private:
 	TCHAR m_szFile[SI_REGSIZE];
 };
-
-void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath);
-HINSTANCE _OpenLocalFile(TCHAR *szFile, int nMode);
 
 #endif // ___PRIVATE_CONFIG_H___

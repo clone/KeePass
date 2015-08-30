@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,7 @@
 #ifndef ___TRANSLATE_EX_H___
 #define ___TRANSLATE_EX_H___
 
-#define MAX_TRANSLATION_STRINGS 420
+#define MAX_TRANSLATION_STRINGS 460
 
 // Translate string, sptr must be a char*, _not_ a TCHAR* !
 #define TRL(sptr) _TRL(sptr)
@@ -38,11 +38,11 @@
 #define TRL_MODE_DEF FALSE
 #define TRL_MODE_TRL TRUE
 
-BOOL LoadTranslationTable(const char *pszTableName);
-BOOL FreeCurrentTranslationTable();
+C_FN_SHARE BOOL LoadTranslationTable(const char *pszTableName);
+C_FN_SHARE BOOL FreeCurrentTranslationTable();
 
-const char *_TRL(const char *pszDefString);
+C_FN_SHARE const char *_TRL(const char *pszDefString);
 
-const TCHAR *GetCurrentTranslationTable();
+C_FN_SHARE const TCHAR *GetCurrentTranslationTable();
 
 #endif // ___TRANSLATE_EX_H___

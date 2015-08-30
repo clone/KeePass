@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -40,12 +40,17 @@
 #include "NewGUI/KCWndUtil.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/BCMenu.h"
-#include "NewGUI/BtnST.h"
+#include "NewGUI/XPStyleButtonST.h"
+#include "NewGUI/ThemeHelperST.h"
 #include "NewGUI/CustomListCtrlEx.h"
 #include "NewGUI/CustomTreeCtrlEx.h"
 #include "NewGUI/SystemTray.h"
 #include "NewGUI/SystemTrayEx.h"
 #include "NewGUI/AutoRichEditCtrl.h"
+#include "Util/PluginMgr.h"
+#include "Util/SysDefEx.h"
+
+#define _CALLPLUGINS(__c,__l,__w) m_piMgr.CallPlugins((__c),(LPARAM)(__l),(LPARAM)(__w))
 
 #define GUI_GROUPLIST_EXT 170
 // Standard Windows Dialog GUI_SPACER = 11
@@ -66,23 +71,35 @@
 #define PWS_TAN_ENTRY      TRL("<TAN>")
 #define PWS_NEW_ATTACHMENT _T(":: ")
 
+#define WM_PLUGINS_FIRST (0x9FFF)
+#define WM_PLUGINS_LAST  (0xAFFF)
+
+#define HOTKEYID_AUTOTYPE 33
+
+#define CM_TIMED 0
+#define CM_ENHSECURE 1
+
 /////////////////////////////////////////////////////////////////////////////
 
-class CPwSafeDlg : public CDialog
+class CPP_CLASS_SHARE CPwSafeDlg : public CDialog
 {
 public:
 	CPwSafeDlg(CWnd* pParent = NULL);
 
 	void OnUpdateFlush(CMenu *pMenu); // BCMenu function
 
-	static void _TranslateMenu(BCMenu *pBCMenu); // Translate this menu
+	static void _TranslateMenu(BCMenu *pBCMenu, BOOL bAppendSuffix = TRUE);
 	static const TCHAR *_GetCmdAccelExt(const TCHAR *psz);
+	void RestartApplication();
 
 	void ProcessResize();
 	void CleanUp();
 	void SetStatusTextEx(LPCTSTR lpStatusText, int nPane = -1);
 	void NotifyUserActivity();
 	void UpdateAutoSortMenuItems();
+	void BuildPluginMenu();
+	BOOL RegisterGlobalHotKey(int nHotKeyID, DWORD dwHotKey, BOOL bReleasePrevious);
+	void _AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus);
 
 	void UpdateGroupList();
 	void UpdatePasswordList();
@@ -111,8 +128,11 @@ public:
 
 	void _HandleEntryDrop(DWORD dwDropType, HTREEITEM hTreeItem);
 
+	int m_nClipboardMethod;
 	BOOL m_bTimer;
 	int m_nClipboardCountdown;
+	int m_nClipboardState;
+	HWND m_hwndNextViewer;
 	BOOL m_bOpenLastDb;
 	CString m_strLastDb;
 	BOOL m_bImgButtons;
@@ -126,8 +146,10 @@ public:
 	long m_nLockedViewParams[3];
 	BOOL m_bShowWindow;
 	BOOL m_bWasMaximized;
+	BOOL m_bRestartApplication;
 
 	CPwManager m_mgr;
+	CPluginManager m_piMgr;
 
 	BOOL m_bWindowsNewLine;
 	BOOL m_bPasswordStars;
@@ -191,6 +213,7 @@ public:
 	CString m_strFontSpec;
 	CString m_strListFontFace;
 	int m_nListFontSize;
+	DWORD m_dwATHotKey;
 
 	DWORD m_dwLastNumSelectedItems;
 	DWORD m_dwLastFirstSelectedItem;
@@ -203,20 +226,20 @@ public:
 
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
+	CStatic	m_stcMenuLine;
 	CEdit	m_cQuickFind;
 	CCustomTreeCtrlEx	m_cGroups;
-	CButtonST	m_btnTbNew;
-	CButtonST	m_btnTbLock;
-	CButtonST	m_btnTbFind;
-	CButtonST	m_btnTbEditEntry;
-	CButtonST	m_btnTbDeleteEntry;
-	CButtonST	m_btnTbCopyUser;
-	CButtonST	m_btnTbCopyPw;
-	CButtonST	m_btnTbAddEntry;
-	CButtonST	m_btnTbAbout;
-	CButtonST	m_btnTbSave;
-	CButtonST	m_btnTbOpen;
-	CStatic	m_stcMenuLine;
+	CXPStyleButtonST	m_btnTbNew;
+	CXPStyleButtonST	m_btnTbLock;
+	CXPStyleButtonST	m_btnTbFind;
+	CXPStyleButtonST	m_btnTbEditEntry;
+	CXPStyleButtonST	m_btnTbDeleteEntry;
+	CXPStyleButtonST	m_btnTbCopyUser;
+	CXPStyleButtonST	m_btnTbCopyPw;
+	CXPStyleButtonST	m_btnTbAddEntry;
+	CXPStyleButtonST	m_btnTbAbout;
+	CXPStyleButtonST	m_btnTbSave;
+	CXPStyleButtonST	m_btnTbOpen;
 	CCustomListCtrlEx	m_cList;
 	CAutoRichEditCtrl	m_reEntryView;
 	CString	m_strQuickFind;
@@ -247,18 +270,23 @@ protected:
 	{
 		m_dwGroupsSaveFirstVisible = m_cGroups.GetItemData(m_cGroups.GetFirstVisibleItem());
 
+		m_dwGroupsSaveSelected = DWORD_MAX;
 		if(bSaveSelection == TRUE)
-			m_dwGroupsSaveSelected = m_cGroups.GetItemData(m_cGroups.GetSelectedItem());
-		else
-			m_dwGroupsSaveSelected = DWORD_MAX;
+		{
+			HTREEITEM h = m_cGroups.GetSelectedItem();
+			if(h != NULL) m_dwGroupsSaveSelected = m_cGroups.GetItemData(h);
+		}
 	}
 	void _Groups_RestoreView()
 	{
 		HTREEITEM h = _GroupIdToHTreeItem(m_dwGroupsSaveFirstVisible);
 		if(h != NULL) m_cGroups.SelectSetFirstVisible(h);
 
-		h = _GroupIdToHTreeItem(m_dwGroupsSaveSelected);
-		m_cGroups.SelectItem(h);
+		if(m_dwGroupsSaveSelected != DWORD_MAX)
+		{
+			h = _GroupIdToHTreeItem(m_dwGroupsSaveSelected);
+			if(h != NULL) m_cGroups.SelectItem(h);
+		}
 	}
 	void _CalcColumnSizes()
 	{
@@ -328,11 +356,13 @@ protected:
 	BOOL _IsUnsafeAllowed();
 
 	HICON m_hIcon;
+	CThemeHelperST *m_pThemeHelper;
 
 	int m_nSaveView;
 	LPARAM m_dwOldListParameters;
 	BYTE m_pPreLockItemUuid[16];
 	ULONGLONG m_ullLastListParams;
+	UINT m_uOriginalExtrasMenuItemCount;
 
 	DWORD m_dwGroupsSaveFirstVisible;
 	DWORD m_dwGroupsSaveSelected;
@@ -463,6 +493,7 @@ protected:
 	afx_msg void OnGroupMoveDown();
 	afx_msg void OnUpdateGroupMoveDown(CCmdUI* pCmdUI);
 	afx_msg LRESULT OnTrayNotification(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnUpdateClipboard(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnViewHide();
 	afx_msg void OnImportCsv();
 	afx_msg void OnUpdateImportCsv(CCmdUI* pCmdUI);
@@ -561,7 +592,16 @@ protected:
 	afx_msg void OnPwlistAutoType();
 	afx_msg void OnUpdatePwlistAutoType(CCmdUI* pCmdUI);
 	afx_msg void OnColumnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnExtrasPluginMgr();
+	afx_msg LRESULT OnHotKey(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
+
+	afx_msg void OnPluginMessage(UINT nID);
+	afx_msg void OnUpdatePluginMessage(CCmdUI* pCmdUI);
+	afx_msg void OnRenderFormat(UINT nFormat);
+	afx_msg void OnRenderAllFormats();
+	afx_msg void OnChangeCbChain(HWND hWndRemove, HWND hWndAfter);
+	afx_msg void OnDrawClipboard();
 	DECLARE_MESSAGE_MAP()
 };
 

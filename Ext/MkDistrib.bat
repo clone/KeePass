@@ -4,6 +4,11 @@ CLS
 IF EXIST ..\Debug\KeePass.exe COPY /B ..\Debug\KeePass.exe /B ..\Distrib\KeePass.exe
 IF EXIST ..\Release\KeePass.exe COPY /B ..\Release\KeePass.exe /B ..\Distrib\KeePass.exe
 
+DEL KeePass.lib
+COPY /B ..\Release\KeePass.lib /B KeePass.lib
+DEL KeePass.exp
+COPY /B ..\Release\KeePass.exp /B KeePass.exp
+
 DEL ..\Distrib\KeePass.chm
 COPY /B Doc\KeePass.chm /B ..\Distrib\KeePass.chm
 
@@ -37,6 +42,9 @@ Util\CprLang.exe GermanSrc.lng German.lng
 DEL Hebrew.lng
 Util\CprLang.exe HebrewSrc.lng Hebrew.lng
 
+DEL Hungarian.lng
+Util\CprLang.exe HungarianSrc.lng Hungarian.lng
+
 DEL Italian.lng
 Util\CprLang.exe ItalianSrc.lng Italian.lng
 
@@ -55,6 +63,9 @@ Util\CprLang.exe PolishSrc.lng Polish.lng
 DEL Portuguese.lng
 Util\CprLang.exe PortugueseSrc.lng Portuguese.lng
 
+DEL Russian.lng
+Util\CprLang.exe RussianSrc.lng Russian.lng
+
 DEL Slovak.lng
 Util\CprLang.exe SlovakSrc.lng Slovak.lng
 
@@ -66,6 +77,9 @@ Util\CprLang.exe SwedishSrc.lng Swedish.lng
 
 DEL Turkish.lng
 Util\CprLang.exe TurkishSrc.lng Turkish.lng
+
+DEL Macedonian.lng
+Util\CprLang.exe MacedonianSrc.lng Macedonian.lng
 
 ECHO.
 ECHO Have you updated the language information fields?
@@ -108,6 +122,12 @@ DEL ..\Debug\Japanese.lng
 COPY /B Japanese.lng /B ..\Debug\Japanese.lng > NUL
 DEL ..\Debug\Danish.lng
 COPY /B Danish.lng /B ..\Debug\Danish.lng > NUL
+DEL ..\Debug\Russian.lng
+COPY /B Russian.lng /B ..\Debug\Russian.lng > NUL
+DEL ..\Debug\Macedonian.lng
+COPY /B Macedonian.lng /B ..\Debug\Macedonian.lng > NUL
+DEL ..\Debug\Hungarian.lng
+COPY /B Hungarian.lng /B ..\Debug\Hungarian.lng > NUL
 
 REM Copy latest language files into Release directory
 
@@ -147,6 +167,12 @@ DEL ..\Release\Japanese.lng
 COPY /B Japanese.lng /B ..\Release\Japanese.lng > NUL
 DEL ..\Release\Danish.lng
 COPY /B Danish.lng /B ..\Release\Danish.lng > NUL
+DEL ..\Release\Russian.lng
+COPY /B Russian.lng /B ..\Release\Russian.lng > NUL
+DEL ..\Release\Macedonian.lng
+COPY /B Macedonian.lng /B ..\Release\Macedonian.lng > NUL
+DEL ..\Release\Hungarian.lng
+COPY /B Hungarian.lng /B ..\Release\Hungarian.lng > NUL
 
 REM Copy language reference file
 

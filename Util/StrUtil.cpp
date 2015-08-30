@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -32,9 +32,7 @@
 #include "StrUtil.h"
 #include "../Crypto/sha2.h"
 
-static unsigned char g_shaLastString[32];
-
-void EraseCString(CString *pString)
+CPP_FN_SHARE void EraseCString(CString *pString)
 {
 	int j, len;
 	LPTSTR lpt;
@@ -55,78 +53,7 @@ void EraseCString(CString *pString)
 	pString->FreeExtra();
 }
 
-#ifndef _WIN32_WCE
-void CopyStringToClipboard(const TCHAR *lptString)
-{
-	unsigned long uDataSize;
-	HGLOBAL globalHandle;
-	LPVOID globalData;
-
-	if(OpenClipboard(NULL) == FALSE) return;
-
-	if(EmptyClipboard() == FALSE) return;
-
-	if(lptString == NULL) // No string to copy => empty clipboard
-	{
-		CloseClipboard();
-		return;
-	}
-
-	uDataSize = _tcslen(lptString) * sizeof(TCHAR); // Get length
-	if(uDataSize == 0)
-	{
-		CloseClipboard();
-		return;
-	}
-	uDataSize += sizeof(TCHAR); // Plus NULL-terminator of string
-
-	globalHandle = GlobalAlloc(GHND | GMEM_DDESHARE, uDataSize);
-	globalData = GlobalLock(globalHandle);
-	_tcscpy((TCHAR *)globalData, lptString); // Copy string plus NULL-byte to global memory
-	GlobalUnlock(globalHandle); // Unlock before SetClipboardData!
-
-	VERIFY(SetClipboardData(CF_TEXT, globalHandle)); // Set clipboard data to our global memory block
-	VERIFY(CloseClipboard()); // Close clipboard, and done
-
-	sha256_ctx shactx;
-	sha256_begin(&shactx);
-	sha256_hash((unsigned char *)lptString, uDataSize - sizeof(TCHAR), &shactx);
-	sha256_end(g_shaLastString, &shactx);
-}
-
-void ClearClipboardIfOwner()
-{
-	if(OpenClipboard(NULL) == FALSE) return;
-
-	if((IsClipboardFormatAvailable(CF_TEXT) == FALSE) &&
-		(IsClipboardFormatAvailable(CF_OEMTEXT) == FALSE))
-	{
-		CloseClipboard();
-		return;
-	}
-
-	HANDLE hClipboardData = GetClipboardData(CF_TEXT);
-	TCHAR *lpString = (TCHAR *)GlobalLock(hClipboardData);
-
-	sha256_ctx shactx;
-	unsigned char uHash[32];
-	sha256_begin(&shactx);
-	sha256_hash((unsigned char *)lpString, _tcslen(lpString) * sizeof(TCHAR), &shactx);
-	sha256_end(uHash, &shactx);
-
-	GlobalUnlock(hClipboardData);
-
-	// If we have copied the string to the clipboard, delete it
-	if(memcmp(uHash, g_shaLastString, 32) == 0)
-	{
-		VERIFY(EmptyClipboard());
-	}
-
-	VERIFY(CloseClipboard());
-}
-#endif
-
-void FixURL(CString *pstrURL)
+CPP_FN_SHARE void FixURL(CString *pstrURL)
 {
 	CString strTemp;
 	BOOL bPre = FALSE;
@@ -161,7 +88,7 @@ void FixURL(CString *pstrURL)
 	}
 }
 
-char *_StringToAnsi(const TCHAR *lptString)
+C_FN_SHARE char *_StringToAnsi(const TCHAR *lptString)
 {
 	char *p = NULL;
 	int _nChars = 0;
@@ -185,7 +112,7 @@ char *_StringToAnsi(const TCHAR *lptString)
 	return p;
 }
 
-TCHAR *_StringToUnicode(const char *pszString)
+C_FN_SHARE TCHAR *_StringToUnicode(const char *pszString)
 {
 	int _nChars = 0;
 
@@ -221,7 +148,7 @@ TCHAR *_StringToUnicode(const char *pszString)
 	return (TCHAR *)p;
 }
 
-void _PwTimeToString(PW_TIME t, CString *pstrDest)
+CPP_FN_SHARE void _PwTimeToString(PW_TIME t, CString *pstrDest)
 {
 	ASSERT(pstrDest != NULL);
 	pstrDest->Empty();
@@ -229,7 +156,7 @@ void _PwTimeToString(PW_TIME t, CString *pstrDest)
 		t.btDay, t.btHour, t.btMinute, t.btSecond);
 }
 
-void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest)
+CPP_FN_SHARE void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest)
 {
 	ASSERT(pstrDest != NULL);
 	pstrDest->Empty();
@@ -237,7 +164,7 @@ void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest)
 		t.btDay, t.btHour, t.btMinute, t.btSecond);
 }
 
-void _UuidToString(const BYTE *pUuid, CString *pstrDest)
+CPP_FN_SHARE void _UuidToString(const BYTE *pUuid, CString *pstrDest)
 {
 	CString strTemp;
 	ASSERT(pstrDest != NULL);
@@ -250,7 +177,7 @@ void _UuidToString(const BYTE *pUuid, CString *pstrDest)
 	}
 }
 
-void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
+C_FN_SHARE void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 {
 	ASSERT((ptszSource != NULL) && (pUuid != NULL));
 	if((ptszSource == NULL) || (pUuid == NULL)) return;
@@ -284,7 +211,7 @@ void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 	}
 }
 
-UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
+C_FN_SHARE UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 {
 	DWORD i, j = 0;
 	DWORD dwLength, dwBytesNeeded, dwUniBufferLength = 0;
@@ -357,7 +284,7 @@ UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 	return p;
 }
 
-DWORD _UTF8NumChars(const UTF8_BYTE *pUTF8String)
+C_FN_SHARE DWORD _UTF8NumChars(const UTF8_BYTE *pUTF8String)
 {
 	DWORD i = 0, dwLength = 0;
 	BYTE bt;
@@ -379,7 +306,7 @@ DWORD _UTF8NumChars(const UTF8_BYTE *pUTF8String)
 }
 
 // This returns the needed bytes to represent the string, without terminating NULL character
-DWORD _UTF8BytesNeeded(const TCHAR *pszString)
+C_FN_SHARE DWORD _UTF8BytesNeeded(const TCHAR *pszString)
 {
 	DWORD i = 0;
 	DWORD dwBytes = 0;
@@ -413,7 +340,7 @@ DWORD _UTF8BytesNeeded(const TCHAR *pszString)
 	return dwBytes;
 }
 
-TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
+C_FN_SHARE TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 {
 	DWORD i, j;
 	DWORD dwNumChars, dwMoreBytes, dwPBufLength = 0;
@@ -499,9 +426,9 @@ TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 #endif
 }
 
-void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString)
+CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString)
 {
-	CString str;
+	CString str, strTemp;
 	int nPos;
 
 	ASSERT(pString != NULL); if(pString == NULL) return;
@@ -564,16 +491,63 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString)
 		if(nPos == -1) break;
 
 		if(bMakeSimString == FALSE)
-			str = str.Left(nPos) + pEntry->pszAdditional + str.Right(str.GetLength() - nPos - 7);
+		{
+			strTemp = pEntry->pszAdditional;
+			strTemp = CsRemoveMeta(&strTemp);
+			str = str.Left(nPos) + strTemp + str.Right(str.GetLength() - nPos - 7);
+			EraseCString(&strTemp);
+		}
 		else
-			str = str.Left(nPos) + TagSimString(pEntry->pszAdditional) + str.Right(str.GetLength() - nPos - 7);
+		{
+			strTemp = pEntry->pszAdditional;
+			strTemp = CsRemoveMeta(&strTemp);
+			str = str.Left(nPos) + TagSimString((LPCTSTR)strTemp) + str.Right(str.GetLength() - nPos - 7);
+			EraseCString(&strTemp);
+		}
 	}
 
 	*pString = str;
 	EraseCString(&str);
 }
 
-CString CsFileOnly(CString *psFilePath)
+CPP_FN_SHARE CString CsRemoveMeta(CString *psString)
+{
+	CString str = _T(""), strLower;
+	int nPos, nCount;
+	LPCTSTR lpRemove = NULL;
+	int i;
+
+	ASSERT(psString != NULL); if(psString == NULL) return str;
+
+	str = *psString;
+	strLower = str; strLower.MakeLower();
+
+	for(i = 0; i < 2; i++)
+	{
+		if(i == 0) lpRemove = _T("auto-type:");
+		else if(i == 1) lpRemove = _T("auto-type-window:");
+
+		nPos = strLower.Find(lpRemove, 0);
+		if(nPos != -1)
+		{
+			if(nPos != 0)
+				if(strLower.GetAt(nPos - 1) == _T('\n')) nPos -= 1;
+			if(nPos != 0)
+				if(strLower.GetAt(nPos - 1) == _T('\r')) nPos -= 1;
+
+			nCount = strLower.Find(_T('\n'), nPos + _tcslen(lpRemove) - 1);
+			if(nCount == -1) nCount = strLower.GetLength() - nPos;
+			else nCount -= nPos - 1;
+
+			strLower.Delete(nPos, nCount);
+			str.Delete(nPos, nCount);
+		}
+	}
+
+	return str;
+}
+
+CPP_FN_SHARE CString CsFileOnly(CString *psFilePath)
 {
 	CString str;
 	int i;
@@ -594,7 +568,7 @@ CString CsFileOnly(CString *psFilePath)
 
 #define LOCAL_NUMXMLCONV 7
 
-TCHAR *MakeSafeXmlString(TCHAR *ptString)
+C_FN_SHARE TCHAR *MakeSafeXmlString(TCHAR *ptString)
 {
 	DWORD i, j;
 	DWORD dwStringLen, dwNeededChars = 0, dwOutPos = 0;
@@ -662,228 +636,22 @@ TCHAR *MakeSafeXmlString(TCHAR *ptString)
 	return pFinal;
 }
 
-size_t szlen(const char *pszString)
+C_FN_SHARE size_t szlen(const char *pszString)
 {
 	ASSERT(pszString != NULL); if(pszString == NULL) return 0;
 	return strlen(pszString);
 }
 
-char *szcpy(char *szDestination, const char *szSource)
+C_FN_SHARE char *szcpy(char *szDestination, const char *szSource)
 {
 	ASSERT(szDestination != NULL); if(szDestination == NULL) return NULL;
 	ASSERT(szSource != NULL); if(szSource == NULL) { szDestination[0] = 0; return szDestination; }
 	return strcpy(szDestination, szSource);
 }
 
-#ifdef _UNICODE
-#define PRPT_API_NAME "PathRelativePathToW"
-#else
-#define PRPT_API_NAME "PathRelativePathToA"
-#endif
-
-#ifndef _WIN32_WCE
-CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile)
-{
-	LPPATHRELATIVEPATHTO lpRel;
-	HINSTANCE hShl;
-	TCHAR tszPath[MAX_PATH * 2];
-	BOOL bResult = FALSE;
-	CString str;
-	BOOL bMod;
-
-	if((lpBaseFile[1] == _T(':')) && (lpTargetFile[1] == _T(':')) &&
-		(lpBaseFile[2] == _T('\\')) && (lpTargetFile[2] == _T('\\')) &&
-		(lpBaseFile[0] != lpTargetFile[0]))
-	{
-		return CString(lpTargetFile);
-	}
-	else if((lpTargetFile[0] == _T('\\')) && (lpTargetFile[1] == _T('\\')))
-	{
-		return CString(lpTargetFile);
-	}
-
-	hShl = LoadLibrary(_T("ShlWApi.dll"));
-	if(hShl == NULL) return CString(lpTargetFile);
-
-	lpRel = (LPPATHRELATIVEPATHTO)GetProcAddress(hShl, _T(PRPT_API_NAME));
-	if(lpRel != NULL)
-	{
-		bResult = lpRel(tszPath, lpBaseFile, 0, lpTargetFile, 0);
-	}
-	FreeLibrary(hShl); hShl = NULL;
-	if(bResult == FALSE) return CString(lpTargetFile);
-
-	str = tszPath;
-	while(1) // Remove all .\\ from the left of the path
-	{
-		bMod = FALSE;
-
-		if(str.Left(2) == ".\\")
-		{
-			str = str.Right(str.GetLength() - 2);
-			bMod = TRUE;
-		}
-
-		if(bMod == FALSE) break;
-	}
-
-	if(bResult == TRUE) return str;
-	else return CString(lpTargetFile);
-}
-#else
-CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile)
-{
-	return CString(lpTargetFile);
-}
-#endif
-
-BOOL GetRegKeyEx(HKEY hkeyBase, LPCTSTR lpSubKey, LPTSTR lpRetData)
-{
-	HKEY hkey = hkeyBase;
-	LONG lRetVal = RegOpenKeyEx(hkeyBase, lpSubKey, 0, KEY_QUERY_VALUE, &hkey);
-
-	if(lRetVal == ERROR_SUCCESS)
-	{
-		LONG lDataSize = MAX_PATH;
-		TCHAR tszData[MAX_PATH];
-
-		lRetVal = RegQueryValue(hkey, NULL, tszData, &lDataSize);
-		_tcscpy(lpRetData, tszData);
-		RegCloseKey(hkey); hkey = (HKEY)NULL;
-	}
-
-	return lRetVal == ERROR_SUCCESS ? TRUE : FALSE;
-}
-
-BOOL OpenUrlInNewBrowser(LPCTSTR lpURL)
-{
-	TCHAR tszKey[MAX_PATH << 1];
-	UINT uResult = 0;
-
-	ASSERT(lpURL != NULL); if(lpURL == NULL) return FALSE;
-
-	_tcscpy(tszKey, _T("http\\shell\\open\\command"));
-
-	if(GetRegKeyEx(HKEY_CLASSES_ROOT, tszKey, tszKey) == TRUE)
-	{
-		TCHAR *pos;
-		pos = _tcsstr(tszKey, _T("\"%1\""));
-		if(pos == NULL) // No quotes found
-		{
-			pos = _tcsstr(tszKey, _T("%1")); // Check for %1, without quotes 
-			if(pos == NULL) // No parameter at all...
-				pos = tszKey + _tcslen(tszKey) - 1;
-			else
-				*pos = '\0'; // Remove the parameter
-		}
-		else *pos = '\0'; // Remove the parameter
-
-		_tcscat(pos, _T(" "));
-		_tcscat(pos, lpURL);
-
-		uResult = WinExec(tszKey, SW_SHOW);
-	}
-
-	return uResult > 31 ? TRUE : FALSE;
-}
-
-BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
-{
-	CString strURL;
-	BOOL bResult = FALSE;
-
-	ASSERT(lpURL != NULL); if(lpURL == NULL) return FALSE;
-	strURL = lpURL;
-
-	if(strURL.Find(_T("ssh:")) >= 0)
-	{
-		TCHAR tszKey[MAX_PATH << 1];
-
-		// TODO: Make this configurable
-		_tcscpy(tszKey, _T("PUTTY.EXE -ssh "));
-
-		// Parse out the "http://" and "ssh://"
-		if(strURL.Find(_T("http://")) == 0)
-			strURL = strURL.Right(strURL.GetLength() - _tcslen(_T("http://")));
-
-		strURL = strURL.Right(strURL.GetLength() - _tcslen(_T("ssh:")));
-		if(strURL.Left(1) == _T("/"))
-			strURL = strURL.Right(strURL.GetLength() - 1);
-		if(strURL.Left(1) == _T("/"))
-			strURL = strURL.Right(strURL.GetLength() - 1);
-
-		// Add pre-URL command-line parameters
-		if(lpUser != NULL)
-		{
-			if(_tcslen(lpUser) > 0)
-			{
-				_tcscat(tszKey, lpUser);
-				_tcscat(tszKey, _T("@"));
-			}
-		}
-
-		// Add the URL
-		_tcscat(tszKey, (LPCTSTR)strURL);
-
-		// Execute the ssh client
-		bResult = WinExec(tszKey, SW_SHOW) > 31 ? TRUE : FALSE;
-	}
-	else if(strURL.Find(_T("telnet:")) >= 0)
-	{
-		TCHAR tszKey[MAX_PATH << 1];
-
-		// TODO: Make this configurable
-		_tcscpy(tszKey, _T("PUTTY.EXE "));
-
-		// Parse out the "http://" and "telnet://"
-		if(strURL.Find(_T("http://")) == 0)
-			strURL = strURL.Right(strURL.GetLength() - _tcslen(_T("http://")));
-
-		strURL = strURL.Right(strURL.GetLength() - _tcslen(_T("telnet:")));
-		if(strURL.Left(1) == _T("/"))
-			strURL = strURL.Right(strURL.GetLength() - 1);
-		if(strURL.Left(1) == _T("/"))
-			strURL = strURL.Right(strURL.GetLength() - 1);
-
-		// Add the url
-		_tcscat(tszKey, _T("telnet://"));
-		_tcscat(tszKey, strURL.GetBuffer(0));
-
-		// Execute the ssh client
-		bResult = WinExec(tszKey, SW_SHOW) > 31 ? TRUE : FALSE;
-	}
-
-	return bResult;
-}
-
-void OpenUrlEx(LPCTSTR lpURL)
-{
-	ASSERT(lpURL != NULL); if(lpURL == NULL) return;
-
-	if(_tcslen(lpURL) == 0) return;
-
-	if(_tcsncmp(lpURL, _T("http://"), 7) == 0)
-	{
-		if(OpenUrlInNewBrowser(lpURL) == FALSE)
-			ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
-	}
-	else if(_tcsncmp(lpURL, _T("https://"), 8) == 0)
-	{
-		if(OpenUrlInNewBrowser(lpURL) == FALSE)
-			ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
-	}
-	else if(_tcsncmp(lpURL, _T("cmd://"), 6) == 0)
-	{
-		if(_tcslen(lpURL) != 6)
-			WinExec(((LPCSTR)lpURL) + (6 * sizeof(TCHAR)), SW_SHOW);
-	}
-	else
-	{
-		ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
-	}
-}
-
-CString ExtractAutoTypeCmd(LPCTSTR lpstr)
+// Extracts a substring from the lpstr string
+// Example: to extract the auto-type command, pass "auto-type:" in lpStart
+CPP_FN_SHARE CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart)
 {
 	TCHAR *lp;
 	TCHAR tch;
@@ -897,10 +665,10 @@ CString ExtractAutoTypeCmd(LPCTSTR lpstr)
 	strSource.MakeLower();
 	lp = (TCHAR *)lpstr;
 
-	nPos = strSource.Find("auto-type:", 0);
+	nPos = strSource.Find(lpStart, 0);
 	if(nPos != -1)
 	{
-		lp += _tcslen("auto-type:");
+		lp += _tcslen(lpStart);
 		lp += nPos;
 
 		while(1)
@@ -920,7 +688,7 @@ CString ExtractAutoTypeCmd(LPCTSTR lpstr)
 	return str;
 }
 
-CString TagSimString(LPCTSTR lpString)
+CPP_FN_SHARE CString TagSimString(LPCTSTR lpString)
 {
 	int i;
 	CString str = _T("");
@@ -948,4 +716,23 @@ CString TagSimString(LPCTSTR lpString)
 	}
 
 	return str;
+}
+
+
+C_FN_SHARE void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath)
+{
+	unsigned int i;
+
+	_tcscpy(pszPath, pszFile);
+
+	for(i = _tcslen(pszFile) - 1; i > 1; i--)
+	{
+		if((pszFile[i] == _T('\\')) || (pszFile[i] == _T('/')))
+		{
+			pszPath[i] = 0;
+			pszPath[i+1] = 0;
+			break;
+		}
+	}
+
 }

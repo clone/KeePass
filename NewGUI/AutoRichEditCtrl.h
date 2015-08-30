@@ -1,3 +1,6 @@
+// This is a modified version of the AutoRichEditCtrl class
+// Editor: Dominik Reichl
+
 #if !defined(AFX_AUTORICHEDITCTRL_H__C26D1E0E_DD32_11D2_B39F_000092914562__INCLUDED_)
 #define AFX_AUTORICHEDITCTRL_H__C26D1E0E_DD32_11D2_B39F_000092914562__INCLUDED_
 
@@ -6,6 +9,8 @@
 #endif // _MSC_VER > 1000
 // AutoRichEditCtrl.h : header file
 //
+
+#include "../Util/SysDefEx.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CAutoRichEditCtrl window

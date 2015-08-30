@@ -136,6 +136,10 @@ SOURCE=.\PasswordDlg.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\PluginsDlg.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\PwGeneratorDlg.cpp
 # End Source File
 # Begin Source File
@@ -209,6 +213,10 @@ SOURCE=.\PasswordDlg.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\PluginsDlg.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\PwGeneratorDlg.h
 # End Source File
 # Begin Source File
@@ -237,15 +245,11 @@ SOURCE=.\TanWizardDlg.h
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 # Begin Source File
 
+SOURCE=.\res\bin1.bin
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\cancel.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=.\res\check_fa.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=.\res\check_tr.bmp
 # End Source File
 # Begin Source File
 
@@ -262,10 +266,6 @@ SOURCE=.\res\document.bmp
 # Begin Source File
 
 SOURCE=.\res\file.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=.\res\hand.cur
 # End Source File
 # Begin Source File
 
@@ -297,10 +297,6 @@ SOURCE=.\res\locked.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\res\mainfram.ico
-# End Source File
-# Begin Source File
-
 SOURCE=.\res\mouse_sm.bmp
 # End Source File
 # Begin Source File
@@ -310,6 +306,10 @@ SOURCE=.\res\ok.bmp
 # Begin Source File
 
 SOURCE=.\res\options.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\plugins.ico
 # End Source File
 # Begin Source File
 
@@ -358,10 +358,6 @@ SOURCE=.\res\tb_find.bmp
 # Begin Source File
 
 SOURCE=.\res\tb_lock.bmp
-# End Source File
-# Begin Source File
-
-SOURCE=.\res\tb_main.bmp
 # End Source File
 # Begin Source File
 
@@ -431,6 +427,22 @@ SOURCE=.\PwSafe\PwUtil.h
 # Begin Group "Util"
 
 # PROP Default_Filter ""
+# Begin Group "Plugins"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\Util\KeePluginDef.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Util\PluginMgr.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Util\PluginMgr.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\Util\base64.cpp
@@ -479,6 +491,18 @@ SOURCE=.\Util\StrUtil.cpp
 # Begin Source File
 
 SOURCE=.\Util\StrUtil.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Util\SysDefEx.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Util\WinUtil.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Util\WinUtil.h
 # End Source File
 # End Group
 # Begin Group "Crypto"
@@ -661,6 +685,14 @@ SOURCE=.\NewGUI\SystemTrayEx.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\NewGUI\ThemeHelperST.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\ThemeHelperST.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\NewGUI\TranslateEx.cpp
 # End Source File
 # Begin Source File
@@ -691,6 +723,14 @@ SOURCE=.\NewGUI\XHyperLink.cpp
 # Begin Source File
 
 SOURCE=.\NewGUI\XHyperLink.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\XPStyleButtonST.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\XPStyleButtonST.h
 # End Source File
 # End Group
 # End Target

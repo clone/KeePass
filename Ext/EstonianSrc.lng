@@ -146,7 +146,7 @@
 |&File|                        |&Fail|
 |&Edit|                        |&Muuda|
 |&View|                        |&Vaade|
-|&Extras|                      |&Ekstra|
+|E&xtras|                      |&Ekstra|
 |&?|                           |&?|
 
 |&New Database...|             |&Uus andmebaas...|
@@ -158,22 +158,22 @@
 |&Print Complete Password List|                |&Prindi välja täielik paroolinimekiri|
 |&Lock Workspace|              |&Lukusta töökeskkond|
 |&Unlock Workspace|            |&Ava töökeskkond|
-|&Exit|                        |&Välju|
+|E&xit|                        |&Välju|
 
 |&Lock/Unlock Workspace|       |&Töökeskkonna lukustamine/avamine|
 
-|&Options|                     |&Seaded|
-|&Add Password Group...|       |&Uus parooligrupp...|
-|&Modify Password Group...|    |Muuda parooligruppi...|
+|&Options...|                     |&Seaded...|
+|Add Password &Group...|       |Lisa parooligrupp...|
+|Modif&y Password Group...|    |&Muuda parooligruppi...|
 |&Delete Password Group...|    |Kustuta parooligrupp...|
-|&Print Group|                 |&Prindi grupp...|
+|Pr&int Group|                 |&Prindi grupp...|
 |Export Group To &HTML...|     |Ekspordi grupp &HTML formaadis...|
 |Export Group To &XML...|      |Ekspordi grupp &XML formaadis...|
 |Export Group To &CSV...|      |Ekspordi grupp &CSV formaadis...|
 |Copy User&Name To Clipboard|  |Kopeeri kasutajanimi lõikelauale|
 |Copy &Password To Clipboard|  |Kopeeri parool lõikelauale|
 |&Find In Database...|         |Otsi andmebaasist...|
-|Find In This &Group...|       |Otsi sellest grupist...|
+|Find In T&his Group...|       |Otsi sellest grupist...|
 |&Add Entry...|                |Lisa sissekanne...|
 |&Edit/View Entry...|          |Muuda/vaata sissekannet...|
 |&Delete Entry|                |Kustuta sissekanne|
@@ -193,13 +193,13 @@
 |Show User&Name Column|        |Näita kasutajanime veergu|
 |Show &URL Column|             |Näita URL veergu|
 |Show &Password Column|        |Näita parooli veergu|
-|Show &Notes Column|           |Näita märkuste veergu|
+|Show Note&s Column|           |Näita &märkuste veergu|
 |Main Window &Always On Top|   |Põhiaken alati kõige pealmine|
-|&Hide Passwords Behind Asterisks (***)|       |Peida paroolid tärnidega (***)|
+|Hide &Passwords Behind Asterisks (***)|       |Peida &paroolid tärnidega (***)|
 
 |Password &Generator|          |Parooli &Generaator|
 
-|Visit KeePass &Homepage|      |Külasta KeePass &kodulehekülge|
+|Visit &KeePass Homepage|      |Külasta &KeePass kodulehekülge|
 |&About KeePass...|            |KeeP&ass Tiitelandmed...|
 
 |&Minimize/Maximize Window To/From Tray|
@@ -272,7 +272,6 @@
     |Valige üks nimekirjas olevatest keeltest.|
 |Available Languages|          |Olemasolevad keeled|
 
-|Open &ReadMe File|            |Ava LoeMind fail|
 |Open &License File|           |Ava litsentsi fail|
 |&Print License File|          |&Prindi litsents välja|
 
@@ -361,8 +360,8 @@
 
 |Show &Creation Time Column|   |Näita loomisaja veergu|
 |Show Last &Modification Time Column|          |&Näita viimase muutmise veergu|
-|Show Last Access &Time Column|                |Näita viimase kasutuse veergu|
-|Show &Expire Time Column|                     |Näita kehtivusaja lõpu veergu|
+|Show &Last Access Time Column|                |Näita &viimase kasutuse veergu|
+|Show &Expire Time Column|                     |Näita &kehtivusaja lõpu veergu|
 |Show UU&ID Column|                            |Näita UU&ID veergu|
 
 |Show &ToolBar|                |Näita &Tööristariba|
@@ -404,13 +403,13 @@
 |Author|                       |Autor|
 |Translation author contact|   |Tõlke autori kontaktandmed|
 
-|Add Password &Subgroup...|	   |Lisa uus paroolide &alamgrupp...|
+|Add Password Su&bgroup...|	   |Lisa uus paroolide &alamgrupp...|
 |&Rearrange|                   |&Korralda ümber|
 |&Sort Group List|			   |&Sorteeri gruppide nimekiri|
 |Move Group One &Left|		   |Liiguta grupp koha võrra &vasakule|
 |Move Group One &Right|		   |Liiguta grupp koha võrra &paremale|
 
-|&Sort List By Title|		   |Sorteeri nimekiri &nime järgi|
+|Sort List By &Title|		   |Sorteeri nimekiri &nime järgi|
 |Sort List By User&Name|	   |Sorteeri nimekiri &kasutajanime järgi|
 |Sort List By &URL|			   |Sorteeri nimekiri &URL järgi|
 |Sort List By &Password|	   |Sorteeri nimekiri &parooli järgi|
@@ -424,8 +423,8 @@
 |Sort List By &Expiration Time|
 	|Sorteeri nimekiri kehtivuse kaotamise aja järgi|
 
-|Hide UserNames Behind &Asterisks (***)|
-	|Peida kasutajanimed tärnide taha (***)|
+|Hide &UserNames Behind Asterisks (***)|
+	|Peida &kasutajanimed tärnide taha (***)|
 
 |Attachment:|				   |Manus:|
 
@@ -465,7 +464,7 @@
 |&Remove Association|		   |&Kustuta seos|
 |Collect &entropy (recommended for strong passwords)|
 	|Kogu &entroopiat (soovituslik tugevate paroolide saamiseks)|
-|Create &Association|		   |Loo &Seos|
+|Create &Association|		   |Loo &seos|
 |Here you can associate .kdb files with KeePass (so KeePass opens the file when double-clicking on it):|
 	|Siin on võimalik seostada .kdb faile KeePassiga (seos tähendab et topeltklõps avab faili KeePassiga):|
 |KeePass Password Database|	   |KeePass paroolide andmebaas|
@@ -526,8 +525,8 @@
 |&XML File...|					|&XML fail...|
 |Code&Wallet TXT File...|		|Code&Wallet TXT fail...|
 |Do you want to overwrite it?|	|Kas sa tahad selle ülekirjutada?|
-|Export To|						|Ekpordi..|
-|Import From|					|Impordi..|
+|&Export To|					|&Ekpordi..|
+|&Import From|					|&Impordi..|
 |Imported from Password Safe|	|Password Safe'ist imporditud|
 |Most probably someone has changed the file while you were editing it.|
 	|Kõige tõenäolisemalt on keegi vahepeal faili muutnud.|
@@ -562,9 +561,27 @@
 	|Kõik valitud sissekanded kustutatakse igaveseks!|
 |Use PuTTY for ssh: and telnet: URLs|
 	|Kasuta PuTTYt ssh: ja telnet: URL aadresside puhul|
+	
+|Auto-&Sort Password List|		|Auto-&sorteeri paroolinimekiri|
+|Auto-sorting of the password list is enabled, you cannot move entries manually.|
+	|Auto-sorteerimine sisselülitatud, sissekannete käsitsi sorteerimine ei ole võimalik.|
+|Auto-sorting of the password list is enabled, you cannot sort the list manually now.|
+	|Auto-sorteerimine sisselülitatud, hetkel ei ole võimalik käsitsi sorteerida.|
+|Change password of this database - Enter new master key|
+	|Muuda käesoleva andmebaasi põhiparooli - Sisesta uus parool|
+|Enter the new master key for this database.|
+	|Sisesta uus põhiparool käesolevale andmebaasile.|
+|N&o Auto-Sort|					|Auto-sorteerimine väljas|
+|Open &Help File|				|Ava &abi fail|
+|Perform Auto-&Type|			|&Automaatne sisestus|
+|Repeat master key|				|Korda põhiparooli|
+|Repeat the master key for this database.|
+	|Korda käesoleva andmebaasi põhiparooli.|
+|Save key-file manually to...|  |Salvesta võtmefail käsitsi...|
+|Select key-file manually...|	|Vali võtmefail käsitsi...|	
 
 |~LANGUAGENAME|                |Estonian|
-|~LANGUAGEVERSION|             |0.97b|
+|~LANGUAGEVERSION|             |0.98a|
 |~LANGUAGEAUTHOR|              |Andri Viiand|
 |~LANGUAGEAUTHOREMAIL|         |andriv@users.sourceforge.net, http://sourceforge.net/users/andriv|
 

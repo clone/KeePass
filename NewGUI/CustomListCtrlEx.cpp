@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -193,4 +193,14 @@ void CCustomListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	((CPwSafeDlg *)m_pParentI)->NotifyUserActivity();
 
 	CListCtrl::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+BOOL CCustomListCtrlEx::EnsureVisible(int nItem, BOOL bPartialOK)
+{
+	return CListCtrl::EnsureVisible(nItem, bPartialOK);
+}
+
+int CCustomListCtrlEx::GetItemCount()
+{
+	return CListCtrl::GetItemCount();
 }

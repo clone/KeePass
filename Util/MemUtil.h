@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -35,8 +35,8 @@
 
 // Safely delete pointers
 #ifndef SAFE_DELETE
-#define SAFE_DELETE(p)       { if((p) != NULL) { delete (p);     (p) = NULL; } }
-#define SAFE_DELETE_ARRAY(p) { if((p) != NULL) { delete [](p);  (p) = NULL; } }
+#define SAFE_DELETE(p)       { if((p) != NULL) { delete (p); (p) = NULL; } }
+#define SAFE_DELETE_ARRAY(p) { if((p) != NULL) { delete [](p); (p) = NULL; } }
 #define SAFE_RELEASE(p)      { if((p) != NULL) { (p)->Release(); (p) = NULL; } }
 #endif
 
@@ -44,32 +44,30 @@
 #define SDF_BUF_SIZE 4096
 
 // Securely erase memory
-void mem_erase(unsigned char *p, unsigned long u);
+C_FN_SHARE void mem_erase(unsigned char *p, unsigned long u);
 
 #ifndef _WIN32_WCE
-BOOL SecureDeleteFile(LPCSTR pszFilePath);
+C_FN_SHARE BOOL SecureDeleteFile(LPCSTR pszFilePath);
 #endif
 
 // Time conversion functions
-void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWORD dwDay, DWORD dwHour, DWORD dwMinute, DWORD dwSecond);
-void _UnpackStructToTime(BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond);
+C_FN_SHARE void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWORD dwDay, DWORD dwHour, DWORD dwMinute, DWORD dwSecond);
+C_FN_SHARE void _UnpackStructToTime(BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond);
 
 // Getting the time
-void _GetCurrentPwTime(PW_TIME *p);
+C_FN_SHARE void _GetCurrentPwTime(PW_TIME *p);
 
 // Compare two PW_TIME structures, returns -1 if pt1<pt2, returns 1 if pt1>pt2,
 // returns 0 if pt1=pt2
-int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2);
+C_FN_SHARE int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2);
 
 // Packs an array of integers to a TCHAR string
-void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount);
+C_FN_SHARE void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount);
 
 // Unpacks a TCHAR string to an array of integers
-void str2ar(TCHAR *tszString, INT *pArray, INT nItemCount);
+C_FN_SHARE void str2ar(TCHAR *tszString, INT *pArray, INT nItemCount);
 
 // Hash a file
-BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash);
-
-BOOL _FileAccessible(LPCTSTR lpFile);
+C_FN_SHARE BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash);
 
 #endif

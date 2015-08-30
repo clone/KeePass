@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,12 +30,13 @@
 #ifndef AFX_DBSETTINGSDLG_H__B913D560_B1A3_11D8_BF16_0050BF14F5CC__INCLUDED_
 #define AFX_DBSETTINGSDLG_H__B913D560_B1A3_11D8_BF16_0050BF14F5CC__INCLUDED_
 
-#include "NewGUI/BtnST.h"
+#include "Util/SysDefEx.h"
+#include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CDbSettingsDlg : public CDialog
+class CPP_CLASS_SHARE CDbSettingsDlg : public CDialog
 {
 public:
 	CDbSettingsDlg(CWnd* pParent = NULL);
@@ -45,8 +46,8 @@ public:
 	//{{AFX_DATA(CDbSettingsDlg)
 	enum { IDD = IDD_DBSETTINGS_DLG };
 	CComboBox	m_cEncAlgos;
-	CButtonST	m_btCancel;
-	CButtonST	m_btOK;
+	CXPStyleButtonST	m_btCancel;
+	CXPStyleButtonST	m_btOK;
 	int		m_nAlgorithm;
 	DWORD	m_dwNumKeyEnc;
 	//}}AFX_DATA

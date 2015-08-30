@@ -1,3 +1,58 @@
+05/02/26 - 0.98b
+- Implemented plugin architecture
+- Added global auto-type hot key (just press some hot key
+  combination to make KeePass enter the login information, you
+  can set the key combination in 'Edit - Options - Setup', the
+  default hot key is Ctrl-Alt-A; see manual for more info)
+- Added option to lock a database using a password _and_ a key-
+  disk together, i.e. you need both to unlock your database
+- Added full XP theme compatibility
+- Updated CHM documentation and the KeePass homepage
+- The column sizes and splitter positions are now remembered
+  when KeePass is in maximized mode
+- Toolbar and statusbar are now updated after a quickfind
+- User cannot add a search-results group himself any more
+- Fixed a problem in the auto-type feature when typing long
+  strings
+- Improved error messages for opening and saving files (not
+  just telling that something failed, but why it failed)
+- Fixed some window bugs, which could occur after using the
+  auto-type feature (small window and always-on-top failure)
+- Improved UTF-8 support for all import formats
+- KeePass now releases the Ctrl key for you before auto-typing
+- Entry preview window is cleared after a find or quickfind
+- When a restart is needed (for example after changing the
+  'disable security-critical commands' option), KeePass first
+  asks the user to save all data before restarting (avoiding a
+  hidden KeePass window in the background)
+- KeePass uses the users directory to store the INI file, if
+  there is no INI file in the application directory and the
+  application directory is write-protected
+- Improved CSV export (escapes special characters now)
+- The delete-entry toolbar button works again
+- Improved, more secure copy-to-clipboard functions (blocking
+  clipboard monitors and paste-once-only functionality; thanks
+  to Gabe Martin for contributing the code!)
+- It's possible now to disable the expiration time of an entry
+- The entry-moving routines should now be a bit faster
+- New help hyperlinks in the add-entry dialog about URLs and
+  the auto-type feature
+- Bugfix: the date field in the add-entry dialog didn't allow
+  days greater than 28
+- Improved tab orders in some dialogs
+- The auto-type sequence and auto-type window definition lines
+  are now removed before copying the contents of the notes
+  field to the clipboard
+- The clipboard is now cleared when the database is closed or
+  the workspace is locked
+- All dialogs are now positioned relatively to their parent
+  instead of being centered in the full screen area
+- Improved the TAN wizard (you can assign consecutive numbers
+  to the TANs now, if you wish) and fixed some bugs in it
+- More clear "save before close/lock" message box title
+- KeePass now first tests if the configuration file (.ini) is
+  accessible before trying to write to it
+
 04/11/21 - 0.98a
 - Implemented auto-type feature (KeePass can minimize itself
   and type the username and password of the currently selected

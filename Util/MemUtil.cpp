@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -32,21 +32,22 @@
 #include "NewRandom.h"
 #include "../Crypto/sha2.h"
 
-void mem_erase(unsigned char *p, unsigned long u)
+C_FN_SHARE void mem_erase(unsigned char *p, unsigned long u)
 {
-	// unsigned long i;
+	unsigned long i;
 
+	ASSERT(sizeof(unsigned char) == 1);
 	ASSERT(p != NULL); if(p == NULL) return;
 	if(u == 0) return;
 
-	// for(i = 0; i < u; i++)
-	//	p[i] = (unsigned char)(rand() & 0xFF);
+	for(i = 0; i < u; i++)
+		p[i] = (unsigned char)(rand() & 0xFF);
 
 	memset(p, 0, u);
 }
 
 #ifndef _WIN32_WCE
-BOOL SecureDeleteFile(LPCSTR pszFilePath)
+C_FN_SHARE BOOL SecureDeleteFile(LPCSTR pszFilePath)
 {
 	HANDLE hFile;
 	DWORD i, m, dwSizeLo, dwTmp;
@@ -112,7 +113,7 @@ BOOL SecureDeleteFile(LPCSTR pszFilePath)
 // Byte bits: 11111111 22222222 33333333 44444444 55555555
 // Contents : 00YYYYYY YYYYYYMM MMDDDDDH HHHHMMMM MMSSSSSS
 
-void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWORD dwDay, DWORD dwHour, DWORD dwMinute, DWORD dwSecond)
+C_FN_SHARE void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWORD dwDay, DWORD dwHour, DWORD dwMinute, DWORD dwSecond)
 {
 	ASSERT(pBytes != NULL); if(pBytes == NULL) return;
 	// Pack the time to a 5 byte structure
@@ -123,7 +124,7 @@ void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWORD dwDay, D
 	pBytes[4] = (BYTE)(((dwMinute & 0x00000003) << 6) | (dwSecond & 0x0000003F));
 }
 
-void _UnpackStructToTime(BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond)
+C_FN_SHARE void _UnpackStructToTime(BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond)
 {
 	DWORD dw1, dw2, dw3, dw4, dw5;
 	ASSERT(pBytes != NULL);
@@ -139,7 +140,7 @@ void _UnpackStructToTime(BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *p
 	*pdwSecond = dw5 & 0x0000003F;
 }
 
-void _GetCurrentPwTime(PW_TIME *p)
+C_FN_SHARE void _GetCurrentPwTime(PW_TIME *p)
 {
 	SYSTEMTIME t;
 	ASSERT(p != NULL);
@@ -149,7 +150,7 @@ void _GetCurrentPwTime(PW_TIME *p)
 	p->btSecond = (BYTE)t.wSecond; p->shYear = (USHORT)t.wYear;
 }
 
-int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2)
+C_FN_SHARE int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2)
 {
 	if(pt1->shYear < pt2->shYear) return -1;
 	else if(pt1->shYear > pt2->shYear) return 1;
@@ -173,7 +174,7 @@ int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2)
 }
 
 // Packs an array of integers to a TCHAR string
-void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount)
+C_FN_SHARE void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount)
 {
 	INT i;
 	TCHAR tszTemp[20];
@@ -195,7 +196,7 @@ void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount)
 }
 
 // Unpacks a TCHAR string to an array of integers
-void str2ar(TCHAR *tszString, INT *pArray, INT nItemCount)
+C_FN_SHARE void str2ar(TCHAR *tszString, INT *pArray, INT nItemCount)
 {
 	INT i = 0;
 	TCHAR *p = tszString;
@@ -220,7 +221,7 @@ void str2ar(TCHAR *tszString, INT *pArray, INT nItemCount)
 	}
 }
 
-BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash)
+C_FN_SHARE BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash)
 {
 	FILE *fp = NULL;
 	unsigned char *pBuf = NULL;
@@ -251,14 +252,5 @@ BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash)
 	fclose(fp); fp = NULL;
 
 	SAFE_DELETE_ARRAY(pBuf);
-	return TRUE;
-}
-
-BOOL _FileAccessible(LPCTSTR lpFile)
-{
-	FILE *fp;
-	fp = _tfopen(lpFile, _T("rb"));
-	if(fp == NULL) return FALSE;
-	fclose(fp); fp = NULL;
 	return TRUE;
 }

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@
 #define ___WINDOW_GROUPS_H___
 
 #include "NewGUICommon.h"
+#include "../Util/SysDefEx.h"
 
 #define WG_OFFSET_TOP  105
 #define WG_OFFSET_LEFT  35

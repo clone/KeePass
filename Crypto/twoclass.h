@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,9 @@
 
 #include "twofish.h"
 #include "rijndael.h"
+#include "../Util/SysDefEx.h"
 
-class CTwofish
+class CPP_CLASS_SHARE CTwofish
 {
 public:
 	CTwofish();

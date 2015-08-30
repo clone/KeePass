@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -90,7 +90,11 @@ BOOL CPwImport::ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwGr
 	if(pData[uFileSize - 1] == '\\') pData[uFileSize - 1] = 0;
 
 	j = 0; bInField = FALSE;
-	for(i = 0; i < uFileSize; i++)
+	if(uFileSize > 3)
+		if((pData[0] == 0xEF) && (pData[1] == 0xBB) && (pData[2] == 0xBF))
+			j += 3; // Skip UTF-8 initialization characters
+
+	for(i = j; i < uFileSize; i++)
 	{
 		if(pData[i] == '\\')
 		{
@@ -149,6 +153,11 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 	strPassword.Empty(); strNotes.Empty();
 
 	i = DWORD_MAX;
+
+	if(uFileSize > 3)
+		if((pData[0] == 0xEF) && (pData[1] == 0xBB) && (pData[2] == 0xBF))
+			i += 3; // Skip UTF-8 initialization characters
+
 	while(1) // Processing the file
 	{
 		str.Empty();
@@ -319,6 +328,11 @@ BOOL CPwImport::ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr)
 	strPassword.Empty(); strNotes.Empty();
 
 	i = DWORD_MAX;
+
+	if(uFileSize > 3)
+		if((pData[0] == 0xEF) && (pData[1] == 0xBB) && (pData[2] == 0xBF))
+			i += 3; // Skip UTF-8 initialization characters
+
 	while(1) // Processing the file
 	{
 		str.Empty();
@@ -450,6 +464,11 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 	nField = 0;
 	i = 0; j = 0;
 	strGroup.Empty(); strTitle.Empty(); strUserName.Empty(); strPassword.Empty(); strNotes.Empty();
+
+	if(uFileSize > 3)
+		if((pData[0] == 0xEF) && (pData[1] == 0xBB) && (pData[2] == 0xBF))
+			i += 3; // Skip UTF-8 initialization characters
+
 	while(1)
 	{
 		if((pData[i] == '\t') && (bInNotes == FALSE))
@@ -617,9 +636,10 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamSize)
 {
 	unsigned long s;
-	char *pTitle, *pUserName, *pPassword, *pURL, *pNotes;
+	char *pTitle = NULL, *pUserName = NULL, *pPassword = NULL, *pURL = NULL, *pNotes = NULL;
 	char *p = (char *)pStream;
 	char *pEnd = (char *)pStream + uStreamSize;
+	TCHAR *tszTitle = NULL, *tszUserName = NULL, *tszPassword = NULL, *tszURL = NULL, *tszNotes = NULL;
 
 	ASSERT(pStream != NULL);
 
@@ -627,27 +647,27 @@ void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamS
 	{
 		if(p >= pEnd) break;
 		pTitle = p;
-		s = strlen(p);
+		s = szlen(p);
 		p += s + 1;
 
 		if(p >= pEnd) break;
 		pUserName = p;
-		s = strlen(p);
+		s = szlen(p);
 		p += s + 1;
 
 		if(p >= pEnd) break;
 		pPassword = p;
-		s = strlen(p);
+		s = szlen(p);
 		p += s + 1;
 
 		if(p >= pEnd) break;
 		pURL = p;
-		s = strlen(p);
+		s = szlen(p);
 		p += s + 1;
 
 		if(p >= pEnd) break;
 		pNotes = p;
-		s = strlen(p);
+		s = szlen(p);
 		p += s + 1;
 
 		if((strcmp(pTitle, "Account") != 0) && (strcmp(pPassword, "Password") != 0))
@@ -655,21 +675,33 @@ void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamS
 			PW_ENTRY pwTemplate;
 			PW_TIME tNow;
 
+			tszTitle = _UTF8ToString((UTF8_BYTE *)pTitle);
+			tszUserName = _UTF8ToString((UTF8_BYTE *)pUserName);
+			tszPassword = _UTF8ToString((UTF8_BYTE *)pPassword);
+			tszURL = _UTF8ToString((UTF8_BYTE *)pURL);
+			tszNotes = _UTF8ToString((UTF8_BYTE *)pNotes);
+
 			memset(&pwTemplate, 0, sizeof(PW_ENTRY));
 			_GetCurrentPwTime(&tNow);
-			pwTemplate.pszAdditional = pNotes;
-			pwTemplate.pszPassword = pPassword;
-			pwTemplate.pszTitle = pTitle;
-			pwTemplate.pszURL = pURL;
-			pwTemplate.pszUserName = pUserName;
+			pwTemplate.pszAdditional = tszNotes;
+			pwTemplate.pszPassword = tszPassword;
+			pwTemplate.pszTitle = tszTitle;
+			pwTemplate.pszURL = tszURL;
+			pwTemplate.pszUserName = tszUserName;
 			pwTemplate.tCreation = tNow; CPwManager::_GetNeverExpireTime(&pwTemplate.tExpire);
 			pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
 			pwTemplate.uGroupId = m_dwLastGroupId;
-			pwTemplate.uImageId = _GetPreferredIcon(pTitle);
-			pwTemplate.uPasswordLen = _tcslen(pPassword);
+			pwTemplate.uImageId = _GetPreferredIcon(tszTitle);
+			pwTemplate.uPasswordLen = _tcslen(tszPassword);
 			// UUID is zero -> create new UUID
 
 			m_pLastMgr->AddEntry(&pwTemplate);
+
+			SAFE_DELETE_ARRAY(tszTitle);
+			SAFE_DELETE_ARRAY(tszUserName);
+			SAFE_DELETE_ARRAY(tszPassword);
+			SAFE_DELETE_ARRAY(tszURL);
+			SAFE_DELETE_ARRAY(tszNotes);
 		}
 	}
 }

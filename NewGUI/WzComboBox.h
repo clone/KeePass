@@ -14,6 +14,7 @@
 #define AFX_CWZCOMBOBOX_H__86AA2FAB_5927_430B_AF57_06B24164E192__INCLUDED_
 
 #include "NewGUICommon.h"
+#include "../Util/SysDefEx.h"
 
 #if _MSC_VER > 1000
 #pragma once

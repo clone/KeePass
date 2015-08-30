@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,12 +30,13 @@
 #ifndef AFX_FINDINDBDLG_H__BE7DB380_15E6_11D8_BF16_0050BF14F5CC__INCLUDED_
 #define AFX_FINDINDBDLG_H__BE7DB380_15E6_11D8_BF16_0050BF14F5CC__INCLUDED_
 
+#include "Util/SysDefEx.h"
 #include "NewGUI/KCSideBannerWnd.h"
-#include "NewGUI/BtnST.h"
+#include "NewGUI/XPStyleButtonST.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CFindInDbDlg : public CDialog
+class CPP_CLASS_SHARE CFindInDbDlg : public CDialog
 {
 public:
 	CFindInDbDlg(CWnd* pParent = NULL);
@@ -44,8 +45,8 @@ public:
 
 	//{{AFX_DATA(CFindInDbDlg)
 	enum { IDD = IDD_FIND_DLG };
-	CButtonST	m_btOK;
-	CButtonST	m_btCancel;
+	CXPStyleButtonST	m_btOK;
+	CXPStyleButtonST	m_btCancel;
 	BOOL	m_bAdditional;
 	BOOL	m_bPassword;
 	BOOL	m_bTitle;

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -109,7 +109,7 @@ static const unsigned char g_uVectTwofishCipher[16] =
 	0x9F, 0x0C, 0xFC, 0xCA, 0xE8, 0x7C, 0xFA, 0x20
 };
 
-unsigned long testCryptoImpl()
+C_FN_SHARE unsigned long testCryptoImpl()
 {
 	unsigned long uTestMask;
 	sha2_32t sha32;

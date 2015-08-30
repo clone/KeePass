@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -35,12 +35,14 @@
 #include "GradientProgressCtrl.h"
 #include "KCSideBannerWnd.h"
 #include "XHyperLink.h"
+#include "XPStyleButtonST.h"
 
 #include "../PwSafe/PwUtil.h"
 
 static BOOL g_bImgButtons = 0;
+static CThemeHelperST *g_pThemeHelper = NULL;
 
-COLORREF NewGUI_GetBgColor()
+C_FN_SHARE COLORREF NewGUI_GetBgColor()
 {
 	// HDC hDC = NULL;
 	// int nBitsPerPixel = 0;
@@ -56,7 +58,7 @@ COLORREF NewGUI_GetBgColor()
 	return GetSysColor(COLOR_BTNFACE);
 }
 
-COLORREF NewGUI_GetBtnColor()
+C_FN_SHARE COLORREF NewGUI_GetBtnColor()
 {
 	COLORREF clr;
 
@@ -66,15 +68,17 @@ COLORREF NewGUI_GetBtnColor()
 	return clr;
 }
 
-void NewGUI_SetImgButtons(BOOL bImageButtons)
+C_FN_SHARE void NewGUI_SetImgButtons(BOOL bImageButtons)
 {
 	ASSERT((bImageButtons == TRUE) || (bImageButtons == FALSE));
 	g_bImgButtons = bImageButtons;
 }
 
-void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage)
+C_FN_SHARE void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage)
 {
 	CButtonST *p = (CButtonST *)pButton;
+
+	ASSERT(p != NULL); if(p == NULL) return;
 
 	p->SetFlat(FALSE);
 
@@ -85,6 +89,36 @@ void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImag
 
 	if((nBitmapIn != -1) && (nBitmapOut != -1))
 		p->SetBitmaps(nBitmapIn, RGB(255, 0, 255), nBitmapOut, RGB(255, 0, 255));
+}
+
+C_FN_SHARE void NewGUI_SetThemeHelper(void *pThemeHelper)
+{
+	ASSERT(pThemeHelper != NULL);
+	g_pThemeHelper = (CThemeHelperST *)pThemeHelper;
+
+	if(g_pThemeHelper != NULL)
+	{
+		if(g_pThemeHelper->IsAppThemed() == FALSE)
+			g_pThemeHelper = NULL;
+	}
+}
+
+C_FN_SHARE void NewGUI_XPButton(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage)
+{
+	CXPStyleButtonST *p = (CXPStyleButtonST *)pButton;
+
+	ASSERT(p != NULL); if(p == NULL) return;
+
+	if(g_pThemeHelper != NULL) p->SetFlat(TRUE);
+	else p->SetFlat(FALSE);
+
+	if(!((g_bImgButtons == FALSE) && (bForceImage == FALSE)))
+	{
+		if((nBitmapIn != -1) && (nBitmapOut != -1))
+			p->SetBitmaps(nBitmapIn, RGB(255, 0, 255), nBitmapOut, RGB(255, 0, 255));
+	}
+
+	if(g_pThemeHelper != NULL) p->SetThemeHelper(g_pThemeHelper);
 }
 
 /* Old shade button code:
@@ -118,7 +152,7 @@ void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImag
 */
 
 /*
-COLORREF NewGUI_LightenColor(COLORREF crColor, double dblFactor)
+C_FN_SHARE COLORREF NewGUI_LightenColor(COLORREF crColor, double dblFactor)
 {
 	BYTE byRed, byGreen, byBlue, byLightRed, byLightGreen, byLightBlue;
 
@@ -136,12 +170,15 @@ COLORREF NewGUI_LightenColor(COLORREF crColor, double dblFactor)
 }
 */
 
-void NewGUI_ToolBarButton(void *pButton, int nBitmapIn, int nBitmapOut)
+C_FN_SHARE void NewGUI_ToolBarButton(void *pButton, int nBitmapIn, int nBitmapOut)
 {
-	CButtonST *p = (CButtonST *)pButton;
+	CXPStyleButtonST *p = (CXPStyleButtonST *)pButton;
 	CString strToolTip;
 
+	ASSERT(p != NULL); if(p == NULL) return;
+
 	p->SetFlat(TRUE);
+	// p->DrawTransparent();
 
 	if((nBitmapIn != -1) && (nBitmapOut != -1))
 		p->SetBitmaps(nBitmapIn, RGB(255,0,255), nBitmapOut, RGB(255,0,255));
@@ -150,17 +187,23 @@ void NewGUI_ToolBarButton(void *pButton, int nBitmapIn, int nBitmapOut)
 	p->SetWindowText(_T(""));
 	p->SetTooltipText(TRL((LPCTSTR)strToolTip));
 
-	COLORREF crHighlight;
-	BYTE byRed, byGreen, byBlue;
-	p->GetColor(CButtonST::BTNST_COLOR_BK_IN, &crHighlight);
-	byRed = (BYTE)((GetRValue(crHighlight) < 240) ? GetRValue(crHighlight) + 15 : 255);
-	byGreen = (BYTE)((GetGValue(crHighlight) < 240) ? GetGValue(crHighlight) + 15 : 255);
-	byBlue = (BYTE)((GetBValue(crHighlight) < 240) ? GetBValue(crHighlight) + 15 : 255);
-	crHighlight = RGB(byRed, byGreen, byBlue);
-	p->SetColor(CButtonST::BTNST_COLOR_BK_IN, crHighlight, TRUE);
+	if(g_pThemeHelper == NULL)
+	{
+		COLORREF crHighlight;
+		BYTE byRed, byGreen, byBlue;
+		p->GetColor(CButtonST::BTNST_COLOR_BK_IN, &crHighlight);
+		byRed = (BYTE)((GetRValue(crHighlight) < 240) ? GetRValue(crHighlight) + 15 : 255);
+		byGreen = (BYTE)((GetGValue(crHighlight) < 240) ? GetGValue(crHighlight) + 15 : 255);
+		byBlue = (BYTE)((GetBValue(crHighlight) < 240) ? GetBValue(crHighlight) + 15 : 255);
+		crHighlight = RGB(byRed, byGreen, byBlue);
+		p->SetColor(CButtonST::BTNST_COLOR_BK_IN, crHighlight, TRUE);
+	}
+
+	p->SetThemeHelper(g_pThemeHelper);
+	p->DrawAsToolbar(TRUE);
 }
 
-void NewGUI_TranslateCWnd(CWnd *pWnd)
+CPP_FN_SHARE void NewGUI_TranslateCWnd(CWnd *pWnd)
 {
 	CString str;
 	ASSERT(pWnd != NULL); if(pWnd == NULL) return;
@@ -168,7 +211,7 @@ void NewGUI_TranslateCWnd(CWnd *pWnd)
 	pWnd->SetWindowText(TRL((LPCTSTR)str));
 }
 
-BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
+C_FN_SHARE BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
 {
 	TCHAR sz[1024];
 	UNREFERENCED_PARAMETER(lParam);
@@ -178,7 +221,7 @@ BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
 	return TRUE;
 }
 
-void NewGUI_ConfigQualityMeter(void *pWnd)
+CPP_FN_SHARE void NewGUI_ConfigQualityMeter(void *pWnd)
 {
 	CGradientProgressCtrl *p = (CGradientProgressCtrl *)pWnd;
 
@@ -190,7 +233,7 @@ void NewGUI_ConfigQualityMeter(void *pWnd)
 	p->SetPos(0);
 }
 
-void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword)
+CPP_FN_SHARE void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword)
 {
 	CGradientProgressCtrl *pProgress = (CGradientProgressCtrl *)pProgressBar;
 	CStatic *pStatic = (CStatic *)pStaticDesc;
@@ -210,7 +253,7 @@ void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR 
 	pProgress->SetPos((int)dwBits);
 }
 
-void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
+CPP_FN_SHARE void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
 {
 	CKCSideBannerWnd *p = (CKCSideBannerWnd *)pBanner;
 	CWnd *pParent = (CWnd *)pParentWnd;
@@ -229,7 +272,7 @@ void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
 	p->SetColEdge(RGB(0,0,0));
 }
 
-BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
+C_FN_SHARE BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
 {
 	HWND hHeader;
 
@@ -247,7 +290,7 @@ BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
 	return TRUE;
 }
 
-BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
+C_FN_SHARE BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
 {
 	HWND hHeader;
 
@@ -265,7 +308,7 @@ BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
 	return TRUE;
 }
 
-void NewGUI_MakeHyperLink(void *pXHyperLink)
+CPP_FN_SHARE void NewGUI_MakeHyperLink(void *pXHyperLink)
 {
 	CXHyperLink *p = (CXHyperLink *)pXHyperLink;
 	ASSERT(p != NULL); if(p == NULL) return;

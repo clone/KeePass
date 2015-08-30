@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -35,62 +35,60 @@
 
 #define UTF8_BYTE BYTE
 
+#define METAMODE_NULL     0
+#define METAMODE_AUTOTYPE 1
+
+#define CLIPBOARD_DELAYED_NONE     0
+#define CLIPBOARD_DELAYED_PASSWORD 1
+#define CLIPBOARD_DELAYED_USERNAME 2
+#define CLIPBOARD_DELAYED_USERPASS 3
+
 typedef BOOL(WINAPI *LPPATHRELATIVEPATHTO)(LPTSTR pszPath, LPCTSTR pszFrom, DWORD dwAttrFrom, LPCTSTR pszTo, DWORD dwAttrTo);
-typedef HWND(WINAPI *LPHTMLHELP)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD dwData); 
 
-void EraseCString(CString *pString);
-
-#ifndef _WIN32_WCE
-void CopyStringToClipboard(const TCHAR *lptString);
-void ClearClipboardIfOwner();
-#endif
+CPP_FN_SHARE void EraseCString(CString *pString);
 
 // Fix an URL if necessary (check protocol, form, etc.)
-void FixURL(CString *pstrURL);
+CPP_FN_SHARE void FixURL(CString *pstrURL);
 
 // Replace placeholders in pString by data in pEntry
-void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString = FALSE);
+CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString = FALSE);
+
+CPP_FN_SHARE CString CsRemoveMeta(CString *psString);
 
 // String conversion functions
-char *_StringToAnsi(const TCHAR *lptString);
-TCHAR *_StringToUnicode(const char *pszString);
+C_FN_SHARE char *_StringToAnsi(const TCHAR *lptString);
+C_FN_SHARE TCHAR *_StringToUnicode(const char *pszString);
 
 // Convert UCS-2 to UTF-8 and the other way round
-UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString);
-TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String);
+C_FN_SHARE UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString);
+C_FN_SHARE TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String);
 
-DWORD _UTF8NumChars(const UTF8_BYTE *pUTF8String);
+C_FN_SHARE DWORD _UTF8NumChars(const UTF8_BYTE *pUTF8String);
 
 // This returns the needed bytes to represent the string, without terminating NULL character
-DWORD _UTF8BytesNeeded(const TCHAR *pszString);
+C_FN_SHARE DWORD _UTF8BytesNeeded(const TCHAR *pszString);
 
 // Convert PW_TIME structure to a CString
-void _PwTimeToString(PW_TIME t, CString *pstrDest);
-void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest);
+CPP_FN_SHARE void _PwTimeToString(PW_TIME t, CString *pstrDest);
+CPP_FN_SHARE void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest);
 
 // Convert UUID to string and the other way round
-void _UuidToString(const BYTE *pUuid, CString *pstrDest);
-void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid);
+CPP_FN_SHARE void _UuidToString(const BYTE *pUuid, CString *pstrDest);
+C_FN_SHARE void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid);
 
 // Get the filename of the file in psFilePath
-CString CsFileOnly(CString *psFilePath);
+CPP_FN_SHARE CString CsFileOnly(CString *psFilePath);
 
 // Convert ptString into a XML string
-TCHAR *MakeSafeXmlString(TCHAR *ptString);
+C_FN_SHARE TCHAR *MakeSafeXmlString(TCHAR *ptString);
 
 // Our own simple string functions which do some additional memory checks
-size_t szlen(const char *pszString);
-char *szcpy(char *szDestination, const char *szSource);
+C_FN_SHARE size_t szlen(const char *pszString);
+C_FN_SHARE char *szcpy(char *szDestination, const char *szSource);
 
-CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile);
+CPP_FN_SHARE CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart);
+CPP_FN_SHARE CString TagSimString(LPCTSTR lpString);
 
-BOOL GetRegKeyEx(HKEY hkey, LPCTSTR lpSubKey, LPTSTR lpRetData);
-BOOL OpenUrlInNewBrowser(LPCTSTR lpURL);
-BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser);
-
-void OpenUrlEx(LPCTSTR lpURL);
-
-CString ExtractAutoTypeCmd(LPCTSTR lpstr);
-CString TagSimString(LPCTSTR lpString);
+C_FN_SHARE void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath);
 
 #endif

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,8 @@
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/WindowGroups.h"
 #include "NewGUI/ColourPickerXP.h"
-#include "NewGUI/BtnST.h"
+#include "NewGUI/XPStyleButtonST.h"
+#include "PwSafeDlg.h"
 
 #define OPTGRP_SECURITY  0
 #define OPTGRP_STARTEXIT 1
@@ -52,10 +53,11 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class COptionsDlg : public CDialog
+class CPP_CLASS_SHARE COptionsDlg : public CDialog
 {
 public:
 	COptionsDlg(CWnd* pParent = NULL);
+	CPwSafeDlg *m_pParentDlg;
 
 	CKCSideBannerWnd m_banner;
 
@@ -65,17 +67,20 @@ public:
 
 	COLORREF m_rgbRowHighlight;
 
+	DWORD m_dwATHotKey;
+
 	static void NotifyAssocChanged();
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };
-	CButtonST	m_btnDeleteAssoc;
-	CButtonST	m_btnCreateAssoc;
+	CHotKeyCtrl	m_hkAutoType;
+	CXPStyleButtonST	m_btnDeleteAssoc;
+	CXPStyleButtonST	m_btnCreateAssoc;
 	CColourPickerXP	m_btnColorRowHighlight;
 	CTabCtrl	m_tabMenu;
-	CButtonST	m_btSelFont;
-	CButtonST	m_btCancel;
-	CButtonST	m_btOK;
+	CXPStyleButtonST	m_btSelFont;
+	CXPStyleButtonST	m_btCancel;
+	CXPStyleButtonST	m_btOK;
 	int		m_nNewlineSequence;
 	UINT	m_uClipboardSeconds;
 	BOOL	m_bOpenLastDb;
@@ -92,6 +97,7 @@ public:
 	BOOL	m_bRememberLast;
 	BOOL	m_bUsePuttyForURLs;
 	BOOL	m_bSaveOnLATMod;
+	int		m_nClipboardMethod;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(COptionsDlg)
@@ -110,6 +116,8 @@ protected:
 	afx_msg void OnBtnDeleteAssoc();
 	afx_msg void OnCheckRememberLast();
 	afx_msg void OnCheckAutoOpenLastDb();
+	afx_msg void OnRadioClipMethodSecure();
+	afx_msg void OnRadioClipMethodTimed();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

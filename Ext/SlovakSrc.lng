@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Slovenèina|
-|~LANGUAGEVERSION|             |0.97c|
+|~LANGUAGEVERSION|             |0.98a|
 |~LANGUAGEAUTHOR|              |Radoslav Bielik|
 |~LANGUAGEAUTHOREMAIL|         |rado@bielik.org, http://www.bielik.org|
 
@@ -71,6 +71,7 @@
     |Zadajte hlavné heslo pre túto databázu.|
 |Key|                          |Heslo|
 |<no drive selected>|          |<jednotka nebola zvolená>|
+
 
 |Password Generator|           |Generátor hesiel|
 |This will generate a random password.|        |Tu môete vytvori náhodné heslo.|
@@ -152,7 +153,7 @@
 |&File|                        |&Súbor|
 |&Edit|                        |&Upravi|
 |&View|                        |&Zobrazi|
-|&Extras|                      |&Extra|
+|E&xtras|                      |&Extra|
 |&?|                           |&Nápoveda|
 
 |&New Database...|             |&Nová databáza...|
@@ -164,16 +165,16 @@
 |&Print Complete Password List|                |&Tlaèi celı zoznam hesiel|
 |&Lock Workspace|              |&Zamknú pracovnú plochu|
 |&Unlock Workspace|            |O&domknú pracovnú plochu|
-|&Exit|                        |&Koniec|
+|E&xit|                        |&Koniec|
 
 |&Lock/Unlock Workspace|       |&Zamknú/Odomknú pracovnú plochu|
 
 |&Options...|                  |M&onosti...|
-|&Add Password Group...|       |Prida novú &skupinu hesiel...|
-|Add Password &Subgroup...|    |Prida novú &podskupinu hesiel...|
-|&Modify Password Group...|    |&Upravi skupinu hesiel...|
+|Add Password &Group...|       |Prida novú &skupinu hesiel...|
+|Add Password Su&bgroup...|    |Prida novú &podskupinu hesiel...|
+|Modif&y Password Group...|    |&Upravi skupinu hesiel...|
 |&Delete Password Group...|    |&Zmaza skupinu hesiel...|
-|&Print Group|                 |&Tlaèi skupinu...|
+|Pr&int Group|                 |&Tlaèi skupinu...|
 |Export Group To &HTML...|     |Exportova skupinu do &HTML...|
 |Export Group To &XML...|      |Exportova skupinu do &XML...|
 |Export Group To &CSV...|      |Exportova skupinu do &CSV...|
@@ -182,7 +183,7 @@
 |Copy &Password To Clipboard|  |Kopírova &heslo do schránky|
 |Open &URL(s)|                 |Otvori U&RL|
 |&Find In Database...|         |Nájs v databáze...|
-|Find In This &Group...|       |Nájs v tejto skupine...|
+|Find In T&his Group...|       |Nájs v tejto skupine...|
 |&Add Entry...|                |Pr&ida záznam...|
 |&Edit/View Entry...|          |Upra&vi/Zobrazi záznam...|
 |&Delete Entry|                |Zmaza& záznam|
@@ -198,17 +199,17 @@
 |Move Group To &Bottom|        |Presunú skupinu na koniec|
 
 |Change &Language...|          |Zmeni &jazyk...|
-|Show &Title Column|           |Zobrati ståpec '&Názov'|
-|Show User&Name Column|        |Zobrati ståpec 'Uívate¾ské &meno'|
-|Show &URL Column|             |Zobrati ståpec '&URL'|
-|Show &Password Column|        |Zobrati ståpec '&Heslo'|
-|Show &Notes Column|           |Zobrati ståpec '&Poznámky'|
+|Show &Title Column|           |Zobrazi ståpec '&Názov'|
+|Show User&Name Column|        |Zobrazi ståpec 'Uívate¾ské &meno'|
+|Show &URL Column|             |Zobrazi ståpec '&URL'|
+|Show &Password Column|        |Zobrazi ståpec '&Heslo'|
+|Show Note&s Column|           |Zobrazi ståpec '&Poznámky'|
 |Main Window &Always On Top|   |Hlavné &okno vdy navrchu|
-|&Hide Passwords Behind Asterisks (***)|       |Skry &heslá za hviezdièky (***)|
+|Hide &Passwords Behind Asterisks (***)|       |Skry &heslá za hviezdièky (***)|
 
 |Password &Generator|          |&Generátor hesiel|
 
-|Visit KeePass &Homepage|      |&Navštívi web stránku programu KeePass|
+|Visit &KeePass Homepage|      |&Navštívi web stránku programu KeePass|
 |&About KeePass...|            |&O programe KeePass...|
 
 |&Minimize/Maximize Window To/From Tray|
@@ -284,7 +285,7 @@
     |Prosím zvo¾te jazyk zo zoznamu nišie.|
 |Available Languages|          |Dostupné jazyky|
 
-|Open &ReadMe File|            |Otvori súbor &ReadMe|
+|Open &Help File|              |Otvori súbor &nápovedy|
 |Open &License File|           |Otvori &licenènı súbor|
 |&Print License File|          |Vy&tlaèit licenènı súbor|
 
@@ -335,8 +336,8 @@
 |Select &Font|                 |Zvo¾te &Font|
 |Select a new font for the list controls.|     |Zvo¾te novı font pre zoznamy.|
 
-|Export To|			|Exportova do...|
-|Import From|			|Importova z...|
+|&Export To|			|&Exportova do...|
+|&Import From|			|&Importova z...|
 
 |&TXT File...|			|&Textového súboru...|
 |&HTML File...|			|&HTML súboru...|
@@ -384,11 +385,11 @@
 |Expires|                      |Platné do|
 |UUID|                         |UUID|
 
-|Show &Creation Time Column|   |Zobrati ståpec 'Èas &vytvorenia'|
-|Show Last &Modification Time Column|          |Zobrati ståpec 'Posledná &zmena'|
-|Show Last Access &Time Column|                |Zobrati ståpec 'Poslednı p&rístup'|
-|Show &Expire Time Column|                     |Zobrati ståpec 'Platné &do'|
-|Show UU&ID Column|                            |Zobrati ståpec 'UU&ID'|
+|Show &Creation Time Column|   |Zobrazi ståpec 'Èas &vytvorenia'|
+|Show Last &Modification Time Column|          |Zobrazi ståpec 'Posledná &zmena'|
+|Show &Last Access Time Column|                |Zobrazi ståpec 'Poslednı p&rístup'|
+|Show &Expire Time Column|                     |Zobrazi ståpec 'Platné &do'|
+|Show UU&ID Column|                            |Zobrazi ståpec 'UU&ID'|
 
 |Show &ToolBar|                |Zobrazi &nástrojovú lištu|
 |Visit KeePass Homepage|       |Navštívi web stránku programu KeePass|
@@ -438,7 +439,7 @@
 |Translation author contact|   |Kontakt na autora prekladu|
 |&Rearrange|                   |Reor&ganizova|
 |&Sort Group List|             |Zoradi zoznam &skupín|
-|&Sort List By Title|          |Zoradi zoznam pod¾a &názvu|
+|Sort List By &Title|          |Zoradi zoznam pod¾a &názvu|
 |Sort List By User&Name|       |Zoradi zoznam pod¾a uívate¾ského &mena|
 |Sort List By &URL|            |Zoradi zoznam pod¾a &URL|
 |Sort List By &Password|       |Zoradi zoznam pod¾a &hesla|
@@ -450,7 +451,7 @@
 |Move Group One &Left|         |Presunú skupinu o úroveò do&¾ava|
 |Move Group One &Right|        |Presunú skupinu o úroveò dop&rava|
 
-|Hide UserNames Behind &Asterisks (***)|  |Skry &uívate¾ské mená za hviezdièky (***)|
+|Hide &UserNames Behind Asterisks (***)|  |Skry &uívate¾ské mená za hviezdièky (***)|
 |Attachment:|                  |Príloha:|
 |Attachment|                   |Príloha|
 |Show &Attachment Column|      |Zobrazi ståpec 'Príloha'|
@@ -552,7 +553,25 @@
 |Use PuTTY for ssh: and telnet: URLs|
 	|Pouíva PuTTY pre ssh: a telnet: URL adresy|
 
-|&No Auto-Sort|					|Nezoraïova &automaticky|
+|N&o Auto-Sort|					|Nezoraïova &automaticky|
 |Auto-&Sort Password List|		|&Automatické zoraïovanie zoznamu hesiel|
 |Auto-sorting of the password list is enabled, you cannot move entries manually.|
 	|Je zapnuté automatické zoraïovanie zoznamu hesiel, nie je moné manuálne presúva záznamy.|
+|Auto-sorting of the password list is enabled, you cannot sort the list manually now.|
+	|Je zapnuté automatické zoraïovanie zoznamu hesiel, nie je moné manuálne zoradi záznamy.|
+	
+
+|Perform Auto-&Type|
+	|&Automatické zadanie (Auto-Type)|
+
+|Change password of this database - Enter new master key|
+	|Zmeni heslo pre túto databázu - zadajte nové hlavné heslo|
+|Enter the new master key for this database.|
+    |Zadajte nové hlavné heslo pre túto databázu.|
+|Repeat master key|
+	|Zopakujte hlavné heslo|
+|Repeat the master key for this database.|
+	|Zopakujte hlavné heslo pre túto databázu.|
+	
+|Save key-file manually to...|	|Uloi súbor k¾úèa manuálne ako...|
+|Select key-file manually...|	|Zvoli súbor k¾úèa manuálne...|

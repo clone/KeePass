@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,11 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
+#include "Util/SysDefEx.h"
 #include "NewGUI/KCSideBannerWnd.h"
-#include "NewGUI/BtnST.h"
+#include "NewGUI/XPStyleButtonST.h"
 
-class CLanguagesDlg : public CDialog
+class CPP_CLASS_SHARE CLanguagesDlg : public CDialog
 {
 public:
 	CLanguagesDlg(CWnd* pParent = NULL);
@@ -47,9 +48,9 @@ public:
 
 	//{{AFX_DATA(CLanguagesDlg)
 	enum { IDD = IDD_LANGUAGES_DLG };
-	CButtonST	m_btGetLang;
+	CXPStyleButtonST	m_btGetLang;
 	CListCtrl	m_listLang;
-	CButtonST	m_btClose;
+	CXPStyleButtonST	m_btClose;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CLanguagesDlg)

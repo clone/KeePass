@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,8 @@
 #ifndef ___PASSWORD_MANAGER_H___
 #define ___PASSWORD_MANAGER_H___
 
+#include "../Util/SysDefEx.h"
+#include <string>
 #include "../Util/NewRandom.h"
 #include "../Crypto/rijndael.h"
 
@@ -37,7 +39,8 @@
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
 
 // When making a Windows build, don't forget to update the verinfo resource
-#define PWM_VERSION_STR  _T("0.98a")
+#define PWM_VERSION_STR  _T("0.98b")
+#define PWM_VERSION_DW   0x00090802
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -46,11 +49,16 @@
 
 #define PWM_HOMEPAGE     _T("http://keepass.sourceforge.net")
 #define PWM_URL_TRL      _T("http://keepass.sourceforge.net/translations.php")
-
-#define PWM_README_FILE  _T("KeePass.chm")
-#define PWM_LICENSE_FILE _T("License.html")
+#define PWM_URL_PLUGINS  _T("http://keepass.sourceforge.net/plugins.php")
 
 #define PWM_EXENAME       _T("KeePass")
+
+#define PWM_README_FILE   _T("KeePass.chm")
+#define PWM_LICENSE_FILE  _T("License.html")
+
+#define PWM_HELP_AUTOTYPE _T("autotype.html")
+#define PWM_HELP_URLS     _T("autourl.html")
+
 #define PWMKEY_LANG       _T("KeeLanguage")
 #define PWMKEY_CLIPSECS   _T("KeeClipboardSeconds")
 #define PWMKEY_NEWLINE    _T("KeeNewLine")
@@ -111,12 +119,19 @@
 #define PWMKEY_SAVEONLATMOD     _T("KeeSaveOnLATMod")
 #define PWMKEY_WINSTATE_MAX     _T("KeeWindowMaximized")
 #define PWMKEY_AUTOSORT         _T("KeeAutoSortPwList")
+#define PWMKEY_AUTOTYPEHOTKEY   _T("KeeAutoTypeHotKey")
+#define PWMKEY_CLIPBOARDMETHOD  _T("KeeClipboardMethod")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
 
-#define PWM_PASSWORD_STRING     _T("********")
-#define PWS_SEARCHGROUP         TRL("Search results")
+#define PWM_PASSWORD_STRING      _T("********")
+
+#define PWM_KEYMETHOD_OR        FALSE
+#define PWM_KEYMETHOD_AND       TRUE
+
+#define PWS_SEARCHGROUP          TRL("Search results")
+#define PWS_DEFAULT_KEY_FILENAME _T("pwsafe.key")
 
 #define PWM_FLAG_SHA2           1
 #define PWM_FLAG_RIJNDAEL       2
@@ -144,6 +159,20 @@
 
 #define ALGO_AES          0
 #define ALGO_TWOFISH      1
+
+// Error codes
+#define PWE_UNKNOWN                0
+#define PWE_SUCCESS                1
+#define PWE_INVALID_PARAM          2
+#define PWE_NO_MEM                 3
+#define PWE_INVALID_KEY            4
+#define PWE_NOFILEACCESS_READ      5
+#define PWE_NOFILEACCESS_WRITE     6
+#define PWE_FILEERROR_READ         7 
+#define PWE_FILEERROR_WRITE        8
+#define PWE_INVALID_RANDOMSOURCE   9
+#define PWE_INVALID_FILESTRUCTURE 10
+#define PWE_CRYPT_ERROR           11
 
 // Password Meta Streams
 #define PMS_ID_BINDESC  _T("bin-stream")
@@ -197,7 +226,7 @@ typedef struct _PW_GROUP // Structure containing information about one group
 
 	USHORT usLevel;
 
-	DWORD dwFlags;
+	DWORD dwFlags; // Used by KeePass internally, don't use
 } PW_GROUP, *PPW_GROUP;
 
 typedef struct _PW_ENTRY // Structure containing information about one entry
@@ -264,7 +293,7 @@ typedef struct _PMS_SIMPLE_UI_STATE
 #define DWORD_MAX 0xFFFFFFFF
 #endif
 
-class CPwManager
+class CPP_CLASS_SHARE CPwManager
 {
 public:
 	CPwManager();
@@ -273,7 +302,7 @@ public:
 	void CleanUp(); // Delete everything and release all allocated memory
 
 	// Set the master key for the database.
-	BOOL SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const CNewRandomInterface *pARI, BOOL bOverwrite = TRUE);
+	int SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const TCHAR *pszSecondKey, const CNewRandomInterface *pARI, BOOL bOverwrite);
 
 	DWORD GetNumberOfEntries(); // Returns number of entries in database
 	DWORD GetNumberOfGroups(); // Returns number of groups in database
@@ -316,8 +345,8 @@ public:
 	void UnlockEntryPassword(PW_ENTRY *pEntry); // Make password readable
 
 	void NewDatabase();
-	BOOL OpenDatabase(const TCHAR *pszFile);
-	BOOL SaveDatabase(const TCHAR *pszFile);
+	int OpenDatabase(const TCHAR *pszFile);
+	int SaveDatabase(const TCHAR *pszFile);
 
 	// Move entries and groups
 	void MoveInternal(DWORD nFrom, DWORD nTo);
@@ -341,6 +370,7 @@ public:
 	// Convert PW_TIME to 5-byte compressed structure and the other way round
 	static void _TimeToPwTime(BYTE *pCompressedTime, PW_TIME *pPwTime);
 	static void _PwTimeToTime(PW_TIME *pPwTime, BYTE *pCompressedTime);
+	static std::string FormatError(int nErrorCode);
 
 	// Get the never-expire time
 	static void _GetNeverExpireTime(PW_TIME *pPwTime);

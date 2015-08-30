@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -76,6 +76,7 @@ BOOL CPwSafeApp::InitInstance()
 	VERIFY(AfxOleInit());
 	AfxEnableControlContainer();
 	AfxInitRichEdit();
+	InitCommonControls();
 
 	// SetDialogBkColor(NewGUI_GetBgColor(), CR_FRONT); // Setup the "new" dialog look
 
@@ -85,12 +86,9 @@ BOOL CPwSafeApp::InitInstance()
 	CPwSafeDlg dlg;
 	m_pMainWnd = &dlg;
 	int nResponse = dlg.DoModal();
-	if (nResponse == IDOK)
-	{
-	}
-	else if (nResponse == IDCANCEL)
-	{
-	}
+
+	if(nResponse == IDOK) { }
+	else if(nResponse == IDCANCEL) { }
 
 	return FALSE;
 }
@@ -102,6 +100,7 @@ int CPwSafeApp::ExitInstance()
 	{
 		m_pAppMutex->Unlock();
 		delete m_pAppMutex;
+		m_pAppMutex = NULL;
 	}
 
 	return CWinApp::ExitInstance();

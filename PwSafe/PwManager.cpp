@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,7 @@
 #include "../Crypto/twoclass.h"
 #include "../Crypto/sha2.h"
 #include "../Crypto/arcfour.h"
-
-#include <string.h>
+#include "../NewGUI/TranslateEx.h"
 
 static const BYTE g_uuidZero[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 static PW_TIME g_pwTimeNever = { 2999, 12, 28, 23, 59, 59 };
@@ -92,31 +91,51 @@ void CPwManager::CleanUp()
 	m_random.Reset();
 }
 
-BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const CNewRandomInterface *pARI, BOOL bOverwrite)
+int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const TCHAR *pszSecondKey, const CNewRandomInterface *pARI, BOOL bOverwrite)
 {
-	unsigned long uKeyLen, uFileSize, uRead;
+	unsigned long uKeyLen, uKeyLen2 = 0, uFileSize, uRead;
 	TCHAR szFile[2048];
 	sha256_ctx sha32;
 	char *paKey = NULL;
+	char *paKey2 = NULL;
+	unsigned char aFileKey[32];
+	unsigned char aPasswordKey[32];
 
-	ASSERT(pszMasterKey != NULL); if(pszMasterKey == NULL) return FALSE;
+	ASSERT(pszMasterKey != NULL); if(pszMasterKey == NULL) return PWE_INVALID_PARAM;
 
 #ifdef _UNICODE
 	ASSERT(sizeof(TCHAR) >= 2);
-	paKey = _StringToAnsi((const TCHAR *)pszMasterKey);
+	paKey = _StringToAnsi(pszMasterKey);
 #else
 	ASSERT(sizeof(TCHAR) == 1);
 	paKey = new char[strlen(pszMasterKey) + 1];
-	ASSERT(paKey != NULL); if(paKey == NULL) return FALSE;
+	ASSERT(paKey != NULL); if(paKey == NULL) return PWE_NO_MEM;
 	strcpy(paKey, pszMasterKey);
 #endif
 
-	ASSERT(paKey != NULL);
-	if(paKey == NULL) return FALSE;
+	ASSERT(paKey != NULL); if(paKey == NULL) return PWE_NO_MEM;
+
+	if(pszSecondKey != NULL)
+	{
+#ifdef _UNICODE
+		ASSERT(sizeof(TCHAR) >= 2);
+		paKey2 = _StringToAnsi(pszSecondKey);
+#else
+		ASSERT(sizeof(TCHAR) == 1);
+		paKey2 = new char[strlen(pszSecondKey) + 1];
+		ASSERT(paKey2 != NULL); if(paKey2 == NULL) return PWE_NO_MEM;
+		strcpy(paKey2, pszSecondKey);
+#endif
+
+		ASSERT(paKey2 != NULL); if(paKey2 == NULL) return PWE_NO_MEM;
+
+		uKeyLen2 = strlen(paKey2);
+		ASSERT(uKeyLen2 != 0);
+	}
 
 	uKeyLen = strlen(paKey);
 	ASSERT(uKeyLen != 0);
-	if(uKeyLen == 0) { SAFE_DELETE_ARRAY(paKey); return FALSE; }
+	if(uKeyLen == 0) { SAFE_DELETE_ARRAY(paKey); return PWE_INVALID_KEY; }
 
 	if(bDiskDrive == FALSE)
 	{
@@ -126,77 +145,172 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 
 		mem_erase((unsigned char *)paKey, uKeyLen);
 		SAFE_DELETE_ARRAY(paKey);
-		return TRUE;
+		return PWE_SUCCESS;
 	}
 	else
 	{
-		mem_erase((unsigned char *)paKey, uKeyLen);
-		SAFE_DELETE_ARRAY(paKey); // Don't need ASCII key any more from on now
-
-		_tcscpy(szFile, pszMasterKey);
-		if(szFile[_tcslen(szFile) - 1] == _T('\\'))
+		if(pszSecondKey == NULL)
 		{
-			_tcscat(szFile, _T("pwsafe.key"));
-		}
+			mem_erase((unsigned char *)paKey, uKeyLen);
+			SAFE_DELETE_ARRAY(paKey); // Don't need ASCII key any more from on now
 
-		if(pARI == NULL) // If pARI is NULL: load key from disk
-		{
-			FILE *fp;
-
-			fp = _tfopen(szFile, _T("rb"));
-			if(fp == NULL) return FALSE;
-			fseek(fp, 0, SEEK_END);
-			uFileSize = (unsigned long)ftell(fp);
-			fseek(fp, 0, SEEK_SET);
-
-			if(uFileSize == 32)
+			_tcscpy(szFile, pszMasterKey);
+			if(szFile[_tcslen(szFile) - 1] == _T('\\'))
 			{
-				if(fread(m_pMasterKey, 1, 32, fp) != 32)
-				{
-					fclose(fp); fp = NULL;
-					return FALSE;
-				}
+				_tcscat(szFile, PWS_DEFAULT_KEY_FILENAME);
 			}
-			else
+
+			if(pARI == NULL) // If pARI is NULL: load key from disk
 			{
+				FILE *fp;
+
+				fp = _tfopen(szFile, _T("rb"));
+				if(fp == NULL) return PWE_NOFILEACCESS_READ;
+				fseek(fp, 0, SEEK_END);
+				uFileSize = (unsigned long)ftell(fp);
+				fseek(fp, 0, SEEK_SET);
+
+				if(uFileSize == 32)
+				{
+					if(fread(m_pMasterKey, 1, 32, fp) != 32)
+					{
+						fclose(fp); fp = NULL;
+						return PWE_FILEERROR_READ;
+					}
+				}
+				else
+				{
+					sha256_begin(&sha32);
+					while(1)
+					{
+						uRead = (unsigned long)fread((unsigned char *)szFile, 1, 2048, fp);
+						if(uRead == 0) break;
+						sha256_hash((unsigned char *)szFile, uRead, &sha32);
+						if(uRead != 2048) break;
+					}
+					sha256_end((unsigned char *)m_pMasterKey, &sha32);
+				}
+
+				fclose(fp); fp = NULL;
+				return PWE_SUCCESS;
+			}
+			else // pARI is not NULL: save key to disk
+			{
+				FILE *fp;
+				unsigned char aRandomBytes[32];
+
+				fp = _tfopen(szFile, _T("rb")); // Does the file exist already?
+				if((fp != NULL) && (bOverwrite == FALSE)) { fclose(fp); fp = NULL; return PWE_NOFILEACCESS_READ; }
+				if(fp != NULL) { fclose(fp); fp = NULL; } // We must close it before opening for write
+
+				if(pARI->GenerateRandomSequence(32, aRandomBytes) == FALSE) return PWE_INVALID_RANDOMSOURCE;
+
+				fp = _tfopen(szFile, _T("wb"));
+				if(fp == NULL) return PWE_NOFILEACCESS_WRITE;
+				if(fwrite(aRandomBytes, 1, 32, fp) != 32) { fclose(fp); fp = NULL; return PWE_FILEERROR_WRITE; }
+				fclose(fp); fp = NULL;
+
+				memcpy(m_pMasterKey, aRandomBytes, 32);
+				return PWE_SUCCESS;
+			}
+		}
+		else // pszSecondKey != NULL
+		{
+			mem_erase((unsigned char *)paKey, uKeyLen);
+			SAFE_DELETE_ARRAY(paKey); // Don't need ASCII key any more from on now
+
+			_tcscpy(szFile, pszMasterKey);
+			if(szFile[_tcslen(szFile) - 1] == _T('\\'))
+			{
+				_tcscat(szFile, PWS_DEFAULT_KEY_FILENAME);
+			}
+
+			if(pARI == NULL) // If pARI is NULL: load key from disk
+			{
+				FILE *fp;
+
+				fp = _tfopen(szFile, _T("rb"));
+				if(fp == NULL) return PWE_NOFILEACCESS_READ;
+				fseek(fp, 0, SEEK_END);
+				uFileSize = (unsigned long)ftell(fp);
+				fseek(fp, 0, SEEK_SET);
+
+				if(uFileSize == 32)
+				{
+					if(fread(aFileKey, 1, 32, fp) != 32)
+					{
+						fclose(fp); fp = NULL;
+						return PWE_FILEERROR_READ;
+					}
+				}
+				else
+				{
+					sha256_begin(&sha32);
+					while(1)
+					{
+						uRead = (unsigned long)fread((unsigned char *)szFile, 1, 2048, fp);
+						if(uRead == 0) break;
+						sha256_hash((unsigned char *)szFile, uRead, &sha32);
+						if(uRead != 2048) break;
+					}
+					sha256_end((unsigned char *)aFileKey, &sha32);
+				}
+
+				fclose(fp); fp = NULL;
+
 				sha256_begin(&sha32);
-				while(1)
-				{
-					uRead = (unsigned long)fread((unsigned char *)szFile, 1, 2048, fp);
-					if(uRead == 0) break;
-					sha256_hash((unsigned char *)szFile, uRead, &sha32);
-					if(uRead != 2048) break;
-				}
+				sha256_hash((unsigned char *)paKey2, uKeyLen2, &sha32);
+				sha256_end((unsigned char *)aPasswordKey, &sha32);
+
+				mem_erase((unsigned char *)paKey2, uKeyLen2);
+				SAFE_DELETE_ARRAY(paKey);
+
+				sha256_begin(&sha32);
+				sha256_hash(aPasswordKey, 32, &sha32);
+				sha256_hash(aFileKey, 32, &sha32);
 				sha256_end((unsigned char *)m_pMasterKey, &sha32);
+
+				mem_erase((unsigned char *)aPasswordKey, 32);
+				mem_erase((unsigned char *)aFileKey, 32);
+				return PWE_SUCCESS;
 			}
+			else // pARI is not NULL: save key to disk
+			{
+				FILE *fp;
+				unsigned char aRandomBytes[32];
 
-			fclose(fp); fp = NULL;
+				fp = _tfopen(szFile, _T("rb")); // Does the file exist already?
+				if((fp != NULL) && (bOverwrite == FALSE)) { fclose(fp); fp = NULL; return PWE_NOFILEACCESS_READ; }
+				if(fp != NULL) { fclose(fp); fp = NULL; } // We must close it before opening for write
 
-			return TRUE;
-		}
-		else // pARI is not NULL: save key to disk
-		{
-			FILE *fp;
-			unsigned char aRandomBytes[32];
+				if(pARI->GenerateRandomSequence(32, aRandomBytes) == FALSE) return PWE_INVALID_RANDOMSOURCE;
 
-			fp = _tfopen(szFile, _T("rb")); // Does the file exist already?
-			if((fp != NULL) && (bOverwrite == FALSE)) { fclose(fp); fp = NULL; return FALSE; }
-			if(fp != NULL) { fclose(fp); fp = NULL; } // We must close it before opening for write
+				fp = _tfopen(szFile, _T("wb"));
+				if(fp == NULL) return PWE_NOFILEACCESS_WRITE;
+				if(fwrite(aRandomBytes, 1, 32, fp) != 32) { fclose(fp); fp = NULL; return PWE_FILEERROR_WRITE; }
+				fclose(fp); fp = NULL;
 
-			if(pARI->GenerateRandomSequence(32, aRandomBytes) == FALSE) return FALSE;
+				ASSERT(uKeyLen2 != 0);
+				sha256_begin(&sha32);
+				sha256_hash((unsigned char *)paKey2, uKeyLen2, &sha32);
+				sha256_end((unsigned char *)aPasswordKey, &sha32);
 
-			fp = _tfopen(szFile, _T("wb"));
-			if(fp == NULL) return FALSE;
-			fwrite(aRandomBytes, 1, 32, fp);
-			fclose(fp); fp = NULL;
+				mem_erase((unsigned char *)paKey2, uKeyLen2);
+				SAFE_DELETE_ARRAY(paKey);
 
-			memcpy(m_pMasterKey, aRandomBytes, 32);
+				sha256_begin(&sha32);
+				sha256_hash(aPasswordKey, 32, &sha32);
+				sha256_hash(aRandomBytes, 32, &sha32);
+				sha256_end((unsigned char *)m_pMasterKey, &sha32);
 
-			return TRUE;
+				mem_erase((unsigned char *)aPasswordKey, 32);
+				mem_erase((unsigned char *)aFileKey, 32);
+				return PWE_SUCCESS;
+			}
 		}
 	}
 
-	return FALSE;
+	return PWE_UNKNOWN;
 }
 
 BOOL CPwManager::SetAlgorithm(int nAlgorithm)
@@ -796,7 +910,7 @@ void CPwManager::NewDatabase()
 	_AllocEntries(PWM_NUM_INITIAL_ENTRIES);
 }
 
-#define _OPENDB_FAIL \
+#define _OPENDB_FAIL_LIGHT \
 { \
 	if(pVirtualFile != NULL) \
 	{ \
@@ -804,7 +918,11 @@ void CPwManager::NewDatabase()
 		SAFE_DELETE_ARRAY(pVirtualFile); \
 	} \
 	m_dwKeyEncRounds = PWM_STD_KEYENCROUNDS; \
-	return FALSE; \
+}
+#define _OPENDB_FAIL \
+{ \
+	_OPENDB_FAIL_LIGHT; \
+	return PWE_INVALID_FILESTRUCTURE; \
 }
 
 #define RESET_TIME_FIELD_NORMAL(pTimeEx) { \
@@ -823,7 +941,7 @@ void CPwManager::NewDatabase()
 	RESET_TIME_FIELD_NORMAL(&(ptrx)->tCreation); RESET_TIME_FIELD_NORMAL(&(ptrx)->tLastMod); \
 	RESET_TIME_FIELD_NORMAL(&(ptrx)->tLastAccess); RESET_TIME_FIELD_EXPIRE(&(ptrx)->tExpire); }
 
-BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
+int CPwManager::OpenDatabase(const TCHAR *pszFile)
 {
 	FILE *fp;
 	char *pVirtualFile;
@@ -841,12 +959,12 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 	ASSERT(sizeof(char) == 1);
 
 	ASSERT(pszFile != NULL);
-	if(pszFile == NULL) return FALSE;
+	if(pszFile == NULL) return PWE_INVALID_PARAM;
 	ASSERT(_tcslen(pszFile) != 0);
-	if(_tcslen(pszFile) == 0) return FALSE;
+	if(_tcslen(pszFile) == 0) return PWE_INVALID_PARAM;
 
 	fp = _tfopen(pszFile, _T("rb"));
-	if(fp == NULL) return FALSE;
+	if(fp == NULL) return PWE_NOFILEACCESS_READ;
 
 	// Get file size
 	fseek(fp, 0, SEEK_END);
@@ -854,13 +972,12 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 	fseek(fp, 0, SEEK_SET);
 
 	if(uFileSize < sizeof(PW_DBHEADER))
-		{ fclose(fp); return FALSE; }
+		{ fclose(fp); return PWE_INVALID_FILESTRUCTURE; }
 
 	// Allocate enough memory to hold the complete file
 	uAllocated = uFileSize + 17;
 	pVirtualFile = new char[uAllocated];
-	if(pVirtualFile == NULL)
-		{ fclose(fp); return FALSE; }
+	if(pVirtualFile == NULL) { fclose(fp); return PWE_NO_MEM; }
 	pVirtualFile[uFileSize + 17 - 1] = 0;
 	fread(pVirtualFile, 1, uFileSize, fp);
 	fclose(fp);
@@ -881,7 +998,7 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 				mem_erase((unsigned char *)pVirtualFile, uAllocated);
 				SAFE_DELETE_ARRAY(pVirtualFile);
 			}
-			return _OpenDatabaseV2(pszFile);
+			return (_OpenDatabaseV2(pszFile) != FALSE) ? PWE_SUCCESS : PWE_UNKNOWN;
 		}
 		else if(hdr.dwVersion <= 0x00010002)
 		{
@@ -890,7 +1007,7 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 				mem_erase((unsigned char *)pVirtualFile, uAllocated);
 				SAFE_DELETE_ARRAY(pVirtualFile);
 			}
-			return _OpenDatabaseV1(pszFile);
+			return (_OpenDatabaseV1(pszFile) != FALSE) ? PWE_SUCCESS : PWE_UNKNOWN;
 		}
 		else { _OPENDB_FAIL; }
 	}
@@ -912,6 +1029,8 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 	sha256_end((unsigned char *)uFinalKey, &sha32);
 
 	ASSERT(((uFileSize - sizeof(PW_DBHEADER)) % 16) == 0);
+	if(((uFileSize - sizeof(PW_DBHEADER)) % 16) != 0) { _OPENDB_FAIL; }
+
 	if(m_nAlgorithm == ALGO_AES)
 	{
 		Rijndael aes;
@@ -919,7 +1038,7 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 		// Initialize Rijndael algorithm
 		if(aes.init(Rijndael::CBC, Rijndael::Decrypt, uFinalKey,
 			Rijndael::Key32Bytes, hdr.aEncryptionIV) != RIJNDAEL_SUCCESS)
-			{ _OPENDB_FAIL; }
+			{ _OPENDB_FAIL_LIGHT; return PWE_CRYPT_ERROR; }
 
 		// Decrypt! The first bytes aren't encrypted (that's the header)
 		uEncryptedPartSize = (unsigned long)aes.padDecrypt((RD_UINT8 *)pVirtualFile + sizeof(PW_DBHEADER),
@@ -942,14 +1061,14 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 
 	// Check for success
 	if((uEncryptedPartSize > 2147483446) || (uEncryptedPartSize == 0))
-		{ _OPENDB_FAIL; }
+		{ _OPENDB_FAIL_LIGHT; return PWE_INVALID_KEY; }
 
-	// Check if key is correct (with high probability)
+	// Check if key is correct (with very high probability)
 	sha256_begin(&sha32);
 	sha256_hash((unsigned char *)pVirtualFile + sizeof(PW_DBHEADER), uEncryptedPartSize, &sha32);
 	sha256_end((unsigned char *)uFinalKey, &sha32);
 	if(memcmp(hdr.aContentsHash, uFinalKey, 32) != 0)
-		{ _OPENDB_FAIL; }
+		{ _OPENDB_FAIL_LIGHT; return PWE_INVALID_KEY; }
 
 	NewDatabase(); // Create a new database and initialize internal structures
 
@@ -1020,10 +1139,11 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 	_LoadAndRemoveAllMetaStreams();
 	DeleteLostEntries();
 	FixGroupTree();
-	return TRUE;
+
+	return PWE_SUCCESS;
 }
 
-BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
+int CPwManager::SaveDatabase(const TCHAR *pszFile)
 {
 	FILE *fp;
 	char *pVirtualFile;
@@ -1037,9 +1157,9 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	BYTE aCompressedTime[5];
 
 	ASSERT(pszFile != NULL);
-	if(pszFile == NULL) return FALSE;
+	if(pszFile == NULL) return PWE_INVALID_PARAM;
 	ASSERT(_tcslen(pszFile) != 0);
-	if(_tcslen(pszFile) == 0) return FALSE;
+	if(_tcslen(pszFile) == 0) return PWE_INVALID_PARAM;
 
 	_AddAllMetaStreams();
 
@@ -1102,7 +1222,8 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	// Allocate enough memory
 	uAllocated = uFileSize + 16;
 	pVirtualFile = new char[uAllocated];
-	if(pVirtualFile == NULL) { _LoadAndRemoveAllMetaStreams(); return FALSE; }
+	ASSERT(pVirtualFile != NULL);
+	if(pVirtualFile == NULL) { _LoadAndRemoveAllMetaStreams(); return PWE_NO_MEM; }
 
 	// Build header structure
 	hdr.dwSignature1 = PWM_DBSIG_1;
@@ -1112,7 +1233,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 	if(m_nAlgorithm == ALGO_AES) hdr.dwFlags |= PWM_FLAG_RIJNDAEL;
 	else if(m_nAlgorithm == ALGO_TWOFISH) hdr.dwFlags |= PWM_FLAG_TWOFISH;
-	else { ASSERT(FALSE); _LoadAndRemoveAllMetaStreams(); return FALSE; }
+	else { ASSERT(FALSE); _LoadAndRemoveAllMetaStreams(); return PWE_INVALID_PARAM; }
 
 	hdr.dwVersion = PWM_DBVER_DW;
 	hdr.dwGroups = m_dwNumGroups;
@@ -1312,7 +1433,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 	// Generate m_pTransformedMasterKey from m_pMasterKey
 	if(_TransformMasterKey(hdr.aMasterSeed2) == FALSE)
-		{ ASSERT(FALSE); SAFE_DELETE_ARRAY(pVirtualFile); _LoadAndRemoveAllMetaStreams(); return FALSE; }
+		{ ASSERT(FALSE); SAFE_DELETE_ARRAY(pVirtualFile); _LoadAndRemoveAllMetaStreams(); return PWE_CRYPT_ERROR; }
 
 	// Hash the master password with the generated hash salt
 	sha256_begin(&sha32);
@@ -1329,7 +1450,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 			Rijndael::Key32Bytes, hdr.aEncryptionIV) != RIJNDAEL_SUCCESS)
 		{
 			SAFE_DELETE_ARRAY(pVirtualFile);
-			return FALSE;
+			return PWE_CRYPT_ERROR;
 		}
 
 		uEncryptedPartSize = (unsigned long)aes.padEncrypt((RD_UINT8 *)pVirtualFile +
@@ -1344,7 +1465,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 		{
 			SAFE_DELETE_ARRAY(pVirtualFile);
 			_LoadAndRemoveAllMetaStreams();
-			return FALSE;
+			return PWE_CRYPT_ERROR;
 		}
 
 		uEncryptedPartSize = (unsigned long)twofish.padEncrypt(
@@ -1353,7 +1474,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	}
 	else
 	{
-		ASSERT(FALSE); _OPENDB_FAIL;
+		ASSERT(FALSE); _OPENDB_FAIL_LIGHT; return PWE_INVALID_PARAM;
 	}
 
 	// Check if all went correct
@@ -1361,7 +1482,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	if((uEncryptedPartSize > 2147483446) || (uEncryptedPartSize == 0))
 	{
 		ASSERT(FALSE); SAFE_DELETE_ARRAY(pVirtualFile); _LoadAndRemoveAllMetaStreams();
-		return FALSE;
+		return PWE_CRYPT_ERROR;
 	}
 
 	fp = _tfopen(pszFile, _T("wb"));
@@ -1369,18 +1490,26 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	{
 		mem_erase((unsigned char *)pVirtualFile, uAllocated);
 		SAFE_DELETE_ARRAY(pVirtualFile); _LoadAndRemoveAllMetaStreams();
-		return FALSE;
+		return PWE_NOFILEACCESS_WRITE;
 	}
 
 	// Write memory file to disk
-	fwrite(pVirtualFile, 1, uEncryptedPartSize + sizeof(PW_DBHEADER), fp);
+	if(fwrite(pVirtualFile, 1, uEncryptedPartSize + sizeof(PW_DBHEADER), fp) !=
+		uEncryptedPartSize + sizeof(PW_DBHEADER))
+	{
+		mem_erase((unsigned char *)pVirtualFile, uAllocated);
+		SAFE_DELETE_ARRAY(pVirtualFile); _LoadAndRemoveAllMetaStreams();
+		return PWE_FILEERROR_WRITE;
+	}
 
 	// Close file, erase and delete memory
 	fclose(fp); fp = NULL;
+
 	mem_erase((unsigned char *)pVirtualFile, uAllocated);
 	SAFE_DELETE_ARRAY(pVirtualFile);
 	_LoadAndRemoveAllMetaStreams();
-	return TRUE;
+
+	return PWE_SUCCESS;
 }
 
 DWORD CPwManager::Find(const TCHAR *pszFindString, BOOL bCaseSensitive, DWORD fieldFlags, DWORD nStart)
@@ -2179,6 +2308,66 @@ BOOL CPwManager::IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupN
 	SAFE_DELETE_ARRAY(ptzTemp);
 	return dwId;
 } */
+
+std::string CPwManager::FormatError(int nErrorCode)
+{
+	std::string str;
+	TCHAR tszTemp[24];
+
+	_stprintf(tszTemp, _T("%08X"), (unsigned int)nErrorCode);
+	str = TRL("An error occured"); str += _T("!\r\n");
+
+	str += TRL("Error code"); str += _T(": 0x");
+	str += tszTemp;
+	str += _T("\r\n\r\n");
+
+	switch(nErrorCode)
+	{
+	case PWE_UNKNOWN:
+		str += TRL("Unknown error");
+		break;
+	case PWE_SUCCESS:
+		str += TRL("Success");
+		break;
+	case PWE_INVALID_PARAM:
+		str += TRL("Invalid parameter");
+		break;
+	case PWE_NO_MEM:
+		str += TRL("Too few memory (RAM) available");
+		break;
+	case PWE_INVALID_KEY:
+		str += TRL("Invalid/wrong key");
+		break;
+	case PWE_NOFILEACCESS_READ:
+		str += TRL("File access error: failed to open file in read mode");
+		break;
+	case PWE_NOFILEACCESS_WRITE:
+		str += TRL("File access error: failed to open file in write mode");
+		break;
+	case PWE_FILEERROR_READ:
+		str += TRL("File error: error while reading from the file");
+		break;
+	case PWE_FILEERROR_WRITE:
+		str += TRL("File error: error while writing to the file");
+		break;
+	case PWE_INVALID_RANDOMSOURCE:
+		str += TRL("Internal error"); str += _T(": ");
+		str += TRL("Invalid random source");
+		break;
+	case PWE_INVALID_FILESTRUCTURE:
+		str += TRL("Invalid/corrupted file structure");
+		break;
+	case PWE_CRYPT_ERROR:
+		str += TRL("Encryption/decryption error");
+		break;
+	default:
+		str += TRL("Unknown error");
+		break;
+	}
+	str += _T(".");
+
+	return str;
+}
 
 BOOL CPwManager::_AddMetaStream(LPCTSTR lpMetaDataDesc, BYTE *pData, DWORD dwLength)
 {

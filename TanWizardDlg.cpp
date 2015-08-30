@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "PwSafe.h"
 #include "TanWizardDlg.h"
 
@@ -46,6 +46,8 @@ CTanWizardDlg::CTanWizardDlg(CWnd* pParent /*=NULL*/)
 {
 	//{{AFX_DATA_INIT(CTanWizardDlg)
 	m_strTans = _T("");
+	m_bAssignNumbers = FALSE;
+	m_dwStartNumber = 0;
 	//}}AFX_DATA_INIT
 }
 
@@ -56,11 +58,14 @@ void CTanWizardDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_Text(pDX, IDC_EDIT_TANS, m_strTans);
+	DDX_Check(pDX, IDC_CHECK_NUMBERING, m_bAssignNumbers);
+	DDX_Text(pDX, IDC_EDIT_NUMBERING_START, m_dwStartNumber);
 	//}}AFX_DATA_MAP
 }
 
 BEGIN_MESSAGE_MAP(CTanWizardDlg, CDialog)
 	//{{AFX_MSG_MAP(CTanWizardDlg)
+	ON_BN_CLICKED(IDC_CHECK_NUMBERING, OnCheckNumbering)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -73,14 +78,16 @@ BOOL CTanWizardDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_OPTIONS),
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("TAN Wizard"));
 	m_banner.SetCaption(TRL("Using this wizard you can easily add TAN entries."));
+
+	GetDlgItem(IDC_EDIT_NUMBERING_START)->EnableWindow(FALSE);
 
 	return TRUE;
 }
@@ -95,4 +102,14 @@ void CTanWizardDlg::OnOK()
 void CTanWizardDlg::OnCancel() 
 {
 	CDialog::OnCancel();
+}
+
+void CTanWizardDlg::OnCheckNumbering() 
+{
+	UpdateData(TRUE);
+
+	if(m_bAssignNumbers == TRUE)
+		GetDlgItem(IDC_EDIT_NUMBERING_START)->EnableWindow(TRUE);
+	else
+		GetDlgItem(IDC_EDIT_NUMBERING_START)->EnableWindow(FALSE);
 }

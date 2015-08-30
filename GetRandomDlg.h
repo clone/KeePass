@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,12 +30,13 @@
 #ifndef AFX_GETRANDOMDLG_H__28A6C1A0_0FA4_11D8_BF16_0050BF14F5CC__INCLUDED_
 #define AFX_GETRANDOMDLG_H__28A6C1A0_0FA4_11D8_BF16_0050BF14F5CC__INCLUDED_
 
+#include "Util/SysDefEx.h"
 #include "NewGUI/KCSideBannerWnd.h"
-#include "NewGUI/BtnST.h"
+#include "NewGUI/XPStyleButtonST.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CGetRandomDlg : public CDialog
+class CPP_CLASS_SHARE CGetRandomDlg : public CDialog
 {
 public:
 	CGetRandomDlg(CWnd* pParent = NULL);
@@ -52,9 +53,9 @@ public:
 
 	//{{AFX_DATA(CGetRandomDlg)
 	enum { IDD = IDD_GETRANDOM_DLG };
-	CButtonST	m_btCancel;
-	CButtonST	m_btOK;
-	CButtonST	m_btMouseInput;
+	CXPStyleButtonST	m_btCancel;
+	CXPStyleButtonST	m_btOK;
+	CXPStyleButtonST	m_btMouseInput;
 	CProgressCtrl	m_cMouseProgress;
 	CString	m_strRandom;
 	//}}AFX_DATA

@@ -164,6 +164,8 @@
 // Comment this line out if you don't want XP theme support.
 // #include "XPTheme.h"
 
+#include "../Util/SysDefEx.h"
+
 // CColourPopupXP messages
 #define CPN_SELCHANGE        WM_USER + 1001        // Colour Picker Selection change
 #define CPN_DROPDOWN         WM_USER + 1002        // Colour Picker drop down

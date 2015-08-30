@@ -6,10 +6,43 @@
 #endif // _MSC_VER >= 1000
 // Edit.h : header file
 // Created by: Alvaro Mendez - 07/17/2000
+// Modified by: Dominik Reichl - 26/02/2005
 //
 
 #include <afxwin.h>
 #include <afxtempl.h>
+
+// To export this code from an MFC Extension DLL uncomment the following line and then define _AMSEDIT_EXPORT inside the DLL's Project Settings.
+// #define AMSEDIT_IN_DLL
+
+// Import/Export macro for the classes below
+#if defined(AMSEDIT_IN_DLL)
+	#if defined(_AMSEDIT_EXPORT)
+		#define AMSEDIT_EXPORT	_declspec(dllexport)
+	#else
+		#define AMSEDIT_EXPORT	_declspec(dllimport)
+	#endif
+#else
+	#define AMSEDIT_EXPORT
+#endif
+
+// The following IDs are assigned for each class below to allow us to set which ones we need compiled
+#define AMSEDIT_ALPHANUMERIC_CLASS	0x01
+#define AMSEDIT_MASKED_CLASS		0x02
+#define AMSEDIT_NUMERIC_CLASS		0x04
+#define AMSEDIT_INTEGER_CLASS		(AMSEDIT_NUMERIC_CLASS | 0x08)
+#define AMSEDIT_CURRENCY_CLASS		(AMSEDIT_NUMERIC_CLASS | 0x10)
+#define AMSEDIT_DATE_CLASS			0x20
+#define AMSEDIT_TIME_CLASS			0x40
+#define AMSEDIT_DATETIME_CLASS		(AMSEDIT_DATE_CLASS | AMSEDIT_TIME_CLASS)
+#define AMSEDIT_ALL_CLASSES			(AMSEDIT_ALPHANUMERIC_CLASS | AMSEDIT_MASKED_CLASS | AMSEDIT_INTEGER_CLASS | AMSEDIT_CURRENCY_CLASS | AMSEDIT_DATETIME_CLASS)
+
+// If your program does not need all the CAMSEdit classes below, you can reduce 
+// the size of your executable by selecting just the classes you want to be compiled 
+// via the following macro. Use the IDs defined above and "OR" together the classes you need.
+
+// #define AMSEDIT_COMPILED_CLASSES	AMSEDIT_ALL_CLASSES
+#define AMSEDIT_COMPILED_CLASSES AMSEDIT_DATETIME_CLASS
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSEdit window
@@ -18,7 +51,7 @@
 // It provides some base functionality to set and get the text and change
 // its text and background color.
 //
-class CAMSEdit : public CEdit
+class AMSEDIT_EXPORT CAMSEdit : public CEdit
 {
 public:
 	// Construction/destruction
@@ -59,7 +92,7 @@ private:
 public:
 	// Class SelectionSaver is used to save an edit box's current
 	// selection and then restore it on destruction.
-	class SelectionSaver
+	class AMSEDIT_EXPORT SelectionSaver
 	{
 	public:
 		SelectionSaver(CEdit* pEdit);
@@ -82,10 +115,11 @@ public:
 		int m_nStart, m_nEnd;
 	};
 
+
 	// Class Behavior is an abstract base class used to define how an edit
 	// box will behave when it is used.   Note that its virtual member functions start
 	// with an underscore; this avoids naming conflicts when multiply inheriting.
-	class Behavior
+	class AMSEDIT_EXPORT Behavior
 	{
 	protected:
 		Behavior(CAMSEdit* pEdit);
@@ -115,10 +149,13 @@ public:
 	};
 	friend class Behavior;
 
+
+	#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_ALPHANUMERIC_CLASS)
+
 	// The AlphanumericBehavior class is used to allow entry of alphanumeric
 	// characters.  It can be restricted in terms of what characters cannot 
 	// be inputed as well as how many are allowed altogether.
-	class AlphanumericBehavior : public Behavior
+	class AMSEDIT_EXPORT AlphanumericBehavior : public Behavior
 	{
 	public:
 		AlphanumericBehavior(CAMSEdit* pEdit, int nMaxChars = 0, const CString& strInvalidChars = _T("%'*\"+?><:\\"));
@@ -139,9 +176,14 @@ public:
 		CString m_strInvalidChars;
 	};
 
+	#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_ALPHANUMERIC_CLASS)
+
+
+	#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_MASKED_CLASS)
+
 	// The MaskedBehavior class is used to allow entry of numeric characters
 	// based on a given mask containing '#' characters to hold digits.
-	class MaskedBehavior : public Behavior
+	class AMSEDIT_EXPORT MaskedBehavior : public Behavior
 	{
 	public:
 		// Construction
@@ -156,11 +198,11 @@ public:
 	
 		// The Symbol class represents a character which may be added to the mask and then interpreted by the 
 		// MaskedBehavior class to validate the input from the user and possibly convert it to something else.
-		class Symbol
+		class AMSEDIT_EXPORT Symbol
 		{
 		public:
 			#ifndef _UNICODE
-				typedef int (*ValidationFunction)(int);	// designed for functions such as _istdigit, _istalpha
+				typedef int (*ValidationFunction)(UINT);	// designed for functions such as _istdigit, _istalpha
 				typedef UINT (*ConversionFunction)(UINT);	// designed for functions such as _totupper, _totlower
 			#else
 				typedef int (*ValidationFunction)(WCHAR);		
@@ -184,7 +226,7 @@ public:
 			ConversionFunction m_fnConversion;
 		};
 
-		typedef CArray<Symbol, Symbol&> SymbolArray;
+		typedef CArray<Symbol, Symbol const&> SymbolArray;
 
 		SymbolArray& GetSymbolArray();
 
@@ -199,11 +241,16 @@ public:
 		SymbolArray m_arraySymbols;
 	};
 
+	#endif  // (AMSEDIT_COMPILED_CLASSES & AMSEDIT_MASKED_CLASS)
+
+
+	#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_NUMERIC_CLASS)
+
 	// The NumericBehavior class is used to allow the entry of an actual numeric
 	// value into the edit control.  It may be restricted by the number of digits
 	// before or after the decimal point (if any).  If can also be set to use
 	// commas to separate and group thousands.
-	class NumericBehavior : public Behavior
+	class AMSEDIT_EXPORT NumericBehavior : public Behavior
 	{
 	public:
 		// Construction
@@ -249,6 +296,8 @@ public:
 			None										= 0x0000,
 			CannotBeNegative							= 0x1000,
 			AddDecimalAfterMaxWholeDigits				= 0x2000,
+			PadWithZerosAfterDecimalWhenTextChanges		= 0x4000,
+			PadWithZerosAfterDecimalWhenTextIsSet		= 0x8000,
 
 			OnKillFocus_Beep_IfInvalid					= 0x0001,
 			OnKillFocus_Beep_IfEmpty					= 0x0002,
@@ -298,10 +347,18 @@ public:
 		CString m_strPrefix;
 		double m_dMin;
 		double m_dMax;
+
+	private:
+		bool m_bAdjustingSeparators;
 	};
 
+	#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_NUMERIC_CLASS)
+
+
+	#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATE_CLASS)
+
 	// The DateBehavior class is used to allow the entry of date values.
-	class DateBehavior : virtual public Behavior
+	class AMSEDIT_EXPORT DateBehavior : virtual public Behavior
 	{
 	public:
 		// Construction
@@ -408,8 +465,13 @@ public:
 		TCHAR m_cSep;
 	};
 
+	#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATE_CLASS)
+
+
+	#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_TIME_CLASS)
+
 	// The TimeBehavior class is used to allow the entry of time values.
-	class TimeBehavior : virtual public Behavior
+	class AMSEDIT_EXPORT TimeBehavior : virtual public Behavior
 	{
 	public:
 		// Construction
@@ -533,9 +595,14 @@ public:
 		int m_nHourStart;
 	};
 
+	#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_TIME_CLASS)
+
+
+	#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATETIME_CLASS) == AMSEDIT_DATETIME_CLASS
+
 	// The DateTimeBehavior class is used to allow the entry of date and time values.
-	class DateTimeBehavior : public DateBehavior, 
-							 public TimeBehavior
+	class AMSEDIT_EXPORT DateTimeBehavior : public DateBehavior, 
+											public TimeBehavior
 	{
 	public:
 		// Construction
@@ -592,6 +659,7 @@ public:
 		virtual void ShowErrorMessage() const;
 	};
 
+	#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATETIME_CLASS) == AMSEDIT_DATETIME_CLASS
 
 	// Generated message map functions (for CAMSEdit)
 protected:
@@ -606,13 +674,15 @@ protected:
 };
 
 
+#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_ALPHANUMERIC_CLASS)
+
 /////////////////////////////////////////////////////////////////////////////
 // CAMSAlphanumericEdit window
 
 // The CAMSAlphanumericEdit is a CAMSEdit control which supports the AlphanumericBehavior class.
 //
-class CAMSAlphanumericEdit : public CAMSEdit, 
-                             public CAMSEdit::AlphanumericBehavior
+class AMSEDIT_EXPORT CAMSAlphanumericEdit : public CAMSEdit, 
+											public CAMSEdit::AlphanumericBehavior
 {
 public:
 	// Construction
@@ -636,14 +706,18 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
+#endif // (AMSEDIT_COMPILED_CLASSES & AMSEDIT_ALPHANUMERIC_CLASS)
+
+
+#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_MASKED_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSMaskedEdit window
 
 // The CAMSMaskedEdit is a CAMSEdit control which supports the MaskedBehavior class.
 //
-class CAMSMaskedEdit : public CAMSEdit, 
-                       public CAMSEdit::MaskedBehavior
+class AMSEDIT_EXPORT CAMSMaskedEdit : public CAMSEdit, 
+									  public CAMSEdit::MaskedBehavior
 {
 public:
 	// Construction
@@ -668,14 +742,18 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_MASKED_CLASS)
+
+
+#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_NUMERIC_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSNumericEdit window
 
 // The CAMSNumericEdit is a CAMSEdit control which supports the NumericBehavior class.
 //
-class CAMSNumericEdit : public CAMSEdit, 
-                        public CAMSEdit::NumericBehavior
+class AMSEDIT_EXPORT CAMSNumericEdit : public CAMSEdit, 
+									   public CAMSEdit::NumericBehavior
 {
 public:
 	CAMSNumericEdit(int nMaxWholeDigits = 9, int nMaxDecimalPlaces = 4);
@@ -700,6 +778,10 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_NUMERIC_CLASS)
+
+
+#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_INTEGER_CLASS) == AMSEDIT_INTEGER_CLASS
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSIntegerEdit window
@@ -707,7 +789,7 @@ protected:
 // The CAMSNumericEdit is a CAMSEdit control which supports the NumericBehavior class
 // restricted to only allow integer values.
 //
-class CAMSIntegerEdit : public CAMSNumericEdit
+class AMSEDIT_EXPORT CAMSIntegerEdit : public CAMSNumericEdit
 {
 public:
 	// Construction
@@ -733,6 +815,10 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_INTEGER_CLASS) == AMSEDIT_INTEGER_CLASS
+
+
+#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_CURRENCY_CLASS) == AMSEDIT_CURRENCY_CLASS
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSCurrencyEdit window
@@ -740,7 +826,7 @@ protected:
 // The CAMSNumericEdit is a CAMSEdit control which supports the NumericBehavior class
 // modified to put the '$' character in front of the value and use commas to separate the thousands.
 //
-class CAMSCurrencyEdit : public CAMSNumericEdit
+class AMSEDIT_EXPORT CAMSCurrencyEdit : public CAMSNumericEdit
 {
 public:
 	// Construction
@@ -760,14 +846,18 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_CURRENCY_CLASS) == AMSEDIT_CURRENCY_CLASS
+
+
+#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATE_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSDateEdit window
 
 // The CAMSDateEdit is a CAMSEdit control which supports the DateBehavior class.
 //
-class CAMSDateEdit : public CAMSEdit, 
-                     public CAMSEdit::DateBehavior
+class AMSEDIT_EXPORT CAMSDateEdit : public CAMSEdit, 
+									public CAMSEdit::DateBehavior
 {
 public:
 	// Construction
@@ -795,14 +885,18 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATE_CLASS)
+
+
+#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_TIME_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSTimeEdit window
 
 // The CAMSTimeEdit is a CAMSEdit control which supports the TimeBehavior class.
 //
-class CAMSTimeEdit : public CAMSEdit, 
-                     public CAMSEdit::TimeBehavior
+class AMSEDIT_EXPORT CAMSTimeEdit : public CAMSEdit, 
+									public CAMSEdit::TimeBehavior
 {
 public:
 	// Construction
@@ -830,6 +924,10 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_TIME_CLASS)
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATETIME_CLASS) == AMSEDIT_DATETIME_CLASS
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSDateTimeEdit window
@@ -837,8 +935,8 @@ protected:
 // The CAMSDateTimeEdit is a CAMSEdit control which supports the 
 // DateBehavior and TimeBehavior classes.
 //
-class CAMSDateTimeEdit : public CAMSEdit, 
-						 public CAMSEdit::DateTimeBehavior
+class AMSEDIT_EXPORT CAMSDateTimeEdit : public CAMSEdit, 
+										public CAMSEdit::DateTimeBehavior
 {
 public:
 	// Construction
@@ -866,6 +964,10 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATETIME_CLASS) == AMSEDIT_DATETIME_CLASS
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_ALL_CLASSES) == AMSEDIT_ALL_CLASSES
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSMultiMaskedEdit window
@@ -874,11 +976,11 @@ protected:
 // AlphanumericBehavior, NumericBehavior, MaskedBehavior, DateBehavior, or 
 // TimeBehavior behavior classes.  It uses the mask to determine the current behavior.
 //
-class CAMSMultiMaskedEdit : public CAMSEdit, 
-                            public CAMSEdit::AlphanumericBehavior,
-                            public CAMSEdit::NumericBehavior,
-                            public CAMSEdit::MaskedBehavior,
-                            public CAMSEdit::DateTimeBehavior
+class AMSEDIT_EXPORT CAMSMultiMaskedEdit : public CAMSEdit, 
+										   public CAMSEdit::AlphanumericBehavior,
+										   public CAMSEdit::NumericBehavior,
+										   public CAMSEdit::MaskedBehavior,
+										   public CAMSEdit::DateTimeBehavior
 {
 public:
 	CAMSMultiMaskedEdit();
@@ -910,6 +1012,8 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 };
+
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_ALL_CLASSES) == AMSEDIT_ALL_CLASSES
 
 
 #define AMS_MIN_NUMBER			-1.7976931348623158e+308

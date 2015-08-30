@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@
 #include "AddGroupDlg.h"
 
 #include "IconPickerDlg.h"
+#include "PwSafe/PwManager.h"
 #include "NewGUI/BtnST.h"
 #include "NewGUI/TranslateEx.h"
 
@@ -82,9 +83,9 @@ BOOL CAddGroupDlg::OnInitDialog()
 
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	NewGUI_Button(&m_btSetIcon, -1, -1);
-	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(&m_btSetIcon, -1, -1);
+	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY),
@@ -110,12 +111,23 @@ BOOL CAddGroupDlg::OnInitDialog()
 
 void CAddGroupDlg::OnOK() 
 {
+	CString strRef = TRL(PWS_SEARCHGROUP), strTest;
+	strRef.MakeLower();
+
 	UpdateData(TRUE);
 
 	if(m_strGroupName.GetLength() == 0)
 	{
 		MessageBox(TRL("Enter a group name!"),
 			TRL("Stop"), MB_ICONINFORMATION);
+		return;
+	}
+	strTest = m_strGroupName;
+	strTest.MakeLower();
+	if(strTest == strRef)
+	{
+		MessageBox(TRL("The group you selected cannot store entries. Please select an other group."),
+			TRL("Stop"), MB_ICONWARNING | MB_OK);
 		return;
 	}
 

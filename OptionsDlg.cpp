@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -62,13 +62,17 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	m_bRememberLast = FALSE;
 	m_bUsePuttyForURLs = FALSE;
 	m_bSaveOnLATMod = FALSE;
+	m_nClipboardMethod = -1;
 	//}}AFX_DATA_INIT
+
+	m_pParentDlg = NULL;
 }
 
 void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COptionsDlg)
+	DDX_Control(pDX, IDC_HOTKEY_AUTOTYPE, m_hkAutoType);
 	DDX_Control(pDX, IDC_BTN_DELETEASSOC, m_btnDeleteAssoc);
 	DDX_Control(pDX, IDC_BTN_CREATEASSOC, m_btnCreateAssoc);
 	DDX_Control(pDX, IDC_BTN_ROWHIGHLIGHTSEL, m_btnColorRowHighlight);
@@ -92,6 +96,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_REMEMBERLAST, m_bRememberLast);
 	DDX_Check(pDX, IDC_CHECK_PUTTYURLS, m_bUsePuttyForURLs);
 	DDX_Check(pDX, IDC_CHECK_SAVEONLATMOD, m_bSaveOnLATMod);
+	DDX_Radio(pDX, IDC_RADIO_CLIPMETHOD_TIMED, m_nClipboardMethod);
 	//}}AFX_DATA_MAP
 }
 
@@ -103,6 +108,8 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTN_DELETEASSOC, OnBtnDeleteAssoc)
 	ON_BN_CLICKED(IDC_CHECK_REMEMBERLAST, OnCheckRememberLast)
 	ON_BN_CLICKED(IDC_CHECK_AUTOOPENLASTDB, OnCheckAutoOpenLastDb)
+	ON_BN_CLICKED(IDC_RADIO_CLIPMETHOD_SECURE, OnRadioClipMethodSecure)
+	ON_BN_CLICKED(IDC_RADIO_CLIPMETHOD_TIMED, OnRadioClipMethodTimed)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -112,14 +119,16 @@ BOOL COptionsDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	ASSERT(m_pParentDlg != NULL);
+
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_Button(&m_btSelFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
-	NewGUI_Button(&m_btnCreateAssoc, IDB_FILE, IDB_FILE);
-	NewGUI_Button(&m_btnDeleteAssoc, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(&m_btSelFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
+	NewGUI_XPButton(&m_btnCreateAssoc, IDB_FILE, IDB_FILE);
+	NewGUI_XPButton(&m_btnDeleteAssoc, IDB_CANCEL, IDB_CANCEL);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_OPTIONS),
@@ -133,18 +142,20 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(NULL, OPTGRP_FILES);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_SAVEONLATMOD), OPTGRP_FILES);
 
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CLIPBOARDMETHOD), OPTGRP_MEMORY);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_CLIPMETHOD_TIMED), OPTGRP_MEMORY);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_CLIPMETHOD_SECURE), OPTGRP_MEMORY);
+	m_wndgrp.AddWindow(NULL, OPTGRP_MEMORY);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CLIPCLEARTXT), OPTGRP_MEMORY);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_CLIPBOARDTIME), OPTGRP_MEMORY);
 
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_REMEMBERLAST), OPTGRP_STARTEXIT);
+	m_wndgrp.AddWindow(NULL, OPTGRP_STARTEXIT);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_START), OPTGRP_STARTEXIT);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_AUTOOPENLASTDB), OPTGRP_STARTEXIT);
 	m_wndgrp.AddWindow(NULL, OPTGRP_STARTEXIT);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_EXIT), OPTGRP_STARTEXIT);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_AUTOSAVE), OPTGRP_STARTEXIT);
-	m_wndgrp.AddWindow(NULL, OPTGRP_STARTEXIT);
-	m_wndgrp.AddWindow(NULL, OPTGRP_STARTEXIT);
-	m_wndgrp.AddWindow(NULL, OPTGRP_STARTEXIT);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_REMEMBERLAST), OPTGRP_STARTEXIT);
 
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_IMGBUTTONS), OPTGRP_GUI);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_ENTRYGRID), OPTGRP_GUI);
@@ -175,6 +186,10 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
 	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_PUTTYURLS), OPTGRP_SETUP);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_AUTOTYPEHK), OPTGRP_SETUP);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_HOTKEY_AUTOTYPE), OPTGRP_SETUP);
 
 	m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
 	m_wndgrp.ArrangeWindows(this);
@@ -201,6 +216,9 @@ BOOL COptionsDlg::OnInitDialog()
 
 	m_tabMenu.SetCurSel(0);
 
+	m_hkAutoType.SetRules(HKCOMB_NONE | HKCOMB_S, HOTKEYF_CONTROL | HOTKEYF_ALT);
+	m_hkAutoType.SetHotKey((WORD)(m_dwATHotKey & 0x0000FFFF), (WORD)(m_dwATHotKey >> 16));
+
 	m_btnColorRowHighlight.SetDefaultColor(RGB(238,238,255));
 	m_btnColorRowHighlight.SetColor(m_rgbRowHighlight);
 
@@ -215,9 +233,22 @@ BOOL COptionsDlg::OnInitDialog()
 void COptionsDlg::OnOK() 
 {
 	UpdateData(TRUE);
+
+	WORD wVK = 0, wMod = 0;
+	m_hkAutoType.GetHotKey(wVK, wMod);
+	DWORD dwNewHotKey = ((DWORD)wMod << 16) | (DWORD)wVK;
+	if(dwNewHotKey != m_dwATHotKey)
+	{
+		if(m_pParentDlg->RegisterGlobalHotKey(HOTKEYID_AUTOTYPE, dwNewHotKey, (m_dwATHotKey != 0) ? TRUE : FALSE) == FALSE)
+			return;
+
+		m_dwATHotKey = dwNewHotKey;
+	}
+
 	m_rgbRowHighlight = m_btnColorRowHighlight.GetColor();
-	m_ilIcons.DeleteImageList();
 	if((m_bLockAfterTime == TRUE) && (m_nLockAfter < 5)) m_nLockAfter = 5;
+
+	m_ilIcons.DeleteImageList();
 	CDialog::OnOK();
 }
 
@@ -296,6 +327,9 @@ void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case OPTGRP_MEMORY:
 		m_wndgrp.HideAllExcept(OPTGRP_MEMORY);
+		UpdateData(TRUE);
+		if(m_nClipboardMethod != CM_TIMED)
+			GetDlgItem(IDC_EDIT_CLIPBOARDTIME)->EnableWindow(FALSE);
 		break;
 	case OPTGRP_SECURITY:
 		m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
@@ -320,6 +354,11 @@ void COptionsDlg::OnBtnCreateAssoc()
 		MessageBox(TRL("Successfully associated KeePass with .kdb files! A double-click on a .kdb file will now start KeePass automatically!"),
 			TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
 	}
+	else
+	{
+		MessageBox(TRL("Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations."),
+			TRL("Password Safe"), MB_OK | MB_ICONWARNING);
+	}
 }
 
 void COptionsDlg::OnBtnDeleteAssoc() 
@@ -330,6 +369,11 @@ void COptionsDlg::OnBtnDeleteAssoc()
 
 		MessageBox(TRL("Successfully removed association! KeePass won't be started any more when double-clicking on a .kdb file!"),
 			TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+	}
+	else
+	{
+		MessageBox(TRL("Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations."),
+			TRL("Password Safe"), MB_OK | MB_ICONWARNING);
 	}
 }
 
@@ -366,4 +410,23 @@ void COptionsDlg::OnCheckAutoOpenLastDb()
 	UpdateData(TRUE);
 	if(m_bOpenLastDb == TRUE) m_bRememberLast = TRUE;
 	UpdateData(FALSE);
+}
+
+void COptionsDlg::OnRadioClipMethodSecure() 
+{
+	CString str = TRL("Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.");
+	str += _T("\r\n\r\n");
+	str += TRL("If you notice any problems with this enhanced method, just switch back to the timed clipboard clearing method.");
+	MessageBox((LPCTSTR)str, TRL("Password Safe"), MB_ICONINFORMATION | MB_OK);
+
+	UpdateData(TRUE);
+	if(m_nClipboardMethod == CM_TIMED) GetDlgItem(IDC_EDIT_CLIPBOARDTIME)->EnableWindow(TRUE);
+	else GetDlgItem(IDC_EDIT_CLIPBOARDTIME)->EnableWindow(FALSE);
+}
+
+void COptionsDlg::OnRadioClipMethodTimed() 
+{
+	UpdateData(TRUE);
+	if(m_nClipboardMethod == CM_TIMED) GetDlgItem(IDC_EDIT_CLIPBOARDTIME)->EnableWindow(TRUE);
+	else GetDlgItem(IDC_EDIT_CLIPBOARDTIME)->EnableWindow(FALSE);
 }

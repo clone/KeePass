@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -31,10 +31,11 @@
 #define AFX_CUSTOMLISTCTRLEX_H__14392920_86D7_11D7_BF16_0050BF14F5CC__INCLUDED_
 
 #include "NewGUICommon.h"
+#include "../Util/SysDefEx.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CCustomListCtrlEx : public CListCtrl
+class CPP_CLASS_SHARE CCustomListCtrlEx : public CListCtrl
 {
 public:
 	CCustomListCtrlEx();
@@ -42,6 +43,9 @@ public:
 
 	COLORREF GetColorEx();
 	void SetColorEx(COLORREF rgbColor);
+
+	BOOL EnsureVisible(int nItem, BOOL bPartialOK);
+	int GetItemCount();
 
 	CWnd *m_pParentI;
 

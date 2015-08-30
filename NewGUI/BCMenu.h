@@ -1,3 +1,7 @@
+// This is a modified version of Brent Corkums BCMenu class.
+// Editor: Dominik Reichl
+// For the original version, see the authors site below.
+
 //*************************************************************************
 // BCMenu.h : header file
 // Version : 3.035
@@ -27,6 +31,7 @@
 #define BCMenu_H
 
 #include <afxtempl.h>
+#include "../Util/SysDefEx.h"
 
 // BCMenuData class. Fill this class structure to define a single menu item:
 class BCMenuData
@@ -89,7 +94,7 @@ typedef enum {BCMENU_NONE, BCMENU_HEAD, BCMENU_TAIL, BCMENU_BOTH} BC_Seperator;
 #endif
 
 
-class BCMenu : public CMenu
+class CPP_CLASS_SHARE BCMenu : public CMenu
 {
 	DECLARE_DYNAMIC( BCMenu )
 public:

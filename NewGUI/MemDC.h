@@ -1,3 +1,6 @@
+// Modified version of Keith Rule's CMemDC.
+// Editor: Dominik Reichl
+
 #if !defined(AFX_MEMDC_H__CA1D3541_7235_11D1_ABBA_00A0243D1382__INCLUDED_)
 #define AFX_MEMDC_H__CA1D3541_7235_11D1_ABBA_00A0243D1382__INCLUDED_
 
@@ -7,6 +10,7 @@
 // MemDC.h : header file
 //
 
+#include "../Util/SysDefEx.h"
 
 //////////////////////////////////////////////////
 // CMemDC - memory DC
@@ -23,7 +27,6 @@
 //           25 feb 98 - fixed minor assertion bug
 //
 // This class implements a memory Device Context
-
 
 class CMemDC : public CDC
 {

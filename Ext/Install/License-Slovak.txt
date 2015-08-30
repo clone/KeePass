@@ -1,4 +1,4 @@
-Copyright (c) 2003/2004, Dominik Reichl
+Copyright (c) 2003-2005, Dominik Reichl
 Všetky práva vyhradené.
 
 Toto je neoficiálny preklad licencie programu. Pre právne úèely je smerodajné jedine originálne anglické znenie licencie, ktoré je uvedené nižšie na konci tohoto dokumentu.

@@ -42,6 +42,8 @@
 #define	BTNST_USE_BCMENU
 #include "BCMenu.h"
 
+#include "../Util/SysDefEx.h"
+
 // Uncomment the following line to enable support for sound effects
 // #define	BTNST_USE_SOUND
 
@@ -184,6 +186,7 @@ protected:
 	afx_msg void OnEnable(BOOL bEnable);
 	afx_msg void OnCancelMode();
 	afx_msg UINT OnGetDlgCode();
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	//}}AFX_MSG
 
 #ifdef	BTNST_USE_BCMENU
@@ -212,6 +215,7 @@ protected:
 	BOOL		m_bDrawBorder;		// Draw border?
 	BOOL		m_bDrawFlatFocus;	// Draw focus rectangle for flat button?
 	COLORREF	m_crColors[BTNST_MAX_COLORS];	// Colors to be used
+	BOOL		m_bUseSystemColor[BTNST_MAX_COLORS];  // Distinguish between system and custom colors
 	HWND		m_hParentWndMenu;	// Handle to window for menu selection
 	BOOL		m_bMenuDisplayed;	// Is menu displayed ?
 

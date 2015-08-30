@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,7 @@ CPwExport::~CPwExport()
 void CPwExport::SetManager(CPwManager *pMgr)
 {
 	ASSERT(pMgr != NULL);
-	if(pMgr != NULL) m_pMgr = pMgr;
+	m_pMgr = pMgr;
 }
 
 void CPwExport::SetFormat(int nFormat)
@@ -99,9 +99,13 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 	BYTE aInitUTF8[3] = { 0xEF, 0xBB, 0xBF };
 	CString str;
 	CBase64Codec base64;
+	PW_TIME tNever;
 
-	ASSERT(pszFile != NULL);
-	if(pszFile == NULL) return FALSE;
+	ASSERT(m_pMgr != NULL); if(m_pMgr == NULL) return FALSE;
+	m_pMgr->_GetNeverExpireTime(&tNever);
+
+	ASSERT(pszFile != NULL); if(pszFile == NULL) return FALSE;
+
 	fp = _tfopen(pszFile, _T("wb"));
 	if(fp == NULL) return FALSE;
 
@@ -279,7 +283,14 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 			PWEXPSTR((LPCTSTR)str);
 			PWEXPSTR(_T("</lastaccesstime>")); PWEXPSTR(m_pszNewLine);
 
-			PWEXPSTR(_T("\t<expiretime>"));
+			if(memcmp(&p->tExpire, &tNever, sizeof(PW_TIME)) == 0)
+			{
+				PWEXPSTR(_T("\t<expiretime expires=\"false\">"));
+			}
+			else
+			{
+				PWEXPSTR(_T("\t<expiretime expires=\"true\">"));
+			}
 			_PwTimeToXmlTime(p->tExpire, &str);
 			PWEXPSTR((LPCTSTR)str);
 			PWEXPSTR(_T("</expiretime>")); PWEXPSTR(m_pszNewLine);
@@ -312,15 +323,20 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 		else if(m_nFormat == PWEXP_CSV)
 		{
 			PWEXPSTR(_T("\""));
-			PWEXPSTR(p->pszTitle);
+			str = p->pszTitle; str.Replace("\\", "\\\\"); str.Replace("\"", "\\\"");
+			PWEXPSTR((LPCTSTR)str);
 			PWEXPSTR(_T("\",\""));
-			PWEXPSTR(p->pszUserName);
+			str = p->pszUserName; str.Replace("\\", "\\\\"); str.Replace("\"", "\\\"");
+			PWEXPSTR((LPCTSTR)str);
 			PWEXPSTR(_T("\",\""));
-			PWEXPSTR(p->pszPassword);
+			str = p->pszPassword; str.Replace("\\", "\\\\"); str.Replace("\"", "\\\"");
+			PWEXPSTR((LPCTSTR)str);
 			PWEXPSTR(_T("\",\""));
-			PWEXPSTR(p->pszURL);
+			str = p->pszURL; str.Replace("\\", "\\\\"); str.Replace("\"", "\\\"");
+			PWEXPSTR((LPCTSTR)str);
 			PWEXPSTR(_T("\",\""));
-			PWEXPSTR(p->pszAdditional);
+			str = p->pszAdditional; str.Replace("\\", "\\\\"); str.Replace("\"", "\\\"");
+			PWEXPSTR((LPCTSTR)str);
 			PWEXPSTR(_T("\""));
 			PWEXPSTR(m_pszNewLine);
 		}

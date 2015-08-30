@@ -37,6 +37,7 @@
 // #include <afxwin.h>
 #include <afxtempl.h>
 #include <afxdisp.h>    // COleDateTime
+#include "../Util/SysDefEx.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CSystemTray window

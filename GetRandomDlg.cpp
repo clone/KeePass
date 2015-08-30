@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -85,9 +85,9 @@ BOOL CGetRandomDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_Button(&m_btMouseInput, IDB_MOUSE_SMALL, IDB_MOUSE_SMALL);
+	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(&m_btMouseInput, IDB_MOUSE_SMALL, IDB_MOUSE_SMALL);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY),

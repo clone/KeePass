@@ -1,5 +1,5 @@
 |~LANGUAGENAME||Spanish (Español para España y Latinoamérica)|
-|~LANGUAGEVERSION||0.97c|
+|~LANGUAGEVERSION||0.98a|
 |~LANGUAGEAUTHOR||Marcel Trujillo|
 |~LANGUAGEAUTHOREMAIL||marcelito@gmail.com|
 |&OK||&OK|
@@ -108,7 +108,6 @@
 |&File||&Archivo|
 |&Edit||&Editar|
 |&View||&Visualizar|
-|&Extras||E&xtras|
 |&?||&?|
 |&New Database...||&Nueva Base de Datos...|
 |&Open Database...||&Abrir Base de Datos...|
@@ -119,13 +118,9 @@
 |&Print Complete Password List||&Imprimir lista completa de contraseñas|
 |&Lock Workspace||&Bloquear área de trabajo|
 |&Unlock Workspace||&Desbloquear área de trabajo|
-|&Exit||&Salir|
 |&Lock/Unlock Workspace||&Bloquear/Desbloquear área de trabajo|
 |&Options...||&Opciones...|
-|&Add Password Group...||&Añadir Grupo de Contraseñas...|
-|&Modify Password Group...||&Modificar Grupo de Contraseñas...|
 |&Delete Password Group...||&Eliminar Grupo de Contraseñas...|
-|&Print Group||Im&primir Grupo...|
 |Export Group To &HTML...||Exportar Grupo en &HTML...|
 |Export Group To &XML...||Exportar Grupo en &XML...|
 |Export Group To &CSV...||Exportar Grupo en &CSV...|
@@ -134,7 +129,6 @@
 |Copy &Password To Clipboard||Copiar &Contraseña en el portapapeles|
 |Open &URL(s)||Abrir &URL(s)|
 |&Find In Database...||Encontrar en la &Base de Datos...|
-|Find In This &Group...||Encontrar en este &Grupo...|
 |&Add Entry...||&Añadir Entrada...|
 |&Edit/View Entry...||&Editar/Visualizar Entrada...|
 |&Delete Entry||&Eliminar Entrada|
@@ -152,11 +146,8 @@
 |Show User&Name Column||Mostrar columna Usuar&io|
 |Show &URL Column||Mostrar columna &URL|
 |Show &Password Column||Mostrar columna Contra&seña|
-|Show &Notes Column||Mostrar columna &Comentarios|
 |Main Window &Always On Top||Ventana Principal siempre &Encima|
-|&Hide Passwords Behind Asterisks (***)||&Ocultar contraseñas con Asteriscos (***)|
 |Password &Generator||&Generador de Contraseñas|
-|Visit KeePass &Homepage||Visitar la web de KeePass|
 |&About KeePass...||&Acerca de KeePass...|
 |&Minimize/Maximize Window To/From Tray||Minimizar/Maximizar Ventana de/hacia la Bandeja del Sistema|
 |%u.%u.%u.%u, compatible with %u.%u.x.x||%u.%u.%u.%u, compatible con %u.%u.x.x|
@@ -198,7 +189,6 @@
 |Load a language file||Cargar un archivo de idioma|
 |Select one of the languages in the list below.||Seleccione un idioma entre los listados abajo.|
 |Available Languages||Idiomas Disponibles|
-|Open &ReadMe File||Abrir archivo Lea&Me|
 |Open &License File||Abrir &Licencia|
 |&Print License File||&Imprimir archivo de Licencia|
 |Newline sequence:||Secuencia de nueva línea:|
@@ -255,7 +245,6 @@
 |UUID||UUID|
 |Show &Creation Time Column||Mostrar columna Fecha de &Creación|
 |Show Last &Modification Time Column||Mostrar columna Fecha de &Modificación|
-|Show Last Access &Time Column||Mostrar columna Último &Acceso|
 |Show &Expire Time Column||Mostrar columna &Expiración|
 |Show UU&ID Column||Mostrar columna &UUID |
 |Show &ToolBar||&Mostrar barra de herramientas|
@@ -296,15 +285,12 @@
 |&Rearrange||&Reorganizar|
 |&Save Attached File To...||&Salvar archivo adjunto en...|
 |&Sort Group List||&Ordenar lista de Grupos|
-|&Sort List By Title||&Ordenar lista por Título|
-|Add Password &Subgroup...||Añadir &Sub-Grupo de Contraseña|
 |Advanced Encryption Standard (AES) (128-bit block cipher using 256-bit key)||Advanced Encryption Standard (AES) (bloque de cifrado de 128-bit block usando clave de 256-bit)|
 |Attachment||Adjunto|
 |Attachment:||Adjunto:|
 |Close button [X] minimizes the main window instead of terminating the application||Botón de cerrar [X] minimiza la ventana principal en vez de terminar la aplicación|
 |Do you want to overwrite the current attachment?||Usted desea sobreecribir el adjunto?|
 |Generate a random password...||Generar una contraseña aleatoria...|
-|Hide UserNames Behind &Asterisks (***)||Esconder Nombre de Usuario detrás de &Asteriscos (***)|
 |Move Group One &Left||Mover Grupo una posición a la &Izquierda|
 |Move Group One &Right||Mover Grupo una posición a la &Derecha|
 |Open file and set as attachment...||Abrir archivo y establecer como adjunto...|
@@ -371,8 +357,6 @@
 |Delete Entries Confirmation||Confirmación de Borrado de Entradas|
 |Use PuTTY for ssh: and telnet: URLs||Usar PuTTY para ssh: y telnet: URLS|
 |Mark database as modified on last-access time change||Marcar la base de datos como modificada tras el cambio del último acceso|
-|Export To||Exportar a|
-|Import From||Importar desde|
 |Imported from Password Safe||Importado de Password Safe|
 |Most probably someone has changed the file while you were editing it.||Probablemente alguien ha modificado el archivo mientras usted lo editaba.|
 |Number of selected entries (number of entries in the list)||Número de entradas seleccionadas (número de entradas en la lista)|
@@ -384,5 +368,29 @@
 |Total: %u groups / %u entries||Total: %u grupo(s) / %u entrada(s)|
 |Se&lect All||Se&leccionar Todo|
 |Auto-&Sort Password List||Auto-&Ordenar Lista de Contraseñas|
-|&No Auto-Sort||&No Auto-Ordenar|
 |Auto-sorting of the password list is enabled, you cannot move entries manually.||Auto-ordenar la lista de contraseñas está activado, usted no puede mover las entradas manualmente.|
+|&Export To||&Exportar a|
+|&Import From||&Importar desde|
+|Add Password &Group...||Añadir &Grupo de Contraseñas...|
+|Add Password Su&bgroup...||Añadir Su&bgrupo de Contraseñas...|
+|Auto-sorting of the password list is enabled, you cannot sort the list manually now.||Auto-ordenar la lista de contraseñas está activado, usted no puede ordenar la lista manualmente.|
+|Change password of this database - Enter new master key||Modificar la contraseña de esta base de datos - Introduzca una nueva clave maestra|
+|E&xit||S&alir|
+|E&xtras||E&xtras|
+|Enter the new master key for this database.||Introduzca la nueva clave maestra de esta base de datos.|
+|Find In T&his Group...||Buscar En Es&te Grupo...|
+|Hide &Passwords Behind Asterisks (***)||Ocultar &Contraseñas Detrás de Asteriscos (***)|
+|Hide &UserNames Behind Asterisks (***)||Ocultar Nombres de &Usuario Detrás de Asteriscos (***)|
+|Modif&y Password Group...||Modi&ficar Grupo de Contraseñas...|
+|N&o Auto-Sort||N&o Auto-Ordenar|
+|Open &Help File||Abrir Arc&hivo de Ayuda|
+|Perform Auto-&Type||Realizar Auto-Escri&tura|
+|Pr&int Group||Impr&imir Grupo|
+|Repeat master key||Repetir clave maestra|
+|Repeat the master key for this database.||Repetir la clave maestra para esta base de datos.|
+|Save key-file manually to...||Guardar archivo de clave manualmente en...|
+|Select key-file manually...||Seleccionar archivo de clave manualmente...|
+|Show &Last Access Time Column||Mostrar Columna de Hora de Ú&ltimo Acceso|
+|Show Note&s Column||Mostrar Columna de Nota&s|
+|Sort List By &Title||Ordenar Lista por &Título|
+|Visit &KeePass Homepage||Visitar el sitio de &KeePass|

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@
 #define ___PW_COMPAT_H___
 
 #include "../Util/StrUtil.h"
+#include "../Util/SysDefEx.h"
 
 #pragma pack(1)
 

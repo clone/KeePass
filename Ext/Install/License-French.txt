@@ -1,4 +1,4 @@
-Copyright (c) 2003/2004, Dominik Reichl
+Copyright (c) 2003-2005, Dominik Reichl
 All rights reserved/Tous droits réservés.
 
 La redistribution et l'utilisation des sources ou des fichiers exécutables, avec ou sans modification, sont autorisées, sous les conditions suivantes:

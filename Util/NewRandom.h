@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,11 @@
 
 #include <windows.h>
 #include "../Crypto/sha2.h"
+#include "SysDefEx.h"
 
 #define INTRAND_SIZE 264
 
-class CNewRandom
+class CPP_CLASS_SHARE CNewRandom
 {
 public:
 	CNewRandom();
@@ -51,7 +52,7 @@ private:
 	DWORD m_dwCounter;
 };
 
-class CNewRandomInterface
+class CPP_CLASS_SHARE CNewRandomInterface
 {
 public:
 	virtual ~CNewRandomInterface() { }
@@ -65,6 +66,6 @@ void srandXorShift(unsigned long *pSeed128);
 unsigned long randXorShift();
 
 // Must be able to hold at least 16 bytes
-void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource);
+CPP_FN_SHARE void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource);
 
 #endif

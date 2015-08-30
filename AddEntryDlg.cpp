@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@
 #include "PwGeneratorDlg.h"
 #include "Util/MemUtil.h"
 #include "Util/StrUtil.h"
+#include "Util/WinUtil.h"
 #include "NewGUI/NewGUICommon.h"
 #include "NewGUI/TranslateEx.h"
 #include "Util/base64.h"
@@ -47,7 +48,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 #pragma warning(push)
-// Cast truncates constant value
+// Disable warning: "cast truncates constant value"
 #pragma warning(disable: 4310)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -61,6 +62,7 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 	m_strURL = _T(PWAE_STDURL_A);
 	m_strUserName = _T("");
 	m_strAttachment = _T("");
+	m_bExpires = FALSE;
 	//}}AFX_DATA_INIT
 
 	m_pMgr = NULL;
@@ -77,6 +79,8 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAddEntryDlg)
+	DDX_Control(pDX, IDC_HL_HELP_URL, m_hlHelpURL);
+	DDX_Control(pDX, IDC_HL_HELP_AUTOTYPE, m_hlHelpAutoType);
 	DDX_Control(pDX, IDC_PROGRESS_PASSQUALITY, m_cPassQuality);
 	DDX_Control(pDX, IDC_REMOVEATTACH_BTN, m_btRemoveAttachment);
 	DDX_Control(pDX, IDC_SAVEATTACH_BTN, m_btSaveAttachment);
@@ -98,6 +102,7 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_USERNAME, m_strUserName);
 	DDX_Control(pDX, IDC_RE_NOTES, m_reNotes);
 	DDX_Text(pDX, IDC_EDIT_ATTACHMENT, m_strAttachment);
+	DDX_Check(pDX, IDC_CHECK_EXPIRES, m_bExpires);
 	//}}AFX_DATA_MAP
 }
 
@@ -117,7 +122,10 @@ BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	ON_BN_CLICKED(IDC_SAVEATTACH_BTN, OnSaveAttachBtn)
 	ON_BN_CLICKED(IDC_REMOVEATTACH_BTN, OnRemoveAttachBtn)
 	ON_EN_CHANGE(IDC_EDIT_PASSWORD, OnChangeEditPassword)
+	ON_BN_CLICKED(IDC_CHECK_EXPIRES, OnCheckExpires)
 	//}}AFX_MSG_MAP
+
+	ON_REGISTERED_MESSAGE(WM_XHYPERLINK_CLICKED, OnXHyperLinkClicked)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -142,20 +150,30 @@ BOOL CAddEntryDlg::OnInitDialog()
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
 	// Make the buttons look cool
-	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_Button(&m_btRandomPw, -1, -1);
-	NewGUI_Button(&m_btPickIcon, -1, -1);
-	NewGUI_Button(&m_btHidePw, -1, -1);
-	NewGUI_Button(&m_btSetAttachment, IDB_FILE, IDB_FILE, TRUE);
-	NewGUI_Button(&m_btSaveAttachment, IDB_DISK, IDB_DISK, TRUE);
-	NewGUI_Button(&m_btRemoveAttachment, IDB_TB_DELETEENTRY, IDB_TB_DELETEENTRY, TRUE);
+	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(&m_btRandomPw, -1, -1);
+	NewGUI_XPButton(&m_btPickIcon, -1, -1);
+	NewGUI_XPButton(&m_btHidePw, -1, -1);
+	NewGUI_XPButton(&m_btSetAttachment, IDB_FILE, IDB_FILE, TRUE);
+	NewGUI_XPButton(&m_btSaveAttachment, IDB_DISK, IDB_DISK, TRUE);
+	NewGUI_XPButton(&m_btRemoveAttachment, IDB_TB_DELETEENTRY, IDB_TB_DELETEENTRY, TRUE);
 	m_btHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 
 	m_btRandomPw.SetTooltipText(TRL("Generate a random password..."));
 	m_btSetAttachment.SetTooltipText(TRL("Open file and set as attachment..."));
 	m_btSaveAttachment.SetTooltipText(TRL("Save attached file to disk..."));
 	m_btRemoveAttachment.SetTooltipText(TRL("Remove the currently attached file"));
+
+	NewGUI_MakeHyperLink(&m_hlHelpAutoType);
+	m_hlHelpAutoType.EnableTooltip(FALSE);
+	m_hlHelpAutoType.SetNotifyParent(TRUE);
+	m_hlHelpAutoType.EnableURL(FALSE);
+
+	NewGUI_MakeHyperLink(&m_hlHelpURL);
+	m_hlHelpURL.EnableTooltip(FALSE);
+	m_hlHelpURL.SetNotifyParent(TRUE);
+	m_hlHelpURL.EnableURL(FALSE);
 
 	// Set the imagelist for the group selector combo box
 	m_pGroups.SetXImageList(m_pParentIcons);
@@ -234,16 +252,22 @@ BOOL CAddEntryDlg::OnInitDialog()
 	m_pURL.SetWindowText(m_strURL);
 
 	COleDateTime oleMin = AMS_MIN_OLEDATETIME;
-	COleDateTime oleMax(2999, 12, 28, 23, 59, 59);
+	COleDateTime oleMax(2999, 12, 31, 23, 59, 59);
 	m_editDate.SetRange(oleMin, oleMax);
-	m_editTime.SetRange(oleMin, oleMax);
 	m_editDate.SetDate((int)(unsigned int)m_tExpire.shYear,
 		(int)(unsigned int)m_tExpire.btMonth, (int)(unsigned int)m_tExpire.btDay);
+	m_editTime.SetRange(oleMin, oleMax);
 	m_editTime.SetAMPM(true);
 	m_editTime.Show24HourFormat(true);
 	m_editTime.ShowSeconds(true);
 	m_editTime.SetTime((int)(unsigned int)m_tExpire.btHour,
 		(int)(unsigned int)m_tExpire.btMinute, (int)(unsigned int)m_tExpire.btSecond);
+
+	PW_TIME tNever;
+	m_pMgr->_GetNeverExpireTime(&tNever);
+
+	if(_pwtimecmp(&tNever, &m_tExpire) == 0) m_bExpires = FALSE;
+	else m_bExpires = TRUE;
 
 	// m_reNotes.LimitText(0);
 	m_reNotes.SetEventMask(ENM_MOUSEEVENTS);
@@ -328,12 +352,19 @@ void CAddEntryDlg::OnOK()
 		return;
 	}
 
-	m_tExpire.shYear = (USHORT)m_editDate.GetYear();
-	m_tExpire.btMonth = (BYTE)m_editDate.GetMonth();
-	m_tExpire.btDay = (BYTE)m_editDate.GetDay();
-	m_tExpire.btHour = (BYTE)m_editTime.GetHour();
-	m_tExpire.btMinute = (BYTE)m_editTime.GetMinute();
-	m_tExpire.btSecond = (BYTE)m_editTime.GetSecond();
+	if(m_bExpires == TRUE)
+	{
+		m_tExpire.shYear = (USHORT)m_editDate.GetYear();
+		m_tExpire.btMonth = (BYTE)m_editDate.GetMonth();
+		m_tExpire.btDay = (BYTE)m_editDate.GetDay();
+		m_tExpire.btHour = (BYTE)m_editTime.GetHour();
+		m_tExpire.btMinute = (BYTE)m_editTime.GetMinute();
+		m_tExpire.btSecond = (BYTE)m_editTime.GetSecond();
+	}
+	else
+	{
+		m_pMgr->_GetNeverExpireTime(&m_tExpire);
+	}
 
 	m_reNotes.GetWindowText(m_strNotes);
 
@@ -597,6 +628,17 @@ void CAddEntryDlg::UpdateControlsStatus()
 	}
 
 	if(m_strTitle == CString(PWS_TAN_ENTRY)) m_btSetAttachment.EnableWindow(FALSE);
+
+	if(m_bExpires == TRUE)
+	{
+		m_editDate.EnableWindow(TRUE);
+		m_editTime.EnableWindow(TRUE);
+	}
+	else
+	{
+		m_editDate.EnableWindow(FALSE);
+		m_editTime.EnableWindow(FALSE);
+	}
 }
 
 void CAddEntryDlg::OnChangeEditPassword() 
@@ -606,6 +648,23 @@ void CAddEntryDlg::OnChangeEditPassword()
 	EraseCString(&m_strPassword);
 	m_pEditPw.GetWindowText(m_strPassword);
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
+}
+
+void CAddEntryDlg::OnCheckExpires() 
+{
+	UpdateControlsStatus();
+}
+
+LRESULT CAddEntryDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	if(wParam == IDC_HL_HELP_AUTOTYPE)
+		WU_OpenAppHelp(PWM_HELP_AUTOTYPE);
+	else if(wParam == IDC_HL_HELP_URL)
+		WU_OpenAppHelp(PWM_HELP_URLS);
+
+	return 0;
 }
 
 #pragma warning(pop)

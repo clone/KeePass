@@ -51,6 +51,7 @@
 
 // DR: Added to compile with project
 #include "NewGUICommon.h"
+#include "../Util/SysDefEx.h"
 
 // DR: Changed name of include file
 #include "KCWndUtil.h"

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,8 @@
 #ifndef ___TEST_IMPL_H___
 #define ___TEST_IMPL_H___
 
+#include "../Util/SysDefEx.h"
+
 #define TI_ERR_SHAVAR32          1
 #define TI_ERR_SHAVAR64          2
 #define TI_ERR_SHACMP256         4
@@ -39,6 +41,6 @@
 #define TI_ERR_ARCFOUR_CRYPT    64
 #define TI_ERR_TWOFISH         128
 
-unsigned long testCryptoImpl();
+C_FN_SHARE unsigned long testCryptoImpl();
 
 #endif

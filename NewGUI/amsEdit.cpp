@@ -1,6 +1,6 @@
 // amsEdit.cpp : implementation file for CEdit-derived classes
 // Created by: Alvaro Mendez - 07/17/2000
-// Modified by: Dominik Reichl - 11/20/2004
+// Modified by: Dominik Reichl - 26/02/2005
 //
 
 #include "stdafx.h"
@@ -131,9 +131,8 @@ void CAMSEdit::Redraw()
 }
 
 // Returns true if the given character should be entered into the control.
-bool CAMSEdit::ShouldEnter(TCHAR c) const
+bool CAMSEdit::ShouldEnter(TCHAR) const
 {
-	UNREFERENCED_PARAMETER(c);
 	return true;
 }
 
@@ -153,12 +152,10 @@ LONG CAMSEdit::OnCut(UINT, LONG)
 }
 	
 // Clears the current selection.
-LONG CAMSEdit::OnClear(UINT wParam, LONG lParam)
+LONG CAMSEdit::OnClear(UINT, LONG)
 {
 	int nStart, nEnd;
 	GetSel(nStart, nEnd);
-
-	UNREFERENCED_PARAMETER(wParam); UNREFERENCED_PARAMETER(lParam);
 
 	if (nStart < nEnd)
 		SendMessage(WM_KEYDOWN, VK_DELETE); // delete the selection
@@ -205,11 +202,9 @@ BOOL CAMSEdit::OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT
 }
 
 // Handles the WM_SETTEXT message to ensure that text (set via SetWindowText) is valid.
-LONG CAMSEdit::OnSetText(UINT wParam, LONG lParam)
+LONG CAMSEdit::OnSetText(UINT, LONG lParam)
 {
 	LONG nResult = CEdit::Default();
-
-	UNREFERENCED_PARAMETER(wParam);
 
 	CString strText = GetValidText();
 	if (strText != (LPCTSTR)lParam)
@@ -384,6 +379,8 @@ bool CAMSEdit::Behavior::_ShouldEnter(TCHAR c) const
 }
 
 
+#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_ALPHANUMERIC_CLASS)
+
 /////////////////////////////////////////////////////////////////////////////
 // CAMSEdit::AlphanumericBehavior
 
@@ -482,6 +479,10 @@ void CAMSEdit::AlphanumericBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFla
 		Behavior::_OnChar(uChar, nRepCnt, nFlags);
 }
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_ALPHANUMERIC_CLASS)
+
+
+#if (AMSEDIT_COMPILED_CLASSES & AMSEDIT_MASKED_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSEdit::MaskedBehavior
@@ -542,7 +543,7 @@ CString CAMSEdit::MaskedBehavior::_GetValidText() const
 	for (int iPos = 0, iMaskPos = 0, nLen = strText.GetLength(); iPos < nLen; iPos++, iMaskPos++)
 	{
 		TCHAR c = strText[iPos];
-		TCHAR cMask = (TCHAR)(iMaskPos < nMaskLen ? m_strMask[iMaskPos] : 0);
+		TCHAR cMask = static_cast<TCHAR>(iMaskPos < nMaskLen ? m_strMask[iMaskPos] : 0);
 
 		// If we've reached the end of the mask, break
 		if (!cMask)
@@ -554,7 +555,7 @@ CString CAMSEdit::MaskedBehavior::_GetValidText() const
 			const Symbol& symbol = m_arraySymbols[iSymbol];
 
 			// Find the symbol that applies for the given character
-			if (!symbol.Validate(c))
+			if (cMask != symbol || !symbol.Validate(c))
 				continue;
 
 			// Try to add matching characters in the mask until a different symbol is reached
@@ -808,6 +809,10 @@ CAMSEdit::MaskedBehavior::Symbol::operator TCHAR() const
 	return m_cSymbol;
 }
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_MASKED_CLASS)
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_NUMERIC_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSEdit::NumericBehavior
@@ -822,7 +827,8 @@ CAMSEdit::NumericBehavior::NumericBehavior(CAMSEdit* pEdit, int nMaxWholeDigits 
 	m_cGroupSeparator(','),
 	m_nDigitsInGroup(0),
 	m_dMin(AMS_MIN_NUMBER),	
-	m_dMax(AMS_MAX_NUMBER)	
+	m_dMax(AMS_MAX_NUMBER),
+	m_bAdjustingSeparators(false)
 {
 	ASSERT(m_nMaxWholeDigits > 0);		// must have at least 1 digit to the left of the decimal
 	ASSERT(m_nMaxDecimalPlaces >= 0);	// decimal places must be positive
@@ -1095,8 +1101,8 @@ CString CAMSEdit::NumericBehavior::GetNumericText(const CString& strText, bool b
 	}
 
 	// Add the negative sign to the front of the number
-	// if (bIsNegative)
-	//	strNewText.Insert(0, bUseMathSymbols ? '-' : m_cNegativeSign);
+	if (bIsNegative)
+		strNewText.Insert(0, bUseMathSymbols ? '-' : m_cNegativeSign);
 
 	return strNewText;
 }
@@ -1108,23 +1114,13 @@ CString CAMSEdit::NumericBehavior::GetDoubleText(double dText, bool bTrimTrailin
 	CString strText;
 	strText.Format(_T("%lf"), dText);
 
+	if (m_cDecimalPoint != '.')		
+		strText.Replace('.', m_cDecimalPoint);
+
 	if (bTrimTrailingZeros)
 	{
-		// strText.TrimRight('0');
-		while(1)
-		{
-			if(strText.GetLength() == 0) break;
-			else if(strText.Right(1) == _T("0")) strText = strText.Left(strText.GetLength() - 1);
-			else break;
-		}
-
-		// strText.TrimRight('.');
-		while(1)
-		{
-			if(strText.GetLength() == 0) break;
-			if(strText.Right(1) == _T(".")) strText = strText.Left(strText.GetLength() - 1);
-			else break;
-		}
+		strText.TrimRight('0');
+		strText.TrimRight(m_cDecimalPoint);
 	}
 
 	return strText;
@@ -1140,7 +1136,7 @@ void CAMSEdit::NumericBehavior::SetDouble(double dText, bool bTrimTrailingZeros 
 // Returns the current text as a double value.
 double CAMSEdit::NumericBehavior::GetDouble() const
 {
-	return _tcstod(GetNumericText(m_pEdit->GetText(), true), NULL);
+	return _tcstod(GetNumericText(m_pEdit->GetText()), NULL);
 }
 
 // Sets the control's text to the given integer value.
@@ -1154,13 +1150,14 @@ void CAMSEdit::NumericBehavior::SetInt(int nText)
 // Returns the current text as an integer value.
 int CAMSEdit::NumericBehavior::GetInt() const
 {
-	return _ttoi(GetNumericText(m_pEdit->GetText(), true));
+	return _ttoi(GetNumericText(m_pEdit->GetText()));
 }
 
 // Adjusts the location of separators based on the nCurrentSeparatorCount.
 void CAMSEdit::NumericBehavior::AdjustSeparators(int nCurrentSeparatorCount)
 {
 	SelectionSaver selection = m_pEdit;
+	m_bAdjustingSeparators = true;
 
 	CString strText = _GetValidText();
 	if (strText != m_pEdit->GetText())
@@ -1170,6 +1167,8 @@ void CAMSEdit::NumericBehavior::AdjustSeparators(int nCurrentSeparatorCount)
 	int nNewSeparatorCount = GetGroupSeparatorCount(strText);
 	if (nCurrentSeparatorCount != nNewSeparatorCount && selection.GetStart() > m_strPrefix.GetLength())
 		selection += (nNewSeparatorCount - nCurrentSeparatorCount);
+
+	m_bAdjustingSeparators = false;
 }
 
 // Returns the given text with the group separator characters inserted in the proper places.
@@ -1215,10 +1214,7 @@ void CAMSEdit::NumericBehavior::InsertZeros(CString* pStrText, int nPos, int nCo
 		nPos = pStrText->GetLength();
 
 	for (int iZero = 0; iZero < nCount; iZero++)
-	{
-		// pStrText->Insert(nPos, '0');
-		*pStrText = pStrText->Left(nPos) + CString("0") + pStrText->Right(pStrText->GetLength() - nPos);
-	}
+		pStrText->Insert(nPos, '0');
 }
 
 // Returns the control's value in a valid format.
@@ -1261,10 +1257,29 @@ CString CAMSEdit::NumericBehavior::_GetValidText() const
 			nNewLen++;
 		}
 	}
+	
+	// Check if we need to pad the number with zeros after the decimal point
+	if (m_nMaxDecimalPlaces > 0 && nNewLen > 0 &&
+		((m_uFlags & PadWithZerosAfterDecimalWhenTextChanges) ||
+		(!m_bAdjustingSeparators && (m_uFlags & PadWithZerosAfterDecimalWhenTextIsSet))))
+	{
+		if (nDecimalPos < 0)
+		{
+			if (nNewLen == 0 || strNewText == '-')
+			{
+				strNewText = '0';
+				nNewLen = 1;
+			}
+			strNewText += m_cDecimalPoint;
+			nDecimalPos = nNewLen++;
+		}
+
+		InsertZeros(&strNewText, -1, m_nMaxDecimalPlaces - (nNewLen - nDecimalPos - 1));
+	}
 
 	// Insert the negative sign if it's there
-	// if (bIsNegative)
-	//	strNewText.Insert(0, m_cNegativeSign);
+	if (bIsNegative)
+		strNewText.Insert(0, m_cNegativeSign);
 
 	return GetSeparatedText(strNewText);
 }
@@ -1493,7 +1508,7 @@ void CAMSEdit::NumericBehavior::_OnKillFocus(CWnd* pNewWnd)
 	Behavior::_OnKillFocus(pNewWnd);
 
 	// Check if the value is empty and we don't want to touch it
-	CString strOriginalText = GetNumericText(m_pEdit->GetText(), true);
+	CString strOriginalText = GetNumericText(m_pEdit->GetText());
 	CString strText = strOriginalText;
 	int nLen = strText.GetLength();
 
@@ -1501,31 +1516,21 @@ void CAMSEdit::NumericBehavior::_OnKillFocus(CWnd* pNewWnd)
 	if (m_uFlags & OnKillFocus_RemoveExtraLeadingZeros && nLen > 0)
 	{
 		bool bIsNegative = (strText[0] == m_cNegativeSign);
-//		if (bIsNegative)
-//			strText.Delete(0);
-		
-		// strText.TrimLeft('0');
-		while(1)
-		{
-			if(strText.GetLength() == 0) break;
-			else if(strText.Left(1) == _T('0')) strText = strText.Right(strText.GetLength() - 1);
-			else break;
-		}
-
-		if (strText.IsEmpty() || strText[0] == m_cDecimalPoint)
-			strText = CString(_T("0")) + strText;
 		if (bIsNegative)
-			strText = CString(m_cNegativeSign) + strText;
+			strText.Delete(0);
+		strText.TrimLeft('0');
+		if (strText.IsEmpty() || strText[0] == m_cDecimalPoint)
+			strText.Insert(0, '0');
+		if (bIsNegative)
+			strText.Insert(0, m_cNegativeSign);
 	}
 	else if (!(m_uFlags & OnKillFocus_Max) || (nLen == 0 && m_uFlags & OnKillFocus_DontPadWithZerosIfEmpty))
 		return;
 
-	int nDecimalPos = strText.Find('.');
-	int nMaxDecimalPlaces = GetMaxDecimalPlaces();
-	int nMaxWholeDigits = GetMaxWholeDigits();
+	int nDecimalPos = strText.Find(m_cDecimalPoint);
 
 	// Check if we need to pad the number with zeros after the decimal point
-	if (m_uFlags & OnKillFocus_PadWithZerosAfterDecimal && nMaxDecimalPlaces > 0)
+	if (m_uFlags & OnKillFocus_PadWithZerosAfterDecimal && m_nMaxDecimalPlaces > 0)
 	{
 		if (nDecimalPos < 0)
 		{
@@ -1534,15 +1539,15 @@ void CAMSEdit::NumericBehavior::_OnKillFocus(CWnd* pNewWnd)
 				strText = '0';
 				nLen = 1;
 			}
-			strText += '.';
+			strText += m_cDecimalPoint;
 			nDecimalPos = nLen++;
 		}
 
-		InsertZeros(&strText, -1, nMaxDecimalPlaces - (nLen - nDecimalPos - 1));
+		InsertZeros(&strText, -1, m_nMaxDecimalPlaces - (nLen - nDecimalPos - 1));
 	}
 
 	// Check if we need to pad the number with zeros before the decimal point
-	if (m_uFlags & OnKillFocus_PadWithZerosBeforeDecimal && nMaxWholeDigits > 0)
+	if (m_uFlags & OnKillFocus_PadWithZerosBeforeDecimal && m_nMaxWholeDigits > 0)
 	{
 		if (nDecimalPos < 0)
 			nDecimalPos = nLen;
@@ -1550,7 +1555,7 @@ void CAMSEdit::NumericBehavior::_OnKillFocus(CWnd* pNewWnd)
 		if (nLen && strText[0] == '-')
 			nDecimalPos--;
 
-		InsertZeros(&strText, (nLen ? strText[0] == '-' : -1), nMaxWholeDigits - nDecimalPos);
+		InsertZeros(&strText, (nLen ? strText[0] == '-' : -1), m_nMaxWholeDigits - nDecimalPos);
 	}
 
 	if (strText != strOriginalText)
@@ -1653,6 +1658,10 @@ void CAMSEdit::NumericBehavior::AdjustWithinRange()
 		SetDouble(m_dMax);
 }
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_NUMERIC_CLASS)
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATE_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSEdit::DateBehavior
@@ -1676,7 +1685,7 @@ CAMSEdit::DateBehavior::DateBehavior(CAMSEdit* pEdit) :
 
 		for (int iPos = 0; szShortDate[iPos]; iPos++)
 		{
-			TCHAR c = (TCHAR)_totupper(szShortDate[iPos]);
+			TCHAR c = static_cast<TCHAR>(_totupper(szShortDate[iPos]));
 			if (c == 'M')	// see if the month is first
 				break;
 			if (c == 'D')	// see if the day is first, and then set the flag
@@ -2036,6 +2045,11 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 // Handles the WM_KEYDOWN message, which is called when the user enters a special character such as Delete or the arrow keys.
 void CAMSEdit::DateBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags) 
 {
+	// Check to see if it's read only
+	if (m_pEdit->IsReadOnly())
+		return;
+
+
 	switch (uChar)
 	{
 		case VK_DELETE:
@@ -2754,9 +2768,8 @@ void CAMSEdit::DateBehavior::GetRange(COleDateTime* pDateMin, COleDateTime* pDat
 }
 
 // Returns true if the given date is valid and falls within the range.
-bool CAMSEdit::DateBehavior::IsWithinRange(const COleDateTime& date, bool bDateOnly /*= true*/) const
+bool CAMSEdit::DateBehavior::IsWithinRange(const COleDateTime& date, bool /*= true*/) const
 {
-	UNREFERENCED_PARAMETER(bDateOnly);
 	return (date.GetStatus() == COleDateTime::valid && date >= m_dateMin && date <= m_dateMax);
 }
 
@@ -2831,6 +2844,10 @@ CString CAMSEdit::DateBehavior::GetFormattedDate(int nYear, int nMonth, int nDay
 	return strText;
 }
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATE_CLASS)
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_TIME_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSEdit::TimeBehavior
@@ -3138,6 +3155,10 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 // Handles the WM_KEYDOWN message, which is called when the user enters a special character such as Delete or the arrow keys.
 void CAMSEdit::TimeBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags) 
 {
+	// Check to see if it's read only
+	if (m_pEdit->IsReadOnly())
+		return;
+
 	switch (uChar)
 	{
 		case VK_DELETE:
@@ -3442,9 +3463,8 @@ TCHAR CAMSEdit::TimeBehavior::GetMaxMinuteDigit(int nPos) const
 }
 
 // Returns the digit at the given position (0 or 1) for the maximum value of the minute.
-TCHAR CAMSEdit::TimeBehavior::GetMinMinuteDigit(int nPos) const
+TCHAR CAMSEdit::TimeBehavior::GetMinMinuteDigit(int) const
 {
-	ASSERT(nPos >= 0 && nPos <= 1);	
     return '0';
 }
 
@@ -3468,9 +3488,8 @@ TCHAR CAMSEdit::TimeBehavior::GetMaxSecondDigit(int nPos) const
 }
 
 // Returns the digit at the given position (0 or 1) for the maximum value of the second.
-TCHAR CAMSEdit::TimeBehavior::GetMinSecondDigit(int nPos) const
+TCHAR CAMSEdit::TimeBehavior::GetMinSecondDigit(int) const
 {
-	ASSERT(nPos >= 0 && nPos <= 1);	
     return '0';
 }
 
@@ -3524,7 +3543,7 @@ bool CAMSEdit::TimeBehavior::ChangeAMPM(TCHAR c)
 	m_pEdit->GetSel(nStart, nEnd);
 
 	CString strAMPM = GetAMPM();
-	TCHAR cUpper = (TCHAR)_totupper(c);
+	TCHAR cUpper = static_cast<TCHAR>(_totupper(c));
 
 	switch (cUpper)
 	{
@@ -3941,9 +3960,8 @@ void CAMSEdit::TimeBehavior::GetRange(COleDateTime* pDateMin, COleDateTime* pDat
 }
 
 // Returns true if the given date is valid and falls within the range.
-bool CAMSEdit::TimeBehavior::IsWithinRange(const COleDateTime& date, bool bDateOnly /*= true*/) const
+bool CAMSEdit::TimeBehavior::IsWithinRange(const COleDateTime& date, bool /*= true*/) const
 {
-	UNREFERENCED_PARAMETER(bDateOnly);
 	return (date.GetStatus() == COleDateTime::valid && date >= m_timeMin && date <= m_timeMax);
 }
 
@@ -4097,6 +4115,10 @@ void CAMSEdit::TimeBehavior::AdjustWithinRange()
 		SetTime(m_timeMax);
 }
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_TIME_CLASS)
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATETIME_CLASS) == AMSEDIT_DATETIME_CLASS
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSEdit::DateTimeBehavior
@@ -4359,6 +4381,10 @@ void CAMSEdit::DateTimeBehavior::ShowErrorMessage() const
 	}
 }
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATETIME_CLASS) == AMSEDIT_DATETIME_CLASS
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_ALPHANUMERIC_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSAlphanumericEdit window
@@ -4393,6 +4419,10 @@ void CAMSAlphanumericEdit::OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 	_OnChar(uChar, nRepCnt, nFlags);
 }
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_ALPHANUMERIC_CLASS)
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_MASKED_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSMaskedEdit window
@@ -4433,6 +4463,10 @@ void CAMSMaskedEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 	_OnKeyDown(uChar, nRepCnt, nFlags);
 }
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_MASKED_CLASS)
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_NUMERIC_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSNumericEdit window
@@ -4479,6 +4513,10 @@ void CAMSNumericEdit::OnKillFocus(CWnd* pNewWnd)
 	_OnKillFocus(pNewWnd);
 }
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_NUMERIC_CLASS)
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_INTEGER_CLASS) == AMSEDIT_INTEGER_CLASS
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSIntegerEdit window
@@ -4501,6 +4539,10 @@ BEGIN_MESSAGE_MAP(CAMSIntegerEdit, CEdit)
 	ON_MESSAGE(WM_SETTEXT, OnSetText)
 END_MESSAGE_MAP()
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_INTEGER_CLASS) == AMSEDIT_INTEGER_CLASS
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_CURRENCY_CLASS) == AMSEDIT_CURRENCY_CLASS
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSNumericEdit window
@@ -4511,7 +4553,10 @@ CAMSCurrencyEdit::CAMSCurrencyEdit()
 	m_nDigitsInGroup = 3;
 	m_nMaxDecimalPlaces = 2;
 	m_strPrefix = _T("$");
-	m_uFlags |= (OnKillFocus_RemoveExtraLeadingZeros | OnKillFocus_PadWithZerosAfterDecimal | OnKillFocus_DontPadWithZerosIfEmpty);
+	m_uFlags |= PadWithZerosAfterDecimalWhenTextIsSet | 
+				OnKillFocus_RemoveExtraLeadingZeros | 
+				OnKillFocus_PadWithZerosAfterDecimal | 
+				OnKillFocus_DontPadWithZerosIfEmpty;
 	
 	// Get the system's current settings
 	TCHAR szValue[10];
@@ -4569,6 +4614,10 @@ BEGIN_MESSAGE_MAP(CAMSCurrencyEdit, CEdit)
 	ON_MESSAGE(WM_SETTEXT, OnSetText)
 END_MESSAGE_MAP()
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_CURRENCY_CLASS) == AMSEDIT_CURRENCY_CLASS
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATE_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSDateEdit
@@ -4622,6 +4671,10 @@ LONG CAMSDateEdit::OnPaste(UINT, LONG)
 	return _OnPaste(0, 0);
 }
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATE_CLASS)
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_TIME_CLASS)
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSTimeEdit
@@ -4675,6 +4728,10 @@ LONG CAMSTimeEdit::OnPaste(UINT, LONG)
 	return _OnPaste(0, 0);
 }
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_TIME_CLASS)
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATETIME_CLASS) == AMSEDIT_DATETIME_CLASS
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSDateTimeEdit
@@ -4728,6 +4785,10 @@ LONG CAMSDateTimeEdit::OnPaste(UINT, LONG)
 	return _OnPaste(0, 0);
 }
 
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_DATETIME_CLASS) == AMSEDIT_DATETIME_CLASS
+
+
+#if	(AMSEDIT_COMPILED_CLASSES & AMSEDIT_ALL_CLASSES) == AMSEDIT_ALL_CLASSES
 
 /////////////////////////////////////////////////////////////////////////////
 // CAMSMultiMaskedEdit
@@ -4851,18 +4912,16 @@ BEGIN_MESSAGE_MAP(CAMSMultiMaskedEdit, CEdit)
 END_MESSAGE_MAP()
 
 // Handles the WM_CHAR message, which is called when the user enters a regular character or Backspace
-void CAMSMultiMaskedEdit::OnChar(UINT uChar, UINT nRepCnt, UINT c)
+void CAMSMultiMaskedEdit::OnChar(UINT uChar, UINT nRepCnt, UINT)
 {
 	ASSERT(m_pCurrentBehavior);
-	UNREFERENCED_PARAMETER(c);
 	m_pCurrentBehavior->_OnChar(uChar, nRepCnt, nRepCnt);
 }
 
 // Handles the WM_KEYDOWN message, which is called when the user enters a special character such as Delete or the arrow keys.
-void CAMSMultiMaskedEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
+void CAMSMultiMaskedEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT)
 {
 	ASSERT(m_pCurrentBehavior);
-	UNREFERENCED_PARAMETER(nFlags);
 	m_pCurrentBehavior->_OnKeyDown(uChar, nRepCnt, nRepCnt);
 }
 
@@ -4879,3 +4938,5 @@ LONG CAMSMultiMaskedEdit::OnPaste(UINT wParam, LONG lParam)
 	ASSERT(m_pCurrentBehavior);
 	return m_pCurrentBehavior->_OnPaste(wParam, lParam);
 }
+
+#endif	// (AMSEDIT_COMPILED_CLASSES & AMSEDIT_ALL_CLASSES) == AMSEDIT_ALL_CLASSES

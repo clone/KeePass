@@ -1,6 +1,6 @@
 Upozornìní: Tento èeský pøeklad je neoficiálním pøekladem licence BSD. Nevyjadøuje právní podstatu podmínek pro šíøení softwaru používajícího licenci BSD, tomuto úèelu slouží výhradnì pùvodní anglická verze licence BSD. Tento pøeklad je urèen èeským ètenáøùm k lepšímu porozumìní licenci BSD.
 
-Copyright (c) 2003/2004, Dominik Reichl
+Copyright (c) 2003-2005, Dominik Reichl
 Všechna práva vyhrazena.
 
 Další distribuce a používání ve formì zdrojových kódù a binárních souborù, s úpravami nebo bez nich, je povolena za pøedpokladu, že jsou splnìny následující podmínky:
@@ -15,7 +15,7 @@ POKUD NENÍ PÍSEMNÌ STANOVENO JINAK, POSKYTUJÍ DRŽITELÉ AUTORSKÝCH PRÁV A PØISPÌV
 Originální znìní licence:
 -------------------------
 
-Copyright (c) 2003/2004, Dominik Reichl
+Copyright (c) 2003-2005, Dominik Reichl
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

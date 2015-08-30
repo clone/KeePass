@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,9 @@
 #ifndef ___PW_UTIL_H___
 #define ___PW_UTIL_H___
 
+#include "../Util/SysDefEx.h"
+
 // Very simple password quality estimation function
-DWORD EstimatePasswordBits(const TCHAR *pszPassword);
+C_FN_SHARE DWORD EstimatePasswordBits(const TCHAR *pszPassword);
 
 #endif // ___PW_UTIL_H___

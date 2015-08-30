@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,8 @@
 #ifndef AFX_ENTRYLISTDLG_H__3D6534C0_AFD4_11D8_BF16_0050BF14F5CC__INCLUDED_
 #define AFX_ENTRYLISTDLG_H__3D6534C0_AFD4_11D8_BF16_0050BF14F5CC__INCLUDED_
 
-#include "NewGUI/BtnST.h"
+#include "Util/SysDefEx.h"
+#include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "PwSafe/PwManager.h"
 
@@ -39,7 +40,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CEntryListDlg : public CDialog
+class CPP_CLASS_SHARE CEntryListDlg : public CDialog
 {
 // Konstruktion
 public:
@@ -58,7 +59,7 @@ public:
 
 	//{{AFX_DATA(CEntryListDlg)
 	enum { IDD = IDD_ENTRYLIST_DLG };
-	CButtonST	m_btClose;
+	CXPStyleButtonST	m_btClose;
 	CListCtrl	m_cList;
 	//}}AFX_DATA
 

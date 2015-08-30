@@ -58,6 +58,10 @@
 #define IDI_UNLOCKED                    197
 #define IDI_KEYHOLE                     198
 #define IDR_COLVIEW_MENU                204
+#define IDB_TB_GRADIENT                 205
+#define IDD_PLUGINS_DLG                 206
+#define IDR_PLUGINS_MENU                207
+#define IDI_PLUGINS                     208
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -177,6 +181,25 @@
 #define IDC_CHECK_PUTTYURLS             1155
 #define IDC_CHECK_SAVEONLATMOD          1156
 #define IDC_HL_SELECTFILE               1159
+#define IDC_STATIC_TB_GRADIENT          1160
+#define IDC_PLUGINS_LIST                1161
+#define IDC_STATIC_HL_GETPLUGINS        1162
+#define IDC_BUTTON_HELP                 1164
+#define IDC_STATIC_AUTOTYPEHK           1165
+#define IDC_HOTKEY_AUTOTYPE             1166
+#define IDC_RADIO_KEYMETHOD             1167
+#define IDC_RADIO_KEYMETHOD_2           1169
+#define IDC_STATIC_XPBACK               1170
+#define IDC_RADIO_CLIPMETHOD_TIMED      1172
+#define IDC_RADIO_CLIPMETHOD_SECURE     1173
+#define IDC_STATIC_CLIPBOARDMETHOD      1174
+#define IDC_CHECK_KEYMETHOD_AND         1175
+#define IDC_CHECK_NUMBERING             1176
+#define IDC_EDIT_NUMBERING_START        1177
+#define IDC_CHECK_EXPIRES               1178
+#define IDC_HL_HELP_AUTOTYPE            1179
+#define IDC_HL_HELP_URL                 1180
+#define IDC_STATIC_HL_HELP              1181
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -334,15 +357,20 @@
 #define ID_VIEW_AUTOSORT_EXPIRE         32949
 #define ID_VIEW_AUTOSORT_NOSORT         32950
 #define ID_PWLIST_AUTOTYPE              32951
+#define ID_EXTRAS_PLUGINMGR             32952
+#define ID_PLUGIN_ENABLE                32954
+#define ID_PLUGIN_DISABLE               32955
+#define ID_PLUGIN_CONFIG                32959
+#define ID_PLUGIN_ABOUT                 32960
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        205
-#define _APS_NEXT_COMMAND_VALUE         32952
-#define _APS_NEXT_CONTROL_VALUE         1160
+#define _APS_NEXT_RESOURCE_VALUE        210
+#define _APS_NEXT_COMMAND_VALUE         32961
+#define _APS_NEXT_CONTROL_VALUE         1182
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

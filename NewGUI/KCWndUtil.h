@@ -21,6 +21,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "../Util/SysDefEx.h"
+
 class CWndUtil  
 {
 protected:

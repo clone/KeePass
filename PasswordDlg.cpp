@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -54,6 +54,7 @@ CPasswordDlg::CPasswordDlg(CWnd* pParent /*=NULL*/)
 {
 	//{{AFX_DATA_INIT(CPasswordDlg)
 	m_bStars = TRUE;
+	m_bKeyMethod = FALSE;
 	//}}AFX_DATA_INIT
 
 	m_bLoadMode = TRUE;
@@ -76,6 +77,7 @@ void CPasswordDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_PASSWORD, m_pEditPw);
 	DDX_Control(pDX, IDC_COMBO_DISKLIST, m_cbDiskList);
 	DDX_Check(pDX, IDC_CHECK_STARS, m_bStars);
+	DDX_Check(pDX, IDC_CHECK_KEYMETHOD_AND, m_bKeyMethod);
 	//}}AFX_DATA_MAP
 }
 
@@ -85,6 +87,7 @@ BEGIN_MESSAGE_MAP(CPasswordDlg, CDialog)
 	ON_BN_CLICKED(IDC_MAKEPASSWORD_BTN, OnMakePasswordBtn)
 	ON_EN_CHANGE(IDC_EDIT_PASSWORD, OnChangeEditPassword)
 	ON_CBN_SELCHANGE(IDC_COMBO_DISKLIST, OnSelChangeComboDiskList)
+	ON_BN_CLICKED(IDC_CHECK_KEYMETHOD_AND, OnCheckKeymethodAnd)
 	//}}AFX_MSG_MAP
 
 	ON_REGISTERED_MESSAGE(WM_XHYPERLINK_CLICKED, OnXHyperLinkClicked)
@@ -105,10 +108,10 @@ BOOL CPasswordDlg::OnInitDialog()
 	GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fStyle, TRUE);
 	GetDlgItem(IDC_CHECK_STARS)->SetFont(&m_fStyle, TRUE);
 
-	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_Button(&m_btMakePw, IDB_KEY_SMALL, IDB_KEY_SMALL);
-	NewGUI_Button(&m_btStars, -1, -1);
+	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(&m_btMakePw, IDB_KEY_SMALL, IDB_KEY_SMALL);
+	NewGUI_XPButton(&m_btStars, -1, -1);
 	m_btStars.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
@@ -174,9 +177,6 @@ BOOL CPasswordDlg::OnInitDialog()
 	lp = TRL("Enter password:");
 	GetDlgItem(IDC_STATIC_ENTERPW)->SetWindowText(lp);
 
-	lp = TRL("or");
-	GetDlgItem(IDC_STATIC_OR)->SetWindowText(lp);
-
 	if(m_bConfirm == FALSE)
 	{
 		if(m_bLoadMode == FALSE)
@@ -207,7 +207,7 @@ BOOL CPasswordDlg::OnInitDialog()
 				m_banner.SetCaption(TRL("Enter the new master key for this database."));
 			}
 		}
-		else
+		else // m_bConfirm == FALSE, m_bLoadMode == TRUE
 		{
 			lp = TRL("Select the password disk drive to load the key from:");
 			GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
@@ -238,7 +238,6 @@ BOOL CPasswordDlg::OnInitDialog()
 		if(m_bLoadMode == FALSE)
 		{
 			GetDlgItem(IDC_STATIC_INTRO)->ShowWindow(SW_HIDE);
-			GetDlgItem(IDC_STATIC_OR)->ShowWindow(SW_HIDE);
 			GetDlgItem(IDC_STATIC_SELDISK)->ShowWindow(SW_HIDE);
 			GetDlgItem(IDC_COMBO_DISKLIST)->ShowWindow(SW_HIDE);
 			GetDlgItem(IDC_MAKEPASSWORD_BTN)->EnableWindow(FALSE);
@@ -258,6 +257,8 @@ BOOL CPasswordDlg::OnInitDialog()
 
 			m_cPassQuality.ShowWindow(SW_HIDE);
 			GetDlgItem(IDC_STATIC_PASSBITS)->ShowWindow(SW_HIDE);
+
+			GetDlgItem(IDC_CHECK_KEYMETHOD_AND)->ShowWindow(SW_HIDE);
 		}
 		else
 		{
@@ -284,7 +285,9 @@ BOOL CPasswordDlg::OnInitDialog()
 		}
 	}
 
+	// Alternative password asterisk character: 0xB7 (smaller dot)
 	TCHAR tchDot = (TCHAR)(_T('z') + 27);
+	// TCHAR tchDot = (TCHAR)0xB7;
 	CString strStars = _T("");
 	strStars += tchDot; strStars += tchDot; strStars += tchDot;
 	GetDlgItem(IDC_CHECK_STARS)->SetWindowText(strStars);
@@ -320,15 +323,27 @@ void CPasswordDlg::OnOK()
 	EraseCString(&m_strPassword);
 	m_pEditPw.GetWindowText(m_strPassword);
 
-	// Either password _or_ key disk
-	if(((m_strPassword.GetLength() == 0) ^ (m_cbDiskList.GetCurSel() == 0)) == 0)
+	// Validate input
+	if(m_bKeyMethod == PWM_KEYMETHOD_OR)
 	{
-		MessageBox(TRL("EITHER enter a password/passphrase OR select a key disk drive."),
-			TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
-		return;
+		if(((m_strPassword.GetLength() == 0) ^ (m_cbDiskList.GetCurSel() == 0)) == 0)
+		{
+			MessageBox(TRL("EITHER enter a password/passphrase OR select a key disk drive."),
+				TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+			return;
+		}
+	}
+	else // m_bKeyMethod == PWM_KEYMETHOD_AND
+	{
+		if((m_strPassword.GetLength() == 0) || (m_cbDiskList.GetCurSel() == 0))
+		{
+			MessageBox(TRL("You've selected the AND key mode, so you must enter a password AND select a key-file."),
+				TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+			return;
+		}
 	}
 
-	if(m_cbDiskList.GetCurSel() == 0)
+	if((m_bKeyMethod == PWM_KEYMETHOD_OR) && (m_cbDiskList.GetCurSel() == 0))
 	{
 		m_bKeyFile = FALSE;
 		EraseCString(&m_strRealKey);
@@ -380,6 +395,12 @@ void CPasswordDlg::OnOK()
 		ASSERT(m_strRealKey.GetLength() != 0);
 	}
 
+	if(m_bKeyMethod == PWM_KEYMETHOD_AND)
+	{
+		EraseCString(&m_strRealKey2);
+		m_strRealKey2 = m_strPassword;
+	}
+
 	CleanUp();
 	ASSERT(m_bOnce == FALSE); m_bOnce = TRUE;
 	CDialog::OnOK();
@@ -401,6 +422,7 @@ void CPasswordDlg::OnCheckStars()
 	else
 	{
 		TCHAR tchDot = (TCHAR)(_T('z') + 27);
+		// TCHAR tchDot = (TCHAR)0xB7;
 		m_pEditPw.SetPasswordChar(tchDot);
 	}
 
@@ -429,6 +451,8 @@ void CPasswordDlg::OnMakePasswordBtn()
 		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
 		m_pEditPw.SetWindowText((LPCTSTR)m_strPassword);
 	}
+
+	EnableClientWindows();
 }
 
 void CPasswordDlg::OnChangeEditPassword() 
@@ -437,6 +461,8 @@ void CPasswordDlg::OnChangeEditPassword()
 	EraseCString(&m_strPassword);
 	m_pEditPw.GetWindowText(m_strPassword);
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
+	EraseCString(&m_strPassword);
+	EnableClientWindows();
 }
 
 LRESULT CPasswordDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
@@ -481,10 +507,52 @@ LRESULT CPasswordDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
 
 void CPasswordDlg::OnSelChangeComboDiskList() 
 {
-	if(m_cbDiskList.GetCurSel() == 0)
+	EnableClientWindows();
+}
+
+void CPasswordDlg::EnableClientWindows()
+{
+	UpdateData(TRUE);
+
+	int nPwLength = m_pEditPw.GetWindowTextLength();
+	int nComboSel = m_cbDiskList.GetCurSel();
+
+	if(m_bKeyMethod == PWM_KEYMETHOD_OR)
+	{
+		if(nPwLength != 0)
+		{
+			GetDlgItem(IDC_HL_SELECTFILE)->EnableWindow(FALSE);
+			GetDlgItem(IDC_CHECK_STARS)->EnableWindow(TRUE);
+			GetDlgItem(IDC_MAKEPASSWORD_BTN)->EnableWindow(TRUE);
+			GetDlgItem(IDC_EDIT_PASSWORD)->EnableWindow(TRUE);
+			GetDlgItem(IDC_COMBO_DISKLIST)->EnableWindow(FALSE);
+			return;
+		}
+		else if(nComboSel != 0)
+		{
+			GetDlgItem(IDC_HL_SELECTFILE)->EnableWindow(TRUE);
+			GetDlgItem(IDC_CHECK_STARS)->EnableWindow(FALSE);
+			GetDlgItem(IDC_MAKEPASSWORD_BTN)->EnableWindow(FALSE);
+			GetDlgItem(IDC_EDIT_PASSWORD)->EnableWindow(FALSE);
+			GetDlgItem(IDC_COMBO_DISKLIST)->EnableWindow(TRUE);
+			return;
+		}
+	}
+
+	GetDlgItem(IDC_CHECK_STARS)->EnableWindow(TRUE);
+	GetDlgItem(IDC_MAKEPASSWORD_BTN)->EnableWindow(TRUE);
+	GetDlgItem(IDC_EDIT_PASSWORD)->EnableWindow(TRUE);
+	GetDlgItem(IDC_COMBO_DISKLIST)->EnableWindow(TRUE);
+
+	if(nComboSel == 0)
 		GetDlgItem(IDC_HL_SELECTFILE)->EnableWindow(TRUE);
 	else
 		GetDlgItem(IDC_HL_SELECTFILE)->EnableWindow(FALSE);
+}
+
+void CPasswordDlg::OnCheckKeymethodAnd() 
+{
+	EnableClientWindows();
 }
 
 #pragma warning(pop)

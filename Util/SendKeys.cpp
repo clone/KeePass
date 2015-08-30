@@ -1,4 +1,7 @@
-#include "sendkeys.h"
+// This is a modified version of lallous CSendKeys class.
+// Editor: Dominik Reichl
+
+#include "SendKeys.h"
 
 /* 
 * ----------------------------------------------------------------------------- 

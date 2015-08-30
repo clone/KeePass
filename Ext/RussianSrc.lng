@@ -1,0 +1,548 @@
+|~LANGUAGENAME|                |Russian|
+|~LANGUAGEVERSION|             |0.98a|
+|~LANGUAGEAUTHOR|              |Varrey|
+|~LANGUAGEAUTHOREMAIL|         |varrey@hotmail.com|
+
+|&OK|                          |&OK|
+|&Cancel|                      |&Отмена|
+|&Close|                       |&Закрыть|
+|Password Safe|                |База паролей|
+
+|&Generate Random Password|    |&Генерация случайного пароля|
+|&Pick One|                    |&Выбрать|
+|&Gen|                         |&Ген|
+
+|General|                      |Общие|
+|Windows|                      |ОС|
+|Network|                      |Сеть|
+|Internet|                     |Интернет|
+|eMail|                        |Почта|
+|Homebanking|                  |Счета|
+
+|Entry|                        |Запись|
+
+|&Title|                       |&Названий|
+|User &Name|                   |&Имен|
+|&URL|                         |&Ссылок|
+|&Password|                    |&Паролей|
+|N&otes|                       |&Комментариев|
+|&Case sensitive|              |&Различать регистр|
+|Search in|                    |Искать среди|
+|Search this text:|            |Искать текст:|
+|Find|                         |Поиск|
+|&Find|                        |&Поиск|
+|Find a string in the password list|           |Поиск строки в списке паролей|
+|Find text in password list|   |Поиск текста в списке паролей|
+
+|Database Format Version:|     |Версия формата базы паролей:|
+|About KeePass...|             |О программе...|
+
+|Password Groups|              |Группы паролей|
+|Title|                        |Название|
+|UserName|                     |Имя|
+|URL|                          |Ссылка|
+|Password|                     |Пароль|
+|Notes|                        |Комментарии|
+
+|Ready.|                       |Готов.|
+
+|Either enter the password/passphrase or select the password disk's drive.|
+    |Введите пароль или выберите диск с паролем.|
+|Enter password:|              |Введите пароль:|
+|or|                           |или|
+|Select the password disk drive where the key will be stored:|
+    |Выберите диск, на который будет сохранен пароль:|
+|Create a new password database - Enter master key|
+    |Создание новой базы паролей - Ввод основного пароля|
+|Set master key|               |Ввод основного пароля|
+|Enter the master key for the new database.|
+    |Введите основной пароль для новой базы паролей.|
+|Create a new password database - Repeat master key|
+    |Создание новой базы паролей - Повтор ввода основного пароля|
+|Repeat master password|       |Повтор ввода основного пароля|
+|Repeat the master key for the new database.|
+    |Повторите ввод основного пароля для новой базы паролей.|
+|Select the password disk drive to load the key from:|
+    |Выберите диск, с которого будет считан пароль:|
+|Open database - Enter master key|
+    |Открытие базы паролей - Ввод основного пароля|
+|Enter master key|             |Введите основной пароль|
+|Enter the master key for this database.|
+    |Введите основной пароль для текущей базы паролей.|
+|Key|                          |Пароль|
+|<no drive selected>|          |<диск не выбран>|
+
+|Password Generator|           |Генератор паролей|
+|This will generate a random password.|        |Генерация случайного пароля.|
+|Options|                      |Настройки|
+|Password Generation Options|  |Настройки генератора паролей|
+|&Only the following characters:|              |&Только следующие символы:|
+|Collect &entropy (recommended for strong passwords)|   |Сбор &Энтропии (рекомендуется для большей устойчивости паролей)|
+|Number of characters:|        |Количество символов:|
+|Your new password:|           |Ваш новый пароль:|
+|&Generate|                    |&Генерация|
+|&Accept|                      |&Принять|
+|Upper alphabetic characters (A, B, C, ...)|
+    |Заглавные буквы (A, B, C, ...)|
+|Lower alphabetic characters (a, b, c, ...)|
+    |Строчные буквы (a, b, c, ...)|
+|Numerical characters (1, 2, 3, ...)|
+    |Цифры (1, 2, 3, ...)|
+|Underline character '_'|
+    |Символ подчеркивания '_'|
+|Minus '-'|
+    |Знак минуса '-'|
+|Space ' '|
+    |Пробел ' '|
+|Special characters (!, §, $, %, &, ...)|
+    |Специальные символы (!, §, $, %, &, ...)|
+|Higher ANSI characters (В, ©, Й, µ, Ѕ, ...)|
+    |ANSI-символы второй половины таблицы (В, ©, Й, µ, Ѕ, ...)|
+|Special brackets ('{', '}', '[', ...)|
+    |Символы скобок ('{', '}', '[', ...)|
+
+|Group:|                       |Группа:|
+|Title:|                       |Название:|
+|UserName:|                    |Имя:|
+|URL:|                         |Ссылка:|
+|Icon:|                        |Значок:|
+|Password:|                    |Пароль:|
+|Repeat Password:|             |Повтор:|
+|Notes:|                       |Комментарии:|
+|***|                          |***|
+
+|Add Entry|                    |Добавить запись|
+|Add a new password entry|     |Добавить новую запись с паролем|
+|Edit Entry|                   |Изменить запись|
+|Modify a password entry|      |Изменить запись с паролем|
+
+|Group Name:|                  |Имя группы:|
+
+|Add Group|                    |Добавить группу|
+|Add a new password group|     |Добавить новую группу для паролей|
+|Edit Group|                   |Изменить группу|
+|Modify a password group|      |Изменить группу для паролей|
+
+|Random mouse input|           |Случайные движения мышью|
+|Click to begin:|              |Начать:|
+|Use &Mouse As Random Source|  |&Использовать мышь|
+|Move the mouse in the field above until this is full:|
+    |Двигайте мышью до окончания процесса:|
+|Hint: It is best to use both mouse and keyboard random sources.|
+    |Подсказка: Используйте мышь и клавиатуру одновременно.|
+|Random keyboard input|        |Случайный ввод на клавиатуре|
+|Just hack some random keys into the edit box above.|
+    |Просто введите несколько случайных символов.|
+|You don't have to remember the keys you type in. They are used to generate a random value.|
+    |Запоминать введеные символы не надо. Они нужны только для генерации случайного числа.|
+|So, the more the better. The different, the better.| \
+    |Так что побольше и поразнообразнее.| \
+|The random the better.|       THIS ISN'T A ONE-TO-ONE TRANSLATION!
+    |И чем случайнее, тем лучше.| /
+|Get Random|                   |Получение случайности|
+|Get random data for key generation|           |Получение случайности для генерации пароля|
+|Move the mouse and type some random text to generate random values.|
+    |Подвигайте мышью и введите случайный текст для генерации случайных чисел.|
+
+|Pick an icon|                 |Выбор значка|
+|Pick an Icon|                 |Выбор значка|
+|Pick an icon from the list and click OK to set it.|
+    |Выберите значок из списка и нажмите OK для его установки.|
+
+|&File|                        |&Файл|
+|&Edit|                        |&Изменить|
+|&View|                        |&Вид|
+|E&xtras|                      |&Дополнительно|
+|&?|                           |&?|
+
+|&New Database...|             |&Новая база паролей...|
+|&Open Database...|            |&Открыть базу паролей...|
+|&Close Database|              |&Закрыть базу паролей|
+|&Save Database|               |&Сохранить базу паролей|
+|Save Database &As...|         |Сохранить &как...|
+|Change &Master Key For This Database...|      |&Изменить основной пароль...|
+|&Print Complete Password List|                |&Распечатать полный список паролей|
+|&Export To|                   |&Экспортировать в|
+|&Lock Workspace|              |За&блокировать|
+|&Unlock Workspace|            |Сн&ять блокировку|
+|E&xit|                        |&Выход|
+
+|&Lock/Unlock Workspace|       |За&блокировать/Снять блокировку|
+
+|&Options...|                  |&Настройки...|
+|Add Password &Group...|       |Добавить &группу...|
+|Add Password Su&bgroup...|    |&Добавить подгруппу...|
+|Modif&y Password Group...|    |Изм&енить группу...|
+|&Delete Password Group...|    |&Удалить группу...|
+|Pr&int Group|                 |&Распечатать группу...|
+|Export Group To &HTML...|     |Экспортировать группу в &HTML...|
+|Export Group To &XML...|      |Экспортировать группу в &XML...|
+|Export Group To &CSV...|      |Экспортировать группу в &CSV...|
+|Export Group To &TXT...|      |Экспортировать группу в &TXT...|
+|Copy User&Name To Clipboard|  |Скопировать &имя пользователя в буфер обмена|
+|Copy &Password To Clipboard|  |Скопировать &пароль в буфер обмена|
+|Open &URL(s)|                 |Открыть &ссылку(и)|
+|&Find In Database...|         |П&оиск по базе паролей...|
+|Find In T&his Group...|       |Поис&к по группе...|
+|&Add Entry...|                |Добавить &запись...|
+|&Edit/View Entry...|          |Изменить/просмотреть з&апись...|
+|&Delete Entry|                |Уда&лить запись|
+|Dupli&cate Entry|             |Проду&блировать запись|
+|Move Entry To &Top|           |Переместить в самый верх|
+|Move Entry &One Up|           |Переместить на одну позицию вверх|
+|Mo&ve Entry One Down|         |Переместить на одну позицию вниз|
+|Move Entry To &Bottom|        |Переместить в самый низ|
+
+|Move Group To &Top|           |Переместить в самый верх|
+|Move Group One &Up|           |Переместить на одну позицию вверх|
+|Move Group &One Down|         |Переместить на одну позицию вниз|
+|Move Group To &Bottom|        |Переместить в самый низ|
+
+|Change &Language...|          |Изменить &язык...|
+|Show &Title Column|           |Показывать столбец &назавания|
+|Show User&Name Column|        |Показывать столбец &имени пользователя|
+|Show &URL Column|             |Показывать столбец &ссылки|
+|Show &Password Column|        |Показывать столбец &пароля|
+|Show Note&s Column|           |Показывать столбец &комментариев|
+|Main Window &Always On Top|   |&Главное окно всегда наверху|
+|Hide &Passwords Behind Asterisks (***)|       |Показывать (***) вместо &пароля|
+
+|Password &Generator|          |Г&енератор паролей|
+
+|Visit &KeePass Homepage|      |Посетить &домашнюю страницу|
+|&About KeePass...|            |&О программе...|
+
+|&Database Settings...|        |Н&астройки базы паролей...|
+
+|&Minimize/Maximize Window To/From Tray|
+    |Сворачивать в системную панель|
+
+|%u.%u.%u.%u, compatible with %u.%u.x.x|
+    |%u.%u.%u.%u, совместима с %u.%u.x.x|
+|Version |                     |Версия |
+
+|Password and repeated password aren't identical!|
+    |Пароль и повтор пароля различаются!|
+
+|Stop|                         |Стоп|
+
+|Enter a group name!|          |Введите название группы!|
+|You must generate some random values using the random mouse input box or the edit field before you can close this dialog.|
+    |Вы должны сгенерировать случайные числа используя случайные движения мыши или нажатия клавиш перед закрытием диалога.|
+|No random input|              |Нет случайного ввода|
+|EITHER enter a password/passphrase OR select a key disk drive.|
+    |Введите пароль или выберите диск с паролем.|
+|The password must consist of at least one character!|
+    |Пароль должет содержать как минимум один символ!|
+|Select at least one of the options in the list above!|
+    |Пометьте как минимум одну из опций в списке сверху!|
+
+|The following self-tests failed:|
+    |Следующие тесты завершились с ошибкой:|
+|- SHA 32-bit variables|       |- SHA 32-битный|
+|- SHA 64-bit variables|       |- SHA 64-битный|
+|- SHA-256 test vector(s)|     |- SHA-256 test vector(s)|
+|- SHA-512 test vector(s)|     |- SHA-512 test vector(s)|
+|- Rijndael encryption|        |- Шифрование Rijndael|
+|- Rijndael decryption|        |- Дешифрование Rijndael|
+|- Arcfour crypto routine|     |- Процедура шифрования Arcfour|
+|- Twofish algorithm|          |- Алгоритм Twofish|
+
+|The program will exit now.|   |Сейчас программа будет завершена.|
+|Self-Test(s) Failed|          |Тест(ы) самопроверки завершились с ошибкой|
+
+|Clipboard cleared.|           |Буфер обмена очищен.|
+|Field copied to clipboard. Clipboard will be cleared in %d seconds.|
+    |Поле было скопировано в буфер обмена. Буфер будет очищен через %d секунд.|
+
+|Failed to set the master key!|
+    |Ошибка в установке основного пароля!|
+|File cannot be opened!|
+    |Невозможно открыть файл!|
+|File cannot be saved!|
+    |Невозможно сохранить файл!|
+
+|Password Safe files|          |Файлы баз паролей|
+|All files|                    |Все файлы|
+
+|The current file has been modified.|
+    |Текущий файл был изменен.|
+|Do you want to save the changes before closing?|
+    |Хотите сохранить изменения перед закрытием?|
+|Save Before Close?|           |Сохранить перед закрытием?|
+
+|Deleting a group will delete all items in that group, too.|
+    |Удаление группы приведет к удалению всех записей в этой группе.|
+|Are you sure you want to delete this group?|
+    |Вы уверены, что хотите удалить эту группу?|
+|Delete Group Confirmation|
+    |Подтверждение удаления группы|
+
+|Cannot open temporary file for printing!|
+    |Невозможно открыть временный файл для печати!|
+
+|Load language file|           |Загрузка языкового файла|
+|Load a language file|         |Загрузка языкового файла|
+|Select one of the languages in the list below.|
+    |Выберите один из языков из списка ниже.|
+|Available Languages|          |Доступные языки|
+
+|Open &Help File|              |Открыть &справку|
+|Open &License File|           |Открыть &лицензию|
+|&Print License File|          |&Распечатать лицензию|
+
+|Newline sequence:|            |Символ(ы) перевода строки:|
+|Windows newline sequence (\r\n)|              |Перевод строки в Windows (\r\n)|
+|Unix newline sequence (\n)|   |Перевод строки в Unix (\n)|
+|Clipboard auto-clear time (seconds):|   |Тайм-аут автоочистки буфера обмена (секунд):|
+|Settings|                     |Настройки|
+|Here you can configure KeePass.|              |Настройки KeePass.|
+|Automatically open last used database on startup|
+    |Автооткрытие последней используемой базы паролей при запуске|
+|Automatically save database on exit|
+    |Автосохранение базы паролей при выходе|
+|GUI: Display images on buttons|
+    |Показывать картинки на кнопках|
+|GUI: Show grid lines in password entry list|
+    |Показывать линии в списке записей|
+|Workspace cannot be unlocked!|
+    |Невозможно снять блокировку!|
+|Workspace locked|
+    |База паролей заблокирована|
+
+|Loading error|                |Ошибка загрузки|
+|Language file cannot be opened!|
+    |Невозможно открыть языковой файл!|
+|Language file cannot be registered!|
+    |Нефозможно зарегистрировать языковой файл!|
+|The language file has been installed.|
+    |Языковой файл установлен.|
+|You must restart KeePass in order to use the new language.|
+    |Необходимо перезапустить KeePass для использования нового языка.|
+|Do you wish to restart KeePass now?|
+    |Перезапустить KeePass прямо сейчас?|
+|Restart KeePass?|
+    |Перезапустить KeePass?|
+|Application cannot be restarted automatically!|
+    |Невозможно перезапустить приложение автоматически!|
+|Please restart KeePass manually.|
+    |Пожалуйста, перезапустите KeePass вручную.|
+
+|CSV files|                    |CSV файлы|
+|Text files|                   |Тесктовые файлы|
+|An error occured while importing the CSV file. File cannot be imported.|
+    |Произошла ошибка во время импорта CSV файла. Невозможно проимпортировать файл.|
+|An error occured while importing the file. File cannot be imported.|
+    |Произошла ошибка во время импорта файла. Невозможно проимпортировать файл.|
+|&CSV File...|                 |&CSV файл...|
+|&PwSafe v2 TXT File...|       |&PwSafe v2 TXT файл...|
+|Select &Font|                 |Выбор &шрифта|
+|Select a new font for the list controls.|     |Выберите новый шрифт для списка объектов.|
+
+|Code&Wallet TXT File...|      |Code&Wallet TXT файл...|
+|&TXT File...|                 |&TXT файл...|
+|&HTML File...|                |&HTML файл...|
+|&XML File...|                 |&XML файл...|
+|&CSV File...|                 |&CSV файл...|
+|&Import From|                 |И&мпортировать используя|
+
+|&Get more languages...|       |&Больше языков...|
+|Start and Exit|               |Запуск и выход|
+|Interface (GUI)|              |Интерфейс|
+|Files|                        |Файлы|
+|Memory|                       |Память|
+|Lock workspace when minimizing the main window|
+    |Блокировать базу при минимизации главного окна|
+|Minimize to tray instead of taskbar|
+    |Минимизировать в системную панель вместо панели задач|
+
+|Encryption algorithm to use (for this database):| |Алгоритм шифрования (для этой базы паролей):|
+|Advanced Encryption Standard (AES) (128-bit block cipher using 256-bit key)|
+    |Advanced Encryption Standard (AES) (128-битный блочный шифр используя 256-битный ключ)|
+|Twofish (128-bit block cipher using 256-bit key)|
+    |Twofish (128-битный блочный шифр используя 256-битный ключ)|
+|Security|                     |Безопасность|
+|KeePass is OSI Certified Open Source Software.|
+    |KeePass - OSI сертифицированное приложение с открытым кодом.|
+|KeePass usage:|               |KeePass использует:|
+|db = Path to database you wish to open on KeePass startup|
+    |db = Путь к базе паролей, которая будет открыта при запуске|
+|Automatically lock workspace after the following number of seconds:|
+    |Автоматически блокировать базу через (секунд):|
+|&Group Name|                  |&Названий групп|
+|Every second row has a different background color. Use this color:|
+    |Каждая вторая строка имеет другой цвет фона. Использовать цвет:|
+|Start:|                       |Запуск:|
+|Exit:|                        |Выход:|
+|Default|                      |По усолчанию|
+|More Colors...|               |Больше цветов...|
+|Search results|               |Поиск результатов|
+
+|Creation Time|                |Создание|
+|Last Modification|            |Изменение|
+|Last Access|                  |Просмотр|
+|Expires|                      |Окончание|
+|UUID|                         |Идентификатор|
+
+|Show &Creation Time Column|   |Показывать столбец &времени создания|
+|Show Last &Modification Time Column|          |Показывать столбец времени последнего и&зменения|
+|Show &Last Access Time Column|                |Показывать столбец времени последнего п&росмотра|
+|Show &Expire Time Column|                     |Показывать столбец времени &окончания действия|
+|Show UU&ID Column|                            |Показывать столбец ид&ентификатора|
+
+|Show &ToolBar|                |Показывать панель &управления|
+|Visit KeePass Homepage|       |Перейти на домашнюю страницу KeePass|
+|Field copied to clipboard.|   |Поле скопировано в буфер обмена.|
+
+|A key-file already exists on this drive. Do you want to overwrite it?|
+    |Файл с базой уже сущесвует. Хотите переписать его?|
+|Overwrite?|                   |Переписать?|
+|Expires:|                     |Окончание:|
+|&Delete Selected Entries|     |Удалить выделенные записи|
+|&Mass Modify (All Selected)...|               |&Массовое изменение (все выделенные)...|
+|Change group:|                |Изменить группу:|
+|Change entry icon:|           |Изменить значок записи:|
+|Change expiration time:|      |Изменить время окончания:|
+|Mass Modify|                  |Массовое изменение|
+|Change fields of all selected entries|        |Изменение полей у всех выделенных записей|
+|Show &Columns|                |П&оказывать столбцы|
+|Show &Entry View|             |Показывать поле просмотра &записи|
+
+|GUI: Automatically resize table columns when resizing the main window|
+    |Автоизменение ширины столбцов таблицы при изменении размеров окна|
+|&Copy|                        |&Копировать|
+|Copy &All|                    |Копировать &все|
+|&Undo|                        |&Отменить|
+|&Paste|                       |&Вставить|
+|Cu&t|                         |В&ырезать|
+|&Select All|                  |Вы&делить все|
+|&Delete|                      |&Удалить|
+|&TAN Wizard|                  |&TAN мастер|
+|TAN Wizard|                   |TAN мастер|
+
+|Using this wizard you can easily add TAN entries.|
+    |Этот "мастер" предназначен для упрощенного добавления TAN записей.|
+
+|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-alphanumerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only alphanumerical 'substrings' are added as TAN entries.|
+    |Просто вставьте ваши TANы в область редактирования ниже. Форматирование не имеет значения, все не буквенно-цифровые символы игнорируются (например, перевод строки, табуляция и т.д.) и только буквенно-цифровые последовательности добавляются как TAN записи.|
+
+|<TAN>|                        |<TAN>|
+|Print Pre&view...|            |Предварительный &просмотр...|
+
+|About &Translation...|        |О переводе...|
+|Translation information|      |Информация о переводе|
+|Currently used language|      |Текущий язык|
+|Language file version|        |Версия языкового файла|
+|Author|                       |Автор|
+|Translation author contact|   |Автор перевода|
+|&Rearrange|                   |Пор&ядок|
+|&Sort Group List|             |&Сортировать список групп|
+|Sort List By &Title|          |Сортировать по &названию|
+|Sort List By User&Name|       |Сортировать по &имени пользователя|
+|Sort List By &URL|            |Сортировать по &ссылке|
+|Sort List By &Password|       |Сортировать по &паролю|
+|Sort List By Note&s|          |Сортировать по &комментариям|
+|Sort List By &Creation Time|  |Сортировать по &времени создания|
+|Sort List By Last &Modify Time|               |Сортировать по времени последнего и&зменения|
+|Sort List By Last &Access Time|               |Сортировать по времени последнего п&росмотра|
+|Sort List By &Expiration Time|                |Сортировать по времени &окончания действия|
+|Move Group One &Left|         |Переместить на уровень в&лево|
+|Move Group One &Right|        |Переместить на уровень в&право|
+
+|Hide &UserNames Behind Asterisks (***)|  |Показывать (***) вместо &имени пользователя|
+|Attachment:|                  |Файл:|
+|Attachment|                   |Файл|
+|Show &Attachment Column|      |Показывать столбец присоединенных &файлов|
+
+|Generate a random password...|           |Генерация случайного пароля...|
+|Open file and set as attachment...|      |Открыть файл и присоединить...|
+|Save attached file to disk...|           |Сохранить присоединенный файл...|
+
+|There already is a file attached with this entry.|           |У записи уже есть присоединенный файл.|
+|Do you want to overwrite the current attachment?|            |Переписать существующий присоединенный файл?|
+|&Save Attached File To...|    |Сохранить присоединенный &файл в...|
+|There is no file attached with this entry.|                  |У записи нет присоединенного файла.|
+|Remove the currently attached file|      |Удалить присоединенный файл|
+
+|Close button [X] minimizes the main window instead of terminating the application|
+    |Сворачивать окно при нажатии на кнопку закрытия [X] вместо завершения приложения|
+
+|KeePass Password Database|               |База паролей KeePass|
+|&Open with KeePass|                      |Откр&ыть с помощью KeePass|
+|Here you can associate .kdb files with KeePass (so KeePass opens the file when double-clicking on it):|
+    |Вы можете создать ассоциацию .kdb файлов с KeePass (т.е. KeePass будет открывать файл по двойному щелчку на нем):|
+|Successfully associated KeePass with .kdb files! A double-click on a .kdb file will now start KeePass automatically!|
+    |KeePass проассоциирован с .kdb файлами! Двойной щелчок по .kdb файлу будет запускать KeePass автоматически!|
+|Successfully removed association! KeePass won't be started any more when double-clicking on a .kdb file!|
+    |Ассоциация .kdb файлов с KeePass была удалена! Теперь KeePass не будет запускаться по двойному щелчку на .kdb файле!|
+|Create &Association|                     |Про&ассоциировать|
+|&Remove Association|                     |&Удалить ассоциацию|
+|Setup|                                   |Настройки|
+|Password List|                           |Списак паролей|
+|Exit?|                                   |Выйти?|
+|The file couldn't be saved.|             |Невозможно сохранить файл.|
+|Maybe it's read-only or the storage media has been removed.|
+    |Возможно он доступен только для чтения или устройство хранения было удалено.|
+|If you exit now, all changes to the current database will be lost.|
+    |Если вы выйдите сейчас, то текущая база паролей будет утеряна.|
+|Would you like to exit anyway?|          |Хотили выйти в любом случае?|
+|Cannot access the selected drive.|       |Нет доступа к выбранному диску.|
+|Make sure a writable medium is inserted.||Проверьте, вставлен ли диск для записи.|
+|Not enough free disk space!|             |Недостаточно свободного места!|
+|Disable unsafe (security-critical) operations like exports, etc.|
+    |Запретить небезопасные операции типа экспорта и пр.|
+|Unsafe operations are disabled.|         |Небезопасные операции запрещены.|
+|To execute this operation you must enable unsafe operations in the options dialog.|
+    |Для выполнения этой операции вы должны разрешить небезопасные операции в диалоге настроек.|
+|You have changed an option that requires restarting KeePass to get active.|
+    |Вы изменили настройку, которая требует перезакгрузки KeePass для ее активации.|
+|Expired Entries|                         |Просроченные записи|
+|This is a list of all expired entries|   |Список всех просроченных записей|
+|Show All &Expired Entries...|            |Показать все &просроченные записи...|
+|Click on an entry to jump to it.|        |Щелкните по записи для перехода на нее.|
+|Quality:|                                |Качество:|
+|Database Settings|                       |Настройки базы паролей|
+|Here you can configure the current database.| |Здесь вы можете изменить настройки текущей базы паролей.|
+|Database Summary|                        |Сводка по базе паролей|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
+    |Ваш парой шифруется несколько раз до получения окончательного ключа шифрования базы паролей. Это затрудняет использование brute-force атак.|
+|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
+    |Чем выше это число, тем затруднительней brute-force атаки. Но чем больше это число, тем дольше загружается и сохраняется база паролей.|
+|Number of key encryption rounds:|        |Количисвто циклов шифрования:|
+|bits|                                    |бит|
+|Personal &Vault TXT File...|             |Personal &Vault TXT файл...|
+|Imported from Password Safe|             |Проимпортированно из Password Safe|
+|Remember last opened file|               |Запоминать последний открытый файл|
+|Total number of groups / entries|        |Общее количество групп / записей|
+|Total: %u groups / %u entries|           |Всего: %u групп, %u записей|
+|%u of %u selected|                       |%u из %u выделенно|
+|Number of selected entries (number of entries in the list)| |Количество выделенных записей (количество записей в списке)|
+|Status|                                  |Состояние|
+|The database file has been modified!|    |Файл базы данных был изменен!|
+|Most probably someone has changed the file while you were editing it.| |Вероятнее всего кто-то изменил файл в то время как вы его тоже меняли.|
+|Do you want to overwrite it?|            |Переписать его?|
+|The group you selected cannot store entries. Please select an other group.|
+    |В выбранной группе нельзя сохранить записи. Пожалуйста, выберите другую группу.|
+|This will remove all selected entries unrecoverably!|
+    |Удаление всех выделенных записей будет необратимо!|
+|Are you sure you want to delete all selected entries?|
+    |Вы уверены, что хотите удалить все выделенный записи?|
+|Delete Entries Confirmation|             |Подтверждение удаления записей|
+|Use PuTTY for ssh: and telnet: URLs|     |Использовать PuTTY для ssh: и telnet: ссылок|
+|Mark database as modified on last-access time change|
+    |При просмотре помечать базу паролей как измененную|
+|Se&lect All|                             |В&ыделить все|
+|Auto-&Sort Password List|                |&Автосортировка списка паролей|
+|N&o Auto-Sort|                           |Не использовать &автосортировку|
+|Auto-sorting of the password list is enabled, you cannot move entries manually.|
+    |Автосортировка списка паролей включена - вы не можете перемещать записи вручную.|
+|Perform Auto-&Type|                      |Начать а&втозаполнение|
+|Auto-sorting of the password list is enabled, you cannot sort the list manually now.|
+    |Автосортировка списка паролей включена - вы не можете сортировать записи вручную.|
+|Select key-file manually...|             |Укажите файл с паролем вручную...|
+|Save key-file manually to...|            |Сохранить файл с паролем вручную...|
+|Enter the new master key for this database.|  |Ввод нового основного пароля для текущей базы паролей.|
+|Repeat master key|                       |Повтор основного пароля|
+|Repeat the master key for this database.||Повторите ввод основного пароля для текущей базы паролей.|
+|Change password of this database - Enter new master key|
+    |Изменение пароля базы паролей - Ввод нового основного пароля|

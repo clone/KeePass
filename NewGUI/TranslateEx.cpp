@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -39,11 +39,11 @@ static DWORD m_dwNumTrlStrings = 0;
 static char *m_pDefString[MAX_TRANSLATION_STRINGS];
 static char *m_pTrlString[MAX_TRANSLATION_STRINGS];
 
-void _SortTrlTable();
+C_FN_SHARE void _SortTrlTable();
 
 static char m_szCurrentTranslationTable[2 * MAX_PATH];
 
-BOOL LoadTranslationTable(const char *pszTableName)
+C_FN_SHARE BOOL LoadTranslationTable(const char *pszTableName)
 {
 	FILE *fp = NULL;
 	char szPath[2 * MAX_PATH];
@@ -163,7 +163,7 @@ BOOL LoadTranslationTable(const char *pszTableName)
 	return TRUE;
 }
 
-BOOL FreeCurrentTranslationTable()
+C_FN_SHARE BOOL FreeCurrentTranslationTable()
 {
 	SAFE_DELETE_ARRAY(m_pTranslationStrings);
 	m_dwNumTrlStrings = 0;
@@ -175,7 +175,7 @@ BOOL FreeCurrentTranslationTable()
 	return TRUE;
 }
 
-void _SortTrlTable()
+C_FN_SHARE void _SortTrlTable()
 {
 	unsigned long i, j = 0, min;
 	char *v;
@@ -201,7 +201,7 @@ void _SortTrlTable()
 	}
 }
 
-const TCHAR *_TRL(const char *pszDefString)
+C_FN_SHARE const TCHAR *_TRL(const char *pszDefString)
 {
 	if(m_dwNumTrlStrings == 0) return pszDefString;
 	ASSERT(pszDefString != NULL); if(pszDefString == NULL) return _T("");
@@ -229,7 +229,7 @@ const TCHAR *_TRL(const char *pszDefString)
 	return pszDefString; */
 }
 
-const TCHAR *GetCurrentTranslationTable()
+C_FN_SHARE const TCHAR *GetCurrentTranslationTable()
 {
 	return m_szCurrentTranslationTable;
 }

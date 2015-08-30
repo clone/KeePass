@@ -34,6 +34,8 @@
 #ifndef _CEXDIB_H_
 #define _CEXDIB_H_
 
+#include "../Util/SysDefEx.h"
+
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000

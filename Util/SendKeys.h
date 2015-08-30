@@ -1,8 +1,11 @@
+// This is a modified version of the CSendKeys class.
+// See .cpp file for more information.
 #ifndef __SENDKEYS_04192004__INC__
 #define __SENDKEYS_04192004__INC__
 
 #include <windows.h>
 #include <tchar.h>
+#include "SysDefEx.h"
 // Please see SendKeys.cpp for copyright and usage issues.
 
 class CSendKeys

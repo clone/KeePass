@@ -1,9 +1,8 @@
+// This is a modified version of  Szymon Stefanek's Rijndael implementation.
+// Author : Dominik Reichl
+
 #ifndef _RIJNDAEL_H_
 #define _RIJNDAEL_H_
-
-// This file is based on Szymon Stefanek's Rijndael implementation.
-// All I have done is changed the variable type definitions, not more.
-// The original header is below.
 
 //
 // File : rijndael.h
@@ -66,6 +65,8 @@
 //  else decryptError(len);
 //
 
+#include "../Util/SysDefEx.h"
+
 #define _MAX_KEY_COLUMNS (256/32)
 #define _MAX_ROUNDS      14
 #define MAX_IV_SIZE      16
@@ -85,7 +86,7 @@ typedef unsigned __int32 RD_UINT32;
 #define RIJNDAEL_BAD_DIRECTION -6
 #define RIJNDAEL_CORRUPTED_DATA -7
 
-class Rijndael
+class CPP_CLASS_SHARE Rijndael
 {	
 public:
 	enum Direction { Encrypt , Decrypt };

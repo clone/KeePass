@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,13 +30,14 @@
 #ifndef AFX_PWGENERATORDLG_H__ED008380_12A4_11D8_BF16_0050BF14F5CC__INCLUDED_
 #define AFX_PWGENERATORDLG_H__ED008380_12A4_11D8_BF16_0050BF14F5CC__INCLUDED_
 
+#include "Util/SysDefEx.h"
 #include "NewGUI/KCSideBannerWnd.h"
-#include "NewGUI/BtnST.h"
+#include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/GradientProgressCtrl.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPwGeneratorDlg : public CDialog
+class CPP_CLASS_SHARE CPwGeneratorDlg : public CDialog
 {
 public:
 	CPwGeneratorDlg(CWnd* pParent = NULL);
@@ -58,9 +59,9 @@ public:
 	enum { IDD = IDD_PW_GENERATOR_DLG };
 	CGradientProgressCtrl	m_cPassQuality;
 	CSpinButtonCtrl	m_spinNumChars;
-	CButtonST	m_btGenerate;
-	CButtonST	m_btnCancel;
-	CButtonST	m_btnOK;
+	CXPStyleButtonST	m_btGenerate;
+	CXPStyleButtonST	m_btnCancel;
+	CXPStyleButtonST	m_btnOK;
 	CListCtrl	m_cList;
 	UINT	m_nCharacters;
 	CString	m_strPassword;

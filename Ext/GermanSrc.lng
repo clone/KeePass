@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |0.98a|
+|~LANGUAGEVERSION|             |0.98b|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -49,7 +49,6 @@
 |Either enter the password/passphrase or select the password disk's drive.|
     |Geben Sie entweder ein Passwort ein oder wählen Sie das Laufwerk der Schlüsseldiskette.|
 |Enter password:|              |Passwort eingeben:|
-|or|                           |oder|
 |Select the password disk drive where the key will be stored:|
     |Wählen Sie das Laufwerk der Schlüsseldiskette aus:|
 |Create a new password database - Enter master key|
@@ -266,10 +265,10 @@
 |All files|                    |Alle Dateien|
 
 |The current file has been modified.|
-    |Die aktuell geöffnete Datei würde geändert.|
+    |Die aktuell geöffnete Datei wurde geändert.|
 |Do you want to save the changes before closing?|
     |Möchten Sie die Datei vor dem Beenden speichern?|
-|Save Before Close?|           |Datei vor dem Beenden speichern?|
+|KeePass - Save Before Close/Lock?|   |KeePass - Datei vor dem Beenden oder Sperren speichern?|
 
 |Deleting a group will delete all items in that group, too.|
     |Wenn Sie eine Gruppe löschen werden auch alle Elemente der Gruppe gelöscht.|
@@ -547,3 +546,71 @@
 |Repeat the master key for this database.||Hauptschlüssel für diese Datenbank wiederholen|
 |Change password of this database - Enter new master key|
     |Passwort dieser Datenbank ändern - Neuen Hauptschlüssel eingeben|
+|Plugin|                                  |Plugin|
+|cannot be loaded!|                       |kann nicht geladen werden!|
+|Plugin Manager|                          |Plugin Manager|
+|&Plugin Manager|                         |&Plugin Manager|
+|Here you can configure all installed KeePass plugins.|
+    |Hier können Sie alle installierten KeePass-Plugins konfigurieren.|
+|This plugin has been designed for a different application version and may be incompatible with this one.|
+    |Dieses Plugin wurde für eine andere Applikationsversion geschrieben und ist möglicherweise inkompatibel mit dieser hier.|
+|Application version:|                    |Applikationsversion:|
+|Plugin has been designed for:|           |Plugin wurde geschrieben für:|
+|It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.|
+    |Es ist möglich, dass das Plugin kompatibel ist, aber es ist auch möglich dass KeePass abstürzen wird.|
+|Therefore save all data before you continue.|    |Speichern Sie deshalb alle Daten, bevor Sie fortfahren.|
+|Do you want to load the plugin?|         |Möchten Sie das Plugin laden?|
+|This plugin will be disabled after you restart KeePass.|
+    |Dieses Plugin wird beim nächsten KeePass-Start deaktiviert.|
+|Enabled, loaded|                         |Aktiviert, geladen|
+|Disabled, not loaded|                    |Deaktiviert, nicht geladen|
+|This plugin will be enabled after you restart KeePass.|
+    |Dieses Plugin wird beim nächsten KeePass-Start aktiviert.|
+|&Enable|                                 |&Aktivieren|
+|&Disable|                                |&Deaktivieren|
+|About &Plugin...|                        |Über &Plugin...|
+|An error occured|                        |Es ist ein Fehler aufgetreten|
+|Error code|                              |Fehler-Code|
+|Unknown error|                           |Unbekannter Fehler|
+|Success|                                 |Erfolg|
+|Invalid parameter|                       |Ungültiger Parameter|
+|Too few memory (RAM) available|          |Zu wenig Speicher (RAM) verfügbar|
+|Invalid/wrong key|                       |Ungültiger/falscher Schlüssel|
+|File access error: failed to open file in read mode|
+    |Dateizugriffsfehler: Kann Datei nicht im Lese-Modus öffnen|
+|File access error: failed to open file in write mode|
+    |Dateizugriffsfehler: Kann Datei nicht im Schreiben-Modus öffnen|
+|File error: error while reading from the file|
+    |Datei-Fehler: Fehler während dem Lesen von der Datei|
+|File error: error while writing to the file|
+    |Datei-Fehler: Fehler während dem Schreiben in die Datei|
+|Internal error|                          |Interner Fehler|
+|Invalid random source|                   |Ungültige Zufallszahlen-Quelle|
+|Invalid/corrupted file structure|        |Ungültige/fehlerhafte Dateistruktur|
+|Encryption/decryption error|             |Fehler beim Verschlüsseln/Entschlüsseln|
+|Get more plugins...|                     |Mehr Plugins herunterladen...|
+|Global auto-type hot key combination:|   |Globale Auto-Type Hotkey-Kombination:|
+|Unable to register a global hot key.|    |Globaler HotKey kann nicht registriert werden.|
+|Most probably an other application has reserved this hot key already.|
+    |Vermutlich hat sich bereits eine andere Anwendung diesen HotKey reserviert.|
+|You can choose an other hot key combination in 'Edit - Options - Setup'.|
+    |Sie können eine andere HotKey-Kombination in 'Bearbeiten - Optionen - Setup' auswählen.|
+|and|                                     |und|
+|You've selected the AND key mode, so you must enter a password AND select a key-file.|
+    |Sie haben den UND-Schlüsselmodus ausgewählt. Sie müssen sowohl ein Passwort eingeben, als auch eine Schlüsseldatei auswählen.|
+|Timed: copy data to the clipboard and clear it automatically after some seconds|
+    |Zeitgesteuert: Daten in Zwischenablage kopieren und nach ein paar Sekunden wieder löschen|
+|Enhanced: allow pasting only once and protect against clipboard spies|
+    |Erweitert: nur 1 Einfüge-Operation erlauben und gegen Zwischenablage-Spione schützen|
+|Clipboard behavior:|                     |Zwischenablage-Verhalten:|
+|Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.|
+    |Warnung: es ist möglich, dass diese Option auf Ihrem System nicht korrekt funktioniert, besonders dann, wenn Sie Zwischenablage-Erweiterungs-Programme o.ä. benutzen.|
+|If you notice any problems with this enhanced method, just switch back to the timed clipboard clearing method.|
+    |Sollten Sie Probleme mit diesem erweiterten Zwischenablage-Verhalten feststellen, verwenden Sie einfach wieder die zeitgesteuerte Option.|
+|Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations.|
+    |Das Ändern der .kdb-Datei-Assoziation ist fehlgeschlagen. Stellen Sie sicher, dass Sie die Rechte haben, in die Registry zu schreiben und die Datei-Assoziationen zu ändern.|
+|Number the TANs consecutively, starting from this value|
+    |TANs fortlaufend nummerieren, beginnend von diesem Wert|
+|Never expires|                           |Läuft nicht ab|
+|Auto-Type|                               |Auto-Type|
+|Help:|                                   |Hilfe:|

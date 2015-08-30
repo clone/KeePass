@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -219,7 +219,14 @@ void CNewRandom::GetRandomBuffer(BYTE *pBuf, DWORD dwSize)
 // Seed the xorshift random number generator
 void srandXorShift(unsigned long *pSeed128)
 {
+#ifdef _DEBUG
+	static BOOL _bOnceOnly = FALSE;
+	ASSERT(_bOnceOnly == FALSE);
+	_bOnceOnly = TRUE;
+#endif
+
 	ASSERT(pSeed128 != NULL); // No NULL parameter allowed
+	if(pSeed128 == NULL) return;
 
 	if((g_xorW == 0) && (g_xorX == 0) && (g_xorY == 0) && (g_xorZ == 0))
 	{
@@ -244,14 +251,15 @@ unsigned long randXorShift()
 	return g_xorW;
 }
 
-void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource)
+CPP_FN_SHARE void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource)
 {
 	SYSTEMTIME st;
 	BYTE *p = pUUID16;
 	DWORD *pdw1 = (DWORD *)pUUID16, *pdw2 = (DWORD *)&pUUID16[4],
 		*pdw3 = (DWORD *)&pUUID16[8], *pdw4 = (DWORD *)&pUUID16[12];
+	DWORD dw1, dw2, dw3, dw4;
 
-	ASSERT(pRandomSource != NULL);
+	ASSERT(pRandomSource != NULL); if(pRandomSource == NULL) return;
 
 	ASSERT((sizeof(DWORD) == 4) && (sizeof(USHORT) == 2) && (pUUID16 != NULL));
 	if(pUUID16 == NULL) return;
@@ -271,11 +279,15 @@ void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource)
 
 	pRandomSource->GetRandomBuffer(p, 8); // +8 => 16 bytes filled
 
-	// Mix buffer for better read- and processability using PHTs
-	*pdw1 += *pdw2; *pdw2 += *pdw1; *pdw3 += *pdw4; *pdw4 += *pdw3;
-	*pdw2 += *pdw3; *pdw3 += *pdw2; *pdw1 += *pdw4; *pdw4 += *pdw1;
-	*pdw1 += *pdw3; *pdw3 += *pdw1; *pdw2 += *pdw4; *pdw4 += *pdw2;
-	*pdw1 += *pdw2; *pdw2 += *pdw1; *pdw3 += *pdw4; *pdw4 += *pdw3;
-	*pdw2 += *pdw3; *pdw3 += *pdw2; *pdw1 += *pdw4; *pdw4 += *pdw1;
-	*pdw1 += *pdw3; *pdw3 += *pdw1; *pdw2 += *pdw4; *pdw4 += *pdw2;
+	dw1 = *pdw1; dw2 = *pdw2; dw3 = *pdw3; dw4 = *pdw4; // Load to local
+
+	// Mix buffer using PHTs for better read- and processability
+	dw1 += dw2; dw2 += dw1; dw3 += dw4; dw4 += dw3;
+	dw2 += dw3; dw3 += dw2; dw1 += dw4; dw4 += dw1;
+	dw1 += dw3; dw3 += dw1; dw2 += dw4; dw4 += dw2;
+	dw1 += dw2; dw2 += dw1; dw3 += dw4; dw4 += dw3;
+	dw2 += dw3; dw3 += dw2; dw1 += dw4; dw4 += dw1;
+	dw1 += dw3; dw3 += dw1; dw2 += dw4; dw4 += dw2;
+
+	*pdw1 = dw1; *pdw2 = dw2; *pdw3 = dw3; *pdw4 = dw4; // Save
 }

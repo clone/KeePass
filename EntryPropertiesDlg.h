@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2003/2004, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,8 @@
 #ifndef AFX_ENTRYPROPERTIESDLG_H__C4740E60_4F39_11D8_BF16_0050BF14F5CC__INCLUDED_
 #define AFX_ENTRYPROPERTIESDLG_H__C4740E60_4F39_11D8_BF16_0050BF14F5CC__INCLUDED_
 
-#include "NewGUI/BtnST.h"
+#include "Util/SysDefEx.h"
+#include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/WzComboBox.h"
 #include "NewGUI/amsEdit.h"
@@ -38,7 +39,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CEntryPropertiesDlg : public CDialog
+class CPP_CLASS_SHARE CEntryPropertiesDlg : public CDialog
 {
 public:
 	CEntryPropertiesDlg(CWnd* pParent = NULL);
@@ -53,10 +54,10 @@ public:
 
 	//{{AFX_DATA(CEntryPropertiesDlg)
 	enum { IDD = IDD_ENTRYPROPERTIES_DLG };
-	CButtonST	m_btSelectIcon;
+	CXPStyleButtonST	m_btSelectIcon;
 	CWzComboBox	m_pGroups;
-	CButtonST	m_btCancel;
-	CButtonST	m_btOK;
+	CXPStyleButtonST	m_btCancel;
+	CXPStyleButtonST	m_btOK;
 	CAMSTimeEdit	m_editTime;
 	CAMSDateEdit	m_editDate;
 	BOOL	m_bModExpire;
