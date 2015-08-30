@@ -62,7 +62,8 @@
 
 #define PWS_DEFAULT_SPLITTER_Y 270
 
-#define PWS_TAN_ENTRY TRL("<TAN>")
+#define PWS_TAN_ENTRY      TRL("<TAN>")
+#define PWS_NEW_ATTACHMENT _T(":: ")
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -85,14 +86,18 @@ public:
 
 	DWORD GetSelectedEntry();
 	DWORD GetSelectedEntriesCount();
-	DWORD GetSelectedGroup();
-	DWORD GetSafeSelectedGroup();
+	DWORD GetSelectedGroupId();
 
 	CString GetExportFile(int nFormat, LPCTSTR lpFileName = NULL);
 	void ExportSelectedGroup(int nFormat);
 
 	CString _MakeRtfString(LPCTSTR lptString);
 	void ShowEntryDetails(PW_ENTRY *p);
+
+	HTREEITEM _GetLastVisibleItem(CTreeCtrl *pTree);
+	void GroupSyncStates(BOOL bGuiToMgr = TRUE);
+
+	HTREEITEM _GroupIdToHTreeItem(DWORD dwGroupId);
 
 	BOOL m_bTimer;
 	int m_nClipboardCountdown;
@@ -113,6 +118,7 @@ public:
 
 	BOOL m_bWindowsNewLine;
 	BOOL m_bPasswordStars;
+	BOOL m_bUserStars;
 
 	CStatusBarCtrl m_sbStatus;
 	BOOL m_bShowToolBar;
@@ -128,8 +134,10 @@ public:
 	BOOL m_bShowLastAccess;
 	BOOL m_bShowExpire;
 	BOOL m_bShowUUID;
+	BOOL m_bShowAttach;
 	BOOL m_bLockOnMinimize;
 	BOOL m_bMinimizeToTray;
+	BOOL m_bCloseMinimizes;
 	BOOL m_bEntryView;
 	BOOL m_bColAutoSize;
 
@@ -155,18 +163,19 @@ public:
 
 	CString m_strTempFile;
 
-	BOOL m_bShowColumn[10];
-	int m_nColumnWidths[10];
+	BOOL m_bShowColumn[11];
+	int m_nColumnWidths[11];
 
 	DWORD m_dwClipboardSecs;
 	CString m_strFontSpec;
 
 	DWORD m_dwLastNumSelectedItems;
 	DWORD m_dwLastFirstSelectedItem;
-	DWORD m_dwLastSafeSelectedGroup;
+	HTREEITEM m_hLastSelectedGroup;
 
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
+	CTreeCtrl	m_cGroups;
 	CButtonST	m_btnTbNew;
 	CButtonST	m_btnTbLock;
 	CButtonST	m_btnTbFind;
@@ -179,7 +188,6 @@ public:
 	CButtonST	m_btnTbSave;
 	CButtonST	m_btnTbOpen;
 	CStatic	m_stcMenuLine;
-	CListCtrl	m_cGroups;
 	CCustomListCtrlEx	m_cList;
 	CAutoRichEditCtrl	m_reEntryView;
 	//}}AFX_DATA
@@ -205,11 +213,28 @@ protected:
 		if(m_nSaveView < nItemCount)
 			m_cList.EnsureVisible(m_nSaveView, FALSE);
 	}
+	void _Groups_SaveView(BOOL bSaveSelection = TRUE)
+	{
+		m_dwGroupsSaveFirstVisible = m_cGroups.GetItemData(m_cGroups.GetFirstVisibleItem());
+
+		if(bSaveSelection == TRUE)
+			m_dwGroupsSaveSelected = m_cGroups.GetItemData(m_cGroups.GetSelectedItem());
+		else
+			m_dwGroupsSaveSelected = DWORD_MAX;
+	}
+	void _Groups_RestoreView()
+	{
+		HTREEITEM h = _GroupIdToHTreeItem(m_dwGroupsSaveFirstVisible);
+		m_cGroups.SelectSetFirstVisible(h);
+
+		h = _GroupIdToHTreeItem(m_dwGroupsSaveSelected);
+		m_cGroups.SelectItem(h);
+	}
 	void _CalcColumnSizes()
 	{
 		RECT rect;
 		int nColumnWidth, nColumns = 0, i;
-		for(i = 0; i < 10; i++)
+		for(i = 0; i < 11; i++)
 		{
 			if(m_bShowColumn[i] == TRUE) nColumns++;
 			m_nColumnWidths[i] = 0;
@@ -217,13 +242,13 @@ protected:
 		if(nColumns == 0) return;
 		m_cList.GetClientRect(&rect);
 		nColumnWidth = ((rect.right - 9) / nColumns) - (GetSystemMetrics(SM_CXVSCROLL) / nColumns);
-		for(i = 0; i < 10; i++)
+		for(i = 0; i < 11; i++)
 			if(m_bShowColumn[i] == TRUE)
 				m_nColumnWidths[i] = nColumnWidth;
 	}
 	void _SetColumnWidths()
 	{
-		for(int i = 0; i < 10; i++) m_cList.SetColumnWidth(i, m_nColumnWidths[i]);
+		for(int i = 0; i < 11; i++) m_cList.SetColumnWidth(i, m_nColumnWidths[i]);
 	}
 	void _SetListParameters()
 	{
@@ -237,8 +262,8 @@ protected:
 	}
 
 	void _OpenDatabase(const TCHAR *pszFile);
-	void _PrintGroup(DWORD dwGroupIndex);
-	void _Find(DWORD dwFindGroupIndex);
+	void _PrintGroup(DWORD dwGroupId);
+	void _Find(DWORD dwFindGroupId);
 	void _RemoveSearchGroup();
 
 	void _SelChangeView(UINT uID);
@@ -252,22 +277,39 @@ protected:
 	void _UpdateToolBar();
 	void _ShowToolBar(BOOL bShow = TRUE);
 
-	void _TouchGroup(DWORD dwListIndex, BOOL bEdit);
+	void _TouchGroup(DWORD dwGroupId, BOOL bEdit);
 	void _TouchEntry(DWORD dwListIndex, BOOL bEdit);
+
+	void _SyncSubTree(CTreeCtrl *pTree, HTREEITEM hItem, BOOL bGuiToMgr);
+	void _SyncItem(CTreeCtrl *pTree, HTREEITEM hItem, BOOL bGuiToMgr);
+
+	void _FinishDragging(BOOL bDraggingImageList);
+
+	void _SortList(DWORD dwByField);
+
+	HTREEITEM _FindSelectInTree(CTreeCtrl *pTree, HTREEITEM hRoot, DWORD dwGroupId);
 
 	HICON m_hIcon;
 
 	int m_nSaveView;
 	LPARAM m_dwOldListParameters;
-	PW_ENTRY *m_pPreLockItem;
+	BYTE m_pPreLockItemUuid[16];
+
+	DWORD m_dwGroupsSaveFirstVisible;
+	DWORD m_dwGroupsSaveSelected;
 
 	BOOL m_bCachedToolBarUpdate;
 
 	BOOL m_bDragging;
 	BOOL m_bDraggingHoriz;
+
+	HTREEITEM m_hDraggingGroup;
+	BOOL m_bCanDragGroup;
+
 	HCURSOR m_hArrowCursor;
 	HCURSOR m_hDragLeftRight;
 	HCURSOR m_hDragUpDown;
+
 	LONG m_lSplitterPosHoriz;
 	LONG m_lSplitterPosVert;
 
@@ -385,7 +427,6 @@ protected:
 	afx_msg void OnUpdateImportCWallet(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateFileNew(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateFileOpen(CCmdUI* pCmdUI);
-	afx_msg void OnColumnClickGroupList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnImportPwSafe();
 	afx_msg void OnUpdateImportPwSafe(CCmdUI* pCmdUI);
 	afx_msg void OnViewCreation();
@@ -420,6 +461,38 @@ protected:
 	afx_msg void OnFilePrintPreview();
 	afx_msg void OnUpdateFilePrintPreview(CCmdUI* pCmdUI);
 	afx_msg void OnInfoTranslation();
+	afx_msg void OnSafeAddSubgroup();
+	afx_msg void OnUpdateSafeAddSubgroup(CCmdUI* pCmdUI);
+	afx_msg void OnBeginDragGrouplist(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnCancelMode();
+	afx_msg void OnGroupSort();
+	afx_msg void OnUpdateGroupSort(CCmdUI* pCmdUI);
+	afx_msg void OnPwlistSortTitle();
+	afx_msg void OnUpdatePwlistSortTitle(CCmdUI* pCmdUI);
+	afx_msg void OnPwlistSortUser();
+	afx_msg void OnUpdatePwlistSortUser(CCmdUI* pCmdUI);
+	afx_msg void OnPwlistSortUrl();
+	afx_msg void OnUpdatePwlistSortUrl(CCmdUI* pCmdUI);
+	afx_msg void OnPwlistSortPassword();
+	afx_msg void OnUpdatePwlistSortPassword(CCmdUI* pCmdUI);
+	afx_msg void OnPwlistSortNotes();
+	afx_msg void OnUpdatePwlistSortNotes(CCmdUI* pCmdUI);
+	afx_msg void OnPwlistSortCreation();
+	afx_msg void OnUpdatePwlistSortCreation(CCmdUI* pCmdUI);
+	afx_msg void OnPwlistSortLastmodify();
+	afx_msg void OnUpdatePwlistSortLastmodify(CCmdUI* pCmdUI);
+	afx_msg void OnPwlistSortLastaccess();
+	afx_msg void OnUpdatePwlistSortLastaccess(CCmdUI* pCmdUI);
+	afx_msg void OnPwlistSortExpire();
+	afx_msg void OnUpdatePwlistSortExpire(CCmdUI* pCmdUI);
+	afx_msg void OnGroupMoveLeft();
+	afx_msg void OnUpdateGroupMoveLeft(CCmdUI* pCmdUI);
+	afx_msg void OnGroupMoveRight();
+	afx_msg void OnUpdateGroupMoveRight(CCmdUI* pCmdUI);
+	afx_msg void OnViewHideUsers();
+	afx_msg void OnViewAttach();
+	afx_msg void OnPwlistSaveAttach();
+	afx_msg void OnUpdatePwlistSaveAttach(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

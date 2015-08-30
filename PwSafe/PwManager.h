@@ -35,7 +35,7 @@
 
 // General product information
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
-#define PWM_VERSION_STR  _T("0.92a")
+#define PWM_VERSION_STR  _T("0.93a")
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -48,46 +48,50 @@
 #define PWM_README_FILE  _T("KeePass.html")
 #define PWM_LICENSE_FILE _T("License.html")
 
-#define PWM_EXENAME      _T("KeePass")
-#define PWMKEY_LANG      _T("KeeLanguage")
-#define PWMKEY_CLIPSECS  _T("KeeClipboardSeconds")
-#define PWMKEY_NEWLINE   _T("KeeNewLine")
-#define PWMKEY_LASTDIR   _T("KeeLastDir")
-#define PWMKEY_OPENLASTB _T("KeeAutoOpen")
-#define PWMKEY_LASTDB    _T("KeeLastDb")
-#define PWMKEY_AUTOSAVEB _T("KeeAutoSave")
-#define PWMKEY_IMGBTNS   _T("KeeImgButtons")
-#define PWMKEY_ENTRYGRID _T("KeeEntryGrid")
-#define PWMKEY_ALWAYSTOP _T("KeeAlwaysOnTop")
-#define PWMKEY_SHOWTITLE _T("KeeShowTitle")
-#define PWMKEY_SHOWUSER  _T("KeeShowUser")
-#define PWMKEY_SHOWURL   _T("KeeShowURL")
-#define PWMKEY_SHOWPASS  _T("KeeShowPassword")
-#define PWMKEY_SHOWNOTES _T("KeeShowNotes")
-#define PWMKEY_HIDESTARS _T("KeeHideStars")
-#define PWMKEY_LISTFONT  _T("KeeListFont")
-#define PWMKEY_WINDOWPX  _T("KeeWindowPX")
-#define PWMKEY_WINDOWPY  _T("KeeWindowPY")
-#define PWMKEY_WINDOWDX  _T("KeeWindowDX")
-#define PWMKEY_WINDOWDY  _T("KeeWindowDY")
-#define PWMKEY_SCREENID  _T("KeeLastScreenId")
-#define PWMKEY_COLWIDTH0 _T("KeeColumnWidth0")
-#define PWMKEY_COLWIDTH1 _T("KeeColumnWidth1")
-#define PWMKEY_COLWIDTH2 _T("KeeColumnWidth2")
-#define PWMKEY_COLWIDTH3 _T("KeeColumnWidth3")
-#define PWMKEY_COLWIDTH4 _T("KeeColumnWidth4")
-#define PWMKEY_COLWIDTH5 _T("KeeColumnWidth5")
-#define PWMKEY_COLWIDTH6 _T("KeeColumnWidth6")
-#define PWMKEY_COLWIDTH7 _T("KeeColumnWidth7")
-#define PWMKEY_COLWIDTH8 _T("KeeColumnWidth8")
-#define PWMKEY_COLWIDTH9 _T("KeeColumnWidth9")
-#define PWMKEY_SPLITTERX _T("KeeSplitterX")
-#define PWMKEY_SPLITTERY _T("KeeSplitterY")
-#define PWMKEY_ENTRYVIEW _T("KeeEntryView")
-#define PWMKEY_LOCKMIN   _T("KeeLockOnMinimize")
-#define PWMKEY_MINTRAY   _T("KeeMinimizeToTray")
-#define PWMKEY_LOCKTIMER _T("KeeLockAfterTime")
-#define PWMKEY_ROWCOLOR  _T("KeeRowColor")
+#define PWM_EXENAME       _T("KeePass")
+#define PWMKEY_LANG       _T("KeeLanguage")
+#define PWMKEY_CLIPSECS   _T("KeeClipboardSeconds")
+#define PWMKEY_NEWLINE    _T("KeeNewLine")
+#define PWMKEY_LASTDIR    _T("KeeLastDir")
+#define PWMKEY_OPENLASTB  _T("KeeAutoOpen")
+#define PWMKEY_LASTDB     _T("KeeLastDb")
+#define PWMKEY_AUTOSAVEB  _T("KeeAutoSave")
+#define PWMKEY_IMGBTNS    _T("KeeImgButtons")
+#define PWMKEY_ENTRYGRID  _T("KeeEntryGrid")
+#define PWMKEY_ALWAYSTOP  _T("KeeAlwaysOnTop")
+#define PWMKEY_SHOWTITLE  _T("KeeShowTitle")
+#define PWMKEY_SHOWUSER   _T("KeeShowUser")
+#define PWMKEY_SHOWURL    _T("KeeShowURL")
+#define PWMKEY_SHOWPASS   _T("KeeShowPassword")
+#define PWMKEY_SHOWNOTES  _T("KeeShowNotes")
+#define PWMKEY_SHOWATTACH _T("KeeShowAttach")
+#define PWMKEY_HIDESTARS  _T("KeeHideStars")
+#define PWMKEY_HIDEUSERS  _T("KeeHideUserStars")
+#define PWMKEY_LISTFONT   _T("KeeListFont")
+#define PWMKEY_WINDOWPX   _T("KeeWindowPX")
+#define PWMKEY_WINDOWPY   _T("KeeWindowPY")
+#define PWMKEY_WINDOWDX   _T("KeeWindowDX")
+#define PWMKEY_WINDOWDY   _T("KeeWindowDY")
+#define PWMKEY_SCREENID   _T("KeeLastScreenId")
+#define PWMKEY_COLWIDTH0  _T("KeeColumnWidth0")
+#define PWMKEY_COLWIDTH1  _T("KeeColumnWidth1")
+#define PWMKEY_COLWIDTH2  _T("KeeColumnWidth2")
+#define PWMKEY_COLWIDTH3  _T("KeeColumnWidth3")
+#define PWMKEY_COLWIDTH4  _T("KeeColumnWidth4")
+#define PWMKEY_COLWIDTH5  _T("KeeColumnWidth5")
+#define PWMKEY_COLWIDTH6  _T("KeeColumnWidth6")
+#define PWMKEY_COLWIDTH7  _T("KeeColumnWidth7")
+#define PWMKEY_COLWIDTH8  _T("KeeColumnWidth8")
+#define PWMKEY_COLWIDTH9  _T("KeeColumnWidth9")
+#define PWMKEY_COLWIDTH10 _T("KeeColumnWidth10")
+#define PWMKEY_SPLITTERX  _T("KeeSplitterX")
+#define PWMKEY_SPLITTERY  _T("KeeSplitterY")
+#define PWMKEY_ENTRYVIEW  _T("KeeEntryView")
+#define PWMKEY_LOCKMIN    _T("KeeLockOnMinimize")
+#define PWMKEY_MINTRAY    _T("KeeMinimizeToTray")
+#define PWMKEY_CLOSEMIN   _T("KeeCloseMinimizes")
+#define PWMKEY_LOCKTIMER  _T("KeeLockAfterTime")
+#define PWMKEY_ROWCOLOR   _T("KeeRowColor")
 #define PWMKEY_SHOWCREATION     _T("KeeShowCreation")
 #define PWMKEY_SHOWLASTMOD      _T("KeeShowLastMod")
 #define PWMKEY_SHOWLASTACCESS   _T("KeeShowLastAccess")
@@ -122,8 +126,10 @@
 #define PWMF_EXPIRE     512
 #define PWMF_UUID      1024
 
-#define ALGO_AES         0
-#define ALGO_TWOFISH     1
+#define PWGF_EXPANDED     1
+
+#define ALGO_AES          0
+#define ALGO_TWOFISH      1
 
 #pragma pack(1)
 
@@ -177,6 +183,10 @@ typedef struct _PW_GROUP // Structure containing information about one group
 	PW_TIME tLastMod;
 	PW_TIME tLastAccess;
 	PW_TIME tExpire;
+
+	USHORT usLevel;
+
+	DWORD dwFlags;
 } PW_GROUP, *PPW_GROUP;
 
 typedef struct _PW_ENTRY // Structure containing information about one entry
@@ -198,13 +208,19 @@ typedef struct _PW_ENTRY // Structure containing information about one entry
 	PW_TIME tLastMod;
 	PW_TIME tLastAccess;
 	PW_TIME tExpire;
+
+	TCHAR *pszBinaryDesc; // A string describing what is in pBinaryData
+	BYTE *pBinaryData;
+	DWORD uBinaryDataLen;
 } PW_ENTRY, *PPW_ENTRY;
 #pragma pack()
 
 #ifdef _DEBUG
 #define ASSERT_ENTRY(pp) ASSERT((pp) != NULL); ASSERT((pp)->pszTitle != NULL); \
 	ASSERT((pp)->pszUserName != NULL); ASSERT((pp)->pszURL != NULL); \
-	ASSERT((pp)->pszPassword != NULL); ASSERT((pp)->pszAdditional != NULL);
+	ASSERT((pp)->pszPassword != NULL); ASSERT((pp)->pszAdditional != NULL); \
+	ASSERT((pp)->pszBinaryDesc != NULL); if(((pp)->uBinaryDataLen != 0) && \
+	((pp)->pBinaryData == NULL)) { ASSERT(FALSE); }
 #else
 #define ASSERT_ENTRY(pp)
 #endif
@@ -245,6 +261,7 @@ public:
 	DWORD GetGroupByIdN(DWORD idGroup);
 	DWORD GetGroupId(const TCHAR *pszGroupName);
 	DWORD GetGroupIdByIndex(DWORD uGroupIndex);
+	DWORD GetLastChildGroup(DWORD dwParentGroupIndex);
 
 	// Add entries and groups
 	BOOL AddGroup(const PW_GROUP *pTemplate);
@@ -252,7 +269,7 @@ public:
 
 	// Delete entries and groups
 	BOOL DeleteEntry(DWORD dwIndex);
-	BOOL DeleteGroup(DWORD uGroupId);
+	BOOL DeleteGroupById(DWORD uGroupId);
 
 	BOOL SetGroup(DWORD dwIndex, PW_GROUP *pTemplate);
 	BOOL SetEntry(DWORD dwIndex, PW_ENTRY *pTemplate);
@@ -287,6 +304,13 @@ public:
 
 	// Get the never-expire time
 	static void _GetNeverExpireTime(PW_TIME *pPwTime);
+
+	// Checks and corrects the group tree (level order, etc.)
+	void FixGroupTree();
+
+	BOOL AttachFileAsBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile);
+	BOOL SaveBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile);
+	BOOL RemoveBinaryData(PW_ENTRY *pEntry);
 
 protected:
 	virtual BOOL ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_GROUP *pGroup);

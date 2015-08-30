@@ -41,6 +41,8 @@ static char *m_pTrlString[MAX_TRANSLATION_STRINGS];
 
 void _SortTrlTable();
 
+static char m_szCurrentTranslationTable[2 * MAX_PATH];
+
 BOOL LoadTranslationTable(const char *pszTableName)
 {
 	FILE *fp = NULL;
@@ -152,6 +154,8 @@ BOOL LoadTranslationTable(const char *pszTableName)
 		}
 	}
 
+	_tcscpy(m_szCurrentTranslationTable, pszTableName);
+
 	_SortTrlTable();
 	m_bTableLoaded = TRUE;
 	return TRUE;
@@ -218,4 +222,9 @@ const TCHAR *_TRL(const char *pszDefString)
 	}
 	// String hasn't been found in the translation table -> return the input string
 	return pszDefString; */
+}
+
+const TCHAR *GetCurrentTranslationTable()
+{
+	return m_szCurrentTranslationTable;
 }

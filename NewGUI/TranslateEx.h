@@ -30,7 +30,7 @@
 #ifndef ___TRANSLATE_EX_H___
 #define ___TRANSLATE_EX_H___
 
-#define MAX_TRANSLATION_STRINGS 320
+#define MAX_TRANSLATION_STRINGS 350
 
 // Translate string, sptr must be a char*, _not_ a TCHAR* !
 #define TRL(sptr) _TRL(sptr)
@@ -42,5 +42,7 @@ BOOL LoadTranslationTable(const char *pszTableName);
 BOOL FreeCurrentTranslationTable();
 
 const char *_TRL(const char *pszDefString);
+
+const TCHAR *GetCurrentTranslationTable();
 
 #endif // ___TRANSLATE_EX_H___

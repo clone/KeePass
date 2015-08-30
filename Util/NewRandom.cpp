@@ -219,13 +219,17 @@ void CNewRandom::GetRandomBuffer(BYTE *pBuf, DWORD dwSize)
 // Seed the xorshift random number generator
 void srandXorShift(unsigned long *pSeed128)
 {
-	ASSERT((g_xorW == 0) && (g_xorX == 0) && (g_xorY == 0) && (g_xorZ == 0)); // Call this function only once
 	ASSERT(pSeed128 != NULL); // No NULL parameter allowed
 
-	g_xorW = pSeed128[0]; g_xorX = pSeed128[1];
-	g_xorY = pSeed128[2]; g_xorZ = pSeed128[3];
+	if((g_xorW == 0) && (g_xorX == 0) && (g_xorY == 0) && (g_xorZ == 0))
+	{
+		g_xorW = pSeed128[0];
+		g_xorX = pSeed128[1];
+		g_xorY = pSeed128[2];
+		g_xorZ = pSeed128[3];
 
-	if((g_xorW + g_xorX + g_xorY + g_xorZ) == 0) g_xorX += 0xB7E15163;
+		if((g_xorW + g_xorX + g_xorY + g_xorZ) == 0) g_xorX += 0xB7E15163;
+	}
 }
 
 // Fast XorShift random number generator

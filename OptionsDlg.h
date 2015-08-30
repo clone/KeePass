@@ -82,6 +82,7 @@ public:
 	BOOL	m_bLockAfterTime;
 	UINT	m_nLockAfter;
 	BOOL	m_bColAutoSize;
+	BOOL	m_bCloseMinimizes;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(COptionsDlg)

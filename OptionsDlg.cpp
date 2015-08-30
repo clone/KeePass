@@ -57,6 +57,7 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	m_bLockAfterTime = FALSE;
 	m_nLockAfter = 0;
 	m_bColAutoSize = FALSE;
+	m_bCloseMinimizes = FALSE;
 	//}}AFX_DATA_INIT
 }
 
@@ -82,6 +83,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_LOCKAFTERTIME, m_bLockAfterTime);
 	DDX_Text(pDX, IDC_EDIT_LOCKSECONDS, m_nLockAfter);
 	DDX_Check(pDX, IDC_CHECK_COLAUTOSIZE, m_bColAutoSize);
+	DDX_Check(pDX, IDC_CHECK_CLOSEMIN, m_bCloseMinimizes);
 	//}}AFX_DATA_MAP
 }
 
@@ -132,6 +134,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_COLAUTOSIZE), OPTGRP_GUI);
 	m_wndgrp.AddWindow(NULL, OPTGRP_GUI);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_MINTRAY), OPTGRP_GUI);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_CLOSEMIN), OPTGRP_GUI);
 	m_wndgrp.AddWindow(NULL, OPTGRP_GUI);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_SELFONTTXT), OPTGRP_GUI);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_SELFONT), OPTGRP_GUI);
@@ -168,8 +171,8 @@ BOOL COptionsDlg::OnInitDialog()
 	tci.cchTextMax = _tcslen(TRL(OPTSZ_MEMORY)); tci.pszText = (char *)TRL(OPTSZ_MEMORY);
 	tci.iImage = 42; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
 
-	m_cEncAlgos.AddString(TRL("Advanced Encryption Standard (AES) (128-bit block cipher)"));
-	m_cEncAlgos.AddString(TRL("Twofish (128-bit block cipher)"));
+	m_cEncAlgos.AddString(TRL("Advanced Encryption Standard (AES) (128-bit block cipher using 256-bit key)"));
+	m_cEncAlgos.AddString(TRL("Twofish (128-bit block cipher using 256-bit key)"));
 	m_cEncAlgos.SetCurSel(m_nAlgorithm);
 
 	m_tabMenu.SetCurSel(0);

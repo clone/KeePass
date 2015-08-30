@@ -30,6 +30,8 @@
 #include "StdAfx.h"
 #include "PwExport.h"
 
+#include "../Util/MemUtil.h"
+#include "../Util/StrUtil.h"
 #include "../NewGUI/TranslateEx.h"
 
 CPwExport::CPwExport()
@@ -65,16 +67,12 @@ void CPwExport::SetNewLineSeq(BOOL bWindows)
 	else m_pszNewLine = _T("\n");
 }
 
-#ifdef _UNICODE
 #define PWEXPSTR(sp) \
 { \
-	char *_pa = m_pMgr->_ToAscii(sp); \
-	fwrite(_pa, 1, strlen(_pa), fp); \
-	SAFE_DELETE_ARRAY(_pa); \
+	UTF8_BYTE *_pUtf8String = _StringToUTF8(sp); \
+	fwrite(_pUtf8String, 1, strlen((char *)_pUtf8String), fp); \
+	SAFE_DELETE_ARRAY(_pUtf8String); \
 }
-#else
-#define PWEXPSTR(sp) { fwrite(sp, 1, strlen(sp), fp); }
-#endif
 
 BOOL CPwExport::ExportAll(const TCHAR *pszFile)
 {
@@ -85,7 +83,6 @@ BOOL CPwExport::ExportAll(const TCHAR *pszFile)
 BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 {
 	FILE *fp;
-	TCHAR sz[256];
 	unsigned long i;
 	PW_ENTRY *p;
 	PW_GROUP *pg;
@@ -97,19 +94,14 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 
 	if(m_nFormat == PWEXP_TXT)
 	{
-		PWEXPSTR(_T("Password List"));
-		PWEXPSTR(m_pszNewLine);
-		PWEXPSTR(m_pszNewLine);
-		PWEXPSTR(_T("Title           UserName      URL              Password       Additional"));
-		PWEXPSTR(m_pszNewLine);
-		PWEXPSTR(_T("---------------|-------------|----------------|--------------|-----------------"));
-		PWEXPSTR(m_pszNewLine);
 	}
 	else if(m_nFormat == PWEXP_HTML)
 	{
 		PWEXPSTR(_T("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">"));
 		PWEXPSTR(m_pszNewLine);
-		PWEXPSTR(_T("<html><head><title>Password List</title></head><body>"));
+		PWEXPSTR(_T("<html><head>"));
+		PWEXPSTR(_T("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"));
+		PWEXPSTR(_T("<title>Password List</title></head><body>"));
 		PWEXPSTR(m_pszNewLine);
 		PWEXPSTR(_T("<table width=\"100%\" border=\"1px\"><tr><td><b>"));
 		PWEXPSTR(TRL("Group:"));
@@ -154,11 +146,30 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 
 		if(m_nFormat == PWEXP_TXT)
 		{
-			_stprintf(sz, _T("%-15.15s %-13.13s %-16.16s %-14.14s %-17.17s"),
-				p->pszTitle, p->pszUserName, p->pszURL, p->pszPassword,
-				p->pszAdditional);
-			PWEXPSTR(sz);
-
+			PWEXPSTR(_T("["));
+			PWEXPSTR(p->pszTitle);
+			PWEXPSTR(_T("]"));
+			PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(TRL("Group:"));
+			PWEXPSTR(_T(" "));
+			PWEXPSTR(pg->pszGroupName);
+			PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(TRL("UserName:"));
+			PWEXPSTR(_T(" "));
+			PWEXPSTR(p->pszUserName);
+			PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(TRL("URL:"));
+			PWEXPSTR(_T(" "));
+			PWEXPSTR(p->pszURL);
+			PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(TRL("Password:"));
+			PWEXPSTR(_T(" "));
+			PWEXPSTR(p->pszPassword);
+			PWEXPSTR(m_pszNewLine);
+			PWEXPSTR(TRL("Notes:"));
+			PWEXPSTR(_T(" "));
+			PWEXPSTR(p->pszAdditional);
+			PWEXPSTR(m_pszNewLine);
 			PWEXPSTR(m_pszNewLine);
 		}
 		else if(m_nFormat == PWEXP_HTML)

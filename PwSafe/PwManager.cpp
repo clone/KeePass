@@ -98,8 +98,7 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 	sha256_ctx sha32;
 	char *paKey = NULL;
 
-	ASSERT(pszMasterKey != NULL);
-	if(pszMasterKey == NULL) return FALSE;
+	ASSERT(pszMasterKey != NULL); if(pszMasterKey == NULL) return FALSE;
 
 #ifdef _UNICODE
 	ASSERT(sizeof(TCHAR) >= 2);
@@ -176,6 +175,7 @@ BOOL CPwManager::SetAlgorithm(int nAlgorithm)
 {
 	ASSERT((nAlgorithm == ALGO_AES) || (nAlgorithm == ALGO_TWOFISH));
 	if((nAlgorithm != ALGO_AES) && (nAlgorithm != ALGO_TWOFISH)) return FALSE;
+
 	m_nAlgorithm = nAlgorithm;
 	return TRUE;
 }
@@ -190,7 +190,7 @@ void CPwManager::_AllocEntries(DWORD uEntries)
 	PW_ENTRY *p;
 	DWORD dwEntries;
 
-	ASSERT(uEntries != 0);
+	ASSERT((uEntries != 0) && (uEntries != DWORD_MAX));
 	if(uEntries == 0) return;
 
 	dwEntries = m_dwNumEntries;
@@ -256,6 +256,8 @@ void CPwManager::_DeleteEntryList(BOOL bFreeStrings)
 			SAFE_DELETE_ARRAY(m_pEntries[uCurrentEntry].pszUserName);
 			SAFE_DELETE_ARRAY(m_pEntries[uCurrentEntry].pszPassword);
 			SAFE_DELETE_ARRAY(m_pEntries[uCurrentEntry].pszAdditional);
+			SAFE_DELETE_ARRAY(m_pEntries[uCurrentEntry].pszBinaryDesc);
+			SAFE_DELETE_ARRAY(m_pEntries[uCurrentEntry].pBinaryData);
 		}
 	}
 
@@ -355,7 +357,7 @@ DWORD CPwManager::GetEntryByGroupN(DWORD idGroup, DWORD dwIndex)
 
 PW_ENTRY *CPwManager::GetEntryByUuid(BYTE *pUuid)
 {
-	ASSERT(pUuid != NULL);
+	ASSERT(pUuid != NULL); if(pUuid == NULL) return NULL;
 
 	DWORD dwEntryIndex = GetEntryByUuidN(pUuid);
 
@@ -367,7 +369,7 @@ PW_ENTRY *CPwManager::GetEntryByUuid(BYTE *pUuid)
 
 DWORD CPwManager::GetEntryByUuidN(BYTE *pUuid)
 {
-	ASSERT(pUuid != NULL);
+	ASSERT(pUuid != NULL); if(pUuid == NULL) return DWORD_MAX;
 
 	for(DWORD dw = 0; dw < m_dwNumEntries; dw++)
 	{
@@ -381,6 +383,8 @@ DWORD CPwManager::GetEntryByUuidN(BYTE *pUuid)
 DWORD CPwManager::GetEntryPosInGroup(PW_ENTRY *pEntry)
 {
 	DWORD uCurrentEntry, pos = 0;
+
+	ASSERT(pEntry != NULL); if(pEntry == NULL) return DWORD_MAX;
 
 	for(uCurrentEntry = 0; uCurrentEntry < m_dwNumEntries; uCurrentEntry++)
 	{
@@ -432,8 +436,7 @@ DWORD CPwManager::GetGroupId(const TCHAR *pszGroupName)
 {
 	DWORD i;
 
-	ASSERT(pszGroupName != NULL);
-	if(pszGroupName == NULL) return DWORD_MAX;
+	ASSERT(pszGroupName != NULL); if(pszGroupName == NULL) return DWORD_MAX;
 
 	for(i = 0; i < m_dwNumGroups; i++)
 	{
@@ -452,8 +455,7 @@ DWORD CPwManager::GetGroupIdByIndex(DWORD uGroupIndex)
 
 DWORD CPwManager::GetNumberOfItemsInGroup(const TCHAR *pszGroup)
 {
-	ASSERT(pszGroup != NULL);
-	if(pszGroup == NULL) return 0;
+	ASSERT(pszGroup != NULL); if(pszGroup == NULL) return 0;
 
 	return GetNumberOfItemsInGroupN(GetGroupId(pszGroup));
 }
@@ -480,8 +482,7 @@ BOOL CPwManager::AddEntry(const PW_ENTRY *pTemplate)
 	PW_ENTRY pT;
 
 	// Don't ASSERT_ENTRY the pTemplate!
-	ASSERT(pTemplate != NULL);
-	if(pTemplate == NULL) return FALSE;
+	ASSERT(pTemplate != NULL); if(pTemplate == NULL) return FALSE;
 	ASSERT((pTemplate->uGroupId != 0) && (pTemplate->uGroupId != DWORD_MAX));
 	if((pTemplate->uGroupId == 0) || (pTemplate->uGroupId == DWORD_MAX)) return FALSE;
 
@@ -497,11 +498,13 @@ BOOL CPwManager::AddEntry(const PW_ENTRY *pTemplate)
 		ASSERT(GetEntryByUuidN(pT.uuid) == DWORD_MAX);
 	}
 
+	// Map NULL pointers to valid pointers to a zero-length string
 	if(pT.pszTitle == NULL) pT.pszTitle = (TCHAR *)g_pNullString;
 	if(pT.pszUserName == NULL) pT.pszUserName = (TCHAR *)g_pNullString;
 	if(pT.pszURL == NULL) pT.pszURL = (TCHAR *)g_pNullString;
 	if(pT.pszPassword == NULL) pT.pszPassword = (TCHAR *)g_pNullString;
 	if(pT.pszAdditional == NULL) pT.pszAdditional = (TCHAR *)g_pNullString;
+	if(pT.pszBinaryDesc == NULL) pT.pszBinaryDesc = (TCHAR *)g_pNullString;
 
 	m_dwNumEntries++;
 	return SetEntry(m_dwNumEntries - 1, &pT);
@@ -512,8 +515,7 @@ BOOL CPwManager::AddGroup(const PW_GROUP *pTemplate)
 	PW_GROUP pT;
 	DWORD i, t, b;
 
-	ASSERT(pTemplate != NULL);
-	if(pTemplate == NULL) return FALSE;
+	ASSERT(pTemplate != NULL); if(pTemplate == NULL) return FALSE;
 
 	pT = *pTemplate; // Copy parameter to local temporary variable
 
@@ -560,6 +562,8 @@ BOOL CPwManager::SetGroup(DWORD dwIndex, PW_GROUP *pTemplate)
 
 	m_pGroups[dwIndex].uGroupId = pTemplate->uGroupId;
 	m_pGroups[dwIndex].uImageId = pTemplate->uImageId;
+	m_pGroups[dwIndex].usLevel = pTemplate->usLevel;
+	m_pGroups[dwIndex].dwFlags = pTemplate->dwFlags;
 
 	m_pGroups[dwIndex].tCreation = pTemplate->tCreation;
 	m_pGroups[dwIndex].tLastMod = pTemplate->tLastMod;
@@ -573,8 +577,7 @@ BOOL CPwManager::DeleteEntry(DWORD dwIndex)
 {
 	DWORD i;
 
-	ASSERT(dwIndex < m_dwNumEntries);
-	if(dwIndex >= m_dwNumEntries) return FALSE;
+	ASSERT(dwIndex < m_dwNumEntries); if(dwIndex >= m_dwNumEntries) return FALSE;
 
 	ASSERT_ENTRY(&m_pEntries[dwIndex]);
 
@@ -583,6 +586,8 @@ BOOL CPwManager::DeleteEntry(DWORD dwIndex)
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszUserName);
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszPassword);
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszAdditional);
+	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszBinaryDesc);
+	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pBinaryData);
 
 	if(dwIndex != (m_dwNumEntries - 1))
 	{
@@ -597,7 +602,7 @@ BOOL CPwManager::DeleteEntry(DWORD dwIndex)
 	return TRUE;
 }
 
-BOOL CPwManager::DeleteGroup(DWORD uGroupId)
+BOOL CPwManager::DeleteGroupById(DWORD uGroupId)
 {
 	DWORD i = 0, inx;
 	PW_ENTRY *p;
@@ -639,12 +644,12 @@ BOOL CPwManager::SetEntry(DWORD dwIndex, PW_ENTRY *pTemplate)
 {
 	DWORD slen;
 
-	ASSERT_ENTRY(pTemplate);
-
 	ASSERT(dwIndex < m_dwNumEntries);
 	if(dwIndex >= m_dwNumEntries) return FALSE;
-	ASSERT(pTemplate != NULL);
+
+	ASSERT_ENTRY(pTemplate);
 	if(pTemplate == NULL) return FALSE;
+
 	ASSERT((pTemplate->uGroupId != 0) && (pTemplate->uGroupId != DWORD_MAX));
 	if((pTemplate->uGroupId == 0) || (pTemplate->uGroupId == DWORD_MAX)) return FALSE;
 
@@ -698,6 +703,30 @@ BOOL CPwManager::SetEntry(DWORD dwIndex, PW_ENTRY *pTemplate)
 	else
 		m_pEntries[dwIndex].pszAdditional[0] = 0;
 
+	if(!((m_pEntries[dwIndex].pBinaryData == pTemplate->pBinaryData) && (m_pEntries[dwIndex].pszBinaryDesc == pTemplate->pszBinaryDesc)))
+	{
+		SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszBinaryDesc);
+		slen = _tcslen(pTemplate->pszBinaryDesc);
+		m_pEntries[dwIndex].pszBinaryDesc = new TCHAR[slen + 1];
+		if(slen != 0)
+			_tcscpy(m_pEntries[dwIndex].pszBinaryDesc, pTemplate->pszBinaryDesc);
+		else
+			m_pEntries[dwIndex].pszBinaryDesc[0] = 0;
+
+		SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pBinaryData);
+		slen = pTemplate->uBinaryDataLen;
+		if((pTemplate->pBinaryData != NULL) && (slen != 0))
+		{
+			m_pEntries[dwIndex].pBinaryData = new BYTE[slen];
+			memcpy(m_pEntries[dwIndex].pBinaryData, pTemplate->pBinaryData, slen);
+		}
+		else
+			m_pEntries[dwIndex].pBinaryData = NULL;
+
+		m_pEntries[dwIndex].uBinaryDataLen = pTemplate->uBinaryDataLen;
+		if(m_pEntries[dwIndex].pBinaryData == NULL) m_pEntries[dwIndex].uBinaryDataLen = 0;
+	}
+
 	m_pEntries[dwIndex].uPasswordLen = _tcslen(m_pEntries[dwIndex].pszPassword);
 	LockEntryPassword(&m_pEntries[dwIndex]);
 
@@ -713,9 +742,8 @@ BOOL CPwManager::SetEntry(DWORD dwIndex, PW_ENTRY *pTemplate)
 
 void CPwManager::LockEntryPassword(PW_ENTRY *pEntry)
 {
-	ASSERT_ENTRY(pEntry);
-	if(pEntry == NULL) return;
-	if(pEntry->pszPassword == NULL) return;
+	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return;
+	ASSERT(pEntry->pszPassword != NULL); if(pEntry->pszPassword == NULL) return;
 
 	if(pEntry->uPasswordLen != 0)
 		arcfourCrypt((BYTE *)pEntry->pszPassword, pEntry->uPasswordLen * sizeof(TCHAR),
@@ -936,6 +964,8 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 	SAFE_DELETE_ARRAY(pwEntryTemplate.pszUserName);
 	SAFE_DELETE_ARRAY(pwEntryTemplate.pszPassword);
 	SAFE_DELETE_ARRAY(pwEntryTemplate.pszAdditional);
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pszBinaryDesc);
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pBinaryData);
 
 	// Erase and delete memory file
 	mem_erase((unsigned char *)pVirtualFile, uAllocated);
@@ -1072,6 +1102,7 @@ BOOL CPwManager::_OpenDatabaseV1(const TCHAR *pszFile)
 #ifdef _UNICODE
 		lpptr = _StringToUnicode(ptrTemp);
 		pwTG.pszGroupName = lpptr;
+		pwTG.usLevel = 0;
 		AddGroup(&pwTG);
 		SAFE_DELETE_ARRAY(lpptr);
 #else
@@ -1174,7 +1205,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	// Get the size of all groups
 	for(i = 0; i < m_dwNumGroups; i++)
 	{
-		uFileSize += 76; // 6+4+6+6+5+6+5+6+5+6+5+6+4+6 = 76
+		uFileSize += 94; // 6+4+6+6+5+6+5+6+5+6+5+6+4+6+6+2+6+4 = 94
 		uFileSize += _UTF8BytesNeeded(m_pGroups[i].pszGroupName) + 1;
 	}
 
@@ -1185,13 +1216,15 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 		UnlockEntryPassword(&m_pEntries[i]);
 
-		uFileSize += 122; // 6+16+6+4+6+4+6+6+6+6+6+6+5+6+5+6+5+6+5+6 = 122
+		uFileSize += 134; // 6+16+6+4+6+4+6+6+6+6+6+6+5+6+5+6+5+6+5+6 = 122
 
 		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszTitle) + 1;
 		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszUserName) + 1;
 		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszURL) + 1;
 		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszPassword) + 1;
-		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszAdditional) +1;
+		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszAdditional) + 1;
+		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszBinaryDesc) + 1;
+		uFileSize += m_pEntries[i].uBinaryDataLen;
 
 		LockEntryPassword(&m_pEntries[i]);
 	}
@@ -1271,6 +1304,16 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
 		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
 		memcpy(&pVirtualFile[pos], &m_pGroups[i].uImageId, 4); pos += 4;
+
+		usFieldType = 0x0008; dwFieldSize = 2;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		memcpy(&pVirtualFile[pos], &m_pGroups[i].usLevel, 2); pos += 2;
+
+		usFieldType = 0x0009; dwFieldSize = 4;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		memcpy(&pVirtualFile[pos], &m_pGroups[i].dwFlags, 4); pos += 4;
 
 		usFieldType = 0xFFFF; dwFieldSize = 0;
 		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
@@ -1366,6 +1409,22 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 		_PwTimeToTime(&m_pEntries[i].tExpire, aCompressedTime);
 		memcpy(&pVirtualFile[pos], aCompressedTime, 5); pos += 5;
 
+		usFieldType = 0x000D;
+		dwFieldSize = _UTF8BytesNeeded(m_pEntries[i].pszBinaryDesc) + 1;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		pb = _StringToUTF8(m_pEntries[i].pszBinaryDesc);
+		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		SAFE_DELETE_ARRAY(pb);
+
+		usFieldType = 0x000E; dwFieldSize = m_pEntries[i].uBinaryDataLen;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		if((m_pEntries[i].pBinaryData != NULL) && (dwFieldSize != 0))
+			memcpy(&pVirtualFile[pos], m_pEntries[i].pBinaryData, dwFieldSize);
+		pos += dwFieldSize;
+
 		usFieldType = 0xFFFF; dwFieldSize = 0;
 		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
 		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
@@ -1447,8 +1506,7 @@ DWORD CPwManager::Find(const TCHAR *pszFindString, BOOL bCaseSensitive, DWORD fi
 	CString strEntry;
 
 	if(nStart >= (int)m_dwNumEntries) return DWORD_MAX;
-	ASSERT(pszFindString != NULL);
-	if(pszFindString == NULL) return DWORD_MAX;
+	ASSERT(pszFindString != NULL); if(pszFindString == NULL) return DWORD_MAX;
 
 	strFind = pszFindString;
 	if(bCaseSensitive == FALSE) strFind.MakeLower();
@@ -1541,6 +1599,8 @@ BOOL CPwManager::MoveGroup(DWORD nFrom, DWORD nTo)
 	LONG dir;
 	PW_GROUP pg;
 
+	ASSERT((nFrom != DWORD_MAX) && (nTo != DWORD_MAX));
+
 	if(nFrom == nTo) TRUE;
 	if(nFrom >= m_dwNumGroups) return FALSE;
 	if(nTo >= m_dwNumGroups) return FALSE;
@@ -1561,6 +1621,8 @@ BOOL CPwManager::MoveGroup(DWORD nFrom, DWORD nTo)
 
 		i += dir;
 	}
+
+	FixGroupTree();
 
 	return TRUE;
 }
@@ -1595,6 +1657,8 @@ void CPwManager::SortGroupList()
 		{
 			p = GetGroup(i);
 			q = GetGroup(i + 1);
+
+			p->usLevel = 0; q->usLevel = 0;
 
 			if(_tcsicmp(p->pszGroupName, q->pszGroupName) > 0)
 			{
@@ -1721,37 +1785,43 @@ BOOL CPwManager::ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pDa
 
 	switch(usFieldType)
 	{
-	case 0x00000000:
+	case 0x0000:
 		// Ignore field
 		break;
-	case 0x00000001:
+	case 0x0001:
 		memcpy(&pGroup->uGroupId, pData, 4);
 		break;
-	case 0x00000002:
+	case 0x0002:
 		ASSERT(dwFieldSize != 0);
 		SAFE_DELETE_ARRAY(pGroup->pszGroupName);
 		pGroup->pszGroupName = _UTF8ToString((UTF8_BYTE *)pData);
 		break;
-	case 0x00000003:
+	case 0x0003:
 		memcpy(aCompressedTime, pData, 5);
 		_TimeToPwTime(aCompressedTime, &pGroup->tCreation);
 		break;
-	case 0x00000004:
+	case 0x0004:
 		memcpy(aCompressedTime, pData, 5);
 		_TimeToPwTime(aCompressedTime, &pGroup->tLastMod);
 		break;
-	case 0x00000005:
+	case 0x0005:
 		memcpy(aCompressedTime, pData, 5);
 		_TimeToPwTime(aCompressedTime, &pGroup->tLastAccess);
 		break;
-	case 0x00000006:
+	case 0x0006:
 		memcpy(aCompressedTime, pData, 5);
 		_TimeToPwTime(aCompressedTime, &pGroup->tExpire);
 		break;
-	case 0x00000007:
+	case 0x0007:
 		memcpy(&pGroup->uImageId, pData, 4);
 		break;
-	case 0x0000FFFF:
+	case 0x0008:
+		memcpy(&pGroup->usLevel, pData, 2);
+		break;
+	case 0x0009:
+		memcpy(&pGroup->dwFlags, pData, 4);
+		break;
+	case 0xFFFF:
 		AddGroup(pGroup);
 		SAFE_DELETE_ARRAY(pGroup->pszGroupName);
 		RESET_PWG_TEMPLATE(pGroup);
@@ -1826,6 +1896,20 @@ BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pDa
 		memcpy(aCompressedTime, pData, 5);
 		_TimeToPwTime(aCompressedTime, &pEntry->tExpire);
 		break;
+	case 0x000D:
+		ASSERT(dwFieldSize != 0);
+		SAFE_DELETE_ARRAY(pEntry->pszBinaryDesc);
+		pEntry->pszBinaryDesc = _UTF8ToString((UTF8_BYTE *)pData);
+		break;
+	case 0x000E:
+		SAFE_DELETE_ARRAY(pEntry->pBinaryData);
+		if(dwFieldSize != 0)
+		{
+			pEntry->pBinaryData = new BYTE[dwFieldSize];
+			memcpy(pEntry->pBinaryData, pData, dwFieldSize);
+			pEntry->uBinaryDataLen = dwFieldSize;
+		}
+		break;
 	case 0xFFFF:
 		ASSERT(dwFieldSize == 0);
 		AddEntry(pEntry);
@@ -1845,6 +1929,129 @@ BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pDa
 
 void CPwManager::_GetNeverExpireTime(PW_TIME *pPwTime)
 {
-	ASSERT(pPwTime != NULL);
+	ASSERT(pPwTime != NULL); if(pPwTime == NULL) return;
 	memcpy(pPwTime, &g_pwTimeNever, sizeof(PW_TIME));
+}
+
+void CPwManager::FixGroupTree()
+{
+	DWORD i;
+	USHORT usLastLevel = 0;
+
+	m_pGroups[0].usLevel = 0; // First group must be root
+
+	for(i = 0; i < m_dwNumGroups; i++)
+	{
+		if(m_pGroups[i].usLevel > (usLastLevel + 1))
+			m_pGroups[i].usLevel = usLastLevel + 1;
+
+		usLastLevel = m_pGroups[i].usLevel;
+	}
+}
+
+DWORD CPwManager::GetLastChildGroup(DWORD dwParentGroupIndex)
+{
+	DWORD i;
+	USHORT usParentLevel;
+	USHORT usLevel;
+	USHORT usLastLevel;
+
+	if(m_dwNumGroups <= 1) return 0;
+	ASSERT(dwParentGroupIndex < m_dwNumGroups);
+	if(dwParentGroupIndex == (m_dwNumGroups - 1)) return m_dwNumGroups - 1;
+	else if(dwParentGroupIndex > (DWORD)(m_dwNumGroups - 1)) return DWORD_MAX;
+
+	usParentLevel = m_pGroups[dwParentGroupIndex].usLevel;
+
+	i = dwParentGroupIndex + 1;
+	usLevel = usParentLevel;
+	while(1)
+	{
+		usLastLevel = usLevel;
+		usLevel = m_pGroups[i].usLevel;
+
+		if(usLevel <= usParentLevel) return i - 1;
+
+		i++;
+		if(i >= m_dwNumGroups) break;
+	}
+
+	return DWORD_MAX;
+}
+
+BOOL CPwManager::AttachFileAsBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile)
+{
+	FILE *fp;
+	DWORD dwFileLen;
+	DWORD dwPathLen;
+	LPTSTR pBinaryDesc;
+	DWORD i;
+
+	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return FALSE;
+	ASSERT(lpFile != NULL); if(lpFile == NULL) return FALSE;
+
+	fp = _tfopen(lpFile, _T("rb"));
+	if(fp == NULL) return FALSE;
+
+	fseek(fp, 0, SEEK_END);
+	dwFileLen = (DWORD)ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	if(dwFileLen == 0) { fclose(fp); fp = NULL; return FALSE; }
+	ASSERT(dwFileLen > 0);
+
+	SAFE_DELETE_ARRAY(pEntry->pszBinaryDesc);
+	SAFE_DELETE_ARRAY(pEntry->pBinaryData);
+
+	i = (DWORD)_tcslen(lpFile) - 1;
+	while(1)
+	{
+		if(i == (DWORD)(-1)) break;
+		if((lpFile[i] == '/') || (lpFile[i] == '\\')) break;
+		i--;
+	}
+	pBinaryDesc = (LPTSTR)&lpFile[i + 1];
+
+	dwPathLen = (DWORD)_tcslen(pBinaryDesc);
+
+	pEntry->pszBinaryDesc = new TCHAR[dwPathLen + 1];
+	_tcscpy(pEntry->pszBinaryDesc, pBinaryDesc);
+
+	pEntry->pBinaryData = new BYTE[dwFileLen];
+	fread(pEntry->pBinaryData, 1, dwFileLen, fp);
+
+	pEntry->uBinaryDataLen = dwFileLen;
+
+	fclose(fp); fp = NULL;
+	return TRUE;
+}
+
+BOOL CPwManager::SaveBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile)
+{
+	FILE *fp;
+
+	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return FALSE;
+	ASSERT(lpFile != NULL); if(lpFile == NULL) return FALSE;
+	if(_tcslen(pEntry->pszBinaryDesc) == 0) return FALSE;
+
+	fp = _tfopen(lpFile, _T("wb"));
+	if(fp == NULL) return FALSE;
+
+	if(pEntry->uBinaryDataLen != 0)
+		fwrite(pEntry->pBinaryData, 1, pEntry->uBinaryDataLen, fp);
+
+	fclose(fp); fp = NULL;
+	return TRUE;
+}
+
+BOOL CPwManager::RemoveBinaryData(PW_ENTRY *pEntry)
+{
+	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return FALSE;
+
+	SAFE_DELETE_ARRAY(pEntry->pBinaryData);
+	SAFE_DELETE_ARRAY(pEntry->pszBinaryDesc);
+	pEntry->pszBinaryDesc = new TCHAR[1];
+	pEntry->pszBinaryDesc[0] = 0;
+	pEntry->uBinaryDataLen = 0;
+	return TRUE;
 }

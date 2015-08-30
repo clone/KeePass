@@ -1,5 +1,5 @@
-|~LANGUAGENAME|                |German (Deutsch, Standard)|
-|~LANGUAGEVERSION|             |0.90a|
+|~LANGUAGENAME|                |Deutsch, Standard|
+|~LANGUAGEVERSION|             |0.93|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://keepass.sourceforge.net|
 
@@ -171,6 +171,7 @@
 
 |&Options|                     |&Einstellungen|
 |&Add Password Group...|       |&Neue Passwort-Gruppe...|
+|Add Password &Subgroup...|    |&Neue Passwort-Untergruppe erstellen...|
 |&Modify Password Group...|    |Passwort-Gruppe &bearbeiten...|
 |&Delete Password Group...|    |Passwort-Gruppe &löschen...|
 |&Print Group|                 |Gruppe &drucken...|
@@ -354,9 +355,10 @@
     |Nach Tray anstatt nach Taskbar minimieren|
 
 |Encryption algorithm to use (for this database):| |Zu benutzender Verschlüsselungsalgorithmus (für diese Datenbank):|
-|Advanced Encryption Standard (AES) (128-bit block cipher)|
-    |Advanced Encryption Standard (AES) (128-bit Block-Cipher)|
-|Twofish (128-bit block cipher)|               |Twofish (128-bit Block-Cipher)|
+|Advanced Encryption Standard (AES) (128-bit block cipher using 256-bit key)|
+    |Advanced Encryption Standard (AES) (128-bit Block-Cipher mit 256-bit-Schlüssel)|
+|Twofish (128-bit block cipher using 256-bit key)|
+    |Twofish (128-bit Block-Cipher mit 256-bit-Schlüssel)|
 |Security|                     |Sicherheit|
 |KeePass is OSI Certified Open Source Software.|
     |KeePass ist OSI Certified Open Source Software.|
@@ -435,3 +437,34 @@
 |Language file version|        |Sprachdatei-Version|
 |Author|                       |Autor|
 |Translation author contact|   |Übersetzungs-Autor Kontakt|
+|&Rearrange|                   |&Umordnen|
+|&Sort Group List|             |Gruppenliste &sortieren|
+|&Sort List By Title|          |Liste &sortieren nach Titel|
+|Sort List By User&Name|       |Liste sortieren nach &Benutzername|
+|Sort List By &URL|            |Liste sortieren nach &URL|
+|Sort List By &Password|       |Liste sortieren nach &Passwort|
+|Sort List By Note&s|          |Liste sortieren nach &Kommentaren|
+|Sort List By &Creation Time|  |Liste sortieren nach &Erstellungszeit|
+|Sort List By Last &Modify Time|               |Liste sortieren nach letzter Änderungs&zeit|
+|Sort List By Last &Access Time|               |Liste sortieren nach letzter &Zugriffszeit|
+|Sort List By &Expiration Time|                |Liste sortieren nach &Ablaufdatum|
+|Move Group One &Left|         |Gruppe eins nach &links|
+|Move Group One &Right|        |Gruppe eins nach &rechts|
+
+|Hide UserNames Behind &Asterisks (***)|  |Benutzername hinter &Sternchen verstecken (***)|
+|Attachment:|                  |Anhang:|
+|Attachment|                   |Anhang|
+|Show &Attachment Column|      |&Anhangs-Spalte anzeigen|
+
+|Generate a random password...|           |Ein zufälliges Passwort generieren...|
+|Open file and set as attachment...|      |Datei öffnen und als Eintragsanhang importieren...|
+|Save attached file to disk...|           |Anhang speichern unter...|
+
+|There already is a file attached with this entry.|           |Es ist bereits eine Datei an diesen Eintrag angehängt.|
+|Do you want to overwrite the current attachment?|            |Wollen Sie den aktuellen Anhang überschreiben?|
+|&Save Attached File To...|    |Angehängte Datei &speichern unter...|
+|There is no file attached with this entry.|                  |Es ist keine Datei an diesen Eintrag angehängt.|
+|Remove the currently attached file|      |Den aktuellen Anhang entfernen|
+
+|Close button [X] minimizes the main window instead of terminating the application|
+    |Der Schließen-Knopf [X] minimiert das Hauptfenster anstatt die Anwendung zu beenden|

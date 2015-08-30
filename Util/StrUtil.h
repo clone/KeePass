@@ -39,6 +39,7 @@ void EraseCString(CString *pString);
 
 #ifndef _WIN32_WCE
 void CopyStringToClipboard(const TCHAR *lptString);
+void ClearClipboardIfOwner();
 #endif
 
 // Fix an URL if necessary (check protocol, form, etc.)

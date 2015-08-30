@@ -1,0 +1,27 @@
+Upozornìní: Tento èeskı pøeklad je neoficiálním pøekladem licence BSD. Nevyjadøuje právní podstatu podmínek pro šíøení softwaru pouívajícího licenci BSD, tomuto úèelu slouí vıhradnì pùvodní anglická verze licence BSD. Tento pøeklad je urèen èeskım ètenáøùm k lepšímu porozumìní licenci BSD.
+
+Copyright (c) 2003/2004, Dominik Reichl
+Všechna práva vyhrazena.
+
+Další distribuce a pouívání ve formì zdrojovıch kódù a binárních souborù, s úpravami nebo bez nich, je povolena za pøedpokladu, e jsou splnìny následující podmínky:
+
+- Další distribuce zdrojového kódu musí zachovat vıše uvedené upozornìní na autorské právo, tento seznam podmínek a následující odvolání.
+- Další distribuce binární formy musí opakovat vıše uvedené upozornìní na autorské právo, tento seznam podmínek a následující odvolání v dokumentaci a/nebo v dalších materiálech poskytovanıch s distribucí.
+- Název ReichlSoft ani jména jeho pøispìvatelù nesmí bıt pouita k podpoøe nebo propagaci vırobkù odvozenıch od tohoto softwaru bez pøedcházejícího zvláštního písemného povolení.
+
+POKUD NENÍ PÍSEMNÌ STANOVENO JINAK, POSKYTUJÍ DRITELÉ AUTORSKİCH PRÁV A PØISPÌVATELÉ PROGRAM "TAK, JAK JE", BEZ ZÁRUKY JAKÉHOKOLIV DRUHU, A VİSLOVNÉ NEBO VYPLİVAJÍCÍ, VÈETNÌ, ALE NIKOLI JEN, ZÁRUK PRODEJNOSTI A VHODNOSTI PRO URÈITİ ÚÈEL. V ÁDNÉM PØÍPAD VÁM NEBUDE ÁDNİ Z DRITELÙ AUTORSKİCH PRÁV A PØISPÌVATELÙ ODPOVÌDNİ ZA ŠKODY, VÈETNÌ PØÍMİCH, NEPØÍMİCH, SPECIÁLNÍCH, UKÁZKOVİCH NEBO NÁSLEDNİCH ŠKOD (VÈETNÌ ALE NIKOLI JEN, ZPROSTØEDKOVÁNÍ NÁHRADY ZBOÍ NEBO SLUEB; DISPOZICI K POUÍVÁNÍ, ZTRÁTY DAT NEBO ZISKU NEBO PØERUŠENÍ OBCHODNÍ ÈINNOSTI) ZPÙSOBENİCH A Z JAKÉKOLI DOMNÌNKY ODPOVÌDNOSTI A U SMLUVNÍ NEBO STRIKTNÍ NEBO Z DELIKTU (VÈETNÌ NEDBALOSTI NEBO JINAK) VYPLİVAJÍCÍCH, V KADÉM PØÍPADÌ Z POUÍVÁNÍ TOHOTO PROGRAMU, A TO I V PØÍPADÌ UPOZORNÌNÍ NA MONOST TAKOVİCH ŠKOD.
+
+
+Originální znìní licence:
+-------------------------
+
+Copyright (c) 2003/2004, Dominik Reichl
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. 
+- Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+- Neither the name of ReichlSoft nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

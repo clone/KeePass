@@ -51,6 +51,8 @@
 #define IDD_ENTRYPROPERTIES_DLG         188
 #define IDR_RECTX_MENU                  189
 #define IDD_TANWIZARD_DLG               190
+#define IDB_FILE                        191
+#define IDB_DISK                        192
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -148,6 +150,11 @@
 #define IDC_CHECK_COLAUTOSIZE           1120
 #define IDC_RE_NOTES                    1124
 #define IDC_EDIT_TANS                   1125
+#define IDC_EDIT_ATTACHMENT             1127
+#define IDC_SETATTACH_BTN               1128
+#define IDC_SAVEATTACH_BTN              1129
+#define IDC_REMOVEATTACH_BTN            1130
+#define IDC_CHECK_CLOSEMIN              1131
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -273,14 +280,30 @@
 #define ID_EXTRAS_TANWIZARD             32916
 #define ID_FILE_PRINTPREVIEW            32917
 #define ID_INFO_TRANSLATION             32918
+#define ID_SAFE_ADDSUBGROUP             32919
+#define ID_GROUP_SORT                   32920
+#define ID_PWLIST_SORT_TITLE            32921
+#define ID_PWLIST_SORT_USER             32922
+#define ID_PWLIST_SORT_URL              32923
+#define ID_PWLIST_SORT_PASSWORD         32924
+#define ID_PWLIST_SORT_NOTES            32925
+#define ID_PWLIST_SORT_CREATION         32926
+#define ID_PWLIST_SORT_LASTMODIFY       32927
+#define ID_PWLIST_SORT_LASTACCESS       32928
+#define ID_PWLIST_SORT_EXPIRE           32929
+#define ID_GROUP_MOVELEFT               32931
+#define ID_GROUP_MOVERIGHT              32932
+#define ID_VIEW_HIDEUSERS               32933
+#define ID_VIEW_ATTACH                  32934
+#define ID_PWLIST_SAVEATTACH            32935
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        191
-#define _APS_NEXT_COMMAND_VALUE         32919
-#define _APS_NEXT_CONTROL_VALUE         1126
+#define _APS_NEXT_RESOURCE_VALUE        193
+#define _APS_NEXT_COMMAND_VALUE         32936
+#define _APS_NEXT_CONTROL_VALUE         1132
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

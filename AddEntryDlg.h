@@ -51,12 +51,15 @@ public:
 
 	void CleanUp();
 
+	void UpdateControlsStatus();
+
 	CFont m_fStyle;
 	CImageList *m_pParentIcons;
 	CKCSideBannerWnd m_banner;
 
 	BOOL m_bEditMode;
 	CPwManager *m_pMgr;
+	DWORD m_dwEntryIndex;
 	int m_nGroupId;
 	int m_nIconId;
 
@@ -67,6 +70,9 @@ public:
 
 	//{{AFX_DATA(CAddEntryDlg)
 	enum { IDD = IDD_ADDENTRY_DLG };
+	CShadeButtonST	m_btRemoveAttachment;
+	CShadeButtonST	m_btSaveAttachment;
+	CShadeButtonST	m_btSetAttachment;
 	CAMSTimeEdit	m_editTime;
 	CAMSDateEdit	m_editDate;
 	CShadeButtonST	m_btHidePw;
@@ -85,6 +91,7 @@ public:
 	CString	m_strURL;
 	CString	m_strUserName;
 	CAutoRichEditCtrl	m_reNotes;
+	CString	m_strAttachment;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CAddEntryDlg)
@@ -108,6 +115,9 @@ protected:
 	afx_msg void OnReSelectAll();
 	afx_msg void OnReCut();
 	afx_msg void OnReUndo();
+	afx_msg void OnSetAttachBtn();
+	afx_msg void OnSaveAttachBtn();
+	afx_msg void OnRemoveAttachBtn();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

@@ -58,6 +58,7 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 	m_strTitle = _T("");
 	m_strURL = _T(PWAE_STDURL_A);
 	m_strUserName = _T("");
+	m_strAttachment = _T("");
 	//}}AFX_DATA_INIT
 
 	m_pMgr = NULL;
@@ -72,6 +73,9 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAddEntryDlg)
+	DDX_Control(pDX, IDC_REMOVEATTACH_BTN, m_btRemoveAttachment);
+	DDX_Control(pDX, IDC_SAVEATTACH_BTN, m_btSaveAttachment);
+	DDX_Control(pDX, IDC_SETATTACH_BTN, m_btSetAttachment);
 	DDX_Control(pDX, IDC_EDIT_EXPIRE_TIME, m_editTime);
 	DDX_Control(pDX, IDC_EDIT_EXPIRE_DATE, m_editDate);
 	DDX_Control(pDX, IDC_CHECK_HIDEPW, m_btHidePw);
@@ -90,6 +94,7 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_URL, m_strURL);
 	DDX_Text(pDX, IDC_EDIT_USERNAME, m_strUserName);
 	DDX_Control(pDX, IDC_RE_NOTES, m_reNotes);
+	DDX_Text(pDX, IDC_EDIT_ATTACHMENT, m_strAttachment);
 	//}}AFX_DATA_MAP
 }
 
@@ -105,6 +110,9 @@ BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	ON_COMMAND(ID_RE_SELECTALL, OnReSelectAll)
 	ON_COMMAND(ID_RE_CUT, OnReCut)
 	ON_COMMAND(ID_RE_UNDO, OnReUndo)
+	ON_BN_CLICKED(IDC_SETATTACH_BTN, OnSetAttachBtn)
+	ON_BN_CLICKED(IDC_SAVEATTACH_BTN, OnSaveAttachBtn)
+	ON_BN_CLICKED(IDC_REMOVEATTACH_BTN, OnRemoveAttachBtn)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -119,7 +127,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	// The password dots font
 	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, "Tahoma");
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
 	GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fStyle, TRUE);
 	GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fStyle, TRUE);
 	GetDlgItem(IDC_CHECK_HIDEPW)->SetFont(&m_fStyle, TRUE);
@@ -130,7 +138,15 @@ BOOL CAddEntryDlg::OnInitDialog()
 	NewGUI_Button(&m_btRandomPw, -1, -1);
 	NewGUI_Button(&m_btPickIcon, -1, -1);
 	NewGUI_Button(&m_btHidePw, -1, -1);
+	NewGUI_Button(&m_btSetAttachment, IDB_FILE, IDB_FILE);
+	NewGUI_Button(&m_btSaveAttachment, IDB_DISK, IDB_DISK);
+	NewGUI_Button(&m_btRemoveAttachment, IDB_TB_DELETEENTRY, IDB_TB_DELETEENTRY);
 	m_btHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
+
+	m_btRandomPw.SetTooltipText(TRL("Generate a random password..."));
+	m_btSetAttachment.SetTooltipText(TRL("Open file and set as attachment..."));
+	m_btSaveAttachment.SetTooltipText(TRL("Save attached file to disk..."));
+	m_btRemoveAttachment.SetTooltipText(TRL("Remove the currently attached file"));
 
 	// Set the imagelist for the group selector combo box
 	m_pGroups.SetXImageList(m_pParentIcons);
@@ -153,12 +169,17 @@ BOOL CAddEntryDlg::OnInitDialog()
 	::ReleaseDC(NULL, hDC);
 
 	ASSERT(m_pMgr != NULL); // Must have been initialized by parent
-	unsigned int i; PW_GROUP *p;
+	unsigned int i; PW_GROUP *p; USHORT uLevel;
+	CString strAdd;
 	for(i = 0; i < m_pMgr->GetNumberOfGroups(); i++) // Add groups to combo box
 	{
 		p = m_pMgr->GetGroup(i);
 		ASSERT(p != NULL);
-		m_pGroups.AddCTString(WZ_ROOT_INDEX, (BYTE)p->uImageId, p->pszGroupName);
+
+		strAdd.Empty();
+		for(uLevel = 0; uLevel < p->usLevel; uLevel++) strAdd += _T("        ");
+		strAdd += p->pszGroupName;
+		m_pGroups.AddCTString(WZ_ROOT_INDEX, (BYTE)p->uImageId, strAdd);
 	}
 
 	ASSERT(m_nGroupId != -1); // Must have been initialized by parent
@@ -250,6 +271,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 		GetDlgItem(IDC_EDIT_TITLE)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT_TITLE)->SetFocus();
 	}
+
+	UpdateControlsStatus();
 
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
@@ -414,4 +437,115 @@ BOOL CAddEntryDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	}
 	
 	return CDialog::OnNotify(wParam, lParam, pResult);
+}
+
+void CAddEntryDlg::OnSetAttachBtn() 
+{
+	DWORD dwFlags;
+	CString strFilter;
+
+	UpdateData(TRUE);
+
+	strFilter = TRL("All files");
+	strFilter += _T(" (*.*)|*.*||");
+
+	dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
+	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
+	dwFlags |= 0x00080000 | 0x00800000;
+	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	CFileDialog dlg(TRUE, NULL, NULL, dwFlags, strFilter, this);
+
+	if(dlg.DoModal() == IDOK)
+	{
+		int nRet;
+
+		if(m_strAttachment == CString(PWS_NEW_ATTACHMENT)) nRet = IDYES;
+		else if(m_strAttachment.IsEmpty() == FALSE)
+		{
+			CString strMsg;
+			
+			strMsg = TRL("There already is a file attached with this entry.");
+			strMsg += _T("\r\n\r\n");
+			strMsg += TRL("Do you want to overwrite the current attachment?");
+			nRet = MessageBox(strMsg, TRL("Overwrite?"), MB_YESNO | MB_ICONQUESTION);
+		}
+		else nRet = IDYES;
+
+		if(nRet == IDYES)
+			m_strAttachment = CString(PWS_NEW_ATTACHMENT) + dlg.GetPathName();
+	}
+
+	UpdateData(FALSE);
+	UpdateControlsStatus();
+}
+
+void CAddEntryDlg::OnSaveAttachBtn() 
+{
+	UpdateData(TRUE);
+
+	DWORD dwFlags;
+	LPTSTR lp;
+	CString strSample;
+	CString strFilter;
+	PW_ENTRY *pEntry;
+
+	if(m_dwEntryIndex == DWORD_MAX) return;
+
+	pEntry = m_pMgr->GetEntry(m_dwEntryIndex);
+	ASSERT(pEntry != NULL); if(pEntry == NULL) return;
+
+	if(_tcslen(pEntry->pszBinaryDesc) == 0)
+	{
+		MessageBox(TRL("There is no file attached with this entry."), TRL("Password Safe"), MB_ICONINFORMATION);
+		return;
+	}
+
+	strSample = pEntry->pszBinaryDesc;
+
+	strFilter = TRL("All files");
+	strFilter += _T(" (*.*)|*.*||");
+
+	dwFlags = OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+	dwFlags |= OFN_EXTENSIONDIFFERENT;
+	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
+	dwFlags |= 0x00080000 | 0x00800000 | OFN_NOREADONLYRETURN;
+	CFileDialog dlg(FALSE, lp, strSample, dwFlags, strFilter, this);
+
+	if(dlg.DoModal() == IDOK) { m_pMgr->SaveBinaryData(pEntry, dlg.GetPathName()); }
+
+	UpdateData(FALSE);
+	UpdateControlsStatus();
+}
+
+void CAddEntryDlg::OnRemoveAttachBtn() 
+{
+	UpdateData(TRUE);
+	m_strAttachment = CString(PWS_NEW_ATTACHMENT);
+	UpdateData(FALSE);
+	UpdateControlsStatus();
+}
+
+void CAddEntryDlg::UpdateControlsStatus()
+{
+	UpdateData(TRUE);
+
+	if((m_strAttachment.GetLength() == 0) || (m_strAttachment == CString(PWS_NEW_ATTACHMENT)))
+	{
+		m_btSetAttachment.EnableWindow(TRUE);
+		m_btSaveAttachment.EnableWindow(FALSE);
+		m_btRemoveAttachment.EnableWindow(FALSE);
+	}
+	else
+	{
+		m_btSetAttachment.EnableWindow(TRUE);
+
+		if(m_strAttachment.Left((int)_tcslen(PWS_NEW_ATTACHMENT)) != CString(PWS_NEW_ATTACHMENT))
+			m_btSaveAttachment.EnableWindow(TRUE);
+		else
+			m_btSaveAttachment.EnableWindow(FALSE);
+
+		m_btRemoveAttachment.EnableWindow(TRUE);
+	}
+
+	if(m_strTitle == CString(PWS_TAN_ENTRY)) m_btSetAttachment.EnableWindow(FALSE);
 }

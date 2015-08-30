@@ -1,0 +1,14 @@
+REGEDIT4
+
+[-HKEY_CLASSES_ROOT\.kdb]
+
+[-HKEY_CLASSES_ROOT\kdbfile\shell\&Open with KeePass\command]
+
+[-HKEY_CLASSES_ROOT\kdbfile\shell\&Open with KeePass]
+
+[-HKEY_CLASSES_ROOT\kdbfile\shell]
+
+[-HKEY_CLASSES_ROOT\kdbfile\DefaultIcon]
+
+[-HKEY_CLASSES_ROOT\kdbfile]
+

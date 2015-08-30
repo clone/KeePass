@@ -237,7 +237,15 @@ SOURCE=.\res\clientic.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\disk.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\document.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\file.bmp
 # End Source File
 # Begin Source File
 

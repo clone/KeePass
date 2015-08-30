@@ -1,0 +1,19 @@
+REGEDIT4
+
+[HKEY_CLASSES_ROOT\.kdb]
+@="kdbfile"
+
+[HKEY_CLASSES_ROOT\kdbfile]
+@="KeePass Password Database"
+"AlwaysShowExt"=""
+
+[HKEY_CLASSES_ROOT\kdbfile\DefaultIcon]
+@="SHORTPATH,0"
+
+[HKEY_CLASSES_ROOT\kdbfile\shell]
+
+[HKEY_CLASSES_ROOT\kdbfile\shell\&Open with KeePass]
+@="Open with &KeePass"
+
+[HKEY_CLASSES_ROOT\kdbfile\shell\&Open with KeePass\command]
+@="\"LONGPATH\" \"%1\""

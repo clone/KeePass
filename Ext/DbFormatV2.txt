@@ -1,5 +1,5 @@
 -=-=-=-=-=-=-=-=-=-
-* 041118c: DReichl :: LATEST FORMAT
+* : DReichl :: LATEST FORMAT
 -=-=-=-=-=-=-=-=-=-
 
 General structure:
@@ -45,6 +45,8 @@ Notes:
   * 0005: Last access time, FIELDSIZE = 5, FIELDDATA = packed date/time
   * 0006: Expiration time, FIELDSIZE = 5, FIELDDATA = packed date/time
   * 0007: Image ID, FIELDSIZE must be 4 bytes
+  * 0008: Level, FIELDSIZE = 2
+  * 0009: Flags, 32-bit value, FIELDSIZE = 4
   * FFFF: Group entry terminator, FIELDSIZE must be 0
 
 ===============================================================================
@@ -73,6 +75,8 @@ Notes:
   * 000A: Last modification time, FIELDSIZE = 5, FIELDDATA = packed date/time
   * 000B: Last access time, FIELDSIZE = 5, FIELDDATA = packed date/time
   * 000C: Expiration time, FIELDSIZE = 5, FIELDDATA = packed date/time
+  * 000D: Binary description UTF-8 encoded string
+  * 000E: Binary data
   * FFFF: Entry terminator, FIELDSIZE must be 0
 
 ===============================================================================

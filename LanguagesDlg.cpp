@@ -91,7 +91,11 @@ BOOL CLanguagesDlg::OnInitDialog()
 	RECT rcList;
 	m_listLang.GetWindowRect(&rcList);
 	int nColSize = rcList.right - rcList.left - GetSystemMetrics(SM_CXVSCROLL) - 8;
+	nColSize /= 4;
 	m_listLang.InsertColumn(0, TRL("Available Languages"), LVCFMT_LEFT, nColSize, 0);
+	m_listLang.InsertColumn(1, TRL("Language file version"), LVCFMT_LEFT, nColSize, 1);
+	m_listLang.InsertColumn(2, TRL("Author"), LVCFMT_LEFT, nColSize, 2);
+	m_listLang.InsertColumn(3, TRL("Translation author contact"), LVCFMT_LEFT, nColSize, 3);
 
 	m_ilIcons.Create(IDR_CLIENTICONS, 16, 1, RGB(255,0,255));
 	m_listLang.SetImageList(&m_ilIcons, LVSIL_SMALL);
@@ -99,15 +103,37 @@ BOOL CLanguagesDlg::OnInitDialog()
 	m_listLang.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0,
 		LVS_EX_SI_REPORT | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_ONECLICKACTIVATE | LVS_EX_UNDERLINEHOT);
 
+	LV_ITEM lvi;
+
 	m_listLang.DeleteAllItems();
-	m_listLang.InsertItem(LVIF_TEXT | LVIF_IMAGE, m_listLang.GetItemCount(),
+	lvi.iItem = m_listLang.InsertItem(LVIF_TEXT | LVIF_IMAGE, m_listLang.GetItemCount(),
 		"English", 0, 0, 1, NULL);
+
+	CString strTemp;
+	
+	strTemp = PWM_VERSION_STR;
+	lvi.iSubItem = 1; lvi.mask = LVIF_TEXT;
+	lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+	m_listLang.SetItem(&lvi);
+
+	strTemp = _T("Dominik Reichl");
+	lvi.iSubItem = 2; lvi.mask = LVIF_TEXT;
+	lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+	m_listLang.SetItem(&lvi);
+
+	strTemp = _T("dominik.reichl@t-online.de, http://keepass.sourceforge.net");
+	lvi.iSubItem = 3; lvi.mask = LVIF_TEXT;
+	lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+	m_listLang.SetItem(&lvi);
 
 	CFileFind ff;
 	TCHAR szThis[1024];
 	unsigned long i = 0;
 	CString csTmp;
 	BOOL chk_w = FALSE;
+	TCHAR szCurrentlyLoaded[MAX_PATH * 2];
+
+	_tcscpy(szCurrentlyLoaded, GetCurrentTranslationTable());
 
 	GetModuleFileName(NULL, szThis, 1024);
 	for(i = _tcslen(szThis) - 1; i > 1; i--) // Extract dir
@@ -125,12 +151,38 @@ BOOL CLanguagesDlg::OnInitDialog()
 		csTmp.MakeLower();
 		if((csTmp != _T("standard")) && (csTmp != _T("english")))
 		{
-			m_listLang.InsertItem(LVIF_TEXT | LVIF_IMAGE, m_listLang.GetItemCount(),
-				ff.GetFileTitle(), 0, 0, 1, NULL);
+			LoadTranslationTable((LPCTSTR)ff.GetFileTitle());
+
+			strTemp = (LPCTSTR)ff.GetFileTitle();
+			// strTemp += _T(" - ");
+			// strTemp += TRL("~LANGUAGENAME");
+
+			lvi.iItem = m_listLang.InsertItem(LVIF_TEXT | LVIF_IMAGE,
+				m_listLang.GetItemCount(), strTemp, 0, 0, 1, NULL);
+
+			strTemp = TRL("~LANGUAGEVERSION");
+			if(strTemp == _T("~LANGUAGEVERSION")) strTemp.Empty();
+			lvi.iSubItem = 1; lvi.mask = LVIF_TEXT;
+			lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+			m_listLang.SetItem(&lvi);
+
+			strTemp = TRL("~LANGUAGEAUTHOR");
+			if(strTemp == _T("~LANGUAGEAUTHOR")) strTemp.Empty();
+			lvi.iSubItem = 2; lvi.mask = LVIF_TEXT;
+			lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+			m_listLang.SetItem(&lvi);
+
+			strTemp = TRL("~LANGUAGEAUTHOREMAIL");
+			if(strTemp == _T("~LANGUAGEAUTHOREMAIL")) strTemp.Empty();
+			lvi.iSubItem = 3; lvi.mask = LVIF_TEXT;
+			lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+			m_listLang.SetItem(&lvi);
 		}
 	}
 
 	ff.Close();
+
+	VERIFY(LoadTranslationTable(szCurrentlyLoaded));
 
 	return TRUE;
 }

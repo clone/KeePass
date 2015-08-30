@@ -29,6 +29,9 @@
 
 #include "StdAfx.h"
 #include "StrUtil.h"
+#include "../Crypto/sha2.h"
+
+static unsigned char g_shaLastString[32];
 
 void EraseCString(CString *pString)
 {
@@ -58,31 +61,67 @@ void CopyStringToClipboard(const TCHAR *lptString)
 	HGLOBAL globalHandle;
 	LPVOID globalData;
 
-	if(::OpenClipboard(NULL) == FALSE) return;
+	if(OpenClipboard(NULL) == FALSE) return;
 
-	if(::EmptyClipboard() == FALSE) return;
+	if(EmptyClipboard() == FALSE) return;
 
 	if(lptString == NULL) // No string to copy => empty clipboard
 	{
-		::CloseClipboard();
+		CloseClipboard();
 		return;
 	}
 
 	uDataSize = _tcslen(lptString) * sizeof(TCHAR); // Get length
 	if(uDataSize == 0)
 	{
-		::CloseClipboard();
+		CloseClipboard();
 		return;
 	}
 	uDataSize += sizeof(TCHAR); // Plus NULL-terminator of string
 
-	globalHandle = ::GlobalAlloc(GHND | GMEM_DDESHARE, uDataSize);
-	globalData = ::GlobalLock(globalHandle);
+	globalHandle = GlobalAlloc(GHND | GMEM_DDESHARE, uDataSize);
+	globalData = GlobalLock(globalHandle);
 	_tcscpy((TCHAR *)globalData, lptString); // Copy string plus NULL-byte to global memory
-	::GlobalUnlock(globalHandle); // Unlock before SetClipboardData!
+	GlobalUnlock(globalHandle); // Unlock before SetClipboardData!
 
-	::SetClipboardData(CF_TEXT, globalHandle); // Set clipboard data to our global memory block
-	::CloseClipboard(); // Close clipboard, and done
+	VERIFY(SetClipboardData(CF_TEXT, globalHandle)); // Set clipboard data to our global memory block
+	VERIFY(CloseClipboard()); // Close clipboard, and done
+
+	sha256_ctx shactx;
+	sha256_begin(&shactx);
+	sha256_hash((unsigned char *)lptString, uDataSize - sizeof(TCHAR), &shactx);
+	sha256_end(g_shaLastString, &shactx);
+}
+
+void ClearClipboardIfOwner()
+{
+	if(OpenClipboard(NULL) == FALSE) return;
+
+	if((IsClipboardFormatAvailable(CF_TEXT) == FALSE) &&
+		(IsClipboardFormatAvailable(CF_OEMTEXT) == FALSE))
+	{
+		CloseClipboard();
+		return;
+	}
+
+	HANDLE hClipboardData = GetClipboardData(CF_TEXT);
+	TCHAR *lpString = (TCHAR *)GlobalLock(hClipboardData);
+
+	sha256_ctx shactx;
+	unsigned char uHash[32];
+	sha256_begin(&shactx);
+	sha256_hash((unsigned char *)lpString, _tcslen(lpString) * sizeof(TCHAR), &shactx);
+	sha256_end(uHash, &shactx);
+
+	GlobalUnlock(hClipboardData);
+
+	// If we have copied the string to the clipboard, delete it
+	if(memcmp(uHash, g_shaLastString, 32) == 0)
+	{
+		VERIFY(EmptyClipboard());
+	}
+
+	VERIFY(CloseClipboard());
 }
 #endif
 

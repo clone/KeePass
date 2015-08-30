@@ -452,3 +452,55 @@
 |Visa &Inmatnings vy|
 |GUI: Automatically resize table columns when resizing the main window|
 |GUI: Ändra automatiskt kolumnernas storlek vid ändring av huvud fönstret|
+
+|&Copy|
+|&Kopiera|
+|Copy &All|
+|Kopiera &Alla|
+|&Undo|
+|&Ångra|
+|&Paste|
+|&Klistra in|
+|Cu&t|
+|K&lipp ut|
+|&Select All|
+|&Välj alla|
+|&Delete|
+|&Ta bort|
+
+|TAN Wizard|
+|TAN Wizard|
+|&TAN Wizard|
+|&TAN Wizard|
+|Using this wizard you can easily add TAN entries.|
+|Använd den här wizarden för att enkelt lägga till TAN poster.|
+
+|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-numerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only numerical 'substrings' are added as TAN entries.|
+|Klistra in dina TANs i fönstret nedanför. Formatteringen har ingen betydelse, alla icke numeriska tecken ignoreras (nyrad, tabulator, mellanslag mm.) och bara numeriska 'substrängar' läggs till som TAN poster.|
+|<TAN>|
+|<TAN>|
+
+|Print Pre&view...|
+|&Förhandsgranska utskrift...|
+|About &Translation...|
+|Om &Översättning...|
+|Translation information|
+|Översättningsinformation|
+|Currently used language|
+|Aktuellt språk|
+|Language file version|
+|Språkfil version|
+|Author|
+|Översättare|
+|Translation author contact|
+|Kontakta översättare|
+
+|~LANGUAGENAME|
+|Swedish|
+|~LANGUAGEVERSION|
+|Avseed för KeePass 0.92a|
+|~LANGUAGEAUTHOR|
+|Michael Åström|
+|~LANGUAGEAUTHOREMAIL| 
+|linmias@idgmail.se, http://www.xinov.com|
+
