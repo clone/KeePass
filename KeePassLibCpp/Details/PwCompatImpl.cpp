@@ -125,8 +125,8 @@ BOOL CPwCompatImpl::OpenDatabaseV1(CPwManager* pMgr, const TCHAR *pszFile)
 	if((hdr.dwSignature1 != PWM_DBSIG_1) || (hdr.dwSignature2 != PWM_DBSIG_2))
 		{ _OPENDB_FAIL; }
 
-	if(hdr.dwFlags & PWM_FLAG_RIJNDAEL) pMgr->SetAlgorithm(ALGO_AES);
-	else if(hdr.dwFlags & PWM_FLAG_TWOFISH) pMgr->SetAlgorithm(ALGO_TWOFISH);
+	if((hdr.dwFlags & PWM_FLAG_RIJNDAEL) != 0) pMgr->SetAlgorithm(ALGO_AES);
+	else if((hdr.dwFlags & PWM_FLAG_TWOFISH) != 0) pMgr->SetAlgorithm(ALGO_TWOFISH);
 	else { ASSERT(FALSE); _OPENDB_FAIL; }
 
 	BYTE aMasterKeyU[32];
@@ -325,8 +325,8 @@ BOOL CPwCompatImpl::OpenDatabaseV2(CPwManager* pMgr, const TCHAR *pszFile)
 	if((hdr.dwSignature1 != PWM_DBSIG_1) || (hdr.dwSignature2 != PWM_DBSIG_2))
 		{ _OPENDB_FAIL; }
 
-	if(hdr.dwFlags & PWM_FLAG_RIJNDAEL) pMgr->SetAlgorithm(ALGO_AES);
-	else if(hdr.dwFlags & PWM_FLAG_TWOFISH) pMgr->SetAlgorithm(ALGO_TWOFISH);
+	if((hdr.dwFlags & PWM_FLAG_RIJNDAEL) != 0) pMgr->SetAlgorithm(ALGO_AES);
+	else if((hdr.dwFlags & PWM_FLAG_TWOFISH) != 0) pMgr->SetAlgorithm(ALGO_TWOFISH);
 	else { ASSERT(FALSE); _OPENDB_FAIL; }
 
 	BYTE aMasterKeyU[32];

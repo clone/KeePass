@@ -99,6 +99,7 @@ public:
 	BOOL m_bDropToBackOnCopy;
 	BOOL m_bClearClipOnDbClose;
 	BOOL m_bDeleteTANsAfterUse;
+	BOOL m_bUseTransactedFileWrites;
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };

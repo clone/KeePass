@@ -39,6 +39,7 @@
 #include "../../KeePassLibCpp/Util/MemUtil.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
+#include "../../KeePassLibCpp/Util/PwUtil.h"
 #include "../../KeePassLibCpp/PwStructsEx.h"
 
 #include <boost/scoped_array.hpp>
@@ -329,7 +330,7 @@ BOOL GetRegKeyEx(HKEY hkeyBase, LPCTSTR lpSubKey, LPTSTR lpRetData)
 #pragma warning(pop)
 
 std::basic_string<TCHAR> GetRegStrEx(HKEY hkeyBase, LPCTSTR lpSubKey,
-	LPCTSTR lpValue, DWORD dwMaxValueSize)
+	LPCTSTR lpValueName, DWORD dwMaxValueSize)
 {
 	std::basic_string<TCHAR> str;
 
@@ -346,7 +347,7 @@ std::basic_string<TCHAR> GetRegStrEx(HKEY hkeyBase, LPCTSTR lpSubKey,
 
 	ZeroMemory(pData.get(), sizeof(TCHAR) * dwAllocSize);
 
-	const LONG lQuery = RegQueryValueEx(hKey, lpValue, NULL, &dwDataType,
+	const LONG lQuery = RegQueryValueEx(hKey, lpValueName, NULL, &dwDataType,
 		(LPBYTE)pData.get(), &dwDataSize);
 
 	VERIFY(RegCloseKey(hKey) == ERROR_SUCCESS);
@@ -593,7 +594,7 @@ void WU_SysExecute(LPCTSTR lpFile, LPCTSTR lpParameters, HWND hParent)
 		const DWORD dwErr = GetLastError();
 		if(dwErr == dwDummyErr) { SetLastError(dwPrevErr); return; }
 
-		std::basic_string<TCHAR> strErr = WU_FormatSystemMessage(dwErr);
+		std::basic_string<TCHAR> strErr = CPwUtil::FormatSystemMessage(dwErr);
 		if(strErr.size() == 0) { SetLastError(dwPrevErr); return; }
 
 		// Try with CreateProcess API now (supports longer paths)
@@ -827,6 +828,8 @@ BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
 {
 	if(g_nAppHelpSource == APPHS_LOCAL)
 	{
+		// WU_RemoveAppHelpZoneIdentifier();
+
 		TCHAR tszBuf[MAX_PATH * 2];
 		AU_GetApplicationDirectory(tszBuf, MAX_PATH * 2 - 2, TRUE, TRUE);
 
@@ -854,6 +857,18 @@ BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
 
 	return TRUE;
 }
+
+/* void WU_RemoveAppHelpZoneIdentifier()
+{
+	TCHAR tszLocalDir[MAX_PATH * 2];
+	AU_GetApplicationDirectory(tszLocalDir, MAX_PATH * 2 - 2, FALSE, FALSE);
+
+	CString strLocal = tszLocalDir;
+	strLocal += _T("\\");
+	strLocal += PWM_README_FILE;
+
+	AU_RemoveZoneIdentifier(strLocal);
+} */
 
 UINT TWinExec(LPCTSTR lpCmdLine, WORD wCmdShow)
 {
@@ -1017,7 +1032,7 @@ void SafeActivateNextWindow(HWND hWndBase)
 			const LONG lStyle = GetWindowLong(hWnd, GWL_STYLE);
 			GetWindowPlacement(hWnd, &wp);
 
-			if(((lStyle & WS_VISIBLE) == WS_VISIBLE) && (wp.showCmd != SW_SHOWMINIMIZED))
+			if(((lStyle & WS_VISIBLE) != 0) && (wp.showCmd != SW_SHOWMINIMIZED))
 			{
 				if(GetWindowTextLength(hWnd) != 0) break;
 			}
@@ -1070,22 +1085,6 @@ HWND WU_ShowWindowInTaskbar(HWND hWndShow, HWND hParent, BOOL bShow)
 
 		return h;
 	}
-}
-
-std::basic_string<TCHAR> WU_FormatSystemMessage(DWORD dwLastErrorCode)
-{
-	std::basic_string<TCHAR> str;
-	LPTSTR lpBuffer = NULL;
-
-	if(FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, dwLastErrorCode, 0, (LPTSTR)&lpBuffer, 1, NULL) != 0)
-	{
-		str = lpBuffer;
-	}
-
-	if(lpBuffer != NULL) { LocalFree(lpBuffer); lpBuffer = NULL; }
-
-	return str;
 }
 
 #define LCL_WUEE_FAIL { ASSERT(FALSE); SAFE_DELETE_ARRAY(pBuf); return str; }
@@ -1383,3 +1382,29 @@ BOOL WU_RunElevated(LPCTSTR lpExe, LPCTSTR lpArgs, HWND hParent)
 
 	return ShellExecuteEx(&sei);
 }
+
+/* std::basic_string<TCHAR> WU_CreateBackupFile(LPCTSTR lpBaseFile)
+{
+	std::basic_string<TCHAR> strResult;
+	if(lpBaseFile == NULL) { ASSERT(FALSE); return strResult; }
+
+	const std::basic_string<TCHAR> strBase = lpBaseFile;
+	const std::basic_string<TCHAR> strBackup = strBase + _T(".bak");
+
+	const bool bMadeUnhidden = CPwUtil::UnhideFile(strBackup.c_str());
+
+	if(CopyFile(strBase.c_str(), strBackup.c_str(), FALSE) == FALSE)
+	{
+		const DWORD dwResult = GetLastError();
+		if(dwResult != 0) strResult = WU_FormatSystemMessage(dwResult);
+	}
+
+	if(bMadeUnhidden) CPwUtil::HideFile(strBackup.c_str(), true);
+
+	if(strResult.size() > 0)
+	{
+		const std::basic_string<TCHAR> strF = TRL("Failed to create a backup file!");
+		strResult = strBackup + _T("\r\n\r\n") + strF + _T("\r\n\r\n") + strResult;
+	}
+	return strResult;
+} */

@@ -22,7 +22,13 @@
 #include "../Util/MemUtil.h"
 #include "../Util/NewRandom.h"
 #include "../Util/PwUtil.h"
+#include "../Util/FileTransactionEx.h"
 #include "../PwManager.h"
+
+// #ifndef _WIN32_WCE
+// #include <objbase.h>
+// #include <atlconv.h>
+// #endif // _WIN32_WCE
 
 BOOL AU_GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpecial, BOOL bMakeURL)
 {
@@ -118,15 +124,20 @@ BOOL AU_SecureDeleteFile(LPCTSTR pszFilePath)
 }
 #endif
 
-int AU_WriteBigFile(LPCTSTR lpFilePath, const BYTE* pData, DWORD dwDataSize)
+int AU_WriteBigFile(LPCTSTR lpFilePath, const BYTE* pData, DWORD dwDataSize,
+	BOOL bTransacted)
 {
-	const bool bMadeUnhidden = CPwUtil::UnhideFile(lpFilePath);
+	// const bool bMadeUnhidden = CPwUtil::UnhideFile(lpFilePath);
 
-	HANDLE hFile = CreateFile(lpFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
-		FILE_ATTRIBUTE_NORMAL, NULL);
+	CFileTransactionEx ft(lpFilePath, (bTransacted == FALSE) ? false : true);
+	std_string strBufFile;
+	if(!ft.OpenWrite(strBufFile)) return PWE_GETLASTERROR;
+
+	HANDLE hFile = CreateFile(strBufFile.c_str(), GENERIC_WRITE, 0, NULL,
+		CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if(hFile == INVALID_HANDLE_VALUE)
 	{
-		if(bMadeUnhidden) CPwUtil::HideFile(lpFilePath, true);
+		// if(bMadeUnhidden) CPwUtil::HideFile(lpFilePath, true);
 		return PWE_NOFILEACCESS_WRITE;
 	}
 
@@ -153,7 +164,9 @@ int AU_WriteBigFile(LPCTSTR lpFilePath, const BYTE* pData, DWORD dwDataSize)
 	VERIFY(FlushFileBuffers(hFile));
 	VERIFY(CloseHandle(hFile));
 
-	if(bMadeUnhidden) CPwUtil::HideFile(lpFilePath, true);
+	if(!ft.CommitWrite()) return PWE_GETLASTERROR;
+
+	// if(bMadeUnhidden) CPwUtil::HideFile(lpFilePath, true);
 	return nResult;
 }
 
@@ -176,3 +189,51 @@ BOOL AU_IsAtLeastWinVistaSystem()
 
 	return ((osvi.dwMajorVersion >= 6) ? TRUE : FALSE);
 }
+
+/*
+#ifndef _WIN32_WCE
+BOOL _AU_RemoveZoneIdentifier(LPCTSTR lpFile)
+{
+	USES_CONVERSION;
+
+	IPersistFile* pf = NULL;
+	if(CoCreateInstance(CLSID_PersistentZoneIdentifier, NULL, CLSCTX_INPROC_SERVER,
+		IID_IPersistFile, (LPVOID*)&pf) != S_OK) return FALSE;
+
+	LPCOLESTR lpOleFile = T2OLE(lpFile);
+	if(pf->Load(lpOleFile, STGM_READWRITE | STGM_SHARE_EXCLUSIVE) != S_OK) return FALSE;
+
+	IZoneIdentifier* pz = NULL;
+	if(pf->QueryInterface(IID_IZoneIdentifier, (void**)&pz) != S_OK) return FALSE;
+
+	DWORD dwZone = 0;
+	VERIFY(pz->GetId(&dwZone) == S_OK);
+	if(dwZone == URLZONE_INTERNET)
+	{
+		VERIFY(pz->Remove() == S_OK);
+		VERIFY(pf->Save(NULL, TRUE) == S_OK);
+	}
+
+	pz->Release();
+	pf->Release();
+	return TRUE;
+}
+
+BOOL AU_RemoveZoneIdentifier(LPCTSTR lpFile)
+{
+	if(lpFile == NULL) { ASSERT(FALSE); return FALSE; }
+
+	HRESULT hrCo = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	if((hrCo != S_OK) && (hrCo != S_FALSE))
+	{
+		ASSERT(FALSE);
+		return FALSE;
+	}
+
+	const BOOL bResult = _AU_RemoveZoneIdentifier(lpFile);
+
+	CoUninitialize();
+	return bResult;
+}
+#endif // _WIN32_WCE
+*/

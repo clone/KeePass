@@ -17,31 +17,36 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___WINDOW_GROUPS_H___
-#define ___WINDOW_GROUPS_H___
+#ifndef ___GRADIENT_UTIL_H___
+#define ___GRADIENT_UTIL_H___
 
-#include "NewGUICommon.h"
+#include <boost/utility.hpp>
+#include <windows.h>
 
-#define WG_OFFSET_TOP  98
-#define WG_OFFSET_LEFT 25
-#define WG_Y_STEP      20
+#define GU_GF_LIB_NAME _T("MsImg32.dll")
+#define GU_GF_FN_NAME "GradientFill"
 
-#define WGF_REPOSITION 1
+typedef BOOL(WINAPI* LPFNGRADIENTFILL)(HDC hdc, PTRIVERTEX pVertex, ULONG dwNumVertex,
+	PVOID pMesh, ULONG dwNumMesh, ULONG dwMode);
 
-class CWindowGroups
+class CGradientUtil : boost::noncopyable
 {
 public:
-	CWindowGroups();
-	virtual ~CWindowGroups();
+	static void Release();
 
-	BOOL AddWindow(CObject *pWindow, DWORD dwGroupID, BOOL bReposition);
-	BOOL ArrangeWindows(CWnd *pParentWindow);
-	BOOL HideAllExcept(DWORD dwGroupID);
+	static bool IsSupported();
+
+	static bool DrawGradient(HDC hdc, LONG x1, LONG y1, LONG x2, LONG y2,
+		COLORREF clrBase, bool bVertical);
 
 private:
-	CObArray m_aWindows;
-	CDWordArray m_aGroupIDs;
-	CByteArray m_aFlags;
+	CGradientUtil();
+
+	static bool EnsureInitialized();
+
+	static bool m_bInitialized;
+	static HMODULE m_hImgLib;
+	static LPFNGRADIENTFILL m_lpGradientFill;
 };
 
-#endif
+#endif // ___GRADIENT_UTIL_H___

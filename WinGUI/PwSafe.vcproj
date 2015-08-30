@@ -2345,6 +2345,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\lock_ovr.ico"
+				>
+			</File>
+			<File
 				RelativePath="res\locked.ico"
 				>
 			</File>
@@ -3565,6 +3569,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NewGUI\GradientUtil.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\GradientUtil.h"
+				>
+			</File>
+			<File
 				RelativePath="NewGUI\KCSideBannerWnd.cpp"
 				>
 				<FileConfiguration
@@ -4328,6 +4340,34 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="TaskbarListEx"
+				>
+				<File
+					RelativePath=".\NewGUI\TaskbarListEx\TaskbarListEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\NewGUI\TaskbarListEx\TaskbarListEx.h"
+					>
+				</File>
+				<File
+					RelativePath=".\NewGUI\TaskbarListEx\TaskbarListExIdl.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="VistaMenu"
+				>
+				<File
+					RelativePath=".\NewGUI\VistaMenu\VistaMenu.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\NewGUI\VistaMenu\VistaMenu.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="KeePassLibCpp"
@@ -4520,6 +4560,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\KeePassLibCpp\Util\FileTransactionEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\FileTransactionEx.h"
+					>
+				</File>
+				<File
 					RelativePath="..\KeePassLibCpp\Util\MemUtil.cpp"
 					>
 				</File>
@@ -4643,6 +4691,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpFileTransaction.h"
+						>
+					</File>
+					<File
 						RelativePath="..\KeePassLibCpp\SDK\Details\IKpFullPathName.h"
 						>
 					</File>
@@ -4702,6 +4754,14 @@
 			</File>
 			<File
 				RelativePath=".\Plugins\KpDatabaseImpl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Plugins\KpFileTransactionImpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Plugins\KpFileTransactionImpl.h"
 				>
 			</File>
 			<File

@@ -34,11 +34,16 @@ BOOL AU_GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterS
 
 #ifndef _WIN32_WCE
 BOOL AU_SecureDeleteFile(LPCTSTR pszFilePath);
-#endif
+#endif // _WIN32_WCE
 
-int AU_WriteBigFile(LPCTSTR lpFilePath, const BYTE* pData, DWORD dwDataSize);
+int AU_WriteBigFile(LPCTSTR lpFilePath, const BYTE* pData, DWORD dwDataSize,
+	BOOL bTransacted);
 
 BOOL AU_IsWin9xSystem();
 BOOL AU_IsAtLeastWinVistaSystem();
 
-#endif
+// #ifndef _WIN32_WCE
+// BOOL AU_RemoveZoneIdentifier(LPCTSTR lpFile);
+// #endif // _WIN32_WCE
+
+#endif // ___APPLICATION_UTILITIES_H___

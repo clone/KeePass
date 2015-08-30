@@ -112,7 +112,7 @@ UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 	// Both counting and converting routines need update to support surrogates
 	// count UTF-8 needed bytes
 	dwBytesNeeded = 0;
-	for(i = 0; i < dwLength; i++)
+	for(i = 0; i < dwLength; ++i)
 	{
 		ut = pUni[i];
 
@@ -127,7 +127,7 @@ UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 	ASSERT(p != NULL); if(p == NULL) return NULL;
 
 	j = 0;
-	for(i = 0; i < dwLength; i++)
+	for(i = 0; i < dwLength; ++i)
 	{
 		ut = pUni[i];
 

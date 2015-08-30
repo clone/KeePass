@@ -194,10 +194,10 @@ BOOL CPwGeneratorExDlg::OnInitDialog()
 
 	CFont* pDialogFont = m_rbCharSetBased.GetFont();
 
-	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
+	m_fStyle.CreateFont(NewGUI_Scale(-12, this), 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
-	m_fSymbol.CreateFont(-13, 0, 0, 0, 0, FALSE, FALSE, 0,
+	m_fSymbol.CreateFont(NewGUI_Scale(-13, this), 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, CPwSafeApp::GetPasswordFont());
 

@@ -234,7 +234,7 @@ void CEntryListDlg::_AddEntryToList(PW_ENTRY *p, BOOL bExpiredIcon)
 	PW_ENTRY *pwe = p;
 	ASSERT(pwe != NULL);
 
-	const DWORD dwInsertPos = (DWORD)m_cList.GetItemCount();
+	const DWORD dwInsertPos = static_cast<DWORD>(m_cList.GetItemCount());
 
 	LV_ITEM lvi;
 	ZeroMemory(&lvi, sizeof(LV_ITEM));
@@ -242,7 +242,7 @@ void CEntryListDlg::_AddEntryToList(PW_ENTRY *p, BOOL bExpiredIcon)
 	lvi.iSubItem = 0;
 	lvi.iImage = ((bExpiredIcon == TRUE) ? 45 : p->uImageId);
 
-	lvi.mask = LVIF_TEXT | LVIF_IMAGE;
+	lvi.mask = (LVIF_TEXT | LVIF_IMAGE);
 	PW_GROUP *pwg = m_pMgr->GetGroupById(pwe->uGroupId);
 	ASSERT(pwg != NULL); if(pwg == NULL) return;
 	lvi.pszText = pwg->pszGroupName;

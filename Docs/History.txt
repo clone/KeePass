@@ -1,3 +1,40 @@
+09/12/05 - 1.17
+- Added option to use file transactions when writing databases
+  (enabled by default; writing to a temporary file and
+  replacing the actual file afterwards avoids data loss when
+  KeePass is prevented from saving the database completely)
+- Added high DPI support
+- The Ctrl+E shortcut key now jumps to the quick search box
+- In the main entry list, backup entries are now rendered with
+  green text color
+- Menus are now rendered with gradient item backgrounds
+- Added support for detecting KeePass 2.08 and higher KDBX
+  database files
+- Added {GOOGLECHROME} placeholder, which is replaced by the
+  executable path of Google Chrome, if installed
+- Added '--auto-type' command line option
+- Added '--lock-all' and '--unlock-all' command line options to
+  lock/unlock the workspaces of all other KeePass instances
+- Added 'KeeConfigFileOverrideGlobal' and
+  'KeeConfigFileOverrideUser' configuration options to change
+  the locations of the configuration files
+- On Windows 7, KeePass now shows a 'locked' overlay icon on
+  the taskbar button when the database is locked
+- On Windows 7, when opening/saving a database, the taskbar
+  button is now animated using an indeterminate progress bar
+
+- Most broadcasted Windows messages do not wait for hanging
+  applications anymore
+- Improved multi-byte characters support in entry details view
+- Improved toolbar updating after restoring from tray
+- Improved naming of options to clarify their meaning
+- Improved tray icon updating
+- Improved behavior on KDBX error
+- Upgraded installer
+- Various performance improvements
+- Various code optimizations
+- Minor other improvements
+
 09/06/06 - 1.16
 - Added option to use Windows' CNG/BCrypt API for key
   transformations (about 50% faster than the KeePass built-in

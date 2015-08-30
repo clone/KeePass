@@ -23,6 +23,8 @@
 #include "../../KeePassLibCpp/SysDefEx.h"
 #include "NewGUICommon.h"
 
+#define CLCIF_HIGHLIGHT_GREEN 1
+
 /////////////////////////////////////////////////////////////////////////////
 
 class CCustomListCtrlEx : public CListCtrl

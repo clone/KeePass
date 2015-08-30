@@ -25,6 +25,7 @@
 #include "KpCommandLineImpl.h"
 #include "KpFullPathNameImpl.h"
 #include "KpCommandLineOptionImpl.h"
+#include "KpFileTransactionImpl.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
 #include "../../KeePassLibCpp/Util/MemUtil.h"
@@ -105,6 +106,13 @@ STDMETHODIMP CKpApiImpl::CreateInstanceEx(REFCLSID rclsid, REFIID riid, void** p
 
 		CKpCommandLineOptionImpl* pOpt = new CKpCommandLineOptionImpl((LPCTSTR)lParamL);
 		KP_QUERY_INTERFACE_RELEASE_LOCAL_RET(pOpt, riid, ppvObject);
+	}
+	if(rclsid == CLSID_KpFileTransaction)
+	{
+		if(lParamW != 0) return E_FAIL;
+
+		CKpFileTransactionImpl* pTx = new CKpFileTransactionImpl((LPCTSTR)lParamL);
+		KP_QUERY_INTERFACE_RELEASE_LOCAL_RET(pTx, riid, ppvObject);
 	}
 
 	return this->CreateInstance(rclsid, riid, ppvObject);

@@ -105,7 +105,6 @@ void NewGUI_SetImgButtons(BOOL bImageButtons)
 
 void NewGUI_SetThemeHelper(void *pThemeHelper)
 {
-	ASSERT(pThemeHelper != NULL);
 	g_pThemeHelper = (CThemeHelperST *)pThemeHelper;
 
 	if(g_pThemeHelper != NULL)
@@ -282,6 +281,18 @@ void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
 	ASSERT(pParentWnd != NULL); if(pParentWnd == NULL) return;
 
 	p->Attach(pParent, KCSB_ATTACH_TOP);
+
+	const int nSize = p->GetSize();
+	const int nNewSize = NewGUI_Scale(nSize, pParent);
+	if(nNewSize != nSize) p->SetSize(nNewSize);
+
+	const CSize sEdgeOffset = p->GetEdgeOffset();
+	CSize sNewEdgeOffset = NewGUI_Scale(sEdgeOffset, pParent);
+	if(sNewEdgeOffset != sEdgeOffset) p->SetEdgeOffset(sNewEdgeOffset);
+
+	const CSize sCaptionOffset = p->GetCaptionOffset();
+	CSize sNewCaptionOffset = NewGUI_Scale(sCaptionOffset, pParent);
+	if(sNewCaptionOffset != sCaptionOffset) p->SetCaptionOffset(sNewCaptionOffset);
 
 	p->SetColBkg(m_crBannerStart);
 	p->SetColBkg2(m_crBannerEnd);
@@ -666,4 +677,46 @@ void NewGUI_DeselectAllItems(CListCtrl* pCtrl)
 void NewGUI_SetShield(CButton& rButton, BOOL bSetShield)
 {
 	rButton.SendMessage(BCM_SETSHIELD, 0, bSetShield);
+}
+
+int NewGUI_Scale(int nPixels, CWnd* pParentWindow)
+{
+	if(pParentWindow == NULL) { ASSERT(FALSE); return nPixels; }
+
+	CDC* pDC = pParentWindow->GetDC();
+	CFont* pFont = pParentWindow->GetFont();
+	if((pDC == NULL) || (pFont == NULL)) { ASSERT(FALSE); return nPixels; }
+
+	const double dDpi = static_cast<double>(GetDeviceCaps(pDC->m_hDC, LOGPIXELSY));
+	const double dScaleDpi = (dDpi / 96.0);
+
+	LOGFONT lf;
+	ZeroMemory(&lf, sizeof(LOGFONT));
+	if(pFont->GetLogFont(&lf) == 0) { ASSERT(FALSE); return nPixels; }
+
+	const double dy = fabs((72.0 * static_cast<double>(lf.lfHeight)) / dDpi);
+	const double dScaleFont = (dy / 8.25);
+
+	return static_cast<int>(floor((static_cast<double>(nPixels) *
+		dScaleDpi * dScaleFont) + 0.5));
+}
+
+CSize NewGUI_Scale(const CSize& rSize, CWnd* pParentWindow)
+{
+	CSize sNew;
+	sNew.cx = NewGUI_Scale(rSize.cx, pParentWindow);
+	sNew.cy = NewGUI_Scale(rSize.cy, pParentWindow);
+	return sNew;
+}
+
+COLORREF NewGUI_ColorToGrayscale(COLORREF clr)
+{
+	int l = static_cast<int>((0.3f * static_cast<float>(GetRValue(clr))) +
+		(0.59f * static_cast<float>(GetGValue(clr))) +
+		(0.11f * static_cast<float>(GetBValue(clr))));
+	
+	if(l < 0) l = 0;
+	else if(l >= 256) l = 255;
+
+	return RGB(l, l, l);
 }

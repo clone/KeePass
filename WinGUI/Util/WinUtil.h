@@ -66,7 +66,7 @@ CString GetShortestAbsolutePath(LPCTSTR lpFilePath);
 
 BOOL GetRegKeyEx(HKEY hkey, LPCTSTR lpSubKey, LPTSTR lpRetData);
 std::basic_string<TCHAR> GetRegStrEx(HKEY hkeyBase, LPCTSTR lpSubKey,
-	LPCTSTR lpValue, DWORD dwMaxValueSize);
+	LPCTSTR lpValueName, DWORD dwMaxValueSize);
 BOOL OpenUrlInNewBrowser(LPCTSTR lpURL);
 BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser);
 
@@ -94,6 +94,7 @@ std::vector<std::basic_string<TCHAR> > WU_GetFileNames(BOOL bOpenMode,
 int WU_GetAppHelpSource();
 void WU_SetAppHelpSource(int nSource);
 BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile);
+// void WU_RemoveAppHelpZoneIdentifier();
 
 UINT TWinExec(LPCTSTR lpCmdLine, WORD uCmdShow);
 
@@ -109,8 +110,6 @@ std::basic_string<TCHAR> WU_GetUserName();
 void SafeActivateNextWindow(HWND hWndBase);
 
 HWND WU_ShowWindowInTaskbar(HWND hWndShow, HWND hParent, BOOL bShow);
-
-std::basic_string<TCHAR> WU_FormatSystemMessage(DWORD dwLastErrorCode);
 
 std::basic_string<TCHAR> WU_ExpandEnvironmentVars(LPCTSTR lpSrc);
 
@@ -139,5 +138,7 @@ HRESULT WU_CreateDirectoryTree(LPCTSTR lpDirPath);
 bool WU_IsCommandLineURL(const CString& strURL);
 
 BOOL WU_RunElevated(LPCTSTR lpExe, LPCTSTR lpArgs, HWND hParent);
+
+// std::basic_string<TCHAR> WU_CreateBackupFile(LPCTSTR lpBaseFile);
 
 #endif

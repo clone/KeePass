@@ -93,7 +93,8 @@ HRESULT CKeyTransformBCrypt::_InitBCrypt(BCRYPT_ALG_HANDLE& hAes, BCRYPT_KEY_HAN
 	pKeyObj.reset(new UCHAR[dwKeyObjLen]);
 
 	if(m_lpBCryptSetProperty(hAes, BCRYPT_CHAINING_MODE, (PUCHAR)BCRYPT_CHAIN_MODE_ECB,
-		(wcslen(BCRYPT_CHAIN_MODE_ECB) + 1) * sizeof(wchar_t), 0) != 0) KTBC_FAIL;
+		static_cast<ULONG>((wcslen(BCRYPT_CHAIN_MODE_ECB) + 1) * sizeof(wchar_t)), 0) != 0)
+		KTBC_FAIL;
 
 	BCRYPT_KEY_DATA_BLOB_32 keyBlob;
 	ZeroMemory(&keyBlob, sizeof(BCRYPT_KEY_DATA_BLOB_32));

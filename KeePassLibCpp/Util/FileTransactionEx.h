@@ -17,31 +17,32 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___WINDOW_GROUPS_H___
-#define ___WINDOW_GROUPS_H___
+#ifndef ___FILE_TRANSACTION_EX_H___
+#define ___FILE_TRANSACTION_EX_H___
 
-#include "NewGUICommon.h"
+#pragma once
 
-#define WG_OFFSET_TOP  98
-#define WG_OFFSET_LEFT 25
-#define WG_Y_STEP      20
+#include <string>
+#include <tchar.h>
 
-#define WGF_REPOSITION 1
+typedef std::basic_string<TCHAR> std_string;
 
-class CWindowGroups
+class CFileTransactionEx
 {
 public:
-	CWindowGroups();
-	virtual ~CWindowGroups();
+	CFileTransactionEx(LPCTSTR lpBaseFile, bool bTransacted);
 
-	BOOL AddWindow(CObject *pWindow, DWORD dwGroupID, BOOL bReposition);
-	BOOL ArrangeWindows(CWnd *pParentWindow);
-	BOOL HideAllExcept(DWORD dwGroupID);
+	bool OpenWrite(std_string& strOutBufferFile);
+	bool CommitWrite();
 
 private:
-	CObArray m_aWindows;
-	CDWordArray m_aGroupIDs;
-	CByteArray m_aFlags;
+	bool CommitWriteTransaction();
+
+	bool m_bTransacted;
+	std_string m_strBaseFile;
+	std_string m_strTempFile;
+
+	bool m_bMadeUnhidden;
 };
 
-#endif
+#endif // ___FILE_TRANSACTION_EX_H___

@@ -39,6 +39,24 @@ typedef struct _PG_TREENODE
 	std::vector<boost::shared_ptr<_PG_TREENODE> > vChildNodes;
 } PG_TREENODE;
 
+template<typename T>
+class CNullableEx : boost::noncopyable
+{
+public:
+	CNullableEx() : m_bHasValue(false), m_tValue() { }
+	CNullableEx(const T& t) : m_bHasValue(true), m_tValue(t) { }
+
+	bool HasValue() const { return m_bHasValue; }
+	const T& GetValue() const { return m_tValue; }
+	T* GetValuePtr() { return &m_tValue; }
+
+	void SetValue(const T& t) { m_bHasValue = true; m_tValue = t; }
+
+private:
+	bool m_bHasValue;
+	T m_tValue;
+};
+
 class CPwUtil : boost::noncopyable
 {
 private:
@@ -90,8 +108,13 @@ public:
 	static void CheckGroupList(CPwManager* pMgr);
 #endif
 
+	static std::basic_string<TCHAR> FormatSystemMessage(DWORD dwLastErrorCode);
+
 	static bool UnhideFile(LPCTSTR lpFile);
 	static bool HideFile(LPCTSTR lpFile, bool bHide);
+
+	static CNullableEx<FILETIME> GetFileCreationTime(LPCTSTR lpFile);
+	static bool SetFileCreationTime(LPCTSTR lpFile, const FILETIME* pTime);
 
 private:
 	inline static BOOL ConvertStrToHex(char ch1, char ch2, BYTE& bt);

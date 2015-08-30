@@ -25,6 +25,7 @@
 std::basic_string<TCHAR> AppLocator::m_strIEPath;
 std::basic_string<TCHAR> AppLocator::m_strFirefoxPath;
 std::basic_string<TCHAR> AppLocator::m_strOperaPath;
+std::basic_string<TCHAR> AppLocator::m_strChromePath;
 
 AppLocator::AppLocator()
 {
@@ -43,6 +44,7 @@ void AppLocator::FillPlaceholders(CString* pString, const SPR_CONTENT_FLAGS* pcf
 	AppLocator::ReplacePath(pString, _T("{INTERNETEXPLORER}"), m_strIEPath, pcf);
 	AppLocator::ReplacePath(pString, _T("{FIREFOX}"), m_strFirefoxPath, pcf);
 	AppLocator::ReplacePath(pString, _T("{OPERA}"), m_strOperaPath, pcf);
+	AppLocator::ReplacePath(pString, _T("{GOOGLECHROME}"), m_strChromePath, pcf);
 }
 
 void AppLocator::ReplacePath(CString* p, LPCTSTR lpPlaceholder,
@@ -76,6 +78,7 @@ void AppLocator::GetPaths()
 	if(m_strIEPath.size() == 0) AppLocator::FindInternetExplorer();
 	if(m_strFirefoxPath.size() == 0) AppLocator::FindFirefox();
 	if(m_strOperaPath.size() == 0) AppLocator::FindOpera();
+	if(m_strChromePath.size() == 0) AppLocator::FindChrome();
 }
 
 void AppLocator::FindInternetExplorer()
@@ -106,6 +109,13 @@ void AppLocator::FindOpera()
 {
 	LPCTSTR lpPath = _T("SOFTWARE\\Clients\\Mail\\Opera\\shell\\open\\command");
 	m_strOperaPath = AppLocator::Fix(GetRegStrEx(HKEY_LOCAL_MACHINE,
+		lpPath, _T(""), 0));
+}
+
+void AppLocator::FindChrome()
+{
+	LPCTSTR lpPath = _T("Applications\\chrome.exe\\shell\\open\\command");
+	m_strChromePath = AppLocator::Fix(GetRegStrEx(HKEY_CLASSES_ROOT,
 		lpPath, _T(""), 0));
 }
 

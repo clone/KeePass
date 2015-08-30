@@ -46,16 +46,16 @@ void EraseCString(CString *pString)
 
 void EraseWCharVector(std::vector<WCHAR>& vBuffer)
 {
-	for(DWORD i = 0; i < vBuffer.size(); ++i)
-		vBuffer[i] = 0;
+	const DWORD dwBufSize = vBuffer.size();
+	for(DWORD i = 0; i < dwBufSize; ++i) vBuffer[i] = 0;
 
 	vBuffer.clear();
 }
 
 void EraseTCharVector(std::vector<TCHAR>& vBuffer)
 {
-	for(DWORD i = 0; i < vBuffer.size(); ++i)
-		vBuffer[i] = 0;
+	const DWORD dwBufSize = vBuffer.size();
+	for(DWORD i = 0; i < dwBufSize; ++i) vBuffer[i] = 0;
 
 	vBuffer.clear();
 }
@@ -169,7 +169,7 @@ void _UuidToString(const BYTE *pUuid, CString *pstrDest)
 	ASSERT(pstrDest != NULL);
 
 	pstrDest->Empty();
-	for(int i = 0; i < 16; i++)
+	for(int i = 0; i < 16; ++i)
 	{
 		strTemp.Format(_T("%02x"), pUuid[i]);
 		*pstrDest += strTemp;
@@ -430,21 +430,19 @@ void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 CString CsRemoveMeta(CString *psString)
 {
 	CString str = _T(""), strLower;
-	int nPos, nCount;
 	LPCTSTR lpRemove = NULL;
-	int i;
 
 	ASSERT(psString != NULL); if(psString == NULL) return str;
 
 	str = *psString;
 	strLower = str; strLower = strLower.MakeLower();
 
-	for(i = 0; i < 2; i++)
+	for(int i = 0; i < 2; ++i)
 	{
 		if(i == 0) lpRemove = _T("auto-type:");
 		else if(i == 1) lpRemove = _T("auto-type-window:");
 
-		nPos = strLower.Find(lpRemove, 0);
+		int nPos = strLower.Find(lpRemove, 0);
 		if(nPos != -1)
 		{
 			if(nPos != 0)
@@ -452,7 +450,7 @@ CString CsRemoveMeta(CString *psString)
 			if(nPos != 0)
 				if(strLower.GetAt(nPos - 1) == _T('\r')) nPos -= 1;
 
-			nCount = strLower.Find(_T('\n'), (int)(nPos + _tcslen(lpRemove) - 1));
+			int nCount = strLower.Find(_T('\n'), (int)(nPos + _tcslen(lpRemove) - 1));
 			if(nCount == -1) nCount = strLower.GetLength() - nPos;
 			else nCount -= nPos - 1;
 
@@ -485,7 +483,7 @@ CString CsFileOnly(const CString *psFilePath)
 TCHAR *MakeSafeXmlString(const TCHAR *ptString)
 {
 	size_t i, j;
-	size_t dwStringLen, dwNeededChars = 0, dwOutPos = 0;
+	size_t dwNeededChars = 0, dwOutPos = 0;
 	TCHAR tch;
 	BOOL bFound;
 	TCHAR *pFinal;
@@ -502,14 +500,13 @@ TCHAR *MakeSafeXmlString(const TCHAR *ptString)
 
 	ASSERT(ptString != NULL); if(ptString == NULL) return NULL;
 
-	dwStringLen = _tcslen(ptString);
-
-	for(i = 0; i < dwStringLen; i++)
+	const size_t dwStringLen = _tcslen(ptString);
+	for(i = 0; i < dwStringLen; ++i)
 	{
 		tch = ptString[i];
 
 		bFound = FALSE;
-		for(j = 0; j < LOCAL_NUMXMLCONV; j++)
+		for(j = 0; j < LOCAL_NUMXMLCONV; ++j)
 		{
 			if(tch == aChar[j])
 			{
@@ -517,18 +514,18 @@ TCHAR *MakeSafeXmlString(const TCHAR *ptString)
 				bFound = TRUE;
 			}
 		}
-		if(bFound == FALSE) dwNeededChars++;
+		if(bFound == FALSE) ++dwNeededChars;
 	}
 
 	pFinal = new TCHAR[dwNeededChars + 4];
 	ASSERT(pFinal != NULL); if(pFinal == NULL) return NULL;
 
-	for(i = 0; i < dwStringLen; i++)
+	for(i = 0; i < dwStringLen; ++i)
 	{
 		tch = ptString[i];
 
 		bFound = FALSE;
-		for(j = 0; j < LOCAL_NUMXMLCONV; j++)
+		for(j = 0; j < LOCAL_NUMXMLCONV; ++j)
 		{
 			if(tch == aChar[j])
 			{
@@ -849,7 +846,8 @@ CStringSetEx::~CStringSetEx()
 
 void CStringSetEx::Clear()
 {
-	for(size_t i = 0; i < m_vStrings.size(); ++i)
+	const size_t uStringCount = m_vStrings.size();
+	for(size_t i = 0; i < uStringCount; ++i)
 		SAFE_DELETE_ARRAY(m_vStrings[i]);
 
 	m_vStrings.clear();
@@ -859,7 +857,8 @@ LPCTSTR CStringSetEx::Add(LPCTSTR lpString)
 {
 	if(lpString == NULL) { ASSERT(FALSE); return NULL; }
 
-	for(size_t i = 0; i < m_vStrings.size(); ++i)
+	const size_t uStringCount = m_vStrings.size();
+	for(size_t i = 0; i < uStringCount; ++i)
 	{
 		if(_tcscmp(m_vStrings[i], lpString) == 0)
 			return m_vStrings[i];

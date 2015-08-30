@@ -35,6 +35,7 @@
 #include "stdafx.h"        // Standard windows header file
 #include "BCMenu.h"        // BCMenu class declaration
 #include <afxpriv.h>       //SK: makes A2W and other spiffy AFX macros work
+#include "GradientUtil.h"  //DR: support for drawing gradients
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -736,7 +737,10 @@ void BCMenu::DrawItem_WinXP (LPDRAWITEMSTRUCT lpDIS)
 
 			CPen *pOldPen = pDC->SelectObject (&m_penBack);
 
-			pDC->FillRect (rect,&m_brSelect);
+			if(!CGradientUtil::DrawGradient (pDC->m_hDC, rect.left, rect.top, rect.right,
+				rect.bottom, crSelectFill, true)) // DR: Added
+				pDC->FillRect (rect,&m_brSelect);
+
 			pDC->Draw3dRect (rect,crSelect,crSelect);
 
 			pDC->SelectObject (pOldPen);
@@ -804,7 +808,7 @@ void BCMenu::DrawItem_WinXP (LPDRAWITEMSTRUCT lpDIS)
 					pDC->Draw3dRect(rect2,crSelect,crSelect);
 					ptImage.x-=1;ptImage.y-=1;
 				}
-				else pDC->FillRect (rect2,&m_brSelect);
+				else if(!CGradientUtil::IsSupported()) pDC->FillRect (rect2,&m_brSelect); // DR: Added condition
 				if(bitmap){
 					// if(CanDraw3D&&!(state&ODS_CHECKED)){
 						// CPoint ptImage1(ptImage.x+1,ptImage.y+1);

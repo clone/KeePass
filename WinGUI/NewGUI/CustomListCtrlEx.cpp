@@ -32,17 +32,12 @@ static char THIS_FILE[] = __FILE__;
 
 CCustomListCtrlEx::CCustomListCtrlEx()
 {
-	HDC hDC = NULL;
-	int nBitsPerPixel = 0;
-
-	hDC = ::GetDC(NULL);
-	nBitsPerPixel = GetDeviceCaps(hDC, BITSPIXEL);
+	HDC hDC = ::GetDC(NULL);
+	const int nBitsPerPixel = GetDeviceCaps(hDC, BITSPIXEL);
 	::ReleaseDC(NULL, hDC);
+	m_bColorize = ((nBitsPerPixel > 8) ? TRUE : FALSE);
 
-	if(nBitsPerPixel > 8) m_bColorize = TRUE;
-	else m_bColorize = FALSE;
-
-	m_rgbRowColor = RGB(238,238,255);
+	m_rgbRowColor = RGB(238, 238, 255);
 
 	m_pParentI = NULL;
 	m_pbShowColumns = NULL;
@@ -86,24 +81,18 @@ void CCustomListCtrlEx::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 		// Windows to draw the subitem itself, but it will use the new colors
 		// we set here.
 
+		crText = RGB(0, 0, 0);
 		if(m_bColorize == TRUE) // Colorize the list only if enough colors are available
 		{
-			if(pLVCD->nmcd.dwItemSpec & 1) // Uneven item number
-			{
-				crText = RGB(0,0,0);
+			if((pLVCD->nmcd.dwItemSpec & 1) != 0) // Uneven item number
 				crBkgnd = m_rgbRowColor;
-			}
 			else // Even item number
-			{
-				crText = RGB(0,0,0);
-				crBkgnd = RGB(255,255,255);
-			}
+				crBkgnd = RGB(255, 255, 255);
 		}
-		else
-		{
-			crText = RGB(0,0,0);
-			crBkgnd = RGB(255,255,255);
-		}
+		else crBkgnd = RGB(255, 255, 255);
+
+		if((pLVCD->nmcd.lItemlParam & CLCIF_HIGHLIGHT_GREEN) != 0)
+			crText = RGB(0, 128, 0);
 
 		// Store the colors into the NMLVCUSTOMDRAW struct
 		pLVCD->clrText = crText;
@@ -113,9 +102,8 @@ void CCustomListCtrlEx::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 BOOL CCustomListCtrlEx::PreCreateWindow(CREATESTRUCT& cs) 
 {
-	cs.style &= ~LVS_TYPEMASK;
-	cs.style &= ~LVS_SHOWSELALWAYS;
-	cs.style |= LVS_REPORT | LVS_OWNERDRAWFIXED;
+	cs.style &= ~(LVS_TYPEMASK | LVS_SHOWSELALWAYS);
+	cs.style |= (LVS_REPORT | LVS_OWNERDRAWFIXED);
 
 	return CListCtrl::PreCreateWindow(cs);
 }
@@ -138,16 +126,13 @@ void CCustomListCtrlEx::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	ASSERT(m_pParentI != NULL); if(m_pParentI == NULL) return;
 	((CPwSafeDlg *)m_pParentI)->NotifyUserActivity();
 
-	if(nFlags & 0x2000)
+	if((nFlags & 0x2000) != 0)
 	{
 		if((nChar == VK_UP) || (nChar == VK_DOWN) || (nChar == VK_HOME) || (nChar == VK_END))
 			((CPwSafeDlg *)m_pParentI)->_ProcessListKey(nChar, TRUE);
 		else CListCtrl::OnSysKeyDown(nChar, nRepCnt, nFlags);
 	}
-	else
-	{
-		CListCtrl::OnSysKeyDown(nChar, nRepCnt, nFlags);
-	}
+	else CListCtrl::OnSysKeyDown(nChar, nRepCnt, nFlags);
 }
 
 BOOL CCustomListCtrlEx::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult) 

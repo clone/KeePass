@@ -62,10 +62,13 @@ public:
 	// file), without a terminating separator
 	std::basic_string<TCHAR> GetUserPath() const { return m_strUserPath; }
 
+	void LoadStaticConfigFileOverrides();
+
 private:
 	void GetConfigPaths();
 	void FlushGlobal(BOOL bDeleteCache);
 	void PrepareUserWrite();
+	void ApplyFileOverrides();
 
 	BOOL GetIn(LPCTSTR pszField, LPTSTR pszValue, int nConfigID) const;
 	BOOL SetIn(LPCTSTR pszField, LPCTSTR pszValue, int nConfigID);

@@ -74,6 +74,8 @@ public:
 	/// created with the IKpAPI::CreateInstance method.
 	/// @param rclsid Class ID. Supported class IDs include but are not limited to:
 	/// - CLSID_KpFullPathName (object wrapping a path).
+	/// - CLSID_KpCommandLineOption (object wrapping a command line option).
+	/// - CLSID_KpFileTransaction (file transaction object).
 	/// - All CLSIDs that are supported by IKpAPI::CreateInstance.
 	/// - For a complete list of supported class IDs, see the KpGuids.h file.
 	/// @param riid ID of the interface requested for the new object.

@@ -17,31 +17,30 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___WINDOW_GROUPS_H___
-#define ___WINDOW_GROUPS_H___
+/*
+#ifndef ___VISTA_MENU_H___
+#define ___VISTA_MENU_H___
 
-#include "NewGUICommon.h"
+#pragma once
 
-#define WG_OFFSET_TOP  98
-#define WG_OFFSET_LEFT 25
-#define WG_Y_STEP      20
+#include <afxtempl.h>
+#include <vector>
 
-#define WGF_REPOSITION 1
-
-class CWindowGroups
+class CVistaMenu : public CMenu
 {
-public:
-	CWindowGroups();
-	virtual ~CWindowGroups();
+	DECLARE_DYNAMIC(CVistaMenu)
 
-	BOOL AddWindow(CObject *pWindow, DWORD dwGroupID, BOOL bReposition);
-	BOOL ArrangeWindows(CWnd *pParentWindow);
-	BOOL HideAllExcept(DWORD dwGroupID);
+public:
+	CVistaMenu();
+	virtual ~CVistaMenu();
+
+	void LoadToolbar(UINT uToolBar, UINT uBitmap);
 
 private:
-	CObArray m_aWindows;
-	CDWordArray m_aGroupIDs;
-	CByteArray m_aFlags;
+	void DeleteBitmaps();
+
+	std::vector<CBitmap*> m_vBitmaps;
 };
 
-#endif
+#endif // ___VISTA_MENU_H___
+*/

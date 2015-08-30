@@ -32,6 +32,8 @@
 #include "Util/CmdLine/Executable.h"
 #include "Plugins/KpCommandLineImpl.h"
 #include "Plugins/KpUtilitiesImpl.h"
+#include "NewGUI/TaskbarListEx/TaskbarListEx.h"
+#include "NewGUI/GradientUtil.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -122,14 +124,17 @@ BOOL CPwSafeApp::InitInstance()
 	CPwSafeDlg dlg;
 	m_pMainWnd = &dlg;
 
-	CPrivateConfigEx *pc = new CPrivateConfigEx(FALSE);
+	CPrivateConfigEx* pc = new CPrivateConfigEx(FALSE);
 	if(pc != NULL)
 	{
+		pc->LoadStaticConfigFileOverrides();
+
 		dlg.m_bCheckForInstance = pc->GetBool(PWMKEY_SINGLEINSTANCE, FALSE);
 		CMemoryProtectionEx::SetEnabledAtStart(pc->GetBool(PWMKEY_USEDPAPIFORMEMPROT, TRUE));
 		*CKeyTransformBCrypt::GetEnabledPtr() = pc->GetBool(PWMKEY_USECNGBCRYPTFORKEYT, TRUE);
 		delete pc; pc = NULL;
 	}
+	else { ASSERT(FALSE); }
 
 	if(dlg.m_bCheckForInstance == TRUE)
 	{
@@ -194,11 +199,13 @@ BOOL CPwSafeApp::InitInstance()
 	}
 
 	NSCAPI_Initialize(); // Initialize natural string comparison API
+	CTaskbarListEx::Initialize();
 
 	const INT_PTR nResponse = dlg.DoModal();
 	if(nResponse == IDOK) { }
 	else if(nResponse == IDCANCEL) { }
 
+	CTaskbarListEx::Release(false);
 	NSCAPI_Exit(); // Clean up natural string comparison API
 
 	this->_App_CleanUp();
@@ -208,6 +215,7 @@ BOOL CPwSafeApp::InitInstance()
 void CPwSafeApp::_App_CleanUp()
 {
 	NewGUI_CleanUp();
+	CGradientUtil::Release();
 	CKpCommandLineImpl::ClearStatic();
 	CMemoryProtectionEx::Release();
 }
@@ -592,7 +600,7 @@ LPCTSTR CPwSafeApp::GetPasswordFont()
 {
 	if((IsMBThreadACP() == TRUE) || (g_bForceSimpleAsterisks == TRUE))
 		return g_pFontNameNormal;
-	return (TCHAR *)g_pFontNameSymbol;
+	return (LPCTSTR)g_pFontNameSymbol;
 }
 
 BOOL CPwSafeApp::ProcessControlCommands()
@@ -606,8 +614,32 @@ BOOL CPwSafeApp::ProcessControlCommands()
 	if((strCmdLine.Right(9) == _T("-exit-all")) ||
 		(strCmdLine.Right(9) == _T("/exit-all")))
 	{
-		::SendMessage(HWND_BROADCAST, CPwSafeDlg::GetKeePassControlMessageID(),
+		::PostMessage(HWND_BROADCAST, CPwSafeDlg::GetKeePassControlMessageID(),
 			KPCM_EXIT, 0);
+		return TRUE;
+	}
+
+	if((strCmdLine.Right(10) == _T("-auto-type")) ||
+		(strCmdLine.Right(10) == _T("/auto-type")))
+	{
+		::PostMessage(HWND_BROADCAST, CPwSafeDlg::GetKeePassControlMessageID(),
+			KPCM_AUTOTYPE, 0);
+		return TRUE;
+	}
+
+	if((strCmdLine.Right(9) == _T("-lock-all")) ||
+		(strCmdLine.Right(9) == _T("/lock-all")))
+	{
+		::PostMessage(HWND_BROADCAST, CPwSafeDlg::GetKeePassControlMessageID(),
+			KPCM_LOCK, 0);
+		return TRUE;
+	}
+
+	if((strCmdLine.Right(11) == _T("-unlock-all")) ||
+		(strCmdLine.Right(11) == _T("/unlock-all")))
+	{
+		::PostMessage(HWND_BROADCAST, CPwSafeDlg::GetKeePassControlMessageID(),
+			KPCM_UNLOCK, 0);
 		return TRUE;
 	}
 
@@ -649,7 +681,7 @@ BOOL CPwSafeApp::ProcessControlCommands()
 		strContent += tszUrlOverride;
 		strContent += _T("\r\n");
 		VERIFY(AU_WriteBigFile(strOutFile.c_str(), (const BYTE*)strContent.c_str(),
-			strContent.size() * sizeof(TCHAR)) == PWE_SUCCESS);
+			strContent.size() * sizeof(TCHAR), FALSE) == PWE_SUCCESS);
 		return TRUE;
 	}
 

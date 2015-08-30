@@ -37,19 +37,22 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.16")
+#define PWM_VERSION_STR  _T("1.17")
 #else
-#define PWM_VERSION_STR  _T("1.16 Unicode")
+#define PWM_VERSION_STR  _T("1.17 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01010600
+#define PWM_VERSION_DW   0x01010700
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
 #define PWM_DBSIG_2      0xB54BFB65
 #define PWM_DBVER_DW     0x00030002
 
-#define PWM_DBSIG_1_KDBX 0x9AA2D903
-#define PWM_DBSIG_2_KDBX 0xB54BFB66
+// KeePass 2.x database file signatures (pre-release and release)
+#define PWM_DBSIG_1_KDBX_P 0x9AA2D903
+#define PWM_DBSIG_2_KDBX_P 0xB54BFB66
+#define PWM_DBSIG_1_KDBX_R 0x9AA2D903
+#define PWM_DBSIG_2_KDBX_R 0xB54BFB67
 
 #define PWM_HOMEPAGE     _T("http://keepass.info/")
 #define PWM_URL_TRL      _T("http://keepass.info/translations.html")
@@ -195,12 +198,15 @@
 #define PWMKEY_AUTONEWDBBASENAME    _T("KeeAutoNewDbBaseName")
 #define PWMKEY_DELETETANSAFTERUSE   _T("KeeDeleteTANsAfterUse")
 #define PWMKEY_SOONTOEXPIREDAYS     _T("KeeSoonToExpireDays")
+#define PWMKEY_TRANSACTEDFILEWRITE  _T("KeeUseTransactedFileWrites")
 
 #define PWMKEY_GENPROFILE       _T("KeeGenProfile")
 #define PWMKEY_GENPROFILEAUTO   _T("KeeGenProfileAuto")
 #define PWMKEY_GENPROFILELASTPR _T("KeeGenProfileLast")
 
-#define PWMKEY_PREFERUSER       _T("KeePreferUserConfiguration")
+#define PWMKEY_PREFERUSER           _T("KeePreferUserConfiguration")
+#define PWMKEY_CFGOVERRIDE_GLOBAL   _T("KeeConfigFileOverrideGlobal")
+#define PWMKEY_CFGOVERRIDE_USER     _T("KeeConfigFileOverrideUser")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -256,6 +262,7 @@
 
 // Group flags (dwFlags field of PW_GROUP)
 #define PWGF_EXPANDED    1
+#define PWGF_RESERVED0   0x1000     /* Reserved for KeePassMobile */
 #define PWGF_TEMP_BIT    0x40000000
 
 #define ALGO_AES         0
@@ -281,6 +288,7 @@
 #define PWE_KEYPROV_INVALID_KEY    16
 #define PWE_FILEERROR_VERIFY       17
 #define PWE_UNSUPPORTED_KDBX       18
+#define PWE_GETLASTERROR           19
 
 // Format flags
 #define PWFF_NO_INTRO               1
@@ -466,6 +474,8 @@ public:
 	BOOL SetCustomKvp(LPCTSTR lpKey, LPCTSTR lpValue);
 	LPCTSTR GetCustomKvp(LPCTSTR lpKey) const;
 
+	void SetTransactedFileWrites(BOOL bTransacted) { m_bUseTransactedFileWrites = bTransacted; }
+
 	DWORD m_dwLastSelectedGroupId;
 	DWORD m_dwLastTopVisibleGroupId;
 	BYTE m_aLastSelectedEntryUuid[16];
@@ -530,6 +540,8 @@ private:
 	std::vector<CustomKvp> m_vCustomKVPs;
 
 	std::vector<PWDB_META_STREAM> m_vUnknownMetaStreams;
+
+	BOOL m_bUseTransactedFileWrites;
 };
 
 #endif // ___KEEPASS_PASSWORD_MANAGER_H___

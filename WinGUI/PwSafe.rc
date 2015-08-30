@@ -88,6 +88,7 @@ IDI_LOCKED              ICON                    "res\\locked.ico"
 IDI_UNLOCKED            ICON                    "res\\unlocked.ico"
 IDI_KEYHOLE             ICON                    "res\\keyhole.ico"
 IDI_PLUGINS             ICON                    "res\\plugins.ico"
+IDI_LOCK_OVERLAY        ICON                    "res\\lock_ovr.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -309,7 +310,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,128,337,10
     CONTROL         "Lock workspace when locking Windows, switching user or sleeping",IDC_CHECK_LOCKONWINLOCK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,122,353,10
-    CONTROL         "Automatically lock workspace after the following number of seconds:",IDC_CHECK_LOCKAFTERTIME,
+    CONTROL         "Lock workspace after the following idle time (seconds):",IDC_CHECK_LOCKAFTERTIME,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,178,336,10
     EDITTEXT        IDC_EDIT_LOCKSECONDS,19,0,40,14,ES_AUTOHSCROLL
     CONTROL         "Disable unsafe (security-critical) operations like exports, etc.",IDC_CHECK_DISABLEUNSAFE,
@@ -836,8 +837,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,6,0
- PRODUCTVERSION 1,1,6,0
+ FILEVERSION 1,1,7,0
+ PRODUCTVERSION 1,1,7,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -854,13 +855,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.16"
-            VALUE "FileVersion", "1.1.6.0"
+            VALUE "FileDescription", "KeePass Password Safe 1.17"
+            VALUE "FileVersion", "1.1.7.0"
             VALUE "InternalName", "PwSafe"
             VALUE "LegalCopyright", "Copyright (c) 2003-2009 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.16"
-            VALUE "ProductVersion", "1.1.6.0"
+            VALUE "ProductName", "KeePass Password Safe 1.17"
+            VALUE "ProductVersion", "1.1.7.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -941,15 +942,15 @@ BEGIN
         BEGIN
             MENUITEM "N&o Auto-Sort",               ID_VIEW_AUTOSORT_NOSORT
             MENUITEM SEPARATOR
-            MENUITEM "Sort List By &Title",         ID_VIEW_AUTOSORT_TITLE
-            MENUITEM "Sort List By User &Name",     ID_VIEW_AUTOSORT_USER
-            MENUITEM "Sort List By &Password",      ID_VIEW_AUTOSORT_PASSWORD
-            MENUITEM "Sort List By &URL",           ID_VIEW_AUTOSORT_URL
-            MENUITEM "Sort List By Note&s",         ID_VIEW_AUTOSORT_NOTES
-            MENUITEM "Sort List By &Creation Time", ID_VIEW_AUTOSORT_CREATION
-            MENUITEM "Sort List By Last &Modify Time", ID_VIEW_AUTOSORT_LASTMODIFY
-            MENUITEM "Sort List By Last &Access Time", ID_VIEW_AUTOSORT_LASTACCESS
-            MENUITEM "Sort List By &Expiration Time", ID_VIEW_AUTOSORT_EXPIRE
+            MENUITEM "Sort List by &Title",         ID_VIEW_AUTOSORT_TITLE
+            MENUITEM "Sort List by User &Name",     ID_VIEW_AUTOSORT_USER
+            MENUITEM "Sort List by &Password",      ID_VIEW_AUTOSORT_PASSWORD
+            MENUITEM "Sort List by &URL",           ID_VIEW_AUTOSORT_URL
+            MENUITEM "Sort List by Note&s",         ID_VIEW_AUTOSORT_NOTES
+            MENUITEM "Sort List by &Creation Time", ID_VIEW_AUTOSORT_CREATION
+            MENUITEM "Sort List by Last &Modify Time", ID_VIEW_AUTOSORT_LASTMODIFY
+            MENUITEM "Sort List by Last &Access Time", ID_VIEW_AUTOSORT_LASTACCESS
+            MENUITEM "Sort List by &Expiration Time", ID_VIEW_AUTOSORT_EXPIRE
         END
         MENUITEM SEPARATOR
         POPUP "Show &Columns"
@@ -1025,15 +1026,15 @@ BEGIN
             MENUITEM "Mo&ve Entry One Down",        ID_PWLIST_MOVEDOWN
             MENUITEM "Move Entry to &Bottom",       ID_PWLIST_MOVEBOTTOM
             MENUITEM SEPARATOR
-            MENUITEM "Sort List By &Title",         ID_PWLIST_SORT_TITLE
-            MENUITEM "Sort List By User &Name",     ID_PWLIST_SORT_USER
-            MENUITEM "Sort List By &Password",      ID_PWLIST_SORT_PASSWORD
-            MENUITEM "Sort List By &URL",           ID_PWLIST_SORT_URL
-            MENUITEM "Sort List By Note&s",         ID_PWLIST_SORT_NOTES
-            MENUITEM "Sort List By &Creation Time", ID_PWLIST_SORT_CREATION
-            MENUITEM "Sort List By Last &Modify Time", ID_PWLIST_SORT_LASTMODIFY
-            MENUITEM "Sort List By Last &Access Time", ID_PWLIST_SORT_LASTACCESS
-            MENUITEM "Sort List By &Expiration Time", ID_PWLIST_SORT_EXPIRE
+            MENUITEM "Sort List by &Title",         ID_PWLIST_SORT_TITLE
+            MENUITEM "Sort List by User &Name",     ID_PWLIST_SORT_USER
+            MENUITEM "Sort List by &Password",      ID_PWLIST_SORT_PASSWORD
+            MENUITEM "Sort List by &URL",           ID_PWLIST_SORT_URL
+            MENUITEM "Sort List by Note&s",         ID_PWLIST_SORT_NOTES
+            MENUITEM "Sort List by &Creation Time", ID_PWLIST_SORT_CREATION
+            MENUITEM "Sort List by Last &Modify Time", ID_PWLIST_SORT_LASTMODIFY
+            MENUITEM "Sort List by Last &Access Time", ID_PWLIST_SORT_LASTACCESS
+            MENUITEM "Sort List by &Expiration Time", ID_PWLIST_SORT_EXPIRE
         END
     END
 END
@@ -1363,15 +1364,14 @@ BEGIN
     "B",            ID_PWLIST_COPYUSER,     VIRTKEY, CONTROL, NOINVERT
     "D",            ID_PWLIST_DELETE,       VIRTKEY, CONTROL, NOINVERT
     "K",            ID_PWLIST_DUPLICATE,    VIRTKEY, CONTROL, NOINVERT
-    "E",            ID_PWLIST_EDIT,         VIRTKEY, CONTROL, NOINVERT
     "F",            ID_PWLIST_FIND,         VIRTKEY, CONTROL, NOINVERT
+    "F",            ID_PWLIST_FINDINGROUP,  VIRTKEY, SHIFT, CONTROL, NOINVERT
     "A",            ID_PWLIST_SELECTALL,    VIRTKEY, CONTROL, NOINVERT
     "U",            ID_PWLIST_VISITURL,     VIRTKEY, CONTROL, NOINVERT
     "G",            ID_SAFE_ADDGROUP,       VIRTKEY, CONTROL, NOINVERT
     "M",            ID_SAFE_OPTIONS,        VIRTKEY, CONTROL, NOINVERT
     "H",            ID_VIEW_HIDESTARS,      VIRTKEY, CONTROL, NOINVERT
     "J",            ID_VIEW_HIDEUSERS,      VIRTKEY, CONTROL, NOINVERT
-    "F",            ID_PWLIST_FINDINGROUP,  VIRTKEY, SHIFT, CONTROL, NOINVERT
 END
 
 

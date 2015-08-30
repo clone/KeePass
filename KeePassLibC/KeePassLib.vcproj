@@ -1011,6 +1011,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\KeePassLibCpp\Util\FileTransactionEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\FileTransactionEx.h"
+					>
+				</File>
+				<File
 					RelativePath="..\KeePassLibCpp\Util\MemUtil.cpp"
 					>
 				</File>
@@ -1127,6 +1135,10 @@
 					</File>
 					<File
 						RelativePath="..\KeePassLibCpp\SDK\Details\IKpDatabase.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpFileTransaction.h"
 						>
 					</File>
 					<File

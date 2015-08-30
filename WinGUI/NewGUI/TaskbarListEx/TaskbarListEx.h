@@ -17,31 +17,25 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___WINDOW_GROUPS_H___
-#define ___WINDOW_GROUPS_H___
+#ifndef ___TASKBAR_LIST_EX_H___
+#define ___TASKBAR_LIST_EX_H___
 
-#include "NewGUICommon.h"
+#pragma once
 
-#define WG_OFFSET_TOP  98
-#define WG_OFFSET_LEFT 25
-#define WG_Y_STEP      20
+#include <boost/utility.hpp>
+#include "TaskbarListExIdl.h"
 
-#define WGF_REPOSITION 1
-
-class CWindowGroups
+class CTaskbarListEx : boost::noncopyable
 {
 public:
-	CWindowGroups();
-	virtual ~CWindowGroups();
+	static void Initialize();
+	static void Release(bool bForceComUninitialize);
 
-	BOOL AddWindow(CObject *pWindow, DWORD dwGroupID, BOOL bReposition);
-	BOOL ArrangeWindows(CWnd *pParentWindow);
-	BOOL HideAllExcept(DWORD dwGroupID);
+	static void SetOverlayIcon(HWND hWnd, HICON hIcon, LPCWSTR pszDescription);
+	static void SetProgressState(HWND hWnd, TBPFLAG tbpFlags);
 
 private:
-	CObArray m_aWindows;
-	CDWordArray m_aGroupIDs;
-	CByteArray m_aFlags;
+	CTaskbarListEx();
 };
 
-#endif
+#endif // ___TASKBAR_LIST_EX_H___

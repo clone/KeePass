@@ -131,7 +131,9 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *p
 	memcpy(&hdr, pVirtualFile, sizeof(PW_DBHEADER));
 
 	// Check if it's a KDBX file created by KeePass 2.x
-	if((hdr.dwSignature1 == PWM_DBSIG_1_KDBX) && (hdr.dwSignature2 == PWM_DBSIG_2_KDBX))
+	if((hdr.dwSignature1 == PWM_DBSIG_1_KDBX_P) && (hdr.dwSignature2 == PWM_DBSIG_2_KDBX_P))
+		{ _OPENDB_FAIL_LIGHT; return PWE_UNSUPPORTED_KDBX; }
+	if((hdr.dwSignature1 == PWM_DBSIG_1_KDBX_R) && (hdr.dwSignature2 == PWM_DBSIG_2_KDBX_R))
 		{ _OPENDB_FAIL_LIGHT; return PWE_UNSUPPORTED_KDBX; }
 
 	// Check if we can open this
@@ -285,17 +287,17 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *p
 	{
 		p = &pVirtualFile[pos];
 
-		if(pRepair != NULL) if(IsBadReadPtr(p, 2) != FALSE) { _OPENDB_FAIL; }
+		if(pRepair != NULL) { if(IsBadReadPtr(p, 2) != FALSE) { _OPENDB_FAIL; } }
 		memcpy(&usFieldType, p, 2);
 		p += 2; pos += 2;
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 
-		if(pRepair != NULL) if(IsBadReadPtr(p, 4) != FALSE) { _OPENDB_FAIL; }
+		if(pRepair != NULL) { if(IsBadReadPtr(p, 4) != FALSE) { _OPENDB_FAIL; } }
 		memcpy(&dwFieldSize, p, 4);
 		p += 4; pos += 4;
 		if(pos >= (uFileSize + dwFieldSize)) { _OPENDB_FAIL; }
 
-		if(pRepair != NULL) if(IsBadReadPtr(p, dwFieldSize) != FALSE) { _OPENDB_FAIL; }
+		if(pRepair != NULL) { if(IsBadReadPtr(p, dwFieldSize) != FALSE) { _OPENDB_FAIL; } }
 		bRet = ReadGroupField(usFieldType, dwFieldSize, (BYTE *)p, &pwGroupTemplate);
 		if((usFieldType == 0xFFFF) && (bRet == TRUE))
 			uCurGroup++; // Now and ONLY now the counter gets increased
@@ -313,17 +315,17 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *p
 	{
 		p = &pVirtualFile[pos];
 
-		if(pRepair != NULL) if(IsBadReadPtr(p, 2) != FALSE) { _OPENDB_FAIL; }
+		if(pRepair != NULL) { if(IsBadReadPtr(p, 2) != FALSE) { _OPENDB_FAIL; } }
 		memcpy(&usFieldType, p, 2);
 		p += 2; pos += 2;
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 
-		if(pRepair != NULL) if(IsBadReadPtr(p, 4) != FALSE) { _OPENDB_FAIL; }
+		if(pRepair != NULL) { if(IsBadReadPtr(p, 4) != FALSE) { _OPENDB_FAIL; } }
 		memcpy(&dwFieldSize, p, 4);
 		p += 4; pos += 4;
 		if(pos >= (uFileSize + dwFieldSize)) { _OPENDB_FAIL; }
 
-		if(pRepair != NULL) if(IsBadReadPtr(p, dwFieldSize) != FALSE) { _OPENDB_FAIL; }
+		if(pRepair != NULL) { if(IsBadReadPtr(p, dwFieldSize) != FALSE) { _OPENDB_FAIL; } }
 		bRet = ReadEntryField(usFieldType, dwFieldSize, (BYTE *)p, &pwEntryTemplate);
 		if((usFieldType == 0xFFFF) && (bRet == TRUE))
 			uCurEntry++; // Now and ONLY now the counter gets increased
@@ -714,7 +716,8 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 	}
 
 	const DWORD dwToWrite = uEncryptedPartSize + sizeof(PW_DBHEADER);
-	const int nWriteRes = AU_WriteBigFile(pszFile, (BYTE *)pVirtualFile, dwToWrite);
+	const int nWriteRes = AU_WriteBigFile(pszFile, (BYTE *)pVirtualFile, dwToWrite,
+		m_bUseTransactedFileWrites);
 	if(nWriteRes != PWE_SUCCESS)
 	{
 		mem_erase((unsigned char *)pVirtualFile, uAllocated);

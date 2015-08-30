@@ -19,6 +19,7 @@
 
 #include "StdAfx.h"
 #include "WindowGroups.h"
+#include <math.h>
 
 CWindowGroups::CWindowGroups()
 {
@@ -75,12 +76,14 @@ BOOL CWindowGroups::ArrangeWindows(CWnd *pParentWindow)
 	int i;
 	RECT rect = { 0, 0, 0, 0 };
 
-	UNREFERENCED_PARAMETER(pParentWindow);
+	const DWORD dwYStep = static_cast<DWORD>(NewGUI_Scale(WG_Y_STEP, pParentWindow));
 
 	CDWordArray aPos;
 	aPos.RemoveAll();
 
-	for(i = 0; i < m_aWindows.GetSize(); i++) aPos.Add(WG_OFFSET_TOP);
+	const DWORD dwXOffset = static_cast<DWORD>(NewGUI_Scale(WG_OFFSET_LEFT, pParentWindow));
+	const DWORD dwYOffset = static_cast<DWORD>(NewGUI_Scale(WG_OFFSET_TOP, pParentWindow));
+	for(i = 0; i < m_aWindows.GetSize(); i++) aPos.Add(dwYOffset);
 
 	for(i = 0; i < m_aWindows.GetSize(); i++)
 	{
@@ -95,12 +98,12 @@ BOOL CWindowGroups::ArrangeWindows(CWnd *pParentWindow)
 			rect.bottom = rect.bottom - rect.top;
 		}
 		rect.top = (LONG)aPos.GetAt((int)m_aGroupIDs.GetAt(i));
-		rect.left = WG_OFFSET_LEFT;
+		rect.left = dwXOffset;
 
 		if(p != NULL)
 			p->MoveWindow(rect.left, rect.top, rect.right, rect.bottom, TRUE);
 
-		aPos.SetAt((int)m_aGroupIDs.GetAt(i), (DWORD)rect.top + WG_Y_STEP);
+		aPos.SetAt((int)m_aGroupIDs.GetAt(i), (DWORD)rect.top + dwYStep);
 	}
 
 	aPos.RemoveAll();

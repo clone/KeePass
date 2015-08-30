@@ -112,11 +112,11 @@ BOOL SendMailslotMessage(const RC_STRING& strMailslotName, const RC_STRING& strM
 
 	HANDLE hMailslot = CreateFile(strFullName.c_str(), GENERIC_WRITE, FILE_SHARE_READ,
 		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if(hMailslot == INVALID_HANDLE_VALUE) hMailslot = NULL;
-	if(hMailslot == NULL) { return FALSE; }
+	if((hMailslot == INVALID_HANDLE_VALUE) || (hMailslot == NULL)) return FALSE;
 
 	DWORD dwWritten = 0;
-	if(WriteFile(hMailslot, strMessage.c_str(), (DWORD)strMessage.size() + 1, &dwWritten, NULL) == FALSE)
+	if(WriteFile(hMailslot, strMessage.c_str(), static_cast<DWORD>(strMessage.size() + 1),
+		&dwWritten, NULL) == FALSE)
 	{
 		ASSERT(FALSE);
 		return FALSE;
@@ -125,7 +125,7 @@ BOOL SendMailslotMessage(const RC_STRING& strMailslotName, const RC_STRING& strM
 
 	CloseHandle(hMailslot);
 
-	if((uEventMessage != 0) && (uEventMessage != (UINT)(-1)))
+	if((uEventMessage != 0) && (uEventMessage != static_cast<UINT>(-1)))
 		SendMessage(HWND_BROADCAST, uEventMessage, 0, 0);
 
 	return TRUE;

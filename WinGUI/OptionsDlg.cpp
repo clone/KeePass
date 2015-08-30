@@ -246,6 +246,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Focus entry list after a successful quick search (toolbar)"), &m_bFocusResAfterQuickFind, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Delete TAN entries immediately after using them"), &m_bDeleteTANsAfterUse, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Clear clipboard when closing/locking the database"), &m_bClearClipOnDbClose, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Use file transactions for writing databases"), &m_bUseTransactedFileWrites, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Use advanced memory protection (DPAPI, only Windows Vista and higher)"), CMemoryProtectionEx::GetEnabledPtr(), NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Use CNG/BCrypt for key transformations (only Windows Vista and higher)"), CKeyTransformBCrypt::GetEnabledPtr(), NULL, OL_LINK_NULL);
 

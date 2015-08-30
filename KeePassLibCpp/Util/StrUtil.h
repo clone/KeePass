@@ -152,7 +152,7 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// Wide character stream
+// CStringBuilderEx class
 
 class CStringBuilderEx : boost::noncopyable
 {

@@ -17,31 +17,30 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___WINDOW_GROUPS_H___
-#define ___WINDOW_GROUPS_H___
+#ifndef ___KPFILETRANSACTIONIMPL_H___
+#define ___KPFILETRANSACTIONIMPL_H___
 
-#include "NewGUICommon.h"
+#include "../../KeePassLibCpp/SDK/KpSDK.h"
+#include "../../KeePassLibCpp/Util/FileTransactionEx.h"
 
-#define WG_OFFSET_TOP  98
-#define WG_OFFSET_LEFT 25
-#define WG_Y_STEP      20
+#pragma pack(1)
 
-#define WGF_REPOSITION 1
-
-class CWindowGroups
+class CKpFileTransactionImpl : public IKpFileTransaction
 {
 public:
-	CWindowGroups();
-	virtual ~CWindowGroups();
+	CKpFileTransactionImpl(LPCTSTR lpBaseFile);
 
-	BOOL AddWindow(CObject *pWindow, DWORD dwGroupID, BOOL bReposition);
-	BOOL ArrangeWindows(CWnd *pParentWindow);
-	BOOL HideAllExcept(DWORD dwGroupID);
+	KP_DECL_IUNKNOWN;
+
+	STDMETHODIMP_(BOOL) OpenWrite(LPTSTR lpOutBufferFilePath);
+	STDMETHODIMP_(BOOL) CommitWrite();
 
 private:
-	CObArray m_aWindows;
-	CDWordArray m_aGroupIDs;
-	CByteArray m_aFlags;
+	KP_DECL_STDREFIMPL;
+
+	CFileTransactionEx* m_pTx;
 };
 
-#endif
+#pragma pack()
+
+#endif // ___KPFILETRANSACTIONIMPL_H___

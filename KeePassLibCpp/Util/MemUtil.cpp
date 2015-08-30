@@ -151,9 +151,6 @@ void _pwtimeadd(PW_TIME *pTime, const PW_TIME *pTimeAdd)
 // Packs an array of integers to a TCHAR string
 void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount)
 {
-	INT i;
-	TCHAR tszTemp[20];
-
 	ASSERT(tszString != NULL); if(tszString == NULL) return;
 	ASSERT(pArray != NULL); if(pArray == NULL) return;
 
@@ -162,7 +159,8 @@ void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount)
 
 	_itot(pArray[0], tszString, 10);
 
-	for(i = 1; i < nItemCount; i++)
+	TCHAR tszTemp[20];
+	for(INT i = 1; i < nItemCount; ++i)
 	{
 		_tcscat(tszString, _T(" "));
 		_itot(pArray[i], tszTemp, 10);

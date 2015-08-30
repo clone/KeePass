@@ -90,6 +90,9 @@
 
 #define KPCM_NULL          0
 #define KPCM_EXIT          1
+#define KPCM_AUTOTYPE      2
+#define KPCM_LOCK          3
+#define KPCM_UNLOCK        4
 
 #define MWS_MIN_CX 314
 #define MWS_MIN_CY 207
@@ -221,6 +224,9 @@ public:
 
 	void _UpdateGuiToManager();
 
+	void _UpdateCachedGroupIDs();
+	static void _SetLVItemParam(LV_ITEM* pItem, const PW_ENTRY* pe);
+
 	void _TouchGroup(DWORD dwGroupId, BOOL bEdit);
 	void _TouchEntry(DWORD dwListIndex, BOOL bEdit);
 
@@ -266,6 +272,7 @@ public:
 
 	HICON m_hTrayIconNormal;
 	HICON m_hTrayIconLocked;
+	HICON m_hLockOverlayIcon;
 
 	BOOL m_bDisplayDialog;
 	BOOL m_bCachedToolBarUpdate;
@@ -317,6 +324,7 @@ private:
 	BOOL m_bDisableAutoType;
 	BOOL m_bLockOnWinLock;
 	BOOL m_bClearClipOnDbClose;
+	BOOL m_bUseTransactedFileWrites;
 
 	BOOL m_bExiting;
 	BOOL m_bIsLocking;
@@ -458,6 +466,9 @@ private:
 
 	static BOOL m_bUnintrusiveMiniMode;
 
+	static DWORD m_dwCachedBackupGroupID;
+	static DWORD m_dwCachedBackupSrcGroupID;
+
 private:
 	void _ChangeLockState(BOOL bLocked);
 	void SetViewHideState(BOOL bReqVisible, BOOL bPreferTray);
@@ -474,6 +485,7 @@ private:
 	void DropToBackgroundIfOptionEnabled(bool bForceDrop);
 
 	void _PostUseTANEntry(DWORD dwListIndex, DWORD dwEntryIndex);
+	void _PreDatabaseWrite();
 
 	LONG m_lNormalWndPosX;
 	LONG m_lNormalWndPosY;

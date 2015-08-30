@@ -57,6 +57,8 @@ CPwManager::CPwManager()
 	mem_erase(m_pMasterKey, 32);
 	mem_erase(m_pTransformedMasterKey, 32);
 
+	m_bUseTransactedFileWrites = FALSE;
+
 	_DetMetaInfo();
 
 	_AllocGroups(PWM_NUM_INITIAL_GROUPS);
@@ -95,6 +97,8 @@ void CPwManager::CleanUp()
 
 	mem_erase(m_pMasterKey, 32);
 	mem_erase(m_pTransformedMasterKey, 32);
+
+	m_bUseTransactedFileWrites = FALSE;
 
 	m_strDefaultUserName.clear();
 	m_vSearchHistory.clear();

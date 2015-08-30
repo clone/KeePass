@@ -110,10 +110,10 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
+	m_fStyle.CreateFont(NewGUI_Scale(-12, this), 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
-	m_fSymbol.CreateFont(-13, 0, 0, 0, 0, FALSE, FALSE, 0,
+	m_fSymbol.CreateFont(NewGUI_Scale(-13, this), 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, CPwSafeApp::GetPasswordFont());
 
@@ -589,7 +589,7 @@ void CPasswordDlg::OnOK()
 				{
 					std::basic_string<TCHAR> strKeyError = strTemp;
 					strKeyError += _T("\r\n\r\n");
-					strKeyError += WU_FormatSystemMessage(dwKeyFileError);
+					strKeyError += CPwUtil::FormatSystemMessage(dwKeyFileError);
 
 					MessageBox(strKeyError.c_str(), PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
 					FreePasswords();

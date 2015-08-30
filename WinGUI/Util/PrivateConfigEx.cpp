@@ -33,6 +33,9 @@
 typedef HRESULT(WINAPI *LPSHGETSPECIALFOLDERPATH)(HWND hwndOwner,
 	LPTSTR lpszPath, int nFolder, BOOL fCreate);
 
+static std::basic_string<TCHAR> g_strFileOverrideGlobal;
+static std::basic_string<TCHAR> g_strFileOverrideUser;
+
 CPrivateConfigEx::CPrivateConfigEx(BOOL bRequireWriteAccess)
 {
 	m_bPreferUser = FALSE;
@@ -113,6 +116,8 @@ void CPrivateConfigEx::GetConfigPaths()
 		m_strFileUser += CFG_SUFFIX_STD;
 	}
 
+	ApplyFileOverrides();
+
 	if(_FileAccessible(m_strFileGlobal.c_str()) == TRUE)
 	{
 		m_strFileCachedGlobal = WU_GetTempFile(CFG_SUFFIX_STD);
@@ -124,6 +129,12 @@ void CPrivateConfigEx::GetConfigPaths()
 			m_strFileCachedGlobal.clear();
 		}
 	}
+}
+
+void CPrivateConfigEx::ApplyFileOverrides()
+{
+	if(g_strFileOverrideGlobal.size() > 0) m_strFileGlobal = g_strFileOverrideGlobal;
+	if(g_strFileOverrideUser.size() > 0) m_strFileUser = g_strFileOverrideUser;
 }
 
 void CPrivateConfigEx::FlushGlobal(BOOL bDeleteCache)
@@ -138,8 +149,7 @@ void CPrivateConfigEx::FlushGlobal(BOOL bDeleteCache)
 			m_strFileGlobal.c_str(), FALSE);
 
 		if(bCopyResult != FALSE)
-			_CallPlugins(KPM_OPTIONS_SAVE_GLOBAL,
-				(LPARAM)m_strFileGlobal.c_str(), 0);
+			_CallPlugins(KPM_OPTIONS_SAVE_GLOBAL, (LPARAM)m_strFileGlobal.c_str(), 0);
 		else { ASSERT(FALSE); }
 	}
 
@@ -362,4 +372,12 @@ std::basic_string<TCHAR> CPrivateConfigEx::GetSafe(const TCHAR *pszField) const
 		return std::basic_string<TCHAR>();
 
 	return std::basic_string<TCHAR>(tszTemp);
+}
+
+void CPrivateConfigEx::LoadStaticConfigFileOverrides()
+{
+	g_strFileOverrideGlobal = this->GetSafe(PWMKEY_CFGOVERRIDE_GLOBAL);
+	g_strFileOverrideUser = this->GetSafe(PWMKEY_CFGOVERRIDE_USER);
+
+	ApplyFileOverrides();
 }

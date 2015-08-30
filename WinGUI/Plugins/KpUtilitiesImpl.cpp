@@ -261,7 +261,7 @@ STDMETHODIMP CKpUtilitiesImpl::WriteFile(LPCTSTR lpFilePath, const BYTE* pData,
 	if(lpFilePath == NULL) return E_POINTER;
 	if(pData == NULL) return E_POINTER;
 	
-	const int nResult = AU_WriteBigFile(lpFilePath, pData, dwDataSize);
+	const int nResult = AU_WriteBigFile(lpFilePath, pData, dwDataSize, FALSE);
 
 	if(nResult == PWE_SUCCESS) return S_OK;
 	if(nResult == PWE_NOFILEACCESS_WRITE) return E_ACCESSDENIED;

@@ -242,4 +242,9 @@ void NewGUI_DeselectAllItems(CListCtrl* pCtrl);
 
 void NewGUI_SetShield(CButton& rButton, BOOL bSetShield);
 
+int NewGUI_Scale(int nPixels, CWnd* pParentWindow);
+CSize NewGUI_Scale(const CSize& rSize, CWnd* pParentWindow);
+
+COLORREF NewGUI_ColorToGrayscale(COLORREF clr);
+
 #endif // ___NEW_GUI_COMMON___

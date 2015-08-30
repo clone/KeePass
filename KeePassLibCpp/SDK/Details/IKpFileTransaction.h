@@ -27,28 +27,41 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ___KEEPASS_SDK_H___
-#define ___KEEPASS_SDK_H___
+#ifndef ___IKPFILETRANSACTION_H___
+#define ___IKPFILETRANSACTION_H___
 
 #pragma once
 
-#include "../SysDefEx.h"
+#include "../../SysDefEx.h"
+#include "IKpUnknown.h"
 
-#include <commctrl.h>
+#pragma pack(1)
 
-#include "Details/KpDefs.h"
-#include "Details/KpGuids.h"
+/// Interface to a file transaction object.
+/// Instances of classes supporting this interface can be created using
+/// IKpAPI::CreateInstanceEx.
+struct KP_DECL_INTERFACE("723A18EE-9769-4843-A79E-53B82DF5C9CA") IKpFileTransaction :
+	public IKpUnknown
+{
+public:
+	// *** IKpUnknown methods ***
+	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObject) = 0;
+	STDMETHOD_(ULONG, AddRef)() = 0;
+	STDMETHOD_(ULONG, Release)() = 0;
 
-#include "Details/IKpAPI.h"
-#include "Details/IKpAPI2.h"
-#include "Details/IKpConfig.h"
-#include "Details/IKpDatabase.h"
-#include "Details/IKpFileTransaction.h"
-#include "Details/IKpPlugin.h"
-#include "Details/IKpUnknown.h"
-#include "Details/IKpUtilities.h"
-#include "Details/IKpCommandLine.h"
-#include "Details/IKpFullPathName.h"
-#include "Details/IKpCommandLineOption.h"
+	// *** IKpFileTransaction methods ***
 
-#endif // ___KEEPASS_SDK_H___
+	/// Begin a file write transaction.
+	/// @param lpOutBufferFilePath KeePass will copy the path of the file
+	/// into this buffer (which should be able to hold at least MAX_PATH
+	/// characters), to which you should write the data that should
+	/// be written to the original file when committing.
+	STDMETHOD_(BOOL, OpenWrite)(LPTSTR lpOutBufferFilePath) = 0;
+
+	/// Commit a file write transaction.
+	STDMETHOD_(BOOL, CommitWrite)() = 0;
+};
+
+#pragma pack()
+
+#endif // ___IKPFILETRANSACTION_H___

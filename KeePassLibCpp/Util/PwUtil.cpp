@@ -118,7 +118,6 @@ BOOL CPwUtil::LoadHexKey32(FILE *fp, BYTE *pBuf)
 {
 	char buf[65], ch1, ch2;
 	BYTE bt;
-	int i;
 
 	ASSERT(fp != NULL); if(fp == NULL) return FALSE;
 	ASSERT(pBuf != NULL); if(pBuf == NULL) return FALSE;
@@ -126,7 +125,7 @@ BOOL CPwUtil::LoadHexKey32(FILE *fp, BYTE *pBuf)
 	buf[64] = 0;
 	if(fread(buf, 1, 64, fp) != 64) { ASSERT(FALSE); return FALSE; }
 
-	for(i = 0; i < 32; i++)
+	for(int i = 0; i < 32; ++i)
 	{
 		ch1 = buf[i * 2];
 		ch2 = buf[i * 2 + 1];
@@ -143,7 +142,6 @@ BOOL CPwUtil::LoadHexKey32(FILE *fp, BYTE *pBuf)
 BOOL CPwUtil::SaveHexKey32(FILE *fp, BYTE *pBuf)
 {
 	char buf[65], ch1, ch2;
-	int i;
 	BYTE bt;
 
 	ASSERT(fp != NULL); if(fp == NULL) return FALSE;
@@ -151,7 +149,7 @@ BOOL CPwUtil::SaveHexKey32(FILE *fp, BYTE *pBuf)
 
 	buf[64] = 0;
 
-	for(i = 0; i < 32; i++)
+	for(int i = 0; i < 32; ++i)
 	{
 		bt = pBuf[i];
 
@@ -227,7 +225,8 @@ CString CPwUtil::FormatError(int nErrorCode, DWORD dwFlags)
 	}
 
 	if(((nErrorCode == PWE_INVALID_KEY) && ((dwFlags & PWFF_INVKEY_WITH_CODE) == 0)) ||
-		(nErrorCode == PWE_UNSUPPORTED_KDBX) || ((dwFlags & PWFF_MAIN_TEXT_ONLY) != 0))
+		(nErrorCode == PWE_UNSUPPORTED_KDBX) || ((dwFlags & PWFF_MAIN_TEXT_ONLY) != 0) ||
+		(nErrorCode == PWE_GETLASTERROR))
 		str.Empty();
 
 	switch(nErrorCode)
@@ -291,6 +290,10 @@ CString CPwUtil::FormatError(int nErrorCode, DWORD dwFlags)
 		str += TRL("KeePass 1.x cannot open KDBX files.");
 		str += _T("\r\n\r\n");
 		str += TRL("Use the KeePass 2.x 'Export' feature to migrate this file");
+		break;
+	case PWE_GETLASTERROR:
+		str += CPwUtil::FormatSystemMessage(GetLastError()).c_str();
+		str = str.TrimRight(_T(".!\r\n"));
 		break;
 	default:
 		ASSERT(FALSE);
@@ -398,10 +401,7 @@ BOOL CPwUtil::AttachFileAsBinaryData(__inout_ecount(1) PW_ENTRY *pEntry,
 	const TCHAR *lpFile)
 {
 	FILE *fp = NULL;
-	DWORD dwFileLen;
-	DWORD dwPathLen;
 	LPTSTR pBinaryDesc;
-	DWORD i;
 
 	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return FALSE;
 	ASSERT(lpFile != NULL); if(lpFile == NULL) return FALSE;
@@ -410,7 +410,7 @@ BOOL CPwUtil::AttachFileAsBinaryData(__inout_ecount(1) PW_ENTRY *pEntry,
 	if(fp == NULL) return FALSE;
 
 	fseek(fp, 0, SEEK_END);
-	dwFileLen = (DWORD)ftell(fp);
+	const DWORD dwFileLen = static_cast<DWORD>(ftell(fp));
 	fseek(fp, 0, SEEK_SET);
 
 	if(dwFileLen == 0) { fclose(fp); fp = NULL; return FALSE; }
@@ -419,16 +419,16 @@ BOOL CPwUtil::AttachFileAsBinaryData(__inout_ecount(1) PW_ENTRY *pEntry,
 	SAFE_DELETE_ARRAY(pEntry->pszBinaryDesc);
 	SAFE_DELETE_ARRAY(pEntry->pBinaryData);
 
-	i = (DWORD)_tcslen(lpFile) - 1;
+	DWORD i = static_cast<DWORD>(_tcslen(lpFile)) - 1;
 	while(1)
 	{
 		if(i == (DWORD)(-1)) break;
 		if((lpFile[i] == '/') || (lpFile[i] == '\\')) break;
-		i--;
+		--i;
 	}
 	pBinaryDesc = (LPTSTR)&lpFile[i + 1];
 
-	dwPathLen = (DWORD)_tcslen(pBinaryDesc);
+	const DWORD dwPathLen = static_cast<DWORD>(_tcslen(pBinaryDesc));
 
 	pEntry->pszBinaryDesc = new TCHAR[dwPathLen + 1];
 	_tcscpy_s(pEntry->pszBinaryDesc, dwPathLen + 1, pBinaryDesc);
@@ -592,11 +592,12 @@ PG_TREENODE CPwUtil::GroupsToTree(CPwManager* pMgr)
 
 	if(pMgr == NULL) { ASSERT(FALSE); return v; }
 
-	for(DWORD i = 0; i < pMgr->GetNumberOfGroups(); ++i)
+	const DWORD dwGroupCount = pMgr->GetNumberOfGroups();
+	for(DWORD i = 0; i < dwGroupCount; ++i)
 		pMgr->GetGroup(i)->dwFlags &= ~PWGF_TEMP_BIT; // Clear
 
 	DWORD dwAllocCount = 0;
-	for(DWORD i = 0; i < pMgr->GetNumberOfGroups(); ++i)
+	for(DWORD i = 0; i < dwGroupCount; ++i)
 	{
 		PW_GROUP* pg = pMgr->GetGroup(i);
 		if(pg->usLevel == 0)
@@ -607,7 +608,7 @@ PG_TREENODE CPwUtil::GroupsToTree(CPwManager* pMgr)
 		else { ASSERT((pg->dwFlags & PWGF_TEMP_BIT) != 0); }
 	}
 
-	ASSERT(dwAllocCount == pMgr->GetNumberOfGroups());
+	ASSERT((pMgr->GetNumberOfGroups() == dwGroupCount) && (dwAllocCount == dwGroupCount));
 	return v;
 }
 
@@ -742,6 +743,22 @@ void CPwUtil::CheckGroupList(CPwManager* pMgr)
 }
 #endif
 
+std::basic_string<TCHAR> CPwUtil::FormatSystemMessage(DWORD dwLastErrorCode)
+{
+	std::basic_string<TCHAR> str;
+	LPTSTR lpBuffer = NULL;
+
+	if(FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, dwLastErrorCode, 0, (LPTSTR)&lpBuffer, 1, NULL) != 0)
+	{
+		str = lpBuffer;
+	}
+
+	if(lpBuffer != NULL) { LocalFree(lpBuffer); lpBuffer = NULL; }
+
+	return str;
+}
+
 bool CPwUtil::UnhideFile(LPCTSTR lpFile)
 {
 	if(lpFile == NULL) { ASSERT(FALSE); return false; }
@@ -769,4 +786,34 @@ bool CPwUtil::HideFile(LPCTSTR lpFile, bool bHide)
 	}
 
 	return (SetFileAttributes(lpFile, dwAttrib) != FALSE);
+}
+
+CNullableEx<FILETIME> CPwUtil::GetFileCreationTime(LPCTSTR lpFile)
+{
+	if(lpFile == NULL) { ASSERT(FALSE); return CNullableEx<FILETIME>(); }
+
+	HANDLE h = CreateFile(lpFile, GENERIC_READ, FILE_SHARE_READ, NULL,
+		OPEN_EXISTING, 0, NULL);
+	if(h == INVALID_HANDLE_VALUE) return CNullableEx<FILETIME>();
+
+	FILETIME vTimes[3];
+	const BOOL bResult = GetFileTime(h, &vTimes[0], &vTimes[1], &vTimes[2]);
+	VERIFY(CloseHandle(h));
+
+	if(bResult == FALSE) { ASSERT(FALSE); return CNullableEx<FILETIME>(); }
+
+	return CNullableEx<FILETIME>(vTimes[0]);
+}
+
+bool CPwUtil::SetFileCreationTime(LPCTSTR lpFile, const FILETIME* pTime)
+{
+	if(lpFile == NULL) { ASSERT(FALSE); return false; }
+
+	HANDLE h = CreateFile(lpFile, FILE_WRITE_ATTRIBUTES, 0, NULL,
+		OPEN_EXISTING, 0, NULL);
+	if(h == INVALID_HANDLE_VALUE) return false;
+
+	VERIFY(SetFileTime(h, pTime, NULL, NULL));
+	VERIFY(CloseHandle(h));
+	return true;
 }
