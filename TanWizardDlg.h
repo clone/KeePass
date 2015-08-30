@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@
 #ifndef AFX_TANWIZARDDLG_H__C738F700_624E_11D8_BF16_0050BF14F5CC__INCLUDED_
 #define AFX_TANWIZARDDLG_H__C738F700_624E_11D8_BF16_0050BF14F5CC__INCLUDED_
 
-#include "NewGUI/ShadeButtonST.h"
+#include "NewGUI/BtnST.h"
 #include "NewGUI/KCSideBannerWnd.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -44,8 +44,8 @@ public:
 
 	//{{AFX_DATA(CTanWizardDlg)
 	enum { IDD = IDD_TANWIZARD_DLG };
-	CShadeButtonST	m_btCancel;
-	CShadeButtonST	m_btOK;
+	CButtonST	m_btCancel;
+	CButtonST	m_btOK;
 	CString	m_strTans;
 	//}}AFX_DATA
 

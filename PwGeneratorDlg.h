@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,8 +30,9 @@
 #ifndef AFX_PWGENERATORDLG_H__ED008380_12A4_11D8_BF16_0050BF14F5CC__INCLUDED_
 #define AFX_PWGENERATORDLG_H__ED008380_12A4_11D8_BF16_0050BF14F5CC__INCLUDED_
 
-#include "NewGUI/ShadeButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
+#include "NewGUI/BtnST.h"
+#include "NewGUI/GradientProgressCtrl.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -55,10 +56,11 @@ public:
 
 	//{{AFX_DATA(CPwGeneratorDlg)
 	enum { IDD = IDD_PW_GENERATOR_DLG };
+	CGradientProgressCtrl	m_cPassQuality;
 	CSpinButtonCtrl	m_spinNumChars;
-	CShadeButtonST	m_btGenerate;
-	CShadeButtonST	m_btnCancel;
-	CShadeButtonST	m_btnOK;
+	CButtonST	m_btGenerate;
+	CButtonST	m_btnCancel;
+	CButtonST	m_btnOK;
 	CListCtrl	m_cList;
 	UINT	m_nCharacters;
 	CString	m_strPassword;
@@ -73,6 +75,8 @@ public:
 	//}}AFX_VIRTUAL
 
 protected:
+	void _SaveOptions();
+
 	//{{AFX_MSG(CPwGeneratorDlg)
 	virtual void OnOK();
 	virtual void OnCancel();
@@ -82,6 +86,7 @@ protected:
 	afx_msg void OnClickListOptions(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnRclickListOptions(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDeltaPosSpinNumChars(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnChangeEditPw();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

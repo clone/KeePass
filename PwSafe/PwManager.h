@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,12 +35,12 @@
 
 // General product information
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
-#define PWM_VERSION_STR  _T("0.94a")
+#define PWM_VERSION_STR  _T("0.95a")
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
 #define PWM_DBSIG_2      0xB54BFB65
-#define PWM_DBVER_DW     0x00020001
+#define PWM_DBVER_DW     0x00030001
 
 #define PWM_HOMEPAGE     _T("http://keepass.sourceforge.net")
 #define PWM_URL_TRL      _T("http://keepass.sourceforge.net/translations.php")
@@ -102,6 +102,7 @@
 #define PWMKEY_PWGEN_OPTIONS    _T("KeePwGenOptions")
 #define PWMKEY_PWGEN_CHARS      _T("KeePwGenChars")
 #define PWMKEY_PWGEN_NUMCHARS   _T("KeePwGenNumChars")
+#define PWMKEY_DISABLEUNSAFE    _T("KeeDisableUnsafe")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -115,6 +116,8 @@
 #define PWM_FLAG_TWOFISH        8
 
 #define PWM_SESSION_KEY_SIZE    12
+
+#define PWM_STD_KEYENCROUNDS    6000
 
 // Field flags (for example in Find function)
 #define PWMF_TITLE        1
@@ -148,33 +151,22 @@ typedef struct _PW_TIME
 
 typedef struct _PW_DBHEADER // The database header
 {
-	DWORD dwSignature1;
-	DWORD dwSignature2;
+	DWORD dwSignature1; // = PWM_DBSIG_1
+	DWORD dwSignature2; // = PWM_DBSIG_2
 	DWORD dwFlags;
 	DWORD dwVersion;
 
-	BYTE aMasterSeed[16];
-	RD_UINT8 aEncryptionIV[16];
+	BYTE aMasterSeed[16]; // Seed that gets hashed with the userkey to form the final key
+	RD_UINT8 aEncryptionIV[16]; // IV used for content encryption
 
-	DWORD dwGroups;
-	DWORD dwEntries;
+	DWORD dwGroups; // Number of groups in the database
+	DWORD dwEntries; // Number of entries in the database
 
-	BYTE aContentsHash[32];
+	BYTE aContentsHash[32]; // SHA-256 hash of the database, used for integrity check
+
+	BYTE aMasterSeed2[32]; // Used for the dwKeyEncRounds AES transformations
+	DWORD dwKeyEncRounds;
 } PW_DBHEADER, *PPW_DBHEADER;
-
-typedef struct _PW_DBHEADER_V1 // Old version 1.x database header
-{
-	DWORD dwSignature1;
-	DWORD dwSignature2;
-	DWORD dwFlags;
-	DWORD dwVersion;
-
-	BYTE aMasterSeed[16];
-	RD_UINT8 aEncryptionIV[16];
-
-	DWORD dwGroups;
-	DWORD dwEntries;
-} PW_DBHEADER_V1, *PPW_DBHEADER_V1;
 
 typedef struct _PW_GROUP // Structure containing information about one group
 {
@@ -216,6 +208,7 @@ typedef struct _PW_ENTRY // Structure containing information about one entry
 	BYTE *pBinaryData;
 	DWORD uBinaryDataLen;
 } PW_ENTRY, *PPW_ENTRY;
+
 #pragma pack()
 
 #ifdef _DEBUG
@@ -301,6 +294,9 @@ public:
 	BOOL SetAlgorithm(int nAlgorithm);
 	int GetAlgorithm();
 
+	DWORD GetKeyEncRounds();
+	void SetKeyEncRounds(DWORD dwRounds);
+
 	// Convert PW_TIME to 5-byte compressed structure and the other way round
 	static void _TimeToPwTime(BYTE *pCompressedTime, PW_TIME *pPwTime);
 	static void _PwTimeToTime(PW_TIME *pPwTime, BYTE *pCompressedTime);
@@ -328,6 +324,12 @@ private:
 	void _DeleteGroupList(BOOL bFreeStrings);
 
 	BOOL _OpenDatabaseV1(const TCHAR *pszFile);
+	BOOL _OpenDatabaseV2(const TCHAR *pszFile);
+	BOOL _ReadGroupFieldV2(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_GROUP *pGroup);
+	BOOL _ReadEntryFieldV2(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_ENTRY *pEntry);
+
+	// Encrypt the master key a few times to make brute-force key-search harder
+	BOOL _TransformMasterKey(BYTE *pKeySeed);
 
 	PW_ENTRY *m_pEntries; // List containing all entries
 	DWORD m_dwMaxEntries; // Maximum number of items that can be stored in the list
@@ -339,11 +341,13 @@ private:
 
 	PW_ENTRY *m_pLastEditedEntry; // Last modified entry, use GetLastEditedEntry() to get it
 
-	CNewRandom m_random; // PRNG
+	CNewRandom m_random; // Pseudo-random number generator
 
 	BYTE m_pSessionKey[PWM_SESSION_KEY_SIZE]; // Used for in-memory encryption of passwords
 	BYTE m_pMasterKey[32]; // Master key used to encrypt the whole database
+	BYTE m_pTransformedMasterKey[32]; // Master key encrypted several times
 	int m_nAlgorithm; // Algorithm used to encrypt the database
+	DWORD m_dwKeyEncRounds;
 };
 
 #endif

@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -128,10 +128,14 @@ typedef void(WINAPI *LPSHCHANGENOTIFY)(LONG wEventId, UINT uFlags, LPCVOID dwIte
 
 COLORREF NewGUI_GetBgColor();
 COLORREF NewGUI_GetBtnColor();
+/* COLORREF NewGUI_LightenColor(COLORREF crColor, double dblFactor); */
 
 void NewGUI_SetImgButtons(BOOL bImageButtons);
 void NewGUI_Button(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1, BOOL bForceImage = FALSE);
 void NewGUI_ToolBarButton(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1);
+
+void NewGUI_ConfigQualityMeter(void *pWnd);
+void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword);
 
 void NewGUI_TranslateCWnd(CWnd *pWnd);
 

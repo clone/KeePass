@@ -53,6 +53,8 @@
 #define IDD_TANWIZARD_DLG               190
 #define IDB_FILE                        191
 #define IDB_DISK                        192
+#define IDD_ENTRYLIST_DLG               195
+#define IDD_DBSETTINGS_DLG              196
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -160,6 +162,12 @@
 #define IDC_BTN_CREATEASSOC             1134
 #define IDC_BTN_DELETEASSOC             1135
 #define IDC_STATIC_ASSOC                1136
+#define IDC_CHECK_DISABLEUNSAFE         1138
+#define IDC_ENTRYLIST                   1139
+#define IDC_PROGRESS_PASSQUALITY        1140
+#define IDC_STATIC_PASSBITS             1141
+#define IDC_COMBO_ENCALGOS              1144
+#define IDC_EDIT_KEYENC                 1145
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -301,14 +309,16 @@
 #define ID_VIEW_HIDEUSERS               32933
 #define ID_VIEW_ATTACH                  32934
 #define ID_PWLIST_SAVEATTACH            32935
+#define ID_FILE_SHOWDBINFO              32936
+#define ID_EXTRAS_SHOWEXPIRED           32937
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        193
-#define _APS_NEXT_COMMAND_VALUE         32936
-#define _APS_NEXT_CONTROL_VALUE         1138
+#define _APS_NEXT_RESOURCE_VALUE        197
+#define _APS_NEXT_COMMAND_VALUE         32938
+#define _APS_NEXT_CONTROL_VALUE         1148
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

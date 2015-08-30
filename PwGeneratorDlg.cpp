@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -70,6 +70,7 @@ void CPwGeneratorDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CPwGeneratorDlg)
+	DDX_Control(pDX, IDC_PROGRESS_PASSQUALITY, m_cPassQuality);
 	DDX_Control(pDX, IDC_SPIN_NUMCHARS, m_spinNumChars);
 	DDX_Control(pDX, IDC_GENERATE_BTN, m_btGenerate);
 	DDX_Control(pDX, IDCANCEL, m_btnCancel);
@@ -90,6 +91,7 @@ BEGIN_MESSAGE_MAP(CPwGeneratorDlg, CDialog)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_OPTIONS, OnClickListOptions)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_OPTIONS, OnRclickListOptions)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_NUMCHARS, OnDeltaPosSpinNumChars)
+	ON_EN_CHANGE(IDC_EDIT_PW, OnChangeEditPw)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -102,6 +104,8 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 	NewGUI_Button(&m_btnOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btnCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_Button(&m_btGenerate, IDB_KEY_SMALL, IDB_KEY_SMALL);
+
+	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
 	m_banner.Attach(this, KCSB_ATTACH_TOP);
 	m_banner.SetColBkg(RGB(255,255,255));
@@ -194,6 +198,8 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
+
 	return TRUE;
 }
 
@@ -202,12 +208,8 @@ void CPwGeneratorDlg::CleanUp()
 	m_ilIcons.DeleteImageList();
 }
 
-void CPwGeneratorDlg::OnOK() 
+void CPwGeneratorDlg::_SaveOptions()
 {
-	UpdateData(TRUE);
-
-	if(m_strPassword.GetLength() == 0) return;
-
 	int i;
 	g_strOptions.Empty();
 	for(i = 0; i < 9; i++)
@@ -222,6 +224,15 @@ void CPwGeneratorDlg::OnOK()
 
 	g_strCharSet = m_strCharSet;
 	g_nChars = m_nCharacters;
+}
+
+void CPwGeneratorDlg::OnOK() 
+{
+	UpdateData(TRUE);
+
+	if(m_strPassword.GetLength() == 0) return;
+
+	_SaveOptions();
 
 	CleanUp();
 	CDialog::OnOK();
@@ -229,7 +240,11 @@ void CPwGeneratorDlg::OnOK()
 
 void CPwGeneratorDlg::OnCancel() 
 {
+	UpdateData(TRUE);
+
 	m_strPassword.Empty();
+
+	_SaveOptions();
 
 	CleanUp();
 	CDialog::OnCancel();
@@ -295,7 +310,7 @@ void CPwGeneratorDlg::OnGenerateBtn()
 	j = 32;
 	while(1)
 	{
-		if(uFinalChars == m_nCharacters) break;
+		if(uFinalChars >= m_nCharacters) break;
 
 		if(j == 32)
 		{
@@ -320,46 +335,56 @@ void CPwGeneratorDlg::OnGenerateBtn()
 
 		if(m_bCharSpec == FALSE)
 		{
-			if(bUpperAlpha == TRUE)
+			if((t != 0) && (t != _T('\r')) && (t != _T('\n')))
 			{
-				if((t >= _T('A')) && (t <= _T('Z')))
-				{ m_strPassword += t; uFinalChars++; }
-			}
+				if(bUpperAlpha == TRUE)
+				{
+					if((t >= _T('A')) && (t <= _T('Z')))
+						{ m_strPassword += t; uFinalChars++; }
+				}
 
-			if(bLowerAlpha == TRUE)
-			{
-				if((t >= _T('a')) && (t <= _T('z')))
-				{ m_strPassword += t; uFinalChars++; }
-			}
+				if(bLowerAlpha == TRUE)
+				{
+					if((t >= _T('a')) && (t <= _T('z')))
+						{ m_strPassword += t; uFinalChars++; }
+				}
 
-			if(bNum == TRUE)
-			{
-				if((t >= _T('0')) && (t <= _T('9')))
-				{ m_strPassword += t; uFinalChars++; }
-			}
+				if(bNum == TRUE)
+				{
+					if((t >= _T('0')) && (t <= _T('9')))
+						{ m_strPassword += t; uFinalChars++; }
+				}
 
-			if((bUnderline == TRUE) && (t == _T('_')))
-				{ m_strPassword += t; uFinalChars++; }
-
-			if((bMinus == TRUE) && (t == _T('-')))
-				{ m_strPassword += t; uFinalChars++; }
-
-			if((bSpace == TRUE) && (t == _T(' ')))
-				{ m_strPassword += t; uFinalChars++; }
-
-			if(bSpecial == TRUE)
-			{
-				if((t >= _T('!')) && (t <= _T('/')))
-				{ m_strPassword += t; uFinalChars++; }
-			}
-
-			if((bHigh == TRUE) && (((BYTE)t) > _T('~')))
-				{ m_strPassword += t; uFinalChars++; }
-
-			if(bBrackets == TRUE)
-			{
-				if((t == _T('[')) || (t == _T(']')) || (t == _T('{')) || (t == _T('}')))
+				if((bUnderline == TRUE) && (t == _T('_')))
 					{ m_strPassword += t; uFinalChars++; }
+
+				if((bMinus == TRUE) && (t == _T('-')))
+					{ m_strPassword += t; uFinalChars++; }
+
+				if((bSpace == TRUE) && (t == _T(' ')))
+					{ m_strPassword += t; uFinalChars++; }
+
+				if(bSpecial == TRUE)
+				{
+					if(!((t == _T('[')) || (t == _T(']')) || (t == _T('{')) || (t == _T('}'))))
+					{
+						if((t >= _T('!')) && (t <= _T('/')))
+							{ m_strPassword += t; uFinalChars++; }
+						if((t >= _T(':')) && (t <= _T('@')))
+							{ m_strPassword += t; uFinalChars++; }
+						if((t >= _T('[')) && (t <= _T('`')))
+							{ m_strPassword += t; uFinalChars++; }
+					}
+				}
+
+				if((bHigh == TRUE) && (((BYTE)t) >= _T('~')))
+					{ m_strPassword += t; uFinalChars++; }
+
+				if(bBrackets == TRUE)
+				{
+					if((t == _T('[')) || (t == _T(']')) || (t == _T('{')) || (t == _T('}')))
+						{ m_strPassword += t; uFinalChars++; }
+				}
 			}
 		}
 		else // m_bCharSpec == TRUE
@@ -382,6 +407,7 @@ void CPwGeneratorDlg::OnGenerateBtn()
 
 	UpdateData(FALSE);
 
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
 	if(m_bCanAccept == TRUE) m_btnOK.EnableWindow(TRUE);
 }
 
@@ -487,4 +513,13 @@ void CPwGeneratorDlg::OnDeltaPosSpinNumChars(NMHDR* pNMHDR, LRESULT* pResult)
 	m_spinNumChars.SetPos(512);
 
 	UpdateData(FALSE);
+}
+
+void CPwGeneratorDlg::OnChangeEditPw() 
+{
+	UpdateData(TRUE);
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
+
+	if(m_strPassword.GetLength() == 0) m_btnOK.EnableWindow(FALSE);
+	else m_btnOK.EnableWindow(TRUE);
 }

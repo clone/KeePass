@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -103,6 +103,8 @@ public:
 	void _ProcessGroupKey(UINT nChar, UINT nFlags);
 	void _ProcessListKey(UINT nChar);
 
+	void _OnPwlistColumnWidthChange(int icolumn = -1, int isize = -1);
+
 	BOOL m_bTimer;
 	int m_nClipboardCountdown;
 	BOOL m_bOpenLastDb;
@@ -123,6 +125,8 @@ public:
 	BOOL m_bWindowsNewLine;
 	BOOL m_bPasswordStars;
 	BOOL m_bUserStars;
+	BOOL m_bDisableUnsafe;
+	BOOL m_bDisableUnsafeAtStart;
 
 	CStatusBarCtrl m_sbStatus;
 	BOOL m_bShowToolBar;
@@ -229,7 +233,7 @@ protected:
 	void _Groups_RestoreView()
 	{
 		HTREEITEM h = _GroupIdToHTreeItem(m_dwGroupsSaveFirstVisible);
-		m_cGroups.SelectSetFirstVisible(h);
+		if(h != NULL) m_cGroups.SelectSetFirstVisible(h);
 
 		h = _GroupIdToHTreeItem(m_dwGroupsSaveSelected);
 		m_cGroups.SelectItem(h);
@@ -293,6 +297,8 @@ protected:
 
 	HTREEITEM _FindSelectInTree(CTreeCtrl *pTree, HTREEITEM hRoot, DWORD dwGroupId);
 
+	BOOL _IsUnsafeAllowed();
+
 	HICON m_hIcon;
 
 	int m_nSaveView;
@@ -318,7 +324,6 @@ protected:
 
 	LONG m_lSplitterPosHoriz;
 	LONG m_lSplitterPosVert;
-
 
 	//{{AFX_MSG(CPwSafeDlg)
 	virtual BOOL OnInitDialog();
@@ -500,6 +505,10 @@ protected:
 	afx_msg void OnViewAttach();
 	afx_msg void OnPwlistSaveAttach();
 	afx_msg void OnUpdatePwlistSaveAttach(CCmdUI* pCmdUI);
+	afx_msg void OnFileShowDbInfo();
+	afx_msg void OnUpdateFileShowDbInfo(CCmdUI* pCmdUI);
+	afx_msg void OnExtrasShowExpired();
+	afx_msg void OnUpdateExtrasShowExpired(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

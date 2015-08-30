@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -48,8 +48,7 @@ char *CPwImport::_FileToMemory(const TCHAR *pszFile, unsigned long *pFileSize)
 	unsigned long uFileSize;
 	char *pData;
 
-	ASSERT(pszFile != NULL);
-	if(pszFile == NULL) return NULL;
+	ASSERT(pszFile != NULL); if(pszFile == NULL) return NULL;
 	if(_tcslen(pszFile) == 0) return NULL;
 
 	fp = _tfopen(pszFile, _T("rb"));
@@ -66,7 +65,7 @@ char *CPwImport::_FileToMemory(const TCHAR *pszFile, unsigned long *pFileSize)
 	fread(pData, 1, uFileSize, fp);
 	fclose(fp);
 
-	*pFileSize = uFileSize; // Store file size
+	if(pFileSize != NULL) *pFileSize = uFileSize; // Store file size
 	return pData;
 }
 
@@ -77,16 +76,17 @@ BOOL CPwImport::ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwGr
 	char *pProcessed;
 	BOOL bInField;
 
-	ASSERT(pMgr != NULL);
+	ASSERT(pszFile != NULL); if(pszFile == NULL) return FALSE;
+	ASSERT(pMgr != NULL); if(pMgr == NULL) return FALSE;
 
 	pData = _FileToMemory(pszFile, &uFileSize);
 	if(pData == NULL) return FALSE;
 
-	pProcessed = new char[uFileSize+1];
+	pProcessed = new char[uFileSize + 1];
 	if(pProcessed == NULL) { SAFE_DELETE_ARRAY(pData); return FALSE; }
 
 	// Last character mustn't be an escape character
-	if(pData[uFileSize-1] == '\\') pData[uFileSize-1] = 0;
+	if(pData[uFileSize - 1] == '\\') pData[uFileSize - 1] = 0;
 
 	j = 0; bInField = FALSE;
 	for(i = 0; i < uFileSize; i++)
@@ -94,8 +94,8 @@ BOOL CPwImport::ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwGr
 		if(pData[i] == '\\')
 		{
 			i++; // Skip escape character
-			pProcessed[j] = pData[i];
-			j++;
+			pProcessed[j] = pData[i]; // Write escaped symbol
+			j++; // Increase write counter
 		}
 		else if(pData[i] == '\"')
 		{
@@ -316,6 +316,7 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 
 	nField = 0;
 	i = 0; j = 0;
+	strGroup.Empty(); strTitle.Empty(); strUserName.Empty(); strPassword.Empty(); strNotes.Empty();
 	while(1)
 	{
 		if(pData[i] == '\t')
@@ -341,8 +342,11 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 		{
 			bInNotes = FALSE;
 
-			if(strNotes.GetAt(0) == '\"') strNotes = strNotes.Right(strNotes.GetLength() - 1);
-			if(strNotes.Right(1) == "\"") strNotes = strNotes.Left(strNotes.GetLength() - 1);
+			if(strNotes.GetLength() != 0)
+			{
+				if(strNotes.GetAt(0) == '\"') strNotes = strNotes.Right(strNotes.GetLength() - 1);
+				if(strNotes.Right(1) == "\"") strNotes = strNotes.Left(strNotes.GetLength() - 1);
+			}
 		}
 		else if((pData[i] == '\r') && (bInNotes == FALSE))
 		{
@@ -356,6 +360,7 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 				PW_GROUP pwT;
 				PW_TIME tNow;
 				_GetCurrentPwTime(&tNow);
+				memset(&pwT, 0, sizeof(PW_GROUP));
 				pwT.pszGroupName = (TCHAR *)(LPCTSTR)strGroup;
 				pwT.tCreation = tNow; CPwManager::_GetNeverExpireTime(&pwT.tExpire);
 				pwT.tLastAccess = tNow; pwT.tLastMod = tNow;

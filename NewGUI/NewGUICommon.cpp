@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,8 +31,10 @@
 #include "NewGUICommon.h"
 #include "BCMenu.h"
 #include "BtnST.h"
-#include "ShadeButtonST.h"
 #include "TranslateEx.h"
+#include "GradientProgressCtrl.h"
+
+#include "../PwSafe/PwUtil.h"
 
 static BOOL g_bImgButtons = 0;
 
@@ -70,6 +72,21 @@ void NewGUI_SetImgButtons(BOOL bImageButtons)
 
 void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage)
 {
+	CButtonST *p = (CButtonST *)pButton;
+
+	p->SetFlat(FALSE);
+
+	p->SetColor(CButtonST::BTNST_COLOR_FG_OUT, RGB(0, 0, 0), TRUE);
+	p->SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 0), TRUE);
+
+	if((g_bImgButtons == FALSE) && (bForceImage == FALSE)) return;
+
+	if((nBitmapIn != -1) && (nBitmapOut != -1))
+		p->SetBitmaps(nBitmapIn, RGB(255, 0, 255), nBitmapOut, RGB(255, 0, 255));
+}
+
+/* Old shade button code:
+
 	CShadeButtonST *p = (CShadeButtonST *)pButton;
 
 	p->DrawFlatFocus(TRUE);
@@ -96,7 +113,26 @@ void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImag
 
 	if((nBitmapIn != -1) && (nBitmapOut != -1))
 		p->SetBitmaps(nBitmapIn, RGB(255, 0, 255), nBitmapOut, RGB(255, 0, 255));
+*/
+
+/*
+COLORREF NewGUI_LightenColor(COLORREF crColor, double dblFactor)
+{
+	BYTE byRed, byGreen, byBlue, byLightRed, byLightGreen, byLightBlue;
+
+	byRed = GetRValue(crColor);
+	byGreen = GetGValue(crColor);
+	byBlue = GetBValue(crColor);
+
+	byLightRed = (BYTE)(dblFactor * (double)byRed);
+	byLightGreen = (BYTE)(dblFactor * (double)byGreen);
+	byLightBlue = (BYTE)(dblFactor * (double)byBlue);
+
+	crColor = RGB(byLightRed, byLightGreen, byLightBlue);
+
+	return crColor;
 }
+*/
 
 void NewGUI_ToolBarButton(void *pButton, int nBitmapIn, int nBitmapOut)
 {
@@ -136,4 +172,34 @@ BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
 	GetWindowText(hwnd, sz, 1023);
 	if(_tcslen(sz) <= 1021) SetWindowText(hwnd, TRL(sz));
 	return TRUE;
+}
+
+void NewGUI_ConfigQualityMeter(void *pWnd)
+{
+	CGradientProgressCtrl *p = (CGradientProgressCtrl *)pWnd;
+
+	ASSERT(p != NULL); if(p == NULL) return;
+	p->SetStartColor(RGB(255,128,0));
+	p->SetEndColor(RGB(0,255,0));
+	p->SetStep(1);
+	p->SetRange(0, 128);
+	p->SetPos(0);
+}
+
+void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword)
+{
+	CGradientProgressCtrl *pProgress = (CGradientProgressCtrl *)pProgressBar;
+	CStatic *pStatic = (CStatic *)pStaticDesc;
+
+	ASSERT(pProgress != NULL); if(pProgress == NULL) return;
+	ASSERT(pStatic != NULL); if(pStatic == NULL) return;
+
+	DWORD dwBits = EstimatePasswordBits(pszPassword);
+	if(dwBits > 9999) dwBits = 9999;
+
+	CString strQuality;
+	strQuality.Format(_T("%u bits"), dwBits);
+	pStatic->SetWindowText((LPCTSTR)strQuality);
+	if(dwBits > 128) dwBits = 128;
+	pProgress->SetPos((int)dwBits);
 }

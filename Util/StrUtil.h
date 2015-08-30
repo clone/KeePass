@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -49,7 +49,7 @@ void FixURL(CString *pstrURL);
 void ParseURL(CString *pString, PW_ENTRY *pEntry);
 
 // String conversion functions
-char *_StringToAscii(const TCHAR *lptString);
+char *_StringToAnsi(const TCHAR *lptString);
 TCHAR *_StringToUnicode(const char *pszString);
 
 // Convert UCS-2 to UTF-8 and the other way round
@@ -57,6 +57,8 @@ UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString);
 TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String);
 
 DWORD _UTF8NumChars(const UTF8_BYTE *pUTF8String);
+
+// This returns the needed bytes to represent the string, without terminating NULL character
 DWORD _UTF8BytesNeeded(const TCHAR *pszString);
 
 // Convert PW_TIME structure to a CString
@@ -68,5 +70,12 @@ void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid);
 
 // Get the filename of the file in psFilePath
 CString CsFileOnly(CString *psFilePath);
+
+// Convert ptString into a XML string
+TCHAR *MakeSafeXmlString(TCHAR *ptString);
+
+// Our own simple string functions which do some additional memory checks
+size_t szlen(const char *pszString);
+char *szcpy(char *szDestination, const char *szSource);
 
 #endif

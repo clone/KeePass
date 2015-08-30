@@ -9,27 +9,27 @@ BODY, P, DIV, H1, H2, H3, H4, H5, H6, LI, TD, TH, DD, DT
 {
 	font-family: Verdana, Helvetica, Arial, sans-serif;
 	font-size: 10pt;
-	color: Black;
+	color: #000000;
 }
 
 .quickjump {
-	background-color : #AFB5CF;
+	background-color: #AFB5CF;
 	font-family: Verdana, Helvetica, Arial, sans-serif;
-	color : Black;
-	border-width : 0px 0px 0px 0px;
-	border : #AFB5CF;
-	width : 100%;
-	font-size : 12px;
+	color: #000000;
+	border-width: 0px 0px 0px 0px;
+	border: #AFB5CF;
+	width: 100%;
+	font-size: 12px;
 }
 
 .quickjumptd {
 	background-color : #F0F0F0;
 	font-family: Verdana, Helvetica, Arial, sans-serif;
-	color : Black;
-	border-width : 0px 0px 0px 0px;
-	border : #F0F0F0;
-	width : 100%;
-	font-size : 12px;
+	color: #000000;
+	border-width: 0px 0px 0px 0px;
+	border: #F0F0F0;
+	width: 100%;
+	font-size: 12px;
 }
 
 h1 {
@@ -114,17 +114,17 @@ a:hover {
 .boxcontent {
 	background-color: #F0F0F0;
 	font-family: Verdana, Helvetica, Arial, sans-serif;
-	color: Black;
+	color: #000000;
 	font-weight: normal;
 	font-size: 10pt;
 }
 
 pre {
-	font-family : "Courier New", Courier, monospace;
-	background-color : #F0F0F0;
-	font-size : 11px;
-	overflow : auto;
-	width : 100%;
+	font-family: "Courier New", Courier, monospace;
+	background-color: #F0F0F0;
+	font-size: 11px;
+	overflow: auto;
+	width: 100%;
 }
 </style>
 
@@ -136,7 +136,7 @@ pre {
     <td class="quickjumptd">
 	&nbsp;Links:&nbsp;
 	<a href="http://keepass.sourceforge.net">[Visit KeePass homepage]</a>&nbsp;
-	<a href="http://www.codeproject.com/tools/KeePass.asp">[An article]</a>
+	<a href="http://www.codeproject.com/tools/KeePass.asp">[KeePass usage tutorial]</a>
     </td>
 </tr>
 </table>
@@ -146,7 +146,7 @@ pre {
 &nbsp;KeePass Password Safe</td></tr></table>
 
 <br>
-KeePass is Copyright (c) 2003 Dominik Reichl. KeePass is OSI Certified Open Source Software. OSI Certified is a certification mark of the Open Source Initiative.
+KeePass is Copyright (c) 2003/2004 Dominik Reichl. KeePass is OSI Certified Open Source Software. OSI Certified is a certification mark of the Open Source Initiative.
 For more information see the <a href="License.html" target="_blank">License</a> file.<br>
 
 <br>Index:<ul>
@@ -162,43 +162,55 @@ For more information see the <a href="License.html" target="_blank">License</a> 
 </ul><br>
 
 <table class="tablebox"><tr><td class="boxtitle">
-&nbsp;<a name="info"></a>General information about KeePass</td></tr></table>
+&nbsp;<a name="info" id="info"></a>General information about KeePass</td></tr></table>
 <br>
 KeePass is a free, open-source, light-weight and easy-to-use password safe for Windows.<br>
 <br>
 <u>The programs key-features:</u>
 <ul>
-<li>Store passwords in a highly encrypted database (AES/Rijndael encrypted, SHA-256 as password hash)</li>
-<li>A database consists of one file that can be transferred from one computer to another easily.</li>
-<li>KeePass supports password groups, so you can sort your passwords</li>
-<li>Drag-n-Drop passwords into other windows.</li>
-<li>Export password list to TXT, HTML, XML or CSV files.</li>
-<li>Print password list.</li>
-<li>Fast copy password or user name to the Windows clipboard.</li>
-<li>Searching in password database is possible.</li>
-<li>KeePass can be translated into other languages very easily. Currently English, German and French are available.</li>
-<li>A strong random password generator (you can define the possible output characters)</li>
-<li>It's free and you have full access to its source code!</li>
+<li>Highly encrypted databases</a></li>
+<li>Support of master passwords and key-disks</a></li>
+<li>Runs on all Windows operating systems and doesn't need to be installed</a></li>
+<li>Export password list to TXT, HTML, XML or CSV files</a></li>
+<li>Import from CSV and CodeWallet(Pro) TXT files</a></li>
+<li>Easy database transfer</a></li>
+<li>Support of password groups</a></li>
+<li>Time fields support</a></li>
+<li>Drag-n-Drop support</a></li>
+<li>Fast copy fields to the Windows clipboard</a></li>
+<li>Searching and sorting</a></li>
+<li>Multi-language translation support</a></li>
+<li>Strong random password generator</a></li>
+<li>Low memory requirement</a></li>
+<li>Open-Source!</a></li>
 </ul>
-<br>
+<br />
 <table class="tablebox"><tr><td class="boxtitle">
-&nbsp;<a name="inst"></a>Installation / un-installation</td></tr></table>
-<br>
-KeePass doesn't need to be installed. Just unpack the archive you downloaded and it
-works.<br>
-<br>
-KeePass doesn't install anything into the environment of your Windows.
-The program stores its settings in a file in the same directory of the executable.
-So no registry entries or initialization files in the Windows directory
-are left on your computer when you delete the folder of KeePass.<br>
-<br>
-<br>
+&nbsp;<a name="inst" id="inst"></a>Installation / un-installation</td></tr></table>
+<br />
+<br />
+The application doesn't need to be installed. The KeePass development team provides you
+an installer which automates creating links in the startmenu etc., but you also can download
+the binary zip package which contains only the main executable, which runs fine without installing
+anything.<br />
+<br />
+KeePass doesn't, in contrast to many other applications, use any functions that require
+the latest Windows operating system, such like theming on XP or like a .NET application requiring a .NET
+framework.<br />
+<br />
+KeePass doesn't store anything on your system. The program doesn't create any new
+registry keys and it doesn't create any initialization files (ini) in your Windows directory.
+Deleting the KeePass directory (in case you downloaded the binary zip package) or using the
+uninstaller (in case you downloaded the installer package) leaves no trace of KeePass on your
+system.<br />
+<br />
+<br />
 <table class="tablebox"><tr><td class="boxtitle">
-&nbsp;<a name="oscompat"></a>Compatible operating systems</td></tr></table>
+&nbsp;<a name="oscompat" id="oscompat"></a>Compatible operating systems</td></tr></table>
 <br>
 KeePass runs on all Windows systems available on the market:
 <ul>
-<li>Windows 95/98/ME</li>
+<li>Windows 95 / 98 / 98SE / ME</li>
 <li>Windows NT 4.0</li>
 <li>Windows 2000</li>
 <li>Windows XP</li>
@@ -207,7 +219,7 @@ KeePass runs on all Windows systems available on the market:
 <br>
 
 <table class="tablebox"><tr><td class="boxtitle">
-&nbsp;<a name="intro"></a>Introduction</td></tr></table>
+&nbsp;<a name="intro" id="intro"></a>Introduction</td></tr></table>
 <br>
 Today you need to remember many passwords. You need a password for the Windows
 network logon, your e-mail account, your homepage's ftp password, online
@@ -250,7 +262,7 @@ for details.
 <br>
 
 <table class="tablebox"><tr><td class="boxtitle">
-&nbsp;<a name="keyinfo"></a>Master passwords and key-disks</td></tr></table>
+&nbsp;<a name="keyinfo" id="keyinfo"></a>Master passwords and key-disks</td></tr></table>
 <br>
 KeePass stores your passwords securely in an encrypted database. This database
 is locked with a master password or key-disk.<br>
@@ -283,7 +295,7 @@ So you must decide: either use a really good master password or a key-disk.
 <br>
 
 <table class="tablebox"><tr><td class="boxtitle">
-&nbsp;<a name="keesec"></a>Security</td></tr></table>
+&nbsp;<a name="keesec" id="keesec"></a>Security</td></tr></table>
 <br>
 In this section I will tell you how the databases are encrypted. If you
 aren't a cryptographer and don't know anything in the security field you won't
@@ -305,7 +317,7 @@ the AES/Rijndael cipher and the SHA-256 are tested against their correct test ve
 <br><br>
 
 <table class="tablebox"><tr><td class="boxtitle">
-&nbsp;<a name="keeint"></a>Internals</td></tr></table>
+&nbsp;<a name="keeint" id="keeint"></a>Internals</td></tr></table>
 <br>
 There is a password manager class (<code>CPwManager</code>) which handles all the operations
 concerning the database. It exports functions for editing groups, edit password
@@ -334,7 +346,7 @@ using mouse movement and typing random characters).<br>
 <br><br>
 
 <table class="tablebox"><tr><td class="boxtitle">
-&nbsp;<a name="thanks"></a>Thanks / Acknowledgements</td></tr></table>
+&nbsp;<a name="thanks" id="thanks"></a>Thanks / Acknowledgements</td></tr></table>
 <br>
 At this place I want to thank a few people very much for their help,
 source code, classes and suggestions: (no particular order)
@@ -342,15 +354,25 @@ source code, classes and suggestions: (no particular order)
 <li><i>Szymon Stefanek</i> - for his C++ implementation of the Rijndael cipher</li>
 <li><i>Dr Brian Gladman</i> - for his C implementation of the SHA-2 (256/384/512) hashing algorithms
 <li><i>Brent Corkum</i> - for his XP-like menu (BCMenu)</li>
-<li><i>Davide Calabro</i> - for his CShadeButtonST class</li>
+<li><i>Davide Calabro</i> - for his CButtonST class</li>
 <li><i>Paul S. Vickery</i> - for his hyperlink edit control</li>
 <li><i>Peter Mares</i> - for his side banner window class</li>
 <li><i>Simon Wang</i> - for his combobox class</li>
 <li><i>Chris Maunder</i> - for his CSystemTray class</li>
 <li><i>Daniel Turini</i> - for suggesting "KeePass" as name for the password safe</li>
-<li><i>Marc Tissot</i> - for creating and maintaining the French translation</li>
+
+<li><i>Doncho Angelov</i> - for creating and maintaining the Bulgarian translation</li>
+<li><i>Lubos Stanek</i> - for creating and maintaining the Czech translation</li>
 <li><i>Kees Koenders</i> - for creating and maintaining the Dutch translation</li>
+<li><i>Andri Viiand</i> - for creating and maintaining the Estonian translation</li>
+<li><i>Marc Tissot</i> - for creating and maintaining the French translation</li>
+<li><i>Park Dae Beom</i> - for creating and maintaining the Korean translation</li>
+<li><i>Jo Chapparal</i> - for creating and maintaining the Norwegian translation</li>
+<li><i>Maciej Chojnacki</i> - for creating and maintaining the Polish translation</li>
+<li><i>Fabio Negri Cicotti</i> - for creating and maintaining the Portuguese translation</li>
+<li><i>Radoslav Bielik</i> - for creating and maintaining the Slovak translation</li>
 <li><i>Michael &Aring;str&ouml;m</i> - for creating and maintaining the Swedish translation</li>
+
 <li><i>The UPX team</i> - for the UPX executable compressor</li>
 </ul>
 

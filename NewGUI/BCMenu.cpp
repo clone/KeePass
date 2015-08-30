@@ -161,7 +161,7 @@ BCMenu::BCMenu()
 	// set the color used for the transparent background in all bitmaps
 	m_bitmapBackground=RGB(192,192,192); //gray
 	m_bitmapBackgroundFlag=FALSE;
-	GetCPInfo(CP_ACP,&CPInfo);
+	GetCPInfo(GetACP(),&CPInfo);
 	m_loadmenu=FALSE;
 }
 

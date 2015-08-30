@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -55,12 +55,14 @@ CPasswordDlg::CPasswordDlg(CWnd* pParent /*=NULL*/)
 
 	m_bLoadMode = TRUE;
 	m_bConfirm = FALSE;
+	m_strDescriptiveName = _T("");
 }
 
 void CPasswordDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CPasswordDlg)
+	DDX_Control(pDX, IDC_PROGRESS_PASSQUALITY, m_cPassQuality);
 	DDX_Control(pDX, IDC_CHECK_STARS, m_btStars);
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
@@ -76,6 +78,7 @@ BEGIN_MESSAGE_MAP(CPasswordDlg, CDialog)
 	//{{AFX_MSG_MAP(CPasswordDlg)
 	ON_BN_CLICKED(IDC_CHECK_STARS, OnCheckStars)
 	ON_BN_CLICKED(IDC_MAKEPASSWORD_BTN, OnMakePasswordBtn)
+	ON_EN_CHANGE(IDC_EDIT_PASSWORD, OnChangeEditPassword)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -96,6 +99,8 @@ BOOL CPasswordDlg::OnInitDialog()
 	NewGUI_Button(&m_btMakePw, IDB_KEY_SMALL, IDB_KEY_SMALL);
 	NewGUI_Button(&m_btStars, -1, -1);
 	m_btStars.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
+
+	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
 	m_ilIcons.Create(IDR_INFOICONS, 16, 1, RGB(255,0,255)); // Purple is transparent
 	m_cbDiskList.SetXImageList(&m_ilIcons);
@@ -164,7 +169,16 @@ BOOL CPasswordDlg::OnInitDialog()
 			GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
 
 			SetWindowText(TRL("Create a new password database - Enter master key"));
-			m_banner.SetTitle(TRL("Set master key"));
+
+			CString str;
+			str = TRL("Set master key");
+			if(m_strDescriptiveName.GetLength() != 0)
+			{
+				str += _T(" - ");
+				str += m_strDescriptiveName;
+			}
+			m_banner.SetTitle(str);
+
 			m_banner.SetCaption(TRL("Enter the master key for the new database."));
 		}
 		else
@@ -173,10 +187,21 @@ BOOL CPasswordDlg::OnInitDialog()
 			GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
 
 			SetWindowText(TRL("Open database - Enter master key"));
-			m_banner.SetTitle(TRL("Enter master key"));
+
+			CString str;
+			str = TRL("Enter master key");
+			if(m_strDescriptiveName.GetLength() != 0)
+			{
+				str += _T(" - ");
+				str += m_strDescriptiveName;
+			}
+			m_banner.SetTitle(str);
+
 			m_banner.SetCaption(TRL("Enter the master key for this database."));
 
 			GetDlgItem(IDC_MAKEPASSWORD_BTN)->ShowWindow(SW_HIDE);
+			m_cPassQuality.ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC_PASSBITS)->ShowWindow(SW_HIDE);
 		}
 	}
 	else // m_bConfirm == TRUE
@@ -192,6 +217,9 @@ BOOL CPasswordDlg::OnInitDialog()
 			SetWindowText(TRL("Create a new password database - Repeat master key"));
 			m_banner.SetTitle(TRL("Repeat master password"));
 			m_banner.SetCaption(TRL("Repeat the master key for the new database."));
+
+			m_cPassQuality.ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC_PASSBITS)->ShowWindow(SW_HIDE);
 		}
 		else
 		{
@@ -203,7 +231,15 @@ BOOL CPasswordDlg::OnInitDialog()
 			GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
 
 			SetWindowText(TRL("Open database - Enter master key"));
-			m_banner.SetTitle(TRL("Enter master key"));
+
+			CString str;
+			str = TRL("Enter master key");
+			if(m_strDescriptiveName.GetLength() != 0)
+			{
+				str += _T(" - ");
+				str += m_strDescriptiveName;
+			}
+			m_banner.SetTitle(str);
 			m_banner.SetCaption(TRL("Enter the master key for this database."));
 
 			GetDlgItem(IDC_MAKEPASSWORD_BTN)->ShowWindow(SW_HIDE);
@@ -219,6 +255,8 @@ BOOL CPasswordDlg::OnInitDialog()
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	UpdateData(FALSE);
+
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
 
 	m_pEditPw.SetFocus();
 	return FALSE; // Return TRUE unless you set the focus to a control
@@ -236,6 +274,9 @@ void CPasswordDlg::CleanUp()
 
 void CPasswordDlg::OnOK() 
 {
+	CString strTemp;
+	ULARGE_INTEGER aBytes[3];
+
 	UpdateData(TRUE);
 
 	// Either password _or_ key disk
@@ -253,8 +294,40 @@ void CPasswordDlg::OnOK()
 	}
 	else
 	{
+		m_cbDiskList.GetLBText(m_cbDiskList.GetCurSel(), strTemp);
+
+		if(GetDiskFreeSpaceEx((LPCTSTR)strTemp, &aBytes[0], &aBytes[1], &aBytes[2]) == FALSE)
+		{
+			strTemp = TRL("Cannot access the selected drive.");
+			strTemp += _T("\r\n\r\n");
+			strTemp += TRL("Make sure a writable medium is inserted.");
+			MessageBox(strTemp, TRL("Stop"), MB_OK | MB_ICONWARNING);
+			return;
+		}
+
+		if(aBytes[2].QuadPart < 128)
+		{
+			MessageBox(TRL("Not enough free disk space!"), TRL("Stop"), MB_OK | MB_ICONWARNING);
+			return;
+		}
+
+		FILE *fpTest;
+		CString strTemp2 = strTemp;
+		strTemp2 += _T("12398756.323"); // Just a random filename
+		fpTest = _tfopen((LPCTSTR)strTemp2, _T("wb"));
+		if(fpTest == NULL)
+		{
+			strTemp = TRL("Cannot access the selected drive.");
+			strTemp += _T("\r\n\r\n");
+			strTemp += TRL("Make sure a writable medium is inserted.");
+			MessageBox(strTemp, TRL("Stop"), MB_OK | MB_ICONWARNING);
+			return;
+		}
+		fclose(fpTest); Sleep(100);
+		DeleteFile(strTemp2);
+
 		m_bKeyFile = TRUE;
-		m_cbDiskList.GetLBText(m_cbDiskList.GetCurSel(), m_strRealKey);
+		m_strRealKey = strTemp;
 		ASSERT(m_strRealKey.GetLength() != 0);
 	}
 
@@ -297,5 +370,13 @@ void CPasswordDlg::OnMakePasswordBtn()
 		m_bStars = FALSE;
 		UpdateData(FALSE);
 		OnCheckStars();
+
+		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
 	}
+}
+
+void CPasswordDlg::OnChangeEditPassword() 
+{
+	UpdateData(TRUE);
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
 }

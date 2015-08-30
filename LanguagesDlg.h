@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,8 +32,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-#include "NewGUI/ShadeButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
+#include "NewGUI/BtnST.h"
 
 class CLanguagesDlg : public CDialog
 {
@@ -47,9 +47,9 @@ public:
 
 	//{{AFX_DATA(CLanguagesDlg)
 	enum { IDD = IDD_LANGUAGES_DLG };
-	CShadeButtonST	m_btGetLang;
+	CButtonST	m_btGetLang;
 	CListCtrl	m_listLang;
-	CShadeButtonST	m_btClose;
+	CButtonST	m_btClose;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CLanguagesDlg)

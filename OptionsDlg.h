@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,9 +31,9 @@
 #define AFX_OPTIONSDLG_H__97A7BE00_1851_11D8_BF16_0050BF14F5CC__INCLUDED_
 
 #include "NewGUI/KCSideBannerWnd.h"
-#include "NewGUI/ShadeButtonST.h"
 #include "NewGUI/WindowGroups.h"
 #include "NewGUI/ColourPickerXP.h"
+#include "NewGUI/BtnST.h"
 
 #define OPTGRP_SECURITY  0
 #define OPTGRP_STARTEXIT 1
@@ -69,14 +69,13 @@ public:
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };
-	CShadeButtonST	m_btnDeleteAssoc;
-	CShadeButtonST	m_btnCreateAssoc;
+	CButtonST	m_btnDeleteAssoc;
+	CButtonST	m_btnCreateAssoc;
 	CColourPickerXP	m_btnColorRowHighlight;
 	CTabCtrl	m_tabMenu;
-	CComboBox	m_cEncAlgos;
-	CShadeButtonST	m_btSelFont;
-	CShadeButtonST	m_btCancel;
-	CShadeButtonST	m_btOK;
+	CButtonST	m_btSelFont;
+	CButtonST	m_btCancel;
+	CButtonST	m_btOK;
 	int		m_nNewlineSequence;
 	UINT	m_uClipboardSeconds;
 	BOOL	m_bOpenLastDb;
@@ -85,11 +84,11 @@ public:
 	BOOL	m_bAutoSave;
 	BOOL	m_bLockOnMinimize;
 	BOOL	m_bMinimizeToTray;
-	int		m_nAlgorithm;
 	BOOL	m_bLockAfterTime;
 	UINT	m_nLockAfter;
 	BOOL	m_bColAutoSize;
 	BOOL	m_bCloseMinimizes;
+	BOOL	m_bDisableUnsafe;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(COptionsDlg)

@@ -1,4 +1,5 @@
 ; Script de localisation Française pour KeePass Password Safe 
+; updated for Inno Setup 4.2.1
 ; Adaptation multi langage par Lubos Stanek
 
 ;[Types]
@@ -18,20 +19,5 @@
 ;Name: "/koreanlanguage"; Description: "Support du Coréen"; Types: full; Languages: fr
 ;Name: "/swedishlanguage"; Description: "Support du Suédois"; Types: full; Languages: fr
 
-[Tasks]
-; translate Descriptions
-Name: "desktopicon"; Description: "Créer une icône sur le &bureau"; GroupDescription: "Icônes additionnelles:"; Languages: fr
-Name: "quicklaunchicon"; Description: "Créer une icône de lancement &rapide"; GroupDescription: "Icônes additionnelles:"; Flags: unchecked; Languages: fr
-
 ;[INI]
 ;Filename: "{app}\KeePass.ini"; Section: "KeePass"; Key: "KeeLanguage"; String: "French"; Languages: fr
-
-[Icons]
-; translate Names except {#CrossAppFullName}
-Name: "{group}\{#CrossAppFullName} sur le Web"; Filename: "{app}\KeePass.url"; Languages: fr
-Name: "{group}\désinstaller {#CrossAppFullName}"; Filename: "{uninstallexe}"; Languages: fr
-
-[Run]
-; translate Description except {#CrossAppFullName}
-Filename: "{app}\KeePass.exe"; Description: "Lancer {#CrossAppFullName}"; Flags: nowait postinstall skipifsilent; Languages: fr
-

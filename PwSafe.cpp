@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -71,8 +71,8 @@ BOOL CPwSafeApp::InitInstance()
 
 	// Create application's mutex object to make our presence public
 	m_pAppMutex = new CMutex(FALSE, _T("KeePassApplicationMutex"), NULL);
-	if(m_pAppMutex == NULL) return FALSE;
- 
+	if(m_pAppMutex == NULL) { ASSERT(FALSE); }
+
 	AfxOleInit();
 	AfxEnableControlContainer();
 	AfxInitRichEdit();
@@ -101,9 +101,9 @@ int CPwSafeApp::ExitInstance()
 	if(m_pAppMutex != NULL)
 	{
 		m_pAppMutex->Unlock();
-		SAFE_DELETE(m_pAppMutex);
+		delete m_pAppMutex;
 	}
-	
+
 	return CWinApp::ExitInstance();
 }
 

@@ -1,7 +1,7 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |0.94a|
+|~LANGUAGEVERSION|             |0.95a|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
-|~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://keepass.sourceforge.net|
+|~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
 |&OK|                          |&OK|
 |&Cancel|                      |&Abbrechen|
@@ -149,7 +149,6 @@
 |Pick an icon from the list and click OK to set it.|
     |Wählen Sie in Icon aus der Liste unten aus und klicken Sie OK.|
 
-
 |&File|                        |&Datei|
 |&Edit|                        |&Bearbeiten|
 |&View|                        |&Ansicht|
@@ -211,6 +210,8 @@
 
 |Visit KeePass &Homepage|      |KeePass-&Homepage besuchen|
 |&About KeePass...|            |Ü&ber KeePass...|
+
+|&Database Settings...|        |&Datenbank-Einstellungen...|
 
 |&Minimize/Maximize Window To/From Tray|
     |Umschalten Hauptfenster/Tray|
@@ -479,3 +480,34 @@
 |Create &Association|                     |&Assoziation erstellen|
 |&Remove Association|                     |Assoziation &löschen|
 |Setup|                                   |Setup|
+|Password List|                           |Passwort-Liste|
+|Exit?|                                   |Beenden?|
+|The file couldn't be saved.|             |Die Datei konnte nicht gespeichert werden.|
+|Maybe it's read-only or the storage media has been removed.|
+    |Möglicherweise ist die Datei schreibgeschützt oder das Speichermedium wurde entfernt.|
+|If you exit now, all changes to the current database will be lost.|
+    |Wenn Sie KeePass jetzt beenden, gehen ihre Änderungen an der aktuellen Datenbank verloren.|
+|Would you like to exit anyway?|          |Möchten Sie KeePass jetzt trotzdem beenden?|
+|Cannot access the selected drive.|       |KeePass kann auf das ausgewählte Laufwerk nicht zugreifen.|
+|Make sure a writable medium is inserted.||Stellen Sie sicher, dass sich ein beschreibbares Medium im Laufwerk befindet.|
+|Not enough free disk space!|             |Nicht genügend Speicherplatz auf dem Medium verfügbar!|
+|Disable unsafe (security-critical) operations like exports, etc.|
+    |Sicherheitsgefährdende Operationen wie z.B. Exporte deaktivieren|
+|Unsafe operations are disabled.|         |Sicherheitsgefährdende Operationen sind deaktiviert.|
+|To execute this operation you must enable unsafe operations in the options dialog.|
+    |Um diese Operation ausführen zu können, müssen Sie die unsicheren Funktionen im Optionsdialog aktivieren.|
+|You have changed an option that requires restarting KeePass to get active.|
+    |Sie haben eine Option geändert, die einen Neustart von KeePass benötigt, um aktiv zu werden.|
+|Expired Entries|                         |Abgelaufene Einträge|
+|This is a list of all expired entries|   |Dies ist eine Liste aller abgelaufenen Passwörter|
+|Show All &Expired Entries...|            |Alle &abgelaufenen Einträge anzeigen...|
+|Click on an entry to jump to it.|        |Klicken Sie auf einen Eintrag, um zu ihm zu springen.|
+|Quality:|                                |Qualität:|
+|Database Settings|                       |Datenbank-Einstellungen|
+|Here you can configure the current database.| |Hier können Sie die aktuelle Datenbank konfigurieren.|
+|Database Summary|                        |Datenbank-Zusammenfassung|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
+    |Ihr Schlüssel wird mehrmals verschlüsselt, um den finalen Datenbank-Verschlüsselungscode zu erzeugen. Dies ist ein konstanter Zeitfaktor und eine Brute-Force-Attacke wird damit deutlich schwieriger.|
+|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
+    |Je größer diese Zahl ist, desto schwieriger sind Brute-Force-Attacken. Je größer allerdings diese Zahl ist, desto länger dauert auch das Laden und Speichern der Datenbank.|
+|Number of key encryption rounds:|        |Anzahl Passwort-Verschlüsselungsrunden:|

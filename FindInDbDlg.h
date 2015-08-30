@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,7 +31,7 @@
 #define AFX_FINDINDBDLG_H__BE7DB380_15E6_11D8_BF16_0050BF14F5CC__INCLUDED_
 
 #include "NewGUI/KCSideBannerWnd.h"
-#include "NewGUI/ShadeButtonST.h"
+#include "NewGUI/BtnST.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -44,8 +44,8 @@ public:
 
 	//{{AFX_DATA(CFindInDbDlg)
 	enum { IDD = IDD_FIND_DLG };
-	CShadeButtonST	m_btOK;
-	CShadeButtonST	m_btCancel;
+	CButtonST	m_btOK;
+	CButtonST	m_btCancel;
 	BOOL	m_bAdditional;
 	BOOL	m_bPassword;
 	BOOL	m_bTitle;

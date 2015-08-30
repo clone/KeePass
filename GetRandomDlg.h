@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,7 +31,7 @@
 #define AFX_GETRANDOMDLG_H__28A6C1A0_0FA4_11D8_BF16_0050BF14F5CC__INCLUDED_
 
 #include "NewGUI/KCSideBannerWnd.h"
-#include "NewGUI/ShadeButtonST.h"
+#include "NewGUI/BtnST.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -52,9 +52,9 @@ public:
 
 	//{{AFX_DATA(CGetRandomDlg)
 	enum { IDD = IDD_GETRANDOM_DLG };
-	CShadeButtonST	m_btCancel;
-	CShadeButtonST	m_btOK;
-	CShadeButtonST	m_btMouseInput;
+	CButtonST	m_btCancel;
+	CButtonST	m_btOK;
+	CButtonST	m_btMouseInput;
 	CProgressCtrl	m_cMouseProgress;
 	CString	m_strRandom;
 	//}}AFX_DATA

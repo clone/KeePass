@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -54,11 +54,11 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	m_bAutoSave = FALSE;
 	m_bLockOnMinimize = FALSE;
 	m_bMinimizeToTray = FALSE;
-	m_nAlgorithm = -1;
 	m_bLockAfterTime = FALSE;
 	m_nLockAfter = 0;
 	m_bColAutoSize = FALSE;
 	m_bCloseMinimizes = FALSE;
+	m_bDisableUnsafe = FALSE;
 	//}}AFX_DATA_INIT
 }
 
@@ -70,7 +70,6 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_CREATEASSOC, m_btnCreateAssoc);
 	DDX_Control(pDX, IDC_BTN_ROWHIGHLIGHTSEL, m_btnColorRowHighlight);
 	DDX_Control(pDX, IDC_TAB_MENU, m_tabMenu);
-	DDX_Control(pDX, IDC_COMBO_ENCALGO, m_cEncAlgos);
 	DDX_Control(pDX, IDC_BTN_SELFONT, m_btSelFont);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
 	DDX_Control(pDX, IDOK, m_btOK);
@@ -82,11 +81,11 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_AUTOSAVE, m_bAutoSave);
 	DDX_Check(pDX, IDC_CHECK_LOCKMIN, m_bLockOnMinimize);
 	DDX_Check(pDX, IDC_CHECK_MINTRAY, m_bMinimizeToTray);
-	DDX_CBIndex(pDX, IDC_COMBO_ENCALGO, m_nAlgorithm);
 	DDX_Check(pDX, IDC_CHECK_LOCKAFTERTIME, m_bLockAfterTime);
 	DDX_Text(pDX, IDC_EDIT_LOCKSECONDS, m_nLockAfter);
 	DDX_Check(pDX, IDC_CHECK_COLAUTOSIZE, m_bColAutoSize);
 	DDX_Check(pDX, IDC_CHECK_CLOSEMIN, m_bCloseMinimizes);
+	DDX_Check(pDX, IDC_CHECK_DISABLEUNSAFE, m_bDisableUnsafe);
 	//}}AFX_DATA_MAP
 }
 
@@ -148,14 +147,14 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(NULL, OPTGRP_GUI);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_SELROWHIGHLIGHT), OPTGRP_GUI);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_ROWHIGHLIGHTSEL), OPTGRP_GUI);
-	
-	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CIPHERTEXT), OPTGRP_SECURITY);
-	m_wndgrp.AddWindow(&m_cEncAlgos, OPTGRP_SECURITY);
-	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY);
+
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_LOCKMIN), OPTGRP_SECURITY);
 	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_LOCKAFTERTIME), OPTGRP_SECURITY);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_LOCKSECONDS), OPTGRP_SECURITY);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_DISABLEUNSAFE), OPTGRP_SECURITY);
 
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_ASSOC), OPTGRP_SETUP);
 	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
@@ -185,10 +184,6 @@ BOOL COptionsDlg::OnInitDialog()
 	tci.iImage = 42; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
 	tci.cchTextMax = _tcslen(TRL(OPTSZ_SETUP)); tci.pszText = (char *)TRL(OPTSZ_SETUP);
 	tci.iImage = 30; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
-
-	m_cEncAlgos.AddString(TRL("Advanced Encryption Standard (AES) (128-bit block cipher using 256-bit key)"));
-	m_cEncAlgos.AddString(TRL("Twofish (128-bit block cipher using 256-bit key)"));
-	m_cEncAlgos.SetCurSel(m_nAlgorithm);
 
 	m_tabMenu.SetCurSel(0);
 

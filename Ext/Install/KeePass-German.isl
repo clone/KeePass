@@ -1,4 +1,5 @@
 ; German KeePass Password Safe Localization Script
+; updated for Inno Setup 4.2.1
 ; multilanguage adaptation by Lubos Stanek
 
 ;[Types]
@@ -18,19 +19,5 @@
 ;Name: "/koreanlanguage"; Description: "Korean language support"; Types: full; Languages: de
 ;Name: "/swedishlanguage"; Description: "Swedish language support"; Types: full; Languages: de
 
-[Tasks]
-; translate Descriptions
-Name: "desktopicon"; Description: "&Desktop-Icon erstellen"; GroupDescription: "Zusätzliche Icons:"; Languages: de
-Name: "quicklaunchicon"; Description: "&Schnellstart-Icon in Taskleiste erstellen"; GroupDescription: "Zusätzliche Icons:"; Flags: unchecked; Languages: de
-
 ;[INI]
 ;Filename: "{app}\KeePass.ini"; Section: "KeePass"; Key: "KeeLanguage"; String: "German"; Languages: de
-
-[Icons]
-; translate Names except {#CrossAppFullName}
-Name: "{group}\{#CrossAppFullName}-Homepage besuchen"; Filename: "{app}\KeePass.url"; Languages: de
-Name: "{group}\{#CrossAppFullName} deinstallieren"; Filename: "{uninstallexe}"; Languages: de
-
-[Run]
-; translate Description except {#CrossAppFullName}
-Filename: "{app}\KeePass.exe"; Description: "{#CrossAppFullName} starten"; Flags: nowait postinstall skipifsilent; Languages: de

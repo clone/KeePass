@@ -1,4 +1,5 @@
 ; Dutch KeePass Password Safe Localization Script
+; updated for Inno Setup 4.2.1
 ; multilanguage adaptation by Lubos Stanek
 
 ;[Types]
@@ -18,20 +19,5 @@
 ;Name: "/koreanlanguage"; Description: "Ondersteun Koreaanse taal"; Types: full; Languages: nl
 ;Name: "/swedishlanguage"; Description: "Ondersteun Zweedse taal"; Types: full; Languages: nl
 
-[Tasks]
-; translate Descriptions
-Name: "desktopicon"; Description: "Maak een &Bureaublad pictogram"; GroupDescription: "Extra pictogrammen:"; Languages: nl
-Name: "quicklaunchicon"; Description: "Maak een &Snelstart pictogram"; GroupDescription: "Extra pictogrammen:"; Flags: unchecked; Languages: nl
-
 ;[INI]
 ;Filename: "{app}\KeePass.ini"; Section: "KeePass"; Key: "KeeLanguage"; String: "Dutch"; Languages: nl
-
-[Icons]
-; translate Names except {#CrossAppFullName}
-Name: "{group}\{#CrossAppFullName} op het web"; Filename: "{app}\KeePass.url"; Languages: nl
-Name: "{group}\Deïnstalleer {#CrossAppFullName}"; Filename: "{uninstallexe}"; Languages: nl
-
-[Run]
-; translate Description except {#CrossAppFullName}
-Filename: "{app}\KeePass.exe"; Description: "Start {#CrossAppFullName}"; Flags: nowait postinstall skipifsilent; Languages: nl
-

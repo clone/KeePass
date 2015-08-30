@@ -1,0 +1,25 @@
+Copyright (c) 2003/2004, Dominik Reichl
+Vöetky pr·va vyhradenÈ.
+
+Toto je neofici·lny preklad licencie programu. Pre pr·vne ˙Ëely je smerodajnÈ jedine origin·lne anglickÈ znenie licencie, ktorÈ je uvedenÈ niûöie na konci tohoto dokumentu.
+
+Ak·koævek Ôalöia distrib˙cia a pouûitie vo forme zdrojov˝ch kÛdov alebo bin·rnych s˙borov, s ˙pravami alebo bez nich, je povolen· len v prÌpade ûe s˙ splnenÈ nasleduj˙ce podmienky:
+
+- Pri distrib˙cii zdrojovÈho kÛdu musÌ byù zachovanÈ vyööie uvedenÈ upozornenie na vlastnÌctvo autorsk˝ch pr·v, tento zoznam podmienok a "Zrieknutie sa z·ruk" uvedenÈ niûöie.
+- Pri distrib˙cii bin·rnych s˙borov musÌ byù poskytnutÈ vyööie uvedenÈ upozornenie na vlastnÌctvo autorsk˝ch pr·v, tento zoznam podmienok a "Zrieknutie sa z·ruk" uvedenÈ niûöie ako s˙Ëasù dokument·cie a/alebo in˝ch s˙borov ktorÈ s˙ s˙Ëasùou distrib˙cie.
+- Ani n·zov ReichlSoft ani men· prispievateæov nesm˙ byù pouûitÈ na podporu, propag·ciu alebo reklamu produktov odvoden˝ch od tohoto softvÈru bez predch·dzaj˙ceho pÌsomnÈho povolenia na takÈto pouûitie.
+
+ZRIEKNUTIE SA Z¡RUK:
+TENTO SOFTV…R JE POSKYTOVAN› VLASTNÕKMI AUTORSK›CH PR¡V A PRISPIEVATEºMI "TAK AKO JE" BEZ Z¡RUKY AK…HOKOºVEK DRUHU, »I Ué V›SLOVNEJ ALEBO VYPL›VAJ⁄CEJ, VR¡TANE, ALE BEZ OBMEDZENIA NA, Z¡RUKY PREDAJNOSTI A VHODNOSTI NA UR»IT› ⁄»EL. V éIADNOM PRÕPADE NEBUDE éIADNY Z DRéITEºOV AUTORSK›CH PR¡V ALEBO PRISPIEVATEºOV ZODPOVEDN› ZA AK…KOºVEK äKODY, VR¡TANE PRIAMYCH, NEPRIAMYCH, N¡HODN›CH, VEDºAJäÕCH, V›NIMO»N›CH, UK¡éKOV›CH A N¡SLEDN›CH äK‘D (VR¡TANE ALE BEZ OBMEDZENIA NA SPROSTREDKOVANIE N¡HRADY TOVARU ALEBO SLUéIEB, STRATY POUéITEºNOSTI, STRATY ⁄DAJOV VALEBO ZISKU, A PRERUäENIA OBCHODNEJ »INNOSTI) AKOKOºVEK SP‘SOBEN›CH A Z AKEJKOºVEK DOMNIENKY ZODPOVEDNOSTI »I Ué ZMLUVNEJ ALEBO STRIKTNEJ ALEBO Z DELIKTU (VR¡TANE NEDBALOSTI ALEBO INAK) VYPL›VAJ⁄CICH Z POUéÕVANIA TOHOTO PROGRAMU, A TO AJ V PRÕPADE UPOZORNENIA NA MOéNOSç TAK›CHTO äK‘D.
+
+
+Origin·lne anglickÈ znenie licencie:
+====================================
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. 
+- Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+- Neither the name of ReichlSoft nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

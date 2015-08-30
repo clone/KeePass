@@ -302,3 +302,15 @@ SharedFileNameLabel=파일 이름:
 SharedFileLocationLabel=경로:
 WizardUninstalling=설치 제거 상태
 StatusUninstalling=%1 제거 중...
+
+[CustomMessages]
+
+NameAndVersion=%1 Version %2
+AdditionalIcons=Additional icons:
+CreateDesktopIcon=Create a &desktop icon
+CreateQuickLaunchIcon=Create a &Quick Launch icon
+ProgramOnTheWeb=%1 on the Web
+UninstallProgram=Uninstall %1
+LaunchProgram=Launch %1
+AssocFileExtension=&Associate %1 with the %2 file extension
+AssocingFileExtension=Associating %1 with the %2 file extension...

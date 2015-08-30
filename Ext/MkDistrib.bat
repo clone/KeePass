@@ -34,14 +34,25 @@ Util\CprLang.exe GermanSrc.lng German.lng
 DEL Korean.lng
 Util\CprLang.exe KoreanSrc.lng Korean.lng
 
+DEL Norwegian.lng
+Util\CprLang.exe NorwegianSrc.lng Norwegian.lng
+
+DEL Polish.lng
+Util\CprLang.exe PolishSrc.lng Polish.lng
+
 DEL Portuguese.lng
 Util\CprLang.exe PortugueseSrc.lng Portuguese.lng
+
+DEL Slovak.lng
+Util\CprLang.exe SlovakSrc.lng Slovak.lng
 
 DEL Swedish.lng
 Util\CprLang.exe SwedishSrc.lng Swedish.lng
 
 ECHO.
 ECHO Have you updated the language information fields?
+
+REM Copy latest language files into Debug directory
 
 DEL ..\Debug\German.lng
 COPY /B German.lng /B ..\Debug\German.lng > NUL
@@ -61,6 +72,14 @@ DEL ..\Debug\Portuguese.lng
 COPY /B Portuguese.lng /B ..\Debug\Portuguese.lng > NUL
 DEL ..\Debug\Bulgarian.lng
 COPY /B Bulgarian.lng /B ..\Debug\Bulgarian.lng > NUL
+DEL ..\Debug\Slovak.lng
+COPY /B Slovak.lng /B ..\Debug\Slovak.lng > NUL
+DEL ..\Debug\Norwegian.lng
+COPY /B Norwegian.lng /B ..\Debug\Norwegian.lng > NUL
+DEL ..\Debug\Polish.lng
+COPY /B Polish.lng /B ..\Debug\Polish.lng > NUL
+
+REM Copy latest language files into Release directory
 
 DEL ..\Release\German.lng
 COPY /B German.lng /B ..\Release\German.lng > NUL
@@ -80,5 +99,15 @@ DEL ..\Release\Portuguese.lng
 COPY /B Portuguese.lng /B ..\Release\Portuguese.lng > NUL
 DEL ..\Release\Bulgarian.lng
 COPY /B Bulgarian.lng /B ..\Release\Bulgarian.lng > NUL
+DEL ..\Release\Slovak.lng
+COPY /B Slovak.lng /B ..\Release\Slovak.lng > NUL
+DEL ..\Release\Norwegian.lng
+COPY /B Norwegian.lng /B ..\Release\Norwegian.lng > NUL
+DEL ..\Release\Polish.lng
+COPY /B Polish.lng /B ..\Release\Polish.lng > NUL
+
+REM Copy language reference file
 
 COPY /B German.lng /B Util\LangRef.src > NUL
+
+ECHO Have you updated the executable version information?

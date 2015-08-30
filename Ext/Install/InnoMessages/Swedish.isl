@@ -297,3 +297,14 @@ SharedFileLocationLabel=Plats:
 WizardUninstalling=Avinstallationsstatus
 StatusUninstalling=Avinstallerar %1...
 
+[CustomMessages]
+
+NameAndVersion=%1 Version %2
+AdditionalIcons=Additional icons:
+CreateDesktopIcon=Create a &desktop icon
+CreateQuickLaunchIcon=Create a &Quick Launch icon
+ProgramOnTheWeb=%1 on the Web
+UninstallProgram=Uninstall %1
+LaunchProgram=Launch %1
+AssocFileExtension=&Associate %1 with the %2 file extension
+AssocingFileExtension=Associating %1 with the %2 file extension...

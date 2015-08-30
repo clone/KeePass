@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -69,9 +69,20 @@ void CPwExport::SetNewLineSeq(BOOL bWindows)
 
 #define PWEXPSTR(sp) \
 { \
+	ASSERT(sp != NULL); if(sp != NULL) { \
 	UTF8_BYTE *_pUtf8String = _StringToUTF8(sp); \
 	fwrite(_pUtf8String, 1, strlen((char *)_pUtf8String), fp); \
+	SAFE_DELETE_ARRAY(_pUtf8String); } \
+}
+
+#define PWEXPSTRXML(sp) \
+{ \
+	ASSERT(sp != NULL); if(sp != NULL) { \
+	TCHAR *_pXmlString = MakeSafeXmlString(sp); \
+	UTF8_BYTE *_pUtf8String = _StringToUTF8(_pXmlString); \
+	fwrite(_pUtf8String, 1, strlen((char *)_pUtf8String), fp); \
 	SAFE_DELETE_ARRAY(_pUtf8String); \
+	SAFE_DELETE_ARRAY(_pXmlString); } \
 }
 
 BOOL CPwExport::ExportAll(const TCHAR *pszFile)
@@ -86,11 +97,14 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 	unsigned long i;
 	PW_ENTRY *p;
 	PW_GROUP *pg;
+	BYTE aInitUTF8[3] = { 0xEF, 0xBB, 0xBF };
 
 	ASSERT(pszFile != NULL);
 	if(pszFile == NULL) return FALSE;
 	fp = _tfopen(pszFile, _T("wb"));
 	if(fp == NULL) return FALSE;
+
+	fwrite(aInitUTF8, 1, 3, fp);
 
 	if(m_nFormat == PWEXP_TXT)
 	{
@@ -101,26 +115,32 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 		PWEXPSTR(m_pszNewLine);
 		PWEXPSTR(_T("<html><head>"));
 		PWEXPSTR(_T("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"));
-		PWEXPSTR(_T("<title>Password List</title></head><body>"));
+		PWEXPSTR(_T("<title>"));
+		PWEXPSTR(TRL("Password List"));
+		PWEXPSTR(_T("</title></head><body>"));
 		PWEXPSTR(m_pszNewLine);
-		PWEXPSTR(_T("<table width=\"100%\" border=\"1px\"><tr><td><b>"));
+		PWEXPSTR(_T("<h1>"));
+		PWEXPSTR(TRL("Password List"));
+		PWEXPSTR(_T("</h1>"));
+		PWEXPSTR(m_pszNewLine);
+		PWEXPSTR(_T("<table width=\"100%\" border=\"1px\" cellspacing=\"0\" cellpadding=\"1\"><tr><th>"));
 		PWEXPSTR(TRL("Group:"));
-		PWEXPSTR(_T("</b></td><td><b>"));
+		PWEXPSTR(_T("</th><th>"));
 		PWEXPSTR(TRL("Title"));
-		PWEXPSTR(_T(":</b></td><td><b>"));
+		PWEXPSTR(_T(":</th><th>"));
 		PWEXPSTR(TRL("UserName"));
-		PWEXPSTR(_T(":</b></td><td><b>"));
+		PWEXPSTR(_T(":</th><th>"));
 		PWEXPSTR(TRL("URL"));
-		PWEXPSTR(_T(":</b></td><td><b>"));
+		PWEXPSTR(_T(":</th><th>"));
 		PWEXPSTR(TRL("Password"));
-		PWEXPSTR(_T(":</b></td><td><b>"));
+		PWEXPSTR(_T(":</th><th>"));
 		PWEXPSTR(TRL("Notes"));
-		PWEXPSTR(_T(":</b></td></tr>"));
+		PWEXPSTR(_T(":</th></tr>"));
 		PWEXPSTR(m_pszNewLine);
 	}
 	else if(m_nFormat == PWEXP_XML)
 	{
-		PWEXPSTR(_T("<?xml version=\"1.0\"?>"));
+		PWEXPSTR(_T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
 		PWEXPSTR(m_pszNewLine);
 		PWEXPSTR(_T("<pwlist>"));
 		PWEXPSTR(m_pszNewLine);
@@ -175,19 +195,30 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 		else if(m_nFormat == PWEXP_HTML)
 		{
 			PWEXPSTR(_T("<tr><td>"));
-			PWEXPSTR(pg->pszGroupName);
+			if(_tcslen(pg->pszGroupName) != 0) PWEXPSTRXML(pg->pszGroupName)
+			else PWEXPSTR(_T("&nbsp;"));
 			PWEXPSTR(_T("</td><td>"));
-			PWEXPSTR(p->pszTitle);
+			if(_tcslen(p->pszTitle) != 0) PWEXPSTRXML(p->pszTitle)
+			else PWEXPSTR(_T("&nbsp;"));
 			PWEXPSTR(_T("</td><td>"));
-			PWEXPSTR(p->pszUserName);
-			PWEXPSTR(_T("</td><td><a href=\""));
-			PWEXPSTR(p->pszURL);
-			PWEXPSTR(_T("\">"));
-			PWEXPSTR(p->pszURL);
-			PWEXPSTR(_T("</a></td><td>"));
-			PWEXPSTR(p->pszPassword);
+			if(_tcslen(p->pszUserName) != 0) PWEXPSTRXML(p->pszUserName)
+			else PWEXPSTR(_T("&nbsp;"));
 			PWEXPSTR(_T("</td><td>"));
-			PWEXPSTR(p->pszAdditional);
+			if(_tcslen(p->pszURL) != 0)
+			{
+				PWEXPSTR(_T("<a href=\""));
+				PWEXPSTRXML(p->pszURL);
+				PWEXPSTR(_T("\">"));
+				PWEXPSTRXML(p->pszURL);
+				PWEXPSTR(_T("</a>"));
+			}
+			else PWEXPSTR(_T("&nbsp;"));
+			PWEXPSTR(_T("</td><td>"));
+			if(_tcslen(p->pszPassword) != 0) PWEXPSTRXML(p->pszPassword)
+			else PWEXPSTR(_T("&nbsp;"));
+			PWEXPSTR(_T("</td><td>"));
+			if(_tcslen(p->pszAdditional) != 0) PWEXPSTRXML(p->pszAdditional)
+			else PWEXPSTR(_T("&nbsp;"));
 			PWEXPSTR(_T("</td></tr>"));
 			PWEXPSTR(m_pszNewLine);
 		}
@@ -196,27 +227,27 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 			PWEXPSTR(_T("<pwentry>")); PWEXPSTR(m_pszNewLine);
 
 			PWEXPSTR(_T("\t<group>"));
-			PWEXPSTR(pg->pszGroupName);
+			PWEXPSTRXML(pg->pszGroupName);
 			PWEXPSTR(_T("</group>")); PWEXPSTR(m_pszNewLine);
 
 			PWEXPSTR(_T("\t<title>"));
-			PWEXPSTR(p->pszTitle);
+			PWEXPSTRXML(p->pszTitle);
 			PWEXPSTR(_T("</title>")); PWEXPSTR(m_pszNewLine);
 
 			PWEXPSTR(_T("\t<username>"));
-			PWEXPSTR(p->pszUserName);
+			PWEXPSTRXML(p->pszUserName);
 			PWEXPSTR(_T("</username>")); PWEXPSTR(m_pszNewLine);
 
 			PWEXPSTR(_T("\t<url>"));
-			PWEXPSTR(p->pszURL);
+			PWEXPSTRXML(p->pszURL);
 			PWEXPSTR(_T("</url>")); PWEXPSTR(m_pszNewLine);
 
 			PWEXPSTR(_T("\t<password>"));
-			PWEXPSTR(p->pszPassword);
+			PWEXPSTRXML(p->pszPassword);
 			PWEXPSTR(_T("</password>")); PWEXPSTR(m_pszNewLine);
 
 			PWEXPSTR(_T("\t<notes>"));
-			PWEXPSTR(p->pszAdditional);
+			PWEXPSTRXML(p->pszAdditional);
 			PWEXPSTR(_T("</notes>")); PWEXPSTR(m_pszNewLine);
 
 			PWEXPSTR(_T("</pwentry>")); PWEXPSTR(m_pszNewLine);

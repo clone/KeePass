@@ -1,11 +1,49 @@
+04/05/31 - 0.95a
+- Instead of hashing the password only once, the password is
+  now 1x hashed (SHA-256), N times encrypted (AES, you can set
+  N in the new database options dialog), and finally 1x hashed
+  (SHA-256); this makes a brute-force key-search much harder
+- Fixed a bug in the PwSafe 2 importing routine
+- Added option to disable unsafe operations like export
+  functions; admins can force their users now not to use such
+  operations (by just placing KeePass and its INI-file
+  write-protected on a network drive)
+- Added encoding information to XML exported files
+- Improved the HTML output (thin borders, better handling of
+  empty cells and hyperlinks, title is translated, etc.)
+- Fixed a small memory leak the (old) database loading code
+- Improved string handling routines (codepage handling, etc.)
+- Fixed a crashing bug when deleting the General group
+- Fixed a bug which could make the main window invisible
+  (setting its position to -32000/-32000)
+- KeePass asks if you would like to exit anyway when failing to
+  save a read-only database at program shutdown
+- Disabling the auto-resize columns option works correctly now
+- Fixed a bug where the username wasn't displayed correctly in
+  the entry preview area
+- Updated ReadMe file
+- Removed shades from buttons
+- KeePass now checks if a disk is inserted when creating a new
+  key-file, it also checks now for enough free disk space
+- The 'always on top' option now works at startup
+- The password generator settings weren't saved if the user
+  clicked the Cancel button, fixed this
+- Executable version information is used now
+- Fixed HTML/XML output (ampersand is encoded now, etc.)
+- Added database settings configuration dialog
+- Database name is shown in the password dialog
+- Added 'show all expired entries' dialog
+- Added password quality meters to some dialogs, these controls
+  show the estimated strength/quality of the entered passwords
+
 04/03/19 - 0.94a
+- Password generator options are remembered now
 - Integrated standard settings from initialization file to
   KeePass, i.e. your settings won't be overwritten any more
   when updating to a new version (both ZIP and installer)
 - Added option to associate .kdb files with KeePass (i.e. a
   double-click on a .kdb file in the Windows Explorer will
   automatically open the file with KeePass)
-- Password generation options are remembered now
 - Made entropy collection in the password generation dialog
   optional
 - Added spin button control right of the password character

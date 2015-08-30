@@ -71,7 +71,6 @@
 |This will generate a random password.|        |Siin saate genereerida juhusliku parooli.|
 |Options|                      |Seaded|
 |Password Generation Options|  |Parooli genereerimise seaded|
-|Only the following characters:|               |Ainult järgnevad tähemärgid:|
 |Number of characters:|        |Parooli pikkus:|
 |Your new password:|           |Sinu uus parool on:|
 |&Generate|                    |&Genereeri|
@@ -446,7 +445,7 @@
 	|Sorteeri nimekiri kehtivise kautamise aja järgi|
 
 |Hide UserNames Behind &Asterisks (***)|
-	|Peida kasutajanimed tätnide taha (***)|
+	|Peida kasutajanimed tärnide taha (***)|
 
 |Attachment:|				   |Manus:|
 
@@ -479,7 +478,24 @@
 |Show &Entry View|			   |Näita sissekande infot|
 |GUI: Automatically resize table columns when resizing the main window|
 	|Muuda automaatselt ka veergude suurust kui muudetakse põhiakna suurust|
+	
+|&Only the following characters:|
+	|&Ainult järgmised tähemärgid:|
+|&Open with KeePass|		   |&Ava KeePassiga|
+|&Remove Association|		   |&Kustuta seos|
+|Collect &entropy (recommended for strong passwords)|
+	|Kogu &entrooopiat (soovituslik tugevate paroolide saamiseks)|
+|Create &Association|		   |Loo &Seos|
+|Here you can associate .kdb files with KeePass (so KeePass opens the file when double-clicking on it):|
+	|Siin on võimalik seostada .kdb faile KeePassiga (seos tähendab et topeltklõps avab faili KeePassiga):|
+|KeePass Password Database|	   |KeePass paroolide andmebaas|
+|Setup|						   |Seaded|
+|Show &Columns|				   |Näita &veergusid|
+|Successfully associated KeePass with .kdb files! A double-click on a .kdb file will now start KeePass automatically!|
+	|.kdb failid edukalt seostatud KeePassiga! Nüüdsest avab topeltklõps .kdb failil automaatselt KeePassi!|
+|Successfully removed association! KeePass won't be started any more when double-clicking on a .kdb file!|
+	|Seostatus edukalt katkestatud! KeePass ei avane enam automaatselt kui teete topeltklõpsu .kdb failil!|
 |~LANGUAGENAME|                |Estonian|
-|~LANGUAGEVERSION|             |0.93b|
+|~LANGUAGEVERSION|             |0.94a|
 |~LANGUAGEAUTHOR|              |Andri Viiand|
 |~LANGUAGEAUTHOREMAIL|         |andriv@users.sourceforge.net, http://sourceforge.net/users/andriv|

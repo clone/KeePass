@@ -154,15 +154,15 @@ BEGIN
                     WS_BORDER | WS_TABSTOP,7,45,114,127
 END
 
-IDD_PASSWORD_DLG DIALOG DISCARDABLE  0, 0, 352, 119
+IDD_PASSWORD_DLG DIALOG DISCARDABLE  0, 0, 352, 129
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | 
     WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_TITLE>"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,229,98,56,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,289,98,56,14
-    GROUPBOX        "Key",IDC_STATIC,7,28,338,59
+    DEFPUSHBUTTON   "&OK",IDOK,229,108,56,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,289,108,56,14
+    GROUPBOX        "Key",IDC_STATIC,7,28,338,72
     LTEXT           "<DYN_INTRO>",IDC_STATIC_INTRO,7,7,338,18
     LTEXT           "Enter password:",IDC_STATIC_ENTERPW,13,40,94,8
     EDITTEXT        IDC_EDIT_PASSWORD,109,38,211,14,ES_PASSWORD | 
@@ -170,23 +170,26 @@ BEGIN
     CONTROL         "***",IDC_CHECK_STARS,"Button",BS_AUTOCHECKBOX | 
                     BS_CENTER | BS_VCENTER | BS_PUSHLIKE | WS_TABSTOP,321,38,
                     16,14
-    LTEXT           "or",IDC_STATIC_OR,13,55,84,8
-    LTEXT           "<DYN_SELDISK>",IDC_STATIC_SELDISK,13,70,195,8
-    COMBOBOX        IDC_COMBO_DISKLIST,209,68,128,150,CBS_DROPDOWNLIST | 
+    LTEXT           "or",IDC_STATIC_OR,13,65,84,8
+    LTEXT           "<DYN_SELDISK>",IDC_STATIC_SELDISK,13,80,195,8
+    COMBOBOX        IDC_COMBO_DISKLIST,209,78,128,150,CBS_DROPDOWNLIST | 
                     CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | 
                     WS_TABSTOP
-    PUSHBUTTON      "&Generate Random Password",IDC_MAKEPASSWORD_BTN,7,98,
+    PUSHBUTTON      "&Generate Random Password",IDC_MAKEPASSWORD_BTN,7,108,
                     124,14
+    CONTROL         "Progress1",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",
+                    WS_BORDER,109,53,180,9
+    RTEXT           "9999 bits",IDC_STATIC_PASSBITS,290,53,30,8
 END
 
-IDD_ADDENTRY_DLG DIALOG DISCARDABLE  0, 0, 315, 276
+IDD_ADDENTRY_DLG DIALOG DISCARDABLE  0, 0, 315, 279
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | 
     WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_TITLE>"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,189,255,58,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,250,255,58,14
+    DEFPUSHBUTTON   "&OK",IDOK,189,258,58,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,250,258,58,14
     COMBOBOX        IDC_COMBO_GROUPS,67,7,167,211,CBS_DROPDOWNLIST | 
                     CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | 
                     WS_TABSTOP
@@ -196,7 +199,7 @@ BEGIN
     LTEXT           "Password:",IDC_STATIC,7,84,57,8
     LTEXT           "Repeat Password:",IDC_STATIC,7,98,58,8
     LTEXT           "URL:",IDC_STATIC,7,66,57,8
-    LTEXT           "Notes:",IDC_STATIC,7,117,58,8
+    LTEXT           "Notes:",IDC_STATIC,7,126,58,8
     EDITTEXT        IDC_EDIT_TITLE,67,25,241,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT_USERNAME,67,44,241,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT_URL,67,63,241,14,ES_AUTOHSCROLL
@@ -206,22 +209,26 @@ BEGIN
                     ES_AUTOHSCROLL
     CONTROL         "",IDC_RE_NOTES,"RICHEDIT",ES_MULTILINE | ES_AUTOVSCROLL | 
                     ES_NOHIDESEL | ES_WANTRETURN | WS_BORDER | WS_VSCROLL | 
-                    WS_TABSTOP,67,115,241,86
-    EDITTEXT        IDC_EDIT_EXPIRE_DATE,67,206,68,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_EXPIRE_TIME,135,206,173,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,251,315,1
+                    WS_TABSTOP,67,124,241,86
+    EDITTEXT        IDC_EDIT_EXPIRE_DATE,67,215,68,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_EXPIRE_TIME,135,215,173,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,254,315,1
     CONTROL         "***",IDC_CHECK_HIDEPW,"Button",BS_AUTOCHECKBOX | 
                     BS_PUSHLIKE | WS_TABSTOP,287,82,21,14
     LTEXT           "Icon:",IDC_STATIC,246,9,23,8
     PUSHBUTTON      "&Pick One",IDC_PICKICON_BTN,271,7,37,14
     PUSHBUTTON      "&Gen",IDC_RANDOMPW_BTN,287,96,21,14
-    LTEXT           "Expires:",IDC_STATIC,7,208,58,8
-    LTEXT           "Attachment:",IDC_STATIC,7,228,59,8
-    EDITTEXT        IDC_EDIT_ATTACHMENT,67,225,176,14,ES_AUTOHSCROLL | 
+    LTEXT           "Expires:",IDC_STATIC,7,217,58,8
+    LTEXT           "Attachment:",IDC_STATIC,7,237,59,8
+    EDITTEXT        IDC_EDIT_ATTACHMENT,67,234,176,14,ES_AUTOHSCROLL | 
                     ES_NOHIDESEL | ES_READONLY
-    PUSHBUTTON      "",IDC_SETATTACH_BTN,244,225,22,14
-    PUSHBUTTON      "",IDC_SAVEATTACH_BTN,266,225,21,14
-    PUSHBUTTON      "",IDC_REMOVEATTACH_BTN,287,225,21,14
+    PUSHBUTTON      "",IDC_SETATTACH_BTN,244,234,22,14
+    PUSHBUTTON      "",IDC_SAVEATTACH_BTN,266,234,21,14
+    PUSHBUTTON      "",IDC_REMOVEATTACH_BTN,287,234,21,14
+    LTEXT           "Quality:",IDC_STATIC,7,111,58,8
+    CONTROL         "Progress1",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",
+                    WS_BORDER,67,110,187,9
+    RTEXT           "1024 bits",IDC_STATIC_PASSBITS,256,111,30,8
 END
 
 IDD_ICONPICKER_DLG DIALOG DISCARDABLE  0, 0, 320, 210
@@ -286,19 +293,18 @@ BEGIN
     PUSHBUTTON      "&Cancel",IDCANCEL,338,194,57,14
 END
 
-IDD_PW_GENERATOR_DLG DIALOG DISCARDABLE  0, 0, 316, 262
+IDD_PW_GENERATOR_DLG DIALOG DISCARDABLE  0, 0, 316, 274
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | 
     WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Password Generator"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "&Accept",IDOK,189,241,58,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,251,241,58,14
+    DEFPUSHBUTTON   "&Accept",IDOK,189,253,58,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,251,253,58,14
     PUSHBUTTON      "&Generate",IDC_GENERATE_BTN,251,216,58,14
     LTEXT           "Your new password:",IDC_STATIC,7,218,85,8
-    EDITTEXT        IDC_EDIT_PW,93,216,154,14,ES_AUTOHSCROLL | ES_NOHIDESEL | 
-                    ES_READONLY
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,236,315,1
+    EDITTEXT        IDC_EDIT_PW,93,216,154,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,248,315,1
     GROUPBOX        "Password Generation Options",IDC_STATIC,7,7,302,201
     CONTROL         "List1",IDC_LIST_OPTIONS,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | WS_BORDER | WS_TABSTOP,13,17,290,130
@@ -313,6 +319,10 @@ BEGIN
                     WS_TABSTOP,13,191,289,10
     CONTROL         "Spin1",IDC_SPIN_NUMCHARS,"msctls_updown32",
                     UDS_ARROWKEYS,293,171,10,14
+    LTEXT           "Quality:",IDC_STATIC,7,231,83,8
+    CONTROL         "Progress1",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",
+                    WS_BORDER,93,231,122,9
+    RTEXT           "9999 bits",IDC_STATIC_PASSBITS,216,231,30,8
 END
 
 IDD_FIND_DLG DIALOG DISCARDABLE  0, 0, 231, 138
@@ -343,16 +353,16 @@ BEGIN
                     BS_AUTOCHECKBOX | WS_TABSTOP,87,64,131,10
 END
 
-IDD_LANGUAGES_DLG DIALOG DISCARDABLE  0, 0, 460, 162
+IDD_LANGUAGES_DLG DIALOG DISCARDABLE  0, 0, 460, 212
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Load language file"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "&Close",IDCANCEL,397,141,56,14
+    DEFPUSHBUTTON   "&Close",IDCANCEL,397,191,56,14
     CONTROL         "List1",IDC_LANGUAGES_LIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SORTASCENDING | LVS_NOSORTHEADER | 
-                    WS_BORDER | WS_TABSTOP,7,7,446,126
-    PUSHBUTTON      "&Get more languages...",IDC_BTN_GETLANGUAGE,7,141,149,
+                    WS_BORDER | WS_TABSTOP,7,7,446,179
+    PUSHBUTTON      "&Get more languages...",IDC_BTN_GETLANGUAGE,7,191,149,
                     14
 END
 
@@ -390,10 +400,6 @@ BEGIN
                     19,128,337,10
     CONTROL         "Minimize to tray instead of taskbar",IDC_CHECK_MINTRAY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,189,340,10
-    LTEXT           "Encryption algorithm to use (for this database):",
-                    IDC_STATIC_CIPHERTEXT,19,38,334,8
-    COMBOBOX        IDC_COMBO_ENCALGO,19,28,336,74,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP
     CONTROL         "Tab1",IDC_TAB_MENU,"SysTabControl32",0x0,7,7,380,192
     CONTROL         "Automatically lock workspace after the following number of seconds:",
                     IDC_CHECK_LOCKAFTERTIME,"Button",BS_AUTOCHECKBOX | 
@@ -414,11 +420,14 @@ BEGIN
     PUSHBUTTON      "&Remove Association",IDC_BTN_DELETEASSOC,129,211,113,14
     LTEXT           "Here you can associate .kdb files with KeePass (so KeePass opens the file when double-clicking on it):",
                     IDC_STATIC_ASSOC,7,187,359,17
+    CONTROL         "Disable unsafe (security-critical) operations like exports, etc.",
+                    IDC_CHECK_DISABLEUNSAFE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,18,202,342,10
 END
 
 IDD_ENTRYPROPERTIES_DLG DIALOG DISCARDABLE  0, 0, 351, 114
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Dialogfeld"
+CAPTION "<DYN_TITLE>"
 FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,217,93,61,14
@@ -453,6 +462,41 @@ BEGIN
     LTEXT           "TAN Wizard",IDC_STATIC,7,242,185,8,WS_DISABLED
 END
 
+IDD_ENTRYLIST_DLG DIALOG DISCARDABLE  0, 0, 413, 255
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "<DYN_TITLE>"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "&Close",IDOK,348,234,58,14
+    CONTROL         "List1",IDC_ENTRYLIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | WS_BORDER | WS_TABSTOP,7,20,399,210
+    LTEXT           "Click on an entry to jump to it.",IDC_STATIC,7,7,399,8
+END
+
+IDD_DBSETTINGS_DLG DIALOG DISCARDABLE  0, 0, 377, 146
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Database Settings"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,247,125,59,14
+    PUSHBUTTON      "Abbrechen",IDCANCEL,311,125,59,14
+    LTEXT           "Encryption algorithm to use (for this database):",
+                    IDC_STATIC,13,18,350,8
+    COMBOBOX        IDC_COMBO_ENCALGOS,13,29,351,135,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Security",IDC_STATIC,7,7,363,110
+    LTEXT           "Number of key encryption rounds:",IDC_STATIC,13,80,177,
+                    8
+    EDITTEXT        IDC_EDIT_KEYENC,193,77,171,14,ES_AUTOHSCROLL | 
+                    ES_NOHIDESEL | ES_NUMBER
+    LTEXT           "Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.",
+                    IDC_STATIC,13,57,350,16
+    LTEXT           "The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.",
+                    IDC_STATIC,13,95,350,16
+END
+
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
@@ -461,8 +505,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
- PRODUCTVERSION 1,0,0,0
+ FILEVERSION 0,9,5,1
+ PRODUCTVERSION 0,9,5,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -478,14 +522,14 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "Comments", "http://keepass.sourceforge.net\0"
-            VALUE "CompanyName", "ReichlSoft\0"
-            VALUE "FileDescription", "KeePass Password Safe\0"
-            VALUE "FileVersion", "1, 0, 0, 0\0"
+            VALUE "CompanyName", "Dominik Reichl\0"
+            VALUE "FileDescription", "KeePass Password Safe v0.95a\0"
+            VALUE "FileVersion", "0, 9, 5, 1\0"
             VALUE "InternalName", "PwSafe\0"
             VALUE "LegalCopyright", "Copyright (c) 2004 Dominik Reichl\0"
             VALUE "OriginalFilename", "KeePass.exe\0"
-            VALUE "ProductName", "KeePass Password Safe\0"
-            VALUE "ProductVersion", "1, 0, 0, 0\0"
+            VALUE "ProductName", "KeePass Password Safe v0.95a\0"
+            VALUE "ProductVersion", "0, 9, 5, 1\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -526,7 +570,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 345
         TOPMARGIN, 7
-        BOTTOMMARGIN, 112
+        BOTTOMMARGIN, 122
     END
 
     IDD_ADDENTRY_DLG, DIALOG
@@ -534,7 +578,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 308
         TOPMARGIN, 7
-        BOTTOMMARGIN, 269
+        BOTTOMMARGIN, 272
     END
 
     IDD_ICONPICKER_DLG, DIALOG
@@ -566,7 +610,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 309
         TOPMARGIN, 7
-        BOTTOMMARGIN, 255
+        BOTTOMMARGIN, 267
     END
 
     IDD_FIND_DLG, DIALOG
@@ -582,7 +626,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 453
         TOPMARGIN, 7
-        BOTTOMMARGIN, 155
+        BOTTOMMARGIN, 205
     END
 
     IDD_OPTIONS_DLG, DIALOG
@@ -608,6 +652,22 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 251
     END
+
+    IDD_ENTRYLIST_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 406
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 248
+    END
+
+    IDD_DBSETTINGS_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 370
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 139
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -628,6 +688,7 @@ BEGIN
         MENUITEM "&Save Database",              ID_FILE_SAVE
         MENUITEM "Save Database &As...",        ID_FILE_SAVEAS
         MENUITEM SEPARATOR
+        MENUITEM "&Database Settings...",       ID_FILE_SHOWDBINFO
         MENUITEM "Change &Master Key For This Database...", 
                                                 ID_FILE_CHANGEMASTERPW
         MENUITEM SEPARATOR
@@ -696,6 +757,8 @@ BEGIN
     BEGIN
         MENUITEM "Password &Generator",         ID_EXTRAS_GENPW
         MENUITEM "&TAN Wizard",                 ID_EXTRAS_TANWIZARD
+        MENUITEM SEPARATOR
+        MENUITEM "Show All &Expired Entries...", ID_EXTRAS_SHOWEXPIRED
     END
     POPUP "&?"
     BEGIN
@@ -907,6 +970,8 @@ BEGIN
     BUTTON      ID_GROUP_MOVELEFT
     BUTTON      ID_GROUP_MOVERIGHT
     BUTTON      ID_PWLIST_SAVEATTACH
+    BUTTON      ID_FILE_SHOWDBINFO
+    BUTTON      ID_EXTRAS_SHOWEXPIRED
 END
 
 IDR_CLIENTICONS TOOLBAR DISCARDABLE  16, 16
@@ -1002,6 +1067,7 @@ BEGIN
     "E",            ID_PWLIST_EDIT,         VIRTKEY, CONTROL, NOINVERT
     "F",            ID_PWLIST_FIND,         VIRTKEY, CONTROL, NOINVERT
     "G",            ID_SAFE_ADDGROUP,       VIRTKEY, CONTROL, NOINVERT
+    "I",            ID_FILE_SHOWDBINFO,     VIRTKEY, CONTROL, NOINVERT
     "K",            ID_PWLIST_DUPLICATE,    VIRTKEY, CONTROL, NOINVERT
     "L",            ID_FILE_LOCK,           VIRTKEY, CONTROL, NOINVERT
     "M",            ID_SAFE_OPTIONS,        VIRTKEY, CONTROL, NOINVERT

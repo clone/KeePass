@@ -1,4 +1,5 @@
 ; Czech KeePass Password Safe Localization Script
+; updated for Inno Setup 4.2.1
 ; multilanguage adaptation by Lubos Stanek
 
 ;[Types]
@@ -18,19 +19,5 @@
 ;Name: "/koreanlanguage"; Description: "Korejské jazykové soubory"; Types: full; Languages: cs
 ;Name: "/swedishlanguage"; Description: "Švédské jazykové soubory"; Types: full; Languages: cs
 
-[Tasks]
-; translate Descriptions, GroupDescriptions
-Name: "desktopicon"; Description: "Vytvoøit zástupce na &ploše"; GroupDescription: "Další ikony:"; Languages: cs
-Name: "quicklaunchicon"; Description: "Vytvoøit zástupce na panelu &Snadné spuštìní"; GroupDescription: "Další ikony:"; Flags: unchecked; Languages: cs
-
 ;[INI]
 ;Filename: "{app}\KeePass.ini"; Section: "KeePass"; Key: "KeeLanguage"; String: "Czech"; Languages: cs
-
-[Icons]
-; translate Names except {#CrossAppFullName}
-Name: "{group}\{#CrossAppFullName} na Internetu"; Filename: "{app}\KeePass.url"; Languages: cs
-Name: "{group}\Odinstalovat {#CrossAppFullName}"; Filename: "{uninstallexe}"; Languages: cs
-
-[Run]
-; translate Description except {#CrossAppFullName}
-Filename: "{app}\KeePass.exe"; Description: "Spustit {#CrossAppFullName}"; Flags: nowait postinstall skipifsilent; Languages: cs

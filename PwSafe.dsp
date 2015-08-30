@@ -101,6 +101,14 @@ SOURCE=.\AddGroupDlg.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\DbSettingsDlg.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\EntryListDlg.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\EntryPropertiesDlg.cpp
 # End Source File
 # Begin Source File
@@ -166,6 +174,14 @@ SOURCE=.\AddGroupDlg.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\DbSettingsDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\EntryListDlg.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\EntryPropertiesDlg.h
 # End Source File
 # Begin Source File
@@ -223,6 +239,14 @@ SOURCE=.\TanWizardDlg.h
 # Begin Source File
 
 SOURCE=.\res\cancel.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\check_fa.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\check_tr.bmp
 # End Source File
 # Begin Source File
 
@@ -358,6 +382,14 @@ SOURCE=.\res\world.ico
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\PwSafe\PwCompat.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\PwSafe\PwCompat.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\PwSafe\PwExport.cpp
 # End Source File
 # Begin Source File
@@ -379,6 +411,14 @@ SOURCE=.\PwSafe\PwManager.cpp
 # Begin Source File
 
 SOURCE=.\PwSafe\PwManager.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\PwSafe\PwUtil.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\PwSafe\PwUtil.h
 # End Source File
 # End Group
 # Begin Group "Util"
@@ -548,6 +588,14 @@ SOURCE=.\NewGUI\CustomTreeCtrlEx.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\NewGUI\GradientProgressCtrl.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\GradientProgressCtrl.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\NewGUI\HyperEdit.cpp
 # ADD CPP /I ".."
 # End Source File
@@ -586,14 +634,6 @@ SOURCE=.\NewGUI\NewGUICommon.cpp
 # Begin Source File
 
 SOURCE=.\NewGUI\NewGUICommon.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\NewGUI\ShadeButtonST.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\NewGUI\ShadeButtonST.h
 # End Source File
 # Begin Source File
 

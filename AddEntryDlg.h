@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,9 +33,9 @@
 #include "NewGUI/WzComboBox.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/HyperEdit.h"
-#include "NewGUI/ShadeButtonST.h"
 #include "NewGUI/amsEdit.h"
 #include "NewGUI/AutoRichEditCtrl.h"
+#include "NewGUI/GradientProgressCtrl.h"
 
 #include "PwSafe/PwManager.h"
 
@@ -70,16 +70,17 @@ public:
 
 	//{{AFX_DATA(CAddEntryDlg)
 	enum { IDD = IDD_ADDENTRY_DLG };
-	CShadeButtonST	m_btRemoveAttachment;
-	CShadeButtonST	m_btSaveAttachment;
-	CShadeButtonST	m_btSetAttachment;
+	CGradientProgressCtrl	m_cPassQuality;
+	CButtonST	m_btRemoveAttachment;
+	CButtonST	m_btSaveAttachment;
+	CButtonST	m_btSetAttachment;
 	CAMSTimeEdit	m_editTime;
 	CAMSDateEdit	m_editDate;
-	CShadeButtonST	m_btHidePw;
-	CShadeButtonST	m_btOK;
-	CShadeButtonST	m_btCancel;
-	CShadeButtonST	m_btRandomPw;
-	CShadeButtonST	m_btPickIcon;
+	CButtonST	m_btHidePw;
+	CButtonST	m_btOK;
+	CButtonST	m_btCancel;
+	CButtonST	m_btRandomPw;
+	CButtonST	m_btPickIcon;
 	CHyperEdit	m_pURL;
 	CEdit	m_pRepeatPw;
 	CEdit	m_pEditPw;
@@ -118,6 +119,7 @@ protected:
 	afx_msg void OnSetAttachBtn();
 	afx_msg void OnSaveAttachBtn();
 	afx_msg void OnRemoveAttachBtn();
+	afx_msg void OnChangeEditPassword();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

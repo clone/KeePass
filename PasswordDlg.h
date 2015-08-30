@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,8 +31,8 @@
 #define AFX_PASSWORDDLG_H__8F02B880_0ADD_11D8_BF16_0050BF14F5CC__INCLUDED_
 
 #include "NewGUI/WzComboBox.h"
-#include "NewGUI/ShadeButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
+#include "NewGUI/GradientProgressCtrl.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -53,12 +53,15 @@ public:
 	CString m_strRealKey;
 	BOOL m_bKeyFile;
 
+	CString m_strDescriptiveName;
+
 	//{{AFX_DATA(CPasswordDlg)
 	enum { IDD = IDD_PASSWORD_DLG };
-	CShadeButtonST	m_btStars;
-	CShadeButtonST	m_btOK;
-	CShadeButtonST	m_btCancel;
-	CShadeButtonST	m_btMakePw;
+	CGradientProgressCtrl	m_cPassQuality;
+	CButtonST	m_btStars;
+	CButtonST	m_btOK;
+	CButtonST	m_btCancel;
+	CButtonST	m_btMakePw;
 	CEdit	m_pEditPw;
 	CWzComboBox	m_cbDiskList;
 	CString	m_strPassword;
@@ -77,6 +80,7 @@ protected:
 	virtual void OnCancel();
 	afx_msg void OnCheckStars();
 	afx_msg void OnMakePasswordBtn();
+	afx_msg void OnChangeEditPassword();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

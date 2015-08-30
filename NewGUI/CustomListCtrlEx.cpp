@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -151,4 +151,22 @@ void CCustomListCtrlEx::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	{
 		CListCtrl::OnSysKeyDown(nChar, nRepCnt, nFlags);
 	}
+}
+
+BOOL CCustomListCtrlEx::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult) 
+{
+	HD_NOTIFY *phdn = (HD_NOTIFY *)lParam;
+
+	ASSERT(m_pParentI != NULL); // Parent must be initialized first
+
+	if((phdn->hdr.code == HDN_ITEMCHANGEDW) || (phdn->hdr.code == HDN_ITEMCHANGEDA))
+	{
+		ASSERT(phdn->pitem != NULL);
+
+		// Track only width changes
+		if (phdn->pitem->mask & HDI_WIDTH)
+			((CPwSafeDlg *)m_pParentI)->_OnPwlistColumnWidthChange(phdn->iItem, phdn->pitem->cxy);
+	}
+	
+	return CListCtrl::OnNotify(wParam, lParam, pResult);
 }

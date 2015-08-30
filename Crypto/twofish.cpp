@@ -502,11 +502,11 @@ static void test_platform()
      * The first check in each case is to make sure the size is correct.
      * The second check is to ensure that it is an unsigned type.
      */
-    if( (Twofish_UInt32)((Twofish_UInt32)1 << 31) == 0 | (Twofish_UInt32)-1 < 0 ) 
+    if( ((Twofish_UInt32)((Twofish_UInt32)1 << 31) == 0) || ((Twofish_UInt32)-1 < 0 )) 
         {
         Twofish_fatal( "Twofish code: Twofish_UInt32 type not suitable" );
         }
-    if( sizeof( Twofish_Byte ) != 1 | (Twofish_Byte)-1 < 0 ) 
+    if( (sizeof( Twofish_Byte ) != 1) || (((Twofish_Byte)-1) < 0) ) 
         {
         Twofish_fatal( "Twofish code: Twofish_Byte type not suitable" );
         }

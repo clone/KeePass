@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -254,6 +254,11 @@ unsigned long testCryptoImpl()
 	arcfourCrypt((unsigned char *)aTemp2, 32, (BYTE *)"abcdef", 6);
 	if(memcmp(aHash, aTemp2, 32) != 0) uTestMask |= TI_ERR_ARCFOUR_CRYPT;
 	if(memcmp(aHash, aTemp, 32) == 0) uTestMask |= TI_ERR_ARCFOUR_CRYPT;
+
+	// Ok, now the following isn't directly cryptography, it's the UTF-8 conversion
+	// routines
+
+
 
 	// A return value of zero means no error
 	return uTestMask;

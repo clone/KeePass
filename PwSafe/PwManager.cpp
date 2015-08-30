@@ -6,7 +6,7 @@
   modification, are permitted provided that the following conditions are met:
 
   - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer.
+    this list of conditions and the following disclaimer. 
   - Redistributions in binary form must reproduce the above copyright notice,
     this list of conditions and the following disclaimer in the documentation
     and/or other materials provided with the distribution.
@@ -53,6 +53,7 @@ CPwManager::CPwManager()
 
 	m_pLastEditedEntry = NULL;
 	m_nAlgorithm = ALGO_AES;
+	m_dwKeyEncRounds = PWM_STD_KEYENCROUNDS;
 
 	memset(m_pMasterKey, 0, 32);
 
@@ -102,7 +103,7 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 
 #ifdef _UNICODE
 	ASSERT(sizeof(TCHAR) >= 2);
-	paKey = _StringToAscii((const TCHAR *)pszMasterKey);
+	paKey = _StringToAnsi((const TCHAR *)pszMasterKey);
 #else
 	ASSERT(sizeof(TCHAR) == 1);
 	paKey = new char[strlen(pszMasterKey) + 1];
@@ -758,6 +759,8 @@ void CPwManager::UnlockEntryPassword(PW_ENTRY *pEntry)
 
 void CPwManager::NewDatabase()
 {
+	m_dwKeyEncRounds = PWM_STD_KEYENCROUNDS;
+
 	_DeleteEntryList(TRUE); // Delete really everything, the strings too
 	_DeleteGroupList(TRUE);
 
@@ -772,6 +775,7 @@ void CPwManager::NewDatabase()
 		mem_erase((unsigned char *)pVirtualFile, uAllocated); \
 		SAFE_DELETE_ARRAY(pVirtualFile); \
 	} \
+	m_dwKeyEncRounds = PWM_STD_KEYENCROUNDS; \
 	return FALSE; \
 }
 
@@ -843,7 +847,16 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 
 	if((hdr.dwVersion & 0xFFFFFF00) != (PWM_DBVER_DW & 0xFFFFFF00))
 	{
-		if(hdr.dwVersion <= 0x00010002)
+		if((hdr.dwVersion == 0x00020000) || (hdr.dwVersion == 0x00020001) || (hdr.dwVersion == 0x00020002))
+		{
+			if(pVirtualFile != NULL)
+			{
+				mem_erase((unsigned char *)pVirtualFile, uAllocated);
+				SAFE_DELETE_ARRAY(pVirtualFile);
+			}
+			return _OpenDatabaseV2(pszFile);
+		}
+		else if(hdr.dwVersion <= 0x00010002)
 		{
 			if(pVirtualFile != NULL)
 			{
@@ -855,14 +868,20 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 		else { _OPENDB_FAIL; }
 	}
 
+	// Only Rijndael and AES are supported currently
 	if(hdr.dwFlags & PWM_FLAG_RIJNDAEL) m_nAlgorithm = ALGO_AES;
 	else if(hdr.dwFlags & PWM_FLAG_TWOFISH) m_nAlgorithm = ALGO_TWOFISH;
 	else { ASSERT(FALSE); _OPENDB_FAIL; }
 
+	m_dwKeyEncRounds = hdr.dwKeyEncRounds;
+
+	// Generate m_pTransformedMasterKey from m_pMasterKey
+	if(_TransformMasterKey(hdr.aMasterSeed2) == FALSE) { ASSERT(FALSE); _OPENDB_FAIL; }
+
 	// Hash the master password with the salt in the file
 	sha256_begin(&sha32);
 	sha256_hash(hdr.aMasterSeed, 16, &sha32);
-	sha256_hash(m_pMasterKey, 32, &sha32);
+	sha256_hash(m_pTransformedMasterKey, 32, &sha32);
 	sha256_end((unsigned char *)uFinalKey, &sha32);
 
 	ASSERT(((uFileSize - sizeof(PW_DBHEADER)) % 16) == 0);
@@ -973,212 +992,6 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 	return TRUE;
 }
 
-BOOL CPwManager::_OpenDatabaseV1(const TCHAR *pszFile)
-{
-	FILE *fp;
-	char *pVirtualFile;
-	unsigned long uFileSize, uAllocated, uEncryptedPartSize;
-	unsigned long i, j, pos;
-	PW_DBHEADER_V1 hdr;
-	sha256_ctx sha32;
-	RD_UINT8 uFinalKey[32];
-	DWORD dw, dw2;
-	char *ptrTemp;
-	char *ptrTitle;
-	char *ptrUserName;
-	char *ptrURL;
-	char *ptrPassword;
-	char *ptrAdditional;
-	LPTSTR lpptr = NULL;
-	LPTSTR lptTitle = NULL, lptUserName = NULL, lptURL = NULL;
-	LPTSTR lptPassword = NULL, lptAdditional = NULL;
-	PW_TIME tNow;
-	PW_GROUP pwTG;
-	PW_ENTRY pwTE;
-
-	_GetCurrentPwTime(&tNow);
-	memset(&pwTG, 0, sizeof(PW_GROUP)); memset(&pwTE, 0, sizeof(PW_ENTRY));
-	pwTG.tCreation = tNow; pwTG.tExpire = g_pwTimeNever;
-	pwTG.tLastAccess = tNow; pwTG.tLastMod = tNow;
-	pwTE.tCreation = tNow; pwTE.tExpire = g_pwTimeNever;
-	pwTE.tLastAccess = tNow; pwTE.tLastMod = tNow;
-
-	ASSERT(sizeof(char) == 1);
-
-	ASSERT(pszFile != NULL);
-	if(pszFile == NULL) return FALSE;
-	ASSERT(_tcslen(pszFile) != 0);
-	if(_tcslen(pszFile) == 0) return FALSE;
-
-	fp = _tfopen(pszFile, _T("rb"));
-	if(fp == NULL) return FALSE;
-
-	// Get file size
-	fseek(fp, 0, SEEK_END);
-	uFileSize = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
-	if(uFileSize < sizeof(PW_DBHEADER_V1))
-		{ fclose(fp); return FALSE; }
-
-	// Allocate enough memory to hold the complete file
-	uAllocated = uFileSize + 17;
-	pVirtualFile = new char[uAllocated];
-	if(pVirtualFile == NULL)
-		{ fclose(fp); return FALSE; }
-	pVirtualFile[uFileSize + 17 - 1] = 0;
-	fread(pVirtualFile, 1, uFileSize, fp);
-	fclose(fp);
-
-	// Extract header structure from memory file
-	memcpy(&hdr, pVirtualFile, sizeof(PW_DBHEADER_V1));
-
-	// Check if we can open this
-	if((hdr.dwSignature1 != PWM_DBSIG_1) || (hdr.dwSignature2 != PWM_DBSIG_2))
-		{ _OPENDB_FAIL; }
-
-	if(hdr.dwFlags & PWM_FLAG_RIJNDAEL) m_nAlgorithm = ALGO_AES;
-	else if(hdr.dwFlags & PWM_FLAG_TWOFISH) m_nAlgorithm = ALGO_TWOFISH;
-	else { ASSERT(FALSE); _OPENDB_FAIL; }
-
-	// Hash the master password with the salt in the file
-	sha256_begin(&sha32);
-	sha256_hash(hdr.aMasterSeed, 16, &sha32);
-	sha256_hash(m_pMasterKey, 32, &sha32);
-	sha256_end((unsigned char *)uFinalKey, &sha32);
-
-	if(m_nAlgorithm == ALGO_AES)
-	{
-		Rijndael aes;
-
-		// Initialize Rijndael algorithm
-		if(aes.init(Rijndael::CBC, Rijndael::Decrypt, uFinalKey,
-			Rijndael::Key32Bytes, hdr.aEncryptionIV) != RIJNDAEL_SUCCESS)
-			{ _OPENDB_FAIL; }
-
-		// Decrypt! The first 48 bytes aren't encrypted (that's the header)
-		uEncryptedPartSize = (unsigned long)aes.padDecrypt((RD_UINT8 *)pVirtualFile + 48,
-			uFileSize - 48, (RD_UINT8 *)pVirtualFile + 48);
-	}
-	else if(m_nAlgorithm == ALGO_TWOFISH)
-	{
-		CTwofish twofish;
-
-		if(twofish.init(uFinalKey, 32, hdr.aEncryptionIV) != true)
-			{ _OPENDB_FAIL };
-
-		uEncryptedPartSize = (unsigned long)twofish.padDecrypt(
-			(RD_UINT8 *)pVirtualFile + 48,
-			uFileSize - 48, (RD_UINT8 *)pVirtualFile + 48);
-	}
-	else
-	{
-		ASSERT(FALSE); _OPENDB_FAIL;
-	}
-
-	// Check for success
-	if((uEncryptedPartSize > 2147483446) || (uEncryptedPartSize == 0))
-		{ _OPENDB_FAIL; }
-
-	// Update header information, it was partially encrypted
-	memcpy(&hdr, pVirtualFile, sizeof(PW_DBHEADER_V1));
-
-	NewDatabase(); // Create a new database and initialize internal structures
-
-	// Add groups from the memory file to the internal structures
-	j = 0;
-	pos = sizeof(PW_DBHEADER_V1);
-	for(i = 0; i < hdr.dwGroups; i++)
-	{
-		ptrTemp = &pVirtualFile[pos];
-		j = strlen(ptrTemp);
-		pos += j + 1;
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
-
-		memcpy(&dw, &pVirtualFile[pos], sizeof(DWORD));
-		pos += 4;
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
-
-		pwTG.uGroupId = i + 1; pwTG.uImageId = dw;
-#ifdef _UNICODE
-		lpptr = _StringToUnicode(ptrTemp);
-		pwTG.pszGroupName = lpptr;
-		pwTG.usLevel = 0;
-		AddGroup(&pwTG);
-		SAFE_DELETE_ARRAY(lpptr);
-#else
-		pwTG.pszGroupName = ptrTemp;
-		AddGroup(&pwTG);
-#endif
-	}
-
-	// Get the entries
-	for(i = 0; i < hdr.dwEntries; i++)
-	{
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
-
-		ptrTitle = &pVirtualFile[pos];
-		j = strlen(ptrTitle);
-		pos += j + 1;
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
-
-		ptrUserName = &pVirtualFile[pos];
-		j = strlen(ptrUserName);
-		pos += j + 1;
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
-
-		ptrURL = &pVirtualFile[pos];
-		j = strlen(ptrURL);
-		pos += j + 1;
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
-
-		ptrPassword = &pVirtualFile[pos];
-		j = strlen(ptrPassword);
-		pos += j + 1;
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
-
-		ptrAdditional = &pVirtualFile[pos];
-		j = strlen(ptrAdditional);
-		pos += j + 1;
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
-
-		memcpy(&dw, &pVirtualFile[pos], sizeof(DWORD));
-		pos += 4;
-		if(pos >= uFileSize) { _OPENDB_FAIL; }
-
-		memcpy(&dw2, &pVirtualFile[pos], sizeof(DWORD));
-		pos += 4;
-		if(pos > uFileSize) { _OPENDB_FAIL; }
-
-		dw++;
-
-		ZeroMemory(pwTE.uuid, 16); // 0 = create new UUID
-
-#ifdef _UNICODE
-		lptTitle = _StringToUnicode(ptrTitle); lptURL = _StringToUnicode(ptrURL);
-		lptUserName = _StringToUnicode(ptrUserName); lptPassword = _StringToUnicode(ptrPassword);
-		lptAdditional = _StringToUnicode(ptrAdditional);
-		pwTE.pszAdditional = lptAdditional; pwTE.pszPassword = lptPassword;
-		pwTE.pszTitle = lptTitle; pwTE.pszURL = lptURL;
-		pwTE.pszUserName = lptUserName; pwTE.uGroupId = dw; pwTE.uImageId = dw2;
-		AddEntry(&pwTE);
-		SAFE_DELETE_ARRAY(lptTitle); SAFE_DELETE_ARRAY(lptURL);
-		SAFE_DELETE_ARRAY(lptUserName); SAFE_DELETE_ARRAY(lptPassword);
-		SAFE_DELETE_ARRAY(lptAdditional);
-#else
-		pwTE.pszAdditional = ptrAdditional; pwTE.pszPassword = ptrPassword;
-		pwTE.pszTitle = ptrTitle; pwTE.pszURL = ptrURL;
-		pwTE.pszUserName = ptrUserName; pwTE.uGroupId = dw; pwTE.uImageId = dw2;
-		AddEntry(&pwTE);
-#endif
-	}
-
-	// Erase and delete memory file
-	mem_erase((unsigned char *)pVirtualFile, uAllocated);
-	SAFE_DELETE_ARRAY(pVirtualFile);
-	return TRUE;
-}
-
 BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 {
 	FILE *fp;
@@ -1202,12 +1015,17 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 	uFileSize = sizeof(PW_DBHEADER);
 
+	BYTE *pbt;
+
 	ASSERT(sizeof(TCHAR *) == sizeof(DWORD));
 	// Get the size of all groups
 	for(i = 0; i < m_dwNumGroups; i++)
 	{
 		uFileSize += 94; // 6+4+6+6+5+6+5+6+5+6+5+6+4+6+6+2+6+4 = 94
-		uFileSize += _UTF8BytesNeeded(m_pGroups[i].pszGroupName) + 1;
+
+		pbt = _StringToUTF8(m_pGroups[i].pszGroupName);
+		uFileSize += szlen((char *)pbt) + 1;
+		SAFE_DELETE_ARRAY(pbt);
 	}
 
 	// Get the size of all entries together
@@ -1219,12 +1037,30 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 		uFileSize += 134; // 6+16+6+4+6+4+6+6+6+6+6+6+5+6+5+6+5+6+5+6 = 122
 
-		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszTitle) + 1;
-		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszUserName) + 1;
-		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszURL) + 1;
-		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszPassword) + 1;
-		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszAdditional) + 1;
-		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszBinaryDesc) + 1;
+		pbt = _StringToUTF8(m_pEntries[i].pszTitle);
+		uFileSize += szlen((char *)pbt) + 1;
+		SAFE_DELETE_ARRAY(pbt);
+
+		pbt = _StringToUTF8(m_pEntries[i].pszUserName);
+		uFileSize += szlen((char *)pbt) + 1;
+		SAFE_DELETE_ARRAY(pbt);
+
+		pbt = _StringToUTF8(m_pEntries[i].pszURL);
+		uFileSize += szlen((char *)pbt) + 1;
+		SAFE_DELETE_ARRAY(pbt);
+
+		pbt = _StringToUTF8(m_pEntries[i].pszPassword);
+		uFileSize += szlen((char *)pbt) + 1;
+		SAFE_DELETE_ARRAY(pbt);
+
+		pbt = _StringToUTF8(m_pEntries[i].pszAdditional);
+		uFileSize += szlen((char *)pbt) + 1;
+		SAFE_DELETE_ARRAY(pbt);
+
+		pbt = _StringToUTF8(m_pEntries[i].pszBinaryDesc);
+		uFileSize += szlen((char *)pbt) + 1;
+		SAFE_DELETE_ARRAY(pbt);
+
 		uFileSize += m_pEntries[i].uBinaryDataLen;
 
 		LockEntryPassword(&m_pEntries[i]);
@@ -1251,10 +1087,12 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	hdr.dwVersion = PWM_DBVER_DW;
 	hdr.dwGroups = m_dwNumGroups;
 	hdr.dwEntries = m_dwNumEntries;
+	hdr.dwKeyEncRounds = m_dwKeyEncRounds;
 
 	// Make up the master key hash seed and the encryption IV
 	m_random.GetRandomBuffer(hdr.aMasterSeed, 16);
 	m_random.GetRandomBuffer((BYTE *)hdr.aEncryptionIV, 16);
+	m_random.GetRandomBuffer(hdr.aMasterSeed2, 32);
 
 	// Skip the header, it will be written later
 	pos = sizeof(PW_DBHEADER);
@@ -1269,12 +1107,12 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
 		memcpy(&pVirtualFile[pos], &m_pGroups[i].uGroupId, 4); pos += 4;
 
-		usFieldType = 0x0002; dwFieldSize = _UTF8BytesNeeded(m_pGroups[i].pszGroupName) + 1;
+		pb = _StringToUTF8(m_pGroups[i].pszGroupName);
+		usFieldType = 0x0002; dwFieldSize = szlen((char *)pb) + 1;
 		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
 		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
-		pb = _StringToUTF8(m_pGroups[i].pszGroupName);
-		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
-		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		ASSERT((pb != NULL) && (szlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		szcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
 		SAFE_DELETE_ARRAY(pb);
 
 		usFieldType = 0x0003; dwFieldSize = 5;
@@ -1341,49 +1179,49 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
 		memcpy(&pVirtualFile[pos], &m_pEntries[i].uImageId, 4); pos += 4;
 
-		usFieldType = 0x0004;
-		dwFieldSize = _UTF8BytesNeeded(m_pEntries[i].pszTitle) + 1;
-		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
-		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
 		pb = _StringToUTF8(m_pEntries[i].pszTitle);
-		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
-		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
-		SAFE_DELETE_ARRAY(pb);
-
-		usFieldType = 0x0005;
-		dwFieldSize = _UTF8BytesNeeded(m_pEntries[i].pszURL) + 1;
+		usFieldType = 0x0004;
+		dwFieldSize = szlen((char *)pb) + 1; // Add terminating NULL character space
 		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
 		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		ASSERT((pb != NULL) && (szlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		szcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		SAFE_DELETE_ARRAY(pb);
+
 		pb = _StringToUTF8(m_pEntries[i].pszURL);
-		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
-		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
-		SAFE_DELETE_ARRAY(pb);
-
-		usFieldType = 0x0006;
-		dwFieldSize = _UTF8BytesNeeded(m_pEntries[i].pszUserName) + 1;
+		usFieldType = 0x0005;
+		dwFieldSize = szlen((char *)pb) + 1; // Add terminating NULL character space
 		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
 		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		ASSERT((pb != NULL) && (szlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		szcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		SAFE_DELETE_ARRAY(pb);
+
 		pb = _StringToUTF8(m_pEntries[i].pszUserName);
-		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
-		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
-		SAFE_DELETE_ARRAY(pb);
-
-		usFieldType = 0x0007;
-		dwFieldSize = _UTF8BytesNeeded(m_pEntries[i].pszPassword) + 1;
+		usFieldType = 0x0006;
+		dwFieldSize = szlen((char *)pb) + 1; // Add terminating NULL character space
 		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
 		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		ASSERT((pb != NULL) && (szlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		szcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		SAFE_DELETE_ARRAY(pb);
+
 		pb = _StringToUTF8(m_pEntries[i].pszPassword);
-		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
-		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
-		SAFE_DELETE_ARRAY(pb);
-
-		usFieldType = 0x0008;
-		dwFieldSize = _UTF8BytesNeeded(m_pEntries[i].pszAdditional) + 1;
+		usFieldType = 0x0007;
+		dwFieldSize = szlen((char *)pb) + 1; // Add terminating NULL character space
 		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
 		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		ASSERT((pb != NULL) && (szlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		szcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		SAFE_DELETE_ARRAY(pb);
+
 		pb = _StringToUTF8(m_pEntries[i].pszAdditional);
-		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
-		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		usFieldType = 0x0008;
+		dwFieldSize = szlen((char *)pb) + 1; // Add terminating NULL character space
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		ASSERT((pb != NULL) && (szlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		szcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
 		SAFE_DELETE_ARRAY(pb);
 
 		usFieldType = 0x0009; dwFieldSize = 5;
@@ -1410,13 +1248,13 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 		_PwTimeToTime(&m_pEntries[i].tExpire, aCompressedTime);
 		memcpy(&pVirtualFile[pos], aCompressedTime, 5); pos += 5;
 
+		pb = _StringToUTF8(m_pEntries[i].pszBinaryDesc);
 		usFieldType = 0x000D;
-		dwFieldSize = _UTF8BytesNeeded(m_pEntries[i].pszBinaryDesc) + 1;
+		dwFieldSize = szlen((char *)pb) + 1;
 		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
 		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
-		pb = _StringToUTF8(m_pEntries[i].pszBinaryDesc);
-		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
-		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		ASSERT((pb != NULL) && (szlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		szcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
 		SAFE_DELETE_ARRAY(pb);
 
 		usFieldType = 0x000E; dwFieldSize = m_pEntries[i].uBinaryDataLen;
@@ -1441,10 +1279,14 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	// Now we have all to build up the header
 	memcpy(pVirtualFile, &hdr, sizeof(PW_DBHEADER));
 
+	// Generate m_pTransformedMasterKey from m_pMasterKey
+	if(_TransformMasterKey(hdr.aMasterSeed2) == FALSE)
+		{ ASSERT(FALSE); fclose(fp); fp = NULL; SAFE_DELETE_ARRAY(pVirtualFile); return FALSE; }
+
 	// Hash the master password with the generated hash salt
 	sha256_begin(&sha32);
 	sha256_hash(hdr.aMasterSeed, 16, &sha32);
-	sha256_hash(m_pMasterKey, 32, &sha32);
+	sha256_hash(m_pTransformedMasterKey, 32, &sha32);
 	sha256_end((unsigned char *)uFinalKey, &sha32);
 
 	if(m_nAlgorithm == ALGO_AES)
@@ -1919,6 +1761,8 @@ BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pDa
 		SAFE_DELETE_ARRAY(pEntry->pszUserName);
 		SAFE_DELETE_ARRAY(pEntry->pszPassword);
 		SAFE_DELETE_ARRAY(pEntry->pszAdditional);
+		SAFE_DELETE_ARRAY(pEntry->pszBinaryDesc);
+		SAFE_DELETE_ARRAY(pEntry->pBinaryData);
 		RESET_PWE_TEMPLATE(pEntry);
 		break;
 	default:
@@ -2066,4 +1910,60 @@ void CPwManager::SubstEntryGroupIds(DWORD dwExistingId, DWORD dwNewId)
 		if(m_pEntries[i].uGroupId == dwExistingId)
 			m_pEntries[i].uGroupId = dwNewId;
 	}
+}
+
+// Encrypt the master key a few times to make brute-force key-search harder
+BOOL CPwManager::_TransformMasterKey(BYTE *pKeySeed)
+{
+	Rijndael rijndael;
+	RD_UINT8 aKey[32];
+	RD_UINT8 aTest[16];
+	RD_UINT8 aRef[16] = { // The Rijndael class will be tested, that's the expected ciphertext
+		0x8e, 0xa2, 0xb7, 0xca, 0x51, 0x67, 0x45, 0xbf,
+		0xea, 0xfc, 0x49, 0x90, 0x4b, 0x49, 0x60, 0x89
+	};
+	DWORD i;
+	sha256_ctx sha2;
+
+	ASSERT(pKeySeed != NULL); if(pKeySeed == NULL) return FALSE;
+
+	if(rijndael.init(Rijndael::ECB, Rijndael::Encrypt, (const RD_UINT8 *)pKeySeed,
+		Rijndael::Key32Bytes, 0) != RIJNDAEL_SUCCESS)
+	{
+		return FALSE;
+	}
+
+	memcpy(m_pTransformedMasterKey, m_pMasterKey, 32);
+
+	for(i = 0; i < m_dwKeyEncRounds; i++)
+	{
+		rijndael.blockEncrypt((const RD_UINT8 *)m_pTransformedMasterKey, 256, (RD_UINT8 *)m_pTransformedMasterKey);
+	}
+
+	// Do a quick test if the Rijndael class worked correctly
+	for(i = 0; i < 32; i++) aKey[i] = (RD_UINT8)i;
+	for(i = 0; i < 16; i++) aTest[i] = ((RD_UINT8)i << 4) | (RD_UINT8)i;
+	if(rijndael.init(Rijndael::ECB, Rijndael::Encrypt, aKey, Rijndael::Key32Bytes, NULL) != RIJNDAEL_SUCCESS)
+		{ ASSERT(FALSE); return FALSE; }
+	if(rijndael.blockEncrypt(aTest, 128, aTest) != 128) { ASSERT(FALSE); }
+	if(memcmp(aTest, aRef, 16) != 0) { ASSERT(FALSE); return FALSE; }
+
+	// Hash once with SHA-256
+	sha256_begin(&sha2);
+	sha256_hash(m_pTransformedMasterKey, 32, &sha2);
+	sha256_end(m_pTransformedMasterKey, &sha2);
+
+	return TRUE;
+}
+
+DWORD CPwManager::GetKeyEncRounds()
+{
+	return m_dwKeyEncRounds;
+}
+
+void CPwManager::SetKeyEncRounds(DWORD dwRounds)
+{
+	// All allowed except DWORD_MAX
+	if(dwRounds == DWORD_MAX) m_dwKeyEncRounds = DWORD_MAX - 1;
+	else m_dwKeyEncRounds = dwRounds;
 }

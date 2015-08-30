@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,10 +30,10 @@
 #ifndef AFX_ENTRYPROPERTIESDLG_H__C4740E60_4F39_11D8_BF16_0050BF14F5CC__INCLUDED_
 #define AFX_ENTRYPROPERTIESDLG_H__C4740E60_4F39_11D8_BF16_0050BF14F5CC__INCLUDED_
 
+#include "NewGUI/BtnST.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/WzComboBox.h"
 #include "NewGUI/amsEdit.h"
-#include "NewGUI/ShadeButtonST.h"
 #include "PwSafe/PwManager.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -53,10 +53,10 @@ public:
 
 	//{{AFX_DATA(CEntryPropertiesDlg)
 	enum { IDD = IDD_ENTRYPROPERTIES_DLG };
-	CShadeButtonST	m_btSelectIcon;
+	CButtonST	m_btSelectIcon;
 	CWzComboBox	m_pGroups;
-	CShadeButtonST	m_btCancel;
-	CShadeButtonST	m_btOK;
+	CButtonST	m_btCancel;
+	CButtonST	m_btOK;
 	CAMSTimeEdit	m_editTime;
 	CAMSDateEdit	m_editDate;
 	BOOL	m_bModExpire;

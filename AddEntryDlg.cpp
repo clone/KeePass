@@ -13,7 +13,7 @@
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -73,6 +73,7 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAddEntryDlg)
+	DDX_Control(pDX, IDC_PROGRESS_PASSQUALITY, m_cPassQuality);
 	DDX_Control(pDX, IDC_REMOVEATTACH_BTN, m_btRemoveAttachment);
 	DDX_Control(pDX, IDC_SAVEATTACH_BTN, m_btSaveAttachment);
 	DDX_Control(pDX, IDC_SETATTACH_BTN, m_btSetAttachment);
@@ -113,6 +114,7 @@ BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	ON_BN_CLICKED(IDC_SETATTACH_BTN, OnSetAttachBtn)
 	ON_BN_CLICKED(IDC_SAVEATTACH_BTN, OnSaveAttachBtn)
 	ON_BN_CLICKED(IDC_REMOVEATTACH_BTN, OnRemoveAttachBtn)
+	ON_EN_CHANGE(IDC_EDIT_PASSWORD, OnChangeEditPassword)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -131,6 +133,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 	GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fStyle, TRUE);
 	GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fStyle, TRUE);
 	GetDlgItem(IDC_CHECK_HIDEPW)->SetFont(&m_fStyle, TRUE);
+
+	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
 	// Make the buttons look cool
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
@@ -280,6 +284,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 		GetDlgItem(IDC_EDIT_TITLE)->SetFocus();
 	}
 
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
+
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
 
@@ -375,6 +381,8 @@ void CAddEntryDlg::OnRandomPwBtn()
 		EraseCString(&dlg.m_strPassword);
 
 		UpdateData(FALSE);
+
+		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
 	}
 }
 
@@ -554,4 +562,11 @@ void CAddEntryDlg::UpdateControlsStatus()
 	}
 
 	if(m_strTitle == CString(PWS_TAN_ENTRY)) m_btSetAttachment.EnableWindow(FALSE);
+}
+
+void CAddEntryDlg::OnChangeEditPassword() 
+{
+	UpdateData(TRUE);
+
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
 }
