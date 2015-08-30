@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #define ___REMOTE_CONTROL_H___
 
 #include <vector>
+#include <boost/utility.hpp>
 #include "../../KeePassLibCpp/PwManager.h"
 #include "../../KeePassLibCpp/Util/ComUtil.h"
 
@@ -38,7 +39,7 @@ typedef struct _RC_CLIENT
 	DWORD dwPermission;
 } RC_CLIENT;
 
-class CRemoteControl
+class CRemoteControl : boost::noncopyable
 {
 public:
 	CRemoteControl();

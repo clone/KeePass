@@ -1031,6 +1031,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Details"
+				>
+				<File
+					RelativePath="..\KeePassLibCpp\Details\PwCompatImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Details\PwCompatImpl.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Details\PwFileImpl.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="KeePassAPI"

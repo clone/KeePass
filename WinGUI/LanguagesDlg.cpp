@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -68,8 +68,8 @@ BOOL CLanguagesDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 	
-	NewGUI_XPButton(&m_btClose, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(&m_btGetLang, IDB_LANGUAGE, IDB_LANGUAGE);
+	NewGUI_XPButton(m_btClose, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(m_btGetLang, IDB_LANGUAGE, IDB_LANGUAGE);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_WORLD),
@@ -245,14 +245,14 @@ void CLanguagesDlg::_LoadLanguage(LPCTSTR szLang)
 	}
 	else cConfig.Set(PWMKEY_LANG, _T("Standard"));
 
-	CString str;
-	str = TRL("The language file has been installed.");
+	CString str = TRL("The language file has been installed.");
 	str += _T("\r\n\r\n");
 	str += TRL("You must restart KeePass in order to use the new language.");
 	str += _T("\r\n\r\n");
 	str += TRL("Do you wish to restart KeePass now?");
-	const int i = MessageBox(str,
-		TRL("Restart KeePass?"), MB_YESNO | MB_ICONQUESTION);
+
+	const int i = MessageBox(str, TRL("Restart KeePass?"), MB_YESNO |
+		MB_ICONQUESTION);
 	if(i == IDYES)
 	{
 		CDialog::OnOK();
@@ -261,7 +261,6 @@ void CLanguagesDlg::_LoadLanguage(LPCTSTR szLang)
 
 void CLanguagesDlg::OnBtnGetLanguage() 
 {
-	ShellExecute(GetSafeHwnd(), _T("open"), PWM_URL_TRL,
-		NULL, NULL, SW_SHOW);
+	ShellExecute(GetSafeHwnd(), NULL, PWM_URL_TRL, NULL, NULL, SW_SHOW);
 	OnCancel();
 }

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,11 +20,10 @@
 #ifndef ___PW_GENERATOR_EX_DLG_H___
 #define ___PW_GENERATOR_EX_DLG_H___
 
-#include "afxwin.h"
-
 #pragma once
 
-#include "afxcmn.h"
+#include <afxwin.h>
+#include <afxcmn.h>
 
 #include "../KeePassLibCpp/SysDefEx.h"
 #include "../KeePassLibCpp/PasswordGenerator/PasswordGenerator.h"
@@ -70,6 +69,7 @@ private:
 	CFont m_fStyle;
 	CFont m_fSymbol;
 	CFont m_fBold;
+	COLORREF m_clrControlText;
 	CToolTipCtrl m_tipSecClear;
 	HWND m_hPrevParent;
 
@@ -82,6 +82,8 @@ private:
 
 	BOOL m_bBlockUIUpdate;
 	BOOL m_bShowInTaskbar;
+
+	PW_GEN_SETTINGS_EX m_pgsAdvanced;
 
 public:
 	CPwGeneratorExDlg(CWnd* pParent = NULL);
@@ -130,7 +132,6 @@ public:
 	CButton m_cbHighAnsi;
 	CString m_strCustomCharSet;
 	CString m_strPattern;
-	BOOL m_bNoConfusing;
 	CXPStyleButtonST m_btnOK;
 	CXPStyleButtonST m_btnCancel;
 	CStatic m_stcCustomCharSet;
@@ -170,10 +171,12 @@ public:
 	afx_msg void OnBnClickedCheckCsSpecial();
 	afx_msg void OnBnClickedCheckCsBrackets();
 	afx_msg void OnBnClickedCheckCsHighansi();
-	afx_msg void OnBnClickedCheckNoConfusing();
 	afx_msg void OnBnClickedCheckCollectEntropy();
 	CButton m_cbPatternPermute;
 	BOOL m_bPatternPermute;
+	afx_msg void OnBnClickedAdvanced();
+	CXPStyleButtonST m_btnAdvanced;
+	afx_msg void OnBnClickedPatternPermute();
 };
 
 #endif // ___PW_GENERATOR_EX_DLG_H___

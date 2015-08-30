@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,7 +20,13 @@
 #ifndef ___BASE64_H___
 #define ___BASE64_H___
 
+#pragma once
+
 #include "../SysDefEx.h"
+#include <vector>
+
+#define CB64_PROTOCOL     "base64://"
+#define CB64_PROTOCOL_LEN 9
 
 class CBase64Codec
 {
@@ -30,6 +36,13 @@ private:
 public:
 	static bool Encode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen);
 	static bool Decode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen);
+
+	static bool DecodeUrlT(LPCTSTR lpBase64, std::vector<BYTE>& rStorage);
+
+	static bool IsBase64UrlStringT(LPCTSTR lpString);
+
+private:
+	static bool DecodeUrlA(LPCSTR lpBase64, std::vector<BYTE>& rStorage);
 };
 
 #endif // ___BASE64_H___

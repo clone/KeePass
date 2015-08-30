@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@
 #include "../KeePassLibCpp/Util/Base64.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "Util/WinUtil.h"
+
+#include <boost/algorithm/string.hpp>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -110,10 +112,10 @@ BOOL CPasswordDlg::OnInitDialog()
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, CPwSafeApp::GetPasswordFont());
 
-	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(&m_btHelp, IDB_HELP_SMALL, IDB_HELP_SMALL);
-	NewGUI_XPButton(&m_btStars, -1, -1);
+	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(m_btHelp, IDB_HELP_SMALL, IDB_HELP_SMALL);
+	NewGUI_XPButton(m_btStars, -1, -1);
 
 	m_btStars.SetFont(&m_fSymbol, TRUE);
 	m_pEditPw.SetFont(&m_fSymbol, TRUE);
@@ -148,16 +150,19 @@ BOOL CPasswordDlg::OnInitDialog()
 	cbi.iIndent = 0;
 	m_cbDiskList.InsertItem(&cbi);
 
-	int i; TCHAR c; UINT uStat; CString str; BYTE idxImage;
+	int i;
+	CString str;
 	int j = 1;
+	
 	for(i = 0; i < 26; i++)
 	{
-		c = (TCHAR)(i + _T('A'));
+		const TCHAR c = (TCHAR)(i + _T('A'));
 		str = CString(c) + _T(":\\");
-		uStat = GetDriveType((LPCTSTR)str);
+
+		const UINT uStat = GetDriveType((LPCTSTR)str);
 		if(uStat != DRIVE_NO_ROOT_DIR)
 		{
-			idxImage = 0;
+			BYTE idxImage = 0;
 			if(uStat == DRIVE_REMOVABLE) idxImage = ICOIDX_REMOVABLE;
 			if(uStat == DRIVE_FIXED) idxImage = ICOIDX_FIXED;
 			if(uStat == DRIVE_REMOTE) idxImage = ICOIDX_REMOTE;
@@ -176,6 +181,31 @@ BOOL CPasswordDlg::OnInitDialog()
 			m_cbDiskList.InsertItem(&cbi);
 		}
 	}
+
+	QueryKeyProviders();
+	for(size_t iProv = 0; iProv < m_vKeyProv.size(); ++iProv)
+	{
+		const KP_KEYPROV_INFO_CPP& keyProv = m_vKeyProv[iProv];
+
+		ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
+		cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
+		cbi.iItem = j; ++j;
+		cbi.pszText = const_cast<TCHAR *>(keyProv.strName.c_str());
+		cbi.cchTextMax = static_cast<int>(keyProv.strName.size());
+		cbi.iImage = cbi.iSelectedImage = static_cast<int>(keyProv.dwImageIndex);
+		cbi.iIndent = 0;
+		m_cbDiskList.InsertItem(&cbi);
+	}
+
+	CString strStaticKeyFile = TRL("Key File");
+	if(m_vKeyProv.size() > 0)
+	{
+		strStaticKeyFile += _T(" / ");
+		strStaticKeyFile += TRL("Provider");
+	}
+	strStaticKeyFile += _T(":");
+	GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(strStaticKeyFile);
+
 	m_cbDiskList.SetCurSel(0);
 
 	DWORD dw = m_cbDiskList.GetExtendedStyle();
@@ -198,7 +228,7 @@ BOOL CPasswordDlg::OnInitDialog()
 	{
 		if(m_bLoadMode == FALSE)
 		{
-			NewGUI_XPButton(&m_btBrowseKeyFile, IDB_TB_SAVE, IDB_TB_SAVE, TRUE);
+			NewGUI_XPButton(m_btBrowseKeyFile, IDB_TB_SAVE, IDB_TB_SAVE, TRUE);
 			lp = TRL("Save key file manually to...");
 			m_btBrowseKeyFile.SetTooltipText(lp);
 
@@ -227,7 +257,7 @@ BOOL CPasswordDlg::OnInitDialog()
 		}
 		else // m_bConfirm == FALSE, m_bLoadMode == TRUE
 		{
-			NewGUI_XPButton(&m_btBrowseKeyFile, IDB_TB_OPEN, IDB_TB_OPEN, TRUE);
+			NewGUI_XPButton(m_btBrowseKeyFile, IDB_TB_OPEN, IDB_TB_OPEN, TRUE);
 			lp = TRL("Select key file manually...");
 			m_btBrowseKeyFile.SetTooltipText(lp);
 
@@ -322,7 +352,7 @@ BOOL CPasswordDlg::OnInitDialog()
 		CString strCBI;
 		BOOL bFound = FALSE;
 
-		for(int i = 0; i < m_cbDiskList.GetCount(); i++)
+		for(i = 0; i < m_cbDiskList.GetCount(); ++i)
 		{
 			m_cbDiskList.GetLBText(i, strCBI);
 			if(strCBI.GetLength() < nSpecLen) continue;
@@ -357,6 +387,8 @@ BOOL CPasswordDlg::OnInitDialog()
 		EnableClientWindows();
 	}
 
+	PerformMiniModeAdjustments();
+
 	m_pEditPw.SetFocus();
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
@@ -368,6 +400,30 @@ void CPasswordDlg::CleanUp()
 	m_fStyle.DeleteObject();
 	m_fSymbol.DeleteObject();
 	m_fBold.DeleteObject();
+
+	_CALLPLUGINS(KPM_KEYPROV_FINALIZE, 0, 0);
+}
+
+void CPasswordDlg::PerformMiniModeAdjustments()
+{
+	if(CPwSafeDlg::m_bMiniMode == FALSE) return;
+
+	NewGUI_DisableHideWnd(GetDlgItem(IDC_CHECK_KEYMETHOD_AND));
+	NewGUI_DisableHideWnd(GetDlgItem(IDC_STATIC_SELDISK));
+	NewGUI_DisableHideWnd(&m_cbDiskList);
+	NewGUI_DisableHideWnd(&m_btBrowseKeyFile);
+	NewGUI_DisableHideWnd(&m_btHelp);
+
+	RECT rectTop, rectBottom;
+	GetDlgItem(IDC_CHECK_KEYMETHOD_AND)->GetWindowRect(&rectTop);
+	m_btOK.GetWindowRect(&rectBottom);
+
+	long lMoveY = -(rectBottom.top - rectTop.top);
+	// NewGUI_MoveWnd(&m_btHelp, 0, lMoveY, this);
+	NewGUI_MoveWnd(&m_btOK, 0, lMoveY, this);
+	NewGUI_MoveWnd(&m_btCancel, 0, lMoveY, this);
+
+	NewGUI_Resize(this, 0, lMoveY, NULL);
 }
 
 void CPasswordDlg::FreePasswords()
@@ -407,7 +463,7 @@ void CPasswordDlg::OnOK()
 			if(!((_tcslen(m_lpKey) == 0) ^ (m_cbDiskList.GetCurSel() == 0)))
 			{
 				MessageBox(TRL("EITHER enter a master password OR select a key file."),
-					TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+					PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONINFORMATION);
 				FreePasswords();
 				return;
 			}
@@ -417,7 +473,7 @@ void CPasswordDlg::OnOK()
 			if((_tcslen(m_lpKey) == 0) || (m_cbDiskList.GetCurSel() == 0))
 			{
 				MessageBox(TRL("You've selected the AND key mode, so you must enter a password AND select a key file."),
-					TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+					PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONINFORMATION);
 				FreePasswords();
 				return;
 			}
@@ -432,7 +488,9 @@ void CPasswordDlg::OnOK()
 	{
 		m_cbDiskList.GetLBText(m_cbDiskList.GetCurSel(), strTemp);
 
-		if(m_bLoadMode == FALSE)
+		const BOOL bKeyProv = IsKeyProvider(strTemp);
+
+		if((m_bLoadMode == FALSE) && (bKeyProv == FALSE))
 		{
 			if(strTemp.GetAt(strTemp.GetLength() - 1) == _T('\\'))
 			{
@@ -470,7 +528,7 @@ void CPasswordDlg::OnOK()
 			fclose(fpTest); Sleep(100);
 			DeleteFile(strTemp2);
 		}
-		else // Load the key file
+		else if(bKeyProv == FALSE) // Load the key file
 		{
 			const DWORD dwDummyErrorCode = 0x6F4B1C80;
 			::SetLastError(dwDummyErrorCode);
@@ -486,10 +544,21 @@ void CPasswordDlg::OnOK()
 					strKeyError += _T("\r\n\r\n");
 					strKeyError += WU_FormatSystemMessage(dwKeyFileError);
 
-					MessageBox(strKeyError.c_str(), TRL("Password Safe"), MB_OK | MB_ICONWARNING);
+					MessageBox(strKeyError.c_str(), PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
 					FreePasswords();
 					return;
 				}
+			}
+		}
+
+		// Get data from external key provider
+		if(bKeyProv == TRUE)
+		{
+			strTemp = GetKeyFromProvider(strTemp).c_str();
+			if(strTemp.GetLength() == 0)
+			{
+				FreePasswords();
+				return;
 			}
 		}
 
@@ -659,6 +728,117 @@ void CPasswordDlg::OnBnClickedBrowseKeyFile()
 	}
 
 	UpdateData(FALSE);
+}
+
+void CPasswordDlg::QueryKeyProviders()
+{
+	m_vKeyProv.clear();
+
+	std::vector<KP_PLUGIN_INSTANCE>& v = CPluginManager::Instance().m_plugins;
+
+	for(size_t i = 0; i < v.size(); ++i)
+	{
+		KP_PLUGIN_INSTANCE& p = v[i];
+
+		if(p.bEnabled == FALSE) continue;
+		if(p.hinstDLL == NULL) continue;
+		if(p.lpCall == NULL) { ASSERT(FALSE); continue; }
+
+		KP_KEYPROV_INFO cInfo;
+		ZeroMemory(&cInfo, sizeof(KP_KEYPROV_INFO));
+		p.lpCall(KPM_KEYPROV_QUERY_INFO_FIRST, NULL, (LPARAM)&cInfo);
+
+		if(cInfo.lpName != NULL)
+		{
+			AddKeyProvider(cInfo);
+
+			while(true)
+			{
+				ZeroMemory(&cInfo, sizeof(KP_KEYPROV_INFO));
+				p.lpCall(KPM_KEYPROV_QUERY_INFO_NEXT, NULL, (LPARAM)&cInfo);
+
+				if(cInfo.lpName != NULL) AddKeyProvider(cInfo);
+				else break;
+			}
+		}
+	}
+}
+
+void CPasswordDlg::AddKeyProvider(const KP_KEYPROV_INFO& keyProvInfo)
+{
+	if((keyProvInfo.lpName == NULL) || (keyProvInfo.lpName[0] == 0)) return;
+
+	// std::basic_string<TCHAR> strSpec = lpKeyProvInfo;
+	// std::basic_string<TCHAR> strSplit = strSpec.substr(0, 1);
+	// std::basic_string<TCHAR> strDef = strSpec.substr(1);
+	// std::vector<std::basic_string<TCHAR> > vSpec;
+	// boost::algorithm::split(vSpec, strDef,
+	//	boost::algorithm::is_any_of(strSplit));
+	// if(vSpec.size() == 0) return;
+
+	m_vKeyProv.push_back(CPasswordDlg::KeyProvCToS(keyProvInfo));
+}
+
+BOOL CPasswordDlg::IsKeyProvider(LPCTSTR lpDisplayName)
+{
+	for(size_t i = 0; i < m_vKeyProv.size(); ++i)
+	{
+		if(m_vKeyProv[i].strName == lpDisplayName)
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+std::basic_string<TCHAR> CPasswordDlg::GetKeyFromProvider(LPCTSTR lpDisplayName)
+{
+	std::basic_string<TCHAR> str;
+
+	if((lpDisplayName == NULL) || (lpDisplayName[0] == 0)) return str;
+
+	KP_KEYPROV_KEY kpKey;
+	ZeroMemory(&kpKey, sizeof(KP_KEYPROV_KEY));
+	_CALLPLUGINS(KPM_KEYPROV_QUERY_KEY, (LPARAM)lpDisplayName, (LPARAM)&kpKey);
+
+	if((kpKey.lpData == NULL) || (kpKey.dwDataSize == 0))
+	{
+		CString strMsg = TRL("The key provider plugin did not supply a valid key");
+		strMsg += _T(".");
+		MessageBox(strMsg, PWM_PRODUCT_NAME_SHORT, MB_ICONWARNING | MB_OK);
+		return str;
+	}
+
+	const DWORD dwBufSizeM = (kpKey.dwDataSize * 3) + 12;
+	BYTE* pBase = new BYTE[dwBufSizeM];
+	ZeroMemory(pBase, dwBufSizeM);
+	DWORD dwBufSize = dwBufSizeM;
+	VERIFY(CBase64Codec::Encode((const BYTE *)kpKey.lpData, kpKey.dwDataSize,
+		pBase, &dwBufSize));
+
+	str = _T(CB64_PROTOCOL);
+
+#ifndef _UNICODE
+	str += (const char *)pBase;
+#else // Unicode
+	const WCHAR *pUni = _StringToUnicode((const char *)pBase);
+	str += pUni;
+	SAFE_DELETE_ARRAY(pUni);
+#endif
+
+	mem_erase(pBase, dwBufSizeM);
+	SAFE_DELETE_ARRAY(pBase);
+	return str;
+}
+
+KP_KEYPROV_INFO_CPP CPasswordDlg::KeyProvCToS(const KP_KEYPROV_INFO& c)
+{
+	KP_KEYPROV_INFO_CPP s;
+
+	s.dwFlags = c.dwFlags;
+	s.strName = c.lpName;
+	s.dwImageIndex = c.dwImageIndex;
+
+	return s;
 }
 
 #pragma warning(pop)

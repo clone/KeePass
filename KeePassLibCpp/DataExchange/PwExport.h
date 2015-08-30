@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,9 +20,12 @@
 #ifndef ___PW_EXPORT_H___
 #define ___PW_EXPORT_H___
 
+#pragma once
+
 #include "../PwManager.h"
 #include "../SysDefEx.h"
 #include <stdio.h>
+#include <boost/utility.hpp>
 
 #define PWEXP_NULL    0
 #define PWEXP_TXT     1
@@ -53,7 +56,7 @@ typedef struct
 	BOOL bExportBackups;
 } PWEXPORT_OPTIONS;
 
-class CPwExport
+class CPwExport : boost::noncopyable
 {
 public:
 	CPwExport();

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ BOOL CPluginsDlg::OnInitDialog()
 	ASSERT(m_pPiMgr != NULL);
 	ASSERT(m_pImgList != NULL);
 
-	NewGUI_XPButton(&m_btClose, IDB_OK, IDB_OK);
+	NewGUI_XPButton(m_btClose, IDB_OK, IDB_OK);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_PLUGINS),
@@ -211,7 +211,8 @@ void CPluginsDlg::OnRClickPluginsList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	m_popmenu.LoadToolbar(IDR_INFOICONS, IDB_INFOICONS_EX);
 
-	BCMenu *psub = (BCMenu *)m_popmenu.GetSubMenu(0);
+	BCMenu *psub = NewGUI_GetBCMenu(m_popmenu.GetSubMenu(0));
+	if(psub == NULL) { ASSERT(FALSE); psub = &m_popmenu; }
 
 	psub->ModifyODMenu(NULL, (UINT)ID_PLUGIN_ENABLE, m_pImgList, 2);
 	psub->ModifyODMenu(NULL, (UINT)ID_PLUGIN_DISABLE, m_pImgList, 45);
@@ -317,9 +318,10 @@ LRESULT CPluginsDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
 	UNREFERENCED_PARAMETER(lParam);
 
 	if(wParam == IDC_STATIC_HL_GETPLUGINS)
-		ShellExecute(NULL, _T("open"), PWM_URL_PLUGINS, NULL, NULL, SW_SHOW);
+		ShellExecute(NULL, NULL, PWM_URL_PLUGINS, NULL, NULL, SW_SHOW);
 	else if(wParam == IDC_STATIC_HL_HELP)
 		WU_OpenAppHelp(PWM_HELP_PLUGINS);
 
+	OnCancel();
 	return 0;
 }

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,42 +20,10 @@
 #ifndef ___PW_COMPAT_H___
 #define ___PW_COMPAT_H___
 
+#pragma once
+
 #include "SysDefEx.h"
 #include "Util/StrUtil.h"
-
-#pragma pack(1)
-
-typedef struct _PW_DBHEADER_V1 // Old version 0.1.x database header
-{
-	DWORD dwSignature1;
-	DWORD dwSignature2;
-	DWORD dwFlags;
-	DWORD dwVersion;
-
-	BYTE aMasterSeed[16];
-	UINT8 aEncryptionIV[16];
-
-	DWORD dwGroups;
-	DWORD dwEntries;
-} PW_DBHEADER_V1, *PPW_DBHEADER_V1;
-
-typedef struct _PW_DBHEADER_V2 // Old version 0.2.x database header
-{
-	DWORD dwSignature1;
-	DWORD dwSignature2;
-	DWORD dwFlags;
-	DWORD dwVersion;
-
-	BYTE aMasterSeed[16];
-	UINT8 aEncryptionIV[16];
-
-	DWORD dwGroups;
-	DWORD dwEntries;
-
-	BYTE aContentsHash[32];
-} PW_DBHEADER_V2, *PPW_DBHEADER_V2;
-
-#pragma pack()
 
 TCHAR *_UTF8ToStringV2(const UTF8_BYTE *pUTF8String); // Don't use outside PwCompat.*
 

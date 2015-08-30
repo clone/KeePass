@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -37,7 +37,8 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 
 CDbSettingsDlg::CDbSettingsDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CDbSettingsDlg::IDD, pParent)
+	: CDialog(CDbSettingsDlg::IDD, pParent),
+	m_strDefaultUserName(_T(""))
 {
 	//{{AFX_DATA_INIT(CDbSettingsDlg)
 	m_nAlgorithm = -1;
@@ -56,6 +57,7 @@ void CDbSettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_CBIndex(pDX, IDC_COMBO_ENCALGOS, m_nAlgorithm);
 	DDX_Text(pDX, IDC_EDIT_KEYENC, m_dwNumKeyEnc);
+	DDX_Text(pDX, IDC_EDIT_DEFAULTUSER, m_strDefaultUserName);
 	//}}AFX_DATA_MAP
 }
 
@@ -76,9 +78,9 @@ BOOL CDbSettingsDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(&m_btCalcRounds, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
+	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(m_btCalcRounds, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
 
 	CString str;
 	m_btCalcRounds.GetWindowText(str);
@@ -138,7 +140,6 @@ void CDbSettingsDlg::OnBtnCalcRounds()
 	CRijndael rijndael;
 	UINT8 aKeySeed[32];
 	UINT8 aTest[32];
-	DWORD dwStartTime;
 	DWORD iRounds = 0;
 
 	UpdateData(TRUE);
@@ -148,13 +149,14 @@ void CDbSettingsDlg::OnBtnCalcRounds()
 
 	if(rijndael.Init(CRijndael::ECB, CRijndael::EncryptDir, aKeySeed, CRijndael::Key32Bytes, 0) != RIJNDAEL_SUCCESS)
 	{
-		MessageBox(TRL("Internal error"), TRL("Password Safe"), MB_ICONSTOP | MB_OK);
+		MessageBox(TRL("Internal error"), PWM_PRODUCT_NAME_SHORT,
+			MB_ICONSTOP | MB_OK);
 		return;
 	}
 
-	dwStartTime = timeGetTime();
+	const DWORD dwStartTime = timeGetTime();
 
-	while(1)
+	while(true)
 	{
 		rijndael.BlockEncrypt(aTest, 256, aTest);
 		rijndael.BlockEncrypt(aTest, 256, aTest);

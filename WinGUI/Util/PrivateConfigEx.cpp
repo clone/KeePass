@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,8 +29,9 @@
 CPrivateConfigEx::CPrivateConfigEx(BOOL bRequireWriteAccess)
 {
 	m_bPreferUser = FALSE;
+	m_bCanWrite = bRequireWriteAccess;
 
-	this->GetConfigPaths(bRequireWriteAccess);
+	this->GetConfigPaths();
 
 	TCHAR tszPref[SI_REGSIZE];
 	if(this->GetIn(PWMKEY_PREFERUSER, tszPref, CFG_ID_GLOBAL) == TRUE)
@@ -39,9 +40,10 @@ CPrivateConfigEx::CPrivateConfigEx(BOOL bRequireWriteAccess)
 
 CPrivateConfigEx::~CPrivateConfigEx()
 {
+	this->FlushGlobal(TRUE);
 }
 
-void CPrivateConfigEx::GetConfigPaths(BOOL bRequireWriteAccess)
+void CPrivateConfigEx::GetConfigPaths()
 {
 	TCHAR tszAppDir[MAX_PATH * 3];
 	tszAppDir[0] = 0; tszAppDir[1] = 0;
@@ -81,6 +83,8 @@ void CPrivateConfigEx::GetConfigPaths(BOOL bRequireWriteAccess)
 	{
 		m_strFileUser = PWM_EXENAME;
 		m_strFileUser += CFG_SUFFIX_STD;
+
+		m_strUserPath.clear();
 	}
 	else
 	{
@@ -94,21 +98,53 @@ void CPrivateConfigEx::GetConfigPaths(BOOL bRequireWriteAccess)
 		_tcscpy_s(tszAppDir, _countof(tszAppDir), tszTemp);
 
 		m_strFileUser = tszTemp;
+		m_strUserPath = tszTemp;
+
 		m_strFileUser += _T("\\");
 		m_strFileUser += PWM_EXENAME;
 		m_strFileUser += CFG_SUFFIX_STD;
 	}
 
-	if(bRequireWriteAccess == TRUE)
+	if(m_bCanWrite == TRUE)
 	{
 		if(_FileWritable(m_strFileGlobal.c_str()) == FALSE)
 		{
 			if(tszAppDir[0] != 0) CreateDirectory(tszAppDir, NULL);
 		}
 	}
+
+	if(_FileAccessible(m_strFileGlobal.c_str()) == TRUE)
+	{
+		m_strFileCachedGlobal = WU_GetTempFile(CFG_SUFFIX_STD);
+
+		if(CopyFile(m_strFileGlobal.c_str(), m_strFileCachedGlobal.c_str(),
+			FALSE) == FALSE)
+		{
+			ASSERT(FALSE);
+			m_strFileCachedGlobal.clear();
+		}
+	}
 }
 
-BOOL CPrivateConfigEx::Get(LPCTSTR pszField, LPTSTR pszValue)
+void CPrivateConfigEx::FlushGlobal(BOOL bDeleteCache)
+{
+	if(m_strFileCachedGlobal.size() == 0) return;
+
+	if(m_bCanWrite == TRUE)
+	{
+		VERIFY(CopyFile(m_strFileCachedGlobal.c_str(), m_strFileGlobal.c_str(),
+			FALSE) != FALSE);
+	}
+
+	if(bDeleteCache == TRUE)
+	{
+		if(DeleteFile(m_strFileCachedGlobal.c_str()) != FALSE)
+			m_strFileCachedGlobal.clear();
+		else { ASSERT(FALSE); }
+	}
+}
+
+BOOL CPrivateConfigEx::Get(LPCTSTR pszField, LPTSTR pszValue) const
 {
 	if(this->GetIn(pszField, pszValue, CFG_ID_ENFORCED) == TRUE)
 		return TRUE;
@@ -158,7 +194,7 @@ BOOL CPrivateConfigEx::Set(LPCTSTR pszField, LPCTSTR pszValue)
 	return FALSE;
 }
 
-BOOL CPrivateConfigEx::GetIn(LPCTSTR pszField, LPTSTR pszValue, int nConfigID)
+BOOL CPrivateConfigEx::GetIn(LPCTSTR pszField, LPTSTR pszValue, int nConfigID) const
 {
 	LPCTSTR lpNotFound = PCFG_NOTFOUND;
 
@@ -172,7 +208,13 @@ BOOL CPrivateConfigEx::GetIn(LPCTSTR pszField, LPTSTR pszValue, int nConfigID)
 	ASSERT(pszField[0] != 0); if(pszField[0] == 0) return FALSE;
 
 	LPCTSTR lpFile = m_strFileUser.c_str();
-	if(nConfigID == CFG_ID_GLOBAL) lpFile = m_strFileGlobal.c_str();
+	if(nConfigID == CFG_ID_GLOBAL)
+	{
+		if(m_strFileCachedGlobal.size() != 0)
+			lpFile = m_strFileCachedGlobal.c_str();
+		else
+			lpFile = m_strFileGlobal.c_str();
+	}
 	else if(nConfigID == CFG_ID_ENFORCED) lpFile = m_strFileEnforced.c_str();
 
 	GetPrivateProfileString(PWM_EXENAME, pszField, lpNotFound, tszTemp,
@@ -189,14 +231,22 @@ BOOL CPrivateConfigEx::SetIn(LPCTSTR pszField, LPCTSTR pszValue, int nConfigID)
 	ASSERT(_tcslen(pszField) > 0); if(_tcslen(pszField) == 0) return FALSE;
 	ASSERT(pszValue != NULL); if(pszValue == NULL) return FALSE;
 
+	ASSERT(m_bCanWrite == TRUE);
+
 	LPCTSTR lpFile = m_strFileUser.c_str();
-	if(nConfigID == CFG_ID_GLOBAL) lpFile = m_strFileGlobal.c_str();
+	if(nConfigID == CFG_ID_GLOBAL)
+	{
+		if(m_strFileCachedGlobal.size() != 0)
+			lpFile = m_strFileCachedGlobal.c_str();
+		else
+			lpFile = m_strFileGlobal.c_str();
+	}
 
 	return ((WritePrivateProfileString(PWM_EXENAME, pszField, pszValue, lpFile) ==
 		FALSE) ? FALSE : TRUE); // Zero-based success mapping
 }
 
-BOOL CPrivateConfigEx::GetBool(const TCHAR *pszField, BOOL bDefault)
+BOOL CPrivateConfigEx::GetBool(const TCHAR *pszField, BOOL bDefault) const
 {
 	ASSERT((bDefault == FALSE) || (bDefault == TRUE));
 
@@ -213,4 +263,31 @@ BOOL CPrivateConfigEx::SetBool(const TCHAR *pszField, BOOL bValue)
 {
 	ASSERT((bValue == FALSE) || (bValue == TRUE));
 	return this->Set(pszField, (bValue == FALSE) ? CFG_VAL_FALSE : CFG_VAL_TRUE);
+}
+
+std::vector<std::basic_string<TCHAR> > CPrivateConfigEx::GetArray(
+	LPCTSTR pszPrefix) const
+{
+	std::vector<std::basic_string<TCHAR> > v;
+
+	ASSERT(pszPrefix != NULL); if(pszPrefix == NULL) return v;
+	ASSERT(pszPrefix[0] != 0); if(pszPrefix[0] == 0) return v;
+
+	DWORD uIndex = 0;
+	TCHAR tszValue[SI_REGSIZE];
+
+	while(true)
+	{
+		CString strKey;
+		strKey.Format(_T("%s%u"), pszPrefix, uIndex);
+
+		if(this->Get(strKey, tszValue) == FALSE) break;
+
+		std::basic_string<TCHAR> strValue = tszValue;
+		v.push_back(strValue);
+
+		++uIndex;
+	}
+
+	return v;
 }

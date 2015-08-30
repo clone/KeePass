@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "../KeePassLibCpp/Util/MemUtil.h"
 #include "Util/PrivateConfigEx.h"
+#include "Util/WinUtil.h"
 #include "Util/CmdLine/CmdArgs.h"
 #include "Util/CmdLine/Executable.h"
 
@@ -53,6 +54,8 @@ CPwSafeApp::CPwSafeApp()
 {
 	_tcscpy_s(g_pFontNameNormal, _countof(g_pFontNameNormal), _T("MS Serif"));
 	_tcscpy_s(g_pFontNameSymbol, _countof(g_pFontNameSymbol), _T("Symbol"));
+
+	m_hGlobalMutex = NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -74,8 +77,11 @@ BOOL CPwSafeApp::InitInstance()
 	if(ProcessControlCommands() == TRUE) return FALSE;
 
 	// Create application's mutex object to make our presence public
-	m_pAppMutex = new CMutex(FALSE, _T("KeePassApplicationMutex"), NULL);
+	m_pAppMutex = new CMutex(FALSE, MTXNAME_LOCAL, NULL);
 	if(m_pAppMutex == NULL) { ASSERT(FALSE); }
+
+	m_hGlobalMutex = CPwSafeApp::CreateGlobalMutex();
+	ASSERT(m_hGlobalMutex != NULL);
 
 	VERIFY(AfxOleInit());
 	AfxEnableControlContainer();
@@ -168,6 +174,8 @@ BOOL CPwSafeApp::InitInstance()
 			else dlg.m_instanceChecker.ActivatePreviousInstance(_T(""), 0xF0FFFFF0);
 
 			m_pMainWnd = NULL;
+
+			NewGUI_CleanUp();
 			return FALSE;
 		}
 	}
@@ -177,6 +185,7 @@ BOOL CPwSafeApp::InitInstance()
 	if(nResponse == IDOK) { }
 	else if(nResponse == IDCANCEL) { }
 
+	NewGUI_CleanUp();
 	return FALSE;
 }
 
@@ -190,6 +199,13 @@ int CPwSafeApp::ExitInstance()
 		m_pAppMutex = NULL;
 	}
 
+	if(m_hGlobalMutex != NULL)
+	{
+		VERIFY(::CloseHandle(m_hGlobalMutex));
+		m_hGlobalMutex = NULL;
+	}
+
+	NewGUI_CleanUp();
 	return CWinApp::ExitInstance();
 }
 
@@ -512,4 +528,39 @@ BOOL CPwSafeApp::ProcessControlCommands()
 	}
 
 	return FALSE;
+}
+
+HANDLE CPwSafeApp::CreateGlobalMutex()
+{
+	std::basic_string<TCHAR> strName = _T("Global\\");
+	strName += MTXNAME_GLOBAL;
+
+	HMODULE hInst = ::LoadLibrary(_T("AdvApi32"));
+	if(hInst == NULL) { ASSERT(FALSE); return NULL; }
+
+	LPINITIALIZESECURITYDESCRIPTOR lpInit = (LPINITIALIZESECURITYDESCRIPTOR)
+		::GetProcAddress(hInst, "InitializeSecurityDescriptor");
+	LPSETSECURITYDESCRIPTORDACL lpSet = (LPSETSECURITYDESCRIPTORDACL)
+		::GetProcAddress(hInst, "SetSecurityDescriptorDacl");
+	if((lpInit == NULL) || (lpSet == NULL))
+	{
+		::FreeLibrary(hInst);
+		return NULL;
+	}
+
+	SECURITY_DESCRIPTOR sd;
+	ZeroMemory(&sd, sizeof(SECURITY_DESCRIPTOR));
+	VERIFY(lpInit(&sd, SECURITY_DESCRIPTOR_REVISION));
+	VERIFY(lpSet(&sd, TRUE, NULL, FALSE));
+
+	SECURITY_ATTRIBUTES sa;
+	ZeroMemory(&sa, sizeof(SECURITY_ATTRIBUTES));
+	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+	sa.lpSecurityDescriptor = &sd;
+	sa.bInheritHandle = FALSE;
+
+	HANDLE hMutex = ::CreateMutex(&sa, FALSE, strName.c_str());
+
+	::FreeLibrary(hInst);
+	return hMutex;
 }

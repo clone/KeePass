@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,9 +28,18 @@
 	#error include 'stdafx.h' before including this file for PCH
 #endif
 
-#include "afxmt.h"
+#include <afxmt.h>
 #include "Resource.h"
 #include "../KeePassLibCpp/SysDefEx.h"
+
+#define MTXNAME_LOCAL  _T("KeePassApplicationMutex")
+#define MTXNAME_GLOBAL _T("KeePassAppMutexExI")
+
+typedef BOOL(WINAPI *LPINITIALIZESECURITYDESCRIPTOR)(
+	PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD dwRevision);
+typedef BOOL(WINAPI *LPSETSECURITYDESCRIPTORDACL)(
+	PSECURITY_DESCRIPTOR pSecurityDescriptor, BOOL bDaclPresent,
+	PACL pDacl, BOOL bDaclDefaulted);
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -53,9 +62,12 @@ public:
 	static TCHAR GetPasswordCharacter();
 	static LPCTSTR GetPasswordFont();
 
+private:
 	static BOOL ProcessControlCommands();
+	static HANDLE CreateGlobalMutex();
 
 	CMutex *m_pAppMutex;
+	HANDLE m_hGlobalMutex;
 
 	//{{AFX_VIRTUAL(CPwSafeApp)
 	public:

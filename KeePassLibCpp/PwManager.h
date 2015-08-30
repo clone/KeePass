@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,9 +20,13 @@
 #ifndef ___KEEPASS_PASSWORD_MANAGER_H___
 #define ___KEEPASS_PASSWORD_MANAGER_H___
 
+#pragma once
+
 #include "SysDefEx.h"
 #include <string>
 #include <vector>
+#include <boost/utility.hpp>
+
 #include "Util/NewRandom.h"
 #include "Crypto/Rijndael.h"
 
@@ -32,11 +36,11 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.09")
+#define PWM_VERSION_STR  _T("1.10")
 #else
-#define PWM_VERSION_STR  _T("1.09 Unicode")
+#define PWM_VERSION_STR  _T("1.10 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01000901
+#define PWM_VERSION_DW   0x01010001
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
@@ -54,15 +58,16 @@
 #define PWM_README_FILE   _T("KeePass.chm")
 #define PWM_LICENSE_FILE  _T("License.txt")
 
-#define PWM_HELP_AUTOTYPE _T("help/base/autotype.html")
-#define PWM_HELP_URLS     _T("help/base/autourl.html")
-#define PWM_HELP_CREDITS  _T("help/base/credits.html")
-#define PWM_HELP_SECURITY _T("help/base/security.html")
-#define PWM_HELP_PLUGINS  _T("help/v1/plugins.html")
-#define PWM_HELP_KEYS     _T("help/base/keys.html")
-#define PWM_HELP_TANS     _T("help/base/tans.html")
-#define PWM_HELP_PWGEN    _T("help/base/pwgenerator.html")
-#define PWM_HELP_CSV      _T("help/base/importexport.html#csv")
+#define PWM_HELP_AUTOTYPE  _T("help/base/autotype.html")
+#define PWM_HELP_URLS      _T("help/base/autourl.html")
+#define PWM_HELP_CREDITS   _T("help/base/credits.html")
+#define PWM_HELP_SECURITY  _T("help/base/security.html")
+#define PWM_HELP_PLUGINS   _T("help/v1/plugins.html")
+#define PWM_HELP_KEYS      _T("help/base/keys.html")
+#define PWM_HELP_TANS      _T("help/base/tans.html")
+#define PWM_HELP_PWGEN     _T("help/base/pwgenerator.html")
+#define PWM_HELP_PWGEN_ADV _T("help/base/pwgenerator.html#secreduc")
+#define PWM_HELP_CSV       _T("help/base/importexport.html#csv")
 
 #define PWMKEY_LANG       _T("KeeLanguage")
 #define PWMKEY_CLIPSECS   _T("KeeClipboardSeconds")
@@ -124,6 +129,7 @@
 #define PWMKEY_WINSTATE_MAX     _T("KeeWindowMaximized")
 #define PWMKEY_AUTOSORT         _T("KeeAutoSortPwList")
 #define PWMKEY_AUTOTYPEHOTKEY   _T("KeeAutoTypeHotKey")
+#define PWMKEY_RESTOREHOTKEY    _T("KeeRestoreHotKey")
 #define PWMKEY_CLIPBOARDMETHOD  _T("KeeClipboardMethod")
 #define PWMKEY_STARTMINIMIZED   _T("KeeStartMinimized")
 #define PWMKEY_AUTOSHOWEXPIRED  _T("KeeShowExpiredAtOpen")
@@ -152,6 +158,12 @@
 #define PWMKEY_USELOCALTIMEFMT  _T("KeeUseLocalTimeFormat")
 #define PWMKEY_TANCHARS         _T("KeeTANCharacters")
 #define PWMKEY_HTMURLMETHOD     _T("KeeHTMURLMethod")
+#define PWMKEY_MINIMODE         _T("KeeMiniMode")
+#define PWMKEY_UNINTRUSIVEMINIMODE _T("KeeUnintrusiveMiniMode")
+#define PWMKEY_BANNERCOLORSTART _T("KeeBannerColorStart")
+#define PWMKEY_BANNERCOLOREND   _T("KeeBannerColorEnd")
+#define PWMKEY_ROOTONNEW        _T("KeeRootInNewDb")
+#define PWMKEY_GROUPONNEW_PRE   _T("KeeGroupInNewDb")
 
 #define PWMKEY_GENPROFILE       _T("KeeGenProfile")
 #define PWMKEY_GENPROFILEAUTO   _T("KeeGenProfileAuto")
@@ -187,9 +199,12 @@
 #define PWM_STD_ICON_GROUP       48
 #define PWM_STD_ICON_GROUP_OPEN  49
 #define PWM_STD_ICON_GROUP_EMAIL 50
-#define PWM_STD_ICON_GROUP_PKG 25
+#define PWM_STD_ICON_GROUP_PKG   25
+
+#define PWM_STD_MAX_HISTORYITEMS 12
 
 // Field flags (for example in Find function)
+// These flags must be disjoint to PWMS_* flags
 #define PWMF_TITLE              1
 #define PWMF_USER               2
 #define PWMF_URL                4
@@ -201,6 +216,10 @@
 #define PWMF_LASTACCESS       256
 #define PWMF_EXPIRE           512
 #define PWMF_UUID            1024
+
+// Search flags
+// These flags must be disjoint to PWMF_* flags
+#define PWMS_REGEX      0x10000000
 
 #define PWGF_EXPANDED   1
 
@@ -224,9 +243,16 @@
 #define PWE_INVALID_FILESIGNATURE 13
 #define PWE_INVALID_FILEHEADER    14
 #define PWE_NOFILEACCESS_READ_KEY 15
+#define PWE_KEYPROV_INVALID_KEY   16
 
 // Format Flags
-#define PWFF_NO_INTRO   1
+#define PWFF_NO_INTRO              1
+
+// Property IDs
+#define PWP_DEFAULT_USER_NAME      1
+
+// Array property IDs
+#define PWPA_SEARCH_HISTORY        1
 
 // Password Meta Streams
 #define PMS_ID_BINDESC  _T("bin-stream")
@@ -234,9 +260,10 @@
 #define PMS_ID_USER     _T("SYSTEM")
 #define PMS_ID_URL      _T("$")
 
-#define PMS_STREAM_SIMPLESTATE _T("Simple UI State")
-
-#define PMS_STREAM_KPXICON2 _T("KPX_CUSTOM_ICONS_2")
+#define PMS_STREAM_SIMPLESTATE       _T("Simple UI State")
+#define PMS_STREAM_DEFAULTUSER       _T("Default User Name")
+#define PMS_STREAM_SEARCHHISTORYITEM _T("Search History Item")
+#define PMS_STREAM_KPXICON2          _T("KPX_CUSTOM_ICONS_2")
 
 #ifdef VPA_MODIFY
 #error VPA_MODIFY must not be defined already.
@@ -381,7 +408,7 @@ typedef struct _PWDB_META_STREAM
 #define DWORD_MAX 0xFFFFFFFF
 #endif
 
-class CPP_CLASS_SHARE CPwManager
+class CPP_CLASS_SHARE CPwManager : boost::noncopyable
 {
 public:
 	CPwManager();
@@ -442,7 +469,6 @@ public:
 	int SaveDatabase(const TCHAR *pszFile);
 
 	// Move entries and groups
-	void MoveInternal(DWORD dwFrom, DWORD dwTo);
 	void MoveInGroup(DWORD idGroup, DWORD dwFrom, DWORD dwTo);
 	BOOL MoveGroup(DWORD dwFrom, DWORD dwTo);
 
@@ -450,62 +476,41 @@ public:
 	void SortGroup(DWORD idGroup, DWORD dwSortByField);
 	void SortGroupList();
 
-	static BOOL MemAllocCopyEntry(__in_ecount(1) const PW_ENTRY *pExisting,
-		__out_ecount(1) PW_ENTRY *pDestination);
-	static void MemFreeEntry(__inout_ecount(1) PW_ENTRY *pEntry);
-
 	void MergeIn(__inout_ecount(1) CPwManager *pDataSource, BOOL bCreateNewUUIDs,
 		BOOL bCompareTimes);
 
 	// Find an item
-	DWORD Find(const TCHAR *pszFindString, BOOL bCaseSensitive, DWORD fieldFlags, DWORD nStart);
+	DWORD Find(const TCHAR *pszFindString, BOOL bCaseSensitive,
+		DWORD searchFlags, DWORD nStart);
 
 	// Get and set the algorithm used to encrypt the database
 	BOOL SetAlgorithm(int nAlgorithm);
-	int GetAlgorithm();
+	int GetAlgorithm() const;
 
 	DWORD GetKeyEncRounds() const;
 	void SetKeyEncRounds(DWORD dwRounds);
 	const PW_DBHEADER *GetLastDatabaseHeader() const;
-
-	// Convert PW_TIME to 5-byte compressed structure and the other way round
-	static void TimeToPwTime(__in_ecount(5) const BYTE *pCompressedTime,
-		__out_ecount(1) PW_TIME *pPwTime);
-	static void PwTimeToTime(__in_ecount(1) const PW_TIME *pPwTime,
-		__out_ecount(5) BYTE *pCompressedTime);
 
 	// Get the never-expire time
 	static void GetNeverExpireTime(__out_ecount(1) PW_TIME *pPwTime);
 
 	// Checks and corrects the group tree (level order, etc.)
 	void FixGroupTree();
-	int DeleteLostEntries();
 
 	void SubstEntryGroupIds(DWORD dwExistingId, DWORD dwNewId);
-
-	static BOOL AttachFileAsBinaryData(__inout_ecount(1) PW_ENTRY *pEntry,
-		const TCHAR *lpFile);
-	static BOOL SaveBinaryData(__in_ecount(1) const PW_ENTRY *pEntry,
-		const TCHAR *lpFile);
-	static BOOL RemoveBinaryData(__inout_ecount(1) PW_ENTRY *pEntry);
-
-	static BOOL IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName);
 
 	void GetRawMasterKey(__out_ecount(32) BYTE *pStorage) const;
 	void SetRawMasterKey(__in_ecount(32) const BYTE *pNewKey);
 
-	static BOOL IsZeroUUID(__in_ecount(16) const BYTE *pUUID);
+	std::basic_string<TCHAR> GetPropertyString(DWORD dwPropertyId) const;
+	BOOL SetPropertyString(DWORD dwPropertyId, LPCTSTR lpValue);
 
-	static BOOL IsTANEntry(const PW_ENTRY *pe);
+	std::vector<std::basic_string<TCHAR> >* AccessPropertyStrArray(DWORD dwPropertyId);
 
 	DWORD m_dwLastSelectedGroupId;
 	DWORD m_dwLastTopVisibleGroupId;
 	BYTE m_aLastSelectedEntryUuid[16];
 	BYTE m_aLastTopVisibleEntryUuid[16];
-
-protected:
-	virtual BOOL ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, const BYTE *pData, PW_GROUP *pGroup);
-	virtual BOOL ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, const BYTE *pData, PW_ENTRY *pEntry);
 
 private:
 	void CleanUp(); // Delete everything and release all allocated memory
@@ -515,10 +520,10 @@ private:
 	void _AllocGroups(DWORD uGroups);
 	void _DeleteGroupList(BOOL bFreeStrings);
 
-	BOOL _OpenDatabaseV1(const TCHAR *pszFile);
-	BOOL _OpenDatabaseV2(const TCHAR *pszFile);
-	BOOL _ReadGroupFieldV2(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_GROUP *pGroup);
-	BOOL _ReadEntryFieldV2(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_ENTRY *pEntry);
+	BOOL ReadGroupField(USHORT usFieldType, DWORD dwFieldSize,
+		const BYTE *pData, PW_GROUP *pGroup);
+	BOOL ReadEntryField(USHORT usFieldType, DWORD dwFieldSize,
+		const BYTE *pData, PW_ENTRY *pEntry);
 
 	BOOL _AddAllMetaStreams();
 	DWORD _LoadAndRemoveAllMetaStreams(bool bAcceptUnknown);
@@ -529,6 +534,10 @@ private:
 
 	// Encrypt the master key a few times to make brute-force key-search harder
 	BOOL _TransformMasterKey(const BYTE *pKeySeed);
+
+	DWORD DeleteLostEntries();
+
+	void MoveInternal(DWORD dwFrom, DWORD dwTo);
 
 	PW_ENTRY *m_pEntries; // List containing all entries
 	DWORD m_dwMaxEntries; // Maximum number of items that can be stored in the list
@@ -548,6 +557,9 @@ private:
 	BYTE m_pTransformedMasterKey[32]; // Master key encrypted several times
 	int m_nAlgorithm; // Algorithm used to encrypt the database
 	DWORD m_dwKeyEncRounds;
+
+	std::basic_string<TCHAR> m_strDefaultUserName;
+	std::vector<std::basic_string<TCHAR> > m_vSearchHistory;
 
 	std::vector<PWDB_META_STREAM> m_vUnknownMetaStreams;
 };

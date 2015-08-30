@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -76,9 +76,9 @@ BOOL CTanWizardDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(&m_btHelp, IDB_HELP_SMALL, IDB_HELP_SMALL);
+	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(m_btHelp, IDB_HELP_SMALL, IDB_HELP_SMALL);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_OPTIONS),
@@ -87,6 +87,16 @@ BOOL CTanWizardDlg::OnInitDialog()
 	m_banner.SetCaption(TRL("Using this wizard you can easily add TAN entries."));
 
 	GetDlgItem(IDC_EDIT_NUMBERING_START)->EnableWindow(FALSE);
+
+	CString strToGroup;
+	GetDlgItem(IDC_STATIC_TOGROUP)->GetWindowText(strToGroup);
+	if(m_strGroupName.GetLength() > 0)
+	{
+		strToGroup += _T(": ");
+		strToGroup += m_strGroupName;
+	}
+	strToGroup += _T(".");
+	GetDlgItem(IDC_STATIC_TOGROUP)->SetWindowText(strToGroup);
 
 	TCHAR lpTANChars[SI_REGSIZE + 1];
 	CPrivateConfigEx cfg(FALSE);

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "../KeePassLibCpp/Util/MemUtil.h"
 #include "../KeePassLibCpp/Util/StrUtil.h"
+#include "../KeePassLibCpp/Util/PwUtil.h"
 #include "NewGUI/NewGUICommon.h"
 
 #ifdef _DEBUG
@@ -79,7 +80,7 @@ BOOL CEntryListDlg::OnInitDialog()
 	// Translate all windows
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	NewGUI_XPButton(&m_btClose, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(m_btClose, IDB_CANCEL, IDB_CANCEL);
 
 	// Configure banner control
 	NewGUI_ConfigSideBanner(&m_banner, this);
@@ -168,17 +169,13 @@ BOOL CEntryListDlg::OnInitDialog()
 	}
 	else // Expired entries mode
 	{
-		DWORD dwDate;
+		const DWORD dwInvalid1 = m_pMgr->GetGroupId(PWS_BACKUPGROUP_SRC);
+		const DWORD dwInvalid2 = m_pMgr->GetGroupId(PWS_BACKUPGROUP);
+
 		PW_TIME tNow;
-		BOOL bAdded;
-		DWORD dwInvalid1, dwInvalid2;
-
-		dwInvalid1 = m_pMgr->GetGroupId(PWS_BACKUPGROUP_SRC);
-		dwInvalid2 = m_pMgr->GetGroupId(PWS_BACKUPGROUP);
-
 		_GetCurrentPwTime(&tNow);
-		DWORD dwDateNow = ((DWORD)tNow.shYear << 16) | ((DWORD)tNow.btMonth << 8) |
-			((DWORD)tNow.btDay & 0xFF);
+		const DWORD dwDateNow = ((DWORD)tNow.shYear << 16) |
+			((DWORD)tNow.btMonth << 8) | ((DWORD)tNow.btDay & 0xFF);
 
 		for(i = 0; i < m_pMgr->GetNumberOfEntries(); i++)
 		{
@@ -186,9 +183,9 @@ BOOL CEntryListDlg::OnInitDialog()
 			ASSERT(p != NULL); if(p == NULL) continue;
 
 			if((p->uGroupId == dwInvalid1) || (p->uGroupId == dwInvalid2)) continue;
-			if(CPwManager::IsTANEntry(p) == TRUE) continue;
+			if(CPwUtil::IsTANEntry(p) == TRUE) continue;
 
-			bAdded = FALSE;
+			BOOL bAdded = FALSE;
 			if((m_nDisplayMode == ELDMODE_EXPIRED) || (m_nDisplayMode == ELDMODE_EXPSOONEXP))
 			{
 				if(_pwtimecmp(&tNow, &p->tExpire) > 0)
@@ -202,8 +199,8 @@ BOOL CEntryListDlg::OnInitDialog()
 			{
 				if((m_nDisplayMode == ELDMODE_SOONTOEXP) || (m_nDisplayMode == ELDMODE_EXPSOONEXP))
 				{
-					dwDate = ((DWORD)p->tExpire.shYear << 16) | ((DWORD)p->tExpire.btMonth << 8) |
-						((DWORD)p->tExpire.btDay & 0xFF);
+					const DWORD dwDate = ((DWORD)p->tExpire.shYear << 16) |
+						((DWORD)p->tExpire.btMonth << 8) | ((DWORD)p->tExpire.btDay & 0xFF);
 
 					if((dwDate >= dwDateNow) && ((dwDate - dwDateNow) <= PWV_SOONTOEXPIRE_DAYS))
 						_AddEntryToList(p, FALSE);

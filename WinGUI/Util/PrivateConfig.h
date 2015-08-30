@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,7 +23,10 @@
 #ifndef ___PRIVATE_CONFIG_H___
 #define ___PRIVATE_CONFIG_H___
 
+#pragma once
+
 #include "../../KeePassLibCpp/SysDefEx.h"
+#include <boost/utility.hpp>
 
 #define SI_REGSIZE 2048
 
@@ -34,17 +37,17 @@
 typedef HRESULT(WINAPI *LPSHGETSPECIALFOLDERPATH)(HWND hwndOwner, LPTSTR lpszPath, int nFolder, BOOL fCreate);
 
 // Export for plugins:
-class CPP_CLASS_SHARE CPrivateConfig
+class CPP_CLASS_SHARE CPrivateConfig : boost::noncopyable
 {
 public:
 	CPrivateConfig(BOOL bRequireWriteAccess);
 	virtual ~CPrivateConfig();
 
 	BOOL Set(LPCTSTR pszField, LPCTSTR pszValue);
-	BOOL Get(LPCTSTR pszField, LPTSTR pszValue);
+	BOOL Get(LPCTSTR pszField, LPTSTR pszValue) const;
 
 	BOOL SetBool(const TCHAR *pszField, BOOL bValue);
-	BOOL GetBool(const TCHAR *pszField, BOOL bDefault);
+	BOOL GetBool(const TCHAR *pszField, BOOL bDefault) const;
 
 private:
 	int m_nUseDir;

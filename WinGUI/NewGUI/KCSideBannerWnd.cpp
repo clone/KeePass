@@ -75,6 +75,7 @@ CKCSideBannerWnd::CKCSideBannerWnd()
 , m_bBmpDelete(false)
 , m_pGradFill(NULL)
 , m_hGradMod(0)
+, m_bSwapGradientDir(false)
 {
 	RegisterWndClass();
 
@@ -461,7 +462,8 @@ void CKCSideBannerWnd::DrawBackground(CDC* pDC, CRect rect)
 					vert[1].Blue = (USHORT)(GetBValue(m_colBkg2)<<8);
 					vert[1].Alpha = 0;
 				}
-				uGFlag = GRADIENT_FILL_RECT_V;
+				uGFlag = ((m_bSwapGradientDir == false) ? GRADIENT_FILL_RECT_V :
+					GRADIENT_FILL_RECT_H); // DR: Added
 			}
 			else
 			{
@@ -478,7 +480,8 @@ void CKCSideBannerWnd::DrawBackground(CDC* pDC, CRect rect)
 				vert[1].Green = (USHORT)(GetGValue(m_colBkg2)<<8);
 				vert[1].Blue = (USHORT)(GetBValue(m_colBkg2)<<8);
 				vert[1].Alpha = 0;
-				uGFlag = GRADIENT_FILL_RECT_H;
+				uGFlag = ((m_bSwapGradientDir == false) ? GRADIENT_FILL_RECT_H :
+					GRADIENT_FILL_RECT_V); // DR: Added
 			}
 
 			gRect.UpperLeft = 0;
@@ -502,6 +505,7 @@ void CKCSideBannerWnd::DrawBackground(CDC* pDC, CRect rect)
 				bFlip = true;
 			}
  
+			if(m_bSwapGradientDir) bFlip = !bFlip; // DR: Added
 			GradientFill(pDC, m_colBkg, m_colBkg2, rect, bHorz, bFlip);
 		}
 
@@ -606,7 +610,7 @@ void CKCSideBannerWnd::DrawTextFields(CDC* pDC, CRect rect)
 	// draw the title
 	nFont.CreateFontIndirect(&m_lfTitle);
 	pOldFont = pDC->SelectObject(&nFont);
-	pDC->TextOut(pt.x, pt.y, m_strTitle);
+	pDC->TextOut(pt.x, pt.y + 3, m_strTitle); // DR: Added +3
 	pDC->SelectObject(pOldFont);
 	nFont.DeleteObject();
 

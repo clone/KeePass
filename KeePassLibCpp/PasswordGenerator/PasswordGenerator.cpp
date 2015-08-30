@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,10 +23,13 @@
 #include "PatternBasedGenerator.h"
 
 #include <algorithm>
+#include <boost/scoped_array.hpp>
 
 #include "../Util/Base64.h"
 #include "../Util/PwUtil.h"
 #include "../Util/StrUtil.h"
+
+using boost::scoped_array;
 
 PWG_ERROR PwgGenerateEx(std::vector<TCHAR>& vOutPassword,
 	const PW_GEN_SETTINGS_EX* pSettings, CNewRandom* pRandomSource)
@@ -102,7 +105,11 @@ WCHAR PwgGenerateCharacter(const PW_GEN_SETTINGS_EX* pSettings,
 
 	uIndex %= static_cast<UINT64>(pCharSet->Size());
 
-	return pCharSet->GetAt(static_cast<unsigned int>(uIndex));
+	const WCHAR wch = pCharSet->GetAt(static_cast<unsigned int>(uIndex));
+
+	if(pSettings->bNoRepeat != FALSE) pCharSet->Remove(wch);
+
+	return wch;
 }
 
 void PwgPrepareCharSet(PwCharSet* pCharSet, const PW_GEN_SETTINGS_EX* pSettings)
@@ -112,8 +119,11 @@ void PwgPrepareCharSet(PwCharSet* pCharSet, const PW_GEN_SETTINGS_EX* pSettings)
 
 	pCharSet->Remove(PDCS_INVALID);
 
-	if(pSettings->bNoConfusing == TRUE)
+	if(pSettings->bNoConfusing != FALSE)
 		pCharSet->Remove(PDCS_CONFUSING);
+
+	if(pSettings->strExcludeChars.size() > 0)
+		pCharSet->Remove(pSettings->strExcludeChars.c_str());
 }
 
 void PwgShufflePassword(std::vector<WCHAR>& vBuffer, CNewRandom* pRandom)
@@ -121,8 +131,6 @@ void PwgShufflePassword(std::vector<WCHAR>& vBuffer, CNewRandom* pRandom)
 	ASSERT(pRandom != NULL); if(pRandom == NULL) return;
 
 	DWORD dwLength = static_cast<DWORD>(vBuffer.size());
-
-	if(dwLength <= 1) return; // Nothing to permute
 
 	// Update length by finding the first 0 character
 	for(DWORD dwScan = 0; dwScan < vBuffer.size(); ++dwScan)
@@ -134,9 +142,10 @@ void PwgShufflePassword(std::vector<WCHAR>& vBuffer, CNewRandom* pRandom)
 		}
 	}
 
+	if(dwLength <= 1) return; // Nothing to permute
+
 	ASSERT(sizeof(UINT64) == 8);
 	UINT64 uRandomIndex;
-	WCHAR wchTemp;
 	for(DWORD dwSelect = 0; dwSelect < (dwLength - 1); ++dwSelect)
 	{
 		pRandom->GetRandomBuffer((BYTE *)&uRandomIndex, sizeof(UINT64));
@@ -144,7 +153,7 @@ void PwgShufflePassword(std::vector<WCHAR>& vBuffer, CNewRandom* pRandom)
 
 		ASSERT((dwSelect + (DWORD)uRandomIndex) < dwLength);
 
-		wchTemp = vBuffer[dwSelect];
+		WCHAR wchTemp = vBuffer[dwSelect];
 		vBuffer[dwSelect] = vBuffer[dwSelect + (DWORD)uRandomIndex];
 		vBuffer[dwSelect + (DWORD)uRandomIndex] = wchTemp;
 	}
@@ -258,6 +267,15 @@ std::basic_string<TCHAR> PwgProfileToString(const PW_GEN_SETTINGS_EX* pSettings)
 
 	s.push_back((BYTE)((pSettings->bNoConfusing == TRUE) ? 'N' : 'A'));
 	s.push_back((BYTE)((pSettings->bPatternPermute == TRUE) ? 'P' : 'N'));
+	s.push_back((BYTE)((pSettings->bNoRepeat == TRUE) ? 'N' : 'R'));
+
+	for(unsigned int uExc = 0; uExc < pSettings->strExcludeChars.size(); ++uExc)
+	{
+		s.push_back((BYTE)(pSettings->strExcludeChars[uExc] >> 8));
+		s.push_back((BYTE)(pSettings->strExcludeChars[uExc] & 0xFF));
+	}
+	s.push_back(0);
+	s.push_back(0);
 
 	DWORD dwOutSize = static_cast<DWORD>(s.size() * 4 + 12);
 	BYTE *pBase64 = new BYTE[dwOutSize];
@@ -288,26 +306,28 @@ void PwgStringToProfile(const std::basic_string<TCHAR>& strProfile,
 {
 	ASSERT(s != NULL); if(s == NULL) return;
 
+	PwgGetDefaultProfile(s);
+
 #ifdef _UNICODE
 	const char *lpEncoded = _StringToAnsi(strProfile.c_str());
 #else
 	const char *lpEncoded = strProfile.c_str();
 #endif
 
-	DWORD dwDecodedSize = static_cast<DWORD>(strProfile.size() + 120);
-	BYTE *pDecoded = new BYTE[dwDecodedSize];
-	memset(pDecoded, 0, dwDecodedSize);
+	DWORD dwDecodedSize = static_cast<DWORD>(strProfile.size() + 130);
 
-	if(CBase64Codec::Decode((BYTE *)lpEncoded, szlen(lpEncoded), pDecoded,
+	scoped_array<BYTE> pDecoded(new BYTE[dwDecodedSize]);
+	memset(pDecoded.get(), 0, dwDecodedSize);
+
+	if(CBase64Codec::Decode((BYTE *)lpEncoded, szlen(lpEncoded), pDecoded.get(),
 		&dwDecodedSize) == false) { ASSERT(FALSE); return; }
 
-	ASSERT(pDecoded[0] <= PWGD_VERSION_BYTE);
+	ASSERT(pDecoded.get()[0] <= PWGD_VERSION_BYTE);
 
-	TCHAR *lpName = _UTF8ToString(&pDecoded[1]);
-
+	TCHAR *lpName = _UTF8ToString(&pDecoded.get()[1]);
 	s->strName = lpName;
 
-	BYTE *pb = (BYTE *)memchr(pDecoded, 0, dwDecodedSize);
+	BYTE *pb = (BYTE *)memchr(pDecoded.get(), 0, dwDecodedSize);
 	if(pb == NULL) { ASSERT(FALSE); return; }
 
 	++pb;
@@ -345,25 +365,52 @@ void PwgStringToProfile(const std::basic_string<TCHAR>& strProfile,
 	ASSERT((*pb == (BYTE)'N') || (*pb == (BYTE)'A'));
 	s->bNoConfusing = ((*pb == (BYTE)'N') ? TRUE : FALSE); ++pb;
 	ASSERT((*pb == (BYTE)'P') || (*pb == (BYTE)'N') || (*pb == 0));
-	s->bPatternPermute = ((*pb == (BYTE)'P') ? TRUE : FALSE);
+	s->bPatternPermute = ((*pb == (BYTE)'P') ? TRUE : FALSE); ++pb;
+	ASSERT((*pb == (BYTE)'N') || (*pb == (BYTE)'R') || (*pb == 0));
+	s->bNoRepeat = ((*pb == (BYTE)'N') ? TRUE : FALSE); ++pb;
+
+	while(true)
+	{
+		BYTE bt1 = *pb; ++pb;
+		BYTE bt2 = *pb; ++pb;
+		if((bt1 == 0) && (bt2 == 0)) break;
+		s->strExcludeChars += (WCHAR)(((WCHAR)bt1 << 8) | (WCHAR)bt2);
+	}
 
 	SAFE_DELETE_ARRAY(lpName);
-	SAFE_DELETE_ARRAY(pDecoded);
 }
 
 void PwgGetDefaultProfile(PW_GEN_SETTINGS_EX* s)
 {
 	ASSERT(s != NULL); if(s == NULL) return;
 
+	s->strName.clear();
+
 	s->btGeneratorType = PWGT_CHARSET;
+	s->bCollectUserEntropy = FALSE;
+
 	s->dwLength = 20;
 
 	PwCharSet pcs;
 	pcs.Add(PDCS_UPPER_CASE, PDCS_LOWER_CASE, PDCS_NUMERIC);
 	s->strCharSet = pcs.ToString();
 
-	s->bCollectUserEntropy = FALSE;
-	s->bNoConfusing = FALSE;
-
+	s->strPattern.clear();
 	s->bPatternPermute = FALSE;
+
+	s->bNoConfusing = FALSE;
+	s->bNoRepeat = FALSE;
+
+	s->strExcludeChars.clear();
+}
+
+BOOL PwgHasSecurityReducingOption(const PW_GEN_SETTINGS_EX* pSettings)
+{
+	ASSERT(pSettings != NULL); if(pSettings == NULL) return FALSE;
+
+	if(pSettings->bNoConfusing != FALSE) return TRUE;
+	if(pSettings->bNoRepeat != FALSE) return TRUE;
+	if(pSettings->strExcludeChars.size() > 0) return TRUE;
+
+	return FALSE;
 }

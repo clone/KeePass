@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ PWG_ERROR PbgGenerate(std::vector<WCHAR>& vOutBuffer,
 	WCharStream csPattern(strExpPattern.c_str());
 	WCHAR ch = csPattern.ReadChar();
 
-	PwCharSet pwCustomCharSet;
+	PwCharSet pwCustomCharSet, pwUsedCharSet;
 	BOOL bInCharSetDef = FALSE;
 
 	while(ch != 0)
@@ -61,9 +61,11 @@ PWG_ERROR PbgGenerate(std::vector<WCHAR>& vOutBuffer,
 			}
 
 			if(bInCharSetDef == FALSE)
+			{
 				PbgAppendChar(vOutBuffer, ch, dwOutBufPos);
-			else
-				pwCustomCharSet.Add(ch);
+				pwUsedCharSet.Add(ch);
+			}
+			else pwCustomCharSet.Add(ch);
 		}
 		else if(ch == '[')
 		{
@@ -83,12 +85,18 @@ PWG_ERROR PbgGenerate(std::vector<WCHAR>& vOutBuffer,
 				pwCustomCharSet.Add(ch);
 		}
 		else if(pwCurrentCharSet.AddCharSet(ch) == false)
+		{
 			PbgAppendChar(vOutBuffer, ch, dwOutBufPos);
+			pwUsedCharSet.Add(ch);
+		}
 		else bGenerateChar = TRUE;
 		
 		if(bGenerateChar == TRUE)
 		{
 			PwgPrepareCharSet(&pwCurrentCharSet, pSettings);
+
+			if(pSettings->bNoRepeat == TRUE)
+				pwCurrentCharSet.Remove(pwUsedCharSet.ToString().c_str());
 
 			if(pwCurrentCharSet.Size() == 0) return PWGE_TOO_FEW_CHARACTERS;
 
@@ -105,6 +113,7 @@ PWG_ERROR PbgGenerate(std::vector<WCHAR>& vOutBuffer,
 
 			WCHAR wch = pwCurrentCharSet.GetAt(static_cast<DWORD>(uIndex));
 			PbgAppendChar(vOutBuffer, wch, dwOutBufPos);
+			pwUsedCharSet.Add(wch);
 		}
 
 		ch = csPattern.ReadChar();

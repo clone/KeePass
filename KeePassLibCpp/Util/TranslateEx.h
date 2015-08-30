@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,9 +20,11 @@
 #ifndef ___TRANSLATE_EX_H___
 #define ___TRANSLATE_EX_H___
 
+#pragma once
+
 #include "../SysDefEx.h"
 
-#define MAX_TRANSLATION_STRINGS 580
+#define MAX_TRANSLATION_STRINGS 590
 
 // Translate a string
 #ifndef _UNICODE

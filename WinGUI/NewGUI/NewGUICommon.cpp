@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,12 +26,30 @@
 #include "KCSideBannerWnd.h"
 #include "XHyperLink.h"
 #include "XPStyleButtonST.h"
+#include "../Util/WinUtil.h"
+#include <algorithm>
 
 #include "../../KeePassLibCpp/Util/PwUtil.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
+#include "../../KeePassLibCpp/Util/MemUtil.h"
 
 static BOOL g_bImgButtons = 0;
 static CThemeHelperST *g_pThemeHelper = NULL;
+
+static COLORREF m_crBannerStart = RGB(235, 235, 255); // = RGB(151, 154, 173);
+static COLORREF m_crBannerEnd = RGB(192, 192, 255); // = RGB(27, 27, 37);
+static COLORREF m_crBannerText = RGB(0, 0, 0); // RGB(255, 255, 255);
+static bool m_bBannerFlip = false; // = true;
+static CFont* m_pfBannerTitle = NULL;
+
+void NewGUI_CleanUp()
+{
+	if(m_pfBannerTitle != NULL)
+	{
+		m_pfBannerTitle->DeleteObject();
+		SAFE_DELETE(m_pfBannerTitle);
+	}
+}
 
 COLORREF NewGUI_GetBgColor()
 {
@@ -51,12 +69,7 @@ COLORREF NewGUI_GetBgColor()
 
 COLORREF NewGUI_GetBtnColor()
 {
-	COLORREF clr;
-
-	clr = GetSysColor(COLOR_BTNFACE);
-
-	// return clr + 10;
-	return clr;
+	return GetSysColor(COLOR_BTNFACE);
 }
 
 void NewGUI_SetImgButtons(BOOL bImageButtons)
@@ -65,10 +78,9 @@ void NewGUI_SetImgButtons(BOOL bImageButtons)
 	g_bImgButtons = bImageButtons;
 }
 
-void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage)
+/* void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage)
 {
 	CButtonST *p = (CButtonST *)pButton;
-
 	ASSERT(p != NULL); if(p == NULL) return;
 
 	p->SetFlat(FALSE);
@@ -80,7 +92,7 @@ void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImag
 
 	if((nBitmapIn != -1) && (nBitmapOut != -1))
 		p->SetBitmaps(nBitmapIn, RGB(255, 0, 255), nBitmapOut, RGB(255, 0, 255));
-}
+} */
 
 void NewGUI_SetThemeHelper(void *pThemeHelper)
 {
@@ -94,22 +106,20 @@ void NewGUI_SetThemeHelper(void *pThemeHelper)
 	}
 }
 
-void NewGUI_XPButton(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage)
+void NewGUI_XPButton(CXPStyleButtonST& rButton, int nBitmapIn,
+	int nBitmapOut, BOOL bForceImage)
 {
-	CXPStyleButtonST *p = (CXPStyleButtonST *)pButton;
-
-	ASSERT(p != NULL); if(p == NULL) return;
-
-	if(g_pThemeHelper != NULL) p->SetFlat(TRUE);
-	else p->SetFlat(FALSE);
+	if(g_pThemeHelper != NULL) rButton.SetFlat(TRUE);
+	else rButton.SetFlat(FALSE);
 
 	if(!((g_bImgButtons == FALSE) && (bForceImage == FALSE)))
 	{
 		if((nBitmapIn != -1) && (nBitmapOut != -1))
-			p->SetBitmaps(nBitmapIn, RGB(255, 0, 255), nBitmapOut, RGB(255, 0, 255));
+			rButton.SetBitmaps(nBitmapIn, RGB(255, 0, 255),
+				nBitmapOut, RGB(255, 0, 255));
 	}
 
-	if(g_pThemeHelper != NULL) p->SetThemeHelper(g_pThemeHelper);
+	if(g_pThemeHelper != NULL) rButton.SetThemeHelper(g_pThemeHelper);
 }
 
 /* Old shade button code:
@@ -205,7 +215,7 @@ void NewGUI_TranslateCWnd(CWnd *pWnd)
 	pWnd->SetWindowText(TRL_VAR(str));
 }
 
-C_FN_SHARE BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
+BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
 {
 	TCHAR sz[512];
 
@@ -228,8 +238,8 @@ void NewGUI_ConfigQualityMeter(void *pWnd)
 	CGradientProgressCtrl *p = (CGradientProgressCtrl *)pWnd;
 
 	ASSERT(p != NULL); if(p == NULL) return;
-	p->SetStartColor(RGB(255,128,0));
-	p->SetEndColor(RGB(0,255,0));
+	p->SetStartColor(RGB(255, 128, 0));
+	p->SetEndColor(RGB(0, 255, 0));
 	p->SetStep(1);
 	p->SetRange(0, 128);
 	p->SetPos(0);
@@ -243,7 +253,7 @@ void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR 
 	ASSERT(pProgress != NULL); if(pProgress == NULL) return;
 	ASSERT(pStatic != NULL); if(pStatic == NULL) return;
 
-	DWORD dwBits = EstimatePasswordBits(pszPassword);
+	DWORD dwBits = CPwUtil::EstimatePasswordBits(pszPassword);
 	if(dwBits > 9999) dwBits = 9999; // 4 characters display limit
 
 	CString strQuality;
@@ -264,14 +274,28 @@ void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
 
 	p->Attach(pParent, KCSB_ATTACH_TOP);
 
-	// Original white-gray
-	// p->SetColBkg(RGB(255,255,255));
-	// p->SetColBkg2(NewGUI_GetBgColor());
+	p->SetColBkg(m_crBannerStart);
+	p->SetColBkg2(m_crBannerEnd);
 
-	p->SetColBkg(RGB(235, 235, 255));
-	p->SetColBkg2(RGB(192, 192, 255));
+	p->SetColTxtTitle(m_crBannerText);
+	p->SetColTxtCaption(m_crBannerText);
 
-	p->SetColEdge(RGB(0,0,0));
+	p->SetColEdge(RGB(0, 0, 0));
+
+	if(m_bBannerFlip) p->SetSwapGradientDirection(true);
+
+	/* if(m_pfBannerTitle != NULL) p->SetTitleFont(m_pfBannerTitle);
+	else
+	{
+		LOGFONT lf;
+		ZeroMemory(&lf, sizeof(LOGFONT));
+		p->GetTitleFont(&lf);
+		lf.lfWeight = FW_BOLD;
+		m_pfBannerTitle = new CFont();
+		m_pfBannerTitle->CreateFontIndirect(&lf);
+
+		p->SetTitleFont(m_pfBannerTitle);
+	} */
 }
 
 BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
@@ -319,4 +343,229 @@ void NewGUI_MakeHyperLink(void *pXHyperLink)
 	p->SetAutoSize(TRUE);
 	p->SetUnderline(CXHyperLink::ulAlways);
 	p->SetColours(RGB(0,0,255), RGB(0,0,255), RGB(100,100,255));
+}
+
+void NewGUI_DisableHideWnd(CWnd *pWnd)
+{
+	ASSERT(pWnd != NULL); if(pWnd == NULL) return;
+
+	pWnd->EnableWindow(FALSE);
+	pWnd->ShowWindow(SW_HIDE);
+}
+
+void NewGUI_MoveWnd(CWnd *pWnd, long lMoveRightPixels, long lMoveDownPixels,
+	CWnd *pParent)
+{
+	ASSERT(pWnd != NULL); if(pWnd == NULL) return;
+	ASSERT(pParent != NULL); if(pParent == NULL) return;
+
+	RECT rect;
+	pWnd->GetWindowRect(&rect);
+	pParent->ScreenToClient(&rect);
+
+	rect.left += lMoveRightPixels;
+	rect.right += lMoveRightPixels;
+	rect.top += lMoveDownPixels;
+	rect.bottom += lMoveDownPixels;
+
+	pWnd->MoveWindow(&rect);
+}
+
+void NewGUI_Resize(CWnd *pWnd, long lAddX, long lAddY, CWnd *pParent)
+{
+	ASSERT(pWnd != NULL); if(pWnd == NULL) return;
+
+	if(pParent == pWnd) { ASSERT(FALSE); pParent = NULL; }
+
+	RECT rect;
+	pWnd->GetWindowRect(&rect);
+
+	if(pParent != NULL) pParent->ScreenToClient(&rect);
+
+	rect.right += lAddX;
+	rect.bottom += lAddY;
+
+	pWnd->MoveWindow(&rect);
+}
+
+void NewGUI_SetBannerColors(COLORREF crStart, COLORREF crEnd)
+{
+	ASSERT(sizeof(COLORREF) == sizeof(DWORD));
+
+	if(crStart != DWORD_MAX)
+		m_crBannerStart = crStart;
+	if(crEnd != DWORD_MAX)
+		m_crBannerEnd = crEnd;
+}
+
+BOOL NewGUI_RemoveMenuCommand(BCMenu *pMenu, UINT uCommandID)
+{
+	ASSERT(pMenu != NULL); if(pMenu == NULL) return FALSE;
+
+	return pMenu->DeleteMenu(uCommandID, MF_BYCOMMAND);
+}
+
+void NewGUI_RemoveInvalidSeparators(BCMenu *pMenu, BOOL bIsTopLevel)
+{
+	ASSERT(pMenu != NULL); if(pMenu == NULL) return;
+
+	int nSub = 0;
+	while(true)
+	{
+		BCMenu *pSub = NewGUI_GetBCMenu(pMenu->GetSubMenu(nSub));
+		if(pSub == NULL) break;
+
+		NewGUI_RemoveInvalidSeparators(pSub, FALSE);
+		++nSub;
+	}
+
+	BOOL bSepAllowed = FALSE;
+	UINT uCount = pMenu->GetMenuItemCount();
+	for(UINT uItem = 0; uItem < uCount; ++uItem)
+	{
+		if(uItem == (uCount - 1)) bSepAllowed = FALSE;
+
+		const UINT uState = pMenu->GetMenuState(uItem, MF_BYPOSITION);
+		if((bIsTopLevel == FALSE) && ((uState & MF_SEPARATOR) != 0) &&
+			((uState & MF_POPUP) == 0))
+		{
+			if(bSepAllowed == FALSE)
+			{
+				pMenu->DeleteMenu(uItem, MF_BYPOSITION);
+				--uCount;
+				--uItem;
+
+				if((uItem == (uCount - 1)) && (uItem >= 1)) --uItem;
+			}
+
+			bSepAllowed = FALSE;
+		}
+		else bSepAllowed = TRUE;
+	}
+}
+
+BCMenu *NewGUI_GetBCMenu(CMenu *pMenu)
+{
+	if(pMenu == NULL) return NULL; // No assert
+
+	BCMenu *p = NULL;
+	try { p = dynamic_cast<BCMenu *>(pMenu); }
+	catch(...) { ASSERT(FALSE); p = NULL; }
+
+	return p;
+}
+
+CSize NewGUI_GetWndBasePosDiff(CWnd *pWnd1, CWnd *pWnd2)
+{
+	ASSERT(pWnd1 != NULL); if(pWnd1 == NULL) return CSize(0, 0);
+	ASSERT(pWnd2 != NULL); if(pWnd2 == NULL) return CSize(0, 0);
+
+	RECT rect1, rect2;
+	pWnd1->GetWindowRect(&rect1);
+	pWnd2->GetWindowRect(&rect2);
+
+	return CSize(abs(rect1.left - rect2.left), abs(rect1.top - rect2.top));
+}
+
+void NewGUI_SetCueBanner_TB(HWND hTextBox, LPCTSTR lpText)
+{
+	ASSERT(lpText != NULL); if(lpText == NULL) return;
+
+	// On Windows XP there's a drawing bug at the left border (text is
+	// not displayed correctly), therefore prepend a space on Windows XP
+	CString strSearchTr = ((WU_IsWinVistaSystem() == FALSE) ? _T(" ") : _T(""));
+	strSearchTr += lpText;
+
+#ifndef _UNICODE
+	LPCWSTR pSearchUni = _StringToUnicode(strSearchTr);
+#else // Unicode
+	LPCWSTR pSearchUni = strSearchTr;
+#endif
+
+	::SendMessage(hTextBox, EM_SETCUEBANNER, 0, (LPARAM)pSearchUni);
+
+#ifndef _UNICODE
+	SAFE_DELETE_ARRAY(pSearchUni);
+#endif
+}
+
+void NewGUI_SetCueBanner_CB(HWND hComboBox, LPCTSTR lpText)
+{
+	HWND hTextBox = NULL;
+	NewGUI_ComboBox_GetInfo(hComboBox, NULL, &hTextBox, NULL);
+	NewGUI_SetCueBanner_TB(hTextBox, lpText);
+}
+
+void NewGUI_ComboBox_GetInfo(HWND hComboBox, HWND* phComboBox,
+	HWND* phEditBox, HWND* phListBox)
+{
+	COMBOBOXINFO cbi;
+	ZeroMemory(&cbi, sizeof(COMBOBOXINFO));
+	cbi.cbSize = sizeof(COMBOBOXINFO);
+	VERIFY(GetComboBoxInfo(hComboBox, &cbi));
+
+	if(phComboBox != NULL) *phComboBox = cbi.hwndCombo;
+	if(phEditBox != NULL) *phEditBox = cbi.hwndItem;
+	if(phListBox != NULL) *phListBox = cbi.hwndList;
+}
+
+bool NewGUI_ComboBox_HasFocus(HWND hComboBox, HWND hCurrentFocus)
+{
+	HWND hCombo = NULL;
+	HWND hTextBox = NULL;
+	HWND hListBox = NULL;
+	NewGUI_ComboBox_GetInfo(hComboBox, &hCombo, &hTextBox, &hListBox);
+
+	return ((hCombo == hCurrentFocus) || (hTextBox == hCurrentFocus) ||
+		(hListBox == hCurrentFocus));
+}
+
+void NewGUI_ComboBox_UpdateHistory(CComboBox& comboBox,
+	const std::basic_string<TCHAR>& strNew,
+	std::vector<std::basic_string<TCHAR> >* pvHistoryItems,
+	size_t dwMaxHistoryItems)
+{
+	ASSERT(pvHistoryItems != NULL); if(pvHistoryItems == NULL) return;
+
+	if(strNew.size() > 0)
+	{
+		std::vector<std::basic_string<TCHAR> >::iterator itExists =
+			std::find(pvHistoryItems->begin(), pvHistoryItems->end(), strNew);
+
+		if(itExists != pvHistoryItems->end())
+			pvHistoryItems->erase(itExists);
+
+		size_t dwCurSize = pvHistoryItems->size();
+		ASSERT(dwCurSize <= dwMaxHistoryItems);
+		while(dwCurSize >= dwMaxHistoryItems)
+		{
+			pvHistoryItems->erase(pvHistoryItems->begin());
+
+			if(dwCurSize == pvHistoryItems->size()) { ASSERT(FALSE); break; }
+			dwCurSize = pvHistoryItems->size();
+		}
+
+		pvHistoryItems->push_back(strNew);
+	}
+
+	ASSERT(pvHistoryItems->size() <= dwMaxHistoryItems);
+
+	const int nOrgCount = comboBox.GetCount();
+	for(int n = 0; n < nOrgCount; ++n)
+	{
+		const UINT uIndex = static_cast<UINT>(nOrgCount - n - 1);
+		VERIFY(comboBox.DeleteString(uIndex) != CB_ERR);
+	}
+
+	for(size_t i = 0; i < pvHistoryItems->size(); ++i)
+	{
+		const size_t iIndex = pvHistoryItems->size() - i - 1;
+		comboBox.AddString(pvHistoryItems->at(iIndex).c_str());
+	}
+
+	if(comboBox.GetCount() > 0)
+	{
+		comboBox.AddString(HCMBX_SEPARATOR);
+		comboBox.AddString(HCMBX_CLEARLIST);
+	}
 }

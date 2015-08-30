@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -167,7 +167,7 @@ BOOL CPrivateConfig::Set(LPCTSTR pszField, LPCTSTR pszValue)
 #pragma warning(push)
 #pragma warning(disable: 4996) // _tcscpy deprecated
 
-BOOL CPrivateConfig::Get(LPCTSTR pszField, LPTSTR pszValue)
+BOOL CPrivateConfig::Get(LPCTSTR pszField, LPTSTR pszValue) const
 {
 	LPCTSTR lpExeName = PWM_EXENAME;
 	LPCTSTR lpNotFound = PCFG_NOTFOUND;
@@ -215,10 +215,9 @@ BOOL CPrivateConfig::SetBool(const TCHAR *pszField, BOOL bValue)
 	return this->Set(pszField, (bValue == FALSE) ? _T("False") : _T("True"));
 }
 
-BOOL CPrivateConfig::GetBool(const TCHAR *pszField, BOOL bDefault)
+BOOL CPrivateConfig::GetBool(const TCHAR *pszField, BOOL bDefault) const
 {
 	TCHAR tszTemp[SI_REGSIZE];
-
 	if(this->Get(pszField, tszTemp) == FALSE) return bDefault;
 
 	if(_tcsicmp(tszTemp, _T("True")) == 0) return TRUE;

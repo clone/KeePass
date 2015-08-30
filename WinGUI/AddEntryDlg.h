@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -39,26 +39,30 @@ public:
 
 	void CleanUp();
 
+private:
 	void UpdateControlsStatus();
 	void SetExpireDays(DWORD dwDays, BOOL bSetTime);
+	void PerformMiniModeAdjustments();
 
 	CFont m_fStyle;
 	CFont m_fSymbol;
-	CImageList *m_pParentIcons;
 	CKCSideBannerWnd m_banner;
 	CToolTipCtrl m_tipSecClear;
 
-	BOOL m_bEditMode;
+	BCMenu m_popmenu;
+
+public:
 	CPwManager *m_pMgr;
+	CImageList *m_pParentIcons;
+	BOOL m_bEditMode;
+
 	DWORD m_dwEntryIndex;
 	int m_nGroupId;
 	int m_nIconId;
-
-	CString m_strNotes;
 	PW_TIME m_tExpire;
-	DWORD m_dwDefaultExpire;
+	CString m_strNotes;
 
-	BCMenu m_popmenu;
+	DWORD m_dwDefaultExpire;
 
 	LPTSTR m_lpPassword;
 	LPTSTR m_lpRepeatPw;

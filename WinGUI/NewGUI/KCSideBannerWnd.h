@@ -142,6 +142,9 @@ public:
 	// added on 2003-Oct-29
 	void				GradientFill(CDC* pDC, COLORREF col1, COLORREF col2, CRect rect, bool bHor, bool cFlip);
 
+	// DR: Added
+	void				SetSwapGradientDirection(bool bSwap)			{ m_bSwapGradientDir = bSwap; }
+
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CKCSideBannerWnd)
@@ -200,6 +203,9 @@ protected:
 	COLORREF			m_colEdge;
 	COLORREF			m_colTxtTitle;
 	COLORREF			m_colTxtCaption;
+
+	// DR: Added
+	bool				m_bSwapGradientDir;
 
 	//{{AFX_MSG(CKCSideBannerWnd)
 	afx_msg void OnPaint();

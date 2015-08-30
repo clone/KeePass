@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,6 +19,13 @@
 
 #ifndef ___STR_UTIL_EX_H___
 #define ___STR_UTIL_EX_H___
+
+#pragma once
+
+#include "../SysDefEx.h"
+
+#define BOOST_REGEX_NON_RECURSIVE
+#include <boost/regex.hpp>
 
 #include "../PwManager.h"
 
@@ -94,6 +101,14 @@ CString TagSimString(LPCTSTR lpString);
 TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource);
 
 void RemoveAcceleratorTip(CString *pString);
+
+// Assumes that lpSearch is lower-case when bCaseSensitive == FALSE
+// If pUseRegex is not NULL, a regular expression search will be
+// performed, otherwise a simple substring matching.
+bool StrMatchText(LPCTSTR lpEntryData, LPCTSTR lpSearch,
+	BOOL bCaseSensitive, const boost::basic_regex<TCHAR>* pUseRegex);
+
+std::basic_string<TCHAR> GetQuotedAppPath(const std::basic_string<TCHAR>& strPath);
 
 class WCharStream
 {

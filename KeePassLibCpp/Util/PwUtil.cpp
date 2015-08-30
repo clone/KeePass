@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 
 #include "PwUtil.h"
 #include "MemUtil.h"
+#include "StrUtil.h"
 #include "TranslateEx.h"
 
 #define CHARSPACE_ESCAPE      60
@@ -32,8 +33,14 @@
 #define CHARSPACE_EXTSPECIAL  17
 #define CHARSPACE_HIGH       112
 
+static const BYTE g_uuidZero[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+
+CPwUtil::CPwUtil()
+{
+}
+
 // Very simple password quality estimation function
-DWORD EstimatePasswordBits(LPCTSTR pszPassword)
+DWORD CPwUtil::EstimatePasswordBits(LPCTSTR pszPassword)
 {
 	DWORD i, dwLen, dwCharSpace, dwBits;
 	BOOL bChLower = FALSE, bChUpper = FALSE, bChNumber = FALSE;
@@ -107,7 +114,7 @@ DWORD EstimatePasswordBits(LPCTSTR pszPassword)
 	return dwBits;
 }
 
-BOOL LoadHexKey32(FILE *fp, BYTE *pBuf)
+BOOL CPwUtil::LoadHexKey32(FILE *fp, BYTE *pBuf)
 {
 	char buf[65], ch1, ch2;
 	BYTE bt;
@@ -124,7 +131,7 @@ BOOL LoadHexKey32(FILE *fp, BYTE *pBuf)
 		ch1 = buf[i * 2];
 		ch2 = buf[i * 2 + 1];
 
-		if(ConvertStrToHexEx(ch1, ch2, bt) == FALSE) return FALSE;
+		if(CPwUtil::ConvertStrToHex(ch1, ch2, bt) == FALSE) return FALSE;
 
 		pBuf[i] = bt;
 	}
@@ -133,7 +140,7 @@ BOOL LoadHexKey32(FILE *fp, BYTE *pBuf)
 	return TRUE;
 }
 
-BOOL SaveHexKey32(FILE *fp, BYTE *pBuf)
+BOOL CPwUtil::SaveHexKey32(FILE *fp, BYTE *pBuf)
 {
 	char buf[65], ch1, ch2;
 	int i;
@@ -148,7 +155,7 @@ BOOL SaveHexKey32(FILE *fp, BYTE *pBuf)
 	{
 		bt = pBuf[i];
 
-		ConvertHexToStrEx(bt, ch1, ch2);
+		CPwUtil::ConvertHexToStr(bt, ch1, ch2);
 
 		buf[i * 2] = ch1;
 		buf[i * 2 + 1] = ch2;
@@ -160,7 +167,7 @@ BOOL SaveHexKey32(FILE *fp, BYTE *pBuf)
 	return TRUE;
 }
 
-BOOL ConvertStrToHexEx(char ch1, char ch2, BYTE& bt)
+BOOL CPwUtil::ConvertStrToHex(char ch1, char ch2, BYTE& bt)
 {
 	if((ch1 >= '0') && (ch1 <= '9')) bt = (BYTE)(ch1 - '0');
 	else if((ch1 >= 'a') && (ch1 <= 'f')) bt = (BYTE)(ch1 - 'a' + 10);
@@ -177,7 +184,7 @@ BOOL ConvertStrToHexEx(char ch1, char ch2, BYTE& bt)
 	return TRUE;
 }
 
-void ConvertHexToStrEx(BYTE bt, char& ch1, char& ch2)
+void CPwUtil::ConvertHexToStr(BYTE bt, char& ch1, char& ch2)
 {
 	char chq = (char)(bt >> 4);
 	if(chq < 10) ch1 = (char)(chq + '0');
@@ -188,7 +195,7 @@ void ConvertHexToStrEx(BYTE bt, char& ch1, char& ch2)
 	else ch2 = (char)(chq - 10 + 'a');
 }
 
-CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags)
+CString CPwUtil::FormatError(int nErrorCode, DWORD dwFlags)
 {
 	CString str;
 
@@ -261,6 +268,9 @@ CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags)
 	case PWE_NOFILEACCESS_READ_KEY:
 		str += TRL("File access error: failed to open file in read mode");
 		break;
+	case PWE_KEYPROV_INVALID_KEY:
+		str += TRL("The key provider plugin did not supply a valid key");
+		break;
 	default:
 		ASSERT(FALSE);
 		str += TRL("Unknown error");
@@ -275,6 +285,186 @@ CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags)
 	}
 
 	return str;
+}
+
+BOOL CPwUtil::MemAllocCopyEntry(__in_ecount(1) const PW_ENTRY *pExisting,
+	__out_ecount(1) PW_ENTRY *pDestination)
+{
+	ASSERT_ENTRY(pExisting); ASSERT(pDestination != NULL);
+	if((pExisting == NULL) || (pDestination == NULL)) return FALSE;
+
+	ZeroMemory(pDestination, sizeof(PW_ENTRY));
+
+	pDestination->uBinaryDataLen = pExisting->uBinaryDataLen;
+	if(pExisting->pBinaryData != NULL)
+	{
+		pDestination->pBinaryData = new BYTE[pExisting->uBinaryDataLen + 1];
+		ASSERT(pDestination->pBinaryData != NULL); if(pDestination->pBinaryData == NULL) return FALSE;
+		pDestination->pBinaryData[pExisting->uBinaryDataLen] = 0;
+		memcpy(pDestination->pBinaryData, pExisting->pBinaryData, pExisting->uBinaryDataLen);
+	}
+
+	pDestination->pszAdditional = _TcsSafeDupAlloc(pExisting->pszAdditional);
+	pDestination->pszBinaryDesc = _TcsSafeDupAlloc(pExisting->pszBinaryDesc);
+	pDestination->pszPassword = _TcsSafeDupAlloc(pExisting->pszPassword);
+	pDestination->pszTitle = _TcsSafeDupAlloc(pExisting->pszTitle);
+	pDestination->pszURL = _TcsSafeDupAlloc(pExisting->pszURL);
+	pDestination->pszUserName = _TcsSafeDupAlloc(pExisting->pszUserName);
+
+	pDestination->tCreation = pExisting->tCreation;
+	pDestination->tExpire = pExisting->tExpire;
+	pDestination->tLastAccess = pExisting->tLastAccess;
+	pDestination->tLastMod = pExisting->tLastMod;
+
+	pDestination->uGroupId = pExisting->uGroupId;
+	pDestination->uImageId = pExisting->uImageId;
+	pDestination->uPasswordLen = pExisting->uPasswordLen;
+	memcpy(pDestination->uuid, pExisting->uuid, 16);
+
+	return TRUE;
+}
+
+void CPwUtil::MemFreeEntry(__inout_ecount(1) PW_ENTRY *pEntry)
+{
+	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return;
+
+	SAFE_DELETE_ARRAY(pEntry->pBinaryData);
+	SAFE_DELETE_ARRAY(pEntry->pszAdditional);
+	SAFE_DELETE_ARRAY(pEntry->pszBinaryDesc);
+	SAFE_DELETE_ARRAY(pEntry->pszPassword);
+	SAFE_DELETE_ARRAY(pEntry->pszTitle);
+	SAFE_DELETE_ARRAY(pEntry->pszURL);
+	SAFE_DELETE_ARRAY(pEntry->pszUserName);
+
+	ZeroMemory(pEntry, sizeof(PW_ENTRY));
+}
+
+void CPwUtil::TimeToPwTime(__in_ecount(5) const BYTE *pCompressedTime,
+	__out_ecount(1) PW_TIME *pPwTime)
+{
+	DWORD dwYear, dwMonth, dwDay, dwHour, dwMinute, dwSecond;
+
+	ASSERT((pCompressedTime != NULL) && (pPwTime != NULL));
+	if(pPwTime == NULL) return;
+
+	_UnpackStructToTime(pCompressedTime, &dwYear, &dwMonth, &dwDay, &dwHour, &dwMinute, &dwSecond);
+	pPwTime->shYear = (USHORT)dwYear;
+	pPwTime->btMonth = (BYTE)dwMonth;
+	pPwTime->btDay = (BYTE)dwDay;
+	pPwTime->btHour = (BYTE)dwHour;
+	pPwTime->btMinute = (BYTE)dwMinute;
+	pPwTime->btSecond = (BYTE)dwSecond;
+}
+
+void CPwUtil::PwTimeToTime(__in_ecount(1) const PW_TIME *pPwTime,
+	__out_ecount(5) BYTE *pCompressedTime)
+{
+	ASSERT((pPwTime != NULL) && (pCompressedTime != NULL));
+	if(pPwTime == NULL) return;
+
+	_PackTimeToStruct(pCompressedTime, (DWORD)pPwTime->shYear, (DWORD)pPwTime->btMonth,
+		(DWORD)pPwTime->btDay, (DWORD)pPwTime->btHour, (DWORD)pPwTime->btMinute,
+		(DWORD)pPwTime->btSecond);
+}
+
+BOOL CPwUtil::AttachFileAsBinaryData(__inout_ecount(1) PW_ENTRY *pEntry,
+	const TCHAR *lpFile)
+{
+	FILE *fp = NULL;
+	DWORD dwFileLen;
+	DWORD dwPathLen;
+	LPTSTR pBinaryDesc;
+	DWORD i;
+
+	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return FALSE;
+	ASSERT(lpFile != NULL); if(lpFile == NULL) return FALSE;
+
+	_tfopen_s(&fp, lpFile, _T("rb"));
+	if(fp == NULL) return FALSE;
+
+	fseek(fp, 0, SEEK_END);
+	dwFileLen = (DWORD)ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	if(dwFileLen == 0) { fclose(fp); fp = NULL; return FALSE; }
+	ASSERT(dwFileLen > 0);
+
+	SAFE_DELETE_ARRAY(pEntry->pszBinaryDesc);
+	SAFE_DELETE_ARRAY(pEntry->pBinaryData);
+
+	i = (DWORD)_tcslen(lpFile) - 1;
+	while(1)
+	{
+		if(i == (DWORD)(-1)) break;
+		if((lpFile[i] == '/') || (lpFile[i] == '\\')) break;
+		i--;
+	}
+	pBinaryDesc = (LPTSTR)&lpFile[i + 1];
+
+	dwPathLen = (DWORD)_tcslen(pBinaryDesc);
+
+	pEntry->pszBinaryDesc = new TCHAR[dwPathLen + 1];
+	_tcscpy_s(pEntry->pszBinaryDesc, dwPathLen + 1, pBinaryDesc);
+
+	pEntry->pBinaryData = new BYTE[dwFileLen];
+	fread(pEntry->pBinaryData, 1, dwFileLen, fp);
+
+	pEntry->uBinaryDataLen = dwFileLen;
+
+	fclose(fp); fp = NULL;
+	return TRUE;
+}
+
+BOOL CPwUtil::SaveBinaryData(__in_ecount(1) const PW_ENTRY *pEntry,
+	const TCHAR *lpFile)
+{
+	FILE *fp = NULL;
+
+	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return FALSE;
+	ASSERT(lpFile != NULL); if(lpFile == NULL) return FALSE;
+	if(_tcslen(pEntry->pszBinaryDesc) == 0) return FALSE;
+
+	_tfopen_s(&fp, lpFile, _T("wb"));
+	if(fp == NULL) return FALSE;
+
+	if(pEntry->uBinaryDataLen != 0)
+		fwrite(pEntry->pBinaryData, 1, pEntry->uBinaryDataLen, fp);
+
+	fclose(fp); fp = NULL;
+	return TRUE;
+}
+
+BOOL CPwUtil::RemoveBinaryData(__inout_ecount(1) PW_ENTRY *pEntry)
+{
+	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return FALSE;
+
+	SAFE_DELETE_ARRAY(pEntry->pBinaryData);
+	SAFE_DELETE_ARRAY(pEntry->pszBinaryDesc);
+	pEntry->pszBinaryDesc = new TCHAR[1];
+	pEntry->pszBinaryDesc[0] = 0;
+	pEntry->uBinaryDataLen = 0;
+	return TRUE;
+}
+
+BOOL CPwUtil::IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName)
+{
+	ASSERT(lpGroupName != NULL); if(lpGroupName == NULL) return FALSE;
+
+	if(_tcscmp(lpGroupName, lpSearchGroupName) == 0) return FALSE;
+	return TRUE;
+}
+
+BOOL CPwUtil::IsZeroUUID(__in_ecount(16) const BYTE *pUUID)
+{
+	if(pUUID == NULL) return TRUE;
+	return (memcmp(pUUID, g_uuidZero, 16) == 0) ? TRUE : FALSE;
+}
+
+BOOL CPwUtil::IsTANEntry(const PW_ENTRY *pe)
+{
+	ASSERT(pe != NULL); if(pe == NULL) return FALSE;
+
+	return ((_tcscmp(pe->pszTitle, PWS_TAN_ENTRY) != 0) ? FALSE : TRUE);
 }
 
 /* CPwErrorInfo::CPwErrorInfo()

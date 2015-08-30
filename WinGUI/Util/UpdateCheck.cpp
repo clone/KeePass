@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ DWORD WINAPI CFU_Thread(LPVOID lpParameter)
 						TRL("Check For Update"), MB_ICONINFORMATION | MB_YESNO);
 
 					if(n == IDYES)
-						ShellExecute(g_hCacheParent, _T("open"), PWM_HOMEPAGE, NULL, NULL, 0);
+						ShellExecute(g_hCacheParent, NULL, PWM_HOMEPAGE, NULL, NULL, 0);
 				}
 
 				fclose(fp); fp = NULL;

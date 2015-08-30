@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -77,7 +77,6 @@ KP_SHARE int OpenDatabase(void *pMgr, const TCHAR *pszFile, PWDB_REPAIR_INFO *pR
 KP_SHARE int SaveDatabase(void *pMgr, const TCHAR *pszFile);
 
 // Move entries and groups
-KP_SHARE void MoveInternal(void *pMgr, DWORD dwFrom, DWORD dwTo);
 KP_SHARE void MoveInGroup(void *pMgr, DWORD idGroup, DWORD dwFrom, DWORD dwTo);
 KP_SHARE BOOL MoveGroup(void *pMgr, DWORD dwFrom, DWORD dwTo);
 
@@ -109,7 +108,6 @@ KP_SHARE void GetNeverExpireTime(PW_TIME *pPwTime);
 
 // Checks and corrects the group tree (level order, etc.)
 KP_SHARE void FixGroupTree(void *pMgr);
-KP_SHARE int DeleteLostEntries(void *pMgr);
 
 KP_SHARE void SubstEntryGroupIds(void *pMgr, DWORD dwExistingId, DWORD dwNewId);
 

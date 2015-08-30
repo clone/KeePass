@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@
 #include "Util/SessionNotify.h"
 #include "Util/RemoteControl.h"
 #include "../KeePassLibCpp/SysDefEx.h"
+#include "afxwin.h"
 
 #define _CALLPLUGINS(__c,__l,__w) CPluginManager::Instance().CallPlugins((__c),(__l),(__w))
 
@@ -55,6 +56,7 @@
 #define APPWND_TIMER_ID         1
 #define APPWND_TIMER_ID_UPDATER 2
 
+#define ICOIDX_GENERIC_KEYPROVIDER 10
 #define ICOIDX_REMOVABLE 16
 #define ICOIDX_FIXED 17
 #define ICOIDX_REMOTE 18
@@ -136,7 +138,8 @@ public:
 	DWORD GetSelectedEntriesCount();
 	DWORD GetSelectedGroupId();
 
-	BOOL GetExportOptions(PWEXPORT_OPTIONS *pOptions, CPwExport *pPwExport);
+	BOOL GetExportOptions(PWEXPORT_OPTIONS *pOptions, CPwExport *pPwExport,
+		BOOL bPrinting);
 	CString GetExportFile(int nFormat, LPCTSTR lpBaseFileName, BOOL bFixFileName);
 	void ExportSelectedGroup(int nFormat);
 	void ExportGroupToKeePass(DWORD dwGroupId);
@@ -236,7 +239,7 @@ public:
 	BOOL _ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew);
 	void _PrintGroup(DWORD dwGroupId);
 	void _Find(DWORD dwFindGroupId);
-	void _DoQuickFind();
+	void _DoQuickFind(LPCTSTR lpText);
 	void _HandleSelectAll();
 	void _ShowExpiredEntries(BOOL bShowIfNone, BOOL bShowExpired, BOOL bShowSoonToExpire);
 
@@ -273,6 +276,7 @@ public:
 
 	CPwManager m_mgr;
 
+	static BOOL m_bMiniMode;
 	static BOOL m_bSecureEdits;
 	static BOOL m_bDisableUnsafeAtStart;
 	static BOOL m_bUseLocalTimeFormat;
@@ -349,6 +353,7 @@ private:
 	BOOL m_bExitInsteadOfLockAT;
 	CString m_strURLOverride;
 	BOOL m_bAllowSaveIfModifiedOnly;
+	BOOL m_bRegisterRestoreHotKey;
 
 	BCMenu *m_pPwListMenu;
 	BCMenu *m_pGroupListMenu;
@@ -401,6 +406,7 @@ private:
 	BOOL m_bBlockPwListUpdate;
 	BOOL m_bIgnoreSizeEvent;
 	BOOL m_bGlobalAutoTypePending;
+	BOOL m_bBlockQuickFindSelChange;
 
 	BOOL m_bDragging;
 	BOOL m_bDraggingHoriz;
@@ -428,11 +434,21 @@ private:
 
 	CString m_strDefaultAutoTypeSequence;
 
+	static BOOL m_bUnintrusiveMiniMode;
+
 private:
 	void ChangeLockStateOnWindowChange(BOOL bLocked);
 	void SetViewHideState(BOOL bReqVisible, BOOL bPreferTray);
 	void ToggleViewHideState(BOOL bPreferTray);
 	void SetTrayState(BOOL bMinimizeToTray);
+
+	void SetToMiniModeIfEnabled(BCMenu *pMenu, BOOL bRemoveAccels,
+		BOOL bProcessToolBar);
+	void _MiniModeShowWindow();
+	void _GetNewDbFileInUserDir(const CString& strLoadedIniLastDb,
+		const CPrivateConfigEx& cConfig);
+
+	void RegisterRestoreHotKey(BOOL bRegister);
 
 	LONG m_lNormalWndPosX;
 	LONG m_lNormalWndPosY;
@@ -440,11 +456,9 @@ private:
 	LONG m_lNormalWndSizeH;
 
 public:
-
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
 	CStatic	m_stcMenuLine;
-	CEdit	m_cQuickFind;
 	CCustomTreeCtrlEx	m_cGroups;
 	CXPStyleButtonST	m_btnTbNew;
 	CXPStyleButtonST	m_btnTbLock;
@@ -457,9 +471,10 @@ public:
 	CXPStyleButtonST	m_btnTbAbout;
 	CXPStyleButtonST	m_btnTbSave;
 	CXPStyleButtonST	m_btnTbOpen;
+	CComboBox m_cQuickFind;
+	CString m_strQuickFind;
 	CCustomListCtrlEx	m_cList;
 	CAutoRichEditCtrlFx	m_reEntryView;
-	CString	m_strQuickFind;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CPwSafeDlg)
@@ -711,6 +726,8 @@ protected:
 	afx_msg LRESULT OnWTSSessionChange(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnQuickFindSelChange();
 };
 
 //{{AFX_INSERT_LOCATION}}

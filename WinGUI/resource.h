@@ -79,6 +79,9 @@
 #define IDD_PW_GENERATOR_EX_DLG         233
 #define IDB_TB_SAVE_AS                  234
 #define IDD_SINGLELINEEDIT_DLG          235
+#define IDD_PW_GEN_ADV_DLG              236
+#define IDB_ROLL                        237
+#define IDB_RANDOM_KEY                  237
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -268,6 +271,18 @@
 #define IDC_STATIC_PROMPT               1255
 #define IDC_COMBO_INPUT                 1256
 #define IDC_CHECK_PATTERN_PERMUTE       1257
+#define IDC_STATIC_ATTACH               1258
+#define IDC_STATIC_DLGSEP               1259
+#define IDC_CHECK_REGEX                 1260
+#define IDC_EDIT_DEFAULTUSER            1261
+#define IDC_CHECK_EXCLUDE_LOOKALIKE     1262
+#define IDC_CHECK_NO_REPEAT             1263
+#define IDC_BTN_ADVANCED                1264
+#define IDC_COMBO_QUICKFIND             1265
+#define IDC_STATIC_TOGROUP              1266
+#define IDC_STATIC_EXCLUDECHARS         1267
+#define IDC_EDIT_EXCLUDECHARS           1268
+#define IDC_STATIC_SECREDUCINFO         1269
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -465,13 +480,13 @@
 #define ID_POPUP_OPENHELPFILE           33004
 
 // Next default values for new objects
-//
+// 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        236
+#define _APS_NEXT_RESOURCE_VALUE        238
 #define _APS_NEXT_COMMAND_VALUE         33005
-#define _APS_NEXT_CONTROL_VALUE         1258
+#define _APS_NEXT_CONTROL_VALUE         1270
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

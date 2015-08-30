@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,10 +27,15 @@
 #include "WinUtil.h"
 #include "CmdLine/Executable.h"
 #include "PrivateConfig.h"
+#include "AppLocator.h"
 #include "../../KeePassLibCpp/Util/AppUtil.h"
 #include "../../KeePassLibCpp/Util/MemUtil.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
+
+#include <boost/scoped_array.hpp>
+
+using boost::scoped_array;
 
 static unsigned char g_shaLastString[32];
 // static LPCTSTR g_lpChildWindowText = NULL;
@@ -47,17 +52,17 @@ static UINT g_uCfIgnoreID = 0; // ID of CFN_CLIPBOARD_VIEWER_IGNORE
 
 void CopyStringToClipboard(const TCHAR *lptString)
 {
-	if(OpenClipboard(NULL) == FALSE) return;
-	if(EmptyClipboard() == FALSE) return;
+	if(OpenClipboard(NULL) == FALSE) { ASSERT(FALSE); return; }
+	if(EmptyClipboard() == FALSE) { ASSERT(FALSE); return; }
 
-	if(lptString == NULL) // No string to copy => empty clipboard
+	if(lptString == NULL) // No string to copy => empty clipboard only
 	{
 		CloseClipboard();
 		return;
 	}
 
 	size_t uDataSize = _tcslen(lptString) * sizeof(TCHAR); // Get length
-	if(uDataSize == 0)
+	if(uDataSize == 0) // No string to copy => empty clipboard only
 	{
 		CloseClipboard();
 		return;
@@ -84,7 +89,6 @@ void RegisterOwnClipboardData(unsigned char* pData, unsigned long dwDataSize)
 	ASSERT(pData != NULL); if(pData == NULL) return;
 
 	sha256_ctx shactx;
-
 	sha256_begin(&shactx);
 
 	if(dwDataSize > 0)
@@ -95,7 +99,7 @@ void RegisterOwnClipboardData(unsigned char* pData, unsigned long dwDataSize)
 
 void ClearClipboardIfOwner()
 {
-	if(OpenClipboard(NULL) == FALSE) return;
+	if(OpenClipboard(NULL) == FALSE) { ASSERT(FALSE); return; }
 
 	if((IsClipboardFormatAvailable(CF_TEXT) == FALSE) &&
 		(IsClipboardFormatAvailable(CF_OEMTEXT) == FALSE))
@@ -298,13 +302,50 @@ BOOL GetRegKeyEx(HKEY hkeyBase, LPCTSTR lpSubKey, LPTSTR lpRetData)
 
 		lRetVal = RegQueryValue(hkey, NULL, tszData, &lDataSize);
 		_tcscpy(lpRetData, tszData);
-		RegCloseKey(hkey); hkey = NULL;
+		VERIFY(RegCloseKey(hkey) == ERROR_SUCCESS);
 	}
 
 	return (lRetVal == ERROR_SUCCESS) ? TRUE : FALSE;
 }
 
 #pragma warning(pop)
+
+std::basic_string<TCHAR> GetRegStrEx(HKEY hkeyBase, LPCTSTR lpSubKey,
+	LPCTSTR lpValue, DWORD dwMaxValueSize)
+{
+	std::basic_string<TCHAR> str;
+
+	HKEY hKey = NULL;
+	if(RegOpenKeyEx(hkeyBase, lpSubKey, 0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
+		return str;
+
+	if(dwMaxValueSize == 0) dwMaxValueSize = MAX_PATH * 8;
+
+	const DWORD dwAllocSize = dwMaxValueSize + 2;
+	scoped_array<TCHAR> pData(new TCHAR[dwAllocSize]);
+	DWORD dwDataSize = dwAllocSize - 2;
+	DWORD dwDataType = 0;
+
+	ZeroMemory(pData.get(), sizeof(TCHAR) * dwAllocSize);
+
+	const LONG lQuery = RegQueryValueEx(hKey, lpValue, NULL, &dwDataType,
+		(LPBYTE)pData.get(), &dwDataSize);
+
+	VERIFY(RegCloseKey(hKey) == ERROR_SUCCESS);
+
+	if(lQuery != ERROR_SUCCESS) return str;
+
+	if((dwDataType != REG_EXPAND_SZ) && (dwDataType != REG_SZ))
+	{
+		ASSERT(FALSE);
+		return str;
+	}
+
+	pData.get()[dwAllocSize - 2] = 0;
+	pData.get()[dwAllocSize - 1] = 0;
+	str = pData.get();
+	return str;
+}
 
 BOOL OpenUrlInNewBrowser(LPCTSTR lpURL)
 {
@@ -342,7 +383,7 @@ BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 	BOOL bResult = FALSE;
 
 	ASSERT(lpURL != NULL); if(lpURL == NULL) return FALSE;
-	strURL = lpURL;
+	strURL = WU_ExpandEnvironmentVars(lpURL).c_str();
 
 	if(strURL.Find(_T("ssh:")) >= 0)
 	{
@@ -410,34 +451,36 @@ BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 void OpenUrlEx(LPCTSTR lpURL, HWND hParent)
 {
 	ASSERT(lpURL != NULL); if(lpURL == NULL) return;
-	if(_tcslen(lpURL) == 0) return; // Valid, but nothing to do
+	if(lpURL[0] == 0) return; // Valid, but nothing to do
+
+	std::basic_string<TCHAR> strURL = WU_ExpandEnvironmentVars(lpURL);
 
 	CPrivateConfig cfg(FALSE);
 	BOOL bPrevMethod = cfg.GetBool(PWMKEY_HTMURLMETHOD, FALSE);
 	if(bPrevMethod == FALSE)
 	{
-		OpenUrlShellExec(lpURL, hParent);
+		OpenUrlShellExec(strURL.c_str(), hParent);
 		return;
 	}
 
-	if(_tcsncmp(lpURL, _T("http://"), 7) == 0)
+	if(_tcsncmp(strURL.c_str(), _T("http://"), 7) == 0)
 	{
-		if(OpenUrlInNewBrowser(lpURL) == FALSE)
-			ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, KPSW_SHOWDEFAULT);
+		if(OpenUrlInNewBrowser(strURL.c_str()) == FALSE)
+			ShellExecute(NULL, NULL, strURL.c_str(), NULL, NULL, KPSW_SHOWDEFAULT);
 	}
-	else if(_tcsncmp(lpURL, _T("https://"), 8) == 0)
+	else if(_tcsncmp(strURL.c_str(), _T("https://"), 8) == 0)
 	{
-		if(OpenUrlInNewBrowser(lpURL) == FALSE)
-			ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, KPSW_SHOWDEFAULT);
+		if(OpenUrlInNewBrowser(strURL.c_str()) == FALSE)
+			ShellExecute(NULL, NULL, strURL.c_str(), NULL, NULL, KPSW_SHOWDEFAULT);
 	}
-	else if(_tcsncmp(lpURL, _T("cmd://"), 6) == 0)
+	else if(_tcsncmp(strURL.c_str(), _T("cmd://"), 6) == 0)
 	{
-		if(_tcslen(lpURL) > 6)
+		if(_tcslen(strURL.c_str()) > 6)
 		{
-			TWinExec(&lpURL[6], KPSW_SHOWDEFAULT);
+			TWinExec(&strURL.c_str()[6], KPSW_SHOWDEFAULT);
 		}
 	}
-	else ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, KPSW_SHOWDEFAULT);
+	else ShellExecute(NULL, NULL, strURL.c_str(), NULL, NULL, KPSW_SHOWDEFAULT);
 }
 
 // Internal function
@@ -452,7 +495,7 @@ void OpenUrlShellExec(LPCTSTR lpURL, HWND hParent)
 	if(strURL.Left(6) == _T("cmd://"))
 		OpenUrlProcess(strURL.Right(strURL.GetLength() - 6), hParent);
 	else // Standard method
-		WU_SysShellExecute(strURL, NULL, hParent);
+		WU_SysExecute(strURL, NULL, hParent);
 }
 
 // Internal function
@@ -462,6 +505,8 @@ void OpenUrlProcess(LPCTSTR lpURL, HWND hParent)
 
 	CString strLine = lpURL, strFile, strParam;
 	BOOL bFile = FALSE, bParam = FALSE;
+
+	strLine.TrimLeft(_T(" \t\r\n"));
 
 	if(strLine.Left(1) == _T("\""))
 	{
@@ -492,12 +537,12 @@ void OpenUrlProcess(LPCTSTR lpURL, HWND hParent)
 	}
 
 	if((bParam == TRUE) && (strParam.GetLength() > 0))
-		WU_SysShellExecute(strFile, strParam, hParent);
+		WU_SysExecute(strFile, strParam, hParent);
 	else
-		WU_SysShellExecute(strFile, NULL, hParent);
+		WU_SysExecute(strFile, NULL, hParent);
 }
 
-void WU_SysShellExecute(LPCTSTR lpFile, LPCTSTR lpParameters, HWND hParent)
+void WU_SysExecute(LPCTSTR lpFile, LPCTSTR lpParameters, HWND hParent)
 {
 	ASSERT(lpFile != NULL); if(lpFile == NULL) return;
 	ASSERT(lpFile[0] != 0); if(lpFile[0] == 0) return;
@@ -524,6 +569,13 @@ void WU_SysShellExecute(LPCTSTR lpFile, LPCTSTR lpParameters, HWND hParent)
 		std::basic_string<TCHAR> strErr = WU_FormatSystemMessage(dwErr);
 		if(strErr.size() == 0) { SetLastError(dwPrevErr); return; }
 
+		// Try with CreateProcess API now (supports longer paths)
+		if(WU_SysCreateProcess(lpFile, lpParameters) == TRUE)
+		{
+			SetLastError(dwPrevErr);
+			return;
+		}
+
 		CString strMsg = TRL("&File");
 		RemoveAcceleratorTip(&strMsg);
 		strMsg += _T(": ");
@@ -531,7 +583,7 @@ void WU_SysShellExecute(LPCTSTR lpFile, LPCTSTR lpParameters, HWND hParent)
 
 		if(lpParameters != NULL)
 		{
-			strMsg += _T("\r\n");
+			strMsg += _T("\r\n\r\n");
 			strMsg += TRL("Arguments");
 			strMsg += _T(": ");
 			strMsg += lpParameters;
@@ -540,65 +592,107 @@ void WU_SysShellExecute(LPCTSTR lpFile, LPCTSTR lpParameters, HWND hParent)
 		strMsg += _T("\r\n\r\n");
 		strMsg += strErr.c_str();
 
-		MessageBox(hParent, strMsg, TRL("Password Safe"), MB_ICONWARNING | MB_OK);
+		MessageBox(hParent, strMsg, PWM_PRODUCT_NAME_SHORT, MB_ICONWARNING | MB_OK);
 	}
 
 	SetLastError(dwPrevErr);
 }
 
+BOOL WU_SysCreateProcess(LPCTSTR lpFile, LPCTSTR lpParameters)
+{
+	ASSERT(lpFile != NULL); if(lpFile == NULL) return TRUE;
+	ASSERT(lpFile[0] != 0); if(lpFile[0] == 0) return TRUE;
+
+	std::basic_string<TCHAR> strCmdLine;
+
+	const size_t uFileLen = _tcslen(lpFile);
+	if((lpFile[0] == _T('\"')) && (lpFile[uFileLen - 1] == _T('\"')))
+		strCmdLine = lpFile;
+	else
+	{
+		strCmdLine = _T("\"");
+		strCmdLine += lpFile;
+		strCmdLine += _T("\"");
+	}
+
+	if((lpParameters != NULL) && (lpParameters[0] != 0))
+	{
+		strCmdLine += _T(" ");
+		strCmdLine += lpParameters;
+	}
+
+	STARTUPINFO sui;
+	ZeroMemory(&sui, sizeof(STARTUPINFO));
+	sui.cb = sizeof(STARTUPINFO);
+
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
+
+	const size_t dwBufLen = strCmdLine.size() + 8;
+	LPTSTR lpBuf = new TCHAR[dwBufLen];
+	ZeroMemory(lpBuf, dwBufLen * sizeof(TCHAR));
+	_tcscpy_s(lpBuf, dwBufLen - 4, strCmdLine.c_str());
+
+	BOOL bRes = ((CreateProcess(NULL, lpBuf, NULL, NULL, FALSE,
+		0, NULL, NULL, &sui, &pi) == FALSE) ? FALSE : TRUE);
+
+	if((pi.hThread != NULL) && (pi.hThread != INVALID_HANDLE_VALUE))
+		CloseHandle(pi.hThread);
+	if((pi.hProcess != NULL) && (pi.hProcess != INVALID_HANDLE_VALUE))
+		CloseHandle(pi.hProcess);
+
+	SAFE_DELETE_ARRAY(lpBuf);
+	return bRes;
+}
+
 BOOL _FileAccessible(LPCTSTR lpFile)
 {
+	ASSERT(lpFile != NULL); if(lpFile == NULL) return FALSE;
+	if(lpFile[0] == 0) return FALSE;
+
 	FILE *fp = NULL;
 	_tfopen_s(&fp, lpFile, _T("rb"));
 	if(fp == NULL) return FALSE;
-	fclose(fp); fp = NULL;
+	fclose(fp);
 	return TRUE;
 }
 
 BOOL _FileWritable(LPCTSTR lpFile)
 {
+	ASSERT(lpFile != NULL); if(lpFile == NULL) return FALSE;
+	if(lpFile[0] == 0) return FALSE;
+
 	FILE *fp = NULL;
 	_tfopen_s(&fp, lpFile, _T("ab"));
 	if(fp == NULL) return FALSE;
-	fclose(fp); fp = NULL;
+	fclose(fp);
 	return TRUE;
 }
 
 C_FN_SHARE int _OpenLocalFile(LPCTSTR szFile, int nMode)
 {
-	// TCHAR szPath[1024];
-	// TCHAR szFileTempl[1024];
-	int nRet = 0;
-
-	// GetModuleFileName(NULL, szFileTempl, MAX_PATH + 32);
-	// _GetPathFromFile(szFileTempl, szPath);
-	// _tcscpy_s(szFileTempl, _countof(szFileTempl), szPath);
-	// _tcscat_s(szFileTempl, _countof(szFileTempl), _T("\\"));
 	std_string strPath = Executable::instance().getPathOnly();
 
-	// _tcscat_s(szFileTempl, _countof(szFileTempl), szFile);
 	std_string strFile = strPath;
 	strFile += szFile;
 
 #ifndef _WIN32_WCE
-	LPCTSTR lpVerb = _T("open");
+	LPCTSTR lpVerb = NULL;
 	if(nMode == OLF_OPEN) { } // Default == OLF_OPEN
 	else if(nMode == OLF_PRINT) lpVerb = _T("print");
 	else if(nMode == OLF_EXPLORE) lpVerb = _T("explore");
 	else { ASSERT(FALSE); }
 
-	nRet = (int)(INT_PTR)ShellExecute(::GetActiveWindow(), lpVerb,
+	return (int)(INT_PTR)ShellExecute(::GetActiveWindow(), lpVerb,
 		strFile.c_str(), NULL, strPath.c_str(), KPSW_SHOWDEFAULT);
 #else
 	ASSERT(FALSE); // Implement before using on WinCE
+	return 0;
 #endif
-
-	return nRet;
 }
 
 BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD dwBufLen)
 {
-	DWORD dwFlags;
 	CString strSample;
 	CString strFilter;
 
@@ -612,16 +706,17 @@ BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD
 	strFilter = TRL("All Files");
 	strFilter += _T(" (*.*)|*.*||");
 
+	DWORD dwFlags = 0;
 	if(bOpenMode == FALSE)
 	{
-		dwFlags = OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+		dwFlags |= OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
 		dwFlags |= OFN_EXTENSIONDIFFERENT;
 		// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 		dwFlags |= 0x00080000 | 0x00800000 | OFN_NOREADONLYRETURN;
 	}
 	else
 	{
-		dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
+		dwFlags |= OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
 		// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 		dwFlags |= 0x00080000 | 0x00800000;
 		dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
@@ -664,34 +759,35 @@ BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
 
 UINT TWinExec(LPCTSTR lpCmdLine, WORD wCmdShow)
 {
-    STARTUPINFO sui;
-	PROCESS_INFORMATION pi;
-	BOOL bResult;
-
 	ASSERT(lpCmdLine != NULL);
 	if(lpCmdLine == NULL) return ERROR_PATH_NOT_FOUND;
 
+    STARTUPINFO sui;
 	ZeroMemory(&sui, sizeof(STARTUPINFO));
 	sui.cb = sizeof(STARTUPINFO);
 	sui.wShowWindow = wCmdShow;
+
+	PROCESS_INFORMATION pi;
 	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
 
 	const size_t dwCmdLen = _tcslen(lpCmdLine);
-	LPTSTR lp = new TCHAR[dwCmdLen + 2];
+	LPTSTR lp = new TCHAR[dwCmdLen + 4];
 	_tcscpy_s(lp, dwCmdLen + 2, lpCmdLine);
 
-	bResult = CreateProcess(NULL, lp, NULL, NULL, FALSE, 0, NULL, NULL, &sui, &pi);
+	BOOL bResult = CreateProcess(NULL, lp, NULL, NULL, FALSE, 0,
+		NULL, NULL, &sui, &pi);
 
 	// LPVOID lpMsgBuf;
 	// FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL);
 	// MessageBox(NULL, (LPCTSTR)lpMsgBuf, _T("Error"), MB_OK | MB_ICONINFORMATION);
 	// LocalFree(lpMsgBuf);
 
-	CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
+	if((pi.hThread != NULL) && (pi.hThread != INVALID_HANDLE_VALUE))
+		CloseHandle(pi.hThread);
+	if((pi.hProcess != NULL) && (pi.hProcess != INVALID_HANDLE_VALUE))
+		CloseHandle(pi.hProcess);
 
 	SAFE_DELETE_ARRAY(lp);
-
 	return (bResult != FALSE) ? 32 : ERROR_FILE_NOT_FOUND;
 }
 
@@ -705,6 +801,16 @@ BOOL WU_IsWin9xSystem()
 	return ((osvi.dwMajorVersion <= 4) ? TRUE : FALSE);
 }
 
+BOOL WU_IsWinVistaSystem()
+{
+	OSVERSIONINFO osvi;
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+
+	return ((osvi.dwMajorVersion >= 6) ? TRUE : FALSE);
+}
+
 BOOL WU_SupportsMultiLineTooltips()
 {
 	OSVERSIONINFO osvi;
@@ -716,9 +822,12 @@ BOOL WU_SupportsMultiLineTooltips()
 		TRUE : FALSE);
 }
 
-std::basic_string<TCHAR> WU_GetTempFile()
+std::basic_string<TCHAR> WU_GetTempFile(LPCTSTR lpSuffix)
 {
 	TCHAR szDir[MAX_PATH * 2];
+
+	if((lpSuffix == NULL) || (lpSuffix[0] == 0))
+		lpSuffix = _T(".tmp");
 
 	GetTempPath(MAX_PATH * 2 - 2, szDir);
 	if(szDir[_tcslen(szDir) - 1] != _T('\\'))
@@ -733,11 +842,11 @@ std::basic_string<TCHAR> WU_GetTempFile()
 		DWORD dwTest = ((DWORD)rand() << 16) + (DWORD)rand() + dwIndex;
 
 		CString strTest;
-		strTest.Format(_T("%s%s%u%s"), szDir, _T("Tmp"), dwTest, _T(".html"));
-		if(_FileAccessible(strTest) == TRUE) continue;
-		if(_FileWritable(strTest) == FALSE) continue;
+		strTest.Format(_T("%s%s%u%s"), szDir, _T("Tmp"), dwTest, lpSuffix);
+		if(_FileAccessible(strTest) == TRUE) continue; // Exists already
+		if(_FileWritable(strTest) == FALSE) continue; // Test write access
 
-		DeleteFile(strTest);
+		VERIFY(DeleteFile(strTest) != FALSE);
 		tszFile = (LPCTSTR)strTest;
 		break;
 	}
@@ -893,4 +1002,52 @@ std::basic_string<TCHAR> WU_FormatSystemMessage(DWORD dwLastErrorCode)
 	if(lpBuffer != NULL) { LocalFree(lpBuffer); lpBuffer = NULL; }
 
 	return str;
+}
+
+#define LCL_WUEE_FAIL { ASSERT(FALSE); SAFE_DELETE_ARRAY(pBuf); return str; }
+
+std::basic_string<TCHAR> WU_ExpandEnvironmentVars(LPCTSTR lpSrc)
+{
+	std::basic_string<TCHAR> str;
+
+	ASSERT(lpSrc != NULL); if(lpSrc == NULL) return str;
+
+	str = lpSrc;
+
+	TCHAR vDummy[4] = { 0, 0, 0, 0 };
+	const DWORD dwReq = ExpandEnvironmentStrings(lpSrc, &vDummy[0], 2);
+	if(dwReq == 0) { ASSERT(FALSE); return str; }
+
+	TCHAR *pBuf = new TCHAR[dwReq + 6];
+	ZeroMemory(pBuf, (dwReq + 6) * sizeof(TCHAR));
+	const DWORD dwCpy = ExpandEnvironmentStrings(lpSrc, pBuf, dwReq + 4);
+	if(dwCpy == 0) LCL_WUEE_FAIL;
+	if(dwCpy > (dwReq + 1)) LCL_WUEE_FAIL;
+
+	str = pBuf;
+	SAFE_DELETE_ARRAY(pBuf);
+	return str;
+}
+
+BOOL WU_IsAbsolutePath(LPCTSTR lpPath)
+{
+	ASSERT(lpPath != NULL); if(lpPath == NULL) return FALSE;
+
+	if(lpPath[0] == 0) return FALSE; // String has length 0
+	if(lpPath[1] == 0) return FALSE; // String has length 1
+
+	if((lpPath[0] == _T('\\')) && (lpPath[1] == _T('\\')))
+		return TRUE; // Absolute network path
+
+	if((lpPath[1] == _T(':')) && (lpPath[2] == _T('\\')))
+		return TRUE; // Absolute Windows path
+
+	return FALSE;
+}
+
+void WU_FillPlaceholders(CString* pString)
+{
+	ASSERT(pString != NULL); if(pString == NULL) return;
+
+	AppLocator::FillPlaceholders(pString);
 }

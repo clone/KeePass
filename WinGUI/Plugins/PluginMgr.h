@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,12 +22,13 @@
 
 #include "KeePluginDef.h"
 #include <vector>
+#include <boost/utility.hpp>
 
 #define DUMMY_COMMAND_LINE_OPT _T("--nop")
 
 typedef std::basic_string<TCHAR> std_string;
 
-class CPluginManager
+class CPluginManager : boost::noncopyable
 {
 public:
     static CPluginManager& Instance();

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ C_FN_SHARE DWORD_PTR KP_API KP_Call(DWORD dwCode, LPARAM lParamW, LPARAM lParamL
 
 	if(dwCode == KPC_INSERT_IMPORTFROM_ITEM)
 	{
-		BCMenu *p = (BCMenu *)g_pMainDlg->m_menu.GetSubMenu((TCHAR *)TRL("&File"));
+		BCMenu *p = NewGUI_GetBCMenu(g_pMainDlg->m_menu.GetSubMenu((TCHAR *)TRL("&File")));
 		if(p != NULL)
 		{
 			p = p->GetSubBCMenu((TCHAR *)TRL("&Import From"));

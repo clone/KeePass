@@ -1783,6 +1783,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\PwGeneratorAdvDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PwGeneratorExDlg.cpp"
 				>
 			</File>
@@ -2204,6 +2208,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PwGeneratorAdvDlg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PwGeneratorExDlg.h"
 				>
 			</File>
@@ -2341,6 +2349,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\randomke.bmp"
+				>
+			</File>
+			<File
 				RelativePath="res\search.ico"
 				>
 			</File>
@@ -2412,6 +2424,14 @@
 		<Filter
 			Name="Util"
 			>
+			<File
+				RelativePath=".\Util\AppLocator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\AppLocator.h"
+				>
+			</File>
 			<File
 				RelativePath="Util\FileLock.cpp"
 				>
@@ -4433,6 +4453,22 @@
 				</File>
 				<File
 					RelativePath="..\KeePassLibCpp\PasswordGenerator\PwCharSet.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Details"
+				>
+				<File
+					RelativePath="..\KeePassLibCpp\Details\PwCompatImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Details\PwCompatImpl.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Details\PwFileImpl.cpp"
 					>
 				</File>
 			</Filter>

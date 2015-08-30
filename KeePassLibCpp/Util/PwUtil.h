@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,17 +20,54 @@
 #ifndef ___PW_UTIL_H___
 #define ___PW_UTIL_H___
 
+#pragma once
+
 #include "../SysDefEx.h"
 #include <string>
+#include <boost/utility.hpp>
 
-// Very simple password quality estimation function
-DWORD EstimatePasswordBits(LPCTSTR pszPassword);
+#include "../PwManager.h"
 
-BOOL LoadHexKey32(FILE *fp, BYTE *pBuf);
-BOOL SaveHexKey32(FILE *fp, BYTE *pBuf);
+class CPwUtil : boost::noncopyable
+{
+private:
+	CPwUtil();
 
-BOOL ConvertStrToHexEx(char ch1, char ch2, BYTE& bt);
-void ConvertHexToStrEx(BYTE bt, char& ch1, char& ch2);
+public:
+	// Very simple password quality estimation function
+	static DWORD EstimatePasswordBits(LPCTSTR pszPassword);
+
+	static BOOL LoadHexKey32(FILE *fp, BYTE *pBuf);
+	static BOOL SaveHexKey32(FILE *fp, BYTE *pBuf);
+
+	static CString FormatError(int nErrorCode, DWORD dwFlags);
+
+	static BOOL MemAllocCopyEntry(__in_ecount(1) const PW_ENTRY *pExisting,
+		__out_ecount(1) PW_ENTRY *pDestination);
+	static void MemFreeEntry(__inout_ecount(1) PW_ENTRY *pEntry);
+
+	// Convert PW_TIME to 5-byte compressed structure and the other way round
+	static void TimeToPwTime(__in_ecount(5) const BYTE *pCompressedTime,
+		__out_ecount(1) PW_TIME *pPwTime);
+	static void PwTimeToTime(__in_ecount(1) const PW_TIME *pPwTime,
+		__out_ecount(5) BYTE *pCompressedTime);
+
+	static BOOL AttachFileAsBinaryData(__inout_ecount(1) PW_ENTRY *pEntry,
+		const TCHAR *lpFile);
+	static BOOL SaveBinaryData(__in_ecount(1) const PW_ENTRY *pEntry,
+		const TCHAR *lpFile);
+	static BOOL RemoveBinaryData(__inout_ecount(1) PW_ENTRY *pEntry);
+
+	static BOOL IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName);
+
+	static BOOL IsZeroUUID(__in_ecount(16) const BYTE *pUUID);
+
+	static BOOL IsTANEntry(const PW_ENTRY *pe);
+
+private:
+	inline static BOOL ConvertStrToHex(char ch1, char ch2, BYTE& bt);
+	inline static void ConvertHexToStr(BYTE bt, char& ch1, char& ch2);
+};
 
 /* class CPwErrorInfo
 {
@@ -50,7 +87,5 @@ private:
 
 	std::basic_string<TCHAR> m_strFinal;
 }; */
-
-CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags);
 
 #endif // ___PW_UTIL_H___

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -55,6 +55,8 @@ CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile);
 CString GetShortestAbsolutePath(LPCTSTR lpFilePath);
 
 BOOL GetRegKeyEx(HKEY hkey, LPCTSTR lpSubKey, LPTSTR lpRetData);
+std::basic_string<TCHAR> GetRegStrEx(HKEY hkeyBase, LPCTSTR lpSubKey,
+	LPCTSTR lpValue, DWORD dwMaxValueSize);
 BOOL OpenUrlInNewBrowser(LPCTSTR lpURL);
 BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser);
 
@@ -66,7 +68,8 @@ void OpenUrlEx(LPCTSTR lpURL, HWND hParent);
 void OpenUrlShellExec(LPCTSTR lpURL, HWND hParent);
 void OpenUrlProcess(LPCTSTR lpURL, HWND hParent);
 
-void WU_SysShellExecute(LPCTSTR lpFile, LPCTSTR lpParameters, HWND hParent);
+void WU_SysExecute(LPCTSTR lpFile, LPCTSTR lpParameters, HWND hParent);
+BOOL WU_SysCreateProcess(LPCTSTR lpFile, LPCTSTR lpParameters);
 
 BOOL _FileAccessible(LPCTSTR lpFile);
 BOOL _FileWritable(LPCTSTR lpFile);
@@ -80,9 +83,10 @@ BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile);
 UINT TWinExec(LPCTSTR lpCmdLine, WORD uCmdShow);
 
 BOOL WU_IsWin9xSystem();
+BOOL WU_IsWinVistaSystem();
 BOOL WU_SupportsMultiLineTooltips();
 
-std::basic_string<TCHAR> WU_GetTempFile();
+std::basic_string<TCHAR> WU_GetTempFile(LPCTSTR lpSuffix);
 std::basic_string<TCHAR> WU_GetUserName();
 
 // BOOL ContainsChildWindow(HWND hWndContainer, LPCTSTR lpChildWindowText);
@@ -93,5 +97,11 @@ void SafeActivateNextWindow(HWND hWndBase);
 HWND WU_ShowWindowInTaskbar(HWND hWndShow, HWND hParent, BOOL bShow);
 
 std::basic_string<TCHAR> WU_FormatSystemMessage(DWORD dwLastErrorCode);
+
+std::basic_string<TCHAR> WU_ExpandEnvironmentVars(LPCTSTR lpSrc);
+
+BOOL WU_IsAbsolutePath(LPCTSTR lpPath);
+
+void WU_FillPlaceholders(CString* pString);
 
 #endif

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 
 #include "GetRandomDlg.h"
+#include "PwGeneratorAdvDlg.h"
 
 IMPLEMENT_DYNAMIC(CPwGeneratorExDlg, CDialog)
 
@@ -51,7 +52,6 @@ CPwGeneratorExDlg::CPwGeneratorExDlg(CWnd* pParent /*=NULL*/)
 	, m_bCsHighAnsi(FALSE)
 	, m_strCustomCharSet(_T(""))
 	, m_strPattern(_T(""))
-	, m_bNoConfusing(FALSE)
 	, m_bHidePw(FALSE)
 	, m_bPatternPermute(FALSE)
 {
@@ -93,7 +93,6 @@ void CPwGeneratorExDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_CS_HIGHANSI, m_cbHighAnsi);
 	DDX_Text(pDX, IDC_EDIT_CUSTOMCHARSET, m_strCustomCharSet);
 	DDX_Text(pDX, IDC_EDIT_PATTERN, m_strPattern);
-	DDX_Check(pDX, IDC_CHECK_NOCONFUSING, m_bNoConfusing);
 	DDX_Control(pDX, IDOK, m_btnOK);
 	DDX_Control(pDX, IDCANCEL, m_btnCancel);
 	DDX_Control(pDX, IDC_STATIC_CUSTOMCHARSET, m_stcCustomCharSet);
@@ -113,6 +112,7 @@ void CPwGeneratorExDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_LENGTH, m_tbLength);
 	DDX_Control(pDX, IDC_CHECK_PATTERN_PERMUTE, m_cbPatternPermute);
 	DDX_Check(pDX, IDC_CHECK_PATTERN_PERMUTE, m_bPatternPermute);
+	DDX_Control(pDX, IDC_BTN_ADVANCED, m_btnAdvanced);
 }
 
 BEGIN_MESSAGE_MAP(CPwGeneratorExDlg, CDialog)
@@ -140,21 +140,25 @@ BEGIN_MESSAGE_MAP(CPwGeneratorExDlg, CDialog)
 	ON_BN_CLICKED(IDC_CHECK_CS_SPECIAL, &CPwGeneratorExDlg::OnBnClickedCheckCsSpecial)
 	ON_BN_CLICKED(IDC_CHECK_CS_BRACKETS, &CPwGeneratorExDlg::OnBnClickedCheckCsBrackets)
 	ON_BN_CLICKED(IDC_CHECK_CS_HIGHANSI, &CPwGeneratorExDlg::OnBnClickedCheckCsHighansi)
-	ON_BN_CLICKED(IDC_CHECK_NOCONFUSING, &CPwGeneratorExDlg::OnBnClickedCheckNoConfusing)
 	ON_BN_CLICKED(IDC_CHECK_COLLECT_ENTROPY, &CPwGeneratorExDlg::OnBnClickedCheckCollectEntropy)
+	ON_BN_CLICKED(IDC_BTN_ADVANCED, &CPwGeneratorExDlg::OnBnClickedAdvanced)
+	ON_BN_CLICKED(IDC_CHECK_PATTERN_PERMUTE, &CPwGeneratorExDlg::OnBnClickedPatternPermute)
 END_MESSAGE_MAP()
 
 BOOL CPwGeneratorExDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	NewGUI_XPButton(&m_btnOK, IDB_OK, IDB_OK);
-	NewGUI_XPButton(&m_btnCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(&m_btnProfileCreate, IDB_TB_SAVE_AS, IDB_TB_SAVE_AS, TRUE);
-	NewGUI_XPButton(&m_btnProfileDelete, IDB_CANCEL, IDB_CANCEL, TRUE);
-	NewGUI_XPButton(&m_btnHelp, IDB_HELP_SMALL, IDB_HELP_SMALL);
-	NewGUI_XPButton(&m_btnGenerate, IDB_KEY_SMALL, IDB_KEY_SMALL);
-	NewGUI_XPButton(&m_btnHidePw, -1, -1);
+	NewGUI_XPButton(m_btnOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(m_btnCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(m_btnProfileCreate, IDB_TB_SAVE_AS, IDB_TB_SAVE_AS, TRUE);
+	NewGUI_XPButton(m_btnProfileDelete, IDB_CANCEL, IDB_CANCEL, TRUE);
+	NewGUI_XPButton(m_btnHelp, IDB_HELP_SMALL, IDB_HELP_SMALL);
+	NewGUI_XPButton(m_btnGenerate, IDB_KEY_SMALL, IDB_KEY_SMALL);
+	NewGUI_XPButton(m_btnHidePw, -1, -1);
+	NewGUI_XPButton(m_btnAdvanced, -1, -1);
+
+	m_btnAdvanced.GetColor(CButtonST::BTNST_COLOR_FG_OUT, &m_clrControlText);
 
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
@@ -166,11 +170,6 @@ BOOL CPwGeneratorExDlg::OnInitDialog()
 	m_btnProfileDelete.GetWindowText(strTooltip);
 	m_btnProfileDelete.SetTooltipText(strTooltip);
 	m_btnProfileDelete.SetWindowText(_T(""));
-
-	CString strConfusingText;
-	GetDlgItem(IDC_CHECK_NOCONFUSING)->GetWindowText(strConfusingText);
-	GetDlgItem(IDC_CHECK_NOCONFUSING)->SetWindowText(strConfusingText +
-		_T(" (l|1I, O0)"));
 
 	CString strSpecialChars;
 	m_cbSpecial.GetWindowText(strSpecialChars);
@@ -243,6 +242,7 @@ BOOL CPwGeneratorExDlg::OnInitDialog()
 	CPwSafeDlg::m_pgsAutoProfile.strName = STR_AUTO_PROFILE;
 
 	PwgGetDefaultProfile(&m_pgsLast);
+	PwgGetDefaultProfile(&m_pgsAdvanced);
 
 	LoadGenProfiles();
 	RecreateProfilesList();
@@ -268,6 +268,12 @@ BOOL CPwGeneratorExDlg::OnInitDialog()
 
 	if(m_bShowInTaskbar == TRUE)
 		m_hPrevParent = WU_ShowWindowInTaskbar(this->m_hWnd, NULL, TRUE);
+
+	if(CPwSafeDlg::m_bMiniMode == TRUE)
+	{
+		m_btnAdvanced.EnableWindow(FALSE);
+		m_btnAdvanced.ShowWindow(SW_HIDE);
+	}
 
 	this->EnableControlsEx(FALSE);
 	return TRUE;
@@ -376,8 +382,9 @@ void CPwGeneratorExDlg::UpdateDialogDataEx(BOOL bDialogToInternal,
 		SAFE_DELETE_ARRAY(lpPattern);
 #endif
 
-		pSettings->bNoConfusing = m_bNoConfusing;
 		pSettings->bPatternPermute = m_bPatternPermute;
+
+		CPwGeneratorAdvDlg::CopyAdvancedOptions(&m_pgsAdvanced, pSettings);
 	}
 	else // bSave == FALSE
 	{
@@ -415,8 +422,9 @@ void CPwGeneratorExDlg::UpdateDialogDataEx(BOOL bDialogToInternal,
 		SAFE_DELETE_ARRAY(lpPattern);
 #endif
 
-		m_bNoConfusing = pSettings->bNoConfusing;
 		m_bPatternPermute = pSettings->bPatternPermute;
+
+		CPwGeneratorAdvDlg::CopyAdvancedOptions(pSettings, &m_pgsAdvanced);
 
 		this->UpdateData(FALSE);
 	}
@@ -493,6 +501,12 @@ void CPwGeneratorExDlg::EnableControlsEx(BOOL bSelectCustom)
 		this->UpdateData(FALSE);
 	}
 
+	COLORREF clr = ((PwgHasSecurityReducingOption(&m_pgsAdvanced) == TRUE) ?
+		RGB(255, 0, 0) : m_clrControlText);
+	m_btnAdvanced.SetColor(CButtonST::BTNST_COLOR_FG_IN, clr, FALSE);
+	m_btnAdvanced.SetColor(CButtonST::BTNST_COLOR_FG_OUT, clr, FALSE);
+	m_btnAdvanced.SetColor(CButtonST::BTNST_COLOR_FG_FOCUS, clr, TRUE);
+
 	m_bBlockUIUpdate = FALSE;
 }
 
@@ -515,12 +529,12 @@ void CPwGeneratorExDlg::LoadGenProfiles()
 {
 	TCHAR szTemp[SI_REGSIZE];
 	CPrivateConfigEx cConfig(FALSE);
-	CString strProfileKey;
 
 	m_vProfiles.clear();
 
 	for(int nProfile = 0; true; ++nProfile)
 	{
+		CString strProfileKey;
 		strProfileKey.Format(_T("%s%d"), PWMKEY_GENPROFILE, nProfile);
 		cConfig.Get(strProfileKey, szTemp);
 
@@ -616,7 +630,7 @@ void CPwGeneratorExDlg::OnBnClickedBtnProfileCreate()
 
 		if(strName == STR_CUSTOM_PROFILE)
 		{
-			MessageBox(TRL("Path is invalid"), TRL("Password Safe"), MB_OK | MB_ICONWARNING);
+			MessageBox(TRL("Path is invalid"), PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
 			return;
 		}
 
@@ -703,7 +717,6 @@ void CPwGeneratorExDlg::OnBnClickedGenerateBtn()
 	this->UpdateDialogDataEx(TRUE, &pws);
 
 	CNewRandom randomSource;
-
 	if(m_bCollectEntropy == TRUE)
 	{
 		CGetRandomDlg dlg;
@@ -719,7 +732,7 @@ void CPwGeneratorExDlg::OnBnClickedGenerateBtn()
 	{
 		std::basic_string<TCHAR> strError = _TRL(PwgErrorToString(uError));
 		strError += _T(".");
-		MessageBox(strError.c_str(), TRL("Password Safe"), MB_OK | MB_ICONWARNING);
+		MessageBox(strError.c_str(), PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
 
 		EraseTCharVector(strPassword);
 	}
@@ -851,12 +864,19 @@ void CPwGeneratorExDlg::OnBnClickedCheckCsHighansi()
 	this->EnableControlsEx(TRUE);
 }
 
-void CPwGeneratorExDlg::OnBnClickedCheckNoConfusing()
+void CPwGeneratorExDlg::OnBnClickedCheckCollectEntropy()
 {
 	this->EnableControlsEx(TRUE);
 }
 
-void CPwGeneratorExDlg::OnBnClickedCheckCollectEntropy()
+void CPwGeneratorExDlg::OnBnClickedAdvanced()
+{
+	CPwGeneratorAdvDlg dlg;
+	dlg.InitEx(&m_pgsAdvanced);
+	if(dlg.DoModal() == IDOK) this->EnableControlsEx(TRUE);
+}
+
+void CPwGeneratorExDlg::OnBnClickedPatternPermute()
 {
 	this->EnableControlsEx(TRUE);
 }

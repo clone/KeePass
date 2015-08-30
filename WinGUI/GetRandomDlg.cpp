@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -75,9 +75,9 @@ BOOL CGetRandomDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(&m_btMouseInput, IDB_MOUSE_SMALL, IDB_MOUSE_SMALL);
+	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(m_btMouseInput, IDB_MOUSE_SMALL, IDB_MOUSE_SMALL);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY),

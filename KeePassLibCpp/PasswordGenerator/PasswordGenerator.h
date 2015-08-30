@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -41,23 +41,6 @@
 
 #pragma pack(1)
 
-/* typedef struct _PW_GEN_SETTINGS
-{
-	LPTSTR lpName;
-
-	BYTE btGeneratorType;
-	BOOL bCollectUserEntropy;
-
-	DWORD dwLength;
-
-	LPWSTR lpCharSet;
-
-	LPWSTR lpPattern;
-	BOOL bPatternPermute;
-
-	BOOL bNoConfusing;
-} PW_GEN_SETTINGS; */
-
 typedef struct _PW_GEN_SETTINGS_EX
 {
 	std::basic_string<TCHAR> strName;
@@ -73,6 +56,9 @@ typedef struct _PW_GEN_SETTINGS_EX
 	BOOL bPatternPermute;
 
 	BOOL bNoConfusing;
+	BOOL bNoRepeat;
+
+	std::basic_string<WCHAR> strExcludeChars;
 } PW_GEN_SETTINGS_EX;
 
 #pragma pack()
@@ -98,5 +84,7 @@ void PwgStringToProfile(const std::basic_string<TCHAR>& strProfile,
 	PW_GEN_SETTINGS_EX* s);
 
 void PwgGetDefaultProfile(PW_GEN_SETTINGS_EX* s);
+
+BOOL PwgHasSecurityReducingOption(const PW_GEN_SETTINGS_EX* pSettings);
 
 #endif // ___PASSWORD_GENERATOR_MAIN_H___

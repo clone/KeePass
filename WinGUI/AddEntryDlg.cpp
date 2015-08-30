@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "NewGUI/NewGUICommon.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "../KeePassLibCpp/Util/Base64.h"
+#include "../KeePassLibCpp/Util/PwUtil.h"
 #include "../KeePassLibCpp/PasswordGenerator/PasswordGenerator.h"
 
 #ifdef _DEBUG
@@ -176,18 +177,17 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
-	// Make the buttons look cool
-	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(&m_btRandomPw, -1, -1);
-	NewGUI_XPButton(&m_btPickIcon, -1, -1);
-	NewGUI_XPButton(&m_btHidePw, -1, -1);
-	NewGUI_XPButton(&m_btSetAttachment, IDB_FILE, IDB_FILE, TRUE);
-	NewGUI_XPButton(&m_btSaveAttachment, IDB_DISK, IDB_DISK, TRUE);
-	NewGUI_XPButton(&m_btRemoveAttachment, IDB_TB_DELETEENTRY, IDB_TB_DELETEENTRY, TRUE);
-	NewGUI_XPButton(&m_btSetToDefaultExpire, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
-	NewGUI_XPButton(&m_btSelDefExpires, IDB_CLOCK, IDB_CLOCK, TRUE);
-	NewGUI_XPButton(&m_btHelp, IDB_HELP_SMALL_POPUP, IDB_HELP_SMALL_POPUP, TRUE);
+	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(m_btRandomPw, IDB_RANDOM_KEY, IDB_RANDOM_KEY);
+	NewGUI_XPButton(m_btPickIcon, -1, -1);
+	NewGUI_XPButton(m_btHidePw, -1, -1);
+	NewGUI_XPButton(m_btSetAttachment, IDB_FILE, IDB_FILE, TRUE);
+	NewGUI_XPButton(m_btSaveAttachment, IDB_DISK, IDB_DISK, TRUE);
+	NewGUI_XPButton(m_btRemoveAttachment, IDB_TB_DELETEENTRY, IDB_TB_DELETEENTRY, TRUE);
+	NewGUI_XPButton(m_btSetToDefaultExpire, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
+	NewGUI_XPButton(m_btSelDefExpires, IDB_CLOCK, IDB_CLOCK, TRUE);
+	NewGUI_XPButton(m_btHelp, IDB_HELP_SMALL_POPUP, IDB_HELP_SMALL_POPUP, TRUE);
 
 	m_btHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 	m_btHidePw.SetTooltipText(TRL("Hide passwords behind asterisks (***)."), TRUE);
@@ -248,11 +248,11 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	CString strGroupTest;
 	m_cbGroups.GetLBText(m_cbGroups.GetCurSel(), strGroupTest);
-	if(CPwManager::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
+	if(CPwUtil::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
 	{
 		for(i = 0; i < (unsigned int)m_pMgr->GetNumberOfGroups(); i++)
 		{
-			if(CPwManager::IsAllowedStoreGroup(m_pMgr->GetGroup(i)->pszGroupName, PWS_SEARCHGROUP))
+			if(CPwUtil::IsAllowedStoreGroup(m_pMgr->GetGroup(i)->pszGroupName, PWS_SEARCHGROUP))
 			{
 				m_cbGroups.SetCurSel(i);
 				m_nGroupId = i;
@@ -394,6 +394,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 		}
 	}
 
+	PerformMiniModeAdjustments();
+
 	if(m_strTitle == PWS_TAN_ENTRY)
 	{
 		GetDlgItem(IDC_EDIT_TITLE)->EnableWindow(FALSE);
@@ -471,7 +473,7 @@ void CAddEntryDlg::OnOK()
 
 	CString strGroupTest;
 	m_cbGroups.GetLBText(m_cbGroups.GetCurSel(), strGroupTest);
-	if(CPwManager::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
+	if(CPwUtil::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
 	{
 		MessageBox(TRL("The group you selected cannot store entries. Please select a different group."),
 			TRL("Stop"), MB_ICONWARNING | MB_OK);
@@ -653,9 +655,11 @@ BOOL CAddEntryDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 
 		m_popmenu.LoadToolbar(IDR_INFOICONS, IDB_INFOICONS_EX);
 
-		BCMenu *psub = (BCMenu *)m_popmenu.GetSubMenu(0);
-		CPwSafeDlg::_TranslateMenu(psub, TRUE, NULL);
-		psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, this);
+		BCMenu *pSub = NewGUI_GetBCMenu(m_popmenu.GetSubMenu(0));
+		if(pSub == NULL) { ASSERT(FALSE); pSub = &m_popmenu; }
+		CPwSafeDlg::_TranslateMenu(pSub, TRUE, NULL);
+		
+		pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, this);
 		m_popmenu.DestroyMenu();
 	}
 	
@@ -715,7 +719,8 @@ void CAddEntryDlg::OnSaveAttachBtn()
 
 	if(_tcslen(pEntry->pszBinaryDesc) == 0)
 	{
-		MessageBox(TRL("There is no file attached with this entry."), TRL("Password Safe"), MB_ICONINFORMATION);
+		MessageBox(TRL("There is no file attached with this entry."),
+			PWM_PRODUCT_NAME_SHORT, MB_ICONINFORMATION | MB_OK);
 		return;
 	}
 
@@ -730,7 +735,8 @@ void CAddEntryDlg::OnSaveAttachBtn()
 	dwFlags |= 0x00080000 | 0x00800000 | OFN_NOREADONLYRETURN;
 	CFileDialog dlg(FALSE, NULL, strSample, dwFlags, strFilter, this);
 
-	if(dlg.DoModal() == IDOK) { m_pMgr->SaveBinaryData(pEntry, dlg.GetPathName()); }
+	if(dlg.DoModal() == IDOK)
+		CPwUtil::SaveBinaryData(pEntry, dlg.GetPathName());
 
 	UpdateData(FALSE);
 	UpdateControlsStatus();
@@ -906,6 +912,26 @@ void CAddEntryDlg::OnHelpURLFieldFeatures()
 void CAddEntryDlg::OnHelpAutoType()
 {
 	WU_OpenAppHelp(PWM_HELP_AUTOTYPE);
+}
+
+void CAddEntryDlg::PerformMiniModeAdjustments()
+{
+	if(CPwSafeDlg::m_bMiniMode == FALSE) return;
+
+	NewGUI_DisableHideWnd(GetDlgItem(IDC_STATIC_ATTACH));
+	NewGUI_DisableHideWnd(GetDlgItem(IDC_EDIT_ATTACHMENT));
+	NewGUI_DisableHideWnd(&m_btSetAttachment);
+	NewGUI_DisableHideWnd(&m_btSaveAttachment);
+	NewGUI_DisableHideWnd(&m_btRemoveAttachment);
+	NewGUI_DisableHideWnd(&m_btHelp);
+
+	long lMoveY = -NewGUI_GetWndBasePosDiff(GetDlgItem(IDC_STATIC_DLGSEP), &m_btSetAttachment).cy;
+	NewGUI_MoveWnd(GetDlgItem(IDC_STATIC_DLGSEP), 0, lMoveY, this);
+	// NewGUI_MoveWnd(&m_btHelp, 0, lMoveY, this);
+	NewGUI_MoveWnd(&m_btOK, 0, lMoveY, this);
+	NewGUI_MoveWnd(&m_btCancel, 0, lMoveY, this);
+
+	NewGUI_Resize(this, 0, lMoveY, NULL);
 }
 
 #pragma warning(pop)

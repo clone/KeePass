@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -116,11 +116,11 @@ BOOL COptionsDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(&m_btSelFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
-	NewGUI_XPButton(&m_btnCreateAssoc, IDB_FILE, IDB_FILE);
-	NewGUI_XPButton(&m_btnDeleteAssoc, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(m_btSelFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
+	NewGUI_XPButton(m_btnCreateAssoc, IDB_FILE, IDB_FILE);
+	NewGUI_XPButton(m_btnDeleteAssoc, IDB_CANCEL, IDB_CANCEL);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_OPTIONS),
@@ -228,6 +228,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Show full path in the title bar (instead of file name only)"), &m_bShowFullPath, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Disable 'Save' button if the database hasn't been modified"), &m_bAllowSaveIfModifiedOnly, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Use local date/time format instead of ISO notation"), &m_bUseLocalTimeFormat, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Register Ctrl-Alt-K hot key (brings the KeePass window to front)"), &m_bRegisterRestoreHotKey, NULL, OL_LINK_NULL);
 
 	AddTcItem(TRL(OPTSZ_SECURITY), 29);
 	AddTcItem(TRL(OPTSZ_GUI), 6);
@@ -406,12 +407,12 @@ void COptionsDlg::OnBtnCreateAssoc()
 		NotifyAssocChanged();
 
 		MessageBox(TRL("Successfully associated KeePass with .kdb files! A double-click on a .kdb file will now start KeePass automatically!"),
-			TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+			PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONINFORMATION);
 	}
 	else
 	{
 		MessageBox(TRL("Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations."),
-			TRL("Password Safe"), MB_OK | MB_ICONWARNING);
+			PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
 	}
 }
 
@@ -422,12 +423,12 @@ void COptionsDlg::OnBtnDeleteAssoc()
 		NotifyAssocChanged();
 
 		MessageBox(TRL("Successfully removed association! KeePass won't be started any more when double-clicking on a .kdb file!"),
-			TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+			PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONINFORMATION);
 	}
 	else
 	{
 		MessageBox(TRL("Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations."),
-			TRL("Password Safe"), MB_OK | MB_ICONWARNING);
+			PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
 	}
 }
 
@@ -455,7 +456,7 @@ void COptionsDlg::OnRadioClipMethodSecure()
 	CString str = TRL("Warning! It is possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing or clipboard backup tools.");
 	str += _T("\r\n\r\n");
 	str += TRL("If you notice any problems with the enhanced method, switch back to the timed clipboard clearing method.");
-	MessageBox((LPCTSTR)str, TRL("Password Safe"), MB_ICONINFORMATION | MB_OK);
+	MessageBox((LPCTSTR)str, PWM_PRODUCT_NAME_SHORT, MB_ICONINFORMATION | MB_OK);
 
 	UpdateData(TRUE);
 	if(m_nClipboardMethod == CM_TIMED) GetDlgItem(IDC_EDIT_CLIPBOARDTIME)->EnableWindow(TRUE);

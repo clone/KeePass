@@ -1,3 +1,96 @@
+08/01/12 - 1.10
+- Added configuration file caching (highly increases
+  performance when running KeePass from slow devices like USB
+  sticks)
+- Added key provider API (it now is very easy to write a plugin
+  that provides additional key methods, like locking to USB
+  device ID, certificates, smart cards, ... see the developers
+  section in the online KeePass help center)
+- Added support for environment variables in URLs and paths
+  (%-syntax support for field placeholders was removed because
+  it conflicts with the environment syntax, see the 'Upgrading
+  to KeePass 1.10' article)
+- Added {INTERNETEXPLORER}, {FIREFOX} and {OPERA} application
+  path placeholders (can be used in URLs and auto-type)
+- Added support for starting very long command lines
+- Added mini mode (must be configured in the INI file manually;
+  in mini mode, a lot of functionality is hidden; see help
+  file - technical FAQ)
+- The quick find control in the main window now remembers the
+  most recent searches (if you want the search texts to be
+  remembered across sessions, you need to save the database)
+- Added password generator option to exclude/omit
+  user-specified characters in generated passwords
+- Added option to disallow repeating characters in generated
+  passwords (both character set-based and pattern-based)
+- Moved security-reducing / dangerous password generator
+  options to a separate 'Advanced' dialog (if you enable a
+  security-reducing option, the 'Advanced' button in the
+  password generator window is shown in red)
+- Added ability to search using a regular expression
+- Internal random number generator is now additionally seeded
+  using random bytes provided by the system's default CSP
+- Internal random number generator is now additionally seeded
+  using a newly generated 128-bit GUID
+- A default user name for new entries can now be specified in
+  'File' -> 'Database Settings'
+- Added ability to specify the groups that are automatically
+  created when creating a new database (in the INI file)
+- Banner colors can be changed in the INI file now
+  (KeeBannerColorStart and KeeBannerColorEnd, set to BGR-Quads)
+- XMLImport plugin: entries with no or empty UUIDs are
+  supported now (KeePass generates new random UUIDs for them)
+- KeePass now registers a global sync. application mutex:
+  'KeePassAppMutexExI' (+ updated Windows installer)
+- Added an advanced option to disable the Ctrl-Alt-K hot key
+- Added textual cue for the quick-search edit control
+- The TAN wizard now shows the name of the group into which the
+  TANs will be imported
+
+- Changed field order: password follows user name now (note:
+  if you use your previous configuration file, the columns in
+  the main window will be ordered the old way; to change it,
+  drag&drop the column headers manually to adjust the order)
+- Code improvements (developers: KeePass now requires the Boost
+  C++ libraries to compile)
+- Empty fields are not shown in the entry details view any more
+- Improved startup time
+- Improved search performance
+- Improved internal menu handling
+- Group export menu items are now named more consistently
+- Improved print options dialog (replaced "export" by "print",
+  excluded irrelevant export options, ...)
+- Search results list display mode is now adjusted based on
+  matching items
+- When trying to open a database that already is currently
+  opened by someone else, you are not prompted any more whether
+  to open it in read-only mode, if the '-readonly' command line
+  argument is present in the current instance
+- Entry list is now automatically focused after a Ctrl-F search
+  and the first item is selected
+- Improved default global configuration file (shipped in setup)
+- Improved title drawing in dialog banners
+- Improved entry list update behavior when there are no groups
+- KeePass now uses the default shell verb for opening URLs and
+  files instead of 'open'
+- Optimized performance of process memory protection algorithm
+- The status bar is now updated immediately after performing a
+  quick search (main window)
+- Search results are not cleared any more when having an auto-
+  sorting option enabled and performing an operation that
+  modifies a search results entry (like auto-type)
+- Replaced 'Gen' button by an image button
+- Minor improvements in the installer
+- Minor improvements in cmd:// URL handling
+- Minor dialog text improvements
+
+- Password generator does not crash any more when trying to
+  generate a password using an empty pattern + random permuting
+- The Ctrl-Alt-K global hot key correctly brings the KeePass
+  main window to front when it's hidden behind other windows
+- Changing the state of the 'Randomly permute characters of
+  password' option now correctly selects the '(Custom)' profile
+
 07/10/12 - 1.09
 - Added option to permute passwords generated using a pattern
   (this allows generating passwords that follow complex rules)
@@ -85,6 +178,7 @@
 - 'New' and 'Open' menu commands are now also enabled when the
   workspace is locked
 - Unified dialog elements
+- Decreased executable file size
 - Fixed various problems that occured when KeePass was
   minimized to tray ('--exit-all' not working, problems at
   Windows shutdown, IPC problems, ...)

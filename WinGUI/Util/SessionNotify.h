@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,10 +20,12 @@
 #ifndef ___SESSION_NOTIFY_H___
 #define ___SESSION_NOTIFY_H___
 
+#include <boost/utility.hpp>
+
 typedef BOOL(WINAPI *LPWTSREGISTERSESSIONNOTIFICATION)(HWND hWnd, DWORD dwFlags);
 typedef BOOL(WINAPI *LPWTSUNREGISTERSESSIONNOTIFICATION)(HWND hWnd);
 
-class CSessionNotify
+class CSessionNotify : boost::noncopyable
 {
 public:
 	CSessionNotify();

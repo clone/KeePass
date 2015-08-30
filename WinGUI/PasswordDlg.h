@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,7 +26,14 @@
 #include "NewGUI/GradientProgressCtrl.h"
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/SecureEditEx.h"
-#include "afxwin.h"
+#include <afxwin.h>
+
+typedef struct _KP_KEYPROV_INFO_CPP
+{
+	DWORD dwFlags;
+	std::basic_string<TCHAR> strName;
+	DWORD dwImageIndex;
+} KP_KEYPROV_INFO_CPP;
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -35,14 +42,35 @@ class CPasswordDlg : public CDialog
 public:
 	CPasswordDlg(CWnd* pParent = NULL);
 
-	void CleanUp();
 	void FreePasswords();
-	void EnableClientWindows();
 
 	BOOL m_bLoadMode;
 	BOOL m_bConfirm;
 	BOOL m_bChanging;
 	HICON m_hWindowIcon;
+
+	LPTSTR m_lpKey;
+	LPTSTR m_lpKey2;
+	BOOL m_bKeyFile;
+
+	LPCTSTR m_lpPreSelectPath;
+
+	CString m_strDescriptiveName;
+
+private:
+	void CleanUp();
+
+	void EnableClientWindows();
+	void PerformMiniModeAdjustments();
+
+	void QueryKeyProviders();
+	void AddKeyProvider(const KP_KEYPROV_INFO& keyProvInfo);
+	BOOL IsKeyProvider(LPCTSTR lpDisplayName);
+	std::basic_string<TCHAR> GetKeyFromProvider(LPCTSTR lpDisplayName);
+
+	static KP_KEYPROV_INFO_CPP KeyProvCToS(const KP_KEYPROV_INFO& c);
+
+	BOOL m_bOnce;
 
 	CImageList m_ilIcons;
 	CFont m_fStyle;
@@ -51,14 +79,9 @@ public:
 	CKCSideBannerWnd m_banner;
 	CToolTipCtrl m_tipSecClear;
 
-	LPCTSTR m_lpPreSelectPath;
+	std::vector<KP_KEYPROV_INFO_CPP> m_vKeyProv;
 
-	LPTSTR m_lpKey;
-	LPTSTR m_lpKey2;
-	BOOL m_bKeyFile;
-
-	CString m_strDescriptiveName;
-
+public:
 	//{{AFX_DATA(CPasswordDlg)
 	enum { IDD = IDD_PASSWORD_DLG };
 	CComboBoxEx	m_cbDiskList;
@@ -79,9 +102,6 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	//}}AFX_VIRTUAL
-
-private:
-	BOOL m_bOnce;
 
 protected:
 	//{{AFX_MSG(CPasswordDlg)

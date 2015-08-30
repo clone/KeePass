@@ -10,10 +10,10 @@
 #define MyAppUrlName "KeePass.url"
 #define MyAppHelpName "KeePass.chm"
 
-#define KeeVersionStr "1.09"
-#define KeeVersionWin "1.0.9.1"
+#define KeeVersionStr "1.10"
+#define KeeVersionWin "1.1.0.1"
 
-#define KeeDevPeriod "2003-2007"
+#define KeeDevPeriod "2003-2008"
 
 [Setup]
 AppName={#MyAppFullName}
@@ -34,7 +34,7 @@ Compression=lzma/ultra
 SolidCompression=yes
 InternalCompressLevel=ultra
 UninstallDisplayIcon={app}\{#MyAppName}.exe
-AppMutex=KeePassApplicationMutex,Global\KeePassApplicationMutex
+AppMutex=KeePassApplicationMutex,Global\KeePassAppMutexExI
 ChangesAssociations=yes
 VersionInfoVersion={#KeeVersionWin}
 VersionInfoCompany={#MyAppPublisher}
@@ -87,7 +87,7 @@ Filename: {app}\{#MyAppExeName}; Description: {cm:LaunchProgram,{#MyAppName}}; F
 Filename: http://keepass.info/plugins.html; Flags: postinstall skipifsilent shellexec nowait; Tasks: ; Description: Visit plugins web page (browser integration, ...)
 
 [Registry]
-; Always unregister .KDB association
+; Always unregister .kdb association
 Root: HKCR; Subkey: .kdb; Flags: uninsdeletekey; Tasks: not fileassoc
 Root: HKCR; Subkey: kdbfile; Flags: uninsdeletekey; Tasks: not fileassoc
 ; Register and unregister .kdb association

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 
 #include "IconPickerDlg.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
+#include "../KeePassLibCpp/Util/PwUtil.h"
 #include "NewGUI/NewGUICommon.h"
 
 #ifdef _DEBUG
@@ -95,11 +96,11 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 	// Translate all windows
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
-	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(&m_btSelectIcon, -1, -1);
-	NewGUI_XPButton(&m_btSetToDefaultExpire, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
-	NewGUI_XPButton(&m_btSelDefExpires, IDB_CLOCK, IDB_CLOCK, TRUE);
+	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
+	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(m_btSelectIcon, -1, -1);
+	NewGUI_XPButton(m_btSetToDefaultExpire, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
+	NewGUI_XPButton(m_btSelDefExpires, IDB_CLOCK, IDB_CLOCK, TRUE);
 
 	CString strTT = TRL("Change expiration time:");
 	strTT.Remove(_T(':')); strTT += _T(".");
@@ -192,7 +193,7 @@ void CEntryPropertiesDlg::OnOK()
 	{
 		CString strGroupTest;
 		m_cbGroups.GetLBText(m_cbGroups.GetCurSel(), strGroupTest);
-		if(CPwManager::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
+		if(CPwUtil::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
 		{
 			MessageBox(TRL("The group you selected cannot store entries. Please select a different group."),
 				TRL("Stop"), MB_ICONWARNING | MB_OK);

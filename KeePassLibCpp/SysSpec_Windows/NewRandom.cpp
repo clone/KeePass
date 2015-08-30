@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 #include "StdAfx.h"
 
 #if (defined(_WIN32) || defined(_WIN64))
+
+#include <wincrypt.h>
+#include <objbase.h>
 
 #include "../Util/NewRandom.h"
 #include "../Util/MemUtil.h"
@@ -151,6 +154,14 @@ void CNewRandom::Initialize()
 	AddRandomObject(&sui, sizeof(STARTUPINFO));
 #endif
 
+	GUID guid;
+	VERIFY(CoCreateGuid(&guid) == S_OK);
+	AddRandomObject(&guid, sizeof(GUID));
+
+	BYTE pbCrypt[64];
+	CNewRandom::SysCryptGetRandom(&pbCrypt[0], 64);
+	AddRandomObject(&pbCrypt[0], 64);
+
 	AddRandomObject(&g_dwNewRandomInstanceCounter, 4);
 }
 
@@ -211,6 +222,21 @@ void CNewRandom::GetRandomBuffer(__out_bcount(dwSize) BYTE *pBuf, DWORD dwSize)
 		pBuf += dw;
 		dwSize -= dw;
 	}
+}
+
+void CNewRandom::SysCryptGetRandom(BYTE *pBuf, DWORD dwSize)
+{
+	HCRYPTPROV hContext = NULL;
+
+	BOOL bReg = CryptAcquireContext(&hContext, NULL, NULL, PROV_RSA_FULL,
+		CRYPT_VERIFYCONTEXT | CRYPT_SILENT);
+	if((bReg == FALSE) || (hContext == NULL))
+		bReg = CryptAcquireContext(&hContext, NULL, NULL, PROV_RSA_FULL,
+			CRYPT_VERIFYCONTEXT); // Windows 98 does not support CRYPT_SILENT
+	if((bReg == FALSE) || (hContext == NULL)) { ASSERT(FALSE); return; }
+
+	VERIFY(CryptGenRandom(hContext, dwSize, pBuf));
+	VERIFY(CryptReleaseContext(hContext, 0));
 }
 
 // Seed the xorshift random number generator

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 
 #include "AppUtil.h"
 #include "MemUtil.h"
+
+#include <boost/algorithm/string.hpp>
 
 // Securely erase a CString object
 void EraseCString(CString *pString)
@@ -217,8 +219,7 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 
 	while(1)
 	{
-		nPos = str.Find(_T("%TITLE%"));
-		if(nPos == -1) nPos = str.Find(_T("{TITLE}"));
+		nPos = str.Find(_T("{TITLE}"));
 		if(nPos == -1) break;
 
 		if(bMakeSimString == FALSE)
@@ -234,8 +235,7 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 
 	while(1)
 	{
-		nPos = str.Find(_T("%USERNAME%"));
-		if(nPos == -1) nPos = str.Find(_T("{USERNAME}"));
+		nPos = str.Find(_T("{USERNAME}"));
 		if(nPos == -1) break;
 
 		if(bMakeSimString == FALSE)
@@ -251,8 +251,7 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 
 	while(1)
 	{
-		nPos = str.Find(_T("%URL%"));
-		if(nPos == -1) nPos = str.Find(_T("{URL}"));
+		nPos = str.Find(_T("{URL}"));
 		if(nPos == -1) break;
 
 		if(bMakeSimString == FALSE)
@@ -268,8 +267,7 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 
 	while(1)
 	{
-		nPos = str.Find(_T("%PASSWORD%"));
-		if(nPos == -1) nPos = str.Find(_T("{PASSWORD}"));
+		nPos = str.Find(_T("{PASSWORD}"));
 		if(nPos == -1) break;
 
 		if(bMakeSimString == FALSE)
@@ -285,8 +283,7 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 
 	while(1)
 	{
-		nPos = str.Find(_T("%NOTES%"));
-		if(nPos == -1) nPos = str.Find(_T("{NOTES}"));
+		nPos = str.Find(_T("{NOTES}"));
 		if(nPos == -1) break;
 
 		if(bMakeSimString == FALSE)
@@ -310,8 +307,7 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 
 	while(1)
 	{
-		nPos = str.Find(_T("%APPDIR%"));
-		if(nPos == -1) nPos = str.Find(_T("{APPDIR}"));
+		nPos = str.Find(_T("{APPDIR}"));
 		if(nPos == -1) break;
 		TCHAR tszBufP[512];
 		GetApplicationDirectory(tszBufP, 512 - 1, TRUE, FALSE);
@@ -324,14 +320,12 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 	if(bMakeSimString == TRUE)
 	{
 		CString strSourceCopy = str;
-		unsigned char uch;
-		int i;
 
 		EraseCString(&str);
 
 		for(nPos = 0; nPos < strSourceCopy.GetLength(); nPos++)
 		{
-			uch = (unsigned char)strSourceCopy.GetAt(nPos);
+			unsigned char uch = static_cast<unsigned char>(strSourceCopy.GetAt(nPos));
 
 			if(uch > 0x7E)
 			{
@@ -339,7 +333,7 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 				strTemp.Format(_T("%u"), uch);
 				ASSERT(strTemp.GetLength() == 3);
 
-				for(i = 0; i < strTemp.GetLength(); i++)
+				for(int i = 0; i < strTemp.GetLength(); i++)
 				{
 					str += _T("{NUMPAD");
 					str += strTemp.GetAt(i);
@@ -348,7 +342,7 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 
 				str += _T(")");
 			}
-			else str += (TCHAR)uch;
+			else str += static_cast<TCHAR>(uch);
 		}
 
 		EraseCString(&strTemp);
@@ -650,6 +644,61 @@ void RemoveAcceleratorTip(CString *pString)
 
 	pString->TrimLeft();
 	pString->TrimRight();
+}
+
+// Assumes that lpSearch is lower-case when bCaseSensitive == FALSE
+// If pUseRegex is not NULL, a regular expression search will be
+// performed, otherwise a simple substring matching.
+bool StrMatchText(LPCTSTR lpEntryData, LPCTSTR lpSearch,
+	BOOL bCaseSensitive, const boost::basic_regex<TCHAR>* pUseRegex)
+{
+	ASSERT(lpEntryData != NULL);
+	if((lpEntryData == NULL) || (lpEntryData[0] == 0)) return false;
+
+	ASSERT((lpSearch != NULL) && (lpSearch[0] != 0));
+
+#ifndef _WIN64
+	if(pUseRegex != NULL)
+	{
+		try
+		{
+			return boost::regex_match(lpEntryData, *pUseRegex,
+				boost::regex_constants::match_any);
+		}
+		catch(...) { return false; }
+	}
+#else
+#pragma message("No regular expression support in x64 library.")
+	UNREFERENCED_PARAMETER(pUseRegex);
+#endif
+
+	if(bCaseSensitive == FALSE)
+	{
+		CString strEntryData = lpEntryData;
+		strEntryData.MakeLower();
+		return (strEntryData.Find(lpSearch) != -1);
+	}
+
+	return (_tcsstr(lpEntryData, lpSearch) != NULL);
+}
+
+std::basic_string<TCHAR> GetQuotedAppPath(const std::basic_string<TCHAR>& strPath)
+{
+	std::basic_string<TCHAR> str = strPath;
+
+	LPCTSTR lpTrim = _T(" \t\r\n");
+	boost::algorithm::trim_if(str, boost::algorithm::is_any_of(lpTrim));
+
+	if(str.size() <= 1) return str;
+
+	const std::basic_string<TCHAR>::size_type nPos = std::basic_string<TCHAR>::npos;
+	const std::basic_string<TCHAR>::size_type iStart = str.find(_T('\"'));
+	if((iStart == nPos) || (iStart == (str.size() - 1))) return str;
+
+	const std::basic_string<TCHAR>::size_type iEnd = str.find(_T('\"'), iStart + 1);
+	if(iEnd == nPos) return str;
+
+	return str.substr(iStart + 1, iEnd - iStart - 1);
 }
 
 WCharStream::WCharStream(LPCWSTR lpData)

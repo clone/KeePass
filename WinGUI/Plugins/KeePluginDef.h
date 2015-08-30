@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,7 +20,10 @@
 #ifndef ___KEEPASS_PLUGIN_DEF_H___
 #define ___KEEPASS_PLUGIN_DEF_H___
 
+#pragma once
+
 #include "../../KeePassLibCpp/SysDefEx.h"
+#include <string>
 
 // Interface names
 #define KP_I_INIT "KeePluginInit"
@@ -53,6 +56,8 @@ typedef DWORD(KP_API *LPKP_QUERY)(DWORD dwCode, LPARAM lParam);
 /////////////////////////////////////////////////////////////////////////////
 // KeePass plugin structures
 
+#pragma pack(1)
+
 typedef struct
 {
 	DWORD dwAppVersion; // 0.98b would be 0x00090802, 1.04 is 0x01000401
@@ -84,6 +89,8 @@ typedef struct
 	KP_MENU_ITEM *pMenuItems;
 } KP_PLUGIN_INFO, *LPKP_PLUGIN_INFO;
 
+#pragma pack()
+
 /*
 Note 1:  If the plugin does not define command line options, set cmdLineArgPrefix to null.
          If the plugin defines command line options, cmdLineArgPrefix should point to
@@ -106,6 +113,8 @@ typedef BOOL(KP_API *LPKEEPLUGINEXIT)(LPARAM lParamW, LPARAM lParamL);
 /////////////////////////////////////////////////////////////////////////////
 // The structure that holds all information about one single plugin
 
+#pragma pack(1)
+
 typedef struct
 {
 	DWORD dwPluginID; // Assigned by KeePass, used internally
@@ -119,6 +128,8 @@ typedef struct
 	LPKEEPLUGINCALL lpCall;
 	LPKEEPLUGINEXIT lpExit;
 } KP_PLUGIN_INSTANCE, *LPKP_PLUGIN_INSTANCE;
+
+#pragma pack()
 
 /////////////////////////////////////////////////////////////////////////////
 // KeePass plugin message codes
@@ -214,14 +225,21 @@ typedef struct
 #define KPM_GROUP_SORT_PRE 47
 #define KPM_GROUP_PRINT_PRE 41
 
+// Key provider messages
+
+#define KPM_KEYPROV_QUERY_INFO_FIRST 59
+#define KPM_KEYPROV_QUERY_INFO_NEXT  60
+#define KPM_KEYPROV_QUERY_KEY        61
+#define KPM_KEYPROV_FINALIZE         62
+
 // The following is unused. It's always the last command ID + 1
-#define KPM_NEXT 59
+#define KPM_NEXT 63
 
 /////////////////////////////////////////////////////////////////////////////
 // KeePass query IDs (used in function KP_Query)
 
-#define KPQUERY_NULL    0 // Deprecated, use KPQ_NULL
-#define KPQUERY_VERSION 1 // Deprecated, use KPQ_VERSION
+#define KPQUERY_NULL    0 /* Deprecated, use KPQ_NULL */
+#define KPQUERY_VERSION 1 /* Deprecated, use KPQ_VERSION */
 
 #define KPQ_NULL              0
 #define KPQ_VERSION           1
@@ -254,5 +272,27 @@ typedef struct
 #define KPC_UPDATE_UI              9
 #define KPC_OPENFILE_DIALOG       10
 #define KPC_ADD_ENTRY             11
+
+/////////////////////////////////////////////////////////////////////////////
+// Key provider structures
+
+#pragma pack(1)
+
+typedef struct _KP_KEYPROV_INFO
+{
+	DWORD dwFlags; // Reserved for future use -- must be 0
+	LPCTSTR lpName; // Unique display name of the key provider
+	DWORD dwImageIndex; // Index of the icon shown in the combo box
+} KP_KEYPROV_INFO;
+
+typedef struct _KP_KEYPROV_KEY
+{
+	DWORD dwType; // Reserved for future use -- must be 0
+	DWORD dwFormat; // Reserved for future use -- must be 0
+	LPVOID lpData; // Key data pointer
+	DWORD dwDataSize; // Size of the key (lpData) in bytes
+} KP_KEYPROV_KEY;
+
+#pragma pack()
 
 #endif

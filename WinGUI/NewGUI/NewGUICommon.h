@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,11 +21,18 @@
 #define ___NEW_GUI_COMMON___
 
 #include "../../KeePassLibCpp/SysDefEx.h"
+#include "BCMenu.h"
+#include "XPStyleButtonST.h"
+#include <string>
+#include <vector>
+
+#define HCMBX_SEPARATOR _T("----------------")
+#define HCMBX_CLEARLIST TRL("Clear Search History")
 
 // #define CR_BACK RGB(216,216,235) /* Blue */
 // #define CR_BACK RGB(240,236,224) /* WinXP */
-#define CR_BACK RGB(208,208,208) /* Win2k */
-#define CR_FRONT RGB(0,0,0)
+#define CR_BACK (RGB(208,208,208)) /* Win2k */
+#define CR_FRONT (RGB(0,0,0))
 
 #ifndef LVS_EX_GRIDLINES
 	#define LVS_EX_GRIDLINES        0x00000001
@@ -163,13 +170,15 @@ typedef struct _MY_GRADIENT_RECT
 #define TTS_BALLOON 0
 #endif
 
+void NewGUI_CleanUp();
+
 COLORREF NewGUI_GetBgColor();
 COLORREF NewGUI_GetBtnColor();
-/* COLORREF NewGUI_LightenColor(COLORREF crColor, double dblFactor); */
+// COLORREF NewGUI_LightenColor(COLORREF crColor, double dblFactor);
 
 void NewGUI_SetImgButtons(BOOL bImageButtons);
-void NewGUI_Button(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1, BOOL bForceImage = FALSE);
-void NewGUI_XPButton(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage = FALSE);
+// void NewGUI_Button(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1, BOOL bForceImage = FALSE);
+void NewGUI_XPButton(CXPStyleButtonST& rButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage = FALSE);
 void NewGUI_ToolBarButton(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1);
 
 void NewGUI_SetThemeHelper(void *pThemeHelper);
@@ -179,7 +188,7 @@ void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR 
 
 void NewGUI_TranslateCWnd(CWnd *pWnd);
 
-C_FN_SHARE BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam);
+BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam);
 
 void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd);
 
@@ -187,5 +196,31 @@ BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount);
 BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount);
 
 void NewGUI_MakeHyperLink(void *pXHyperLink);
+
+void NewGUI_DisableHideWnd(CWnd *pWnd);
+void NewGUI_MoveWnd(CWnd *pWnd, long lMoveRightPixels, long lMoveDownPixels,
+	CWnd *pParent);
+void NewGUI_Resize(CWnd *pWnd, long lAddX, long lAddY, CWnd *pParent);
+
+void NewGUI_SetBannerColors(COLORREF crStart, COLORREF crEnd);
+
+BOOL NewGUI_RemoveMenuCommand(BCMenu *pMenu, UINT uCommandID);
+void NewGUI_RemoveInvalidSeparators(BCMenu *pMenu, BOOL bIsTopLevel);
+
+BCMenu *NewGUI_GetBCMenu(CMenu *pMenu);
+
+CSize NewGUI_GetWndBasePosDiff(CWnd *pWnd1, CWnd *pWnd2);
+
+void NewGUI_SetCueBanner_TB(HWND hTextBox, LPCTSTR lpText);
+void NewGUI_SetCueBanner_CB(HWND hComboBox, LPCTSTR lpText);
+
+void NewGUI_ComboBox_GetInfo(HWND hComboBox, HWND* phComboBox,
+	HWND* phEditBox, HWND* phListBox);
+bool NewGUI_ComboBox_HasFocus(HWND hComboBox, HWND hCurrentFocus);
+
+void NewGUI_ComboBox_UpdateHistory(CComboBox& comboBox,
+	const std::basic_string<TCHAR>& strNew,
+	std::vector<std::basic_string<TCHAR> >* pvHistoryItems,
+	size_t dwMaxHistoryItems);
 
 #endif // ___NEW_GUI_COMMON___

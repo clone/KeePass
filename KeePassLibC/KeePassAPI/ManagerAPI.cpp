@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "StdAfx.h"
 #include "ManagerAPI.h"
 #include "../../KeePassLibCpp/Util/MemUtil.h"
+#include "../../KeePassLibCpp/Util/PwUtil.h"
 
 static BOOL g_bRandomGenInit = FALSE; // Random generator initialized?
 
@@ -273,13 +274,6 @@ KP_SHARE int SaveDatabase(void *pMgr, const TCHAR *pszFile)
 	return p->SaveDatabase(pszFile);
 }
 
-// Move entries and groups
-KP_SHARE void MoveInternal(void *pMgr, DWORD dwFrom, DWORD dwTo)
-{
-	DECL_MGR_V(pMgr);
-	p->MoveInternal(dwFrom, dwTo);
-}
-
 KP_SHARE void MoveInGroup(void *pMgr, DWORD idGroup, DWORD dwFrom, DWORD dwTo)
 {
 	DECL_MGR_V(pMgr);
@@ -307,12 +301,12 @@ KP_SHARE void SortGroupList(void *pMgr)
 
 KP_SHARE BOOL MemAllocCopyEntry(const PW_ENTRY *pExisting, PW_ENTRY *pDestination)
 {
-	return CPwManager::MemAllocCopyEntry(pExisting, pDestination);
+	return CPwUtil::MemAllocCopyEntry(pExisting, pDestination);
 }
 
 KP_SHARE void MemFreeEntry(PW_ENTRY *pEntry)
 {
-	CPwManager::MemFreeEntry(pEntry);
+	CPwUtil::MemFreeEntry(pEntry);
 }
 
 KP_SHARE void MergeIn(void *pMgr, VPA_MODIFY CPwManager *pDataSource, BOOL bCreateNewUUIDs, BOOL bCompareTimes)
@@ -322,7 +316,8 @@ KP_SHARE void MergeIn(void *pMgr, VPA_MODIFY CPwManager *pDataSource, BOOL bCrea
 }
 
 // Find an item
-KP_SHARE DWORD Find(void *pMgr, const TCHAR *pszFindString, BOOL bCaseSensitive, DWORD fieldFlags, DWORD nStart)
+KP_SHARE DWORD Find(void *pMgr, const TCHAR *pszFindString,
+	BOOL bCaseSensitive, DWORD fieldFlags, DWORD nStart)
 {
 	DECL_MGR_N(pMgr);
 	return p->Find(pszFindString, bCaseSensitive, fieldFlags, nStart);
@@ -356,12 +351,12 @@ KP_SHARE void SetKeyEncRounds(void *pMgr, DWORD dwRounds)
 // Convert PW_TIME to 5-byte compressed structure and the other way round
 KP_SHARE void TimeToPwTime(const BYTE *pCompressedTime, PW_TIME *pPwTime)
 {
-	CPwManager::TimeToPwTime(pCompressedTime, pPwTime);
+	CPwUtil::TimeToPwTime(pCompressedTime, pPwTime);
 }
 
 KP_SHARE void PwTimeToTime(const PW_TIME *pPwTime, BYTE *pCompressedTime)
 {
-	CPwManager::PwTimeToTime(pPwTime, pCompressedTime);
+	CPwUtil::PwTimeToTime(pPwTime, pCompressedTime);
 }
 
 // Get the never-expire time
@@ -377,12 +372,6 @@ KP_SHARE void FixGroupTree(void *pMgr)
 	p->FixGroupTree();
 }
 
-KP_SHARE int DeleteLostEntries(void *pMgr)
-{
-	DECL_MGR_N(pMgr);
-	return p->DeleteLostEntries();
-}
-
 KP_SHARE void SubstEntryGroupIds(void *pMgr, DWORD dwExistingId, DWORD dwNewId)
 {
 	DECL_MGR_V(pMgr);
@@ -391,23 +380,24 @@ KP_SHARE void SubstEntryGroupIds(void *pMgr, DWORD dwExistingId, DWORD dwNewId)
 
 KP_SHARE BOOL AttachFileAsBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile)
 {
-	return CPwManager::AttachFileAsBinaryData(pEntry, lpFile);
+	return CPwUtil::AttachFileAsBinaryData(pEntry, lpFile);
 }
 
 KP_SHARE BOOL SaveBinaryData(const PW_ENTRY *pEntry, const TCHAR *lpFile)
 {
-	return CPwManager::SaveBinaryData(pEntry, lpFile);
+	return CPwUtil::SaveBinaryData(pEntry, lpFile);
 }
 
 KP_SHARE BOOL RemoveBinaryData(PW_ENTRY *pEntry)
 {
-	return CPwManager::RemoveBinaryData(pEntry);
+	return CPwUtil::RemoveBinaryData(pEntry);
 }
 
 KP_SHARE BOOL IsAllowedStoreGroup(void *pMgr, LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName)
 {
-	DECL_MGR_B(pMgr);
-	return p->IsAllowedStoreGroup(lpGroupName, lpSearchGroupName);
+	// DECL_MGR_B(pMgr);
+	UNREFERENCED_PARAMETER(pMgr);
+	return CPwUtil::IsAllowedStoreGroup(lpGroupName, lpSearchGroupName);
 }
 
 KP_SHARE void GetRawMasterKey(void *pMgr, BYTE *pStorage)
@@ -424,7 +414,7 @@ KP_SHARE void SetRawMasterKey(void *pMgr, const BYTE *pNewKey)
 
 KP_SHARE BOOL IsZeroUUID(const BYTE *pUUID)
 {
-	return CPwManager::IsZeroUUID(pUUID);
+	return CPwUtil::IsZeroUUID(pUUID);
 }
 
 KP_SHARE PW_GROUP *CreateGroup(void *pMgr, LPCTSTR lpName, DWORD dwImageID)

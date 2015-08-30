@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -36,11 +36,10 @@ CWindowGroups::~CWindowGroups()
 
 BOOL CWindowGroups::AddWindow(CObject *pWindow, DWORD dwGroupID, BOOL bReposition)
 {
-	BYTE bt = 0;
-
 	m_aWindows.Add(pWindow);
 	m_aGroupIDs.Add(dwGroupID);
 
+	BYTE bt = 0;
 	if(bReposition == TRUE) bt |= WGF_REPOSITION;
 	m_aFlags.Add(bt);
 
@@ -49,15 +48,11 @@ BOOL CWindowGroups::AddWindow(CObject *pWindow, DWORD dwGroupID, BOOL bRepositio
 
 BOOL CWindowGroups::HideAllExcept(DWORD dwGroupID)
 {
-	int i;
-	CWnd *p;
-
 	ASSERT(m_aWindows.GetSize() == m_aGroupIDs.GetSize());
 
-	for(i = 0; i < m_aWindows.GetSize(); i++)
+	for(int i = 0; i < m_aWindows.GetSize(); i++)
 	{
-		p = (CWnd *)m_aWindows.GetAt(i);
-
+		CWnd *p = (CWnd *)m_aWindows.GetAt(i);
 		if(p == NULL) continue;
 
 		if(m_aGroupIDs.GetAt(i) != dwGroupID)
@@ -77,13 +72,12 @@ BOOL CWindowGroups::HideAllExcept(DWORD dwGroupID)
 
 BOOL CWindowGroups::ArrangeWindows(CWnd *pParentWindow)
 {
-	CWnd *p;
-	CDWordArray aPos;
 	int i;
 	RECT rect = { 0, 0, 0, 0 };
 
 	UNREFERENCED_PARAMETER(pParentWindow);
 
+	CDWordArray aPos;
 	aPos.RemoveAll();
 
 	for(i = 0; i < m_aWindows.GetSize(); i++) aPos.Add(WG_OFFSET_TOP);
@@ -92,7 +86,7 @@ BOOL CWindowGroups::ArrangeWindows(CWnd *pParentWindow)
 	{
 		if((m_aFlags.GetAt(i) & WGF_REPOSITION) == 0) continue;
 
-		p = (CWnd *)m_aWindows.GetAt(i);
+		CWnd *p = (CWnd *)m_aWindows.GetAt(i);
 
 		if(p != NULL)
 		{

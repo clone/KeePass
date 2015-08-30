@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,33 +26,37 @@
 void ARCFourCrypt(UINT8 *pBuf, UINT32 uBufLen, const UINT8 *pKey, UINT32 uKeyLen)
 {
 	UINT8 S[256];
-	UINT8 i, j, t;
-	UINT32 w, k;
+	UINT32 w;
 
 	ASSERT((pBuf != NULL) && (pKey != NULL) && (uKeyLen != 0));
 	if((pBuf == NULL) || (pKey == NULL) || (uKeyLen == 0)) return;
 
 #if (defined(_WIN32) || defined(_WIN64))
-	ASSERT((IsBadWritePtr(pBuf, uBufLen) == FALSE) && (IsBadReadPtr(pKey, uBufLen) == FALSE));
+	ASSERT((IsBadWritePtr(pBuf, uBufLen) == FALSE) &&
+		(IsBadReadPtr(pKey, uBufLen) == FALSE));
 #endif
 
-	for(w = 0; w < 256; w++) S[w] = (UINT8)w; // Fill linearly
+	for(w = 0; w < 256; ++w)
+		S[w] = static_cast<UINT8>(w); // Fill linearly
 
-	i = 0; j = 0; k = 0;
-	for(w = 0; w < 256; w++) // Key setup
+	const UINT8 btBufDep = static_cast<UINT8>((uBufLen & 0xFF) << 1);
+
+	UINT8 i = 0, j = 0, t;
+	UINT32 k = 0;
+	for(w = 0; w < 256; ++w) // Key setup
 	{
-		j += S[w] + pKey[k] + (UINT8)((uBufLen & 0xFF) << 2);
+		j += S[w] + pKey[k] + btBufDep;
 
 		t = S[i]; S[i] = S[j]; S[j] = t; // Swap entries
 
-		k++;
+		++k;
 		if(k == uKeyLen) k = 0;
 	}
 
 	i = 0; j = 0;
-	for(w = 0; w < uBufLen; w++) // Encrypt PT
+	for(w = 0; w < uBufLen; ++w) // Encrypt PT
 	{
-		i++;
+		++i;
 		j += S[i];
 
 		t = S[i]; S[i] = S[j]; S[j] = t; // Swap entries
