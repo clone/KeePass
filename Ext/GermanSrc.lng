@@ -178,6 +178,11 @@
 |Mo&ve Entry One Down|         |Eintrag eine Zeile nach unten|
 |Move Entry To &Bottom|        |Eintrag ans Ende|
 
+|Move Group To &Top|           |Gruppe an den &Anfang|
+|Move Group One &Up|           |Gruppe eine Zeile nach &oben|
+|Move Group &One Down|         |Gruppe eine Zeile nach &unten|
+|Move Group To &Bottom|        |Gruppe ans &Ende|
+
 |Change &Language...|          |&Sprache ändern...|
 |Show &Title Column|           |Spalte '&Titel' anzeigen|
 |Show User&Name Column|        |Spalte 'Benutzer&name' anzeigen|
@@ -275,8 +280,6 @@
     |Beim Start zuletzt benutzte Datenbank öffnen|
 |GUI: Display images on buttons|
     |GUI: Icons auf Buttons anzeigen|
-|You must save the database before you can lock the workspace!|
-    |Die Datenbank muss gespeichert werden bevor die Arbeitsfläche gesperrt werden kann!|
 |Workspace cannot be unlocked!|
     |Arbeitsfläche kann nicht entsperrt werden!|
 |Workspace locked|

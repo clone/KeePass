@@ -35,7 +35,7 @@
 
 // General product information
 #define PWM_PRODUCT_NAME "KeePass Password Safe"
-#define PWM_VERSION_STR  "0.82"
+#define PWM_VERSION_STR  "0.83"
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -45,7 +45,6 @@
 #define PWM_HOMEPAGE     "http://keepass.sourceforge.net"
 
 // The executable name must be lowercase!
-#define PWM_EXECUTABLE   "keepass.exe"
 #define PWM_README_FILE  "KeePass.html"
 #define PWM_LICENSE_FILE "License.html"
 
@@ -154,6 +153,7 @@ public:
 
 	void MoveInternal(int nFrom, int nTo);
 	void MoveInGroup(int nGroup, int nFrom, int nTo);
+	BOOL MoveGroup(int nFrom, int nTo);
 
 	int Find(const char *pszFindString, BOOL bCaseSensitive, int fieldFlags, int nStart);
 

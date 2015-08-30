@@ -134,13 +134,6 @@ SOURCE=.\PwSafe.cpp
 # Begin Source File
 
 SOURCE=.\PwSafe.rc
-
-!IF  "$(CFG)" == "PwSafe - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "PwSafe - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -455,9 +448,5 @@ SOURCE=.\NewGUI\WzComboBox.cpp
 SOURCE=.\NewGUI\WzComboBox.h
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=.\PwSafe.manifest
-# End Source File
 # End Target
 # End Project

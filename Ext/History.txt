@@ -1,3 +1,20 @@
+03/11/25 - 0.83
+- Groups are movable now (like the entries, see context menu)
+- GUI: Removed moving options from main menu (of course not
+  from the context menus) because of space issues
+- Removed the manifest file from the project because it somehow
+  lead to problems on some computers when compiling with VC.NET
+- Added check for open file before opening another one
+- Improved command-line parsing routine (independent from
+  executable file name)
+- Command-line file now overrides the auto-open feature
+- Fixed a small bug in the lock-workspace routine
+- Improved the internal memory encryption function (not the
+  database encryption algorithm) a bit (uses length as key now)
+- Made random data generation using mouse input a bit faster
+- Group view is restored after editing a group
+- Added some more icons to the user image list
+
 03/11/22 - 0.82
 - Usability fix: OK and Cancel buttons have been swapped
 - KeePass remembers the directory of the last saved or loaded
@@ -21,8 +38,8 @@
   string was invisible because it exceeded the window rectangle
   in the dialog)
 - Now not only passwords can be drag-n-dropped to other windows
-  but all fields (thanks to M. Widmann for this
-  suggestion). Just point on the field you want to drag-n-drop.
+  but all fields. Just point on the field you want to
+  drag-n-drop.
 
 03/11/17 - 0.8
 - First release to the public

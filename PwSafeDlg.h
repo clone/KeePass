@@ -69,7 +69,7 @@ public:
 	void ProcessResize();
 	void CleanUp();
 	void _DeleteTemporaryFiles();
-	void _ParseCommandLine();
+	BOOL _ParseCommandLine();
 
 	void UpdateGroupList();
 	void UpdatePasswordList();
@@ -271,6 +271,14 @@ protected:
 	afx_msg void OnViewNotes();
 	afx_msg void OnFileLock();
 	afx_msg void OnUpdateFileLock(CCmdUI* pCmdUI);
+	afx_msg void OnGroupMoveTop();
+	afx_msg void OnUpdateGroupMoveTop(CCmdUI* pCmdUI);
+	afx_msg void OnGroupMoveBottom();
+	afx_msg void OnUpdateGroupMoveBottom(CCmdUI* pCmdUI);
+	afx_msg void OnGroupMoveUp();
+	afx_msg void OnUpdateGroupMoveUp(CCmdUI* pCmdUI);
+	afx_msg void OnGroupMoveDown();
+	afx_msg void OnUpdateGroupMoveDown(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

@@ -225,6 +225,14 @@ BEGIN_MESSAGE_MAP(CPwSafeDlg, CDialog)
 	ON_COMMAND(ID_VIEW_NOTES, OnViewNotes)
 	ON_COMMAND(ID_FILE_LOCK, OnFileLock)
 	ON_UPDATE_COMMAND_UI(ID_FILE_LOCK, OnUpdateFileLock)
+	ON_COMMAND(ID_GROUP_MOVETOP, OnGroupMoveTop)
+	ON_UPDATE_COMMAND_UI(ID_GROUP_MOVETOP, OnUpdateGroupMoveTop)
+	ON_COMMAND(ID_GROUP_MOVEBOTTOM, OnGroupMoveBottom)
+	ON_UPDATE_COMMAND_UI(ID_GROUP_MOVEBOTTOM, OnUpdateGroupMoveBottom)
+	ON_COMMAND(ID_GROUP_MOVEUP, OnGroupMoveUp)
+	ON_UPDATE_COMMAND_UI(ID_GROUP_MOVEUP, OnUpdateGroupMoveUp)
+	ON_COMMAND(ID_GROUP_MOVEDOWN, OnGroupMoveDown)
+	ON_UPDATE_COMMAND_UI(ID_GROUP_MOVEDOWN, OnUpdateGroupMoveDown)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -315,7 +323,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	BCMenu *pDest;
 	BCMenu *pSrc;
 	UINT i;
-	UINT uState, uID;
+	UINT uState, uID, uLastID = (UINT)-1;
 	CString str;
 
 	m_popmenu.LoadMenu(IDR_GROUPLIST_MENU);
@@ -327,7 +335,11 @@ BOOL CPwSafeDlg::OnInitDialog()
 		uID = pSrc->GetMenuItemID(i);
 		uState = pSrc->GetMenuState(i, MF_BYPOSITION);
 		pSrc->GetMenuText(i, str, MF_BYPOSITION);
-		pDest->AppendMenu(uState, uID, (LPCTSTR)str);
+		if((uID == ID_GROUP_MOVETOP) || (uID == ID_GROUP_MOVEBOTTOM)) continue;
+		if((uID == ID_GROUP_MOVEUP) || (uID == ID_GROUP_MOVEDOWN)) continue;
+		if(uLastID != uID)
+			pDest->AppendMenu(uState, uID, (LPCTSTR)str);
+		uLastID = uID;
 	}
 	m_popmenu.DestroyMenu();
 
@@ -335,12 +347,18 @@ BOOL CPwSafeDlg::OnInitDialog()
 	pDest = (BCMenu *)m_menu.GetSubMenu(1);
 	pSrc = (BCMenu *)m_popmenu.GetSubMenu(0);
 	pDest->AppendMenu(MF_SEPARATOR);
-	for(i = 0; i < pSrc->GetMenuItemCount(); i++)
+	// The last 5 items are the moving commands, don't append them to the
+	// main menu.
+	for(i = 0; i < pSrc->GetMenuItemCount() - 5; i++)
 	{
 		uID = pSrc->GetMenuItemID(i);
 		uState = pSrc->GetMenuState(i, MF_BYPOSITION);
 		pSrc->GetMenuText(i, str, MF_BYPOSITION);
-		pDest->AppendMenu(uState, uID, (LPCTSTR)str);
+		if((uID == ID_PWLIST_MOVETOP) || (uID == ID_PWLIST_MOVEBOTTOM)) continue;
+		if((uID == ID_PWLIST_MOVEUP) || (uID == ID_PWLIST_MOVEDOWN)) continue;
+		if(uLastID != uID)
+			pDest->AppendMenu(uState, uID, (LPCTSTR)str);
+		uLastID = uID;
 	}
 	m_popmenu.DestroyMenu();
 
@@ -516,16 +534,17 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bOpenLastDb = FALSE;
 	if(stricmp(szTemp, "True") == 0) m_bOpenLastDb = TRUE;
 
-	if(m_bOpenLastDb == TRUE)
+	if(_ParseCommandLine() == FALSE)
 	{
-		cConfig.Get(PWMKEY_LASTDB, szTemp);
-		if(strlen(szTemp) != 0)
+		if(m_bOpenLastDb == TRUE)
 		{
-			_OpenDatabase(szTemp);
+			cConfig.Get(PWMKEY_LASTDB, szTemp);
+			if(strlen(szTemp) != 0)
+			{
+				_OpenDatabase(szTemp);
+			}
 		}
 	}
-
-	_ParseCommandLine();
 
 	return TRUE;
 }
@@ -544,36 +563,37 @@ void CPwSafeDlg::_TranslateMenu(BCMenu *pBCMenu)
 	}
 }
 
-void CPwSafeDlg::_ParseCommandLine()
+BOOL CPwSafeDlg::_ParseCommandLine()
 {
-	CString strOrg = GetCommandLine();
-	CString str = strOrg;
+	CString str;
 	long i;
-	long len = str.GetLength();
 
-	str.MakeLower();
+	str.Empty();
+	if(__argc <= 1) return FALSE;
 
-	if(len < 12) return;
+	str = __argv[1];
+	if(__argc != 2)
+	{
+		for(i = 2; i < __argc; i++)
+		{
+			str += " ";
+			str += __argv[i];
+		}
+	}
 
-	i = str.Find(PWM_EXECUTABLE);
-	if(i == -1) return;
-
-	str = strOrg.Right(len - i - strlen(PWM_EXECUTABLE));
-	if(str.Left(1) == "\"") str = str.Right(str.GetLength() - 1);
-	if(str.GetLength() == 0) return;
 	str.TrimLeft(); str.TrimRight();
-	if(str.GetLength() == 0) return;
+	if(str.GetLength() == 0) return FALSE;
 	if(str.Left(1) == "\"") str = str.Right(str.GetLength() - 1);
-	if(str.GetLength() == 0) return;
+	if(str.GetLength() == 0) return FALSE;
 	str.TrimLeft(); str.TrimRight();
-	if(str.GetLength() == 0) return;
+	if(str.GetLength() == 0) return FALSE;
 	if(str.Right(1) == "\"") str = str.Left(str.GetLength() - 1);
-	if(str.GetLength() == 0) return;
+	if(str.GetLength() == 0) return FALSE;
 	str.TrimLeft(); str.TrimRight();
-	if(str.GetLength() == 0) return;
+	if(str.GetLength() == 0) return FALSE;
 
-	if(m_bOpenLastDb == FALSE)
-		_OpenDatabase((LPCTSTR)str);
+	_OpenDatabase((LPCTSTR)str);
+	return TRUE;
 }
 
 void CPwSafeDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -1509,6 +1529,11 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 
 void CPwSafeDlg::OnFileOpen() 
 {
+	if(m_bFileOpen == TRUE)
+	{
+		OnFileClose();
+	}
+
 	_OpenDatabase(NULL);
 }
 
@@ -1864,6 +1889,7 @@ void CPwSafeDlg::OnSafeModifyGroup()
 	CAddGroupDlg dlg;
 	int nGroup = GetSelectedGroup();
 	PW_GROUP *p;
+	long nTopIndex;
 
 	if(nGroup == -1) return;
 	p = m_mgr.GetGroup(nGroup);
@@ -1877,6 +1903,8 @@ void CPwSafeDlg::OnSafeModifyGroup()
 
 	if(dlg.DoModal() == IDOK)
 	{
+		nTopIndex = m_cGroups.GetTopIndex();
+		ASSERT(nTopIndex >= 0);
 		m_mgr.SetGroup(nGroup, dlg.m_nIconId, (LPCTSTR)dlg.m_strGroupName);
 		UpdateGroupList();
 
@@ -1886,6 +1914,8 @@ void CPwSafeDlg::OnSafeModifyGroup()
 
 		UpdatePasswordList();
 		m_cList.SetFocus();
+		m_cGroups.EnsureVisible(m_cGroups.GetItemCount() - 1, FALSE);
+		m_cGroups.EnsureVisible(nTopIndex, FALSE);
 
 		dlg.m_strGroupName.Empty();
 
@@ -2427,12 +2457,7 @@ void CPwSafeDlg::OnFileLock()
 
 		OnFileClose();
 
-		if(m_bFileOpen == TRUE)
-		{
-			MessageBox(TRL("You must save the database before you can lock the workspace!"), TRL("Password Safe"),
-				MB_ICONINFORMATION | MB_OK);
-			return;
-		}
+		if(m_strLastDb.IsEmpty() == TRUE) return;
 
 		m_bLocked = TRUE;
 		m_menu.SetMenuText(ID_FILE_LOCK, TRL("&Unlock Workspace"), MF_BYCOMMAND);
@@ -2468,4 +2493,83 @@ void CPwSafeDlg::OnFileLock()
 void CPwSafeDlg::OnUpdateFileLock(CCmdUI* pCmdUI) 
 {
 	pCmdUI->Enable(m_bFileOpen || m_bLocked);
+}
+
+void CPwSafeDlg::OnGroupMoveTop() 
+{
+	int nGroup = GetSelectedGroup();
+	if(nGroup == -1) return;
+	m_mgr.MoveGroup(nGroup, 0);
+	_List_SaveView();
+	UpdateGroupList();
+	m_cGroups.SetItemState(0, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
+	UpdatePasswordList();
+	_List_RestoreView();
+	m_cGroups.EnsureVisible(0, FALSE);
+	m_bModified = TRUE;
+}
+
+void CPwSafeDlg::OnUpdateGroupMoveTop(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable((GetSafeSelectedGroup() != -1) ? TRUE : FALSE);
+}
+
+void CPwSafeDlg::OnGroupMoveBottom() 
+{
+	int nGroup = GetSelectedGroup();
+	if(nGroup == -1) return;
+	m_mgr.MoveGroup(nGroup, m_cGroups.GetItemCount() - 1);
+	_List_SaveView();
+	UpdateGroupList();
+	m_cGroups.SetItemState(m_cGroups.GetItemCount() - 1,
+		LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
+	UpdatePasswordList();
+	_List_RestoreView();
+	m_cGroups.EnsureVisible(m_cGroups.GetItemCount() - 1, FALSE);
+	m_bModified = TRUE;
+}
+
+void CPwSafeDlg::OnUpdateGroupMoveBottom(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable((GetSafeSelectedGroup() != -1) ? TRUE : FALSE);
+}
+
+void CPwSafeDlg::OnGroupMoveUp() 
+{
+	int nGroup = GetSelectedGroup();
+	if(nGroup == -1) return;
+	BOOL b = m_mgr.MoveGroup(nGroup, nGroup - 1);
+	_List_SaveView();
+	UpdateGroupList();
+	m_cGroups.SetItemState((b == TRUE) ? (nGroup - 1) : nGroup,
+		LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
+	UpdatePasswordList();
+	_List_RestoreView();
+	m_cGroups.EnsureVisible((b == TRUE) ? (nGroup - 1) : nGroup, FALSE);
+	m_bModified = TRUE;
+}
+
+void CPwSafeDlg::OnUpdateGroupMoveUp(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable((GetSafeSelectedGroup() != -1) ? TRUE : FALSE);
+}
+
+void CPwSafeDlg::OnGroupMoveDown() 
+{
+	int nGroup = GetSelectedGroup();
+	if(nGroup == -1) return;
+	BOOL b = m_mgr.MoveGroup(nGroup, nGroup + 1);
+	_List_SaveView();
+	UpdateGroupList();
+	m_cGroups.SetItemState((b == TRUE) ? (nGroup + 1) : nGroup,
+		LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
+	UpdatePasswordList();
+	_List_RestoreView();
+	m_cGroups.EnsureVisible((b == TRUE) ? (nGroup + 1) : nGroup, FALSE);
+	m_bModified = TRUE;
+}
+
+void CPwSafeDlg::OnUpdateGroupMoveDown(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable((GetSafeSelectedGroup() != -1) ? TRUE : FALSE);
 }

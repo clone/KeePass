@@ -174,13 +174,21 @@
 #define ID_VIEW_PASSWORD                32865
 #define ID_VIEW_NOTES                   32866
 #define ID_FILE_LOCK                    32867
+#define ID_GROUP_MOVETOP                32868
+#define ID_GROUP_MOVEBOTTOM             32869
+#define ID_GROUP_MOVEUP                 32870
+#define ID_GROUP_MOVEDOWN               32871
+#define ID_BUTTON32872                  32872
+#define ID_BUTTON32873                  32873
+#define ID_BUTTON32874                  32874
+#define ID_BUTTON32875                  32875
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        157
-#define _APS_NEXT_COMMAND_VALUE         32868
+#define _APS_NEXT_COMMAND_VALUE         32876
 #define _APS_NEXT_CONTROL_VALUE         1063
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

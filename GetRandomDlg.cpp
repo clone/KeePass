@@ -140,7 +140,7 @@ void CGetRandomDlg::OnMouseMove(UINT nFlags, CPoint point)
 		{
 			if(m_dwCurPoint < 100)
 			{
-				if((rand() % 10) == 0)
+				if((rand() % 5) == 0)
 				{
 					m_points[m_dwCurPoint] = (POINT)point;
 					m_dwCurPoint++;

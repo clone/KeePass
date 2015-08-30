@@ -546,13 +546,13 @@ BEGIN
         MENUITEM "Copy User&Name To Clipboard", ID_PWLIST_COPYUSER
         MENUITEM "Open &URL",                   ID_PWLIST_VISITURL
         MENUITEM SEPARATOR
-        MENUITEM "&Find In Database...",        ID_PWLIST_FIND
-        MENUITEM "Find In This &Group...",      ID_PWLIST_FINDINGROUP
-        MENUITEM SEPARATOR
         MENUITEM "&Add Entry...",               ID_PWLIST_ADD
         MENUITEM "&Edit/View Entry...",         ID_PWLIST_EDIT
         MENUITEM "&Delete Entry",               ID_PWLIST_DELETE
         MENUITEM "Dupli&cate Entry",            ID_PWLIST_DUPLICATE
+        MENUITEM SEPARATOR
+        MENUITEM "&Find In Database...",        ID_PWLIST_FIND
+        MENUITEM "Find In This &Group...",      ID_PWLIST_FINDINGROUP
         MENUITEM SEPARATOR
         MENUITEM "Move Entry To &Top",          ID_PWLIST_MOVETOP
         MENUITEM "Move Entry &One Up",          ID_PWLIST_MOVEUP
@@ -568,6 +568,11 @@ BEGIN
         MENUITEM "&Add Password Group...",      ID_SAFE_ADDGROUP
         MENUITEM "&Modify Password Group...",   ID_SAFE_MODIFYGROUP
         MENUITEM "&Delete Password Group...",   ID_SAFE_REMOVEGROUP
+        MENUITEM SEPARATOR
+        MENUITEM "Move Group To &Top",          ID_GROUP_MOVETOP
+        MENUITEM "Move Group One &Up",          ID_GROUP_MOVEUP
+        MENUITEM "Move Group &One Down",        ID_GROUP_MOVEDOWN
+        MENUITEM "Move Group To &Bottom",       ID_GROUP_MOVEBOTTOM
         MENUITEM SEPARATOR
         MENUITEM "&Print Group",                ID_SAFE_PRINTGROUP
         MENUITEM SEPARATOR
@@ -633,6 +638,10 @@ BEGIN
     BUTTON      ID_INFO_README
     BUTTON      ID_SAFE_OPTIONS
     BUTTON      ID_FILE_LOCK
+    BUTTON      ID_GROUP_MOVETOP
+    BUTTON      ID_GROUP_MOVEBOTTOM
+    BUTTON      ID_GROUP_MOVEUP
+    BUTTON      ID_GROUP_MOVEDOWN
 END
 
 IDR_CLIENTICONS TOOLBAR DISCARDABLE  16, 16
@@ -678,6 +687,10 @@ BEGIN
     BUTTON      ID_BUTTON32839
     BUTTON      ID_BUTTON32840
     BUTTON      ID_BUTTON32845
+    BUTTON      ID_BUTTON32872
+    BUTTON      ID_BUTTON32873
+    BUTTON      ID_BUTTON32874
+    BUTTON      ID_BUTTON32875
 END
 
 
@@ -694,13 +707,6 @@ IDB_CANCEL              BITMAP  DISCARDABLE     "res\\cancel.bmp"
 IDB_MOUSE_SMALL         BITMAP  DISCARDABLE     "res\\mouse_sm.bmp"
 IDB_KEY_SMALL           BITMAP  DISCARDABLE     "res\\key_smal.bmp"
 IDB_DOCUMENT_SMALL      BITMAP  DISCARDABLE     "res\\document.bmp"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// RT_MANIFEST
-//
-
-1                       RT_MANIFEST DISCARDABLE "PwSafe.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -921,6 +921,35 @@ void CPwManager::MoveInternal(int nFrom, int nTo)
 	}
 }
 
+BOOL CPwManager::MoveGroup(int nFrom, int nTo)
+{
+	int i;
+	int dir;
+	PW_GROUP pg;
+
+	if(nFrom == nTo) TRUE;
+	if((nFrom < 0) || (nFrom >= (int)m_dwNumGroups)) return FALSE;
+	if((nTo < 0) || (nTo >= (int)m_dwNumGroups)) return FALSE;
+
+	if(nFrom < nTo) dir = 1;
+	else dir = -1;
+
+	i = nFrom;
+
+	while(1)
+	{
+		if(i == nTo) break;
+
+		pg = m_pGroups[i];
+		m_pGroups[i] = m_pGroups[i+dir];
+		m_pGroups[i+dir] = pg;
+
+		i += dir;
+	}
+
+	return TRUE;
+}
+
 void CPwManager::MoveInGroup(int nGroup, int nFrom, int nTo)
 {
 	if((nFrom < 0) || (nFrom >= (int)m_dwNumEntries)) return;
