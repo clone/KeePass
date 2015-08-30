@@ -7,16 +7,22 @@ b2 --toolset=msvc --with-thread --build-type=complete stage
 
 With Boost >= 1.35.0 you also need:
 b2 --toolset=msvc --with-date_time --build-type=complete stage
+With Boost >= 1.52.0 you also need:
+b2 --toolset=msvc --with-chrono --build-type=complete stage
 
 In order to explicitly use Visual Studio 2008, use msvc-9.0 instead of msvc.
 64-bit libraries can be built using the address-model=64 option.
 
 
 
+Command lines for Visual Studio 2008:
+
+b2 --toolset=msvc-9.0 --with-chrono --build-type=complete stage
 b2 --toolset=msvc-9.0 --with-date_time --build-type=complete stage
 b2 --toolset=msvc-9.0 --with-thread --build-type=complete stage
 b2 --toolset=msvc-9.0 --with-regex --build-type=complete stage
 
+b2 --toolset=msvc-9.0 --with-chrono --build-type=complete address-model=64 stage
 b2 --toolset=msvc-9.0 --with-date_time --build-type=complete address-model=64 stage
 b2 --toolset=msvc-9.0 --with-thread --build-type=complete address-model=64 stage
 b2 --toolset=msvc-9.0 --with-regex --build-type=complete address-model=64 stage

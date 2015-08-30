@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include <tchar.h>
+#include "../NewGUI/StatusDialogEx.h"
 
 typedef std::basic_string<TCHAR> std_string;
 
@@ -46,10 +47,13 @@ class CUpdateCheckEx : boost::noncopyable
 {
 public:
 	CUpdateCheckEx(HWND hParent, CImageList* pImages, BOOL bUIOnlyOnUpdate);
-	void _RunCheck();
+	void _RunCheck(void* pDlg);
 
 	static HRESULT Check(BOOL bRunInThread, HWND hParent, CImageList* pImages,
 		BOOL bUIOnlyOnUpdate);
+
+	static void EnsureConfigured(BOOL* pCheck, BOOL* pConfig, HWND hParent,
+		HINSTANCE hInstance);
 
 private:
 	static HRESULT DownloadInfoFile(BYTE** ppbData, std_string& strError);
@@ -64,7 +68,7 @@ private:
 		std_string& strReport, DWORD& dwUpdates);
 
 	void _FinalReport(const UC_COMPONENTS_LIST& vInstalled, LPCTSTR lpResult,
-		bool bError, DWORD dwUpdates);
+		bool bError, DWORD dwUpdates, void* pDlg);
 
 	HWND m_hParent;
 	CImageList* m_pImages;

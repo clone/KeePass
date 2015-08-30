@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -257,6 +257,7 @@ CPwSafeDlg::CPwSafeDlg(CWnd* pParent /*=NULL*/)
 	m_hIcoStoreTrayNormal = NULL;
 	// m_clrIcoStoreTrayLocked = DWORD_MAX;
 	// m_hIcoStoreTrayLocked = NULL;
+	m_bShowTrayOnlyIfTrayed = FALSE;
 
 	m_mgr.InitPrimaryInstance();
 }
@@ -796,9 +797,10 @@ BOOL CPwSafeDlg::OnInitDialog()
 	CKeySourcesPool::SetEnabled(cConfig.GetBool(PWMKEY_REMEMBERKEYSOURCES, TRUE));
 	CKeySourcesPool::Load(&cConfig);
 
-	cConfig.Get(PWMKEY_CLIPBOARDMETHOD, szTemp);
-	if(szTemp[0] != 0) m_nClipboardMethod = _ttoi(szTemp);
-	else m_nClipboardMethod = 0;
+	// cConfig.Get(PWMKEY_CLIPBOARDMETHOD, szTemp);
+	// if(szTemp[0] != 0) m_nClipboardMethod = _ttoi(szTemp);
+	// else m_nClipboardMethod = CM_TIMED;
+	m_nClipboardMethod = CM_TIMED;
 
 	cConfig.Get(PWMKEY_CLIPSECS, szTemp);
 	if(szTemp[0] != 0)
@@ -867,6 +869,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bBackupEntries = cConfig.GetBool(PWMKEY_BACKUPENTRIES, TRUE);
 	m_bSecureEdits = cConfig.GetBool(PWMKEY_SECUREEDITS, TRUE);
 	m_bSingleClickTrayIcon = cConfig.GetBool(PWMKEY_SINGLECLICKTRAY, FALSE);
+	m_bShowTrayOnlyIfTrayed = cConfig.GetBool(PWMKEY_SHOWTRAYONLYIFTRAYED, FALSE);
 	m_bQuickFindIncBackup = cConfig.GetBool(PWMKEY_QUICKFINDINCBK, TRUE);
 	m_bQuickFindIncExpired = cConfig.GetBool(PWMKEY_QUICKFINDINCEXP, TRUE);
 	m_bDeleteBackupsOnSave = cConfig.GetBool(PWMKEY_DELETEBKONSAVE, FALSE);
@@ -889,6 +892,8 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bDeleteTANsAfterUse = cConfig.GetBool(PWMKEY_DELETETANSAFTERUSE, FALSE);
 
 	m_bCheckForUpdate = cConfig.GetBool(PWMKEY_CHECKFORUPDATE, FALSE);
+	m_bCheckForUpdateCfg = cConfig.GetBool(PWMKEY_CHECKFORUPDATECFG, FALSE);
+
 	m_bLockOnWinLock = cConfig.GetBool(PWMKEY_LOCKONWINLOCK, FALSE);
 	m_bClearClipOnDbClose = cConfig.GetBool(PWMKEY_CLEARCLIPONDBCLOSE, TRUE);
 
@@ -1196,10 +1201,11 @@ BOOL CPwSafeDlg::OnInitDialog()
 	CMsgRelayWnd::AddRelayedMessage(WM_REG_KEEPASSCONTROL);
 
 	VERIFY(m_systray.Create(this, WM_MY_SYSTRAY_NOTIFY, PWM_PRODUCT_NAME_SHORT,
-		m_hTrayIconNormal, IDR_SYSTRAY_MENU, FALSE,
+		m_hTrayIconNormal, IDR_SYSTRAY_MENU, m_bShowTrayOnlyIfTrayed,
 		NULL, NULL, NIIF_NONE, 0));
 	m_systray.SetMenuDefaultItem(0, TRUE);
-	m_systray.MoveToRight();
+	// m_systray.MoveToRight();
+	_UpdateTrayIcon(true); // ShowIcon or HideIcon
 
 	for(DWORD ttc = 0; ttc < 11; ++ttc) m_aHeaderOrder[ttc] = ttc;
 	m_aHeaderOrder[2] = 3; m_aHeaderOrder[3] = 2;
@@ -1430,7 +1436,11 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_uACP = GetACP();
 
 	m_sessionNotify.Register(this->m_hWnd);
-	if(m_bCheckForUpdate == TRUE) CUpdateCheckEx::Check(TRUE, this->m_hWnd, &m_ilIcons, TRUE);
+
+	CUpdateCheckEx::EnsureConfigured(&m_bCheckForUpdate, &m_bCheckForUpdateCfg,
+		this->m_hWnd, AfxGetInstanceHandle());
+	if(m_bCheckForUpdate != FALSE)
+		CUpdateCheckEx::Check(TRUE, this->m_hWnd, &m_ilIcons, TRUE);
 
 	UpdateWindow();
 	RedrawWindow();
@@ -2215,8 +2225,8 @@ void CPwSafeDlg::SaveOptions()
 	_ultot_s(m_dwClipboardSecs, szTemp, _countof(szTemp), 10);
 	pcfg.Set(PWMKEY_CLIPSECS, szTemp);
 
-	_itot_s(m_nClipboardMethod, szTemp, _countof(szTemp), 10);
-	pcfg.Set(PWMKEY_CLIPBOARDMETHOD, szTemp);
+	// _itot_s(m_nClipboardMethod, szTemp, _countof(szTemp), 10);
+	// pcfg.Set(PWMKEY_CLIPBOARDMETHOD, szTemp);
 
 	_ultot_s(m_dwATHotKey, szTemp, _countof(szTemp), 10);
 	pcfg.Set(PWMKEY_AUTOTYPEHOTKEY, szTemp);
@@ -2269,6 +2279,7 @@ void CPwSafeDlg::SaveOptions()
 	pcfg.SetBool(PWMKEY_BACKUPENTRIES, m_bBackupEntries);
 	pcfg.SetBool(PWMKEY_SECUREEDITS, m_bSecureEdits);
 	pcfg.SetBool(PWMKEY_SINGLECLICKTRAY, m_bSingleClickTrayIcon);
+	pcfg.SetBool(PWMKEY_SHOWTRAYONLYIFTRAYED, m_bShowTrayOnlyIfTrayed);
 	pcfg.SetBool(PWMKEY_QUICKFINDINCBK, m_bQuickFindIncBackup);
 	pcfg.SetBool(PWMKEY_QUICKFINDINCEXP, m_bQuickFindIncExpired);
 	pcfg.SetBool(PWMKEY_DELETEBKONSAVE, m_bDeleteBackupsOnSave);
@@ -2314,6 +2325,7 @@ void CPwSafeDlg::SaveOptions()
 	pcfg.SetBool(PWMKEY_SHOWTANINDICES, m_bShowTANIndices);
 	pcfg.SetBool(PWMKEY_ALLOWSAVEIFMODIFIEDONLY, m_bAllowSaveIfModifiedOnly);
 	pcfg.SetBool(PWMKEY_CHECKFORUPDATE, m_bCheckForUpdate);
+	pcfg.SetBool(PWMKEY_CHECKFORUPDATECFG, m_bCheckForUpdateCfg);
 	pcfg.SetBool(PWMKEY_LOCKONWINLOCK, m_bLockOnWinLock);
 	pcfg.SetBool(PWMKEY_CLEARCLIPONDBCLOSE, m_bClearClipOnDbClose);
 	pcfg.SetBool(PWMKEY_ENABLEREMOTECTRL, m_remoteControl.IsEnabled());
@@ -3130,8 +3142,8 @@ void CPwSafeDlg::OnPwlistAdd()
 	{
 		if((pgContainer->uImageId != PWM_STD_ICON_GROUP) &&
 			(pgContainer->uImageId != PWM_STD_ICON_GROUP_OPEN) &&
-			(pgContainer->uImageId != PWM_STD_ICON_GROUP_EMAIL) &&
 			(pgContainer->uImageId != PWM_STD_ICON_GROUP_PKG) &&
+			(pgContainer->uImageId != PWM_STD_ICON_GROUP_EMAIL) &&
 			(pgContainer->uImageId != DWORD_MAX))
 		{
 			dlg.m_nIconId = (int)pgContainer->uImageId;
@@ -3821,20 +3833,20 @@ void CPwSafeDlg::OnDblclkPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NotifyUserActivity();
 
-	NM_LISTVIEW *pNMListView = (NM_LISTVIEW *)pNMHDR;
-	CString strData;
-	const DWORD dwEntryIndex = _ListSelToEntryIndex();
-
 	*pResult = 0;
 
-	if(dwEntryIndex == DWORD_MAX) return;
+	const DWORD dwSel = GetSelectedEntry();
+	const DWORD dwEntryIndex = _ListSelToEntryIndex(dwSel);
+	if((dwSel == DWORD_MAX) || (dwEntryIndex == DWORD_MAX)) return;
 
 	PW_ENTRY *p = m_mgr.GetEntry(dwEntryIndex);
 	ASSERT_ENTRY(p); if(p == NULL) return;
 
 	const BOOL bIsTAN = CPwUtil::IsTANEntry(p);
 
-	switch(pNMListView->iSubItem)
+	CString strData;
+	NMITEMACTIVATE* pnmItem = (NMITEMACTIVATE*)pNMHDR;
+	switch(pnmItem->iSubItem)
 	{
 	case 0:
 		if((bIsTAN == TRUE) && (m_dwPwListMode != LVS_REPORT)) OnPwlistCopyPw();
@@ -3853,7 +3865,9 @@ void CPwSafeDlg::OnDblclkPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 		p = NULL; // p may now be invalid!
 		break;
 	case 4:
-		strData = p->pszAdditional;
+		if((pnmItem->uKeyFlags & LVKF_ALT) != 0)
+			strData = m_cList.GetItemText(static_cast<int>(dwSel), 4);
+		else strData = p->pszAdditional;
 		strData = CsRemoveMeta(&strData);
 		CopyStringToClipboard(strData, p, &m_mgr);
 		EraseCString(&strData);
@@ -3907,7 +3921,7 @@ void CPwSafeDlg::OnDblclkPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	}
 
-	_TouchEntry(GetSelectedEntry(), FALSE);
+	_TouchEntry(dwSel, FALSE);
 	_UpdateToolBar();
 }
 
@@ -4381,6 +4395,17 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 	{
 		if(dlg.m_bKeyFile == TRUE)
 		{
+			if(CPwUtil::IsDatabaseFile(dlg.m_lpKey))
+			{
+				CString strDF = dlg.m_lpKey;
+				strDF += _T("\r\n\r\n");
+				strDF += TRL("Database files cannot be used as key files.");
+
+				dlg.FreePasswords();
+				MessageBox(strDF, PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
+				_SetDisplayDialog(false); return FALSE;
+			}
+
 			CVistaTaskDialog dlgTask(this->m_hWnd, AfxGetInstanceHandle(), true);
 			CString strTX = TRL("The selected key file already exists");
 			strTX += _T(":\r\n");
@@ -5267,6 +5292,7 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_bSingleInstance = m_bCheckForInstance;
 	dlg.m_bSecureEdits = m_bSecureEdits;
 	dlg.m_bSingleClickTrayIcon = m_bSingleClickTrayIcon;
+	dlg.m_bShowTrayOnlyIfTrayed = m_bShowTrayOnlyIfTrayed;
 	dlg.m_dwDefaultExpire = m_dwDefaultExpire;
 	dlg.m_bQuickFindIncBackup = m_bQuickFindIncBackup;
 	dlg.m_bQuickFindIncExpired = m_bQuickFindIncExpired;
@@ -5323,6 +5349,7 @@ void CPwSafeDlg::OnSafeOptions()
 		m_bCheckForInstance = dlg.m_bSingleInstance;
 		m_bSecureEdits = dlg.m_bSecureEdits;
 		m_bSingleClickTrayIcon = dlg.m_bSingleClickTrayIcon;
+		m_bShowTrayOnlyIfTrayed = dlg.m_bShowTrayOnlyIfTrayed;
 		m_bQuickFindIncBackup = dlg.m_bQuickFindIncBackup;
 		m_bQuickFindIncExpired = dlg.m_bQuickFindIncExpired;
 		m_bDeleteBackupsOnSave = dlg.m_bDeleteBackupsOnSave;
@@ -5429,6 +5456,7 @@ void CPwSafeDlg::OnSafeOptions()
 	NotifyUserActivity();
 	m_ullLastListParams = 0; // Invalidate
 	_UpdateToolBar(TRUE);
+	_UpdateTrayIcon(); // Update tray icon visibility
 
 	_SetDisplayDialog(false);
 }
@@ -9599,10 +9627,12 @@ void CPwSafeDlg::_HandleEntryDrop(DWORD dwDropType, HTREEITEM hTreeItem)
 
 void CPwSafeDlg::SetStatusTextEx(LPCTSTR lpStatusText, int nPane)
 {
+	if(lpStatusText == NULL) { ASSERT(FALSE); lpStatusText = _T(""); }
+
 	if(nPane == -1) nPane = 2;
 	ASSERT(nPane < 3); if(nPane >= 3) nPane = 2;
 
-	if(::IsWindow(m_sbStatus.m_hWnd) == TRUE)
+	if(::IsWindow(m_sbStatus.m_hWnd) != FALSE)
 		m_sbStatus.SetText(lpStatusText, nPane, 0);
 }
 
@@ -10029,12 +10059,7 @@ void CPwSafeDlg::_AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSe
 	if((GetKeyState(VK_CAPITAL) & 1) > 0)
 		{ bToggleCapsLock = TRUE; sk.SendKeys(_T("({CAPSLOCK})"), true); }
 
-	MSG msgClearWait;
-	while(::PeekMessage(&msgClearWait, 0, WM_KEYFIRST, WM_KEYLAST, PM_REMOVE))
-	{
-		::TranslateMessage(&msgClearWait);
-		::DispatchMessage(&msgClearWait);
-	}
+	NewGUI_PumpMessages(NULL, WM_KEYFIRST, WM_KEYLAST);
 
 	sk.SendKeys(str, true);
 
@@ -11105,17 +11130,12 @@ LRESULT CPwSafeDlg::OnWTSSessionChange(WPARAM wParam, LPARAM lParam)
 
 	if(m_bLockOnWinLock == FALSE)
 	{
-		if(wParam == WTS_SESSION_LOGOFF)
-		{
-			SaveOptions();
-
-			if((m_bFileOpen == TRUE) && (m_bLocked == FALSE) && (m_bModified == TRUE))
-				OnFileSave();
-		}
+		if(wParam == WTS_SESSION_LOGOFF) SaveOptions();
 	}
 	else // m_bLockOnWinLock == TRUE
 	{
-		if((wParam == WTS_SESSION_LOGOFF) || (wParam == WTS_SESSION_LOCK))
+		if((wParam == WTS_SESSION_LOGOFF) || (wParam == WTS_SESSION_LOCK) ||
+			(wParam == WTS_CONSOLE_DISCONNECT))
 		{
 			SaveOptions();
 
@@ -11156,9 +11176,17 @@ LRESULT CPwSafeDlg::OnProcessMailslot(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void CPwSafeDlg::_UpdateTrayIcon()
+void CPwSafeDlg::_UpdateTrayIcon(bool bUpdateOnlyVisibility)
 {
 	USES_CONVERSION;
+
+	if((m_bTrayed != FALSE) || (m_bShowTrayOnlyIfTrayed == FALSE))
+	{
+		VERIFY(m_systray.ShowIcon() != FALSE);
+	}
+	else { VERIFY(m_systray.HideIcon() != FALSE); }
+
+	if(bUpdateOnlyVisibility) return;
 
 	HICON hAssign = NULL, hDestroy = NULL;
 	NewGUI_UpdateColorizedIcon(AfxGetApp()->LoadIcon(IDR_MAINFRAME), NULL, m_mgr.GetColor(),
@@ -11365,6 +11393,7 @@ void CPwSafeDlg::SetTrayState(BOOL bMinimizeToTray)
 		_SaveWindowPositionAndSize(NULL);
 
 		m_bTrayed = TRUE;
+		_UpdateTrayIcon(); // Show icon
 
 		SetMenu(NULL);
 

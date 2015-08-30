@@ -17,36 +17,43 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___GRADIENT_UTIL_H___
-#define ___GRADIENT_UTIL_H___
+#ifndef ___STATUS_DIALOG_EX_H___
+#define ___STATUS_DIALOG_EX_H___
 
+#pragma once
+
+/*
+#include "../../KeePassLibCpp/SysDefEx.h"
+#include "NewGUICommon.h"
+#include <shlobj.h>
 #include <boost/utility.hpp>
-#include <windows.h>
 
-#define GU_GF_LIB_NAME _T("MsImg32.dll")
-#define GU_GF_FN_NAME "GradientFill"
-
-typedef BOOL(WINAPI* LPFNGRADIENTFILL)(HDC hdc, PTRIVERTEX pVertex, ULONG dwNumVertex,
-	PVOID pMesh, ULONG dwNumMesh, ULONG dwMode);
-
-class CGradientUtil : boost::noncopyable
+class CStatusDialogEx : boost::noncopyable
 {
 public:
-	static void Release();
+	CStatusDialogEx(HWND hParent, bool bCanCancel, bool bMarquee) :
+		m_pDlg(NULL), m_hParent(hParent), m_bCanCancel(bCanCancel),
+		m_bMarquee(bMarquee)
+	{
+	}
 
-	static bool IsSupported();
+	virtual ~CStatusDialogEx();
 
-	static bool DrawGradient(HDC hdc, LONG x1, LONG y1, LONG x2, LONG y2,
-		COLORREF clrBase, bool bVertical);
+	bool Show();
+	void Release();
+
+	void SetStatus(bool bPrimary, LPCTSTR lpText);
+
+	void SetProgress(ULONGLONG ullCompleted, ULONGLONG ullTotal);
+	bool HasCancelled();
 
 private:
-	CGradientUtil();
+	HWND m_hParent;
+	bool m_bCanCancel;
+	bool m_bMarquee;
 
-	static bool EnsureInitialized();
-
-	static bool m_bInitialized;
-	static HMODULE m_hImgLib;
-	static LPFNGRADIENTFILL m_lpGradientFill;
+	IProgressDialog* m_pDlg;
 };
+*/
 
-#endif // ___GRADIENT_UTIL_H___
+#endif // ___STATUS_DIALOG_EX_H___

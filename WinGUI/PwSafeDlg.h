@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -241,7 +241,7 @@ public:
 
 	void _UpdateToolBar(BOOL bForceUpdate = FALSE);
 	void _UpdateTitleBar();
-	void _UpdateTrayIcon();
+	void _UpdateTrayIcon(bool bUpdateOnlyVisibility = false);
 
 	void _UpdateGuiToManager();
 
@@ -340,6 +340,7 @@ private:
 	BOOL m_bAutoShowExpiredSoon;
 	BOOL m_bBackupEntries;
 	BOOL m_bSingleClickTrayIcon;
+	BOOL m_bShowTrayOnlyIfTrayed;
 	DWORD m_dwDefaultExpire;
 	BOOL m_bDeleteBackupsOnSave;
 	BOOL m_bDisableAutoType;
@@ -375,6 +376,7 @@ private:
 	BOOL m_bQuickFindIncBackup;
 	BOOL m_bQuickFindIncExpired;
 	BOOL m_bCheckForUpdate;
+	BOOL m_bCheckForUpdateCfg;
 	BOOL m_bFocusResAfterQuickFind;
 
 	CStatusBarCtrl m_sbStatus;

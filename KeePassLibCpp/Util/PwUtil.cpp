@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -950,5 +950,38 @@ bool CPwUtil::EfsEncryptFile(LPCTSTR lpFile)
 	else { ASSERT(FALSE); }
 
 	::FreeLibrary(hLib);
+	return bResult;
+}
+
+bool CPwUtil::IsDatabaseFile(LPCTSTR lpFile)
+{
+	if(lpFile == NULL) { ASSERT(FALSE); return false; }
+
+	FILE* fp = NULL;
+	_tfopen_s(&fp, lpFile, _T("rb"));
+	if(fp == NULL) return false;
+
+	fseek(fp, 0, SEEK_END);
+	const long lFileSize = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	bool bResult = false;
+	if(lFileSize >= 8)
+	{
+		BYTE vStart[8];
+		if(fread(vStart, 1, 8, fp) == 8)
+		{
+			const DWORD dwSig1 = *(DWORD*)&vStart[0];
+			const DWORD dwSig2 = *(DWORD*)&vStart[4];
+
+			if(((dwSig1 == PWM_DBSIG_1) && (dwSig2 == PWM_DBSIG_2)) ||
+				((dwSig1 == PWM_DBSIG_1_KDBX_P) && (dwSig2 == PWM_DBSIG_2_KDBX_P)) ||
+				((dwSig1 == PWM_DBSIG_1_KDBX_R) && (dwSig2 == PWM_DBSIG_2_KDBX_R)))
+				bResult = true;
+		}
+		else { ASSERT(FALSE); }
+	}
+
+	fclose(fp);
 	return bResult;
 }

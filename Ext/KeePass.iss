@@ -11,10 +11,10 @@
 #define MyAppUrlName "KeePass.url"
 #define MyAppHelpName "KeePass.chm"
 
-#define KeeVersionStr "1.24"
-#define KeeVersionWin "1.24.0.0"
+#define KeeVersionStr "1.25"
+#define KeeVersionWin "1.25.0.0"
 
-#define KeeDevPeriod "2003-2012"
+#define KeeDevPeriod "2003-2013"
 
 [Setup]
 AppName={#MyAppFullName}

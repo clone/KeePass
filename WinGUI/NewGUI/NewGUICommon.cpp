@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -773,5 +773,15 @@ void NewGUI_TerminateGDIPlus()
 	{
 		Gdiplus::GdiplusShutdown(g_gdiplusToken);
 		g_gdiplusInitialized = false;
+	}
+}
+
+void NewGUI_PumpMessages(HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax)
+{
+	MSG msg;
+	while(::PeekMessage(&msg, hWnd, wMsgFilterMin, wMsgFilterMax, PM_REMOVE))
+	{
+		::TranslateMessage(&msg);
+		::DispatchMessage(&msg);
 	}
 }

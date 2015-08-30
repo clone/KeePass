@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #include "AppLocator.h"
 #include "WinUtil.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
+
+bool AppLocator::m_bPathsQueried = false;
 
 std::basic_string<TCHAR> AppLocator::m_strIEPath;
 std::basic_string<TCHAR> AppLocator::m_strFirefoxPath;
@@ -77,11 +79,15 @@ void AppLocator::ReplacePath(CString* p, LPCTSTR lpPlaceholder,
 
 void AppLocator::GetPaths()
 {
+	if(m_bPathsQueried) return;
+
 	if(m_strIEPath.size() == 0) AppLocator::FindInternetExplorer();
 	if(m_strFirefoxPath.size() == 0) AppLocator::FindFirefox();
 	if(m_strOperaPath.size() == 0) AppLocator::FindOpera();
 	if(m_strChromePath.size() == 0) AppLocator::FindChrome();
 	if(m_strSafariPath.size() == 0) AppLocator::FindSafari();
+
+	m_bPathsQueried = true;
 }
 
 void AppLocator::FindInternetExplorer()
@@ -129,6 +135,32 @@ void AppLocator::FindChrome()
 	m_strChromePath = AppLocator::Fix(GetRegStrEx(HKEY_CLASSES_ROOT,
 		lpPath, _T(""), 0));
 	if(m_strChromePath.size() > 0) return;
+
+	const size_t ccNameBuf = MAX_PATH + 2;
+	TCHAR tszName[ccNameBuf];
+	ZeroMemory(&tszName[0], ccNameBuf * sizeof(TCHAR));
+	DWORD dwIndex = 0;
+	while(true)
+	{
+		DWORD dwNameLen = ccNameBuf - 1;
+		const LONG lRes = RegEnumKeyEx(HKEY_CLASSES_ROOT, dwIndex, &tszName[0],
+			&dwNameLen, NULL, NULL, NULL, NULL);
+		++dwIndex;
+
+		if(lRes == ERROR_NO_MORE_ITEMS) break;
+		if(lRes != ERROR_SUCCESS) continue;
+
+		if((_tcslen(&tszName[0]) >= 11) && (_tcsnicmp(&tszName[0],
+			_T("ChromeHTML."), 11) == 0))
+		{
+			std_string strKey = &tszName[0];
+			strKey += _T("\\shell\\open\\command");
+
+			m_strChromePath = AppLocator::Fix(GetRegStrEx(HKEY_CLASSES_ROOT,
+				strKey.c_str(), _T(""), 0));
+			if(m_strChromePath.size() > 0) return;
+		}
+	}
 
 	lpPath = _T("Applications\\chrome.exe\\shell\\open\\command");
 	m_strChromePath = AppLocator::Fix(GetRegStrEx(HKEY_CLASSES_ROOT,

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -49,6 +49,8 @@ private:
 
 	static void ReplacePath(CString* p, LPCTSTR lpPlaceholder,
 		const std::basic_string<TCHAR>& strFill, const SPR_CONTENT_FLAGS* pcf);
+
+	static bool m_bPathsQueried;
 
 	static std::basic_string<TCHAR> m_strIEPath;
 	static std::basic_string<TCHAR> m_strFirefoxPath;

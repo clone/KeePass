@@ -111,7 +111,7 @@ CAPTION "About KeePass..."
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,203,111,58,14,WS_GROUP
-    LTEXT           "Copyright © 2003-2012 Dominik Reichl.",IDC_STATIC,7,7,254,8
+    LTEXT           "Copyright © 2003-2013 Dominik Reichl.",IDC_STATIC,7,7,254,8
     LTEXT           "KeePass is OSI Certified Open Source Software.",IDC_STATIC,7,20,254,8
     LTEXT           "The program is distributed under the terms of the GNU General Public License v2 or later.",IDC_STATIC,7,33,254,17
     LTEXT           "<>",IDC_HLINK_HOMEPAGE,7,65,254,8
@@ -844,8 +844,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,24,0,0
- PRODUCTVERSION 1,24,0,0
+ FILEVERSION 1,25,0,0
+ PRODUCTVERSION 1,25,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -862,13 +862,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.24"
-            VALUE "FileVersion", "1.24.0.0"
+            VALUE "FileDescription", "KeePass Password Safe 1.25"
+            VALUE "FileVersion", "1.25.0.0"
             VALUE "InternalName", "PwSafe"
-            VALUE "LegalCopyright", "Copyright (c) 2003-2012 Dominik Reichl"
+            VALUE "LegalCopyright", "Copyright (c) 2003-2013 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.24"
-            VALUE "ProductVersion", "1.24.0.0"
+            VALUE "ProductName", "KeePass Password Safe 1.25"
+            VALUE "ProductVersion", "1.25.0.0"
         END
     END
     BLOCK "VarFileInfo"

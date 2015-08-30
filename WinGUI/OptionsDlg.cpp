@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -147,10 +147,13 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(NULL, OPTGRP_FILES, TRUE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_SAVEONLATMOD), OPTGRP_FILES, TRUE);
 
-	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CLIPBOARDMETHOD), OPTGRP_MEMORY, TRUE);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_CLIPMETHOD_TIMED), OPTGRP_MEMORY, TRUE);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_CLIPMETHOD_SECURE), OPTGRP_MEMORY, TRUE);
-	m_wndgrp.AddWindow(NULL, OPTGRP_MEMORY, TRUE);
+	// m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CLIPBOARDMETHOD), OPTGRP_MEMORY, TRUE);
+	// m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_CLIPMETHOD_TIMED), OPTGRP_MEMORY, TRUE);
+	// m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_CLIPMETHOD_SECURE), OPTGRP_MEMORY, TRUE);
+	// m_wndgrp.AddWindow(NULL, OPTGRP_MEMORY, TRUE);
+	GetDlgItem(IDC_STATIC_CLIPBOARDMETHOD)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_RADIO_CLIPMETHOD_TIMED)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_RADIO_CLIPMETHOD_SECURE)->ShowWindow(SW_HIDE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CLIPCLEARTXT), OPTGRP_MEMORY, TRUE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_CLIPBOARDTIME), OPTGRP_MEMORY, TRUE);
 
@@ -211,6 +214,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddGroupText(TRL("Integration"), 9);
 	m_olAdvanced.AddCheckItem(TRL("Start KeePass at Windows startup (for current user)"), &m_bStartWithWindows, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Single left click instead of double-click for default tray icon action"), &m_bSingleClickTrayIcon, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Show tray icon only if main window has been sent to tray"), &m_bShowTrayOnlyIfTrayed, NULL, OL_LINK_NULL);
 	// m_olAdvanced.AddCheckItem(TRL("Use alternative auto-type method (minimize window)"), &m_bMinimizeBeforeAT, NULL, OL_LINK_NULL);
 	// m_olAdvanced.AddCheckItem(TRL("Disable all auto-type features"), &m_bDisableAutoType, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Copy URLs to clipboard instead of launching them (exception: cmd:// URLs)"), &m_bCopyURLs, NULL, OL_LINK_NULL);
@@ -238,6 +242,12 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Delete all backup entries before saving the database"), &m_bDeleteBackupsOnSave, NULL, OL_LINK_NULL);
 
 	m_olAdvanced.AddGroupText(_T(""), 0);
+	m_olAdvanced.AddGroupText(TRL("Quick search (toolbar)"), 12);
+	m_olAdvanced.AddCheckItem(TRL("Include backup entries in quick searches"), &m_bQuickFindIncBackup, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Include expired entries in quick searches"), &m_bQuickFindIncExpired, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Focus entry list after a successful quick search"), &m_bFocusResAfterQuickFind, NULL, OL_LINK_NULL);
+
+	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Advanced"), 11);
 	// m_olAdvanced.AddCheckItem(TRL("Automatically generate random passwords for new entries"), &m_bAutoPwGen, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Remember key sources (key file paths, provider names, ...)"), &m_bRememberKeySources, NULL, OL_LINK_NULL);
@@ -247,9 +257,6 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Disable 'Save' button if the database hasn't been modified"), &m_bAllowSaveIfModifiedOnly, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Use local date/time format instead of ISO notation"), &m_bUseLocalTimeFormat, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Register Ctrl-Alt-K hot key (brings the KeePass window to front)"), &m_bRegisterRestoreHotKey, NULL, OL_LINK_NULL);
-	m_olAdvanced.AddCheckItem(TRL("Include backup entries in quick searches (toolbar)"), &m_bQuickFindIncBackup, NULL, OL_LINK_NULL);
-	m_olAdvanced.AddCheckItem(TRL("Include expired entries in quick searches (toolbar)"), &m_bQuickFindIncExpired, NULL, OL_LINK_NULL);
-	m_olAdvanced.AddCheckItem(TRL("Focus entry list after a successful quick search (toolbar)"), &m_bFocusResAfterQuickFind, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Delete TAN entries immediately after using them"), &m_bDeleteTANsAfterUse, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Clear clipboard when closing/locking the database"), &m_bClearClipOnDbClose, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Use file transactions for writing databases"), &m_bUseTransactedFileWrites, NULL, OL_LINK_NULL);

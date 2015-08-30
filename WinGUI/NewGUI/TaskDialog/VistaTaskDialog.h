@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -60,7 +60,8 @@ public:
 	void SetCommandLinks(bool bUseCommandLinks) { m_bCommandLinks = bUseCommandLinks; }
 	void SetVerification(LPCTSTR lpText);
 	void SetExpandedText(LPCTSTR lpText);
-	void SetFooter(LPCTSTR lpText);
+	void SetFooterText(LPCTSTR lpText);
+	void SetFooterIcon(PCWSTR lpIcon);
 
 	void EnableHyperLinks(bool bEnable);
 
@@ -89,6 +90,7 @@ private:
 	std::basic_string<WCHAR> m_strConfirmation;
 	std::basic_string<WCHAR> m_strExpandedText;
 	std::basic_string<WCHAR> m_strFooter;
+	PCWSTR m_lpFooterIcon;
 	std::vector<MY_TASKDIALOG_BUTTON> m_vButtons;
 	V_PFTASKDIALOGCALLBACK m_pfCallback;
 };

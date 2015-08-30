@@ -268,7 +268,7 @@ BOOL CSystemTray::Create(CWnd* pParent, UINT uCallbackMessage, LPCTSTR szToolTip
 #ifdef SYSTEMTRAY_USEW2K    
     if (m_bWin2K && m_bHidden)
     {
-        m_tnd.uFlags = NIF_STATE;
+        m_tnd.uFlags |= NIF_STATE; // DR: Changed "=" to "|="
         m_tnd.dwState = NIS_HIDDEN;
         m_tnd.dwStateMask = NIS_HIDDEN;
     }
@@ -299,10 +299,12 @@ CSystemTray::~CSystemTray()
 {
     RemoveIcon();
     m_IconList.RemoveAll();
-    DestroyWindow();
 
-	// DR: Added the following:
-	m_wndInvisible.DestroyWindow();
+    // DR: Added the following:
+	if(::IsWindow(m_wndInvisible.m_hWnd) != FALSE)
+        m_wndInvisible.DestroyWindow();
+
+    DestroyWindow();
 }
 
 /////////////////////////////////////////////////////////////////////////////

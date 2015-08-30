@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,7 +25,8 @@
 
 CVistaTaskDialog::CVistaTaskDialog(HWND hParent, HINSTANCE hInstance,
 	bool bUseCommandLinks) :
-	m_lpIcon(NULL), m_hIcon(NULL), m_bHyperLinks(false), m_pfCallback(NULL)
+	m_lpIcon(NULL), m_hIcon(NULL), m_bHyperLinks(false), m_pfCallback(NULL),
+	m_lpFooterIcon(NULL)
 {
 	m_hParent = hParent;
 	m_hInstance = hInstance;
@@ -108,10 +109,15 @@ void CVistaTaskDialog::SetExpandedText(LPCTSTR lpText)
 	else m_strExpandedText = _StringToUnicodeStl(lpText);
 }
 
-void CVistaTaskDialog::SetFooter(LPCTSTR lpText)
+void CVistaTaskDialog::SetFooterText(LPCTSTR lpText)
 {
 	if(lpText == NULL) m_strFooter.clear();
 	else m_strFooter = _StringToUnicodeStl(lpText);
+}
+
+void CVistaTaskDialog::SetFooterIcon(PCWSTR lpIcon)
+{
+	m_lpFooterIcon = lpIcon;
 }
 
 void CVistaTaskDialog::EnableHyperLinks(bool bEnable)
@@ -166,6 +172,8 @@ int CVistaTaskDialog::ShowDialog(BOOL* pVerificationResult)
 		cfg.hMainIcon = m_hIcon;
 		cfg.dwFlags |= TDF_USE_HICON_MAIN;
 	}
+
+	cfg.pszFooterIcon = m_lpFooterIcon;
 
 	int nResult = 0;
 	if(!SUCCEEDED(lpTaskDialogIndirect(&cfg, &nResult, NULL, pVerificationResult)))

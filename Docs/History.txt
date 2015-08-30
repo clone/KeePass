@@ -1,3 +1,31 @@
+13/01/20 - 1.25
+- Added option to show the tray icon only if the main window
+  has been sent to the tray
+- The caret position in a secure edit control is now preserved
+  when unhiding and hiding the content
+- When starting KeePass for the first time, it asks whether to
+  enable the automatic update check or not (if not enabled
+  already)
+- KeePass now shows an error message when the user accidentally
+  attempts to use a database file as key file
+- When holding Alt while double-clicking onto a notes field in
+  the main entry list, KeePass now copies the displayed cell
+  text instead of the raw notes to the clipboard
+
+- {GOOGLECHROME} placeholder: updated detection code to also
+  support the latest versions of Chrome
+- Enhanced user switch detection
+- Moved quick search options to a separate category
+- Improved update check
+- The 'No updates available' message is not shown in the status
+  bar anymore (updates and errors are shown)
+- Unified clipboard methods
+- Changed naming of translation files
+- Upgraded installer
+- Upgraded to Boost libraries version 1.52.0
+- Various code optimizations
+- Minor other improvements
+
 12/09/01 - 1.24
 - Header data in KDB files is now authenticated (to prevent
   silent data removal attacks; thanks to P. Gasti and K. B.

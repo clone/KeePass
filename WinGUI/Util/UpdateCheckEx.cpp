@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,10 +22,11 @@
 
 #include "../../KeePassLibCpp/Util/StrUtil.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
-#include "../../KeePassLibCpp/PwManager.h"
+#include "../../KeePassLibCpp/PwManager.h" // For PWM_DEVSNAPSHOT
 #include "../../KeePassLibCpp/IO/KpInternetStream.h"
 #include "../Plugins/PluginMgr.h"
 #include "../Plugins/KpApiImpl.h"
+#include "../NewGUI/TaskDialog/VistaTaskDialog.h"
 
 #include "../UpdateInfoDlg.h"
 
@@ -65,10 +66,19 @@ HRESULT CUpdateCheckEx::Check(BOOL bRunInThread, HWND hParent, CImageList* pImag
 	}
 	else
 	{
+		// CStatusDialogEx dlg(hParent, false, true);
+		// dlg.Show();
+		// std_string str = TRL("Check for Updates");
+		// str += _T("...");
+		// dlg.SetStatus(true, str.c_str());
+
 		CUpdateCheckEx uc(hParent, pImages, bUIOnlyOnUpdate);
-		uc._RunCheck();
+		uc._RunCheck(NULL);
+
+		// dlg.Release();
 	}
 
+	ASSERT(SUCCEEDED(hRes));
 	return hRes;
 }
 
@@ -78,12 +88,12 @@ DWORD WINAPI CfuEx_Thread(LPVOID lpParameter)
 
 	CUpdateCheckEx uc(g_ucInitStruct.hParent, g_ucInitStruct.pImages,
 		g_ucInitStruct.bUIOnlyOnUpdate);
-	uc._RunCheck();
+	uc._RunCheck(NULL);
 
 	return 0;
 }
 
-void CUpdateCheckEx::_RunCheck()
+void CUpdateCheckEx::_RunCheck(void* pDlg)
 {
 	UC_COMPONENTS_LIST vInstalled;
 	CUpdateCheckEx::GetInstalledComponents(vInstalled, true);
@@ -95,7 +105,7 @@ void CUpdateCheckEx::_RunCheck()
 	{
 		SAFE_DELETE_ARRAY(pb);
 
-		_FinalReport(vInstalled, strError.c_str(), true, 0);
+		_FinalReport(vInstalled, strError.c_str(), true, 0, pDlg);
 		return;
 	}
 
@@ -104,7 +114,7 @@ void CUpdateCheckEx::_RunCheck()
 	SAFE_DELETE_ARRAY(pb);
 	if(FAILED(hRes))
 	{
-		_FinalReport(vInstalled, TRL("Loading error"), true, 0);
+		_FinalReport(vInstalled, TRL("Loading error"), true, 0, pDlg);
 		return;
 	}
 
@@ -113,13 +123,13 @@ void CUpdateCheckEx::_RunCheck()
 	std_string strReport;
 	DWORD dwUpdates = 0;
 	CUpdateCheckEx::CompareVersions(vInstalled, true, strReport, dwUpdates);
-	_FinalReport(vInstalled, strReport.c_str(), false, dwUpdates);
+	_FinalReport(vInstalled, strReport.c_str(), false, dwUpdates, pDlg);
 }
 
 void CUpdateCheckEx::_FinalReport(const UC_COMPONENTS_LIST& vInstalled,
-	LPCTSTR lpResult, bool bError, DWORD dwUpdates)
+	LPCTSTR lpResult, bool bError, DWORD dwUpdates, void* pDlg)
 {
-	UNREFERENCED_PARAMETER(bError);
+	UNREFERENCED_PARAMETER(pDlg);
 
 	LPCTSTR lpMsg = ((lpResult != NULL) ? lpResult : _T(""));
 
@@ -129,11 +139,18 @@ void CUpdateCheckEx::_FinalReport(const UC_COMPONENTS_LIST& vInstalled,
 
 	if(bShowDialog)
 	{
+		// if(pDlg != NULL) pDlg->Release();
+
+		// FromHandle, not FromHandlePermanent, due to other thread
 		CUpdateInfoDlg dlg(CWnd::FromHandle(m_hParent));
 		dlg.InitEx(m_pImages, &vInstalled, lpResult);
 		dlg.DoModal();
 	}
-	else CKpApiImpl::Instance().SetStatusBarText(lpMsg);
+	else
+	{
+		if(bError || (dwUpdates > 0))
+			CKpApiImpl::Instance().SetStatusBarText(lpMsg);
+	}
 }
 
 HRESULT CUpdateCheckEx::DownloadInfoFile(BYTE** ppbData, std_string& strError)
@@ -188,9 +205,13 @@ HRESULT CUpdateCheckEx::DownloadInfoFile(BYTE** ppbData, std_string& strError)
 		return E_ACCESSDENIED;
 	} */
 
-	std::vector<BYTE> vData;
 	CKpInternetStream s(PWM_URL_VERSION, false);
+	s.SetConnectOptions(5000, 1);
+	s.SetTransferOptions(5000);
+
+	std::vector<BYTE> vData;
 	HRESULT r = s.ReadToEnd(vData);
+	s.Close();
 	if(FAILED(r) || (vData.size() == 0))
 	{
 		strError = TRL("Connect failed, cannot check for updates.");
@@ -366,4 +387,61 @@ void CUpdateCheckEx::CompareVersions(UC_COMPONENTS_LIST& v, bool bSetStatus,
 		strFmt.Format(TRL("%u updates are available!"), dwAvUpdates);
 		strReport = (LPCTSTR)strFmt;
 	}
+}
+
+void CUpdateCheckEx::EnsureConfigured(BOOL* pCheck, BOOL* pConfig,
+	HWND hParent, HINSTANCE hInstance)
+{
+	if((pCheck == NULL) || (pConfig == NULL)) { ASSERT(FALSE); return; }
+	if((*pConfig) != FALSE) return;
+
+#ifdef PWM_DEVSNAPSHOT
+	UNREFERENCED_PARAMETER(hParent);
+	UNREFERENCED_PARAMETER(hInstance);
+#else
+	// If the user has manually enabled the automatic update check
+	// before, there's no need to ask him again
+	if((*pCheck) == FALSE)
+	{
+		CString strHdr = TRL("KeePass can automatically check for updates on each program start.");
+		
+		CString strSub = TRL("Automatic update checks are performed unintrusively in the background. A notification is only displayed when an update is available. Updates are not downloaded or installed automatically.");
+		strSub += _T("\r\n\r\n");
+		strSub += TRL("No personal information is sent to the KeePass web server. KeePass just downloads a small version information file and compares the available version with the installed version.");
+
+		CString strEnable = TRL("&Enable");
+		strEnable += _T(" (");
+		strEnable += TRL("recommended");
+		strEnable += _T(")");
+
+		CString strQ = TRL("Enable automatic update check?");
+
+		CVistaTaskDialog dlg(hParent, hInstance, true);
+		dlg.SetContent(strHdr);
+		dlg.SetMainInstruction(strQ);
+		dlg.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
+		dlg.AddButton(strEnable, NULL, IDYES);
+		dlg.AddButton(TRL("&Disable"), NULL, IDNO);
+		dlg.SetIcon(MTDI_QUESTION);
+		dlg.SetFooterText(strSub);
+		dlg.SetFooterIcon(TD_INFORMATION_ICON);
+
+		int dr = dlg.ShowDialog(NULL);
+		if(dr < 0)
+		{
+			CString strMain = strHdr;
+			strMain += _T("\r\n\r\n");
+			strMain += strSub;
+			strMain += _T("\r\n\r\n");
+			strMain += strQ;
+
+			dr = MessageBox(hParent, strMain, PWM_PRODUCT_NAME_SHORT,
+				MB_YESNO | MB_ICONQUESTION);
+		}
+
+		*pCheck = (((dr == IDOK) || (dr == IDYES)) ? TRUE : FALSE);
+	}
+#endif
+
+	*pConfig = TRUE;
 }

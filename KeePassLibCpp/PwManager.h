@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -38,12 +38,13 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.24")
+#define PWM_VERSION_STR  _T("1.25")
 #else
-#define PWM_VERSION_STR  _T("1.24 Unicode")
+#define PWM_VERSION_STR  _T("1.25 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01180000
-#define PWM_VERSION_QW   0x0001001800000000ULL
+#define PWM_VERSION_DW   0x01190000
+#define PWM_VERSION_QW   0x0001001900000000ULL
+// #define PWM_DEVSNAPSHOT
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
@@ -143,7 +144,7 @@
 #define PWMKEY_AUTOSORT         _T("KeeAutoSortPwList")
 #define PWMKEY_AUTOTYPEHOTKEY   _T("KeeAutoTypeHotKey")
 #define PWMKEY_RESTOREHOTKEY    _T("KeeRestoreHotKey")
-#define PWMKEY_CLIPBOARDMETHOD  _T("KeeClipboardMethod")
+// #define PWMKEY_CLIPBOARDMETHOD  _T("KeeClipboardMethod")
 #define PWMKEY_STARTMINIMIZED   _T("KeeStartMinimized")
 #define PWMKEY_AUTOSHOWEXPIRED  _T("KeeShowExpiredAtOpen")
 #define PWMKEY_AUTOSHOWEXPIREDS _T("KeeShowSoonExpiredAtOpen")
@@ -151,6 +152,7 @@
 #define PWMKEY_SINGLEINSTANCE   _T("KeeSingleInstance")
 #define PWMKEY_SECUREEDITS      _T("KeeSecureEditControls")
 #define PWMKEY_SINGLECLICKTRAY  _T("KeeSingleClickTrayIcon")
+#define PWMKEY_SHOWTRAYONLYIFTRAYED _T("KeeShowTrayOnlyIfTrayed")
 #define PWMKEY_DEFAULTEXPIRE    _T("KeeDefaultExpire")
 #define PWMKEY_AUTOPWGEN        _T("KeeAutoPwGen")
 #define PWMKEY_QUICKFINDINCBK   _T("KeeQuickFindIncBackup")
@@ -165,7 +167,8 @@
 #define PWMKEY_SIMPLETANVIEW    _T("KeeSimpleTANView")
 #define PWMKEY_SHOWTANINDICES   _T("KeeShowTANIndices")
 #define PWMKEY_ALLOWSAVEIFMODIFIEDONLY _T("KeeAllowSaveIfModifiedOnly")
-#define PWMKEY_CHECKFORUPDATE   _T("KeeCheckForUpdate")
+#define PWMKEY_CHECKFORUPDATE          _T("KeeCheckForUpdate")
+#define PWMKEY_CHECKFORUPDATECFG       _T("KeeCheckForUpdateConfigured")
 #define PWMKEY_LOCKONWINLOCK    _T("KeeLockOnWinLock")
 #define PWMKEY_ENABLEREMOTECTRL _T("KeeEnableRemoteCtrl")
 #define PWMKEY_ALWAYSALLOWIPC   _T("KeeAlwaysAllowIPC")
@@ -245,8 +248,8 @@
 
 #define PWM_STD_ICON_GROUP       48
 #define PWM_STD_ICON_GROUP_OPEN  49
-#define PWM_STD_ICON_GROUP_EMAIL 50
-#define PWM_STD_ICON_GROUP_PKG   25
+#define PWM_STD_ICON_GROUP_PKG   50
+#define PWM_STD_ICON_GROUP_EMAIL 25
 
 #define PWM_STD_MAX_HISTORYITEMS 12
 

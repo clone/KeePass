@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -593,7 +593,7 @@ void CPasswordDlg::OnOK()
 			if(hKeyFile != INVALID_HANDLE_VALUE) CloseHandle(hKeyFile);
 			else // hKeyFile == INVALID_HANDLE_VALUE
 			{
-				DWORD dwKeyFileError = ::GetLastError();
+				const DWORD dwKeyFileError = ::GetLastError();
 				if(dwKeyFileError != dwDummyErrorCode)
 				{
 					std::basic_string<TCHAR> strKeyError = strTemp;

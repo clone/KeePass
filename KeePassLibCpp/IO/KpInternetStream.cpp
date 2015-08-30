@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,8 +20,52 @@
 #include "StdAfx.h"
 #include "KpInternetStream.h"
 
+void CKpInternetStream::EnsureInitialized()
+{
+	if(m_bInitialized) return;
+	m_bInitialized = true;
+
+	m_hNet = InternetOpen(PWM_PRODUCT_NAME_SHORT, INTERNET_OPEN_TYPE_PRECONFIG,
+		NULL, NULL, 0);
+	if(m_hNet == NULL) { m_hFile = NULL; return; }
+
+	if(m_nConnectTimeOut >= 0)
+	{
+		DWORD dwTimeOut = static_cast<DWORD>(m_nConnectTimeOut);
+		if(m_nConnectTimeOut == 0) dwTimeOut = DWORD_MAX;
+
+		VERIFY(InternetSetOption(m_hNet, INTERNET_OPTION_CONNECT_TIMEOUT,
+			&dwTimeOut, sizeof(DWORD)));
+	}
+
+	if(m_nConnectRetries >= 0)
+	{
+		DWORD dwRetries = static_cast<DWORD>(m_nConnectRetries);
+
+		VERIFY(InternetSetOption(m_hNet, INTERNET_OPTION_CONNECT_RETRIES,
+			&dwRetries, sizeof(DWORD)));
+	}
+
+	if(m_nTransferTimeOut >= 0)
+	{
+		DWORD dwTimeOut = static_cast<DWORD>(m_nTransferTimeOut);
+		if(m_nTransferTimeOut == 0) dwTimeOut = DWORD_MAX;
+
+		VERIFY(InternetSetOption(m_hNet, INTERNET_OPTION_SEND_TIMEOUT,
+			&dwTimeOut, sizeof(DWORD)));
+		VERIFY(InternetSetOption(m_hNet, INTERNET_OPTION_RECEIVE_TIMEOUT,
+			&dwTimeOut, sizeof(DWORD)));
+	}
+
+	m_hFile = InternetOpenUrl(m_hNet, m_strUrl.c_str(), NULL, 0,
+		INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_PRAGMA_NOCACHE |
+		INTERNET_FLAG_RELOAD, 0);
+}
+
 HRESULT CKpInternetStream::Close()
 {
+	// EnsureInitialized();
+
 	if(m_hFile != NULL)
 	{
 		VERIFY(InternetCloseHandle(m_hFile));
@@ -42,6 +86,8 @@ HRESULT CKpInternetStream::Close()
 HRESULT CKpInternetStream::ReadPartial(BYTE* pbBuffer, UINT64 uCount,
 	UINT64* puRead)
 {
+	EnsureInitialized();
+
 	if(m_hFile == NULL) { if(puRead != NULL) *puRead = 0; return STG_E_INVALIDHANDLE; }
 	if(pbBuffer == NULL) CKPIS_R_FAIL(E_POINTER);
 	if(uCount > static_cast<UINT64>(DWORD_MAX)) CKPIS_R_FAIL(E_INVALIDARG);
@@ -60,6 +106,8 @@ HRESULT CKpInternetStream::ReadPartial(BYTE* pbBuffer, UINT64 uCount,
 HRESULT CKpInternetStream::WritePartial(const BYTE* pbBuffer, UINT64 uCount,
 	UINT64* puWritten)
 {
+	EnsureInitialized();
+
 	if(m_hFile == NULL) { if(puWritten != NULL) *puWritten = 0; return STG_E_INVALIDHANDLE; }
 	if(pbBuffer == NULL) CKPIS_W_FAIL(E_POINTER);
 	if(uCount > static_cast<UINT64>(DWORD_MAX)) CKPIS_W_FAIL(E_INVALIDARG);

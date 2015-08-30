@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005-2012, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2005-2013, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -114,6 +114,8 @@ void CSecureEditEx::EnableSecureMode(BOOL bEnable)
 	LPTSTR lpSource = GetPassword(); ASSERT(lpSource != NULL);
 	ASSERT((int)_tcslen(lpSource) == m_nOldLen);
 
+	const int iPos = static_cast<int>(GetSel() & 0xFFFF);
+
 	_DeleteAll();
 	m_bSecMode = bEnable;
 
@@ -132,6 +134,9 @@ void CSecureEditEx::EnableSecureMode(BOOL bEnable)
 
 			SetWindowText(lpSource);
 		}
+
+		if((iPos >= 0) && (iPos <= m_nOldLen)) SetSel(iPos, iPos, FALSE);
+		else { ASSERT(FALSE); }
 	}
 
 	DeletePassword(lpSource); lpSource = NULL;
@@ -310,7 +315,7 @@ void CSecureEditEx::_ClearSelection()
 {
 	if(m_bSecMode == FALSE) return;
 
-	int nStart, nEnd;
+	int nStart = 0, nEnd = 0;
 	GetSel(nStart, nEnd);
 	if(nStart != nEnd) SetSel(nStart, nStart, FALSE);
 }
