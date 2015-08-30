@@ -80,6 +80,8 @@ BEGIN_MESSAGE_MAP(CPwGeneratorDlg, CDialog)
 	//{{AFX_MSG_MAP(CPwGeneratorDlg)
 	ON_BN_CLICKED(IDC_GENERATE_BTN, OnGenerateBtn)
 	ON_BN_CLICKED(IDC_CHECK_CHARSPEC, OnCheckCharSpec)
+	ON_NOTIFY(NM_CLICK, IDC_LIST_OPTIONS, OnClickListOptions)
+	ON_NOTIFY(NM_RCLICK, IDC_LIST_OPTIONS, OnRclickListOptions)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -102,8 +104,10 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 	m_banner.SetTitle(TRL("Password Generator"));
 	m_banner.SetCaption(TRL("This will generate a random password."));
 
-	m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_SI_MENU |
-		LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT);
+	m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_SI_MENU | LVS_EX_FULLROWSELECT);
+
+	m_ilIcons.Create(IDR_INFOICONS, 16, 1, RGB(255,0,255));
+	m_cList.SetImageList(&m_ilIcons, LVSIL_SMALL);
 
 	m_cList.DeleteAllItems();
 	RECT rect;
@@ -114,35 +118,29 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 	m_btnOK.EnableWindow(FALSE);
 
 	int j = 0;
-	m_cList.InsertItem(LVIF_TEXT, j, TRL("Upper alphabetic characters (A, B, C, ...)"),
-		0, 0, 0, 0); j++;
-	m_cList.InsertItem(LVIF_TEXT, j, TRL("Lower alphabetic characters (a, b, c, ...)"),
-		0, 0, 0, 0); j++;
-	m_cList.InsertItem(LVIF_TEXT, j, TRL("Numerical characters (1, 2, 3, ...)"),
-		0, 0, 0, 0); j++;
-	m_cList.InsertItem(LVIF_TEXT, j, TRL("Underline character '_'"),
-		0, 0, 0, 0); j++;
-	m_cList.InsertItem(LVIF_TEXT, j, TRL("Minus '-'"),
-		0, 0, 0, 0); j++;
-	m_cList.InsertItem(LVIF_TEXT, j, TRL("Space ' '"),
-		0, 0, 0, 0); j++;
-	m_cList.InsertItem(LVIF_TEXT, j, TRL("Special characters (!, §, $, %, &, ...)"),
-		0, 0, 0, 0); j++;
-	m_cList.InsertItem(LVIF_TEXT, j, TRL("Higher ANSI characters (Â, ©, É, µ, ½, ...)"),
-		0, 0, 0, 0); j++;
-	m_cList.InsertItem(LVIF_TEXT, j, TRL("Special brackets ('{', '}', '[', ...)"),
-		0, 0, 0, 0); j++;
+	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
+		TRL("Upper alphabetic characters (A, B, C, ...)"), 0, 0, 0, 0); j++;
+	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
+		TRL("Lower alphabetic characters (a, b, c, ...)"), 0, 0, 0, 0); j++;
+	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
+		TRL("Numerical characters (1, 2, 3, ...)"), 0, 0, 0, 0); j++;
+	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
+		TRL("Underline character '_'"), 0, 0, 0, 0); j++;
+	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
+		TRL("Minus '-'"), 0, 0, 0, 0); j++;
+	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
+		TRL("Space ' '"), 0, 0, 0, 0); j++;
+	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
+		TRL("Special characters (!, §, $, %, &, ...)"), 0, 0, 0, 0); j++;
+	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
+		TRL("Higher ANSI characters (Â, ©, É, µ, ½, ...)"), 0, 0, 0, 0); j++;
+	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
+		TRL("Special brackets ('{', '}', '[', ...)"), 0, 0, 0, 0); j++;
 
-	// _SetCheck doesn't seem to work in OnInitDialog?
-	_SetCheck(0, FALSE);
-	_SetCheck(1, FALSE);
-	_SetCheck(2, FALSE);
-	_SetCheck(3, FALSE);
-	_SetCheck(4, FALSE);
-	_SetCheck(5, FALSE);
-	_SetCheck(6, FALSE);
-	_SetCheck(7, FALSE);
-	_SetCheck(8, FALSE);
+	for(int nItem = 0; nItem < 9; nItem++)
+	{
+		_SetCheck(nItem, FALSE);
+	}
 
 	GetDlgItem(IDC_EDIT_ONLYCHARSPEC)->EnableWindow(FALSE);
 	m_bCharSpec = FALSE;
@@ -154,12 +152,18 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 	return TRUE;
 }
 
+void CPwGeneratorDlg::CleanUp()
+{
+	m_ilIcons.DeleteImageList();
+}
+
 void CPwGeneratorDlg::OnOK() 
 {
 	UpdateData(TRUE);
 
 	if(m_strPassword.GetLength() == 0) return;
 
+	CleanUp();
 	CDialog::OnOK();
 }
 
@@ -167,6 +171,7 @@ void CPwGeneratorDlg::OnCancel()
 {
 	m_strPassword.Empty();
 
+	CleanUp();
 	CDialog::OnCancel();
 }
 
@@ -250,43 +255,43 @@ void CPwGeneratorDlg::OnGenerateBtn()
 		{
 			if(bUpperAlpha == TRUE)
 			{
-				if((t >= 'A') && (t <= 'Z'))
+				if((t >= _T('A')) && (t <= _T('Z')))
 				{ m_strPassword += t; uFinalChars++; }
 			}
 
 			if(bLowerAlpha == TRUE)
 			{
-				if((t >= 'a') && (t <= 'z'))
+				if((t >= _T('a')) && (t <= _T('z')))
 				{ m_strPassword += t; uFinalChars++; }
 			}
 
 			if(bNum == TRUE)
 			{
-				if((t >= '0') && (t <= '9'))
+				if((t >= _T('0')) && (t <= _T('9')))
 				{ m_strPassword += t; uFinalChars++; }
 			}
 
-			if((bUnderline == TRUE) && (t == '_'))
+			if((bUnderline == TRUE) && (t == _T('_')))
 				{ m_strPassword += t; uFinalChars++; }
 
-			if((bMinus == TRUE) && (t == '-'))
+			if((bMinus == TRUE) && (t == _T('-')))
 				{ m_strPassword += t; uFinalChars++; }
 
-			if((bSpace == TRUE) && (t == ' '))
+			if((bSpace == TRUE) && (t == _T(' ')))
 				{ m_strPassword += t; uFinalChars++; }
 
 			if(bSpecial == TRUE)
 			{
-				if((t >= '!') && (t <= '/'))
+				if((t >= _T('!')) && (t <= _T('/')))
 				{ m_strPassword += t; uFinalChars++; }
 			}
 
-			if((bHigh == TRUE) && (((BYTE)t) > '~'))
+			if((bHigh == TRUE) && (((BYTE)t) > _T('~')))
 				{ m_strPassword += t; uFinalChars++; }
 
 			if(bBrackets == TRUE)
 			{
-				if((t == '[') || (t == ']') || (t == '{') || (t == '}'))
+				if((t == _T('[')) || (t == _T(']')) || (t == _T('{')) || (t == _T('}')))
 					{ m_strPassword += t; uFinalChars++; }
 			}
 		}
@@ -315,19 +320,33 @@ void CPwGeneratorDlg::OnGenerateBtn()
 
 void CPwGeneratorDlg::_SetCheck(int inxItem, BOOL bEnable)
 {
-	LV_ITEM _ms_lvi = {0};
-	memset(&_ms_lvi, 0, sizeof(LV_ITEM));
-	_ms_lvi.stateMask = LVIS_STATEIMAGEMASK;
-	_ms_lvi.state = (UINT)(((int)(bEnable) + 1) << 12);
+	LV_ITEM lviAdjust;
 
-	m_cList.SendMessage(LVM_SETITEMSTATE, (WPARAM)inxItem,
-		(LPARAM)(LV_ITEM FAR *)&_ms_lvi);
+	ASSERT(inxItem < m_cList.GetItemCount());
+	if(inxItem >= m_cList.GetItemCount()) return;
+
+	lviAdjust.mask = LVIF_IMAGE;
+	lviAdjust.iItem = inxItem;
+	lviAdjust.iSubItem = 0;
+	lviAdjust.state = 0;
+	lviAdjust.stateMask = 0;
+	lviAdjust.lParam = 0;
+	lviAdjust.iIndent = 0;
+	lviAdjust.iImage = (bEnable == FALSE) ? 57 : 58;
+
+	m_cList.SetItem(&lviAdjust);
 }
 
 BOOL CPwGeneratorDlg::_GetCheck(int inxItem)
 {
-	return ((((UINT)(m_cList.SendMessage(LVM_GETITEMSTATE, (WPARAM)inxItem,
-		LVIS_STATEIMAGEMASK))) >> 12) - 1);
+	LV_ITEM lvi;
+
+	ZeroMemory(&lvi, sizeof(LV_ITEM));
+	lvi.mask = LVIF_IMAGE;
+	lvi.iItem = inxItem;
+	if(m_cList.GetItem(&lvi) == FALSE) return FALSE;
+
+	return ((lvi.iImage == 57) ? FALSE : TRUE);
 }
 
 void CPwGeneratorDlg::OnCheckCharSpec() 
@@ -344,4 +363,30 @@ void CPwGeneratorDlg::OnCheckCharSpec()
 		GetDlgItem(IDC_EDIT_ONLYCHARSPEC)->EnableWindow(FALSE);
 		m_cList.EnableWindow(TRUE);
 	}
+}
+
+void CPwGeneratorDlg::OnClickListOptions(NMHDR* pNMHDR, LRESULT* pResult) 
+{
+	CPoint pointM;
+
+	GetCursorPos(&pointM);
+
+	UNREFERENCED_PARAMETER(pNMHDR);
+
+	m_cList.ScreenToClient(&pointM);
+
+	UINT nFlags = 0;
+	int nHitItem = m_cList.HitTest(pointM, &nFlags);
+
+	if(nFlags & LVHT_ONITEM)
+	{
+		_SetCheck(nHitItem, !_GetCheck(nHitItem));
+	}
+
+	*pResult = 0;
+}
+
+void CPwGeneratorDlg::OnRclickListOptions(NMHDR* pNMHDR, LRESULT* pResult) 
+{
+	*pResult = 0;
 }

@@ -72,10 +72,7 @@ bool CBase64Codec::Encode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOut
 	DWORD i, len2, leven;
 	BYTE *p;
 
-	ASSERT(pIn != NULL);
-	ASSERT(uInLen != 0);
-	ASSERT(pOut != NULL);
-	ASSERT(uOutLen != NULL);
+	ASSERT((pIn != NULL) && (uInLen != 0) && (pOut != NULL) && (uOutLen != NULL));
 
 	len2 = ((uInLen + 2) / 3) << 2;
 	if((*uOutLen) < (len2 + 1)) return false;
@@ -114,10 +111,7 @@ bool CBase64Codec::Decode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOut
 	BYTE c;
 	DWORD g = 3;
 
-	ASSERT(pIn != NULL);
-	ASSERT(uInLen != 0);
-	ASSERT(pOut != NULL);
-	ASSERT(uOutLen != NULL);
+	ASSERT((pIn != NULL) && (uInLen != 0) && (pOut != NULL) && (uOutLen != NULL));
 
 	for(x = y = z = t = 0; x < uInLen; x++)
 	{

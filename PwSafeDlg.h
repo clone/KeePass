@@ -40,6 +40,7 @@
 #include "NewGUI/KCWndUtil.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/BCMenu.h"
+#include "NewGUI/BtnST.h"
 #include "NewGUI/CustomListCtrlEx.h"
 #include "NewGUI/SystemTray.h"
 #include "NewGUI/SystemTrayEx.h"
@@ -57,8 +58,6 @@
 #define ICOIDX_RAMDISK 20
 #define ICOIDX_NODRIVE 21
 
-#define PWS_SEARCHGROUP TRL("Search results")
-
 /////////////////////////////////////////////////////////////////////////////
 
 class CPwSafeDlg : public CDialog
@@ -70,24 +69,18 @@ public:
 
 	void ProcessResize();
 	void CleanUp();
-	void _DeleteTemporaryFiles();
-	BOOL _ParseCommandLine();
-	void _ParseSpecAndSetFont(const TCHAR *pszSpec);
-	const char *_GetCmdAccelExt(const char *psz);
 
 	void UpdateGroupList();
 	void UpdatePasswordList();
+	void RefreshPasswordList(); // Refresh entries by UUID
 
-	int GetSelectedEntry();
-	int GetSelectedGroup();
-	int GetSafeSelectedGroup();
+	DWORD GetSelectedEntry();
+	DWORD GetSelectedEntriesCount();
+	DWORD GetSelectedGroup();
+	DWORD GetSafeSelectedGroup();
 
 	CString GetExportFile(int nFormat);
 	void ExportSelectedGroup(int nFormat);
-
-	void _OpenDatabase(const TCHAR *pszFile);
-	void _PrintGroup(int nGroup);
-	void _Find(int nGroupIdX);
 
 	BOOL m_bTimer;
 	int m_nClipboardCountdown;
@@ -110,6 +103,7 @@ public:
 	BOOL m_bPasswordStars;
 
 	CStatusBarCtrl m_sbStatus;
+	BOOL m_bShowToolBar;
 
 	BOOL m_bAlwaysOnTop;
 	BOOL m_bShowTitle;
@@ -117,6 +111,11 @@ public:
 	BOOL m_bShowURL;
 	BOOL m_bShowPassword;
 	BOOL m_bShowNotes;
+	BOOL m_bShowCreation;
+	BOOL m_bShowLastMod;
+	BOOL m_bShowLastAccess;
+	BOOL m_bShowExpire;
+	BOOL m_bShowUUID;
 	BOOL m_bLockOnMinimize;
 	BOOL m_bMinimizeToTray;
 
@@ -140,14 +139,29 @@ public:
 
 	CString m_strTempFile;
 
-	BOOL m_bShowColumn[5];
-	int m_nColumnWidths[5];
+	BOOL m_bShowColumn[10];
+	int m_nColumnWidths[10];
 
 	DWORD m_dwClipboardSecs;
 	CString m_strFontSpec;
 
+	DWORD m_dwLastNumSelectedItems;
+	DWORD m_dwLastFirstSelectedItem;
+	DWORD m_dwLastSafeSelectedGroup;
+
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
+	CButtonST	m_btnTbNew;
+	CButtonST	m_btnTbLock;
+	CButtonST	m_btnTbFind;
+	CButtonST	m_btnTbEditEntry;
+	CButtonST	m_btnTbDeleteEntry;
+	CButtonST	m_btnTbCopyUser;
+	CButtonST	m_btnTbCopyPw;
+	CButtonST	m_btnTbAddEntry;
+	CButtonST	m_btnTbAbout;
+	CButtonST	m_btnTbSave;
+	CButtonST	m_btnTbOpen;
 	CStatic	m_stcMenuLine;
 	CListCtrl	m_cGroups;
 	CCustomListCtrlEx	m_cList;
@@ -164,15 +178,21 @@ protected:
 	void _List_SaveView() { m_nSaveView = m_cList.GetTopIndex(); }
 	void _List_RestoreView() // Restore the previous password list view
 	{
-		m_cList.EnsureVisible(m_cList.GetItemCount() - 1, FALSE);
-		m_cList.EnsureVisible(m_nSaveView, FALSE);
+		int nItemCount = m_cList.GetItemCount();
+
+		if(nItemCount <= 0) return;
+
+		m_cList.EnsureVisible(nItemCount - 1, FALSE);
+
+		if(m_nSaveView < nItemCount)
+			m_cList.EnsureVisible(m_nSaveView, FALSE);
 	}
 	void _TranslateMenu(BCMenu *pBCMenu); // Translate this menu
 	void _CalcColumnSizes()
 	{
 		RECT rect;
 		int nColumnWidth, nColumns = 0, i;
-		for(i = 0; i < 5; i++)
+		for(i = 0; i < 10; i++)
 		{
 			if(m_bShowColumn[i] == TRUE) nColumns++;
 			m_nColumnWidths[i] = 0;
@@ -180,17 +200,14 @@ protected:
 		if(nColumns == 0) return;
 		m_cList.GetClientRect(&rect);
 		nColumnWidth = ((rect.right - 9) / nColumns) - (GetSystemMetrics(SM_CXVSCROLL) / nColumns);
-		for(i = 0; i < 5; i++)
+		for(i = 0; i < 10; i++)
 			if(m_bShowColumn[i] == TRUE)
 				m_nColumnWidths[i] = nColumnWidth;
 	}
 	void _SetColumnWidths()
 	{
-		m_cList.SetColumnWidth(0, m_nColumnWidths[0]);
-		m_cList.SetColumnWidth(1, m_nColumnWidths[1]);
-		m_cList.SetColumnWidth(2, m_nColumnWidths[2]);
-		m_cList.SetColumnWidth(3, m_nColumnWidths[3]);
-		m_cList.SetColumnWidth(4, m_nColumnWidths[4]);
+		for(int i = 0; i < 10; i++)
+			m_cList.SetColumnWidth(i, m_nColumnWidths[i]);
 	}
 	void _SetListParameters()
 	{
@@ -202,6 +219,26 @@ protected:
 			m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, dw);
 		m_dwOldListParameters = dw;
 	}
+
+	void _OpenDatabase(const TCHAR *pszFile);
+	void _PrintGroup(DWORD dwGroupIndex);
+	void _Find(DWORD dwFindGroupIndex);
+	void _RemoveSearchGroup();
+
+	void _SelChangeView(UINT uID);
+	void _List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEntry, PW_TIME *ptNow);
+	DWORD _ListSelToEntryIndex(DWORD dwSelected = DWORD_MAX);
+
+	void _DeleteTemporaryFiles();
+	BOOL _ParseCommandLine();
+	void _ParseSpecAndSetFont(const TCHAR *pszSpec);
+	const TCHAR *_GetCmdAccelExt(const TCHAR *psz);
+
+	void _UpdateToolBar();
+	void _ShowToolBar(BOOL bShow = TRUE);
+
+	void _TouchGroup(DWORD dwListIndex, BOOL bEdit);
+	void _TouchEntry(DWORD dwListIndex, BOOL bEdit);
 
 	HICON m_hIcon;
 
@@ -325,6 +362,25 @@ protected:
 	afx_msg void OnColumnClickGroupList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnImportPwSafe();
 	afx_msg void OnUpdateImportPwSafe(CCmdUI* pCmdUI);
+	afx_msg void OnViewCreation();
+	afx_msg void OnViewLastMod();
+	afx_msg void OnViewLastAccess();
+	afx_msg void OnViewExpire();
+	afx_msg void OnViewUuid();
+	afx_msg void OnTbOpen();
+	afx_msg void OnTbSave();
+	afx_msg void OnTbNew();
+	afx_msg void OnTbCopyUser();
+	afx_msg void OnTbCopyPw();
+	afx_msg void OnTbAddEntry();
+	afx_msg void OnTbEditEntry();
+	afx_msg void OnTbDeleteEntry();
+	afx_msg void OnTbFind();
+	afx_msg void OnTbLock();
+	afx_msg void OnTbAbout();
+	afx_msg void OnViewShowToolBar();
+	afx_msg void OnPwlistMassModify();
+	afx_msg void OnUpdatePwlistMassModify(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

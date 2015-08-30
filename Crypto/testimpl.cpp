@@ -34,6 +34,7 @@
 #include "rijndael.h"
 #include "twoclass.h"
 #include "arcfour.h"
+#include "../Util/MemUtil.h"
 
 static const char g_szVectABCX[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

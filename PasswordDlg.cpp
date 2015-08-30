@@ -32,7 +32,7 @@
 #include "PwSafeDlg.h"
 #include "PasswordDlg.h"
 
-#include "Util/MemUtil.h"
+#include "Util/StrUtil.h"
 #include "PwGeneratorDlg.h"
 #include "Util/base64.h"
 #include "NewGUI/TranslateEx.h"
@@ -91,14 +91,13 @@ BOOL CPasswordDlg::OnInitDialog()
 	GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fStyle, TRUE);
 	GetDlgItem(IDC_CHECK_STARS)->SetFont(&m_fStyle, TRUE);
 
-	m_ilIcons.Create(IDR_INFOICONS, 16, 1, RGB(255,0,255)); // Purple is transparent
-
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_Button(&m_btMakePw, IDB_KEY_SMALL, IDB_KEY_SMALL);
 	NewGUI_Button(&m_btStars, -1, -1);
 	m_btStars.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 
+	m_ilIcons.Create(IDR_INFOICONS, 16, 1, RGB(255,0,255)); // Purple is transparent
 	m_cbDiskList.SetXImageList(&m_ilIcons);
 
 	m_cbDiskList.SetBkGndColor(RGB(255,255,255));
@@ -119,11 +118,11 @@ BOOL CPasswordDlg::OnInitDialog()
 	::ReleaseDC(NULL, hDC);
 
 	m_cbDiskList.AddCTString(WZ_ROOT_INDEX, ICOIDX_NODRIVE, TRL("<no drive selected>"));
-	int i; char c; UINT uStat; CString str; BYTE idxImage;
+	int i; TCHAR c; UINT uStat; CString str; BYTE idxImage;
 	for(i = 0; i < 26; i++)
 	{
-		c = (char)(i + 'A');
-		str = CString(c) + ":\\";
+		c = (TCHAR)(i + _T('A'));
+		str = CString(c) + _T(":\\");
 		uStat = GetDriveType((LPCTSTR)str);
 		if(uStat != DRIVE_NO_ROOT_DIR)
 		{
@@ -211,8 +210,8 @@ BOOL CPasswordDlg::OnInitDialog()
 		}
 	}
 
-	CString strStars = (char)('z' + 27);
-	strStars += (char)('z' + 27); strStars += (char)('z' + 27);
+	CString strStars = (TCHAR)(_T('z') + 27);
+	strStars += (TCHAR)(_T('z') + 27); strStars += (TCHAR)(_T('z') + 27);
 	GetDlgItem(IDC_CHECK_STARS)->SetWindowText(strStars);
 	m_bStars = TRUE;
 	OnCheckStars();
@@ -239,6 +238,7 @@ void CPasswordDlg::OnOK()
 {
 	UpdateData(TRUE);
 
+	// Either password _or_ key disk
 	if(((m_strPassword.GetLength() == 0) ^ (m_cbDiskList.GetCurSel() == 0)) == 0)
 	{
 		MessageBox(TRL("EITHER enter a password/passphrase OR select a key disk drive."),
@@ -275,7 +275,7 @@ void CPasswordDlg::OnCheckStars()
 	if(m_bStars == FALSE)
 		m_pEditPw.SetPasswordChar(0);
 	else
-		m_pEditPw.SetPasswordChar((TCHAR)('z' + 27));
+		m_pEditPw.SetPasswordChar((TCHAR)(_T('z') + 27));
 
 	UpdateData(FALSE);
 	m_pEditPw.RedrawWindow();
@@ -288,6 +288,7 @@ void CPasswordDlg::OnMakePasswordBtn()
 
 	UpdateData(TRUE);
 
+	dlg.m_bCanAccept = TRUE;
 	if(dlg.DoModal() == IDOK)
 	{
 		m_strPassword = dlg.m_strPassword;

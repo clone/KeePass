@@ -200,23 +200,26 @@ void COptionsDlg::OnBtnSelFont()
 {
 	CString strFontSpec = m_strFontSpec;
 	CString strFace, strSize, strFlags;
-	int nChars = strFontSpec.ReverseFind(';');
-	int nSizeEnd = strFontSpec.ReverseFind(',');
+	int nChars = strFontSpec.ReverseFind(_T(';'));
+	int nSizeEnd = strFontSpec.ReverseFind(_T(','));
 	strFace = strFontSpec.Left(nChars);
 	strSize = strFontSpec.Mid(nChars + 1, nSizeEnd - nChars - 1);
 	strFlags = strFontSpec.Right(4);
 	int nSize = atoi((LPCTSTR)strSize);
 	int nWeight = FW_NORMAL;
-	if(strFlags.GetAt(0) == '1') nWeight = FW_BOLD;
-	BYTE bItalic = (strFlags.GetAt(1) == '1') ? TRUE : FALSE;
-	BYTE bUnderlined = (strFlags.GetAt(2) == '1') ? TRUE : FALSE;
-	BYTE bStrikeOut = (strFlags.GetAt(3) == '1') ? TRUE : FALSE;
+	if(strFlags.GetAt(0) == _T('1')) nWeight = FW_BOLD;
+	BYTE bItalic = (BYTE)((strFlags.GetAt(1) == _T('1')) ? TRUE : FALSE);
+	BYTE bUnderlined = (BYTE)((strFlags.GetAt(2) == _T('1')) ? TRUE : FALSE);
+	BYTE bStrikeOut = (BYTE)((strFlags.GetAt(3) == _T('1')) ? TRUE : FALSE);
 
 	LOGFONT lf;
-	HDC hDC = GetDC()->m_hDC;
+	CDC *pDC = GetDC();
+	HDC hDC = pDC->m_hDC;
 	ASSERT(hDC != NULL);
 	if(hDC != NULL) lf.lfHeight = -MulDiv(nSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
 	else { ASSERT(FALSE); lf.lfHeight = -nSize; }
+	ReleaseDC(pDC);
+
 	lf.lfWidth = 0; lf.lfEscapement = 0; lf.lfOrientation = 0;
 	lf.lfWeight = nWeight; lf.lfItalic = bItalic; lf.lfUnderline = bUnderlined;
 	lf.lfStrikeOut = bStrikeOut; lf.lfCharSet = DEFAULT_CHARSET;
@@ -232,20 +235,22 @@ void COptionsDlg::OnBtnSelFont()
 		int dSize = dlg.GetSize();
 		dSize = (dSize >= 0) ? dSize : -dSize;
 		m_strFontSpec = dlg.GetFaceName();
-		m_strFontSpec += ";";
-		strTemp.Format("%d", dSize / 10);
+		m_strFontSpec += _T(";");
+		strTemp.Format(_T("%d"), dSize / 10);
 		m_strFontSpec += strTemp;
-		m_strFontSpec += ",";
-		m_strFontSpec += (dlg.IsBold() == TRUE) ? '1' : '0';
-		m_strFontSpec += (dlg.IsItalic() == TRUE) ? '1' : '0';
-		m_strFontSpec += (dlg.IsUnderline() == TRUE) ? '1' : '0';
-		m_strFontSpec += (dlg.IsStrikeOut() == TRUE) ? '1' : '0';
+		m_strFontSpec += _T(",");
+		m_strFontSpec += (dlg.IsBold() == TRUE) ? _T('1') : _T('0');
+		m_strFontSpec += (dlg.IsItalic() == TRUE) ? _T('1') : _T('0');
+		m_strFontSpec += (dlg.IsUnderline() == TRUE) ? _T('1') : _T('0');
+		m_strFontSpec += (dlg.IsStrikeOut() == TRUE) ? _T('1') : _T('0');
 	}
 }
 
 void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	int n = m_tabMenu.GetCurSel();
+
+	UNREFERENCED_PARAMETER(pNMHDR);
 
 	switch(n)
 	{
@@ -263,7 +268,9 @@ void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case OPTGRP_SECURITY:
 		m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
+		break;
 	default:
+		ASSERT(FALSE);
 		break;
 	}
 

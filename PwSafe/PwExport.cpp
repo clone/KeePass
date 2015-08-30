@@ -77,10 +77,10 @@ void CPwExport::SetNewLineSeq(BOOL bWindows)
 BOOL CPwExport::ExportAll(const TCHAR *pszFile)
 {
 	ASSERT(pszFile != NULL);
-	return ExportGroup(pszFile, -1);
+	return ExportGroup(pszFile, DWORD_MAX);
 }
 
-BOOL CPwExport::ExportGroup(const TCHAR *pszFile, int nGroup)
+BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 {
 	FILE *fp;
 	TCHAR sz[256];
@@ -90,7 +90,6 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, int nGroup)
 
 	ASSERT(pszFile != NULL);
 	if(pszFile == NULL) return FALSE;
-	ASSERT((nGroup > -2) && (nGroup < (int)m_pMgr->GetNumberOfGroups()));
 	fp = _tfopen(pszFile, _T("wb"));
 	if(fp == NULL) return FALSE;
 
@@ -131,11 +130,11 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, int nGroup)
 	for(i = 0; i < m_pMgr->GetNumberOfEntries(); i++)
 	{
 		p = m_pMgr->GetEntry(i);
-		ASSERT(p != NULL);
+		ASSERT_ENTRY(p);
 
-		if((nGroup != -1) && (p->uGroupId != (DWORD)nGroup)) continue;
+		if((dwGroupId != DWORD_MAX) && (p->uGroupId != dwGroupId)) continue;
 
-		pg = m_pMgr->GetGroup(p->uGroupId);
+		pg = m_pMgr->GetGroup(m_pMgr->GetGroupByIdN(p->uGroupId));
 		ASSERT(pg != NULL);
 
 		m_pMgr->UnlockEntryPassword(p);
@@ -219,7 +218,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, int nGroup)
 	}
 
 	if(m_nFormat == PWEXP_TXT)
-	{ // Nothing to finalize TXT
+	{ // Nothing to do to finalize TXT
 	}
 	else if(m_nFormat == PWEXP_HTML)
 	{
@@ -234,9 +233,8 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, int nGroup)
 	else if(m_nFormat == PWEXP_CSV)
 	{ // Nothing to finalize CSV
 	}
-	else { ASSERT(FALSE); }
+	else { ASSERT(FALSE); } // Unknown format, should never happen
 
 	fclose(fp); fp = NULL;
-
 	return TRUE;
 }

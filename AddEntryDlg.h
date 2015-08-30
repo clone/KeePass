@@ -34,6 +34,7 @@
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/HyperEdit.h"
 #include "NewGUI/ShadeButtonST.h"
+#include "NewGUI/amsEdit.h"
 
 #include "PwSafe/PwManager.h"
 
@@ -50,7 +51,7 @@ public:
 	void CleanUp();
 
 	CFont m_fStyle;
-	CImageList m_ilIcons;
+	CImageList *m_pParentIcons;
 	CKCSideBannerWnd m_banner;
 
 	BOOL m_bEditMode;
@@ -58,8 +59,12 @@ public:
 	int m_nGroupId;
 	int m_nIconId;
 
+	PW_TIME m_tExpire;
+
 	//{{AFX_DATA(CAddEntryDlg)
 	enum { IDD = IDD_ADDENTRY_DLG };
+	CAMSTimeEdit	m_editTime;
+	CAMSDateEdit	m_editDate;
 	CShadeButtonST	m_btHidePw;
 	CShadeButtonST	m_btOK;
 	CShadeButtonST	m_btCancel;

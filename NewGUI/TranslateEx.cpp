@@ -192,7 +192,7 @@ void _SortTrlTable()
 	}
 }
 
-const char *_TRL(const char *pszDefString)
+const TCHAR *_TRL(const char *pszDefString)
 {
 	if(m_dwNumTrlStrings == 0) return pszDefString;
 	if(pszDefString == NULL) return "";

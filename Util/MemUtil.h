@@ -31,23 +31,34 @@
 #define ___MEMORY_UTILITIES_H___
 
 #include "../StdAfx.h"
+#include "../PwSafe/PwManager.h"
 
+// Safely delete pointers
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)       { if((p) != NULL) { delete (p);     (p) = NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if((p) != NULL) { delete [](p);  (p) = NULL; } }
 #define SAFE_RELEASE(p)      { if((p) != NULL) { (p)->Release(); (p) = NULL; } }
 #endif
 
+// Maximum temporary buffer for SecureDeleteFile
 #define SDF_BUF_SIZE 4096
 
+// Securely erase memory
 void mem_erase(unsigned char *p, unsigned long u);
-void EraseCString(CString *pString);
 
 #ifndef _WIN32_WCE
-void CopyStringToClipboard(char *pszString);
 BOOL SecureDeleteFile(LPCSTR pszFilePath);
 #endif
 
-void FixURL(CString *pstrURL);
+// Time conversion functions
+void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWORD dwDay, DWORD dwHour, DWORD dwMinute, DWORD dwSecond);
+void _UnpackStructToTime(BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond);
+
+// Getting the time
+void _GetCurrentPwTime(PW_TIME *p);
+
+// Compare two PW_TIME structures, returns -1 if pt1<pt2, returns 1 if pt1>pt2,
+// returns 0 if pt1=pt2
+int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2);
 
 #endif

@@ -40,13 +40,13 @@ public:
 	CPwImport();
 	virtual ~CPwImport();
 
-	BOOL ImportCsvToDb(const char *pszFile, CPwManager *pMgr, DWORD dwGroupId);
-	BOOL ImportCWalletToDb(const char *pszFile, CPwManager *pMgr);
-	BOOL ImportPwSafeToDb(const char *pszFile, CPwManager *pMgr);
+	BOOL ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwGroupId);
+	BOOL ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr);
+	BOOL ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr);
 
 private:
 	void _AddStringStreamToDb(const char *pStream, unsigned long uStreamSize);
-	char *_FileToMemory(const char *pszFile, unsigned long *pFileSize);
+	char *_FileToMemory(const TCHAR *pszFile, unsigned long *pFileSize);
 	unsigned long _GetPreferredIcon(const char *pszGroup);
 
 	CPwManager *m_pLastMgr;

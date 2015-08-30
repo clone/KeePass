@@ -40,12 +40,15 @@ class CPwGeneratorDlg : public CDialog
 public:
 	CPwGeneratorDlg(CWnd* pParent = NULL);
 
+	void CleanUp();
+
 	void _SetCheck(int inxItem, BOOL bEnable);
 	BOOL _GetCheck(int inxItem);
 
 	BOOL m_bCanAccept;
 
 	CKCSideBannerWnd m_banner;
+	CImageList m_ilIcons;
 
 	//{{AFX_DATA(CPwGeneratorDlg)
 	enum { IDD = IDD_PW_GENERATOR_DLG };
@@ -71,6 +74,8 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnGenerateBtn();
 	afx_msg void OnCheckCharSpec();
+	afx_msg void OnClickListOptions(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnRclickListOptions(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

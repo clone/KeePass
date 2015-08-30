@@ -55,7 +55,7 @@ CPrivateConfig::~CPrivateConfig()
 {
 }
 
-BOOL CPrivateConfig::Set(TCHAR *pszField, PCFG_IN TCHAR *pszValue)
+BOOL CPrivateConfig::Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue)
 {
 	BOOL bRet = FALSE;
 
@@ -77,15 +77,15 @@ BOOL CPrivateConfig::Set(TCHAR *pszField, PCFG_IN TCHAR *pszValue)
 	return bRet;
 }
 
-BOOL CPrivateConfig::Get(TCHAR *pszField, PCFG_OUT TCHAR *pszValue)
+BOOL CPrivateConfig::Get(const TCHAR *pszField, PCFG_OUT TCHAR *pszValue)
 {
 	BOOL bRet = FALSE;
 	TCHAR chEmpty[2] = { 0, 0 };
 
-	ASSERT(pszField != NULL);
-	if(pszField == NULL) return FALSE;
+	ASSERT((pszField != NULL) && (pszValue != NULL));
+	if((pszField == NULL) || (pszValue == NULL)) return FALSE;
 
-	pszValue[0] = 0; pszValue[1] = 0;
+	pszValue[0] = 0; pszValue[1] = 0; // Reset string
 
 #ifndef _WIN32_WCE
 	bRet = GetPrivateProfileString(PWM_EXENAME, pszField, chEmpty,

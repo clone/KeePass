@@ -101,6 +101,10 @@ SOURCE=.\AddGroupDlg.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\EntryPropertiesDlg.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\FindInDbDlg.cpp
 # End Source File
 # Begin Source File
@@ -162,6 +166,10 @@ SOURCE=.\AddEntryDlg.h
 # Begin Source File
 
 SOURCE=.\AddGroupDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\EntryPropertiesDlg.h
 # End Source File
 # Begin Source File
 
@@ -285,6 +293,54 @@ SOURCE=.\res\search.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\tb_about.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\tb_adden.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\tb_copyp.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\tb_copyu.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\tb_delet.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\tb_edite.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\tb_find.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\tb_lock.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\tb_main.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\tb_new.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\tb_open.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\tb_save.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\world.ico
 # End Source File
 # End Group
@@ -351,6 +407,14 @@ SOURCE=.\Util\PrivateConfig.cpp
 
 SOURCE=.\Util\PrivateConfig.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\Util\StrUtil.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Util\StrUtil.h
+# End Source File
 # End Group
 # Begin Group "Crypto"
 
@@ -409,6 +473,14 @@ SOURCE=.\Crypto\twofish.h
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\NewGUI\amsEdit.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\amsEdit.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\NewGUI\BCMenu.cpp
 # End Source File
 # Begin Source File
@@ -456,6 +528,14 @@ SOURCE=.\NewGUI\HyperEdit.cpp
 # Begin Source File
 
 SOURCE=.\NewGUI\HyperEdit.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\HyperLink.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\HyperLink.h
 # End Source File
 # Begin Source File
 

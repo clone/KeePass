@@ -50,7 +50,7 @@ public:
 	void SetNewLineSeq(BOOL bWindows);
 
 	BOOL ExportAll(const TCHAR *pszFile);
-	BOOL ExportGroup(const TCHAR *pszFile, int nGroup);
+	BOOL ExportGroup(const TCHAR *pszFile, DWORD dwGroupId);
 
 private:
 	CPwManager *m_pMgr;

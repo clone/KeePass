@@ -32,7 +32,8 @@
 
 #define MAX_TRANSLATION_STRINGS 300
 
-#define TRL(sptr) _TRL(_T(sptr))
+// Translate string, sptr must be a char*, _not_ a TCHAR* !
+#define TRL(sptr) _TRL(sptr)
 
 #define TRL_MODE_DEF FALSE
 #define TRL_MODE_TRL TRUE

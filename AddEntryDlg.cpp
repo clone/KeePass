@@ -33,7 +33,7 @@
 
 #include "IconPickerDlg.h"
 #include "PwGeneratorDlg.h"
-#include "Util/MemUtil.h"
+#include "Util/StrUtil.h"
 #include "NewGUI/TranslateEx.h"
 #include "Util/base64.h"
 
@@ -63,12 +63,15 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 	m_nGroupId = -1;
 	m_nIconId = 0;
 	m_bEditMode = FALSE;
+	m_pParentIcons = NULL;
 }
 
 void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAddEntryDlg)
+	DDX_Control(pDX, IDC_EDIT_EXPIRE_TIME, m_editTime);
+	DDX_Control(pDX, IDC_EDIT_EXPIRE_DATE, m_editDate);
 	DDX_Control(pDX, IDC_CHECK_HIDEPW, m_btHidePw);
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
@@ -103,6 +106,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	ASSERT(m_pParentIcons != NULL); // Parent must set image list first!
+
 	// The password dots font
 	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
@@ -110,9 +115,6 @@ BOOL CAddEntryDlg::OnInitDialog()
 	GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fStyle, TRUE);
 	GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fStyle, TRUE);
 	GetDlgItem(IDC_CHECK_HIDEPW)->SetFont(&m_fStyle, TRUE);
-
-	// The available images for the entry
-	m_ilIcons.Create(IDR_CLIENTICONS, 16, 1, RGB(255,0,255)); // Purple is transparent
 
 	// Make the buttons look cool
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
@@ -123,7 +125,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	m_btHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 
 	// Set the imagelist for the group selector combo box
-	m_pGroups.SetXImageList(&m_ilIcons);
+	m_pGroups.SetXImageList(m_pParentIcons);
 
 	m_pGroups.SetBkGndColor(RGB(255,255,255));
 	m_pGroups.SetTextColor(RGB(0,0,128));
@@ -176,8 +178,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 	}
 
 	// 'z' + 27 is that black dot in Tahoma
-	CString strStars = (TCHAR)('z' + 27);
-	strStars += (TCHAR)('z' + 27); strStars += (TCHAR)('z' + 27);
+	CString strStars = (TCHAR)(_T('z') + 27);
+	strStars += (TCHAR)(_T('z') + 27); strStars += (TCHAR)(_T('z') + 27);
 	GetDlgItem(IDC_CHECK_HIDEPW)->SetWindowText(strStars);
 	m_bStars = TRUE;
 	OnCheckHidePw();
@@ -190,6 +192,18 @@ BOOL CAddEntryDlg::OnInitDialog()
 	m_pURL.SetDblClkToJump(TRUE);
 
 	m_pURL.SetWindowText(m_strURL);
+
+	COleDateTime oleMin = AMS_MIN_OLEDATETIME;
+	COleDateTime oleMax(2999, 12, 28, 23, 59, 59);
+	m_editDate.SetRange(oleMin, oleMax);
+	m_editTime.SetRange(oleMin, oleMax);
+	m_editDate.SetDate((int)(unsigned int)m_tExpire.shYear,
+		(int)(unsigned int)m_tExpire.btMonth, (int)(unsigned int)m_tExpire.btDay);
+	m_editTime.SetAMPM(true);
+	m_editTime.Show24HourFormat(true);
+	m_editTime.ShowSeconds(true);
+	m_editTime.SetTime((int)(unsigned int)m_tExpire.btHour,
+		(int)(unsigned int)m_tExpire.btMinute, (int)(unsigned int)m_tExpire.btSecond);
 
 	UpdateData(FALSE);
 
@@ -226,6 +240,13 @@ void CAddEntryDlg::OnOK()
 {
 	UpdateData(TRUE);
 
+	m_tExpire.shYear = (USHORT)m_editDate.GetYear();
+	m_tExpire.btMonth = (BYTE)m_editDate.GetMonth();
+	m_tExpire.btDay = (BYTE)m_editDate.GetDay();
+	m_tExpire.btHour = (BYTE)m_editTime.GetHour();
+	m_tExpire.btMinute = (BYTE)m_editTime.GetMinute();
+	m_tExpire.btSecond = (BYTE)m_editTime.GetSecond();
+
 	m_nGroupId = m_pGroups.GetCurSel();
 
 	if(m_strPassword != m_strRepeatPw)
@@ -261,8 +282,8 @@ void CAddEntryDlg::OnCheckHidePw()
 	}
 	else
 	{
-		m_pEditPw.SetPasswordChar((TCHAR)('z' + 27));
-		m_pRepeatPw.SetPasswordChar((TCHAR)('z' + 27));
+		m_pEditPw.SetPasswordChar((TCHAR)(_T('z') + 27));
+		m_pRepeatPw.SetPasswordChar((TCHAR)(_T('z') + 27));
 	}
 
 	UpdateData(FALSE);
@@ -276,8 +297,8 @@ void CAddEntryDlg::OnPickIconBtn()
 {
 	CIconPickerDlg dlg;
 
-	dlg.m_pImageList = &m_ilIcons;
-	dlg.m_uNumIcons = (UINT)m_ilIcons.GetImageCount();
+	dlg.m_pImageList = m_pParentIcons;
+	dlg.m_uNumIcons = (UINT)m_pParentIcons->GetImageCount();
 
 	if(dlg.DoModal() == IDOK)
 	{

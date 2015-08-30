@@ -27,6 +27,9 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef ___WINDOW_GROUPS_H___
+#define ___WINDOW_GROUPS_H___
+
 #include "NewGUICommon.h"
 
 #define WG_OFFSET_TOP  105
@@ -47,3 +50,5 @@ private:
 	CObArray m_aWindows;
 	CDWordArray m_aGroupIDs;
 };
+
+#endif

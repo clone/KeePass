@@ -125,6 +125,7 @@ COLORREF NewGUI_GetBtnColor();
 
 void NewGUI_SetImgButtons(BOOL bImageButtons);
 void NewGUI_Button(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1);
+void NewGUI_ToolBarButton(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1);
 
 void NewGUI_TranslateCWnd(CWnd *pWnd);
 

@@ -50,8 +50,8 @@ public:
 	CPrivateConfig();
 	virtual ~CPrivateConfig();
 
-	BOOL Set(TCHAR *pszField, PCFG_IN TCHAR *pszValue);
-	BOOL Get(TCHAR *pszField, PCFG_OUT TCHAR *pszValue);
+	BOOL Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue);
+	BOOL Get(const TCHAR *pszField, PCFG_OUT TCHAR *pszValue);
 
 private:
 	TCHAR m_szFile[SI_REGSIZE];

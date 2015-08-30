@@ -273,8 +273,7 @@
 |Newline sequence:|            |Nyrad sekvens:|
 |Windows newline sequence (\r\n)|              |Fönster nyrad sekvens (\r\n)|
 |Unix newline sequence (\n)|   |Unix nyrad sekvens (\n)|
-|Clipboard auto-clear time:|   |Klippbokens auto resnings tid:|
-|sec|                          |sek|
+|Clipboard auto-clear time (seconds)|   |Klippbokens auto resnings tid (sekunder)|
 |Settings|                     |Inställningar|
 |Here you can configure KeePass.|              |Här kan du konfigurera KeePass.|
 |Automatically open last used database on startup|
@@ -348,3 +347,47 @@
 |Importera till databasen|
 |Search in|
 |Sök i|
+
+|&Get more languages...|
+|&Hämta fler språk...|
+
+|Security|
+|Säkerhet|
+|Start and Exit|
+|Starta och avsluta|
+|Interface (GUI)|
+|Gränssnitt (GUI)|
+|Files|
+|Filer|
+|Memory|
+|Minne|
+
+|Start:|
+|Starta:|
+|Exit:|
+|Avsluta:|
+
+|Default|
+|Standard värde|
+|More Colors...|
+|Fler färger...|
+|Lock workspace when minimizing the main window|
+|Lås arbetsytan vid minimering av huvudfönstret|
+|Automatically lock workspace after the following number of seconds:|
+|Lås arbetsytan efter angivet antal sekunder:|
+|Encryption algorithm to use (for this database):|
+|Krypterings algorithm (för denna databas):|
+|Advanced Encryption Standard (AES) (128-bit block cipher)|
+|Avancerad kryptering standard (AES) (128-bit block krypto)|
+|Twofish (128-bit block cipher)|
+|Twofish (128-bit block krypto)|
+|KeePass usage:|
+|KeePass användning:|
+|db = Path to database you wish to open on KeePass startup|
+|db = Sökväg till den databas som ska öppnas vid programstart| 
+|First close the open file before opening another one!|
+|Stäng den öppna filen innan du försöker öppna en annan!|
+|- Twofish algorithm|
+|- Twofish algorithm|
+|Import From &PwSafe v2 TXT|
+|Importera från &PwSafe v2 TXT|

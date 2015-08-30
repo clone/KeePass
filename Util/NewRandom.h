@@ -33,7 +33,7 @@
 #include <windows.h>
 #include "../Crypto/sha2.h"
 
-#define INTRAND_SIZE 260
+#define INTRAND_SIZE 264
 
 class CNewRandom
 {
@@ -59,6 +59,12 @@ public:
 	virtual BOOL GenerateRandomSequence(unsigned long uRandomSeqSize, unsigned char *pBuffer) const = 0;
 };
 
+// Seed is 128 bits = 4 32-bit DWORDS
+void srandXorShift(unsigned long *pSeed128);
+
 unsigned long randXorShift();
+
+// Must be able to hold at least 16 bytes
+void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource);
 
 #endif

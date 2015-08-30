@@ -36,6 +36,19 @@
 #define IDR_ACCEL_MAIN                  159
 #define IDB_LANGUAGE                    160
 #define IDI_LOCKED                      170
+#define IDR_TB_MAIN                     172
+#define IDB_TB_OPEN                     174
+#define IDB_TB_SAVE                     175
+#define IDB_TB_NEW                      176
+#define IDB_TB_ADDENTRY                 177
+#define IDB_TB_EDITENTRY                178
+#define IDB_TB_DELETEENTRY              179
+#define IDB_TB_COPYPW                   180
+#define IDB_TB_COPYUSER                 181
+#define IDB_TB_FIND                     182
+#define IDB_TB_LOCK                     183
+#define IDB_TB_ABOUT                    184
+#define IDD_ENTRYPROPERTIES_DLG         188
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -106,6 +119,29 @@
 #define IDC_STATIC_SELROWHIGHLIGHT      1085
 #define IDC_STATIC_START                1086
 #define IDC_STATIC_EXIT                 1087
+#define IDC_TB_OPEN                     1088
+#define IDC_TB_SAVE                     1089
+#define IDC_STATIC_TBSEP0               1090
+#define IDC_TB_ADDENTRY                 1091
+#define IDC_TB_EDITENTRY                1092
+#define IDC_TB_DELETEENTRY              1093
+#define IDC_STATIC_TBSEP1               1094
+#define IDC_TB_COPYUSER                 1095
+#define IDC_TB_COPYPW                   1096
+#define IDC_TB_NEW                      1097
+#define IDC_STATIC_TBSEP2               1098
+#define IDC_TB_FIND                     1099
+#define IDC_STATIC_TBSEP3               1100
+#define IDC_TB_LOCK                     1101
+#define IDC_STATIC_TBSEP4               1102
+#define IDC_TB_ABOUT                    1103
+#define IDC_HLINK_HOMEPAGE              1106
+#define IDC_EDIT_EXPIRE_DATE            1107
+#define IDC_EDIT_EXPIRE_TIME            1108
+#define IDC_CHECK_MODGROUP              1109
+#define IDC_CHECK_MODICON               1111
+#define IDC_BUTTON_SELECT_ICON          1112
+#define IDC_CHECK_MODEXPIRE             1113
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -210,14 +246,24 @@
 #define ID_PWLIST_SORT                  32878
 #define ID_IMPORT_CWALLET               32879
 #define ID_IMPORT_PWSAFE                32893
+#define ID_VIEW_CREATION                32895
+#define ID_VIEW_LASTMOD                 32896
+#define ID_VIEW_LASTACCESS              32897
+#define ID_VIEW_EXPIRE                  32898
+#define ID_VIEW_UUID                    32899
+#define ID_BUTTON32900                  32900
+#define ID_VIEW_SHOWTOOLBAR             32902
+#define ID_PWLIST_MASSMODIFY            32903
+#define ID_BUTTON32904                  32904
+#define ID_BUTTON32905                  32905
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        172
-#define _APS_NEXT_COMMAND_VALUE         32895
-#define _APS_NEXT_CONTROL_VALUE         1088
+#define _APS_NEXT_RESOURCE_VALUE        189
+#define _APS_NEXT_COMMAND_VALUE         32906
+#define _APS_NEXT_CONTROL_VALUE         1117
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

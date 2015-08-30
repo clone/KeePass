@@ -32,16 +32,15 @@
 
 #include "../Util/NewRandom.h"
 #include "../Crypto/rijndael.h"
-#include "../Crypto/twoclass.h"
 
 // General product information
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
-#define PWM_VERSION_STR  _T("0.87")
+#define PWM_VERSION_STR  _T("0.88a")
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
 #define PWM_DBSIG_2      0xB54BFB65
-#define PWM_DBVER_DW     0x00010002
+#define PWM_DBVER_DW     0x00020001
 
 #define PWM_HOMEPAGE     _T("http://keepass.sourceforge.net")
 #define PWM_URL_TRL      _T("http://keepass.sourceforge.net/translations.php")
@@ -77,14 +76,27 @@
 #define PWMKEY_COLWIDTH2 _T("KeeColumnWidth2")
 #define PWMKEY_COLWIDTH3 _T("KeeColumnWidth3")
 #define PWMKEY_COLWIDTH4 _T("KeeColumnWidth4")
+#define PWMKEY_COLWIDTH5 _T("KeeColumnWidth5")
+#define PWMKEY_COLWIDTH6 _T("KeeColumnWidth6")
+#define PWMKEY_COLWIDTH7 _T("KeeColumnWidth7")
+#define PWMKEY_COLWIDTH8 _T("KeeColumnWidth8")
+#define PWMKEY_COLWIDTH9 _T("KeeColumnWidth9")
 #define PWMKEY_LOCKMIN   _T("KeeLockOnMinimize")
 #define PWMKEY_MINTRAY   _T("KeeMinimizeToTray")
 #define PWMKEY_LOCKTIMER _T("KeeLockAfterTime")
 #define PWMKEY_ROWCOLOR  _T("KeeRowColor")
+#define PWMKEY_SHOWCREATION     _T("KeeShowCreation")
+#define PWMKEY_SHOWLASTMOD      _T("KeeShowLastMod")
+#define PWMKEY_SHOWLASTACCESS   _T("KeeShowLastAccess")
+#define PWMKEY_SHOWEXPIRE       _T("KeeShowExpire")
+#define PWMKEY_SHOWUUID         _T("KeeShowUUID")
+#define PWMKEY_SHOWTOOLBAR      _T("KeeShowToolBar")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
+
 #define PWM_PASSWORD_STRING     _T("********")
+#define PWS_SEARCHGROUP         TRL("Search results")
 
 #define PWM_FLAG_SHA2           1
 #define PWM_FLAG_RIJNDAEL       2
@@ -94,39 +106,34 @@
 #define PWM_SESSION_KEY_SIZE    12
 
 // Field flags (for example in Find function)
-#define PWMF_TITLE       1
-#define PWMF_USER        2
-#define PWMF_URL         4
-#define PWMF_PASSWORD    8
-#define PWMF_ADDITIONAL 16
-#define PWMF_GROUPNAME  32
+#define PWMF_TITLE        1
+#define PWMF_USER         2
+#define PWMF_URL          4
+#define PWMF_PASSWORD     8
+#define PWMF_ADDITIONAL  16
+#define PWMF_GROUPNAME   32
+#define PWMF_CREATION    64
+#define PWMF_LASTMOD    128
+#define PWMF_LASTACCESS 256
+#define PWMF_EXPIRE     512
+#define PWMF_UUID      1024
 
 #define ALGO_AES         0
 #define ALGO_TWOFISH     1
 
 #pragma pack(1)
-typedef struct _PW_ENTRY
+
+typedef struct _PW_TIME
 {
-	DWORD uGroupId;
-	DWORD uImageId;
+	USHORT shYear; // The year, 2004 means 2004
+	BYTE btMonth;  // 1 = Jan, 12 = Dec
+	BYTE btDay;    // The first day is 1
+	BYTE btHour;   // The day begins with hour 0, max value is 23
+	BYTE btMinute; // Begins at 0, max value is 59
+	BYTE btSecond; // Begins at 0, max value is 59
+} PW_TIME, *PPW_TIME;
 
-	TCHAR *pszTitle;
-	TCHAR *pszURL;
-	TCHAR *pszUserName;
-
-	DWORD uPasswordLen;
-	TCHAR *pszPassword;
-
-	TCHAR *pszAdditional;
-} PW_ENTRY, *PPW_ENTRY;
-
-typedef struct _PW_GROUP
-{
-	DWORD uImageId;
-	TCHAR *pszGroupName;
-} PW_GROUP, *PPW_GROUP;
-
-typedef struct _PW_DBHEADER
+typedef struct _PW_DBHEADER // The database header
 {
 	DWORD dwSignature1;
 	DWORD dwSignature2;
@@ -138,15 +145,67 @@ typedef struct _PW_DBHEADER
 
 	DWORD dwGroups;
 	DWORD dwEntries;
+
+	BYTE aContentsHash[32];
 } PW_DBHEADER, *PPW_DBHEADER;
+
+typedef struct _PW_DBHEADER_V1 // Old version 1.x database header
+{
+	DWORD dwSignature1;
+	DWORD dwSignature2;
+	DWORD dwFlags;
+	DWORD dwVersion;
+
+	BYTE aMasterSeed[16];
+	RD_UINT8 aEncryptionIV[16];
+
+	DWORD dwGroups;
+	DWORD dwEntries;
+} PW_DBHEADER_V1, *PPW_DBHEADER_V1;
+
+typedef struct _PW_GROUP // Structure containing information about one group
+{
+	DWORD uGroupId;
+	DWORD uImageId;
+	TCHAR *pszGroupName;
+
+	PW_TIME tCreation;
+	PW_TIME tLastMod;
+	PW_TIME tLastAccess;
+	PW_TIME tExpire;
+} PW_GROUP, *PPW_GROUP;
+
+typedef struct _PW_ENTRY // Structure containing information about one entry
+{
+	BYTE uuid[16];
+	DWORD uGroupId;
+	DWORD uImageId;
+
+	TCHAR *pszTitle;
+	TCHAR *pszURL;
+	TCHAR *pszUserName;
+
+	DWORD uPasswordLen;
+	TCHAR *pszPassword;
+
+	TCHAR *pszAdditional;
+
+	PW_TIME tCreation;
+	PW_TIME tLastMod;
+	PW_TIME tLastAccess;
+	PW_TIME tExpire;
+} PW_ENTRY, *PPW_ENTRY;
 #pragma pack()
 
 #ifdef _DEBUG
-#define ASSERT_ENTRY(pp) ASSERT(pp != NULL); ASSERT(pp->pszTitle != NULL); \
-	ASSERT(pp->pszUserName != NULL); ASSERT(pp->pszURL != NULL); \
-	ASSERT(pp->pszPassword != NULL); ASSERT(pp->pszAdditional != NULL);
+#define ASSERT_ENTRY(pp) ASSERT((pp) != NULL); ASSERT((pp)->pszTitle != NULL); \
+	ASSERT((pp)->pszUserName != NULL); ASSERT((pp)->pszURL != NULL); \
+	ASSERT((pp)->pszPassword != NULL); ASSERT((pp)->pszAdditional != NULL);
 #else
 #define ASSERT_ENTRY(pp)
+#endif
+#ifndef DWORD_MAX
+#define DWORD_MAX 0xFFFFFFFF
 #endif
 
 class CPwManager
@@ -155,75 +214,100 @@ public:
 	CPwManager();
 	virtual ~CPwManager();
 
-	void CleanUp();
+	void CleanUp(); // Delete everything and release all allocated memory
 
-	BOOL SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const CNewRandomInterface *pARI);
+	// Set the master key for the database.
+	BOOL SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const CNewRandomInterface *pARI, BOOL bOverwrite = TRUE);
 
-	DWORD GetNumberOfEntries();
-	DWORD GetNumberOfGroups();
+	DWORD GetNumberOfEntries(); // Returns number of entries in database
+	DWORD GetNumberOfGroups(); // Returns number of groups in database
 
-	int GetNumberOfItemsInGroup(const TCHAR *pszGroup);
-	int GetNumberOfItemsInGroupN(int idGroup);
+	// Count items in groups
+	DWORD GetNumberOfItemsInGroup(const TCHAR *pszGroup);
+	DWORD GetNumberOfItemsInGroupN(DWORD idGroup);
+
+	// Access entry information
 	PW_ENTRY *GetEntry(DWORD dwIndex);
-	PW_ENTRY *GetEntryByGroup(int idGroup, DWORD dwIndex);
-	int GetEntryByGroupN(int idGroup, DWORD dwIndex);
+	PW_ENTRY *GetEntryByGroup(DWORD idGroup, DWORD dwIndex);
+	DWORD GetEntryByGroupN(DWORD idGroup, DWORD dwIndex);
+	PW_ENTRY *GetEntryByUuid(BYTE *pUuid);
+	DWORD GetEntryByUuidN(BYTE *pUuid); // Returns the index of the item with pUuid
+	DWORD GetEntryPosInGroup(PW_ENTRY *pEntry);
+	PW_ENTRY *GetLastEditedEntry();
+
+	// Access group information
 	PW_GROUP *GetGroup(DWORD dwIndex);
+	PW_GROUP *GetGroupById(DWORD idGroup);
+	DWORD GetGroupByIdN(DWORD idGroup);
+	DWORD GetGroupId(const TCHAR *pszGroupName);
+	DWORD GetGroupIdByIndex(DWORD uGroupIndex);
 
-	int GetGroupId(const TCHAR *pszGroupName);
+	// Add entries and groups
+	BOOL AddGroup(const PW_GROUP *pTemplate);
+	BOOL AddEntry(const PW_ENTRY *pTemplate);
 
-	BOOL AddGroup(DWORD uImageId, const TCHAR *pszGroupName);
-	BOOL AddEntry(DWORD uGroupId, DWORD uImageId, const TCHAR *pszTitle,
-		const TCHAR *pszURL, const TCHAR *pszUserName, const TCHAR *pszPassword,
-		const TCHAR *pszAdditional);
+	// Delete entries and groups
 	BOOL DeleteEntry(DWORD dwIndex);
-	BOOL DeleteGroup(int nGroupId);
+	BOOL DeleteGroup(DWORD uGroupId);
 
-	BOOL SetGroup(DWORD dwIndex, DWORD uImageId, const TCHAR *pszGroupName);
-	BOOL SetEntry(DWORD dwIndex, DWORD uGroupId, DWORD uImageId,
-		const TCHAR *pszTitle, const TCHAR *pszURL, const TCHAR *pszUserName,
-		const TCHAR *pszPassword, const TCHAR *pszAdditional);
+	BOOL SetGroup(DWORD dwIndex, PW_GROUP *pTemplate);
+	BOOL SetEntry(DWORD dwIndex, PW_ENTRY *pTemplate);
 
-	void LockEntryPassword(PW_ENTRY *pEntry);
-	void UnlockEntryPassword(PW_ENTRY *pEntry);
+	// Use these functions to make passwords in PW_ENTRY structures readable
+	void LockEntryPassword(PW_ENTRY *pEntry); // Lock password, encrypt it
+	void UnlockEntryPassword(PW_ENTRY *pEntry); // Make password readable
 
 	void NewDatabase();
 	BOOL OpenDatabase(const TCHAR *pszFile);
 	BOOL SaveDatabase(const TCHAR *pszFile);
 
-	void MoveInternal(int nFrom, int nTo);
-	void MoveInGroup(int nGroup, int nFrom, int nTo);
-	BOOL MoveGroup(int nFrom, int nTo);
-	void SortGroup(int nGroup, DWORD dwSortByField);
+	// Move entries and groups
+	void MoveInternal(DWORD nFrom, DWORD nTo);
+	void MoveInGroup(DWORD idGroup, DWORD nFrom, DWORD nTo);
+	BOOL MoveGroup(DWORD nFrom, DWORD nTo);
+
+	// Sort entry and group lists
+	void SortGroup(DWORD idGroup, DWORD dwSortByField);
 	void SortGroupList();
 
-	int Find(const TCHAR *pszFindString, BOOL bCaseSensitive, int fieldFlags, int nStart);
+	// Find an item
+	DWORD Find(const TCHAR *pszFindString, BOOL bCaseSensitive, DWORD fieldFlags, DWORD nStart);
 
+	// Get and set the algorithm used to encrypt the database
 	BOOL SetAlgorithm(int nAlgorithm);
 	int GetAlgorithm();
 
-	// Unicode/Ascii conversion helpers
-	char *_ToAscii(const TCHAR *lptString);
-	TCHAR *_ToUnicode(const char *pszString);
+	// Convert PW_TIME to 5-byte compressed structure and the other way round
+	static void _TimeToPwTime(BYTE *pCompressedTime, PW_TIME *pPwTime);
+	static void _PwTimeToTime(PW_TIME *pPwTime, BYTE *pCompressedTime);
+
+protected:
+	virtual BOOL ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_GROUP *pGroup);
+	virtual BOOL ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_ENTRY *pEntry);
 
 private:
-	void _AllocEntries(unsigned long uEntries);
+	void _AllocEntries(DWORD uEntries);
 	void _DeleteEntryList(BOOL bFreeStrings);
-	void _AllocGroups(unsigned long uGroups);
+	void _AllocGroups(DWORD uGroups);
 	void _DeleteGroupList(BOOL bFreeStrings);
 
-	PW_ENTRY *m_pEntries;
-	DWORD m_dwMaxEntries;
-	DWORD m_dwNumEntries;
+	BOOL _OpenDatabaseV1(const TCHAR *pszFile);
 
-	PW_GROUP *m_pGroups;
-	DWORD m_dwMaxGroups;
-	DWORD m_dwNumGroups;
+	PW_ENTRY *m_pEntries; // List containing all entries
+	DWORD m_dwMaxEntries; // Maximum number of items that can be stored in the list
+	DWORD m_dwNumEntries; // Current number of items stored in the list
 
-	CNewRandom m_random;
+	PW_GROUP *m_pGroups; // List containing all groups
+	DWORD m_dwMaxGroups; // Maximum number of groups that can be stored in the list
+	DWORD m_dwNumGroups; // Current number of groups stored in the list
 
-	BYTE m_pSessionKey[PWM_SESSION_KEY_SIZE];
-	BYTE m_pMasterKey[32];
-	int m_nAlgorithm;
+	PW_ENTRY *m_pLastEditedEntry; // Last modified entry, use GetLastEditedEntry() to get it
+
+	CNewRandom m_random; // PRNG
+
+	BYTE m_pSessionKey[PWM_SESSION_KEY_SIZE]; // Used for in-memory encryption of passwords
+	BYTE m_pMasterKey[32]; // Master key used to encrypt the whole database
+	int m_nAlgorithm; // Algorithm used to encrypt the database
 };
 
 #endif

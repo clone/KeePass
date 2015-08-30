@@ -31,6 +31,13 @@
 #include "NewRandom.h"
 #include "MemUtil.h"
 
+static DWORD g_dwNewRandomInstanceCounter = 0;
+
+static unsigned long g_xorW;
+static unsigned long g_xorX;
+static unsigned long g_xorY;
+static unsigned long g_xorZ;
+
 CNewRandom::CNewRandom()
 {
 	Reset();
@@ -59,6 +66,8 @@ void CNewRandom::Initialize()
 	MEMORYSTATUS ms;
 	SYSTEM_INFO si;
 	STARTUPINFO sui;
+
+	g_dwNewRandomInstanceCounter++;
 
 	Reset();
 
@@ -176,6 +185,9 @@ void CNewRandom::Initialize()
 #endif
 	inx += sizeof(STARTUPINFO);
 
+	memcpy(&m_pPseudoRandom[inx], &g_dwNewRandomInstanceCounter, 4);
+	inx += 4;
+
 	ASSERT(inx <= INTRAND_SIZE);
 }
 
@@ -202,18 +214,58 @@ void CNewRandom::GetRandomBuffer(BYTE *pBuf, DWORD dwSize)
 	}
 }
 
+// Seed the xorshift random number generator
+void srandXorShift(unsigned long *pSeed128)
+{
+	ASSERT(pSeed128 != NULL);
+	g_xorW = pSeed128[0]; g_xorX = pSeed128[1];
+	g_xorY = pSeed128[2]; g_xorZ = pSeed128[3];
+}
+
 // Fast XorShift random number generator
 unsigned long randXorShift()
 {
-	static unsigned long w = 88675123;
-	static unsigned long x = 362436069;
-	static unsigned long y = 2463534242;
-	static unsigned long z = 521288629;
 	unsigned long tmp;
 
-	tmp = (x ^ (x << 15));
-	x = y; y = z; z = w;
-	w = (w ^ (w >> 21)) ^ (tmp ^ (tmp >> 4));
+	tmp = (g_xorX ^ (g_xorX << 15));
+	g_xorX = g_xorY; g_xorY = g_xorZ; g_xorZ = g_xorW;
+	g_xorW = (g_xorW ^ (g_xorW >> 21)) ^ (tmp ^ (tmp >> 4));
 
-	return w;
+	return g_xorW;
+}
+
+void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource)
+{
+	SYSTEMTIME st;
+	BYTE *p = pUUID16;
+	DWORD *pdw1 = (DWORD *)pUUID16, *pdw2 = (DWORD *)&pUUID16[4],
+		*pdw3 = (DWORD *)&pUUID16[8], *pdw4 = (DWORD *)&pUUID16[12];
+
+	ASSERT(pRandomSource != NULL);
+
+	ASSERT((sizeof(DWORD) == 4) && (sizeof(USHORT) == 2) && (pUUID16 != NULL));
+	if(pUUID16 == NULL) return;
+
+	ZeroMemory(&st, sizeof(SYSTEMTIME));
+	GetSystemTime(&st);
+
+	_PackTimeToStruct(p, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+	p += 5; // +5 => 5 bytes filled
+	*p = (BYTE)((st.wMilliseconds >> 2) & 0xFF); // Store milliseconds
+	p++; // +1 => 6 bytes filled
+
+	// Use the xorshift random number generator as pseudo-counter
+	DWORD dwPseudoCounter = randXorShift();
+	memcpy(p, &dwPseudoCounter, 2); // Use only 2/4 bytes
+	p += 2; // +2 => 8 bytes filled
+
+	pRandomSource->GetRandomBuffer(p, 8); // +8 => 16 bytes filled
+
+	// Mix buffer for better read- and processability using PHTs
+	*pdw1 += *pdw2; *pdw2 += *pdw1; *pdw3 += *pdw4; *pdw4 += *pdw3;
+	*pdw2 += *pdw3; *pdw3 += *pdw2; *pdw1 += *pdw4; *pdw4 += *pdw1;
+	*pdw1 += *pdw3; *pdw3 += *pdw1; *pdw2 += *pdw4; *pdw4 += *pdw2;
+	*pdw1 += *pdw2; *pdw2 += *pdw1; *pdw3 += *pdw4; *pdw4 += *pdw3;
+	*pdw2 += *pdw3; *pdw3 += *pdw2; *pdw1 += *pdw4; *pdw4 += *pdw1;
+	*pdw1 += *pdw3; *pdw3 += *pdw1; *pdw2 += *pdw4; *pdw4 += *pdw2;
 }

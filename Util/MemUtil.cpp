@@ -50,61 +50,7 @@ void mem_erase(unsigned char *p, unsigned long u)
 	memset(p, 0, u);
 }
 
-void EraseCString(CString *pString)
-{
-	int i, j, len;
-	const TCHAR tcPlus = ' ';
-	const TCHAR tcMod = '}' - tcPlus;
-
-	ASSERT(pString != NULL);
-
-	len = pString->GetLength();
-
-	for(i = 0; i < 3; i++) // 3 rounds overwrite
-	{
-		for(j = 0; j < len; j++)
-		{
-			pString->SetAt(j, (TCHAR)((rand() % tcMod) + tcPlus));
-		}
-	}
-
-	pString->Empty();
-}
-
 #ifndef _WIN32_WCE
-void CopyStringToClipboard(char *pszString)
-{
-	unsigned long uDataSize;
-	HGLOBAL globalHandle;
-	LPVOID globalData;
-
-	if(::OpenClipboard(NULL) == FALSE) return;
-
-	if(::EmptyClipboard() == FALSE) return;
-
-	if(pszString == NULL) // No string to copy => empty clipboard
-	{
-		::CloseClipboard();
-		return;
-	}
-
-	uDataSize = strlen(pszString); // Get length
-	if(uDataSize == 0)
-	{
-		::CloseClipboard();
-		return;
-	}
-	uDataSize++; // Plus NULL-terminator of string
-
-	globalHandle = ::GlobalAlloc(GHND | GMEM_DDESHARE, uDataSize);
-	globalData = ::GlobalLock(globalHandle);
-	strcpy((char *)globalData, pszString); // Copy string plus NULL-byte to global memory
-	::GlobalUnlock(globalHandle); // Unlock before SetClipboardData!
-
-	::SetClipboardData(CF_TEXT, globalHandle); // Set clipboard data to our global memory block
-	::CloseClipboard(); // Close clipboard, done
-}
-
 BOOL SecureDeleteFile(LPCSTR pszFilePath)
 {
 	HANDLE hFile;
@@ -167,36 +113,66 @@ BOOL SecureDeleteFile(LPCSTR pszFilePath)
 }
 #endif
 
-void FixURL(CString *pstrURL)
+// Pack time to 5 byte structure:
+// Byte bits: 11111111 22222222 33333333 44444444 55555555
+// Contents : 00YYYYYY YYYYYYMM MMDDDDDH HHHHMMMM MMSSSSSS
+
+void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWORD dwDay, DWORD dwHour, DWORD dwMinute, DWORD dwSecond)
 {
-	CString strTemp;
-	BOOL bPre = FALSE;
+	ASSERT(pBytes != NULL); if(pBytes == NULL) return;
+	// Pack the time to a 5 byte structure
+	pBytes[0] = (BYTE)((dwYear >> 6) & 0x0000003F);
+	pBytes[1] = (BYTE)(((dwYear & 0x0000003F) << 2) | ((dwMonth >> 2) & 0x00000003));
+	pBytes[2] = (BYTE)(((dwMonth & 0x00000003) << 6) | ((dwDay & 0x0000001F) << 1) | ((dwHour >> 4) & 0x00000001));
+	pBytes[3] = (BYTE)(((dwHour & 0x0000000F) << 4) | ((dwMinute >> 2) & 0x0000000F));
+	pBytes[4] = (BYTE)(((dwMinute & 0x00000003) << 6) | (dwSecond & 0x0000003F));
+}
 
-	ASSERT(pstrURL != NULL);
+void _UnpackStructToTime(BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond)
+{
+	DWORD dw1, dw2, dw3, dw4, dw5;
+	ASSERT(pBytes != NULL);
+	dw1 = (DWORD)pBytes[0]; dw2 = (DWORD)pBytes[1]; dw3 = (DWORD)pBytes[2];
+	dw4 = (DWORD)pBytes[3]; dw5 = (DWORD)pBytes[4];
 
-	// Load string and make lower
-	strTemp = *pstrURL;
-	strTemp.MakeLower();
+	// Unpack 5 byte structure to date and time
+	*pdwYear = (dw1 << 6) | (dw2 >> 2);
+	*pdwMonth = ((dw2 & 0x00000003) << 2) | (dw3 >> 6);
+	*pdwDay = (dw3 >> 1) & 0x0000001F;
+	*pdwHour = ((dw3 & 0x00000001) << 4) | (dw4 >> 4);
+	*pdwMinute = ((dw4 & 0x0000000F) << 2) | (dw5 >> 6);
+	*pdwSecond = dw5 & 0x0000003F;
+}
 
-	// If the string begins with one of the following prefixes it is an URL
-	if(strTemp.Left(5) == "file:") bPre = TRUE;
-	if(strTemp.Left(4) == "ftp:") bPre = TRUE;
-	if(strTemp.Left(7) == "gopher:") bPre = TRUE;
-	if(strTemp.Left(5) == "http:") bPre = TRUE;
-	if(strTemp.Left(6) == "https:") bPre = TRUE;
-	if(strTemp.Left(7) == "mailto:") bPre = TRUE;
-	if(strTemp.Left(5) == "news:") bPre = TRUE;
-	if(strTemp.Left(5) == "nntp:") bPre = TRUE;
-	if(strTemp.Left(9) == "prospero:") bPre = TRUE;
-	if(strTemp.Left(7) == "telnet:") bPre = TRUE;
-	if(strTemp.Left(5) == "wais:") bPre = TRUE;
+void _GetCurrentPwTime(PW_TIME *p)
+{
+	SYSTEMTIME t;
+	ASSERT(p != NULL);
+	GetLocalTime(&t);
+	p->btDay = (BYTE)t.wDay; p->btHour = (BYTE)t.wHour;
+	p->btMinute = (BYTE)t.wMinute; p->btMonth = (BYTE)t.wMonth;
+	p->btSecond = (BYTE)t.wSecond; p->shYear = (USHORT)t.wYear;
+}
 
-	if(bPre == FALSE) // The string isn't a valid URL, so assume it's a HTTP
-	{
-		strTemp = "http:";
-		if(pstrURL->Left(1) != "/") strTemp += "//";
-		strTemp += *pstrURL;
+int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2)
+{
+	if(pt1->shYear < pt2->shYear) return -1;
+	else if(pt1->shYear > pt2->shYear) return 1;
 
-		*pstrURL = strTemp;
-	}
+	if(pt1->btMonth < pt2->btMonth) return -1;
+	else if(pt1->btMonth > pt2->btMonth) return 1;
+
+	if(pt1->btDay < pt2->btDay) return -1;
+	else if(pt1->btDay > pt2->btDay) return 1;
+
+	if(pt1->btHour < pt2->btHour) return -1;
+	else if(pt1->btHour > pt2->btHour) return 1;
+
+	if(pt1->btMinute < pt2->btMinute) return -1;
+	else if(pt1->btMinute > pt2->btMinute) return 1;
+
+	if(pt1->btSecond < pt2->btSecond) return -1;
+	else if(pt1->btSecond > pt2->btSecond) return 1;
+
+	return 0; // They are exactly the same
 }

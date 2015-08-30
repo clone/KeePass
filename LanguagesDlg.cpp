@@ -104,17 +104,17 @@ BOOL CLanguagesDlg::OnInitDialog()
 		"English", 0, 0, 1, NULL);
 
 	CFileFind ff;
-	char szThis[1024];
+	TCHAR szThis[1024];
 	unsigned long i = 0;
 	CString csTmp;
 	BOOL chk_w = FALSE;
 
 	GetModuleFileName(NULL, szThis, 1024);
-	for(i = strlen(szThis)-1; i > 1; i--) // Extract dir
+	for(i = _tcslen(szThis) - 1; i > 1; i--) // Extract dir
 	{
-		if(szThis[i] == '\\') { szThis[i] = 0; break; }
+		if(szThis[i] == _T('\\')) { szThis[i] = 0; break; }
 	}
-	strcat(szThis, "\\*.lng");
+	_tcscat(szThis, _T("\\*.lng"));
 
 	chk_w = ff.FindFile(szThis, 0);
 	while(chk_w == TRUE)
@@ -123,7 +123,7 @@ BOOL CLanguagesDlg::OnInitDialog()
 
 		csTmp = ff.GetFileTitle();
 		csTmp.MakeLower();
-		if((csTmp != "standard") && (csTmp != "english"))
+		if((csTmp != _T("standard")) && (csTmp != _T("english")))
 		{
 			m_listLang.InsertItem(LVIF_TEXT | LVIF_IMAGE, m_listLang.GetItemCount(),
 				ff.GetFileTitle(), 0, 0, 1, NULL);
@@ -150,7 +150,7 @@ void CLanguagesDlg::OnClickLanguagesList(NMHDR* pNMHDR, LRESULT* pResult)
 	CPoint mousePoint;
 	UINT nFlags = 0;
 	int nHitItem = 0;
-	char szItem[MAX_PATH];
+	TCHAR tszItem[MAX_PATH];
 
 	UNREFERENCED_PARAMETER(pNMHDR);
 
@@ -160,11 +160,11 @@ void CLanguagesDlg::OnClickLanguagesList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	nHitItem = m_listLang.HitTest(mousePoint, &nFlags);
 
-	m_listLang.GetItemText(nHitItem, 0, szItem, 254);
+	m_listLang.GetItemText(nHitItem, 0, tszItem, 254);
 
 	if(nFlags & LVHT_ONITEM)
 	{
-		_LoadLanguage(szItem);
+		_LoadLanguage(tszItem);
 	}
 
 	*pResult = 0;
@@ -173,23 +173,23 @@ void CLanguagesDlg::OnClickLanguagesList(NMHDR* pNMHDR, LRESULT* pResult)
 void CLanguagesDlg::_LoadLanguage(char *szLang)
 {
 	FILE *fp = NULL;
-	char szFile[MAX_PATH * 2];
+	TCHAR szFile[MAX_PATH * 2];
 	int i = 0;
 	CPrivateConfig cConfig;
 
 	GetModuleFileName(NULL, szFile, MAX_PATH * 2);
-	for(i = strlen(szFile)-1; i > 1; i--) // Extract dir
+	for(i = _tcslen(szFile)-1; i > 1; i--) // Extract dir
 	{
-		if(szFile[i] == '\\') { szFile[i] = 0; break; }
+		if(szFile[i] == _T('\\')) { szFile[i] = 0; break; }
 	}
-	strcat(szFile, "\\");
-	strcat(szFile, szLang);
+	_tcscat(szFile, _T("\\"));
+	_tcscat(szFile, szLang);
 
-	if(strcmp(szLang, "English") != 0)
+	if(_tcscmp(szLang, _T("English")) != 0)
 	{
-		strcat(szFile, ".lng");
+		_tcscat(szFile, _T(".lng"));
 
-		fp = fopen(szFile, "rb");
+		fp = _tfopen(szFile, _T("rb"));
 		ASSERT(fp != NULL);
 		if(fp == NULL)
 		{
@@ -206,14 +206,14 @@ void CLanguagesDlg::_LoadLanguage(char *szLang)
 	}
 	else
 	{
-		cConfig.Set(PWMKEY_LANG, "Standard");
+		cConfig.Set(PWMKEY_LANG, _T("Standard"));
 	}
 
 	CString str;
 	str = TRL("The language file has been installed.");
-	str += "\r\n\r\n";
+	str += _T("\r\n\r\n");
 	str += TRL("You must restart KeePass in order to use the new language.");
-	str += "\r\n\r\n";
+	str += _T("\r\n\r\n");
 	str += TRL("Do you wish to restart KeePass now?");
 	i = MessageBox(str,
 		TRL("Restart KeePass?"), MB_YESNO | MB_ICONQUESTION);
@@ -225,7 +225,7 @@ void CLanguagesDlg::_LoadLanguage(char *szLang)
 
 void CLanguagesDlg::OnBtnGetLanguage() 
 {
-	ShellExecute(GetSafeHwnd(), "open", PWM_URL_TRL,
+	ShellExecute(GetSafeHwnd(), _T("open"), PWM_URL_TRL,
 		NULL, NULL, SW_SHOW);
 	OnCancel();
 }

@@ -81,9 +81,11 @@ int main(int argc, char *argv[])
 	delete []pDataOut;
 	delete []pDataIn;
 
-	if(!(uDivCount & 1))
+	if((uDivCount % 4) == 0) // !(uDivCount & 1)
 	{
-		printf("Compilation successful.\r\n");
+		printf("Translation ");
+		printf("%12s", argv[2]);
+		printf(" successful, %4u strings translated.\r\n", uDivCount / 4);
 	}
 	else
 	{

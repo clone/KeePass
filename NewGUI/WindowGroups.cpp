@@ -84,6 +84,8 @@ BOOL CWindowGroups::ArrangeWindows(CWnd *pParentWindow)
 	int i;
 	RECT rect;
 
+	UNREFERENCED_PARAMETER(pParentWindow);
+
 	aPos.RemoveAll();
 
 	for(i = 0; i < m_aWindows.GetSize(); i++) aPos.Add(WG_OFFSET_TOP);

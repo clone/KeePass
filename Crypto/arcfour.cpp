@@ -32,23 +32,19 @@
 
 void arcfourCrypt(BYTE *pBuf, unsigned long uBufLen, BYTE *pKey, unsigned long uKeyLen)
 {
-	unsigned char S[256];
-	unsigned char i, j;
-	unsigned char t;
+	BYTE S[256];
+	BYTE i, j;
+	BYTE t;
 	DWORD w, k;
 
-	ASSERT(sizeof(unsigned char) == 1);
-	ASSERT(sizeof(BYTE) == 1);
-	ASSERT(pBuf != NULL);
-	ASSERT(pKey != NULL);
-	ASSERT(uKeyLen != 0);
+	ASSERT((sizeof(BYTE) == 1) && (pBuf != NULL) && (pKey != NULL) && (uKeyLen != 0));
 
 	for(w = 0; w < 256; w++) S[w] = (BYTE)w; // Fill linearly
 
 	i = 0; j = 0; k = 0;
 	for(w = 0; w < 256; w++) // Key setup
 	{
-		j += S[w] + (BYTE)(pKey[k] + ((BYTE)uBufLen << 2));
+		j += S[w] + (BYTE)(pKey[k] + (BYTE)((uBufLen & 0xFF) << 2));
 
 		t = S[i];
 		S[i] = S[j];

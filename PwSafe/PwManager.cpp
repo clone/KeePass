@@ -6,14 +6,14 @@
   modification, are permitted provided that the following conditions are met:
 
   - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
+    this list of conditions and the following disclaimer.
   - Redistributions in binary form must reproduce the above copyright notice,
     this list of conditions and the following disclaimer in the documentation
     and/or other materials provided with the distribution.
   - Neither the name of ReichlSoft nor the names of its contributors may be
     used to endorse or promote products derived from this software without
     specific prior written permission.
- 
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,14 +30,22 @@
 #include "StdAfx.h"
 #include "PwManager.h"
 #include "../Util/MemUtil.h"
-#include "../Crypto/rijndael.h"
+#include "../Util/StrUtil.h"
+#include "../Crypto/twoclass.h"
 #include "../Crypto/sha2.h"
 #include "../Crypto/arcfour.h"
 
 #include <string.h>
 
+static const BYTE g_uuidZero[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+static PW_TIME g_pwTimeNever;
+static char g_pNullString[4] = { 0, 0, 0, 0 };
+
 CPwManager::CPwManager()
 {
+	g_pwTimeNever.btDay = 28; g_pwTimeNever.btHour = 23; g_pwTimeNever.btMinute = 59;
+	g_pwTimeNever.btMonth = 12; g_pwTimeNever.btSecond = 59; g_pwTimeNever.shYear = 2999;
+
 	m_pEntries = NULL;
 	m_dwNumEntries = 0;
 	m_dwMaxEntries = 0;
@@ -46,6 +54,7 @@ CPwManager::CPwManager()
 	m_dwNumGroups = 0;
 	m_dwMaxGroups = 0;
 
+	m_pLastEditedEntry = NULL;
 	m_nAlgorithm = ALGO_AES;
 
 	memset(m_pMasterKey, 0, 32);
@@ -55,6 +64,10 @@ CPwManager::CPwManager()
 
 	m_random.Initialize();
 	m_random.GetRandomBuffer(m_pSessionKey, PWM_SESSION_KEY_SIZE);
+
+	DWORD dwInitXorShift[4];
+	m_random.GetRandomBuffer((BYTE *)&dwInitXorShift, 16);
+	srandXorShift(dwInitXorShift);
 
 	ASSERT(sizeof(BYTE) == 1);
 }
@@ -66,26 +79,22 @@ CPwManager::~CPwManager()
 
 void CPwManager::CleanUp()
 {
-	if(m_pEntries != NULL)
-	{
-		_DeleteEntryList(TRUE);
-	}
+	if(m_pEntries != NULL) _DeleteEntryList(TRUE);
 	m_dwNumEntries = 0;
 	m_dwMaxEntries = 0;
 
-	if(m_pGroups != NULL)
-	{
-		_DeleteGroupList(TRUE);
-	}
+	if(m_pGroups != NULL) _DeleteGroupList(TRUE);
 	m_dwNumGroups = 0;
 	m_dwMaxGroups = 0;
+
+	m_pLastEditedEntry = NULL;
 
 	mem_erase(m_pMasterKey, 32);
 
 	m_random.Reset();
 }
 
-BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const CNewRandomInterface *pARI)
+BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const CNewRandomInterface *pARI, BOOL bOverwrite)
 {
 	unsigned long uKeyLen;
 	TCHAR szFile[2048];
@@ -96,8 +105,10 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 	if(pszMasterKey == NULL) return FALSE;
 
 #ifdef _UNICODE
-	paKey = _ToAscii((const TCHAR *)pszMasterKey);
+	ASSERT(sizeof(TCHAR) >= 2);
+	paKey = _StringToAscii((const TCHAR *)pszMasterKey);
 #else
+	ASSERT(sizeof(TCHAR) == 1);
 	paKey = new char[strlen(pszMasterKey) + 1];
 	strcpy(paKey, pszMasterKey);
 #endif
@@ -107,7 +118,7 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 
 	uKeyLen = strlen(paKey);
 	ASSERT(uKeyLen != 0);
-	if(uKeyLen == 0) return FALSE;
+	if(uKeyLen == 0) { SAFE_DELETE_ARRAY(paKey); return FALSE; }
 
 	if(bDiskDrive == FALSE)
 	{
@@ -128,7 +139,7 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 		if(szFile[_tcslen(szFile) - 1] != _T('\\')) _tcscat(szFile, _T("\\"));
 		_tcscat(szFile, _T("pwsafe.key"));
 
-		if(pARI == NULL) // Load key from disk
+		if(pARI == NULL) // If pARI is NULL: load key from disk
 		{
 			FILE *fp;
 
@@ -139,10 +150,14 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 
 			return TRUE;
 		}
-		else // Save key to disk
+		else // pARI is not NULL: save key to disk
 		{
 			FILE *fp;
 			unsigned char aRandomBytes[32];
+
+			fp = _tfopen(szFile, _T("rb")); // Does the file exist already?
+			if((fp != NULL) && (bOverwrite == FALSE)) { fclose(fp); fp = NULL; return FALSE; }
+			if(fp != NULL) { fclose(fp); fp = NULL; } // We must close it before opening for write
 
 			if(pARI->GenerateRandomSequence(32, aRandomBytes) == FALSE) return FALSE;
 
@@ -173,7 +188,7 @@ int CPwManager::GetAlgorithm()
 	return m_nAlgorithm;
 }
 
-void CPwManager::_AllocEntries(unsigned long uEntries)
+void CPwManager::_AllocEntries(DWORD uEntries)
 {
 	PW_ENTRY *p;
 	DWORD dwEntries;
@@ -201,13 +216,13 @@ void CPwManager::_AllocEntries(unsigned long uEntries)
 	m_pEntries = p;
 }
 
-void CPwManager::_AllocGroups(unsigned long uGroups)
+void CPwManager::_AllocGroups(DWORD uGroups)
 {
 	PW_GROUP *p;
 	DWORD dwGroups;
 
-	ASSERT(uGroups != 0);
-	if(uGroups == 0) return;
+	ASSERT((uGroups != 0) && (uGroups != DWORD_MAX));
+	if((uGroups == 0) || (uGroups == DWORD_MAX)) return;
 
 	dwGroups = m_dwNumGroups;
 
@@ -231,23 +246,23 @@ void CPwManager::_AllocGroups(unsigned long uGroups)
 
 void CPwManager::_DeleteEntryList(BOOL bFreeStrings)
 {
-	unsigned long i;
+	unsigned long uCurrentEntry;
 
 	if(m_pEntries == NULL) return; // Nothing to delete
 
 	if(bFreeStrings == TRUE)
 	{
-		for(i = 0; i < m_dwNumEntries; i++)
+		for(uCurrentEntry = 0; uCurrentEntry < m_dwNumEntries; uCurrentEntry++)
 		{
-			SAFE_DELETE_ARRAY(m_pEntries[i].pszTitle);
-			SAFE_DELETE_ARRAY(m_pEntries[i].pszURL);
-			SAFE_DELETE_ARRAY(m_pEntries[i].pszUserName);
-			SAFE_DELETE_ARRAY(m_pEntries[i].pszPassword);
-			SAFE_DELETE_ARRAY(m_pEntries[i].pszAdditional);
+			SAFE_DELETE_ARRAY(m_pEntries[uCurrentEntry].pszTitle);
+			SAFE_DELETE_ARRAY(m_pEntries[uCurrentEntry].pszURL);
+			SAFE_DELETE_ARRAY(m_pEntries[uCurrentEntry].pszUserName);
+			SAFE_DELETE_ARRAY(m_pEntries[uCurrentEntry].pszPassword);
+			SAFE_DELETE_ARRAY(m_pEntries[uCurrentEntry].pszAdditional);
 		}
 	}
 
-	if(m_dwNumEntries != 0)
+	if(m_dwNumEntries != 0) // Erase ALL data
 	{
 		mem_erase((unsigned char *)m_pEntries,
 			sizeof(PW_ENTRY) * m_dwNumEntries);
@@ -261,15 +276,15 @@ void CPwManager::_DeleteEntryList(BOOL bFreeStrings)
 
 void CPwManager::_DeleteGroupList(BOOL bFreeStrings)
 {
-	unsigned long i;
+	unsigned long uCurrentGroup;
 
 	if(m_pGroups == NULL) return; // Nothing to delete
 
 	if(bFreeStrings == TRUE)
 	{
-		for(i = 0; i < m_dwNumGroups; i++)
+		for(uCurrentGroup = 0; uCurrentGroup < m_dwNumGroups; uCurrentGroup++)
 		{
-			SAFE_DELETE_ARRAY(m_pGroups[i].pszGroupName);
+			SAFE_DELETE_ARRAY(m_pGroups[uCurrentGroup].pszGroupName);
 		}
 	}
 
@@ -303,42 +318,90 @@ PW_ENTRY *CPwManager::GetEntry(DWORD dwIndex)
 	return &m_pEntries[dwIndex];
 }
 
-PW_ENTRY *CPwManager::GetEntryByGroup(int idGroup, DWORD dwIndex)
+PW_ENTRY *CPwManager::GetEntryByGroup(DWORD idGroup, DWORD dwIndex)
 {
-	int nPos;
+	DWORD dwPos;
 
-	ASSERT(idGroup != -1);
-	if(idGroup < 0) return NULL;
+	ASSERT(idGroup != DWORD_MAX);
+	if(idGroup == DWORD_MAX) return NULL;
 	ASSERT(dwIndex < m_dwNumEntries);
 	if(dwIndex >= m_dwNumEntries) return NULL;
 
-	nPos = GetEntryByGroupN(idGroup, dwIndex);
+	dwPos = GetEntryByGroupN(idGroup, dwIndex);
 
-	if(nPos != -1) return &m_pEntries[nPos];
+	if(dwPos != DWORD_MAX) return &m_pEntries[dwPos];
 
 	ASSERT(FALSE);
 	return NULL;
 }
 
-int CPwManager::GetEntryByGroupN(int idGroup, DWORD dwIndex)
+DWORD CPwManager::GetEntryByGroupN(DWORD idGroup, DWORD dwIndex)
 {
-	DWORD i, j = 0;
+	DWORD uCurrentEntry, uEntryInGroupCounter = 0;
 
-	ASSERT(idGroup > -1);
-	if(idGroup < 0) return -1;
+	ASSERT(idGroup != DWORD_MAX);
+	if(idGroup == DWORD_MAX) return DWORD_MAX;
 	ASSERT(dwIndex < m_dwNumEntries);
-	if(dwIndex >= m_dwNumEntries) return -1;
+	if(dwIndex >= m_dwNumEntries) return DWORD_MAX;
 
-	for(i = 0; i < m_dwNumEntries; i++)
+	for(uCurrentEntry = 0; uCurrentEntry < m_dwNumEntries; uCurrentEntry++)
 	{
-		if(idGroup == (int)m_pEntries[i].uGroupId)
+		if(idGroup == m_pEntries[uCurrentEntry].uGroupId)
 		{
-			if(dwIndex == j) return (int)i;
-			j++;
+			if(dwIndex == uEntryInGroupCounter) return uCurrentEntry;
+			uEntryInGroupCounter++;
 		}
 	}
 
-	return -1;
+	return DWORD_MAX;
+}
+
+PW_ENTRY *CPwManager::GetEntryByUuid(BYTE *pUuid)
+{
+	ASSERT(pUuid != NULL);
+
+	DWORD dwEntryIndex = GetEntryByUuidN(pUuid);
+
+	ASSERT(dwEntryIndex != DWORD_MAX);
+	if(dwEntryIndex == DWORD_MAX) return NULL;
+
+	return &m_pEntries[dwEntryIndex];
+}
+
+DWORD CPwManager::GetEntryByUuidN(BYTE *pUuid)
+{
+	ASSERT(pUuid != NULL);
+
+	for(DWORD dw = 0; dw < m_dwNumEntries; dw++)
+	{
+		if(memcmp(m_pEntries[dw].uuid, pUuid, 16) == 0) return dw;
+	}
+
+	// Don't ASSERT here, just return DWORD_MAX
+	return DWORD_MAX;
+}
+
+DWORD CPwManager::GetEntryPosInGroup(PW_ENTRY *pEntry)
+{
+	DWORD uCurrentEntry, pos = 0;
+
+	for(uCurrentEntry = 0; uCurrentEntry < m_dwNumEntries; uCurrentEntry++)
+	{
+		if(m_pEntries[uCurrentEntry].uGroupId == pEntry->uGroupId)
+		{
+			if(memcmp(m_pEntries[uCurrentEntry].uuid, pEntry->uuid, 16) == 0)
+				return pos;
+
+			pos++;
+		}
+	}
+
+	return DWORD_MAX;
+}
+
+PW_ENTRY *CPwManager::GetLastEditedEntry()
+{
+	return m_pLastEditedEntry;
 }
 
 PW_GROUP *CPwManager::GetGroup(DWORD dwIndex)
@@ -349,23 +412,48 @@ PW_GROUP *CPwManager::GetGroup(DWORD dwIndex)
 	return &m_pGroups[dwIndex];
 }
 
-int CPwManager::GetGroupId(const TCHAR *pszGroupName)
+PW_GROUP *CPwManager::GetGroupById(DWORD idGroup)
 {
-	int i;
-
-	ASSERT(pszGroupName != NULL);
-	if(pszGroupName == NULL) return -1;
-
-	for(i = 0; i < (int)m_dwNumGroups; i++)
-	{
-		if(_tcsicmp(m_pGroups[i].pszGroupName, pszGroupName) == 0)
-			return i;
-	}
-
-	return -1;
+	DWORD dwIndex = GetGroupByIdN(idGroup);
+	if(dwIndex == DWORD_MAX) return NULL;
+	return &m_pGroups[dwIndex];
 }
 
-int CPwManager::GetNumberOfItemsInGroup(const TCHAR *pszGroup)
+DWORD CPwManager::GetGroupByIdN(DWORD idGroup)
+{
+	DWORD uCurrentEntry;
+
+	for(uCurrentEntry = 0; uCurrentEntry < m_dwNumGroups; uCurrentEntry++)
+	{
+		if(m_pGroups[uCurrentEntry].uGroupId == idGroup) return uCurrentEntry;
+	}
+
+	return DWORD_MAX;
+}
+
+DWORD CPwManager::GetGroupId(const TCHAR *pszGroupName)
+{
+	DWORD i;
+
+	ASSERT(pszGroupName != NULL);
+	if(pszGroupName == NULL) return DWORD_MAX;
+
+	for(i = 0; i < m_dwNumGroups; i++)
+	{
+		if(_tcsicmp(m_pGroups[i].pszGroupName, pszGroupName) == 0)
+			return m_pGroups[i].uGroupId;
+	}
+
+	return DWORD_MAX;
+}
+
+DWORD CPwManager::GetGroupIdByIndex(DWORD uGroupIndex)
+{
+	if(uGroupIndex >= m_dwNumGroups) return DWORD_MAX;
+	return m_pGroups[uGroupIndex].uGroupId;
+}
+
+DWORD CPwManager::GetNumberOfItemsInGroup(const TCHAR *pszGroup)
 {
 	ASSERT(pszGroup != NULL);
 	if(pszGroup == NULL) return 0;
@@ -373,73 +461,113 @@ int CPwManager::GetNumberOfItemsInGroup(const TCHAR *pszGroup)
 	return GetNumberOfItemsInGroupN(GetGroupId(pszGroup));
 }
 
-int CPwManager::GetNumberOfItemsInGroupN(int idGroup)
+DWORD CPwManager::GetNumberOfItemsInGroupN(DWORD idGroup)
 {
 	DWORD i;
-	DWORD id;
-	int n;
+	DWORD n;
 
-	ASSERT(idGroup >= 0);
-	if(idGroup < 0) return 0;
-	ASSERT((DWORD)idGroup < m_dwNumGroups);
-	if((DWORD)idGroup >= m_dwNumGroups) return 0;
+	ASSERT(idGroup != DWORD_MAX);
+	if(idGroup == DWORD_MAX) return 0;
 
-	id = (DWORD)idGroup;
 	n = 0;
 	for(i = 0; i < m_dwNumEntries; i++)
 	{
-		if(m_pEntries[i].uGroupId == id) n++;
+		if(m_pEntries[i].uGroupId == idGroup) n++;
 	}
 
 	return n;
 }
 
-BOOL CPwManager::AddEntry(DWORD uGroupId, DWORD uImageId, const TCHAR *pszTitle,
-	const TCHAR *pszURL, const TCHAR *pszUserName, const TCHAR *pszPassword,
-	const TCHAR *pszAdditional)
+BOOL CPwManager::AddEntry(const PW_ENTRY *pTemplate)
 {
-	ASSERT(pszTitle != NULL); if(pszTitle == NULL) return FALSE;
-	ASSERT(pszURL != NULL); if(pszURL == NULL) return FALSE;
-	ASSERT(pszUserName != NULL); if(pszUserName == NULL) return FALSE;
-	ASSERT(pszPassword != NULL); if(pszPassword == NULL) return FALSE;
-	ASSERT(pszAdditional != NULL); if(pszAdditional == NULL) return FALSE;
+	PW_ENTRY pT;
+
+	// Don't ASSERT_ENTRY the pTemplate!
+	ASSERT(pTemplate != NULL);
+	if(pTemplate == NULL) return FALSE;
+	ASSERT((pTemplate->uGroupId != 0) && (pTemplate->uGroupId != DWORD_MAX));
+	if((pTemplate->uGroupId == 0) || (pTemplate->uGroupId == DWORD_MAX)) return FALSE;
 
 	// If we don't have enough allocated entries, allocate 32 more
 	if(m_dwNumEntries == m_dwMaxEntries)
 		_AllocEntries(m_dwMaxEntries + 32);
 
+	pT = *pTemplate; // Copy parameter to local temporary variable
+
+	if(memcmp(pT.uuid, g_uuidZero, 16) == 0) // Shall we create a new UUID?
+	{
+		randCreateUUID(pT.uuid, &m_random); // Create it!
+		ASSERT(GetEntryByUuidN(pT.uuid) == DWORD_MAX);
+	}
+
+	if(pT.pszTitle == NULL) pT.pszTitle = (TCHAR *)g_pNullString;
+	if(pT.pszUserName == NULL) pT.pszUserName = (TCHAR *)g_pNullString;
+	if(pT.pszURL == NULL) pT.pszURL = (TCHAR *)g_pNullString;
+	if(pT.pszPassword == NULL) pT.pszPassword = (TCHAR *)g_pNullString;
+	if(pT.pszAdditional == NULL) pT.pszAdditional = (TCHAR *)g_pNullString;
+
 	m_dwNumEntries++;
-	return SetEntry(m_dwNumEntries - 1, uGroupId, uImageId, pszTitle,
-		pszURL, pszUserName, pszPassword, pszAdditional);
+	return SetEntry(m_dwNumEntries - 1, &pT);
 }
 
-BOOL CPwManager::AddGroup(DWORD uImageId, const TCHAR *pszGroupName)
+BOOL CPwManager::AddGroup(const PW_GROUP *pTemplate)
 {
-	ASSERT(pszGroupName != NULL);
-	if(pszGroupName == NULL) return FALSE;
+	PW_GROUP pT;
+	DWORD i, t, b;
+
+	ASSERT(pTemplate != NULL);
+	if(pTemplate == NULL) return FALSE;
+
+	pT = *pTemplate; // Copy parameter to local temporary variable
+
+	if((pT.uGroupId == 0) || (pT.uGroupId == DWORD_MAX))
+	{
+		while(1) // Generate a new group ID that doesn't exist already
+		{
+			b = 0;
+			t = randXorShift();
+			if((t == 0) || (t == DWORD_MAX)) continue;
+			for(i = 0; i < m_dwNumGroups; i++)
+			{
+				if(m_pGroups[i].uGroupId == t) b = 1;
+			}
+
+			if(b == 0) break;
+		}
+	}
+	else t = pT.uGroupId;
+
+	pT.uGroupId = t;
 
 	if(m_dwNumGroups == m_dwMaxGroups)
 		_AllocGroups(m_dwMaxGroups + 8);
 
 	m_dwNumGroups++;
 
-	return SetGroup(m_dwNumGroups - 1, uImageId, pszGroupName);
+	return SetGroup(m_dwNumGroups - 1, &pT);
 }
 
-BOOL CPwManager::SetGroup(DWORD dwIndex, DWORD uImageId, const TCHAR *pszGroupName)
+BOOL CPwManager::SetGroup(DWORD dwIndex, PW_GROUP *pTemplate)
 {
-	int slen;
+	DWORD slen;
 
 	ASSERT(dwIndex < m_dwNumGroups);
-	ASSERT(pszGroupName != NULL);
-	if(pszGroupName == NULL) return FALSE;
+	ASSERT(pTemplate != NULL);
+	ASSERT((pTemplate->uGroupId != 0) && (pTemplate->uGroupId != DWORD_MAX));
+	if((pTemplate->uGroupId == 0) || (pTemplate->uGroupId == DWORD_MAX)) return FALSE;
 
-	slen = _tcslen(pszGroupName);
+	slen = _tcslen(pTemplate->pszGroupName);
 	SAFE_DELETE_ARRAY(m_pGroups[dwIndex].pszGroupName);
 	m_pGroups[dwIndex].pszGroupName = new TCHAR[slen + 1];
-	_tcscpy(m_pGroups[dwIndex].pszGroupName, pszGroupName);
+	_tcscpy(m_pGroups[dwIndex].pszGroupName, pTemplate->pszGroupName);
 
-	m_pGroups[dwIndex].uImageId = uImageId;
+	m_pGroups[dwIndex].uGroupId = pTemplate->uGroupId;
+	m_pGroups[dwIndex].uImageId = pTemplate->uImageId;
+
+	m_pGroups[dwIndex].tCreation = pTemplate->tCreation;
+	m_pGroups[dwIndex].tLastMod = pTemplate->tLastMod;
+	m_pGroups[dwIndex].tLastAccess = pTemplate->tLastAccess;
+	m_pGroups[dwIndex].tExpire = pTemplate->tExpire;
 
 	return TRUE;
 }
@@ -450,6 +578,8 @@ BOOL CPwManager::DeleteEntry(DWORD dwIndex)
 
 	ASSERT(dwIndex < m_dwNumEntries);
 	if(dwIndex >= m_dwNumEntries) return FALSE;
+
+	ASSERT_ENTRY(&m_pEntries[dwIndex]);
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszTitle);
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszURL);
@@ -470,21 +600,17 @@ BOOL CPwManager::DeleteEntry(DWORD dwIndex)
 	return TRUE;
 }
 
-BOOL CPwManager::DeleteGroup(int nGroupId)
+BOOL CPwManager::DeleteGroup(DWORD uGroupId)
 {
-	DWORD i = 0;
+	DWORD i = 0, inx;
 	PW_ENTRY *p;
-
-	ASSERT((DWORD)nGroupId < m_dwNumGroups);
-	if((DWORD)nGroupId >= m_dwNumGroups) return FALSE;
-	if(nGroupId < 0) return FALSE;
 
 	if(m_dwNumEntries != 0)
 	{
 		while(1) // Remove all items in that group
 		{
-			p = GetEntry(i);
-			if(p->uGroupId == (DWORD)nGroupId)
+			p = &m_pEntries[i];
+			if(p->uGroupId == uGroupId)
 			{
 				VERIFY(DeleteEntry(i));
 				i--;
@@ -495,11 +621,12 @@ BOOL CPwManager::DeleteGroup(int nGroupId)
 		}
 	}
 
-	SAFE_DELETE_ARRAY(m_pGroups[nGroupId].pszGroupName);
+	inx = GetGroupByIdN(uGroupId);
+	SAFE_DELETE_ARRAY(m_pGroups[inx].pszGroupName);
 
-	if((DWORD)nGroupId != (m_dwNumGroups - 1))
+	if(inx != (m_dwNumGroups - 1))
 	{
-		for(i = (DWORD)nGroupId; i < (m_dwNumGroups - 1); i++)
+		for(i = inx; i < (m_dwNumGroups - 1); i++)
 		{
 			m_pGroups[i] = m_pGroups[i+1];
 		}
@@ -508,77 +635,82 @@ BOOL CPwManager::DeleteGroup(int nGroupId)
 	mem_erase((unsigned char *)&m_pGroups[m_dwNumGroups - 1], sizeof(PW_GROUP));
 	m_dwNumGroups--;
 
-	// Update group IDs in password entries
-	for(i = 0; i < m_dwNumEntries; i++)
-	{
-		if(m_pEntries[i].uGroupId > (DWORD)nGroupId)
-			m_pEntries[i].uGroupId--;
-	}
-
 	return TRUE;
 }
 
-BOOL CPwManager::SetEntry(DWORD dwIndex, DWORD uGroupId, DWORD uImageId,
-	const TCHAR *pszTitle, const TCHAR *pszURL, const TCHAR *pszUserName,
-	const TCHAR *pszPassword, const TCHAR *pszAdditional)
+BOOL CPwManager::SetEntry(DWORD dwIndex, PW_ENTRY *pTemplate)
 {
-	int slen;
+	DWORD slen;
+
+	ASSERT_ENTRY(pTemplate);
 
 	ASSERT(dwIndex < m_dwNumEntries);
 	if(dwIndex >= m_dwNumEntries) return FALSE;
-	ASSERT(pszTitle != NULL); if(pszTitle == NULL) return FALSE;
-	ASSERT(pszURL != NULL); if(pszURL == NULL) return FALSE;
-	ASSERT(pszUserName != NULL); if(pszUserName == NULL) return FALSE;
-	ASSERT(pszPassword != NULL); if(pszPassword == NULL) return FALSE;
-	ASSERT(pszAdditional != NULL); if(pszAdditional == NULL) return FALSE;
+	ASSERT(pTemplate != NULL);
+	if(pTemplate == NULL) return FALSE;
+	ASSERT((pTemplate->uGroupId != 0) && (pTemplate->uGroupId != DWORD_MAX));
+	if((pTemplate->uGroupId == 0) || (pTemplate->uGroupId == DWORD_MAX)) return FALSE;
 
-	m_pEntries[dwIndex].uGroupId = uGroupId;
-	m_pEntries[dwIndex].uImageId = uImageId;
+	if(pTemplate->pszTitle == NULL) return FALSE;
+	if(pTemplate->pszUserName == NULL) return FALSE;
+	if(pTemplate->pszURL == NULL) return FALSE;
+	if(pTemplate->pszPassword == NULL) return FALSE;
+	if(pTemplate->pszAdditional == NULL) return FALSE;
+
+	memcpy(m_pEntries[dwIndex].uuid, pTemplate->uuid, 16);
+	m_pEntries[dwIndex].uGroupId = pTemplate->uGroupId;
+	m_pEntries[dwIndex].uImageId = pTemplate->uImageId;
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszTitle);
-	slen = _tcslen(pszTitle);
+	slen = _tcslen(pTemplate->pszTitle);
 	m_pEntries[dwIndex].pszTitle = new TCHAR[slen + 1];
 	if(slen != 0)
-		_tcscpy(m_pEntries[dwIndex].pszTitle, pszTitle);
+		_tcscpy(m_pEntries[dwIndex].pszTitle, pTemplate->pszTitle);
 	else
 		m_pEntries[dwIndex].pszTitle[0] = 0;
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszUserName);
-	slen = _tcslen(pszUserName);
+	slen = _tcslen(pTemplate->pszUserName);
 	m_pEntries[dwIndex].pszUserName = new TCHAR[slen + 1];
 	if(slen != 0)
-		_tcscpy(m_pEntries[dwIndex].pszUserName, pszUserName);
+		_tcscpy(m_pEntries[dwIndex].pszUserName, pTemplate->pszUserName);
 	else
 		m_pEntries[dwIndex].pszUserName[0] = 0;
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszURL);
-	slen = _tcslen(pszURL);
+	slen = _tcslen(pTemplate->pszURL);
 	m_pEntries[dwIndex].pszURL = new TCHAR[slen + 1];
 	if(slen != 0)
-		_tcscpy(m_pEntries[dwIndex].pszURL, pszURL);
+		_tcscpy(m_pEntries[dwIndex].pszURL, pTemplate->pszURL);
 	else
 		m_pEntries[dwIndex].pszURL[0] = 0;
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszPassword);
-	slen = _tcslen(pszPassword);
+	slen = _tcslen(pTemplate->pszPassword);
 	m_pEntries[dwIndex].pszPassword = new TCHAR[slen + 1];
 	if(slen != 0)
-		_tcscpy(m_pEntries[dwIndex].pszPassword, pszPassword);
+		_tcscpy(m_pEntries[dwIndex].pszPassword, pTemplate->pszPassword);
 	else
 		m_pEntries[dwIndex].pszPassword[0] = 0;
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszAdditional);
-	slen = _tcslen(pszAdditional);
+	slen = _tcslen(pTemplate->pszAdditional);
 	m_pEntries[dwIndex].pszAdditional = new TCHAR[slen + 1];
 	if(slen != 0)
-		_tcscpy(m_pEntries[dwIndex].pszAdditional, pszAdditional);
+		_tcscpy(m_pEntries[dwIndex].pszAdditional, pTemplate->pszAdditional);
 	else
 		m_pEntries[dwIndex].pszAdditional[0] = 0;
 
-	m_pEntries[dwIndex].uPasswordLen = _tcslen(pszPassword);
+	m_pEntries[dwIndex].uPasswordLen = _tcslen(m_pEntries[dwIndex].pszPassword);
 	LockEntryPassword(&m_pEntries[dwIndex]);
 
+	m_pEntries[dwIndex].tCreation = pTemplate->tCreation;
+	m_pEntries[dwIndex].tLastMod = pTemplate->tLastMod;
+	m_pEntries[dwIndex].tLastAccess = pTemplate->tLastAccess;
+	m_pEntries[dwIndex].tExpire = pTemplate->tExpire;
+
 	ASSERT_ENTRY((&m_pEntries[dwIndex]));
+	m_pLastEditedEntry = &m_pEntries[dwIndex];
 	return TRUE;
 }
 
@@ -595,15 +727,16 @@ void CPwManager::LockEntryPassword(PW_ENTRY *pEntry)
 
 void CPwManager::UnlockEntryPassword(PW_ENTRY *pEntry)
 {
+	ASSERT_ENTRY(pEntry);
 	LockEntryPassword(pEntry); // OFB encryption mode
 }
 
 void CPwManager::NewDatabase()
 {
-	_DeleteEntryList(TRUE);
+	_DeleteEntryList(TRUE); // Delete really everything, the strings too
 	_DeleteGroupList(TRUE);
 
-	_AllocGroups(PWM_NUM_INITIAL_GROUPS);
+	_AllocGroups(PWM_NUM_INITIAL_GROUPS); // Allocate some space for the new items
 	_AllocEntries(PWM_NUM_INITIAL_ENTRIES);
 }
 
@@ -617,25 +750,37 @@ void CPwManager::NewDatabase()
 	return FALSE; \
 }
 
+#define RESET_TIME_FIELD_NORMAL(pTimeEx) { \
+	(pTimeEx)->btDay = 1; (pTimeEx)->btHour = 0; (pTimeEx)->btMinute = 0; \
+	(pTimeEx)->btMonth = 1; (pTimeEx)->btSecond = 0; (pTimeEx)->shYear = 2004; }
+#define RESET_TIME_FIELD_EXPIRE(pTimeEx) { \
+	(pTimeEx)->btDay = 28; (pTimeEx)->btHour = 23; (pTimeEx)->btMinute = 59; \
+	(pTimeEx)->btMonth = 12; (pTimeEx)->btSecond = 59; (pTimeEx)->shYear = 4092; }
+
+#define RESET_PWG_TEMPLATE(ptrx) { \
+	memset(ptrx, 0, sizeof(PW_GROUP)); \
+	RESET_TIME_FIELD_NORMAL(&(ptrx)->tCreation); RESET_TIME_FIELD_NORMAL(&(ptrx)->tLastMod); \
+	RESET_TIME_FIELD_NORMAL(&(ptrx)->tLastAccess); RESET_TIME_FIELD_EXPIRE(&(ptrx)->tExpire); }
+#define RESET_PWE_TEMPLATE(ptrx) { \
+	memset(ptrx, 0, sizeof(PW_ENTRY)); \
+	RESET_TIME_FIELD_NORMAL(&(ptrx)->tCreation); RESET_TIME_FIELD_NORMAL(&(ptrx)->tLastMod); \
+	RESET_TIME_FIELD_NORMAL(&(ptrx)->tLastAccess); RESET_TIME_FIELD_EXPIRE(&(ptrx)->tExpire); }
+
 BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 {
 	FILE *fp;
 	char *pVirtualFile;
 	unsigned long uFileSize, uAllocated, uEncryptedPartSize;
-	unsigned long i, j, pos;
+	unsigned long pos;
 	PW_DBHEADER hdr;
 	sha256_ctx sha32;
 	RD_UINT8 uFinalKey[32];
-	DWORD dw, dw2;
-	char *ptrTemp;
-	char *ptrTitle;
-	char *ptrUserName;
-	char *ptrURL;
-	char *ptrPassword;
-	char *ptrAdditional;
-	LPTSTR lpptr = NULL;
-	LPTSTR lptTitle = NULL, lptUserName = NULL, lptURL = NULL;
-	LPTSTR lptPassword = NULL, lptAdditional = NULL;
+	CString strTitle, strUserName, strURL, strPassword, strNotes;
+	char *p;
+	USHORT usFieldType;
+	DWORD dwFieldSize;
+	PW_GROUP pwGroupTemplate;
+	PW_ENTRY pwEntryTemplate;
 
 	ASSERT(sizeof(char) == 1);
 
@@ -670,7 +815,198 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 	// Check if we can open this
 	if((hdr.dwSignature1 != PWM_DBSIG_1) || (hdr.dwSignature2 != PWM_DBSIG_2))
 		{ _OPENDB_FAIL; }
+
 	if((hdr.dwVersion & 0xFFFFFF00) != (PWM_DBVER_DW & 0xFFFFFF00))
+	{
+		if(hdr.dwVersion <= 0x00010002)
+		{
+			if(pVirtualFile != NULL)
+			{
+				mem_erase((unsigned char *)pVirtualFile, uAllocated);
+				SAFE_DELETE_ARRAY(pVirtualFile);
+			}
+			return _OpenDatabaseV1(pszFile);
+		}
+		else { _OPENDB_FAIL; }
+	}
+
+	if(hdr.dwFlags & PWM_FLAG_RIJNDAEL) m_nAlgorithm = ALGO_AES;
+	else if(hdr.dwFlags & PWM_FLAG_TWOFISH) m_nAlgorithm = ALGO_TWOFISH;
+	else { ASSERT(FALSE); _OPENDB_FAIL; }
+
+	// Hash the master password with the salt in the file
+	sha256_begin(&sha32);
+	sha256_hash(hdr.aMasterSeed, 16, &sha32);
+	sha256_hash(m_pMasterKey, 32, &sha32);
+	sha256_end((unsigned char *)uFinalKey, &sha32);
+
+	ASSERT(((uFileSize - sizeof(PW_DBHEADER)) % 16) == 0);
+	if(m_nAlgorithm == ALGO_AES)
+	{
+		Rijndael aes;
+
+		// Initialize Rijndael algorithm
+		if(aes.init(Rijndael::CBC, Rijndael::Decrypt, uFinalKey,
+			Rijndael::Key32Bytes, hdr.aEncryptionIV) != RIJNDAEL_SUCCESS)
+			{ _OPENDB_FAIL; }
+
+		// Decrypt! The first bytes aren't encrypted (that's the header)
+		uEncryptedPartSize = (unsigned long)aes.padDecrypt((RD_UINT8 *)pVirtualFile + sizeof(PW_DBHEADER),
+			uFileSize - sizeof(PW_DBHEADER), (RD_UINT8 *)pVirtualFile + sizeof(PW_DBHEADER));
+	}
+	else if(m_nAlgorithm == ALGO_TWOFISH)
+	{
+		CTwofish twofish;
+
+		if(twofish.init(uFinalKey, 32, hdr.aEncryptionIV) != true)
+			{ _OPENDB_FAIL };
+
+		uEncryptedPartSize = (unsigned long)twofish.padDecrypt((RD_UINT8 *)pVirtualFile + sizeof(PW_DBHEADER),
+			uFileSize - sizeof(PW_DBHEADER), (RD_UINT8 *)pVirtualFile + sizeof(PW_DBHEADER));
+	}
+	else
+	{
+		ASSERT(FALSE); _OPENDB_FAIL; // This should never happen
+	}
+
+	// Check for success
+	if((uEncryptedPartSize > 2147483446) || (uEncryptedPartSize == 0))
+		{ _OPENDB_FAIL; }
+
+	// Check if key is correct (with high probability)
+	sha256_begin(&sha32);
+	sha256_hash((unsigned char *)pVirtualFile + sizeof(PW_DBHEADER), uEncryptedPartSize, &sha32);
+	sha256_end((unsigned char *)uFinalKey, &sha32);
+	if(memcmp(hdr.aContentsHash, uFinalKey, 32) != 0)
+		{ _OPENDB_FAIL; }
+
+	NewDatabase(); // Create a new database and initialize internal structures
+
+	memset(&pwGroupTemplate, 0, 16);
+	RESET_PWG_TEMPLATE(&pwGroupTemplate);
+
+	// Add groups from the memory file to the internal structures
+	unsigned long uCurGroup;
+	BOOL bRet;
+	pos = sizeof(PW_DBHEADER);
+	for(uCurGroup = 0; uCurGroup < hdr.dwGroups; )
+	{
+		p = &pVirtualFile[pos];
+
+		memcpy(&usFieldType, p, 2);
+		p += 2; pos += 2;
+		if(pos >= uFileSize) { _OPENDB_FAIL; }
+
+		memcpy(&dwFieldSize, p, 4);
+		p += 4; pos += 4;
+		if(pos >= (uFileSize + dwFieldSize)) { _OPENDB_FAIL; }
+
+		bRet = ReadGroupField(usFieldType, dwFieldSize, (BYTE *)p, &pwGroupTemplate);
+		if((usFieldType == 0xFFFF) && (bRet == TRUE))
+			uCurGroup++; // Now and ONLY now the counter gets increased
+
+		p += dwFieldSize;
+		pos += dwFieldSize;
+		if(pos >= uFileSize) { _OPENDB_FAIL; }
+	}
+	SAFE_DELETE_ARRAY(pwGroupTemplate.pszGroupName);
+
+	RESET_PWE_TEMPLATE(&pwEntryTemplate);
+	// Get the entries
+	unsigned long uCurEntry;
+	for(uCurEntry = 0; uCurEntry < hdr.dwEntries; )
+	{
+		p = &pVirtualFile[pos];
+
+		memcpy(&usFieldType, p, 2);
+		p += 2; pos += 2;
+		if(pos >= uFileSize) { _OPENDB_FAIL; }
+
+		memcpy(&dwFieldSize, p, 4);
+		p += 4; pos += 4;
+		if(pos >= (uFileSize + dwFieldSize)) { _OPENDB_FAIL; }
+
+		bRet = ReadEntryField(usFieldType, dwFieldSize, (BYTE *)p, &pwEntryTemplate);
+		if((usFieldType == 0xFFFF) && (bRet == TRUE))
+			uCurEntry++; // Now and ONLY now the counter gets increased
+
+		p += dwFieldSize;
+		pos += dwFieldSize;
+		if(pos >= uFileSize) { _OPENDB_FAIL; }
+	}
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pszTitle);
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pszURL);
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pszUserName);
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pszPassword);
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pszAdditional);
+
+	// Erase and delete memory file
+	mem_erase((unsigned char *)pVirtualFile, uAllocated);
+	SAFE_DELETE_ARRAY(pVirtualFile);
+	return TRUE;
+}
+
+BOOL CPwManager::_OpenDatabaseV1(const TCHAR *pszFile)
+{
+	FILE *fp;
+	char *pVirtualFile;
+	unsigned long uFileSize, uAllocated, uEncryptedPartSize;
+	unsigned long i, j, pos;
+	PW_DBHEADER_V1 hdr;
+	sha256_ctx sha32;
+	RD_UINT8 uFinalKey[32];
+	DWORD dw, dw2;
+	char *ptrTemp;
+	char *ptrTitle;
+	char *ptrUserName;
+	char *ptrURL;
+	char *ptrPassword;
+	char *ptrAdditional;
+	LPTSTR lpptr = NULL;
+	LPTSTR lptTitle = NULL, lptUserName = NULL, lptURL = NULL;
+	LPTSTR lptPassword = NULL, lptAdditional = NULL;
+	PW_TIME tNow;
+	PW_GROUP pwTG;
+	PW_ENTRY pwTE;
+
+	_GetCurrentPwTime(&tNow);
+	pwTG.tCreation = tNow; pwTG.tExpire = g_pwTimeNever;
+	pwTG.tLastAccess = tNow; pwTG.tLastMod = tNow;
+	pwTE.tCreation = tNow; pwTE.tExpire = g_pwTimeNever;
+	pwTE.tLastAccess = tNow; pwTE.tLastMod = tNow;
+
+	ASSERT(sizeof(char) == 1);
+
+	ASSERT(pszFile != NULL);
+	if(pszFile == NULL) return FALSE;
+	ASSERT(_tcslen(pszFile) != 0);
+	if(_tcslen(pszFile) == 0) return FALSE;
+
+	fp = _tfopen(pszFile, _T("rb"));
+	if(fp == NULL) return FALSE;
+
+	// Get file size
+	fseek(fp, 0, SEEK_END);
+	uFileSize = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	if(uFileSize < sizeof(PW_DBHEADER_V1))
+		{ fclose(fp); return FALSE; }
+
+	// Allocate enough memory to hold the complete file
+	uAllocated = uFileSize + 17;
+	pVirtualFile = new char[uAllocated];
+	if(pVirtualFile == NULL)
+		{ fclose(fp); return FALSE; }
+	pVirtualFile[uFileSize + 17 - 1] = 0;
+	fread(pVirtualFile, 1, uFileSize, fp);
+	fclose(fp);
+
+	// Extract header structure from memory file
+	memcpy(&hdr, pVirtualFile, sizeof(PW_DBHEADER_V1));
+
+	// Check if we can open this
+	if((hdr.dwSignature1 != PWM_DBSIG_1) || (hdr.dwSignature2 != PWM_DBSIG_2))
 		{ _OPENDB_FAIL; }
 
 	if(hdr.dwFlags & PWM_FLAG_RIJNDAEL) m_nAlgorithm = ALGO_AES;
@@ -717,13 +1053,13 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 		{ _OPENDB_FAIL; }
 
 	// Update header information, it was partially encrypted
-	memcpy(&hdr, pVirtualFile, sizeof(PW_DBHEADER));
+	memcpy(&hdr, pVirtualFile, sizeof(PW_DBHEADER_V1));
 
 	NewDatabase(); // Create a new database and initialize internal structures
 
 	// Add groups from the memory file to the internal structures
 	j = 0;
-	pos = sizeof(PW_DBHEADER);
+	pos = sizeof(PW_DBHEADER_V1);
 	for(i = 0; i < hdr.dwGroups; i++)
 	{
 		ptrTemp = &pVirtualFile[pos];
@@ -735,12 +1071,15 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 		pos += 4;
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 
+		pwTG.uGroupId = i + 1; pwTG.uImageId = dw;
 #ifdef _UNICODE
-		lpptr = _ToUnicode(ptrTemp);
-		AddGroup(dw, lpptr);
+		lpptr = _StringToUnicode(ptrTemp);
+		pwTG.pszGroupName = lpptr;
+		AddGroup(&pwTG);
 		SAFE_DELETE_ARRAY(lpptr);
 #else
-		AddGroup(dw, ptrTemp);
+		pwTG.pszGroupName = ptrTemp;
+		AddGroup(&pwTG);
 #endif
 	}
 
@@ -782,16 +1121,26 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 		pos += 4;
 		if(pos > uFileSize) { _OPENDB_FAIL; }
 
+		dw++;
+
+		ZeroMemory(pwTE.uuid, 16); // 0 = create new UUID
+
 #ifdef _UNICODE
-		lptTitle = _ToUnicode(ptrTitle); lptURL = _ToUnicode(ptrURL);
-		lptUserName = _ToUnicode(ptrUserName); lptPassword = _ToUnicode(ptrPassword);
-		lptAdditional = _ToUnicode(ptrAdditional);
-		AddEntry(dw, dw2, lptTitle, lptURL, lptUserName, lptPassword, lptAdditional);
+		lptTitle = _StringToUnicode(ptrTitle); lptURL = _StringToUnicode(ptrURL);
+		lptUserName = _StringToUnicode(ptrUserName); lptPassword = _StringToUnicode(ptrPassword);
+		lptAdditional = _StringToUnicode(ptrAdditional);
+		pwTE.pszAdditional = lptAdditional; pwTE.pszPassword = lptPassword;
+		pwTE.pszTitle = lptTitle; pwTE.pszURL = lptURL;
+		pwTE.pszUserName = lptUserName; pwTE.uGroupId = dw; pwTE.uImageId = dw2;
+		AddEntry(&pwTE);
 		SAFE_DELETE_ARRAY(lptTitle); SAFE_DELETE_ARRAY(lptURL);
 		SAFE_DELETE_ARRAY(lptUserName); SAFE_DELETE_ARRAY(lptPassword);
 		SAFE_DELETE_ARRAY(lptAdditional);
 #else
-		AddEntry(dw, dw2, ptrTitle, ptrURL, ptrUserName, ptrPassword, ptrAdditional);
+		pwTE.pszAdditional = ptrAdditional; pwTE.pszPassword = ptrPassword;
+		pwTE.pszTitle = ptrTitle; pwTE.pszURL = ptrURL;
+		pwTE.pszUserName = ptrUserName; pwTE.uGroupId = dw; pwTE.uImageId = dw2;
+		AddEntry(&pwTE);
 #endif
 	}
 
@@ -810,6 +1159,9 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	PW_DBHEADER hdr;
 	RD_UINT8 uFinalKey[32];
 	sha256_ctx sha32;
+	USHORT usFieldType;
+	DWORD dwFieldSize;
+	BYTE aCompressedTime[5];
 
 	ASSERT(pszFile != NULL);
 	if(pszFile == NULL) return FALSE;
@@ -821,26 +1173,34 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 	uFileSize = sizeof(PW_DBHEADER);
 
+	ASSERT(sizeof(TCHAR *) == sizeof(DWORD));
 	// Get the size of all groups
 	for(i = 0; i < m_dwNumGroups; i++)
 	{
-		uFileSize += _tcslen(m_pGroups[i].pszGroupName) + 1;
-		uFileSize += 4; // One more 32-bit dword
+		uFileSize += 76; // 6+4+6+6+5+6+5+6+5+6+5+6+4+6 = 76
+		uFileSize += _UTF8BytesNeeded(m_pGroups[i].pszGroupName) + 1;
 	}
 
 	// Get the size of all entries together
 	for(i = 0; i < m_dwNumEntries; i++)
 	{
-		uFileSize += _tcslen(m_pEntries[i].pszAdditional) + 1;
-		uFileSize += m_pEntries[i].uPasswordLen + 1;
-		uFileSize += _tcslen(m_pEntries[i].pszTitle) + 1;
-		uFileSize += _tcslen(m_pEntries[i].pszURL) + 1;
-		uFileSize += _tcslen(m_pEntries[i].pszUserName) + 1;
-		uFileSize += 8; // Plus 2 32-bit dwords
+		ASSERT_ENTRY(&m_pEntries[i]);
+
+		UnlockEntryPassword(&m_pEntries[i]);
+
+		uFileSize += 122; // 6+16+6+4+6+4+6+6+6+6+6+6+5+6+5+6+5+6+5+6 = 122
+
+		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszTitle) + 1;
+		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszUserName) + 1;
+		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszURL) + 1;
+		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszPassword) + 1;
+		uFileSize += _UTF8BytesNeeded(m_pEntries[i].pszAdditional) +1;
+
+		LockEntryPassword(&m_pEntries[i]);
 	}
 
-	// Round up filesize to 16-byte boundary for Rijndael
-	uFileSize = uFileSize - (uFileSize % 16) + 16;
+	// Round up filesize to 16-byte boundary for Rijndael/Twofish
+	uFileSize = (uFileSize + 16) - (uFileSize % 16);
 
 	// Allocate enough memory
 	uAllocated = uFileSize + 16;
@@ -851,7 +1211,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	hdr.dwSignature1 = PWM_DBSIG_1;
 	hdr.dwSignature2 = PWM_DBSIG_2;
 
-	hdr.dwFlags = PWM_FLAG_SHA2;
+	hdr.dwFlags = PWM_FLAG_SHA2; // The one and only hash algorithm available currently
 
 	if(m_nAlgorithm == ALGO_AES) hdr.dwFlags |= PWM_FLAG_RIJNDAEL;
 	else if(m_nAlgorithm == ALGO_TWOFISH) hdr.dwFlags |= PWM_FLAG_TWOFISH;
@@ -865,86 +1225,164 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	m_random.GetRandomBuffer(hdr.aMasterSeed, 16);
 	m_random.GetRandomBuffer((BYTE *)hdr.aEncryptionIV, 16);
 
-	// Copy header to memory file
-	pos = 0;
-	memcpy(pVirtualFile, &hdr, sizeof(PW_DBHEADER));
-	pos += sizeof(PW_DBHEADER);
+	// Skip the header, it will be written later
+	pos = sizeof(PW_DBHEADER);
 
-#ifdef _UNICODE
-	char *paPtr;
-#endif
+	BYTE *pb;
+
 	// Store all groups to memory file
 	for(i = 0; i < m_dwNumGroups; i++)
 	{
-#ifdef _UNICODE
-		paPtr = _ToAscii(m_pGroups[i].pszGroupName);
-		strcpy(&pVirtualFile[pos], paPtr);
-		SAFE_DELETE_ARRAY(paPtr);
-#else
-		strcpy(&pVirtualFile[pos], m_pGroups[i].pszGroupName);
-#endif
-		pos += _tcslen(m_pGroups[i].pszGroupName) + 1;
+		usFieldType = 0x0001; dwFieldSize = 4;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		memcpy(&pVirtualFile[pos], &m_pGroups[i].uGroupId, 4); pos += 4;
 
-		memcpy(&pVirtualFile[pos], &m_pGroups[i].uImageId, 4);
-		pos += 4;
+		usFieldType = 0x0002; dwFieldSize = _UTF8BytesNeeded(m_pGroups[i].pszGroupName) + 1;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		pb = _StringToUTF8(m_pGroups[i].pszGroupName);
+		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		SAFE_DELETE_ARRAY(pb);
+
+		usFieldType = 0x0003; dwFieldSize = 5;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		_PwTimeToTime(&m_pGroups[i].tCreation, aCompressedTime);
+		memcpy(&pVirtualFile[pos], aCompressedTime, 5); pos += 5;
+
+		usFieldType = 0x0004; dwFieldSize = 5;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		_PwTimeToTime(&m_pGroups[i].tLastMod, aCompressedTime);
+		memcpy(&pVirtualFile[pos], aCompressedTime, 5); pos += 5;
+
+		usFieldType = 0x0005; dwFieldSize = 5;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		_PwTimeToTime(&m_pGroups[i].tLastAccess, aCompressedTime);
+		memcpy(&pVirtualFile[pos], aCompressedTime, 5); pos += 5;
+
+		usFieldType = 0x0006; dwFieldSize = 5;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		_PwTimeToTime(&m_pGroups[i].tExpire, aCompressedTime);
+		memcpy(&pVirtualFile[pos], aCompressedTime, 5); pos += 5;
+
+		usFieldType = 0x0007; dwFieldSize = 4;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		memcpy(&pVirtualFile[pos], &m_pGroups[i].uImageId, 4); pos += 4;
+
+		usFieldType = 0xFFFF; dwFieldSize = 0;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
 	}
 
 	// Store all entries to memory file
 	for(i = 0; i < m_dwNumEntries; i++)
 	{
-#ifdef _UNICODE
-		paPtr = _ToAscii(m_pEntries[i].pszTitle);
-		strcpy(&pVirtualFile[pos], paPtr);
-		SAFE_DELETE_ARRAY(paPtr);
-#else
-		strcpy(&pVirtualFile[pos], m_pEntries[i].pszTitle);
-#endif
-		pos += _tcslen(m_pEntries[i].pszTitle) + 1;
-
-#ifdef _UNICODE
-		paPtr = _ToAscii(m_pEntries[i].pszUserName);
-		strcpy(&pVirtualFile[pos], paPtr);
-		SAFE_DELETE_ARRAY(paPtr);
-#else
-		strcpy(&pVirtualFile[pos], m_pEntries[i].pszUserName);
-#endif
-		pos += _tcslen(m_pEntries[i].pszUserName) + 1;
-
-#ifdef _UNICODE
-		paPtr = _ToAscii(m_pEntries[i].pszURL);
-		strcpy(&pVirtualFile[pos], paPtr);
-		SAFE_DELETE_ARRAY(paPtr);
-#else
-		strcpy(&pVirtualFile[pos], m_pEntries[i].pszURL);
-#endif
-		pos += _tcslen(m_pEntries[i].pszURL) + 1;
-
 		UnlockEntryPassword(&m_pEntries[i]);
-#ifdef _UNICODE
-		paPtr = _ToAscii(m_pEntries[i].pszPassword);
-		strcpy(&pVirtualFile[pos], paPtr);
-		SAFE_DELETE_ARRAY(paPtr);
-#else
-		strcpy(&pVirtualFile[pos], m_pEntries[i].pszPassword);
-#endif
+
+		usFieldType = 0x0001; dwFieldSize = 16;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		memcpy(&pVirtualFile[pos], &m_pEntries[i].uuid, 16); pos += 16;
+
+		usFieldType = 0x0002; dwFieldSize = 4;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		memcpy(&pVirtualFile[pos], &m_pEntries[i].uGroupId, 4); pos += 4;
+
+		usFieldType = 0x0003; dwFieldSize = 4;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		memcpy(&pVirtualFile[pos], &m_pEntries[i].uImageId, 4); pos += 4;
+
+		usFieldType = 0x0004;
+		dwFieldSize = _UTF8BytesNeeded(m_pEntries[i].pszTitle) + 1;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		pb = _StringToUTF8(m_pEntries[i].pszTitle);
+		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		SAFE_DELETE_ARRAY(pb);
+
+		usFieldType = 0x0005;
+		dwFieldSize = _UTF8BytesNeeded(m_pEntries[i].pszURL) + 1;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		pb = _StringToUTF8(m_pEntries[i].pszURL);
+		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		SAFE_DELETE_ARRAY(pb);
+
+		usFieldType = 0x0006;
+		dwFieldSize = _UTF8BytesNeeded(m_pEntries[i].pszUserName) + 1;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		pb = _StringToUTF8(m_pEntries[i].pszUserName);
+		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		SAFE_DELETE_ARRAY(pb);
+
+		usFieldType = 0x0007;
+		dwFieldSize = _UTF8BytesNeeded(m_pEntries[i].pszPassword) + 1;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		pb = _StringToUTF8(m_pEntries[i].pszPassword);
+		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		SAFE_DELETE_ARRAY(pb);
+
+		usFieldType = 0x0008;
+		dwFieldSize = _UTF8BytesNeeded(m_pEntries[i].pszAdditional) + 1;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		pb = _StringToUTF8(m_pEntries[i].pszAdditional);
+		ASSERT((pb != NULL) && (strlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
+		strcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		SAFE_DELETE_ARRAY(pb);
+
+		usFieldType = 0x0009; dwFieldSize = 5;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		_PwTimeToTime(&m_pEntries[i].tCreation, aCompressedTime);
+		memcpy(&pVirtualFile[pos], aCompressedTime, 5); pos += 5;
+
+		usFieldType = 0x000A; dwFieldSize = 5;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		_PwTimeToTime(&m_pEntries[i].tLastMod, aCompressedTime);
+		memcpy(&pVirtualFile[pos], aCompressedTime, 5); pos += 5;
+
+		usFieldType = 0x000B; dwFieldSize = 5;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		_PwTimeToTime(&m_pEntries[i].tLastAccess, aCompressedTime);
+		memcpy(&pVirtualFile[pos], aCompressedTime, 5); pos += 5;
+
+		usFieldType = 0x000C; dwFieldSize = 5;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+		_PwTimeToTime(&m_pEntries[i].tExpire, aCompressedTime);
+		memcpy(&pVirtualFile[pos], aCompressedTime, 5); pos += 5;
+
+		usFieldType = 0xFFFF; dwFieldSize = 0;
+		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+
 		LockEntryPassword(&m_pEntries[i]);
-		pos += m_pEntries[i].uPasswordLen + 1;
-
-#ifdef _UNICODE
-		paPtr = _ToAscii(m_pEntries[i].pszAdditional);
-		strcpy(&pVirtualFile[pos], paPtr);
-		SAFE_DELETE_ARRAY(paPtr);
-#else
-		strcpy(&pVirtualFile[pos], m_pEntries[i].pszAdditional);
-#endif
-		pos += _tcslen(m_pEntries[i].pszAdditional) + 1;
-
-		memcpy(&pVirtualFile[pos], &m_pEntries[i].uGroupId, 4);
-		pos += 4;
-
-		memcpy(&pVirtualFile[pos], &m_pEntries[i].uImageId, 4);
-		pos += 4;
 	}
+	ASSERT((pos <= uFileSize) && ((pos + 33) > uAllocated));
+
+	sha256_begin(&sha32);
+	sha256_hash((unsigned char *)pVirtualFile + sizeof(PW_DBHEADER), pos - sizeof(PW_DBHEADER), &sha32);
+	sha256_end((unsigned char *)hdr.aContentsHash, &sha32);
+
+	// Now we have all to build up the header
+	memcpy(pVirtualFile, &hdr, sizeof(PW_DBHEADER));
 
 	// Hash the master password with the generated hash salt
 	sha256_begin(&sha32);
@@ -964,9 +1402,9 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 			return FALSE;
 		}
 
-		// Encrypt! The first 48 bytes remain unencrypted, that's the header
-		uEncryptedPartSize = (unsigned long)aes.padEncrypt((RD_UINT8 *)pVirtualFile + 48,
-			pos - 48, (RD_UINT8 *)pVirtualFile + 48);
+		uEncryptedPartSize = (unsigned long)aes.padEncrypt((RD_UINT8 *)pVirtualFile +
+			sizeof(PW_DBHEADER), pos - sizeof(PW_DBHEADER), (RD_UINT8 *)pVirtualFile +
+			sizeof(PW_DBHEADER));
 	}
 	else if(m_nAlgorithm == ALGO_TWOFISH)
 	{
@@ -979,8 +1417,8 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 		}
 
 		uEncryptedPartSize = (unsigned long)twofish.padEncrypt(
-			(RD_UINT8 *)pVirtualFile + 48,
-			pos - 48, (RD_UINT8 *)pVirtualFile + 48);
+			(RD_UINT8 *)pVirtualFile + sizeof(PW_DBHEADER),
+			pos - sizeof(PW_DBHEADER), (RD_UINT8 *)pVirtualFile + sizeof(PW_DBHEADER));
 	}
 	else
 	{
@@ -996,7 +1434,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	}
 
 	// Write memory file to disk
-	fwrite(pVirtualFile, 1, uEncryptedPartSize + 48, fp);
+	fwrite(pVirtualFile, 1, uEncryptedPartSize + sizeof(PW_DBHEADER), fp);
 
 	// Close file, erase and delete memory
 	fclose(fp); fp = NULL;
@@ -1005,17 +1443,15 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	return TRUE;
 }
 
-int CPwManager::Find(const TCHAR *pszFindString, BOOL bCaseSensitive, int fieldFlags, int nStart)
+DWORD CPwManager::Find(const TCHAR *pszFindString, BOOL bCaseSensitive, DWORD fieldFlags, DWORD nStart)
 {
-	int i;
+	DWORD i;
 	CString strFind;
 	CString strEntry;
 
-	ASSERT(nStart >= 0);
-	if(nStart < 0) return -1;
-	if(nStart >= (int)m_dwNumEntries) return -1;
+	if(nStart >= (int)m_dwNumEntries) return DWORD_MAX;
 	ASSERT(pszFindString != NULL);
-	if(pszFindString == NULL) return -1;
+	if(pszFindString == NULL) return DWORD_MAX;
 
 	strFind = pszFindString;
 	if(bCaseSensitive == FALSE) strFind.MakeLower();
@@ -1063,34 +1499,36 @@ int CPwManager::Find(const TCHAR *pszFindString, BOOL bCaseSensitive, int fieldF
 		}
 		if(fieldFlags & PWMF_GROUPNAME)
 		{
-			strEntry = GetGroup(m_pEntries[i].uGroupId)->pszGroupName;
+			DWORD dwGroupIndex = GetGroupByIdN(m_pEntries[i].uGroupId);
+			ASSERT(dwGroupIndex != DWORD_MAX);
+			strEntry = GetGroup(dwGroupIndex)->pszGroupName;
 			if(bCaseSensitive == FALSE) strEntry.MakeLower();
 
 			if(strEntry.Find(strFind) != -1) return i;
 		}
 	}
 
-	return -1;
+	return DWORD_MAX;
 }
 
-void CPwManager::MoveInternal(int nFrom, int nTo)
+void CPwManager::MoveInternal(DWORD nFrom, DWORD nTo)
 {
-	int i;
-	int dir;
+	LONG i;
+	LONG dir;
 	PW_ENTRY pe;
 
 	if(nFrom == nTo) return;
-	if((nFrom < 0) || (nFrom >= (int)m_dwNumEntries)) return;
-	if((nTo < 0) || (nTo >= (int)m_dwNumEntries)) return;
+	if(nFrom >= m_dwNumEntries) return;
+	if(nTo >= m_dwNumEntries) return;
 
 	// Set moving direction
 	if(nFrom < nTo) dir = 1;
 	else dir = -1;
 
-	i = nFrom;
+	i = (LONG)nFrom;
 	while(1)
 	{
-		if(i == nTo) break;
+		if(i == (LONG)nTo) break;
 
 		pe = m_pEntries[i];
 		m_pEntries[i] = m_pEntries[i+dir];
@@ -1100,40 +1538,29 @@ void CPwManager::MoveInternal(int nFrom, int nTo)
 	}
 }
 
-BOOL CPwManager::MoveGroup(int nFrom, int nTo)
+BOOL CPwManager::MoveGroup(DWORD nFrom, DWORD nTo)
 {
-	int i;
-	int dir;
+	LONG i;
+	LONG dir;
 	PW_GROUP pg;
-	DWORD j, dwId1, dwId2;
 
 	if(nFrom == nTo) TRUE;
-	if((nFrom < 0) || (nFrom >= (int)m_dwNumGroups)) return FALSE;
-	if((nTo < 0) || (nTo >= (int)m_dwNumGroups)) return FALSE;
+	if(nFrom >= m_dwNumGroups) return FALSE;
+	if(nTo >= m_dwNumGroups) return FALSE;
 
 	// Set moving direction
 	if(nFrom < nTo) dir = 1;
 	else dir = -1;
 
-	i = nFrom;
+	i = (LONG)nFrom;
 
 	while(1)
 	{
-		if(i == nTo) break;
+		if(i == (LONG)nTo) break;
 
 		pg = m_pGroups[i];
 		m_pGroups[i] = m_pGroups[i+dir];
 		m_pGroups[i+dir] = pg;
-
-		// Swap group IDs in password entries too
-		dwId1 = (DWORD)i; dwId2 = (DWORD)(i + dir);
-		for(j = 0; j < m_dwNumEntries; j++)
-		{
-			if(m_pEntries[j].uGroupId == dwId1)
-				m_pEntries[j].uGroupId = dwId2;
-			else if(m_pEntries[j].uGroupId == dwId2)
-				m_pEntries[j].uGroupId = dwId1;
-		}
 
 		i += dir;
 	}
@@ -1141,18 +1568,18 @@ BOOL CPwManager::MoveGroup(int nFrom, int nTo)
 	return TRUE;
 }
 
-void CPwManager::MoveInGroup(int nGroup, int nFrom, int nTo)
+void CPwManager::MoveInGroup(DWORD idGroup, DWORD nFrom, DWORD nTo)
 {
-	if((nFrom < 0) || (nFrom >= (int)m_dwNumEntries)) return;
-	if((nTo < 0) || (nTo >= (int)m_dwNumEntries)) return;
+	if((nFrom >= m_dwNumEntries) || (nFrom == DWORD_MAX)) return;
+	if((nTo >= m_dwNumEntries) || (nTo == DWORD_MAX)) return;
 	if(nFrom == nTo) return;
 
-	int nFromEx = GetEntryByGroupN(nGroup, nFrom);
-	int nToEx = GetEntryByGroupN(nGroup, nTo);
+	DWORD dwFromEx = GetEntryByGroupN(idGroup, nFrom);
+	DWORD dwToEx = GetEntryByGroupN(idGroup, nTo);
 
-	if((nFromEx == -1) || (nToEx == -1)) return;
+	if((dwFromEx == DWORD_MAX) || (dwToEx == DWORD_MAX)) return;
 
-	MoveInternal(nFromEx, nToEx);
+	MoveInternal(dwFromEx, dwToEx);
 }
 
 void CPwManager::SortGroupList()
@@ -1170,27 +1597,24 @@ void CPwManager::SortGroupList()
 		for(i = 0; i < (m_dwNumGroups - 1); i++)
 		{
 			p = GetGroup(i);
-			q = GetGroup(i+1);
+			q = GetGroup(i + 1);
 
 			if(_tcsicmp(p->pszGroupName, q->pszGroupName) > 0)
 			{
-				MoveGroup((int)i, (int)i+1);
+				MoveGroup(i, i + 1);
 				bSwapped = TRUE;
 			}
 		}
 	}
 }
 
-void CPwManager::SortGroup(int nGroup, DWORD dwSortByField)
+void CPwManager::SortGroup(DWORD idGroup, DWORD dwSortByField)
 {
-	ASSERT(nGroup >= 0);
-	if(nGroup < 0) return;
-	ASSERT(nGroup < (int)m_dwNumGroups);
-	if(nGroup >= (int)m_dwNumGroups) return;
-
 	PPW_ENTRY *p;
 	PW_ENTRY v;
 	DWORD i, j, n = 0, min, t;
+
+	if(m_dwNumEntries <= 1) return; // Nothing to sort
 
 	p = new PPW_ENTRY[m_dwNumEntries];
 	if(p == NULL) return;
@@ -1198,13 +1622,13 @@ void CPwManager::SortGroup(int nGroup, DWORD dwSortByField)
 	// Build pointer array that contains pointers to the elements to sort
 	for(i = 0; i < m_dwNumEntries; i++)
 	{
-		if(m_pEntries[i].uGroupId == (DWORD)nGroup)
+		if(m_pEntries[i].uGroupId == idGroup)
 		{
 			p[n] = &m_pEntries[i];
 			n++;
 		}
 	}
-	if(n <= 1) return; // Something to sort?
+	if(n <= 1) { SAFE_DELETE_ARRAY(p); return; } // Something to sort?
 
 	// Sort the array, using a simple selection sort
 	for(i = 0; i < (n - 1); i++)
@@ -1238,6 +1662,25 @@ void CPwManager::SortGroup(int nGroup, DWORD dwSortByField)
 				if(_tcsicmp(p[j]->pszAdditional, p[min]->pszAdditional) < 0)
 					min = j;
 				break;
+			case 5:
+				if(_pwtimecmp(&p[j]->tCreation, &p[min]->tCreation) > 0)
+					min = j;
+				break;
+			case 6:
+				if(_pwtimecmp(&p[j]->tLastMod, &p[min]->tLastMod) > 0)
+					min = j;
+				break;
+			case 7:
+				if(_pwtimecmp(&p[j]->tLastAccess, &p[min]->tLastAccess) > 0)
+					min = j;
+				break;
+			case 8:
+				if(_pwtimecmp(&p[j]->tExpire, &p[min]->tExpire) > 0)
+					min = j;
+				break;
+			case 9:
+				// Cannot sort by UUID
+				break;
 			default:
 				ASSERT(FALSE);
 				if(_tcsicmp(p[j]->pszTitle, p[min]->pszTitle) < 0)
@@ -1250,60 +1693,155 @@ void CPwManager::SortGroup(int nGroup, DWORD dwSortByField)
 		*p[min] = *p[i];
 		*p[i] = v;
 	}
-	
+
 	SAFE_DELETE_ARRAY(p);
 }
 
-char *CPwManager::_ToAscii(const TCHAR *lptString)
+void CPwManager::_TimeToPwTime(BYTE *pCompressedTime, PW_TIME *pPwTime)
 {
-	char *p;
-	int _nChars = 0;
-
-	if(lptString == NULL) { ASSERT(FALSE); return NULL; }
-
-#ifdef _UNICODE
-	_nChars = (_tcslen(lptString) + 1) * 2;
-	p = new char[_nChars];
-	p[0] = 0;
-	VERIFY(WideCharToMultiByte(CP_ACP, 0, lptString, -1, p, _nChars, NULL, NULL) !=
-		ERROR_INSUFFICIENT_BUFFER);
-#else
-	p = new char[strlen(lptString) + 1];
-	strcpy(p, lptString);
-#endif
-
-	return p;
+	DWORD dwYear, dwMonth, dwDay, dwHour, dwMinute, dwSecond;
+	ASSERT((pCompressedTime != NULL) && (pPwTime != NULL));
+	_UnpackStructToTime(pCompressedTime, &dwYear, &dwMonth, &dwDay, &dwHour, &dwMinute, &dwSecond);
+	pPwTime->shYear = (USHORT)dwYear;
+	pPwTime->btMonth = (BYTE)dwMonth;
+	pPwTime->btDay = (BYTE)dwDay;
+	pPwTime->btHour = (BYTE)dwHour;
+	pPwTime->btMinute = (BYTE)dwMinute;
+	pPwTime->btSecond = (BYTE)dwSecond;
 }
 
-TCHAR *CPwManager::_ToUnicode(const char *pszString)
+void CPwManager::_PwTimeToTime(PW_TIME *pPwTime, BYTE *pCompressedTime)
 {
-	TCHAR *p;
-	int _nChars = 0;
+	ASSERT((pPwTime != NULL) && (pCompressedTime != NULL));
+	_PackTimeToStruct(pCompressedTime, (DWORD)pPwTime->shYear, (DWORD)pPwTime->btMonth,
+		(DWORD)pPwTime->btDay, (DWORD)pPwTime->btHour, (DWORD)pPwTime->btMinute,
+		(DWORD)pPwTime->btSecond);
+}
 
-	if(pszString == NULL) { ASSERT(FALSE); return NULL; }
+BOOL CPwManager::ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_GROUP *pGroup)
+{
+	BYTE aCompressedTime[5];
 
-#ifdef _UNICODE
-	// Determine the correct buffer size by calling the function itself with 0 as buffer size (see docs)
-	_nChars = MultiByteToWideChar(CP_ACP, 0, pszString, -1, NULL, 0);
+	switch(usFieldType)
+	{
+	case 0x00000000:
+		// Ignore field
+		break;
+	case 0x00000001:
+		memcpy(&pGroup->uGroupId, pData, 4);
+		break;
+	case 0x00000002:
+		ASSERT(dwFieldSize != 0);
+		SAFE_DELETE_ARRAY(pGroup->pszGroupName);
+		pGroup->pszGroupName = _UTF8ToString((UTF8_BYTE *)pData);
+		break;
+	case 0x00000003:
+		memcpy(aCompressedTime, pData, 5);
+		_TimeToPwTime(aCompressedTime, &pGroup->tCreation);
+		break;
+	case 0x00000004:
+		memcpy(aCompressedTime, pData, 5);
+		_TimeToPwTime(aCompressedTime, &pGroup->tLastMod);
+		break;
+	case 0x00000005:
+		memcpy(aCompressedTime, pData, 5);
+		_TimeToPwTime(aCompressedTime, &pGroup->tLastAccess);
+		break;
+	case 0x00000006:
+		memcpy(aCompressedTime, pData, 5);
+		_TimeToPwTime(aCompressedTime, &pGroup->tExpire);
+		break;
+	case 0x00000007:
+		memcpy(&pGroup->uImageId, pData, 4);
+		break;
+	case 0x0000FFFF:
+		AddGroup(pGroup);
+		SAFE_DELETE_ARRAY(pGroup->pszGroupName);
+		RESET_PWG_TEMPLATE(pGroup);
+		break;
+	default:
+		return FALSE; // Field unsupported
+	}
 
-	p = new TCHAR[_nChars + 1];
-	p[0] = 0;
+	return TRUE; // Field supported
+}
 
-	// Jan 9th 2004: DonAngel { 
-	// This was ASSERTing for string. All debugging did not given good results, so I decided to remove
-	// the verification. This could be a bug in MultiByteToWideChar, because thou it was returning
-	// ERROR_INSUFFICIENT_BUFFER, the convertion was OK!?
-	// The problem should be investigated later, but for now - I prefer to remove the ASSERT
-	// VERIFY(MultiByteToWideChar(CP_ACP, 0, pszString, -1, p, _nChars) !=
-	//	ERROR_INSUFFICIENT_BUFFER);
-	// Jan 9th 2004: DonAngel }
+BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_ENTRY *pEntry)
+{
+	BYTE aCompressedTime[5];
 
-	MultiByteToWideChar(CP_ACP, 0, pszString, -1, p, _nChars);
-#else
-	// Non-unicode - return the same!
-	p = new char[strlen(pszString) + 1];
-	strcpy(p, pszString);
-#endif
+	switch(usFieldType)
+	{
+	case 0x0000:
+		// Ignore field
+		break;
+	case 0x0001:
+		memcpy(pEntry->uuid, pData, 16);
+		break;
+	case 0x0002:
+		memcpy(&pEntry->uGroupId, pData, 4);
+		break;
+	case 0x0003:
+		memcpy(&pEntry->uImageId, pData, 4);
+		break;
+	case 0x0004:
+		ASSERT(dwFieldSize != 0);
+		SAFE_DELETE_ARRAY(pEntry->pszTitle);
+		pEntry->pszTitle = _UTF8ToString((UTF8_BYTE *)pData);
+		break;
+	case 0x0005:
+		ASSERT(dwFieldSize != 0);
+		SAFE_DELETE_ARRAY(pEntry->pszURL);
+		pEntry->pszURL = _UTF8ToString((UTF8_BYTE *)pData);
+		break;
+	case 0x0006:
+		ASSERT(dwFieldSize != 0);
+		SAFE_DELETE_ARRAY(pEntry->pszUserName);
+		pEntry->pszUserName = _UTF8ToString((UTF8_BYTE *)pData);
+		break;
+	case 0x0007:
+		ASSERT(dwFieldSize != 0);
+		SAFE_DELETE_ARRAY(pEntry->pszPassword);
+		pEntry->pszPassword = _UTF8ToString((UTF8_BYTE *)pData);
+		break;
+	case 0x0008:
+		ASSERT(dwFieldSize != 0);
+		SAFE_DELETE_ARRAY(pEntry->pszAdditional);
+		pEntry->pszAdditional = _UTF8ToString((UTF8_BYTE *)pData);
+		break;
+	case 0x0009:
+		ASSERT(dwFieldSize == 5);
+		memcpy(aCompressedTime, pData, 5);
+		_TimeToPwTime(aCompressedTime, &pEntry->tCreation);
+		break;
+	case 0x000A:
+		ASSERT(dwFieldSize == 5);
+		memcpy(aCompressedTime, pData, 5);
+		_TimeToPwTime(aCompressedTime, &pEntry->tLastMod);
+		break;
+	case 0x000B:
+		ASSERT(dwFieldSize == 5);
+		memcpy(aCompressedTime, pData, 5);
+		_TimeToPwTime(aCompressedTime, &pEntry->tLastAccess);
+		break;
+	case 0x000C:
+		ASSERT(dwFieldSize == 5);
+		memcpy(aCompressedTime, pData, 5);
+		_TimeToPwTime(aCompressedTime, &pEntry->tExpire);
+		break;
+	case 0xFFFF:
+		ASSERT(dwFieldSize == 0);
+		AddEntry(pEntry);
+		SAFE_DELETE_ARRAY(pEntry->pszTitle);
+		SAFE_DELETE_ARRAY(pEntry->pszURL);
+		SAFE_DELETE_ARRAY(pEntry->pszUserName);
+		SAFE_DELETE_ARRAY(pEntry->pszPassword);
+		SAFE_DELETE_ARRAY(pEntry->pszAdditional);
+		RESET_PWE_TEMPLATE(pEntry);
+		break;
+	default:
+		return FALSE; // Field unsupported
+	}
 
-	return p;
+	return TRUE; // Field processed
 }

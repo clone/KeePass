@@ -86,7 +86,7 @@ int CTwofish::padEncrypt(RD_UINT8 *pInput, int nInputOctets, RD_UINT8 *pOutBuffe
 		pOutBuffer += 16;
 	}
 
-	padLen = 16 - (nInputOctets - (16*numBlocks));
+	padLen = 16 - (nInputOctets - (16 * numBlocks));
 
 	for (i = 0; i < 16 - padLen; i++)
 	{
@@ -112,7 +112,7 @@ int CTwofish::padDecrypt(RD_UINT8 *pInput, int nInputOctets, RD_UINT8 *pOutBuffe
 	ASSERT((pInput != NULL) && (nInputOctets != NULL) && (pOutBuffer != NULL));
 	if((pInput == NULL) || (nInputOctets <= 0) || (pOutBuffer == NULL)) return 0;
 
-	if((nInputOctets % 16) != 0) return -1;
+	if((nInputOctets % 16) != 0) { ASSERT(FALSE); return -1; }
 
 	numBlocks = nInputOctets / 16;
 

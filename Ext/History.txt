@@ -1,4 +1,27 @@
-XX/XX/XX - 0.87
+04/02/01 - 0.88
+- Added more entry fields: creation time, last modification,
+  last access time, expires and UUID
+- Added toolbar (optional)
+- Completely new database format, but you can open v1 databases
+  without any problems (100% backward compatibility is given)
+- New search engine, the entries aren't duplicated any more and
+  you can make changes to the entries in the results list
+- Double-clicking on the title field of an entry now opens the
+  edit/view dialog, the ctrl-left method has been removed
+- KeePass now asks if it should overwrite key-files, if a key-
+  file already exists on the target drive
+- Password list now supports multi-selection, this allows new
+  operations like 'delete all selected', etc.
+- Mass-edit feature; change group, icon and expiration date of
+  all selected items at once using this new contextmenu command
+- The main image list is reused, therefor KeePass requires
+  fewer GDI memory
+- Fixed a bug which could have caused KeePass to forget the
+  last opened database
+- Replaced IE>=3.0 checkboxes by images, KeePass now runs fine
+  under Linux/Wine
+
+04/01/11 - 0.87
 - Added Twofish as alternative file encryption algorithm
 - Added option to lock the workspace when minimizing the window
 - Added option to minimize the window to tray instead of
@@ -20,6 +43,7 @@ XX/XX/XX - 0.87
   when saving a database wasn't successful
 - Added a cancel button to the file save confirmation dialog
 - The system tray icon is now high-color
+- Fixed a translation bug: the search group wasn't translated
 - PwSafe v2 TXT exports can be imported now (the files exported
   by the latest version [v2] of CounterPane's PwSafe)
 

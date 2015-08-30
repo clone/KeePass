@@ -38,8 +38,10 @@
 #include "PwSafe/PwImport.h"
 #include "Crypto/testimpl.h"
 #include "Util/MemUtil.h"
+#include "Util/StrUtil.h"
 #include "Util/PrivateConfig.h"
 #include "NewGUI/TranslateEx.h"
+#include "NewGUI/HyperLink.h"
 
 #include "PasswordDlg.h"
 #include "AddEntryDlg.h"
@@ -49,6 +51,7 @@
 #include "LanguagesDlg.h"
 #include "OptionsDlg.h"
 #include "GetRandomDlg.h"
+#include "EntryPropertiesDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -58,8 +61,13 @@ static char THIS_FILE[] = __FILE__;
 
 #define WM_MY_SYSTRAY_NOTIFY (WM_APP+10)
 
+#ifdef _DEBUG
 // #define or #undef sample group and entries
-#undef ___PWSAFE_SAMPLE_DATA
+#define ___PWSAFE_SAMPLE_DATA
+#endif
+
+static PW_TIME g_pwTimeNever;
+static char g_pNullString[4] = { 0, 0, 0, 0 };
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -73,6 +81,7 @@ public:
 
 	//{{AFX_DATA(CAboutDlg)
 	enum { IDD = IDD_ABOUTBOX };
+	CHyperLink	m_hlHomepage;
 	CShadeButtonST	m_btReadMe;
 	CShadeButtonST	m_btLicense;
 	CShadeButtonST	m_btOK;
@@ -104,6 +113,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAboutDlg)
+	DDX_Control(pDX, IDC_HLINK_HOMEPAGE, m_hlHomepage);
 	DDX_Control(pDX, IDC_README_BTN, m_btReadMe);
 	DDX_Control(pDX, IDC_LICENSE_BTN, m_btLicense);
 	DDX_Control(pDX, IDOK, m_btOK);
@@ -148,12 +158,29 @@ CPwSafeDlg::CPwSafeDlg(CWnd* pParent /*=NULL*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
 	m_bExiting = FALSE;
+	g_pwTimeNever.btDay = 28; g_pwTimeNever.btHour = 23; g_pwTimeNever.btMinute = 59;
+	g_pwTimeNever.btMonth = 12; g_pwTimeNever.btSecond = 59; g_pwTimeNever.shYear = 2999;
+
+	m_dwLastSafeSelectedGroup = 0;
+	m_dwLastNumSelectedItems = 0;
+	m_dwLastFirstSelectedItem = 0;
 }
 
 void CPwSafeDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CPwSafeDlg)
+	DDX_Control(pDX, IDC_TB_NEW, m_btnTbNew);
+	DDX_Control(pDX, IDC_TB_LOCK, m_btnTbLock);
+	DDX_Control(pDX, IDC_TB_FIND, m_btnTbFind);
+	DDX_Control(pDX, IDC_TB_EDITENTRY, m_btnTbEditEntry);
+	DDX_Control(pDX, IDC_TB_DELETEENTRY, m_btnTbDeleteEntry);
+	DDX_Control(pDX, IDC_TB_COPYUSER, m_btnTbCopyUser);
+	DDX_Control(pDX, IDC_TB_COPYPW, m_btnTbCopyPw);
+	DDX_Control(pDX, IDC_TB_ADDENTRY, m_btnTbAddEntry);
+	DDX_Control(pDX, IDC_TB_ABOUT, m_btnTbAbout);
+	DDX_Control(pDX, IDC_TB_SAVE, m_btnTbSave);
+	DDX_Control(pDX, IDC_TB_OPEN, m_btnTbOpen);
 	DDX_Control(pDX, IDC_MENULINE, m_stcMenuLine);
 	DDX_Control(pDX, IDC_GROUPLIST, m_cGroups);
 	DDX_Control(pDX, IDC_PWLIST, m_cList);
@@ -275,6 +302,25 @@ BEGIN_MESSAGE_MAP(CPwSafeDlg, CDialog)
 	ON_NOTIFY(LVN_COLUMNCLICK, IDC_GROUPLIST, OnColumnClickGroupList)
 	ON_COMMAND(ID_IMPORT_PWSAFE, OnImportPwSafe)
 	ON_UPDATE_COMMAND_UI(ID_IMPORT_PWSAFE, OnUpdateImportPwSafe)
+	ON_COMMAND(ID_VIEW_CREATION, OnViewCreation)
+	ON_COMMAND(ID_VIEW_LASTMOD, OnViewLastMod)
+	ON_COMMAND(ID_VIEW_LASTACCESS, OnViewLastAccess)
+	ON_COMMAND(ID_VIEW_EXPIRE, OnViewExpire)
+	ON_COMMAND(ID_VIEW_UUID, OnViewUuid)
+	ON_BN_CLICKED(IDC_TB_OPEN, OnTbOpen)
+	ON_BN_CLICKED(IDC_TB_SAVE, OnTbSave)
+	ON_BN_CLICKED(IDC_TB_NEW, OnTbNew)
+	ON_BN_CLICKED(IDC_TB_COPYUSER, OnTbCopyUser)
+	ON_BN_CLICKED(IDC_TB_COPYPW, OnTbCopyPw)
+	ON_BN_CLICKED(IDC_TB_ADDENTRY, OnTbAddEntry)
+	ON_BN_CLICKED(IDC_TB_EDITENTRY, OnTbEditEntry)
+	ON_BN_CLICKED(IDC_TB_DELETEENTRY, OnTbDeleteEntry)
+	ON_BN_CLICKED(IDC_TB_FIND, OnTbFind)
+	ON_BN_CLICKED(IDC_TB_LOCK, OnTbLock)
+	ON_BN_CLICKED(IDC_TB_ABOUT, OnTbAbout)
+	ON_COMMAND(ID_VIEW_SHOWTOOLBAR, OnViewShowToolBar)
+	ON_COMMAND(ID_PWLIST_MASSMODIFY, OnPwlistMassModify)
+	ON_UPDATE_COMMAND_UI(ID_PWLIST_MASSMODIFY, OnUpdatePwlistMassModify)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -317,6 +363,12 @@ BOOL CAboutDlg::OnInitDialog()
 	m_hWindowIcon = AfxGetApp()->LoadIcon(MAKEINTRESOURCE(IDR_MAINFRAME));
 	SetIcon(m_hWindowIcon, TRUE);
 	SetIcon(m_hWindowIcon, FALSE);
+
+	m_hlHomepage.SetURL(CString(PWM_HOMEPAGE));
+	m_hlHomepage.SetVisited(FALSE);
+	m_hlHomepage.SetAutoSize(TRUE);
+	m_hlHomepage.SetUnderline(CHyperLink::ulAlways);
+	m_hlHomepage.SetColours(RGB(0,0,255), RGB(0,0,255), RGB(100,100,255));
 
 	UpdateData(FALSE);
 
@@ -401,137 +453,183 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_popmenu.DestroyMenu();
 
 	CPrivateConfig cConfig;
-	char szTemp[SI_REGSIZE];
+	TCHAR szTemp[SI_REGSIZE];
 	szTemp[0] = 0; szTemp[1] = 0;
 	cConfig.Get(PWMKEY_LANG, szTemp);
 	LoadTranslationTable(szTemp);
 
 	cConfig.Get(PWMKEY_LASTDIR, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 		SetCurrentDirectory(szTemp);
 
-	szTemp[0] = 0; szTemp[1] = 0;
 	cConfig.Get(PWMKEY_CLIPSECS, szTemp);
-	if(strlen(szTemp) > 0)
+	if(_tcslen(szTemp) > 0)
 	{
-		m_dwClipboardSecs = (DWORD)atol(szTemp);
+		m_dwClipboardSecs = (DWORD)_ttol(szTemp);
 		if(m_dwClipboardSecs == 0) m_dwClipboardSecs = 10 + 1;
 		if(m_dwClipboardSecs == (DWORD)(-1)) m_dwClipboardSecs = 10 + 1;
 	}
 	else m_dwClipboardSecs = 10 + 1;
 
-	szTemp[0] = 0; szTemp[1] = 0;
 	m_bWindowsNewLine = TRUE; // Assume Windows
 	cConfig.Get(PWMKEY_NEWLINE, szTemp);
-	if(stricmp(szTemp, "Unix") == 0) m_bWindowsNewLine = FALSE;
+	if(_tcsicmp(szTemp, _T("Unix")) == 0) m_bWindowsNewLine = FALSE;
 
 	cConfig.Get(PWMKEY_IMGBTNS, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
-		if(strcmp(szTemp, "False") == 0) m_bImgButtons = FALSE;
+		if(_tcscmp(szTemp, _T("False")) == 0) m_bImgButtons = FALSE;
 		else m_bImgButtons = TRUE;
 	}
 	else m_bImgButtons = TRUE;
 	NewGUI_SetImgButtons(m_bImgButtons);
 
 	cConfig.Get(PWMKEY_ENTRYGRID, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
-		if(strcmp(szTemp, "True") == 0) m_bEntryGrid = TRUE;
+		if(_tcscmp(szTemp, _T("True")) == 0) m_bEntryGrid = TRUE;
 		else m_bEntryGrid = FALSE;
 	}
 	else m_bEntryGrid = FALSE;
 
 	cConfig.Get(PWMKEY_ALWAYSTOP, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
-		if(strcmp(szTemp, "True") == 0) m_bAlwaysOnTop = TRUE;
+		if(_tcscmp(szTemp, _T("True")) == 0) m_bAlwaysOnTop = TRUE;
 		else m_bAlwaysOnTop = FALSE;
 	}
 	else m_bAlwaysOnTop = FALSE;
 
 	cConfig.Get(PWMKEY_SHOWTITLE, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
-		if(strcmp(szTemp, "False") == 0) m_bShowTitle = FALSE;
+		if(_tcscmp(szTemp, _T("False")) == 0) m_bShowTitle = FALSE;
 		else m_bShowTitle = TRUE;
 	}
 	else m_bShowTitle = TRUE;
 
 	cConfig.Get(PWMKEY_SHOWUSER, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
-		if(strcmp(szTemp, "False") == 0) m_bShowUserName = FALSE;
+		if(_tcscmp(szTemp, _T("False")) == 0) m_bShowUserName = FALSE;
 		else m_bShowUserName = TRUE;
 	}
 	else m_bShowUserName = TRUE;
 
 	cConfig.Get(PWMKEY_SHOWURL, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
-		if(strcmp(szTemp, "False") == 0) m_bShowURL = FALSE;
+		if(_tcscmp(szTemp, _T("False")) == 0) m_bShowURL = FALSE;
 		else m_bShowURL = TRUE;
 	}
 	else m_bShowURL = TRUE;
 
 	cConfig.Get(PWMKEY_SHOWPASS, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
-		if(strcmp(szTemp, "False") == 0) m_bShowPassword = FALSE;
+		if(_tcscmp(szTemp, _T("False")) == 0) m_bShowPassword = FALSE;
 		else m_bShowPassword = TRUE;
 	}
 	else m_bShowPassword = TRUE;
 
 	cConfig.Get(PWMKEY_SHOWNOTES, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
-		if(strcmp(szTemp, "False") == 0) m_bShowNotes = FALSE;
+		if(_tcscmp(szTemp, _T("False")) == 0) m_bShowNotes = FALSE;
 		else m_bShowNotes = TRUE;
 	}
 	else m_bShowNotes = TRUE;
 
-	cConfig.Get(PWMKEY_HIDESTARS, szTemp);
-	if(strlen(szTemp) != 0)
+	cConfig.Get(PWMKEY_SHOWCREATION, szTemp);
+	if(_tcslen(szTemp) != 0)
 	{
-		if(strcmp(szTemp, "False") == 0) m_bPasswordStars = FALSE;
+		if(_tcscmp(szTemp, _T("True")) == 0) m_bShowCreation = TRUE;
+		else m_bShowCreation = FALSE;
+	}
+	else m_bShowCreation = FALSE;
+
+	cConfig.Get(PWMKEY_SHOWLASTMOD, szTemp);
+	if(_tcslen(szTemp) != 0)
+	{
+		if(_tcscmp(szTemp, _T("True")) == 0) m_bShowLastMod = TRUE;
+		else m_bShowLastMod = FALSE;
+	}
+	else m_bShowNotes = FALSE;
+
+	cConfig.Get(PWMKEY_SHOWLASTACCESS, szTemp);
+	if(_tcslen(szTemp) != 0)
+	{
+		if(_tcscmp(szTemp, _T("True")) == 0) m_bShowLastAccess = TRUE;
+		else m_bShowLastAccess = FALSE;
+	}
+	else m_bShowLastAccess = FALSE;
+
+	cConfig.Get(PWMKEY_SHOWEXPIRE, szTemp);
+	if(_tcslen(szTemp) != 0)
+	{
+		if(_tcscmp(szTemp, _T("True")) == 0) m_bShowExpire = TRUE;
+		else m_bShowExpire = FALSE;
+	}
+	else m_bShowExpire = FALSE;
+
+	cConfig.Get(PWMKEY_SHOWUUID, szTemp);
+	if(_tcslen(szTemp) != 0)
+	{
+		if(_tcscmp(szTemp, _T("True")) == 0) m_bShowUUID = TRUE;
+		else m_bShowUUID = FALSE;
+	}
+	else m_bShowUUID = FALSE;
+
+	cConfig.Get(PWMKEY_HIDESTARS, szTemp);
+	if(_tcslen(szTemp) != 0)
+	{
+		if(_tcscmp(szTemp, _T("False")) == 0) m_bPasswordStars = FALSE;
 		else m_bPasswordStars = TRUE;
 	}
 	else m_bPasswordStars = TRUE;
 
 	cConfig.Get(PWMKEY_LOCKMIN, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
-		if(strcmp(szTemp, "True") == 0) m_bLockOnMinimize = TRUE;
+		if(_tcscmp(szTemp, _T("True")) == 0) m_bLockOnMinimize = TRUE;
 		else m_bLockOnMinimize = FALSE;
 	}
 	else m_bLockOnMinimize = FALSE;
 
 	cConfig.Get(PWMKEY_MINTRAY, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
-		if(strcmp(szTemp, "True") == 0) m_bMinimizeToTray = TRUE;
+		if(_tcscmp(szTemp, _T("True")) == 0) m_bMinimizeToTray = TRUE;
 		else m_bMinimizeToTray = FALSE;
 	}
 	else m_bMinimizeToTray = FALSE;
 
 	cConfig.Get(PWMKEY_ROWCOLOR, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
-		COLORREF cref = (COLORREF)atol(szTemp);
+		COLORREF cref = (COLORREF)_ttol(szTemp);
 		m_cList.SetColorEx(cref);
 	}
 
+	cConfig.Get(PWMKEY_SHOWTOOLBAR, szTemp);
+	if(_tcslen(szTemp) != 0)
+	{
+		if(_tcscmp(szTemp, _T("False")) == 0) m_bShowToolBar = FALSE;
+		else m_bShowToolBar = TRUE;
+	}
+	else m_bShowToolBar = TRUE;
+
 	m_nLockTimeDef = -1;
 	cConfig.Get(PWMKEY_LOCKTIMER, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
-		m_nLockTimeDef = atol(szTemp);
+		m_nLockTimeDef = _ttol(szTemp);
 	}
 	m_nLockCountdown = m_nLockTimeDef;
 
 	// Translate the menu
 	BCMenu *pSubMenu = &m_menu;
-	const char *pSuffix = _T("");
+	const TCHAR *pSuffix = _T("");
 	CString strItem, strNew;
 	int nItem = 0, nSub = 0;
 	UINT nID;
@@ -540,7 +638,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 		if(pSubMenu->GetMenuString((UINT)nItem, strItem, MF_BYPOSITION) == FALSE) break;
 		pSuffix = _GetCmdAccelExt((LPCTSTR)strItem);
 		strNew = TRL((LPCTSTR)strItem);
-		if(strlen(pSuffix) != 0) { strNew += "\tCtrl+"; strNew += pSuffix; }
+		if(_tcslen(pSuffix) != 0) { strNew += _T("\t"); strNew += pSuffix; }
 		nID = pSubMenu->GetMenuItemID(nItem);
 		if(pSubMenu->ModifyMenu(nItem, MF_BYPOSITION | MF_STRING, nID, strNew) == FALSE) { ASSERT(FALSE); }
 		nItem++;
@@ -576,11 +674,11 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_cList.SetImageList(&m_ilIcons, LVSIL_SMALL);
 	m_cGroups.SetImageList(&m_ilIcons, LVSIL_SMALL);
 
-	m_bShowColumn[0] = m_bShowTitle;
-	m_bShowColumn[1] = m_bShowUserName;
-	m_bShowColumn[2] = m_bShowURL;
-	m_bShowColumn[3] = m_bShowPassword;
-	m_bShowColumn[4] = m_bShowNotes;
+	m_bShowColumn[0] = m_bShowTitle; m_bShowColumn[1] = m_bShowUserName;
+	m_bShowColumn[2] = m_bShowURL; m_bShowColumn[3] = m_bShowPassword;
+	m_bShowColumn[4] = m_bShowNotes; m_bShowColumn[5] = m_bShowCreation;
+	m_bShowColumn[6] = m_bShowLastMod; m_bShowColumn[7] = m_bShowLastAccess;
+	m_bShowColumn[8] = m_bShowExpire; m_bShowColumn[9] = m_bShowUUID;
 
 	if(m_bShowTitle == TRUE) uState = MF_CHECKED; else uState = MF_UNCHECKED;
 	m_menu.CheckMenuItem(ID_VIEW_TITLE, MF_BYCOMMAND | uState);
@@ -592,10 +690,23 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_menu.CheckMenuItem(ID_VIEW_PASSWORD, MF_BYCOMMAND | uState);
 	if(m_bShowNotes == TRUE) uState = MF_CHECKED; else uState = MF_UNCHECKED;
 	m_menu.CheckMenuItem(ID_VIEW_NOTES, MF_BYCOMMAND | uState);
+	if(m_bShowCreation == TRUE) uState = MF_CHECKED; else uState = MF_UNCHECKED;
+	m_menu.CheckMenuItem(ID_VIEW_CREATION, MF_BYCOMMAND | uState);
+	if(m_bShowLastMod == TRUE) uState = MF_CHECKED; else uState = MF_UNCHECKED;
+	m_menu.CheckMenuItem(ID_VIEW_LASTMOD, MF_BYCOMMAND | uState);
+	if(m_bShowLastAccess == TRUE) uState = MF_CHECKED; else uState = MF_UNCHECKED;
+	m_menu.CheckMenuItem(ID_VIEW_LASTACCESS, MF_BYCOMMAND | uState);
+	if(m_bShowExpire == TRUE) uState = MF_CHECKED; else uState = MF_UNCHECKED;
+	m_menu.CheckMenuItem(ID_VIEW_EXPIRE, MF_BYCOMMAND | uState);
+	if(m_bShowUUID == TRUE) uState = MF_CHECKED; else uState = MF_UNCHECKED;
+	m_menu.CheckMenuItem(ID_VIEW_UUID, MF_BYCOMMAND | uState);
 	if(m_bPasswordStars == TRUE) uState = MF_CHECKED; else uState = MF_UNCHECKED;
 	m_menu.CheckMenuItem(ID_VIEW_HIDESTARS, MF_BYCOMMAND | uState);
 	if(m_bAlwaysOnTop == TRUE) uState = MF_CHECKED; else uState = MF_UNCHECKED;
 	m_menu.CheckMenuItem(ID_VIEW_ALWAYSONTOP, MF_BYCOMMAND | uState);
+
+	if(m_bShowToolBar == TRUE) uState = MF_CHECKED; else uState = MF_UNCHECKED;
+	m_menu.CheckMenuItem(ID_VIEW_SHOWTOOLBAR, MF_BYCOMMAND | uState);
 
 	_CalcColumnSizes();
 	// Windows computes the sizes wrong the first time because there aren't
@@ -605,6 +716,11 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_cList.InsertColumn(2, TRL("URL"), LVCFMT_LEFT, 10 - 3, 2);
 	m_cList.InsertColumn(3, TRL("Password"), LVCFMT_LEFT, 10 - 3, 3);
 	m_cList.InsertColumn(4, TRL("Notes"), LVCFMT_LEFT, 10 - 3, 4);
+	m_cList.InsertColumn(5, TRL("Creation Time"), LVCFMT_LEFT, 10 - 3, 4);
+	m_cList.InsertColumn(6, TRL("Last Modification"), LVCFMT_LEFT, 10 - 3, 4);
+	m_cList.InsertColumn(7, TRL("Last Access"), LVCFMT_LEFT, 10 - 3, 4);
+	m_cList.InsertColumn(8, TRL("Expires"), LVCFMT_LEFT, 10 - 3, 4);
+	m_cList.InsertColumn(9, TRL("UUID"), LVCFMT_LEFT, 10 - 3, 4);
 
 	ASSERT(LVM_SETEXTENDEDLISTVIEWSTYLE == (0x1000 + 54));
 	_SetListParameters();
@@ -628,26 +744,26 @@ BOOL CPwSafeDlg::OnInitDialog()
 		CString str;
 
 		str = TRL("The following self-tests failed:");
-		str += "\r\n";
+		str += _T("\r\n");
 
 		if(ul & TI_ERR_SHAVAR32)
-			{ str += TRL("- SHA 32-bit variables"); str += "\r\n"; }
+			{ str += TRL("- SHA 32-bit variables"); str += _T("\r\n"); }
 		if(ul & TI_ERR_SHAVAR64)
-			{ str += TRL("- SHA 64-bit variables"); str += "\r\n"; }
+			{ str += TRL("- SHA 64-bit variables"); str += _T("\r\n"); }
 		if(ul & TI_ERR_SHACMP256)
-			{ str += TRL("- SHA-256 test vector(s)"); str += "\r\n"; }
+			{ str += TRL("- SHA-256 test vector(s)"); str += _T("\r\n"); }
 		if(ul & TI_ERR_SHACMP512)
-			{ str += TRL("- SHA-512 test vector(s)"); str += "\r\n"; }
+			{ str += TRL("- SHA-512 test vector(s)"); str += _T("\r\n"); }
 		if(ul & TI_ERR_RIJNDAEL_ENCRYPT)
-			{ str += TRL("- Rijndael encryption"); str += "\r\n"; }
+			{ str += TRL("- Rijndael encryption"); str += _T("\r\n"); }
 		if(ul & TI_ERR_RIJNDAEL_DECRYPT)
-			{ str += TRL("- Rijndael decryption"); str += "\r\n"; }
+			{ str += TRL("- Rijndael decryption"); str += _T("\r\n"); }
 		if(ul & TI_ERR_ARCFOUR_CRYPT)
-			{ str += TRL("- Arcfour crypto routine"); str += "\r\n"; }
+			{ str += TRL("- Arcfour crypto routine"); str += _T("\r\n"); }
 		if(ul & TI_ERR_TWOFISH)
-			{ str += TRL("- Twofish algorithm"); str += "\r\n"; }
+			{ str += TRL("- Twofish algorithm"); str += _T("\r\n"); }
 
-		str += "\r\n";
+		str += _T("\r\n");
 		str += TRL("The program will exit now.");
 		MessageBox(str, TRL("Self-Test(s) Failed"), MB_OK | MB_ICONWARNING);
 		OnCancel();
@@ -659,6 +775,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_cList.EnableWindow(FALSE);
 	m_cGroups.EnableWindow(FALSE);
 
+	// "Initialize" the xorshift pseudo-random number generator
 	CNewRandom nr;
 	nr.Initialize();
 	DWORD dwSkip, dwPos;
@@ -681,11 +798,11 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_strLastDb.Empty();
 	cConfig.Get(PWMKEY_OPENLASTB, szTemp);
 	m_bOpenLastDb = FALSE;
-	if(stricmp(szTemp, "True") == 0) m_bOpenLastDb = TRUE;
+	if(_tcsicmp(szTemp, _T("True")) == 0) m_bOpenLastDb = TRUE;
 
 	cConfig.Get(PWMKEY_AUTOSAVEB, szTemp);
 	m_bAutoSaveDb = FALSE;
-	if(stricmp(szTemp, "True") == 0) m_bAutoSaveDb = TRUE;
+	if(_tcsicmp(szTemp, _T("True")) == 0) m_bAutoSaveDb = TRUE;
 
 	m_hTrayIconNormal = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_hTrayIconLocked = AfxGetApp()->LoadIcon(IDI_LOCKED);
@@ -693,24 +810,38 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bShowWindow = TRUE;
 	VERIFY(m_systray.Create(this, WM_MY_SYSTRAY_NOTIFY, PWM_PRODUCT_NAME,
 		m_hTrayIconNormal, IDR_SYSTRAY_MENU, FALSE,
-		NULL, NULL,NIIF_NONE, 0));
+		NULL, NULL, NIIF_NONE, 0));
 	m_systray.SetMenuDefaultItem(0, TRUE);
 	m_systray.MoveToRight();
+
+	NewGUI_ToolBarButton(&m_btnTbNew, IDB_TB_NEW, IDB_TB_NEW);
+	NewGUI_ToolBarButton(&m_btnTbOpen, IDB_TB_OPEN, IDB_TB_OPEN);
+	NewGUI_ToolBarButton(&m_btnTbSave, IDB_TB_SAVE, IDB_TB_SAVE);
+	NewGUI_ToolBarButton(&m_btnTbAddEntry, IDB_TB_ADDENTRY, IDB_TB_ADDENTRY);
+	NewGUI_ToolBarButton(&m_btnTbEditEntry, IDB_TB_EDITENTRY, IDB_TB_EDITENTRY);
+	NewGUI_ToolBarButton(&m_btnTbDeleteEntry, IDB_TB_DELETEENTRY, IDB_TB_DELETEENTRY);
+	NewGUI_ToolBarButton(&m_btnTbCopyPw, IDB_TB_COPYPW, IDB_TB_COPYPW);
+	NewGUI_ToolBarButton(&m_btnTbCopyUser, IDB_TB_COPYUSER, IDB_TB_COPYUSER);
+	NewGUI_ToolBarButton(&m_btnTbFind, IDB_TB_FIND, IDB_TB_FIND);
+	NewGUI_ToolBarButton(&m_btnTbLock, IDB_TB_LOCK, IDB_TB_LOCK);
+	NewGUI_ToolBarButton(&m_btnTbAbout, IDB_TB_ABOUT, IDB_TB_ABOUT);
+
+	_ShowToolBar(m_bShowToolBar);
 
 	m_hAccel = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCEL_MAIN));
 	ASSERT(m_hAccel != NULL);
 
 	int px, py, dx, dy, idScreenNow, idScreenSaved; // Restore window position
 	cConfig.Get(PWMKEY_WINDOWPX, szTemp);
-	if(strlen(szTemp) > 0) px = atoi(szTemp); else px = -1;
+	if(_tcslen(szTemp) > 0) px = _ttoi(szTemp); else px = -1;
 	cConfig.Get(PWMKEY_WINDOWPY, szTemp);
-	if(strlen(szTemp) > 0) py = atoi(szTemp); else py = -1;
+	if(_tcslen(szTemp) > 0) py = _ttoi(szTemp); else py = -1;
 	cConfig.Get(PWMKEY_WINDOWDX, szTemp);
-	if(strlen(szTemp) > 0) dx = atoi(szTemp); else dx = -1;
+	if(_tcslen(szTemp) > 0) dx = _ttoi(szTemp); else dx = -1;
 	cConfig.Get(PWMKEY_WINDOWDY, szTemp);
-	if(strlen(szTemp) > 0) dy = atoi(szTemp); else dy = -1;
+	if(_tcslen(szTemp) > 0) dy = _ttoi(szTemp); else dy = -1;
 	cConfig.Get(PWMKEY_SCREENID, szTemp);
-	if(strlen(szTemp) > 0) idScreenSaved = atoi(szTemp); else idScreenSaved = -1;
+	if(_tcslen(szTemp) > 0) idScreenSaved = _ttoi(szTemp); else idScreenSaved = -1;
 
 	idScreenNow = GetSystemMetrics(SM_CXSCREEN) ^ (GetSystemMetrics(SM_CYSCREEN) << 12);
 
@@ -720,15 +851,25 @@ BOOL CPwSafeDlg::OnInitDialog()
 
 		// Restore column sizes
 		cConfig.Get(PWMKEY_COLWIDTH0, szTemp);
-		if(strlen(szTemp) != 0) m_cList.SetColumnWidth(0, atoi(szTemp));
+		if(_tcslen(szTemp) != 0) m_cList.SetColumnWidth(0, _ttoi(szTemp));
 		cConfig.Get(PWMKEY_COLWIDTH1, szTemp);
-		if(strlen(szTemp) != 0) m_cList.SetColumnWidth(1, atoi(szTemp));
+		if(_tcslen(szTemp) != 0) m_cList.SetColumnWidth(1, _ttoi(szTemp));
 		cConfig.Get(PWMKEY_COLWIDTH2, szTemp);
-		if(strlen(szTemp) != 0) m_cList.SetColumnWidth(2, atoi(szTemp));
+		if(_tcslen(szTemp) != 0) m_cList.SetColumnWidth(2, _ttoi(szTemp));
 		cConfig.Get(PWMKEY_COLWIDTH3, szTemp);
-		if(strlen(szTemp) != 0) m_cList.SetColumnWidth(3, atoi(szTemp));
+		if(_tcslen(szTemp) != 0) m_cList.SetColumnWidth(3, _ttoi(szTemp));
 		cConfig.Get(PWMKEY_COLWIDTH4, szTemp);
-		if(strlen(szTemp) != 0) m_cList.SetColumnWidth(4, atoi(szTemp));
+		if(_tcslen(szTemp) != 0) m_cList.SetColumnWidth(4, _ttoi(szTemp));
+		cConfig.Get(PWMKEY_COLWIDTH5, szTemp);
+		if(_tcslen(szTemp) != 0) m_cList.SetColumnWidth(5, _ttoi(szTemp));
+		cConfig.Get(PWMKEY_COLWIDTH6, szTemp);
+		if(_tcslen(szTemp) != 0) m_cList.SetColumnWidth(6, _ttoi(szTemp));
+		cConfig.Get(PWMKEY_COLWIDTH7, szTemp);
+		if(_tcslen(szTemp) != 0) m_cList.SetColumnWidth(7, _ttoi(szTemp));
+		cConfig.Get(PWMKEY_COLWIDTH8, szTemp);
+		if(_tcslen(szTemp) != 0) m_cList.SetColumnWidth(8, _ttoi(szTemp));
+		cConfig.Get(PWMKEY_COLWIDTH9, szTemp);
+		if(_tcslen(szTemp) != 0) m_cList.SetColumnWidth(9, _ttoi(szTemp));
 	}
 
 	if(_ParseCommandLine() == FALSE)
@@ -736,12 +877,14 @@ BOOL CPwSafeDlg::OnInitDialog()
 		if(m_bOpenLastDb == TRUE)
 		{
 			cConfig.Get(PWMKEY_LASTDB, szTemp);
-			if(strlen(szTemp) != 0)
+			if(_tcslen(szTemp) != 0)
 			{
 				_OpenDatabase(szTemp);
 			}
 		}
 	}
+
+	_UpdateToolBar();
 
 	return TRUE;
 }
@@ -751,7 +894,7 @@ void CPwSafeDlg::_TranslateMenu(BCMenu *pBCMenu)
 	CString strItem, strNew;
 	int nItem = 0;
 	BCMenu *pNext;
-	const char *pSuffix = _T("");
+	const TCHAR *pSuffix = _T("");
 
 	ASSERT(pBCMenu != NULL);
 	if(pBCMenu == NULL) return;
@@ -763,12 +906,12 @@ void CPwSafeDlg::_TranslateMenu(BCMenu *pBCMenu)
 
 		if((strItem == _T("Export Complete Database")) || (strItem == _T("Import To Database")))
 		{
-			pNext = pBCMenu->GetSubBCMenu((char *)(LPCTSTR)strItem);
+			pNext = pBCMenu->GetSubBCMenu((TCHAR *)(LPCTSTR)strItem);
 			_TranslateMenu(pNext);
 		}
 
 		strNew = TRL((LPCTSTR)strItem);
-		if(strlen(pSuffix) != 0) { strNew += "\tCtrl+"; strNew += pSuffix; }
+		if(_tcslen(pSuffix) != 0) { strNew += _T("\t"); strNew += pSuffix; }
 		if(pBCMenu->SetMenuText(nItem, strNew, MF_BYPOSITION) == FALSE) { ASSERT(FALSE); }
 
 		nItem++;
@@ -788,7 +931,7 @@ BOOL CPwSafeDlg::_ParseCommandLine()
 	{
 		for(i = 2; i < __argc; i++)
 		{
-			str += " ";
+			str += _T(" ");
 			str += __argv[i];
 		}
 	}
@@ -798,20 +941,20 @@ BOOL CPwSafeDlg::_ParseCommandLine()
 	if((str == _T("/?")) || (str == _T("-?")))
 	{
 		str = TRL("KeePass usage:");
-		str += "\r\n\r\n";
+		str += _T("\r\n\r\n");
 		str += "KeePass.exe [<db>]";
-		str += "\r\n\r\n";
+		str += _T("\r\n\r\n");
 		str += TRL("db = Path to database you wish to open on KeePass startup");
 		MessageBox(str, TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
 		return TRUE;
 	}
 
 	if(str.GetLength() == 0) return FALSE;
-	if(str.Left(1) == "\"") str = str.Right(str.GetLength() - 1);
+	if(str.Left(1) == _T("\"")) str = str.Right(str.GetLength() - 1);
 	if(str.GetLength() == 0) return FALSE;
 	str.TrimLeft(); str.TrimRight();
 	if(str.GetLength() == 0) return FALSE;
-	if(str.Right(1) == "\"") str = str.Left(str.GetLength() - 1);
+	if(str.Right(1) == _T("\"")) str = str.Left(str.GetLength() - 1);
 	if(str.GetLength() == 0) return FALSE;
 	str.TrimLeft(); str.TrimRight();
 	if(str.GetLength() == 0) return FALSE;
@@ -823,13 +966,14 @@ BOOL CPwSafeDlg::_ParseCommandLine()
 void CPwSafeDlg::_ParseSpecAndSetFont(const TCHAR *pszSpec)
 {
 	HFONT hPre = (HFONT)m_fListFont;
-	HDC hDC = GetDC()->m_hDC;
+	CDC *pDC = GetDC();
+	HDC hDC = pDC->m_hDC;
 	CString strFontSpec, strTemp;
 	LOGFONT lf;
 	int nSize;
 
 	ASSERT(pszSpec != NULL);
-	if(pszSpec == NULL) return;
+	if(pszSpec == NULL) { ReleaseDC(pDC); return; }
 
 	ZeroMemory(&lf, sizeof(LOGFONT));
 
@@ -839,17 +983,17 @@ void CPwSafeDlg::_ParseSpecAndSetFont(const TCHAR *pszSpec)
 	{
 		strFontSpec = pszSpec;
 		CString strFace, strSize, strFlags;
-		int nChars = strFontSpec.ReverseFind(';');
-		int nSizeEnd = strFontSpec.ReverseFind(',');
+		int nChars = strFontSpec.ReverseFind(_T(';'));
+		int nSizeEnd = strFontSpec.ReverseFind(_T(','));
 		strFace = strFontSpec.Left(nChars);
 		strSize = strFontSpec.Mid(nChars + 1, nSizeEnd - nChars - 1);
 		strFlags = strFontSpec.Right(4);
-		nSize = atoi((LPCTSTR)strSize);
+		nSize = _ttoi((LPCTSTR)strSize);
 		int nWeight = FW_NORMAL;
-		if(strFlags.GetAt(0) == '1') nWeight = FW_BOLD;
-		BYTE bItalic = (strFlags.GetAt(1) == '1') ? TRUE : FALSE;
-		BYTE bUnderlined = (strFlags.GetAt(2) == '1') ? TRUE : FALSE;
-		BYTE bStrikeOut = (strFlags.GetAt(3) == '1') ? TRUE : FALSE;
+		if(strFlags.GetAt(0) == _T('1')) nWeight = FW_BOLD;
+		BYTE bItalic = (BYTE)((strFlags.GetAt(1) == _T('1')) ? TRUE : FALSE);
+		BYTE bUnderlined = (BYTE)((strFlags.GetAt(2) == _T('1')) ? TRUE : FALSE);
+		BYTE bStrikeOut = (BYTE)((strFlags.GetAt(3) == _T('1')) ? TRUE : FALSE);
 
 		if(nSize < 0) nSize = -nSize;
 		if(strFace.GetLength() >= 32) strFace = strFace.Left(31);
@@ -860,7 +1004,7 @@ void CPwSafeDlg::_ParseSpecAndSetFont(const TCHAR *pszSpec)
 		lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 		lf.lfStrikeOut = bStrikeOut; lf.lfUnderline = bUnderlined;
 		lf.lfWeight = nWeight; lf.lfWidth = 0;
-		strcpy(lf.lfFaceName, (LPCTSTR)strFace);
+		_tcscpy(lf.lfFaceName, (LPCTSTR)strFace);
 		lf.lfHeight = -MulDiv(nSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
 
 		m_fListFont.CreateFontIndirect(&lf);
@@ -876,55 +1020,57 @@ void CPwSafeDlg::_ParseSpecAndSetFont(const TCHAR *pszSpec)
 	ZeroMemory(&lf, sizeof(LOGFONT));
 	m_fListFont.GetLogFont(&lf);
 	strFontSpec = lf.lfFaceName;
-	strFontSpec += ';';
-	strTemp.Format("%d", nSize);
+	strFontSpec += _T(';');
+	strTemp.Format(_T("%d"), nSize);
 	strFontSpec += strTemp;
-	strFontSpec += ",";
-	if(lf.lfWeight == FW_BOLD) strFontSpec += '1'; else strFontSpec += '0';
-	if(lf.lfItalic != 0) strFontSpec += '1'; else strFontSpec += '0';
-	if(lf.lfUnderline != 0) strFontSpec += '1'; else strFontSpec += '0';
-	if(lf.lfStrikeOut != 0) strFontSpec += '1'; else strFontSpec += '0';
+	strFontSpec += _T(",");
+	if(lf.lfWeight == FW_BOLD) strFontSpec += _T('1'); else strFontSpec += _T('0');
+	if(lf.lfItalic != 0) strFontSpec += _T('1'); else strFontSpec += _T('0');
+	if(lf.lfUnderline != 0) strFontSpec += _T('1'); else strFontSpec += _T('0');
+	if(lf.lfStrikeOut != 0) strFontSpec += _T('1'); else strFontSpec += _T('0');
 
 	m_strFontSpec = strFontSpec;
 
 	ASSERT(m_fListFont.m_hObject != NULL);
 	m_cGroups.SetFont(&m_fListFont, TRUE);
 	m_cList.SetFont(&m_fListFont, TRUE);
+
+	ReleaseDC(pDC);
 }
 
 // This should be replaced by a function that scans the accelerator table
-const char *CPwSafeDlg::_GetCmdAccelExt(const char *psz)
+const TCHAR *CPwSafeDlg::_GetCmdAccelExt(const TCHAR *psz)
 {
-	const char *pEmpty = _T("");
+	const TCHAR *pEmpty = _T("");
 
 	ASSERT(psz != NULL);
 	if(psz == NULL) return pEmpty;
 
-	if(stricmp(psz, "&New Database...") == 0) return _T("N");
-	if(stricmp(psz, "&Open Database...") == 0) return _T("O");
-	if(stricmp(psz, "&Save Database") == 0) return _T("S");
-	if(stricmp(psz, "&Print Complete Password List") == 0) return _T("P");
-	if(stricmp(psz, "&Lock Workspace") == 0) return _T("L");
-	if(stricmp(psz, "&Exit") == 0) return _T("X");
+	if(_tcsicmp(psz, _T("&New Database...")) == 0) return _T("Ctrl+N");
+	if(_tcsicmp(psz, _T("&Open Database...")) == 0) return _T("Ctrl+O");
+	if(_tcsicmp(psz, _T("&Save Database")) == 0) return _T("Ctrl+S");
+	if(_tcsicmp(psz, _T("&Print Complete Password List")) == 0) return _T("Ctrl+P");
+	if(_tcsicmp(psz, _T("&Lock Workspace")) == 0) return _T("Ctrl+L");
+	if(_tcsicmp(psz, _T("&Exit")) == 0) return _T("Ctrl+X");
 
-	if(stricmp(psz, "&Add Entry...") == 0) return _T("A");
-	if(stricmp(psz, "&Edit/View Entry...") == 0) return _T("E");
-	if(stricmp(psz, "&Delete Entry") == 0) return _T("D");
-	if(stricmp(psz, "&Find In Database...") == 0) return _T("F");
-	if(stricmp(psz, "&Add Password Group...") == 0) return _T("G");
-	if(stricmp(psz, "Open &URL") == 0) return _T("U");
-	if(stricmp(psz, "Copy &Password To Clipboard") == 0) return _T("C");
-	if(stricmp(psz, "Copy User&Name To Clipboard") == 0) return _T("B");
-	if(stricmp(psz, "Dupli&cate Entry") == 0) return _T("K");
-	if(stricmp(psz, "&Close Database") == 0) return _T("Q");
-	if(stricmp(psz, "&Options") == 0) return _T("M");
+	if(_tcsicmp(psz, _T("&Add Entry...")) == 0) return _T("Ctrl+A");
+	if(_tcsicmp(psz, _T("&Edit/View Entry...")) == 0) return _T("Ctrl+E");
+	if(_tcsicmp(psz, _T("&Delete Entry")) == 0) return _T("Ctrl+D");
+	if(_tcsicmp(psz, _T("&Find In Database...")) == 0) return _T("Ctrl+F");
+	if(_tcsicmp(psz, _T("&Add Password Group...")) == 0) return _T("Ctrl+G");
+	if(_tcsicmp(psz, _T("Open &URL")) == 0) return _T("Ctrl+U");
+	if(_tcsicmp(psz, _T("Copy &Password To Clipboard")) == 0) return _T("Ctrl+C");
+	if(_tcsicmp(psz, _T("Copy User&Name To Clipboard")) == 0) return _T("Ctrl+B");
+	if(_tcsicmp(psz, _T("Dupli&cate Entry")) == 0) return _T("Ctrl+K");
+	if(_tcsicmp(psz, _T("&Close Database")) == 0) return _T("Ctrl+Q");
+	if(_tcsicmp(psz, _T("&Options")) == 0) return _T("Ctrl+M");
 
-	if(stricmp(psz, "Password &Generator") == 0) return _T("Z");
+	if(_tcsicmp(psz, _T("Password &Generator")) == 0) return _T("Ctrl+Z");
 
-	if(stricmp(psz, "Move Entry To &Top") == 0) return _T("Up");
-	if(stricmp(psz, "Move Entry &One Up") == 0) return _T("Down");
-	if(stricmp(psz, "Mo&ve Entry One Down") == 0) return _T("PgUp");
-	if(stricmp(psz, "Move Entry To &Bottom") == 0) return _T("PgDown");
+	if(_tcsicmp(psz, _T("Move Entry To &Top")) == 0) return _T("Ctrl+Up");
+	if(_tcsicmp(psz, _T("Move Entry &One Up")) == 0) return _T("Ctrl+Down");
+	if(_tcsicmp(psz, _T("Mo&ve Entry One Down")) == 0) return _T("Ctrl+PgUp");
+	if(_tcsicmp(psz, _T("Move Entry To &Bottom")) == 0) return _T("Ctrl+PgDown");
 
 	return pEmpty;
 }
@@ -976,6 +1122,8 @@ void CPwSafeDlg::OnSysCommand(UINT nID, LPARAM lParam)
 			m_bMinimized = (nID == SC_MINIMIZE);
 		}
 	}
+
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnPaint() 
@@ -984,7 +1132,7 @@ void CPwSafeDlg::OnPaint()
 	{
 		CPaintDC dc(this);
 
-		SendMessage(WM_ICONERASEBKGND, (WPARAM) dc.GetSafeHdc(), 0);
+		SendMessage(WM_ICONERASEBKGND, (WPARAM)dc.GetSafeHdc(), 0);
 
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
@@ -1036,10 +1184,14 @@ LRESULT CPwSafeDlg::OnMenuChar(UINT nChar, UINT nFlags, CMenu* pMenu)
 
 void CPwSafeDlg::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu) 
 {
+	m_dwLastFirstSelectedItem = GetSelectedEntry();
+	m_dwLastNumSelectedItems = GetSelectedEntriesCount();
+	m_dwLastSafeSelectedGroup = GetSafeSelectedGroup();
+
 	CDialog::OnInitMenuPopup(pPopupMenu, nIndex, bSysMenu);
 
 	OnUpdateFlush(pPopupMenu);
-	
+
 	if(!bSysMenu)
 	{
 		if(BCMenu::IsMenu(pPopupMenu)) BCMenu::UpdateMenu(pPopupMenu);
@@ -1153,12 +1305,16 @@ void CPwSafeDlg::ProcessResize()
 	RECT rectClient;
 	RECT rectList;
 	int cyMenu = GetSystemMetrics(SM_CYMENU);
+	LONG nAddTop;
+
+	if(m_bShowToolBar == TRUE) nAddTop = 26;
+	else nAddTop = 0;
 
 	GetClientRect(&rectClient);
 
 	if(IsWindow(m_cGroups.m_hWnd)) // Resize group box
 	{
-		rectList.top = GUI_SPACER;
+		rectList.top = GUI_SPACER + nAddTop;
 		rectList.bottom = rectClient.bottom - (GUI_SPACER >> 1) - cyMenu;
 		rectList.left = 0;
 		rectList.right = GUI_SPACER + GUI_GROUPLIST_EXT;
@@ -1171,7 +1327,7 @@ void CPwSafeDlg::ProcessResize()
 
 	if(IsWindow(m_cList.m_hWnd)) // Resize password list box
 	{
-		rectList.top = GUI_SPACER;
+		rectList.top = GUI_SPACER + nAddTop;
 		rectList.bottom = rectClient.bottom - (GUI_SPACER >> 1) - cyMenu;
 		rectList.left = GUI_SPACER + GUI_GROUPLIST_EXT + 2;
 		rectList.right = rectClient.right;
@@ -1201,13 +1357,13 @@ void CPwSafeDlg::ProcessResize()
 		m_sbStatus.MoveWindow(&rectSB, TRUE);
 	}
 
-	m_nLockCountdown = m_nLockTimeDef;
+	m_nLockCountdown = m_nLockTimeDef; // Resize = user action = no idle time
 }
 
 void CPwSafeDlg::CleanUp()
 {
 	CPrivateConfig pcfg;
-	char szTemp[1024];
+	TCHAR szTemp[1024];
 	CString strTemp;
 
 	if(m_bTimer == TRUE)
@@ -1226,8 +1382,8 @@ void CPwSafeDlg::CleanUp()
 
 	if(m_nClipboardCountdown >= 0)
 	{
-		CopyStringToClipboard(NULL);
-		m_nClipboardCountdown = -1;
+		CopyStringToClipboard(NULL); // This clears the clipboard
+		m_nClipboardCountdown = -1; // Disable clipboard clear countdown
 	}
 
 	_DeleteTemporaryFiles();
@@ -1238,97 +1394,127 @@ void CPwSafeDlg::CleanUp()
 	pcfg.Set(PWMKEY_CLIPSECS, szTemp);
 
 	GetCurrentDirectory(1024, szTemp);
-	if(strlen(szTemp) != 0)
+	if(_tcslen(szTemp) != 0)
 	{
 		pcfg.Set(PWMKEY_LASTDIR, szTemp);
 	}
 
 	// Save newline sequence
-	if(m_bWindowsNewLine == TRUE) strcpy(szTemp, "Windows");
-	else strcpy(szTemp, "Unix");
+	if(m_bWindowsNewLine == TRUE) _tcscpy(szTemp, _T("Windows"));
+	else _tcscpy(szTemp, _T("Unix"));
 	pcfg.Set(PWMKEY_NEWLINE, szTemp);
 
-	if(m_bOpenLastDb == TRUE) strcpy(szTemp, "True");
-	else strcpy(szTemp, "False");
+	if(m_bOpenLastDb == TRUE) _tcscpy(szTemp, _T("True"));
+	else _tcscpy(szTemp, _T("False"));
 	pcfg.Set(PWMKEY_OPENLASTB, szTemp);
 
-	if(m_bAutoSaveDb == TRUE) strcpy(szTemp, "True");
-	else strcpy(szTemp, "False");
+	if(m_bAutoSaveDb == TRUE) _tcscpy(szTemp, _T("True"));
+	else _tcscpy(szTemp, _T("False"));
 	pcfg.Set(PWMKEY_AUTOSAVEB, szTemp);
 
 	pcfg.Set(PWMKEY_LASTDB, (LPCTSTR)m_strLastDb);
 
-	if(m_bImgButtons == FALSE) strcpy(szTemp, "False");
-	else strcpy(szTemp, "True");
+	if(m_bImgButtons == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
 	pcfg.Set(PWMKEY_IMGBTNS, szTemp);
 
-	if(m_bEntryGrid == FALSE) strcpy(szTemp, "False");
-	else strcpy(szTemp, "True");
+	if(m_bEntryGrid == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
 	pcfg.Set(PWMKEY_ENTRYGRID, szTemp);
 
-	if(m_bShowTitle == FALSE) strcpy(szTemp, "False");
-	else strcpy(szTemp, "True");
+	if(m_bShowTitle == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
 	pcfg.Set(PWMKEY_SHOWTITLE, szTemp);
-	if(m_bShowUserName == FALSE) strcpy(szTemp, "False");
-	else strcpy(szTemp, "True");
+	if(m_bShowUserName == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
 	pcfg.Set(PWMKEY_SHOWUSER, szTemp);
-	if(m_bShowURL == FALSE) strcpy(szTemp, "False");
-	else strcpy(szTemp, "True");
+	if(m_bShowURL == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
 	pcfg.Set(PWMKEY_SHOWURL, szTemp);
-	if(m_bShowPassword == FALSE) strcpy(szTemp, "False");
-	else strcpy(szTemp, "True");
+	if(m_bShowPassword == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
 	pcfg.Set(PWMKEY_SHOWPASS, szTemp);
-	if(m_bShowNotes == FALSE) strcpy(szTemp, "False");
-	else strcpy(szTemp, "True");
+	if(m_bShowNotes == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
 	pcfg.Set(PWMKEY_SHOWNOTES, szTemp);
 
-	if(m_bPasswordStars == FALSE) strcpy(szTemp, "False");
-	else strcpy(szTemp, "True");
+	if(m_bShowCreation == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
+	pcfg.Set(PWMKEY_SHOWCREATION, szTemp);
+	if(m_bShowLastMod == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
+	pcfg.Set(PWMKEY_SHOWLASTMOD, szTemp);
+	if(m_bShowLastAccess == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
+	pcfg.Set(PWMKEY_SHOWLASTACCESS, szTemp);
+	if(m_bShowExpire == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
+	pcfg.Set(PWMKEY_SHOWEXPIRE, szTemp);
+	if(m_bShowUUID == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
+	pcfg.Set(PWMKEY_SHOWUUID, szTemp);
+
+	if(m_bPasswordStars == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
 	pcfg.Set(PWMKEY_HIDESTARS, szTemp);
-	if(m_bAlwaysOnTop == FALSE) strcpy(szTemp, "False");
-	else strcpy(szTemp, "True");
+	if(m_bAlwaysOnTop == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
 	pcfg.Set(PWMKEY_ALWAYSTOP, szTemp);
-	if(m_bLockOnMinimize == FALSE) strcpy(szTemp, "False");
-	else strcpy(szTemp, "True");
+	if(m_bLockOnMinimize == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
 	pcfg.Set(PWMKEY_LOCKMIN, szTemp);
-	if(m_bMinimizeToTray == FALSE) strcpy(szTemp, "False");
-	else strcpy(szTemp, "True");
+	if(m_bMinimizeToTray == FALSE) _tcscpy(szTemp, _T("False"));
+	else _tcscpy(szTemp, _T("True"));
 	pcfg.Set(PWMKEY_MINTRAY, szTemp);
+
+	if(m_bShowToolBar == TRUE) _tcscpy(szTemp, _T("True"));
+	else _tcscpy(szTemp, _T("False"));
+	pcfg.Set(PWMKEY_SHOWTOOLBAR, szTemp);
 
 	pcfg.Set(PWMKEY_LISTFONT, (LPCTSTR)m_strFontSpec);
 
 	int idScreen;
 	RECT rect;
-
 	idScreen = GetSystemMetrics(SM_CXSCREEN) ^ (GetSystemMetrics(SM_CYSCREEN) << 12);
-	sprintf(szTemp, "%d", idScreen);
+	_itot(idScreen, szTemp, 10);
 	pcfg.Set(PWMKEY_SCREENID, szTemp);
 
 	GetWindowRect(&rect);
-	sprintf(szTemp, "%d", rect.left);
+	_itot(rect.left, szTemp, 10);
 	pcfg.Set(PWMKEY_WINDOWPX, szTemp);
-	sprintf(szTemp, "%d", rect.top);
+	_itot(rect.top, szTemp, 10);
 	pcfg.Set(PWMKEY_WINDOWPY, szTemp);
-	sprintf(szTemp, "%d", rect.right - rect.left);
+	_itot(rect.right - rect.left, szTemp, 10);
 	pcfg.Set(PWMKEY_WINDOWDX, szTemp);
-	sprintf(szTemp, "%d", rect.bottom - rect.top);
+	_itot(rect.bottom - rect.left, szTemp, 10);
 	pcfg.Set(PWMKEY_WINDOWDY, szTemp);
 
-	itoa(m_cList.GetColumnWidth(0), szTemp, 10);
+	// Save all column widths
+	_itot(m_cList.GetColumnWidth(0), szTemp, 10);
 	pcfg.Set(PWMKEY_COLWIDTH0, szTemp);
-	itoa(m_cList.GetColumnWidth(1), szTemp, 10);
+	_itot(m_cList.GetColumnWidth(1), szTemp, 10);
 	pcfg.Set(PWMKEY_COLWIDTH1, szTemp);
-	itoa(m_cList.GetColumnWidth(2), szTemp, 10);
+	_itot(m_cList.GetColumnWidth(2), szTemp, 10);
 	pcfg.Set(PWMKEY_COLWIDTH2, szTemp);
-	itoa(m_cList.GetColumnWidth(3), szTemp, 10);
+	_itot(m_cList.GetColumnWidth(3), szTemp, 10);
 	pcfg.Set(PWMKEY_COLWIDTH3, szTemp);
-	itoa(m_cList.GetColumnWidth(4), szTemp, 10);
+	_itot(m_cList.GetColumnWidth(4), szTemp, 10);
 	pcfg.Set(PWMKEY_COLWIDTH4, szTemp);
+	_itot(m_cList.GetColumnWidth(5), szTemp, 10);
+	pcfg.Set(PWMKEY_COLWIDTH5, szTemp);
+	_itot(m_cList.GetColumnWidth(6), szTemp, 10);
+	pcfg.Set(PWMKEY_COLWIDTH6, szTemp);
+	_itot(m_cList.GetColumnWidth(7), szTemp, 10);
+	pcfg.Set(PWMKEY_COLWIDTH7, szTemp);
+	_itot(m_cList.GetColumnWidth(8), szTemp, 10);
+	pcfg.Set(PWMKEY_COLWIDTH8, szTemp);
+	_itot(m_cList.GetColumnWidth(9), szTemp, 10);
+	pcfg.Set(PWMKEY_COLWIDTH9, szTemp);
 
-	ltoa((long)m_cList.GetColorEx(), szTemp, 10);
+	_ltot((long)m_cList.GetColorEx(), szTemp, 10);
 	pcfg.Set(PWMKEY_ROWCOLOR, szTemp);
 
-	ltoa(m_nLockTimeDef, szTemp, 10);
+	_ltot(m_nLockTimeDef, szTemp, 10);
 	pcfg.Set(PWMKEY_LOCKTIMER, szTemp);
 
 	HICON hReleaser; // Load/get all icons and release them safely
@@ -1344,6 +1530,8 @@ void CPwSafeDlg::CleanUp()
 	DestroyIcon(hReleaser);
 	hReleaser = AfxGetApp()->LoadIcon(MAKEINTRESOURCE(IDR_MAINFRAME));
 	DestroyIcon(hReleaser);
+
+	m_ilIcons.DeleteImageList();
 }
 
 void CPwSafeDlg::_DeleteTemporaryFiles()
@@ -1357,12 +1545,15 @@ void CPwSafeDlg::_DeleteTemporaryFiles()
 
 void CPwSafeDlg::OnOK() 
 {
+	// Ignore enter in dialog
+
 	// CleanUp();
 	// CDialog::OnOK();
 }
 
 void CPwSafeDlg::OnCancel() 
 {
+	// Do not accept the escape key
 	if(GetKeyState(27) & 0x8000) return;
 
 	m_bExiting = TRUE;
@@ -1393,6 +1584,8 @@ void CPwSafeDlg::OnSafeAddGroup()
 {
 	CString strGroupName;
 	CAddGroupDlg dlg;
+	PW_GROUP pwTemplate;
+	PW_TIME pwTime;
 
 	if(m_bFileOpen == FALSE) return;
 
@@ -1403,9 +1596,18 @@ void CPwSafeDlg::OnSafeAddGroup()
 
 	if(dlg.DoModal() == IDOK)
 	{
-		m_mgr.AddGroup(dlg.m_nIconId, (LPCTSTR)dlg.m_strGroupName);
+		_GetCurrentPwTime(&pwTime);
+		pwTemplate.pszGroupName = (LPSTR)(LPCTSTR)dlg.m_strGroupName;
+		pwTemplate.tCreation = pwTime;
+		pwTemplate.tExpire = g_pwTimeNever;
+		pwTemplate.tLastAccess = pwTime;
+		pwTemplate.tLastMod = pwTime;
+		pwTemplate.uGroupId = 0; // 0 = create new group
+		pwTemplate.uImageId = (DWORD)dlg.m_nIconId;
+		VERIFY(m_mgr.AddGroup(&pwTemplate));
 		UpdateGroupList();
 
+		m_cGroups.EnsureVisible(m_cGroups.GetItemCount() - 1, FALSE);
 		// Focus new group
 		m_cGroups.SetItemState(m_mgr.GetNumberOfGroups() - 1,
 			LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
@@ -1417,6 +1619,8 @@ void CPwSafeDlg::OnSafeAddGroup()
 
 		m_bModified = TRUE;
 	}
+
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnViewHideStars() 
@@ -1458,71 +1662,89 @@ void CPwSafeDlg::OnViewHideStars()
 		}
 	}
 	else
-		UpdatePasswordList();
+		RefreshPasswordList(); // Refresh list based on UUIDs
 }
 
-int CPwSafeDlg::GetSelectedEntry()
+DWORD CPwSafeDlg::GetSelectedEntry()
 {
-	int i;
+	DWORD i;
 	UINT uState;
 
 	m_nLockCountdown = m_nLockTimeDef;
 
-	if(m_bFileOpen == FALSE) return -1;
+	if(m_bFileOpen == FALSE) return DWORD_MAX;
 
 	// LVIS_FOCUSED is not enough here, it must be LVIS_SELECTED
-	for(i = 0; i < m_cList.GetItemCount(); i++)
+	for(i = 0; i < (DWORD)m_cList.GetItemCount(); i++)
 	{
-		uState = m_cList.GetItemState(i, LVIS_SELECTED);
+		uState = m_cList.GetItemState((int)i, LVIS_SELECTED);
 		if(uState & LVIS_SELECTED) return i;
 	}
 
-	return -1;
+	return DWORD_MAX;
 }
 
-int CPwSafeDlg::GetSelectedGroup()
+DWORD CPwSafeDlg::GetSelectedEntriesCount()
 {
-	int i, f = -1, s = -1;
+	DWORD i, uSelectedItems = 0;
 	UINT uState;
 
 	m_nLockCountdown = m_nLockTimeDef;
 
-	if(m_bFileOpen == FALSE) return -1;
+	if(m_bFileOpen == FALSE) return DWORD_MAX;
 
-	for(i = 0; i < m_cGroups.GetItemCount(); i++)
+	for(i = 0; i < (DWORD)m_cList.GetItemCount(); i++)
 	{
-		uState = m_cGroups.GetItemState(i, LVIS_SELECTED | LVIS_FOCUSED);
+		uState = m_cList.GetItemState((int)i, LVIS_SELECTED);
+		if(uState & LVIS_SELECTED) uSelectedItems++;
+	}
+
+	return uSelectedItems;
+}
+
+DWORD CPwSafeDlg::GetSelectedGroup()
+{
+	DWORD i, f = DWORD_MAX, s = DWORD_MAX;
+	UINT uState;
+
+	m_nLockCountdown = m_nLockTimeDef;
+
+	if(m_bFileOpen == FALSE) return DWORD_MAX;
+
+	for(i = 0; i < (DWORD)m_cGroups.GetItemCount(); i++)
+	{
+		uState = m_cGroups.GetItemState((int)i, LVIS_SELECTED | LVIS_FOCUSED);
 		if(uState & LVIS_SELECTED) s = i;
 		if(uState & LVIS_FOCUSED) f = i;
 	}
 
-	if(s != -1) return s;
-	if(f != -1) return f;
-	return -1;
+	if(s != DWORD_MAX) return s;
+	if(f != DWORD_MAX) return f;
+	return DWORD_MAX;
 }
 
-int CPwSafeDlg::GetSafeSelectedGroup()
+DWORD CPwSafeDlg::GetSafeSelectedGroup()
 {
-	int i;
+	DWORD i;
 	UINT uState;
 
 	m_nLockCountdown = m_nLockTimeDef;
 
-	if(m_bFileOpen == FALSE) return -1;
+	if(m_bFileOpen == FALSE) return DWORD_MAX;
 
 	// LVIS_FOCUSED is not enough here, it must be LVIS_SELECTED
-	for(i = 0; i < m_cGroups.GetItemCount(); i++)
+	for(i = 0; i < (DWORD)m_cGroups.GetItemCount(); i++)
 	{
-		uState = m_cGroups.GetItemState(i, LVIS_SELECTED);
+		uState = m_cGroups.GetItemState((int)i, LVIS_SELECTED);
 		if(uState & LVIS_SELECTED) return i;
 	}
 
-	return -1;
+	return DWORD_MAX;
 }
 
 void CPwSafeDlg::UpdateGroupList()
 {
-	int i;
+	DWORD i;
 	LV_ITEM lvi;
 	PW_GROUP *pgrp;
 
@@ -1535,13 +1757,14 @@ void CPwSafeDlg::UpdateGroupList()
 	ZeroMemory(&lvi, sizeof(LV_ITEM));
 	lvi.mask = LVIF_TEXT | LVIF_IMAGE;
 
-	for(i = 0; i < (int)m_mgr.GetNumberOfGroups(); i++)
+	for(i = 0; i < m_mgr.GetNumberOfGroups(); i++)
 	{
-		pgrp = m_mgr.GetGroup((DWORD)i);
+		pgrp = m_mgr.GetGroup(i);
 		ASSERT(pgrp != NULL);
 		if(pgrp == NULL) continue;
+		ASSERT(pgrp->pszGroupName != NULL);
 
-		lvi.iItem = i;
+		lvi.iItem = (int)i;
 		lvi.iImage = pgrp->uImageId;
 		lvi.pszText = pgrp->pszGroupName;
 
@@ -1555,73 +1778,200 @@ void CPwSafeDlg::UpdateGroupList()
 
 void CPwSafeDlg::UpdatePasswordList()
 {
-	int i, j = 0, t;
-	CString strGroup;
-	DWORD dwGroupId;
+	DWORD i, j = 0;
+	DWORD dwGroupInx, dwGroupId;
 	PW_ENTRY *pwe;
-	LV_ITEM lvi;
-	CString strTemp;
+	PW_TIME tNow;
 
 	m_nLockCountdown = m_nLockTimeDef;
 
-	m_cList.DeleteAllItems();
-
 	if(m_bFileOpen == FALSE) return;
 
-	dwGroupId = (DWORD)GetSelectedGroup();
-	if(dwGroupId == 0xFFFFFFFF) return;
-	strGroup = m_cGroups.GetItemText((int)dwGroupId, 0);
+	dwGroupInx = GetSelectedGroup();
+	if(dwGroupInx == DWORD_MAX) return;
+	dwGroupId = m_mgr.GetGroupIdByIndex(dwGroupInx);
 
-	for(i = 0; i < (int)m_mgr.GetNumberOfEntries(); i++)
+	m_cList.DeleteAllItems();
+	_GetCurrentPwTime(&tNow);
+
+	for(i = 0; i < m_mgr.GetNumberOfEntries(); i++)
 	{
-		pwe = m_mgr.GetEntry((DWORD)i);
-		ASSERT(pwe != NULL);
+		pwe = m_mgr.GetEntry(i);
+		ASSERT_ENTRY(pwe);
 
 		if(pwe != NULL)
 		{
 			if(pwe->uGroupId == dwGroupId)
 			{
-				ZeroMemory(&lvi, sizeof(LV_ITEM));
-				lvi.mask = LVIF_TEXT | LVIF_IMAGE;
-				lvi.iItem = j;
-				lvi.pszText = pwe->pszTitle;
-				lvi.iImage = pwe->uImageId;
-				m_cList.InsertItem(&lvi);
-
-				lvi.mask = LVIF_TEXT;
-				lvi.iSubItem = 1;
-				lvi.pszText = pwe->pszUserName;
-				m_cList.SetItem(&lvi);
-
-				lvi.iSubItem = 2;
-				lvi.pszText = pwe->pszURL;
-				m_cList.SetItem(&lvi);
-
-				lvi.iSubItem = 3;
-				if(m_bPasswordStars == TRUE)
-				{
-					lvi.pszText = PWM_PASSWORD_STRING;
-					m_cList.SetItem(&lvi);
-				}
-				else
-				{
-					m_mgr.UnlockEntryPassword(pwe);
-					lvi.pszText = (char *)pwe->pszPassword;
-					m_cList.SetItem(&lvi);
-					m_mgr.LockEntryPassword(pwe);
-				}
-
-				// Remove newline and break character for better display
-				strTemp = pwe->pszAdditional;
-				for(t = 0; t < strTemp.GetLength(); t++)
-					if((strTemp[t] == '\r') || (strTemp[t] == '\n'))
-						strTemp.SetAt(t, ' ');
-				lvi.iSubItem = 4;
-				lvi.pszText = (char *)(LPCTSTR)strTemp;
-				m_cList.SetItem(&lvi);
-
+				_List_SetEntry(j, pwe, TRUE, &tNow);
 				j++;
 			}
+		}
+	}
+}
+
+void CPwSafeDlg::_List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEntry, PW_TIME *ptNow)
+{
+	LV_ITEM lvi;
+	DWORD t;
+	CString strTemp;
+
+	if((dwInsertPos == DWORD_MAX) && (bIsNewEntry == TRUE))
+		dwInsertPos = (DWORD)m_cList.GetItemCount();
+
+	ZeroMemory(&lvi, sizeof(LV_ITEM));
+	lvi.iItem = (int)dwInsertPos;
+	lvi.iSubItem = 0;
+
+	// Set 'expired' image if necessary
+	if(_pwtimecmp(&pwe->tExpire, ptNow) <= 0) pwe->uImageId = 45;
+
+	lvi.mask = LVIF_TEXT | LVIF_IMAGE;
+	if(m_bShowTitle == TRUE)
+		lvi.pszText = pwe->pszTitle;
+	else
+		lvi.pszText = g_pNullString;
+	lvi.iImage = pwe->uImageId;
+
+	if(bIsNewEntry == TRUE)
+		m_cList.InsertItem(&lvi); // Add
+	else
+		m_cList.SetItem(&lvi); // Set
+
+	lvi.mask = LVIF_TEXT;
+	lvi.iSubItem = 1;
+	if(m_bShowUserName == TRUE)
+		lvi.pszText = pwe->pszUserName;
+	else
+		lvi.pszText = g_pNullString;
+	m_cList.SetItem(&lvi);
+
+	lvi.iSubItem = 2;
+	if(m_bShowURL == TRUE)
+		lvi.pszText = pwe->pszURL;
+	else
+		lvi.pszText = g_pNullString;
+	m_cList.SetItem(&lvi);
+
+	lvi.iSubItem = 3;
+	if(m_bShowPassword == TRUE)
+	{
+		// Hide passwords behind ******** if the user has selected this option
+		if(m_bPasswordStars == TRUE)
+		{
+			lvi.pszText = PWM_PASSWORD_STRING;
+			m_cList.SetItem(&lvi);
+		}
+		else // Don't hide, display them
+		{
+			m_mgr.UnlockEntryPassword(pwe);
+			lvi.pszText = pwe->pszPassword;
+			m_cList.SetItem(&lvi);
+			m_mgr.LockEntryPassword(pwe);
+		}
+	}
+	else // Hide passwords completely
+	{
+		lvi.pszText = g_pNullString;
+		m_cList.SetItem(&lvi);
+	}
+
+	lvi.iSubItem = 4;
+	if(m_bShowNotes == TRUE)
+	{
+		// Remove newline and break character for better display
+		strTemp = pwe->pszAdditional;
+		for(t = 0; t < (DWORD)strTemp.GetLength(); t++)
+			if((strTemp.GetAt(t) == _T('\r')) || (strTemp.GetAt(t) == _T('\n')))
+				strTemp.SetAt(t, _T(' '));
+		lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+	}
+	else
+		lvi.pszText = g_pNullString;
+	m_cList.SetItem(&lvi);
+
+	lvi.iSubItem = 5;
+	if(m_bShowCreation == TRUE)
+	{
+		_PwTimeToString(pwe->tCreation, &strTemp);
+		lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+	}
+	else
+		lvi.pszText = g_pNullString;
+	m_cList.SetItem(&lvi);
+
+	lvi.iSubItem = 6;
+	if(m_bShowLastMod == TRUE)
+	{
+		_PwTimeToString(pwe->tLastMod, &strTemp);
+		lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+	}
+	else
+		lvi.pszText = g_pNullString;
+	m_cList.SetItem(&lvi);
+
+	lvi.iSubItem = 7;
+	if(m_bShowLastAccess == TRUE)
+	{
+		_PwTimeToString(pwe->tLastAccess, &strTemp);
+		lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+	}
+	else
+		lvi.pszText = g_pNullString;
+	m_cList.SetItem(&lvi);
+
+	lvi.iSubItem = 8;
+	if(m_bShowExpire == TRUE)
+	{
+		_PwTimeToString(pwe->tExpire, &strTemp);
+		lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+	}
+	else
+		lvi.pszText = g_pNullString;
+	m_cList.SetItem(&lvi);
+
+	// Ignore m_bShowUUID, the UUID field is needed in all cases
+	lvi.iSubItem = 9;
+	_UuidToString(pwe->uuid, &strTemp);
+	lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+	m_cList.SetItem(&lvi);
+}
+
+void CPwSafeDlg::RefreshPasswordList()
+{
+	DWORD i, j = 0;
+	PW_ENTRY *pwe;
+	LV_ITEM lvi;
+	TCHAR szTemp[1024];
+	BYTE aUuid[16];
+	CString strTemp;
+	PW_TIME tNow;
+
+	m_nLockCountdown = m_nLockTimeDef;
+
+	if(m_bFileOpen == FALSE) return;
+
+	_GetCurrentPwTime(&tNow);
+
+	for(i = 0; i < (DWORD)m_cList.GetItemCount(); i++)
+	{
+		ZeroMemory(&lvi, sizeof(LV_ITEM));
+		lvi.iItem = (int)i;
+		lvi.iSubItem = 9;
+		lvi.mask = LVIF_TEXT;
+		lvi.cchTextMax = 1024;
+		lvi.pszText = szTemp;
+		m_cList.GetItem(&lvi);
+		strTemp = lvi.pszText;
+
+		_StringToUuid((LPCTSTR)strTemp, aUuid);
+		pwe = m_mgr.GetEntryByUuid(aUuid);
+		ASSERT_ENTRY(pwe);
+
+		if(pwe != NULL)
+		{
+			_List_SetEntry(j, pwe, FALSE, &tNow);
+			j++;
 		}
 	}
 }
@@ -1629,27 +1979,51 @@ void CPwSafeDlg::UpdatePasswordList()
 void CPwSafeDlg::OnPwlistAdd() 
 {
 	CAddEntryDlg dlg;
-	int nGroup = GetSelectedGroup();
+	DWORD uGroup = GetSelectedGroup();
+	PW_ENTRY pwTemplate;
+	PW_TIME tNow;
+	DWORD dwInitialGroup; // ID
 
 	if(m_bFileOpen == FALSE) return;
-	if(nGroup == -1) return;
+	if(uGroup == DWORD_MAX) return;
 
 	dlg.m_pMgr = &m_mgr;
-	dlg.m_nGroupId = nGroup;
+	dlg.m_pParentIcons = &m_ilIcons;
+	dlg.m_nGroupId = (int)uGroup; // m_nGroupId of the dialog is an index, not an ID
 	dlg.m_nIconId = 0;
 	dlg.m_bEditMode = FALSE;
+	dlg.m_tExpire = g_pwTimeNever;
+	dwInitialGroup = m_mgr.GetGroupIdByIndex(uGroup); // ID
 
 	if(dlg.DoModal() == IDOK)
 	{
-		m_mgr.AddEntry((DWORD)dlg.m_nGroupId, (DWORD)dlg.m_nIconId,
-			(LPCTSTR)dlg.m_strTitle,
-			(LPCTSTR)dlg.m_strURL, (LPCTSTR)dlg.m_strUserName,
-			(LPCTSTR)dlg.m_strPassword, (LPCTSTR)dlg.m_strNotes);
+		_GetCurrentPwTime(&tNow);
+		memset(&pwTemplate, 0, sizeof(PW_ENTRY));
+		pwTemplate.pszAdditional = (TCHAR *)(LPCTSTR)dlg.m_strNotes;
+		pwTemplate.pszPassword = (TCHAR *)(LPCTSTR)dlg.m_strPassword;
+		pwTemplate.pszTitle = (TCHAR *)(LPCTSTR)dlg.m_strTitle;
+		pwTemplate.pszURL = (TCHAR *)(LPCTSTR)dlg.m_strURL;
+		pwTemplate.pszUserName = (TCHAR *)(LPCTSTR)dlg.m_strUserName;
+		pwTemplate.tCreation = tNow;
+		pwTemplate.tExpire = dlg.m_tExpire;
+		pwTemplate.tLastAccess = tNow;
+		pwTemplate.tLastMod = tNow;
+		pwTemplate.uGroupId = m_mgr.GetGroupIdByIndex((DWORD)dlg.m_nGroupId);
+		pwTemplate.uImageId = (DWORD)dlg.m_nIconId;
+		pwTemplate.uPasswordLen = (DWORD)dlg.m_strPassword.GetLength();
 
-		UpdatePasswordList();
-		m_cList.EnsureVisible(m_cList.GetItemCount() - 1, FALSE);
+		// Add the entry to the password manager
+		VERIFY(m_mgr.AddEntry(&pwTemplate));
 
-		m_bModified = TRUE;
+		// Add the password to the GUI, but only if it's visible
+		PW_ENTRY *pNew = m_mgr.GetLastEditedEntry();
+		if(pNew->uGroupId == dwInitialGroup) // dwInitialGroup is an ID
+		{
+			_List_SetEntry(DWORD_MAX, pNew, TRUE, &tNow); // No unlock needed
+			m_cList.EnsureVisible(m_cList.GetItemCount() - 1, FALSE);
+		}
+
+		m_bModified = TRUE; // Haven't we? :)
 	}
 
 	// Cleanup dialog data
@@ -1659,89 +2033,156 @@ void CPwSafeDlg::OnPwlistAdd()
 	EraseCString(&dlg.m_strPassword);
 	EraseCString(&dlg.m_strNotes);
 	ASSERT(dlg.m_strPassword.GetLength() == 0);
+
+	_UpdateToolBar();
+}
+
+DWORD CPwSafeDlg::_ListSelToEntryIndex(DWORD dwSelected)
+{
+	LV_ITEM lvi;
+	DWORD dwSel;
+	TCHAR tszTemp[1024];
+	CString strTemp;
+	BYTE aUuid[16];
+
+	if(dwSelected == DWORD_MAX) dwSel = GetSelectedEntry();
+	else dwSel = dwSelected;
+
+	ZeroMemory(&lvi, sizeof(LV_ITEM));
+	lvi.iItem = (int)dwSel;
+	lvi.iSubItem = 9;
+	lvi.mask = LVIF_TEXT;
+	lvi.pszText = tszTemp;
+	lvi.cchTextMax = 1024;
+	if(m_cList.GetItem(&lvi) == FALSE) return DWORD_MAX;
+
+	strTemp = lvi.pszText;
+	_StringToUuid((LPCTSTR)strTemp, aUuid);
+
+	EraseCString(&strTemp);
+
+	dwSel = m_mgr.GetEntryByUuidN(aUuid);
+	ASSERT(dwSel != DWORD_MAX);
+	return dwSel;
 }
 
 void CPwSafeDlg::OnPwlistEdit() 
 {
-	int nSel = GetSelectedEntry();
-	int nGroup = GetSelectedGroup();
-	DWORD dwId;
+	DWORD dwEntryIndex;
 	PW_ENTRY *pEntry;
 	CAddEntryDlg dlg;
+	PW_ENTRY pwTemplate;
+	PW_TIME tNow;
+	DWORD dwNewGroupId;
+	BOOL bNeedFullUpdate = FALSE;
+	DWORD dwSelectedEntry = GetSelectedEntry();
 
-	if(nSel == -1) return;
-	if(nGroup == -1) return;
 	if(m_bFileOpen == FALSE) return;
 
+	ASSERT(dwSelectedEntry != DWORD_MAX);
+	if(dwSelectedEntry == DWORD_MAX) return;
+
+	dwEntryIndex = _ListSelToEntryIndex();
+	if(dwEntryIndex == DWORD_MAX) return;
+	pEntry = m_mgr.GetEntry(dwEntryIndex);
+	ASSERT_ENTRY(pEntry);
+	if(pEntry == NULL) return;
+
 	dlg.m_pMgr = &m_mgr;
+	dlg.m_pParentIcons = &m_ilIcons;
 	dlg.m_bEditMode = TRUE;
 
-	if((nSel != -1) && (nGroup != -1))
+	dlg.m_nGroupId = (int)m_mgr.GetGroupByIdN(pEntry->uGroupId); // ID to index
+	dlg.m_strTitle = pEntry->pszTitle;
+	dlg.m_strUserName = pEntry->pszUserName;
+	dlg.m_strURL = pEntry->pszURL;
+	m_mgr.UnlockEntryPassword(pEntry);
+	dlg.m_strPassword = pEntry->pszPassword;
+	dlg.m_strRepeatPw = pEntry->pszPassword;
+	m_mgr.LockEntryPassword(pEntry);
+	dlg.m_strNotes = pEntry->pszAdditional;
+	dlg.m_nIconId = (int)pEntry->uImageId;
+	dlg.m_tExpire = pEntry->tExpire;
+
+	if(dlg.DoModal() == IDOK)
 	{
-		dwId = (DWORD)m_mgr.GetEntryByGroupN(nGroup, (DWORD)nSel);
-		ASSERT(dwId != 0xFFFFFFFF);
-		pEntry = m_mgr.GetEntry(dwId);
-		ASSERT(pEntry != NULL);
-		if(pEntry == NULL) return;
+		pwTemplate = *pEntry;
 
-		dlg.m_nGroupId = nGroup;
-		dlg.m_strTitle = pEntry->pszTitle;
-		dlg.m_strUserName = pEntry->pszUserName;
-		dlg.m_strURL = pEntry->pszURL;
-		m_mgr.UnlockEntryPassword(pEntry);
-		dlg.m_strPassword = pEntry->pszPassword;
-		dlg.m_strRepeatPw = pEntry->pszPassword;
-		m_mgr.LockEntryPassword(pEntry);
-		dlg.m_strNotes = pEntry->pszAdditional;
-		dlg.m_nIconId = pEntry->uImageId;
+		_GetCurrentPwTime(&tNow);
 
-		if(dlg.DoModal() == IDOK)
+		pwTemplate.pszAdditional = (TCHAR *)(LPCTSTR)dlg.m_strNotes;
+		pwTemplate.pszPassword = (TCHAR *)(LPCTSTR)dlg.m_strPassword;
+		pwTemplate.pszTitle = (TCHAR *)(LPCTSTR)dlg.m_strTitle;
+		pwTemplate.pszURL = (TCHAR *)(LPCTSTR)dlg.m_strURL;
+		pwTemplate.pszUserName = (TCHAR *)(LPCTSTR)dlg.m_strUserName;
+		// pwTemplate.tCreation = pEntry->tCreation;
+		pwTemplate.tExpire = dlg.m_tExpire;
+		pwTemplate.tLastAccess = tNow;
+		pwTemplate.tLastMod = tNow;
+		pwTemplate.uImageId = (DWORD)dlg.m_nIconId;
+		pwTemplate.uPasswordLen = (DWORD)dlg.m_strPassword.GetLength();
+
+		// If the entry has been moved to a different group, a full
+		// update of the list is needed.
+		dwNewGroupId = m_mgr.GetGroupIdByIndex((DWORD)dlg.m_nGroupId);
+		if(dwNewGroupId != pwTemplate.uGroupId) bNeedFullUpdate = TRUE;
+		pwTemplate.uGroupId = dwNewGroupId;
+
+		VERIFY(m_mgr.SetEntry(dwEntryIndex, &pwTemplate));
+
+		if(bNeedFullUpdate == TRUE) // Complete list update(!) needed
 		{
-			m_mgr.SetEntry(dwId, (DWORD)dlg.m_nGroupId, (DWORD)dlg.m_nIconId,
-				(LPCTSTR)dlg.m_strTitle, (LPCTSTR)dlg.m_strURL,
-				(LPCTSTR)dlg.m_strUserName, (LPCTSTR)dlg.m_strPassword,
-				(LPCTSTR)dlg.m_strNotes);
-
 			_List_SaveView();
-			UpdatePasswordList();
+			UpdatePasswordList(); // Refresh is not enough!
 			_List_RestoreView();
-
-			m_bModified = TRUE;
+		}
+		else // Just update the selected item, not the whole list
+		{
+			m_mgr.UnlockEntryPassword(&pwTemplate);
+			_List_SetEntry(dwSelectedEntry, &pwTemplate, FALSE, &tNow);
+			m_mgr.LockEntryPassword(&pwTemplate);
 		}
 
-		// Cleanup dialog data
-		EraseCString(&dlg.m_strTitle);
-		EraseCString(&dlg.m_strUserName);
-		EraseCString(&dlg.m_strURL);
-		EraseCString(&dlg.m_strPassword);
-		EraseCString(&dlg.m_strNotes);
-		ASSERT(dlg.m_strPassword.GetLength() == 0);
+		m_bModified = TRUE;
 	}
+	else
+		_TouchEntry(GetSelectedEntry(), FALSE); // User had viewed it only
+
+	// Cleanup dialog data
+	EraseCString(&dlg.m_strTitle);
+	EraseCString(&dlg.m_strUserName);
+	EraseCString(&dlg.m_strURL);
+	EraseCString(&dlg.m_strPassword);
+	EraseCString(&dlg.m_strNotes);
+	ASSERT(dlg.m_strPassword.GetLength() == 0);
+
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnPwlistDelete() 
 {
-	int nSel = GetSelectedEntry();
-	int nGroup = GetSelectedGroup();
-	DWORD dwId;
+	DWORD dwIndex;
+	DWORD dwSel;
 
-	if(nSel == -1) return;
-	if(nGroup == -1) return;
 	if(m_bFileOpen == FALSE) return;
 
-	if((nSel != -1) && (nGroup != -1))
+	while(1)
 	{
-		dwId = m_mgr.GetEntryByGroupN(nGroup, (DWORD)nSel);
-		ASSERT(dwId != 0xFFFFFFFF);
-		if(dwId == 0xFFFFFFFF) return;
-		m_mgr.DeleteEntry(dwId);
+		dwSel = GetSelectedEntry();
 
-		_List_SaveView();
-		UpdatePasswordList();
-		_List_RestoreView();
+		if(dwSel == DWORD_MAX) break;
+		dwIndex = _ListSelToEntryIndex();
+		ASSERT(dwIndex != DWORD_MAX);
+		if(dwIndex == DWORD_MAX) break;
 
-		m_bModified = TRUE;
+		VERIFY(m_mgr.DeleteEntry(dwIndex)); // Delete from password manager
+		VERIFY(m_cList.DeleteItem((int)dwSel)); // Delete from GUI
 	}
+
+	m_cList.RedrawWindow();
+	m_bModified = TRUE;
+
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnRclickPwlist(NMHDR* pNMHDR, LRESULT* pResult) 
@@ -1759,17 +2200,20 @@ void CPwSafeDlg::OnRclickPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 	m_popmenu.SetMenuDrawMode(BCMENU_DRAWMODE_XP); // <<<!=>>> BCMENU_DRAWMODE_ORIGINAL
 	m_popmenu.SetSelectDisableMode(FALSE);
 	m_popmenu.SetXPBitmap3D(TRUE);
-	m_popmenu.SetBitmapBackground(RGB(255,0,255));
+	m_popmenu.SetBitmapBackground(RGB(255, 0, 255));
 	m_popmenu.SetIconSize(16, 16);
 
 	m_popmenu.LoadToolbar(IDR_INFOICONS);
 
 	BCMenu *psub = (BCMenu *)m_popmenu.GetSubMenu(0);
 	_TranslateMenu(psub);
-	psub->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,pt.x,pt.y,AfxGetMainWnd());
+	psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y,
+		AfxGetMainWnd());
 	m_popmenu.DestroyMenu();
 
 	*pResult = 0;
+
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnClickGroupList(NMHDR* pNMHDR, LRESULT* pResult) 
@@ -1785,25 +2229,30 @@ void CPwSafeDlg::OnClickGroupList(NMHDR* pNMHDR, LRESULT* pResult)
 	//ScreenToClient(&pt);
 	//if(m_cGroups.HitTest(CPoint(pt)) < 0) return;
 
+	_RemoveSearchGroup();
+
 	UpdatePasswordList();
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnPwlistCopyPw() 
 {
-	int nEntry = GetSelectedEntry();
-	int nGroupId = GetSelectedGroup();
+	DWORD dwIndex = _ListSelToEntryIndex();
 	PW_ENTRY *p;
 
-	if(nGroupId == -1) return;
-	if(nEntry == -1) return;
-	p = m_mgr.GetEntryByGroup(nGroupId, nEntry);
-	ASSERT(p != NULL);
+	if(dwIndex == DWORD_MAX) return;
+	p = m_mgr.GetEntry(dwIndex);
+	ASSERT_ENTRY(p);
 	if(p == NULL) return;
 
 	m_mgr.UnlockEntryPassword(p);
 	CopyStringToClipboard(p->pszPassword);
 	m_mgr.LockEntryPassword(p);
 	m_nClipboardCountdown = (int)m_dwClipboardSecs;
+
+	_TouchEntry(GetSelectedEntry(), FALSE);
+
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnTimer(UINT nIDEvent) 
@@ -1853,30 +2302,25 @@ void CPwSafeDlg::OnDblclkPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
 	CString strData;
-	int iEntry;
-	int idGroup;
+	DWORD dwEntryIndex = _ListSelToEntryIndex();
 	PW_ENTRY *p;
 
 	*pResult = 0;
 
-	idGroup = GetSelectedGroup();
-	if(idGroup == -1) return;
-	iEntry = GetSelectedEntry();
-	if(iEntry == -1) return;
-
-	p = m_mgr.GetEntryByGroup(idGroup, iEntry);
-	ASSERT(p != NULL);
+	if(dwEntryIndex == DWORD_MAX) return;
+	p = m_mgr.GetEntry(dwEntryIndex);
+	ASSERT_ENTRY(p);
 	if(p == NULL) return;
 
 	switch(pNMListView->iSubItem)
 	{
 	case 0:
-		CopyStringToClipboard(p->pszTitle);
-		m_nClipboardCountdown = -1;
+		OnPwlistEdit();
 		break;
 	case 1:
 		CopyStringToClipboard(p->pszUserName);
 		m_nClipboardCountdown = -1;
+		m_sbStatus.SetText(TRL("Field copied to clipboard."), 255, 0);
 		break;
 	case 2:
 		OnPwlistVisitUrl();
@@ -1886,15 +2330,50 @@ void CPwSafeDlg::OnDblclkPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 		CopyStringToClipboard(p->pszPassword);
 		m_mgr.LockEntryPassword(p);
 		m_nClipboardCountdown = (int)m_dwClipboardSecs;
+		m_sbStatus.SetText(TRL("Field copied to clipboard."), 255, 0);
 		break;
 	case 4:
 		CopyStringToClipboard(p->pszAdditional);
 		m_nClipboardCountdown = -1;
+		m_sbStatus.SetText(TRL("Field copied to clipboard."), 255, 0);
+		break;
+	case 5:
+		_PwTimeToString(p->tCreation, &strData);
+		CopyStringToClipboard((LPCTSTR)strData);
+		m_nClipboardCountdown = -1;
+		m_sbStatus.SetText(TRL("Field copied to clipboard."), 255, 0);
+		break;
+	case 6:
+		_PwTimeToString(p->tLastMod, &strData);
+		CopyStringToClipboard((LPCTSTR)strData);
+		m_nClipboardCountdown = -1;
+		m_sbStatus.SetText(TRL("Field copied to clipboard."), 255, 0);
+		break;
+	case 7:
+		_PwTimeToString(p->tLastAccess, &strData);
+		CopyStringToClipboard((LPCTSTR)strData);
+		m_nClipboardCountdown = -1;
+		m_sbStatus.SetText(TRL("Field copied to clipboard."), 255, 0);
+		break;
+	case 8:
+		_PwTimeToString(p->tExpire, &strData);
+		CopyStringToClipboard((LPCTSTR)strData);
+		m_nClipboardCountdown = -1;
+		m_sbStatus.SetText(TRL("Field copied to clipboard."), 255, 0);
+		break;
+	case 9:
+		_UuidToString(p->uuid, &strData);
+		CopyStringToClipboard((LPCTSTR)strData);
+		m_nClipboardCountdown = -1;
+		m_sbStatus.SetText(TRL("Field copied to clipboard."), 255, 0);
 		break;
 	default:
 		ASSERT(FALSE);
 		break;
 	}
+
+	_TouchEntry(GetSelectedEntry(), FALSE);
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnRclickGroupList(NMHDR* pNMHDR, LRESULT* pResult) 
@@ -1912,66 +2391,69 @@ void CPwSafeDlg::OnRclickGroupList(NMHDR* pNMHDR, LRESULT* pResult)
 	m_popmenu.SetMenuDrawMode(BCMENU_DRAWMODE_XP); // <<<!=>>> BCMENU_DRAWMODE_ORIGINAL
 	m_popmenu.SetSelectDisableMode(FALSE);
 	m_popmenu.SetXPBitmap3D(TRUE);
-	m_popmenu.SetBitmapBackground(RGB(255,0,255));
+	m_popmenu.SetBitmapBackground(RGB(255, 0, 255));
 	m_popmenu.SetIconSize(16, 16);
 
 	m_popmenu.LoadToolbar(IDR_INFOICONS);
 
 	BCMenu *psub = (BCMenu *)m_popmenu.GetSubMenu(0);
 	_TranslateMenu(psub);
-	psub->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,pt.x,pt.y,AfxGetMainWnd());
+	psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y,
+		AfxGetMainWnd());
 	m_popmenu.DestroyMenu();
 	
 	*pResult = 0;
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnPwlistCopyUser() 
 {
-	int iEntry;
-	int idGroup;
+	DWORD dwEntryIndex;
 	PW_ENTRY *p;
 
-	iEntry = GetSelectedEntry();
-	if(iEntry == -1) return;
-	idGroup = GetSelectedGroup();
-	if(idGroup == -1) return;
+	dwEntryIndex = _ListSelToEntryIndex();
+	if(dwEntryIndex == DWORD_MAX) return;
 
-	p = m_mgr.GetEntryByGroup(idGroup, iEntry);
-	ASSERT(p != NULL);
+	p = m_mgr.GetEntry(dwEntryIndex);
+	ASSERT_ENTRY(p);
 	if(p == NULL) return;
 
 	CopyStringToClipboard(p->pszUserName);
 	m_nClipboardCountdown = -1;
+
+	_TouchEntry(GetSelectedEntry(), FALSE);
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnPwlistVisitUrl() 
 {
-	int iEntry;
-	int idGroup;
+	DWORD dwEntryIndex;
 	PW_ENTRY *p;
 	CString strURL;
 
-	iEntry = GetSelectedEntry();
-	if(iEntry == -1) return;
-	idGroup = GetSelectedGroup();
-	if(idGroup == -1) return;
+	dwEntryIndex = _ListSelToEntryIndex();
+	if(dwEntryIndex == DWORD_MAX) return;
 
-	p = m_mgr.GetEntryByGroup(idGroup, iEntry);
-	ASSERT(p != NULL);
+	p = m_mgr.GetEntry(dwEntryIndex);
+	ASSERT_ENTRY(p);
 	if(p == NULL) return;
 
 	strURL = p->pszURL;
 	if(strURL.GetLength() == 0) return;
 	FixURL(&strURL);
 
-	if(strlen(p->pszURL) != 0)
-		ShellExecute(NULL, "open", strURL, NULL, NULL, SW_SHOW);
+	if(strURL.GetLength() != 0)
+		ShellExecute(NULL, _T("open"), (LPCTSTR)strURL, NULL, NULL, SW_SHOW);
+
+	_TouchEntry(GetSelectedEntry(), FALSE);
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnFileNew() 
 {
 	CPasswordDlg dlg;
 	CString strFirstPassword;
+
 	dlg.m_bLoadMode = FALSE;
 	dlg.m_bConfirm = FALSE;
 
@@ -1994,7 +2476,7 @@ void CPwSafeDlg::OnFileNew()
 		EraseCString(&dlg.m_strPassword);
 		EraseCString(&dlg.m_strRealKey);
 		if(dlg.DoModal() == IDCANCEL) return;
-		if(dlg.m_strRealKey != strFirstPassword)
+		if((dlg.m_strRealKey != strFirstPassword) || (dlg.m_bKeyFile == TRUE))
 		{
 			MessageBox(TRL("Password and repeated password aren't identical!"),
 				TRL("Password Safe"), MB_ICONWARNING);
@@ -2004,11 +2486,31 @@ void CPwSafeDlg::OnFileNew()
 	}
 
 	m_mgr.NewDatabase();
-	if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, &CPwSafeAppRI()) == FALSE)
+	CPwSafeAppRI ri;
+	if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, &ri, FALSE) == FALSE)
 	{
-		MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"),
-			MB_OK | MB_ICONWARNING);
-		return;
+		if(dlg.m_bKeyFile == TRUE)
+		{
+			int nMsg = MessageBox(TRL("A key-file already exists on this drive. Do you want to overwrite it?"),
+				TRL("Overwrite?"), MB_ICONQUESTION | MB_YESNO);
+
+			if(nMsg == IDYES)
+			{
+				if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, &ri, TRUE) == FALSE)
+				{
+					MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"),
+						MB_OK | MB_ICONWARNING);
+					return;
+				}
+			}
+			else return;
+		}
+		else
+		{
+			MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"),
+				MB_OK | MB_ICONWARNING);
+			return;
+		}
 	}
 
 	m_bFileOpen = TRUE;
@@ -2018,31 +2520,82 @@ void CPwSafeDlg::OnFileNew()
 
 	EraseCString(&dlg.m_strRealKey);
 
-	m_mgr.AddGroup(0, TRL("General"));
-	m_mgr.AddGroup(38, TRL("Windows"));
-	m_mgr.AddGroup(3, TRL("Network"));
-	m_mgr.AddGroup(1, TRL("Internet"));
-	m_mgr.AddGroup(19, TRL("eMail"));
-	m_mgr.AddGroup(37, TRL("Homebanking"));
+	PW_GROUP pwTemplate;
+	PW_TIME tNow;
+	_GetCurrentPwTime(&tNow);
+	pwTemplate.tCreation = tNow;
+	pwTemplate.tExpire = g_pwTimeNever;
+	pwTemplate.tLastAccess = tNow;
+	pwTemplate.tLastMod = tNow;
+
+	// Add standard groups
+	pwTemplate.uImageId = 0; pwTemplate.pszGroupName = (TCHAR *)TRL("General");
+	pwTemplate.uGroupId = 0; // 0 = create new group ID
+	VERIFY(m_mgr.AddGroup(&pwTemplate));
+	pwTemplate.uImageId = 38; pwTemplate.pszGroupName = (TCHAR *)TRL("Windows");
+	pwTemplate.uGroupId = 0; // 0 = create new group ID
+	VERIFY(m_mgr.AddGroup(&pwTemplate));
+	pwTemplate.uImageId = 3; pwTemplate.pszGroupName = (TCHAR *)TRL("Network");
+	pwTemplate.uGroupId = 0; // 0 = create new group ID
+	VERIFY(m_mgr.AddGroup(&pwTemplate));
+	pwTemplate.uImageId = 1; pwTemplate.pszGroupName = (TCHAR *)TRL("Internet");
+	pwTemplate.uGroupId = 0; // 0 = create new group ID
+	VERIFY(m_mgr.AddGroup(&pwTemplate));
+	pwTemplate.uImageId = 19; pwTemplate.pszGroupName = (TCHAR *)TRL("eMail");
+	pwTemplate.uGroupId = 0; // 0 = create new group ID
+	VERIFY(m_mgr.AddGroup(&pwTemplate));
+	pwTemplate.uImageId = 37; pwTemplate.pszGroupName = (TCHAR *)TRL("Homebanking");
+	pwTemplate.uGroupId = 0; // 0 = create new group ID
+	VERIFY(m_mgr.AddGroup(&pwTemplate));
 
 	// TESTING CODE, uncomment if you want to add sample groups and entries
 #ifdef ___PWSAFE_SAMPLE_DATA
+	PW_ENTRY pwT;
+	pwT.pszAdditional = _T("Some Notes");
+	pwT.pszPassword = _T("The Password");
+	pwT.pszURL = _T("google.com");
+	pwT.pszUserName = _T("Anonymous");
+	pwT.tCreation = tNow; pwT.tExpire = g_pwTimeNever; pwT.tLastAccess = tNow;
+	pwT.tLastMod = tNow;
 	for(int ix = 0; ix < (32+32+32+3); ix++)
 	{
 		CString str;
-		str.Format("%d group", ix);
-		m_mgr.AddGroup(ix % 20, (LPCTSTR)str);
+		str.Format(_T("%d Group"), ix);
+		pwTemplate.uImageId = (DWORD)rand() % 30;
+		pwTemplate.pszGroupName = (TCHAR *)(LPCTSTR)str;
+		pwTemplate.uGroupId = 0; // 0 = create new group
+		VERIFY(m_mgr.AddGroup(&pwTemplate));
 	}
-	for(int iy = 0; iy < (512+256+3); iy++)
+
+	PW_TIME tExpired;
+	tExpired.btDay = 1; tExpired.btHour = 1; tExpired.btMinute = 1;
+	tExpired.btMonth = 1; tExpired.btSecond = 0; tExpired.shYear = 2000;
+	for(int ir = 0; ir < 10; ir++)
+	{
+		pwT.pszTitle = _T("I am expired");
+		pwT.uGroupId = m_mgr.GetGroupIdByIndex((DWORD)rand() % 6);
+		pwT.uImageId = rand() % 30;
+		pwT.tExpire = tExpired;
+		ZeroMemory(pwT.uuid, 16);
+		VERIFY(m_mgr.AddEntry(&pwT));
+	}
+
+	for(int iy = 0; iy < (1024+256+3); iy++)
 	{
 		CString str;
 		str.Format("Sample #%d", iy);
-		m_mgr.AddEntry(rand() % 6, rand() % 30, (LPCTSTR)str, "google.com", "Anonymous", "The Password", "Some notes");
+		pwT.pszTitle = (TCHAR *)(LPCTSTR)str;
+		pwT.uGroupId = m_mgr.GetGroupIdByIndex((DWORD)rand() % 8);
+		pwT.uImageId = (DWORD)rand() % 30;
+		pwT.tExpire = g_pwTimeNever;
+		ZeroMemory(pwT.uuid, 16);
+		VERIFY(m_mgr.AddEntry(&pwT));
 	}
 #endif
 
 	UpdateGroupList();
 	UpdatePasswordList();
+	_UpdateToolBar();
 }
 
 // When pszFile == NULL a file selection dialog is displayed
@@ -2056,15 +2609,16 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 	const TCHAR *pSuffix = _T("");
 
 	strFilter = TRL("Password Safe files");
-	strFilter += " (*.pwd)|*.pwd|";
+	strFilter += _T(" v1/v2");
+	strFilter += _T(" (*.kdb)|*.kdb|");
 	strFilter += TRL("All files");
-	strFilter += " (*.*)|*.*||";
+	strFilter += _T(" (*.*)|*.*||");
 
 	dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
 	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 	dwFlags |= 0x00080000 | 0x00800000;
 	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "pwd", "*.pwd", dwFlags, strFilter, this);
+	CFileDialog dlg(TRUE, _T("kdb"), _T("*.kdb"), dwFlags, strFilter, this);
 
 	if(pszFile == NULL) nRet = dlg.DoModal();
 	else strFile = pszFile;
@@ -2072,6 +2626,7 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 	if((pszFile != NULL) || (nRet == IDOK))
 	{
 		if(pszFile == NULL) strFile = dlg.GetPathName();
+		m_strLastDb = strFile;
 
 		CPasswordDlg dlgPass;
 		dlgPass.m_bLoadMode = TRUE;
@@ -2101,15 +2656,14 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 
 			m_bLocked = FALSE;
 
-			pSuffix = _GetCmdAccelExt("&Lock Workspace");
+			pSuffix = _GetCmdAccelExt(_T("&Lock Workspace"));
 			strText = TRL("&Lock Workspace");
-			if(strlen(pSuffix) != 0) { strText += "\tCtrl+"; strText += pSuffix; }
+			if(_tcslen(pSuffix) != 0) { strText += _T("\t"); strText += pSuffix; }
 			m_menu.SetMenuText(ID_FILE_LOCK, strText, MF_BYCOMMAND);
+			m_btnTbLock.SetTooltipText(TRL("&Lock Workspace"));
 
 			UpdateGroupList();
 			UpdatePasswordList();
-
-			m_strLastDb = strFile;
 		}
 	}
 
@@ -2131,6 +2685,7 @@ void CPwSafeDlg::OnFileOpen()
 	}
 
 	_OpenDatabase(NULL);
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnFileSave() 
@@ -2139,6 +2694,7 @@ void CPwSafeDlg::OnFileSave()
 
 	if(m_strFile.IsEmpty()) { OnFileSaveAs(); return; }
 
+	_RemoveSearchGroup();
 	if(m_mgr.SaveDatabase((LPCTSTR)m_strFile) == FALSE)
 	{
 		MessageBox(TRL("File cannot be saved!"), TRL("Password Safe"),
@@ -2148,6 +2704,7 @@ void CPwSafeDlg::OnFileSave()
 
 	m_strLastDb = m_strFile;
 	m_bModified = FALSE;
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnFileSaveAs() 
@@ -2159,20 +2716,21 @@ void CPwSafeDlg::OnFileSaveAs()
 	if(m_bFileOpen == FALSE) return;
 
 	strFilter = TRL("Password Safe files");
-	strFilter += " (*.pwd)|*.pwd|";
+	strFilter += _T(" (*.kdb)|*.kdb|");
 	strFilter += TRL("All files");
-	strFilter += " (*.*)|*.*||";
+	strFilter += _T(" (*.*)|*.*||");
 
 	dwFlags = OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
 	dwFlags |= OFN_EXTENSIONDIFFERENT;
 	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 	dwFlags |= 0x00080000 | 0x00800000 | OFN_NOREADONLYRETURN;
-	CFileDialog dlg(FALSE, "pwd", "Database.pwd", dwFlags, strFilter, this);
+	CFileDialog dlg(FALSE, _T("kdb"), _T("Database.kdb"), dwFlags, strFilter, this);
 
 	if(dlg.DoModal() == IDOK)
 	{
 		strFile = dlg.GetPathName();
 
+		_RemoveSearchGroup();
 		if(m_mgr.SaveDatabase((LPCTSTR)strFile) == FALSE)
 		{
 			MessageBox(TRL("File cannot be saved!"), TRL("Password Safe"),
@@ -2185,6 +2743,7 @@ void CPwSafeDlg::OnFileSaveAs()
 			m_strLastDb = strFile;
 		}
 	}
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnFileClose() 
@@ -2202,7 +2761,7 @@ void CPwSafeDlg::OnFileClose()
 			CString str;
 
 			str = TRL("The current file has been modified.");
-			str += "\r\n\r\n";
+			str += _T("\r\n\r\n");
 			str += TRL("Do you want to save the changes before closing?");
 			nRes = MessageBox(str,
 				TRL("Save Before Close?"), MB_YESNOCANCEL | MB_ICONQUESTION);
@@ -2231,6 +2790,7 @@ void CPwSafeDlg::OnFileClose()
 	CString str = PWM_PRODUCT_NAME;
 	SetWindowText(str);
 	m_systray.SetTooltipText(str);
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnSafeOptions() 
@@ -2286,30 +2846,32 @@ void CPwSafeDlg::OnSafeOptions()
 	}
 
 	m_nLockCountdown = m_nLockTimeDef;
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnSafeRemoveGroup() 
 {
-	int nGroup = GetSelectedGroup();
+	DWORD dwGroup = GetSafeSelectedGroup(); // Group must be selected, focus not enough
 	int nRes;
 
-	if(nGroup == -1) return;
+	if(dwGroup == DWORD_MAX) return;
 
 	CString str;
 	str = TRL("Deleting a group will delete all items in that group, too.");
-	str += "\r\n\r\n";
+	str += _T("\r\n\r\n");
 	str += TRL("Are you sure you want to delete this group?");
 	nRes = MessageBox(str,
 		TRL("Delete Group Confirmation"), MB_OK | MB_ICONQUESTION | MB_YESNO);
 	if(nRes == IDYES)
 	{
-		m_mgr.DeleteGroup(nGroup);
+		VERIFY(m_mgr.DeleteGroup(m_mgr.GetGroupIdByIndex(dwGroup)));
 
 		UpdateGroupList();
 		UpdatePasswordList();
 
 		m_bModified = TRUE;
 	}
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnFileChangeMasterPw() 
@@ -2317,21 +2879,72 @@ void CPwSafeDlg::OnFileChangeMasterPw()
 	if(m_bFileOpen == FALSE) return;
 
 	CPasswordDlg dlg;
+	CString strFirstPassword;
+
 	dlg.m_bConfirm = FALSE;
 	dlg.m_bLoadMode = FALSE;
 
-	if(dlg.DoModal() == TRUE)
+	if(dlg.DoModal() == IDCANCEL) return;
+
+	if(dlg.m_bKeyFile == TRUE)
 	{
-		if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, &CPwSafeAppRI()) == FALSE)
+		CPwSafeAppRI ri;
+		if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, &ri, FALSE) == FALSE)
 		{
-			MessageBox(TRL("Failed to set the master key!"), TRL("Stop"), MB_OK | MB_ICONWARNING);
-			return;
+			int nMsg = MessageBox(TRL("A key-file already exists on this drive. Do you want to overwrite it?"),
+				TRL("Overwrite?"), MB_ICONQUESTION | MB_YESNO);
+
+			if(nMsg == IDYES)
+			{
+				if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, &ri, TRUE) == FALSE)
+				{
+					MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"),
+						MB_OK | MB_ICONWARNING);
+					EraseCString(&dlg.m_strRealKey);
+					return;
+				}
+			}
+			else return;
 		}
 
 		EraseCString(&dlg.m_strRealKey);
 
 		m_bModified = TRUE;
 	}
+	else
+	{
+		dlg.m_bConfirm = TRUE;
+		dlg.m_bLoadMode = FALSE;
+
+		strFirstPassword = dlg.m_strRealKey;
+
+		EraseCString(&dlg.m_strPassword);
+		EraseCString(&dlg.m_strRealKey);
+
+		if(dlg.DoModal() == IDCANCEL) { EraseCString(&strFirstPassword); return; }
+
+		if((dlg.m_strRealKey != strFirstPassword) || (dlg.m_bKeyFile == TRUE))
+		{
+			MessageBox(TRL("Password and repeated password aren't identical!"),
+				TRL("Password Safe"), MB_ICONWARNING);
+			EraseCString(&dlg.m_strRealKey);
+			EraseCString(&strFirstPassword);
+			return;
+		}
+
+		CPwSafeAppRI ri;
+		if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, &ri, TRUE) == FALSE)
+		{
+			MessageBox(TRL("Failed to set the master key!"), TRL("Stop"), MB_OK | MB_ICONWARNING);
+			return;
+		}
+
+		EraseCString(&dlg.m_strRealKey);
+		EraseCString(&strFirstPassword);
+
+		m_bModified = TRUE;
+	}
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdateFileSave(CCmdUI* pCmdUI) 
@@ -2344,7 +2957,7 @@ void CPwSafeDlg::OnUpdateFileSave(CCmdUI* pCmdUI)
 
 void CPwSafeDlg::OnUpdateFileSaveAs(CCmdUI* pCmdUI) 
 {
-	OnUpdateFileSave(pCmdUI);
+	pCmdUI->Enable(m_bFileOpen);
 }
 
 void CPwSafeDlg::OnUpdateFileChangeMasterPw(CCmdUI* pCmdUI) 
@@ -2359,32 +2972,32 @@ void CPwSafeDlg::OnUpdateFileClose(CCmdUI* pCmdUI)
 
 void CPwSafeDlg::OnUpdatePwlistCopyPw(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSelectedEntry() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable((((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems == 1)) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnUpdatePwlistCopyUser(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSelectedEntry() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable((((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems == 1)) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnUpdatePwlistDelete(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSelectedEntry() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable(((m_dwLastFirstSelectedItem != DWORD_MAX) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnUpdatePwlistEdit(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSelectedEntry() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable((((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems == 1)) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnUpdatePwlistVisitUrl(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSelectedEntry() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable((((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems == 1)) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnUpdateSafeRemoveGroup(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSafeSelectedGroup() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable(((m_dwLastSafeSelectedGroup != DWORD_MAX) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnUpdateSafeAddGroup(CCmdUI* pCmdUI) 
@@ -2406,17 +3019,17 @@ CString CPwSafeDlg::GetExportFile(int nFormat)
 
 	if(m_bFileOpen == FALSE) return CString("");
 
-	if(nFormat == PWEXP_TXT) lp = "txt";
-	else if(nFormat == PWEXP_HTML) lp = "html";
-	else if(nFormat == PWEXP_XML) lp = "xml";
-	else if(nFormat == PWEXP_CSV) lp = "csv";
+	if(nFormat == PWEXP_TXT) lp = _T("txt");
+	else if(nFormat == PWEXP_HTML) lp = _T("html");
+	else if(nFormat == PWEXP_XML) lp = _T("xml");
+	else if(nFormat == PWEXP_CSV) lp = _T("csv");
 	else { ASSERT(FALSE); }
 
-	strSample = "Export.";
+	strSample = _T("Export.");
 	strSample += lp;
 
 	strFilter = TRL("All files");
-	strFilter += " (*.*)|*.*||";
+	strFilter += _T(" (*.*)|*.*||");
 
 	dwFlags = OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
 	dwFlags |= OFN_EXTENSIONDIFFERENT;
@@ -2497,10 +3110,13 @@ void CPwSafeDlg::OnUpdateExportCsv(CCmdUI* pCmdUI)
 	pCmdUI->Enable(m_bFileOpen);
 }
 
-void CPwSafeDlg::_PrintGroup(int nGroup)
+void CPwSafeDlg::_PrintGroup(DWORD dwGroupIndex)
 {
 	CPwExport cExp;
-	char szFile[MAX_PATH * 2];
+	TCHAR szFile[MAX_PATH * 2];
+
+	ASSERT(dwGroupIndex != DWORD_MAX);
+	if(dwGroupIndex == DWORD_MAX) return;
 
 	_DeleteTemporaryFiles();
 
@@ -2511,24 +3127,24 @@ void CPwSafeDlg::_PrintGroup(int nGroup)
 	cExp.SetFormat(PWEXP_HTML);
 
 	GetTempPath(MAX_PATH * 2, szFile);
-	if(szFile[strlen(szFile) - 1] != '\\') strcat(szFile, "\\");
-	strcat(szFile, "pwsafetmp.html");
+	if(szFile[_tcslen(szFile) - 1] != _T('\\')) _tcscat(szFile, _T("\\"));
+	_tcscat(szFile, _T("pwsafetmp.html"));
 
-	if(cExp.ExportGroup(szFile, nGroup) == FALSE)
+	if(cExp.ExportGroup(szFile, m_mgr.GetGroupIdByIndex(dwGroupIndex)) == FALSE)
 	{
 		MessageBox(TRL("Cannot open temporary file for printing!"), TRL("Stop"),
 			MB_OK | MB_ICONWARNING);
 		return;
 	}
 
-	ShellExecute(m_hWnd, "print", szFile, NULL, NULL, SW_SHOW);
+	ShellExecute(m_hWnd, _T("print"), szFile, NULL, NULL, SW_SHOW);
 
 	m_strTempFile = szFile;
 }
 
 void CPwSafeDlg::OnFilePrint() 
 {
-	_PrintGroup(-1);
+	_PrintGroup(DWORD_MAX);
 }
 
 void CPwSafeDlg::OnUpdateFilePrint(CCmdUI* pCmdUI) 
@@ -2548,16 +3164,18 @@ void CPwSafeDlg::OnSafeModifyGroup()
 {
 	CString strGroupName;
 	CAddGroupDlg dlg;
-	int nGroup = GetSelectedGroup();
+	DWORD dwGroup = GetSafeSelectedGroup();
 	PW_GROUP *p;
 	long nTopIndex;
+	PW_GROUP pwTemplate;
+	PW_TIME tNow;
 
-	if(nGroup == -1) return;
-	p = m_mgr.GetGroup(nGroup);
+	if(dwGroup == DWORD_MAX) return;
+	p = m_mgr.GetGroup(dwGroup);
 	ASSERT(p != NULL);
 	if(p == NULL) return;
 
-	dlg.m_nIconId = p->uImageId;
+	dlg.m_nIconId = (int)p->uImageId;
 	dlg.m_strGroupName = p->pszGroupName;
 	dlg.m_pParentImageList = &m_ilIcons;
 	dlg.m_bEditMode = TRUE;
@@ -2566,11 +3184,19 @@ void CPwSafeDlg::OnSafeModifyGroup()
 	{
 		nTopIndex = m_cGroups.GetTopIndex();
 		ASSERT(nTopIndex >= 0);
-		m_mgr.SetGroup(nGroup, dlg.m_nIconId, (LPCTSTR)dlg.m_strGroupName);
+
+		_GetCurrentPwTime(&tNow);
+		pwTemplate = *p; // Copy previous standard values like group ID, etc.
+		pwTemplate.tLastAccess = tNow; // Update times
+		pwTemplate.tLastMod = tNow;
+		pwTemplate.pszGroupName = (TCHAR *)(LPCTSTR)dlg.m_strGroupName;
+		pwTemplate.uImageId = (DWORD)dlg.m_nIconId;
+
+		m_mgr.SetGroup(dwGroup, &pwTemplate);
 		UpdateGroupList();
 
 		// Focus new group
-		m_cGroups.SetItemState(nGroup,
+		m_cGroups.SetItemState((int)dwGroup,
 			LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
 
 		UpdatePasswordList();
@@ -2582,29 +3208,31 @@ void CPwSafeDlg::OnSafeModifyGroup()
 
 		m_bModified = TRUE;
 	}
+	else
+		_TouchGroup(dwGroup, FALSE);
+
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdateSafeModifyGroup(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSafeSelectedGroup() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable(((m_dwLastSafeSelectedGroup != DWORD_MAX) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnPwlistFind() 
 {
-	_Find(-1);
+	_Find(DWORD_MAX);
+	_UpdateToolBar();
 }
 
-void CPwSafeDlg::_Find(int nGroupIdX)
+void CPwSafeDlg::_Find(DWORD dwFindGroupIndex)
 {
 	CFindInDbDlg dlg;
 	DWORD dwMaxItems;
 	PW_ENTRY *p;
 	CString strTemp;
+	PW_TIME tNow;
 
-	if(m_bFileOpen == FALSE) return;
-
-	ASSERT(nGroupIdX > -2);
-	ASSERT(nGroupIdX < (int)m_mgr.GetNumberOfGroups());
 	if(m_bFileOpen == FALSE) return;
 
 	dwMaxItems = m_mgr.GetNumberOfEntries();
@@ -2612,42 +3240,57 @@ void CPwSafeDlg::_Find(int nGroupIdX)
 
 	if(dlg.DoModal() == IDOK)
 	{
-		int nFlags = 0;
+		DWORD dwFlags = 0;
 
-		if(dlg.m_bTitle == TRUE)      nFlags |= PWMF_TITLE;
-		if(dlg.m_bUserName == TRUE)   nFlags |= PWMF_USER;
-		if(dlg.m_bURL == TRUE)        nFlags |= PWMF_URL;
-		if(dlg.m_bPassword == TRUE)   nFlags |= PWMF_PASSWORD;
-		if(dlg.m_bAdditional == TRUE) nFlags |= PWMF_ADDITIONAL;
-		if(dlg.m_bGroupName == TRUE)  nFlags |= PWMF_GROUPNAME;
+		m_cList.DeleteAllItems();
 
-		int n = 0;
-		int cnt = 0;
-		int nGroupId;
+		_GetCurrentPwTime(&tNow);
 
-		nGroupId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
-		if(nGroupId == -1)
+		if(dlg.m_bTitle == TRUE)      dwFlags |= PWMF_TITLE;
+		if(dlg.m_bUserName == TRUE)   dwFlags |= PWMF_USER;
+		if(dlg.m_bURL == TRUE)        dwFlags |= PWMF_URL;
+		if(dlg.m_bPassword == TRUE)   dwFlags |= PWMF_PASSWORD;
+		if(dlg.m_bAdditional == TRUE) dwFlags |= PWMF_ADDITIONAL;
+		if(dlg.m_bGroupName == TRUE)  dwFlags |= PWMF_GROUPNAME;
+
+		DWORD dw = 0;
+		DWORD cnt = 0;
+		DWORD dwGroupId;
+		DWORD dwGroupInx;
+
+		// Create the search group if it doesn't exist already
+		dwGroupId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
+		if(dwGroupId == DWORD_MAX)
 		{
-			// Search icon = 40
-			VERIFY(m_mgr.AddGroup(40, PWS_SEARCHGROUP));
-			nGroupId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
+			PW_GROUP pwTemplate;
+			pwTemplate.pszGroupName = (TCHAR *)PWS_SEARCHGROUP;
+			pwTemplate.tCreation = tNow; pwTemplate.tExpire = g_pwTimeNever;
+			pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
+			pwTemplate.uGroupId = 0; // 0 = create new group ID
+			pwTemplate.uImageId = 40; // 40 = 'search' icon
+
+			VERIFY(m_mgr.AddGroup(&pwTemplate));
+			dwGroupId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
 		}
-		ASSERT(nGroupId != -1);
+		ASSERT((dwGroupId != DWORD_MAX) && (dwGroupId != 0));
 
 		while(1)
 		{
-			n = m_mgr.Find((LPCTSTR)dlg.m_strFind, dlg.m_bCaseSensitive, nFlags, cnt);
+			dw = m_mgr.Find((LPCTSTR)dlg.m_strFind, dlg.m_bCaseSensitive, dwFlags, cnt);
 
-			if(n == -1) break;
+			if(dw == DWORD_MAX) break;
 			else
 			{
-				p = m_mgr.GetEntry((DWORD)n);
+				p = m_mgr.GetEntry(dw);
 				ASSERT_ENTRY(p);
 				if(p == NULL) break;
 
-				if(p->uGroupId != (DWORD)nGroupId)
+				if(p->uGroupId != dwGroupId)
 				{
-					if((nGroupIdX == -1) || (nGroupIdX == (int)(p->uGroupId)))
+					dwGroupInx = m_mgr.GetGroupByIdN(p->uGroupId);
+					ASSERT(dwGroupInx != DWORD_MAX);
+
+					if((dwFindGroupIndex == DWORD_MAX) || (dwFindGroupIndex == dwGroupInx))
 					{
 						// The entry could get reallocated by AddEntry, therefor
 						// save it to a local CString object
@@ -2655,23 +3298,22 @@ void CPwSafeDlg::_Find(int nGroupIdX)
 						strTemp = p->pszPassword;
 						m_mgr.LockEntryPassword(p);
 
-						m_mgr.AddEntry((DWORD)nGroupId, p->uImageId, p->pszTitle,
-							p->pszURL, p->pszUserName, (LPCTSTR)strTemp, p->pszAdditional);
+						_List_SetEntry(m_cList.GetItemCount(), p, TRUE, &tNow);
 
 						EraseCString(&strTemp); // Destroy the plaintext password
 					}
 				}
 			}
 
-			cnt = n + 1;
+			cnt = dw + 1;
 			if((DWORD)cnt >= dwMaxItems) break;
 		}
 
 		UpdateGroupList();
-		m_cGroups.EnsureVisible(nGroupId, FALSE);
-		m_cGroups.SetItemState(nGroupId,
+		int nViewGroup = (int)m_mgr.GetGroupByIdN(dwGroupId);
+		m_cGroups.EnsureVisible(nViewGroup, FALSE);
+		m_cGroups.SetItemState(nViewGroup,
 			LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
-		UpdatePasswordList();
 
 		m_bModified = TRUE;
 	}
@@ -2684,50 +3326,57 @@ void CPwSafeDlg::OnUpdatePwlistFind(CCmdUI* pCmdUI)
 
 void CPwSafeDlg::OnPwlistFindInGroup() 
 {
-	int nCurGroup = GetSelectedGroup();
-	if(nCurGroup == -1) return;
-	_Find(nCurGroup);
+	DWORD dwCurGroup = GetSelectedGroup();
+	if(dwCurGroup == DWORD_MAX) return;
+	_Find(dwCurGroup);
 }
 
 void CPwSafeDlg::OnUpdatePwlistFindInGroup(CCmdUI* pCmdUI) 
 {
-	int nGroup = GetSelectedGroup();
-	int nRefId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
-	BOOL bEnable = m_bFileOpen && (nGroup != nRefId);
-
+	DWORD dwGroupId = m_mgr.GetGroupIdByIndex(m_dwLastSafeSelectedGroup);
+	DWORD dwRefId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
+	BOOL bEnable = m_bFileOpen && (dwGroupId != dwRefId);
 	pCmdUI->Enable(bEnable && (m_mgr.GetNumberOfEntries() != 0));
 }
 
 void CPwSafeDlg::OnPwlistDuplicate() 
 {
 	PW_ENTRY *p;
-	int nItem = GetSelectedEntry();
-	int nGroup = GetSelectedGroup();
+	DWORD dwEntryIndex = _ListSelToEntryIndex();
+	PW_ENTRY pwTemplate;
+	PW_TIME tNow;
 
-	if(nItem == -1) return;
-	if(nGroup == -1) return;
+	if(dwEntryIndex == DWORD_MAX) return;
 
-	p = m_mgr.GetEntryByGroup(nGroup, (DWORD)nItem);
-	ASSERT(p != NULL);
+	p = m_mgr.GetEntry(dwEntryIndex);
+	ASSERT_ENTRY(p);
 	if(p == NULL) return;
 
-	m_mgr.UnlockEntryPassword(p);
-	m_mgr.AddEntry(p->uGroupId, p->uImageId, p->pszTitle, p->pszURL,
-		p->pszUserName, (char *)p->pszPassword, p->pszAdditional);
-	m_mgr.LockEntryPassword(p);
+	_GetCurrentPwTime(&tNow);
+	pwTemplate = *p; // Duplicate
+	memset(pwTemplate.uuid, 0, 16); // We need a new UUID
+	pwTemplate.tCreation = tNow; // Set new times
+	pwTemplate.tLastMod = tNow;
+	pwTemplate.tLastAccess = tNow;
+
+	m_mgr.UnlockEntryPassword(&pwTemplate);
+	VERIFY(m_mgr.AddEntry(&pwTemplate));
+	m_mgr.LockEntryPassword(&pwTemplate);
 
 	UpdatePasswordList();
 	m_cList.EnsureVisible(m_cList.GetItemCount() - 1, FALSE);
+
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdatePwlistDuplicate(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSelectedEntry() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable((((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems == 1)) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnInfoHomepage() 
 {
-	ShellExecute(NULL, "open", PWM_HOMEPAGE, NULL, NULL, SW_SHOW);
+	ShellExecute(NULL, _T("open"), PWM_HOMEPAGE, NULL, NULL, SW_SHOW);
 }
 
 void CPwSafeDlg::OnViewAlwaysOnTop() 
@@ -2763,11 +3412,16 @@ void CPwSafeDlg::ExportSelectedGroup(int nFormat)
 {
 	CPwExport cExp;
 	CString strFile;
+	DWORD dwSelectedGroup = GetSelectedGroup();
+
+	ASSERT(dwSelectedGroup != DWORD_MAX);
+	if(dwSelectedGroup == DWORD_MAX) return;
+
 	cExp.SetManager(&m_mgr);
 	cExp.SetNewLineSeq(m_bWindowsNewLine);
 	cExp.SetFormat(nFormat);
 	strFile = GetExportFile(nFormat);
-	if(strFile.GetLength() != 0) cExp.ExportGroup(strFile, GetSelectedGroup());
+	if(strFile.GetLength() != 0) cExp.ExportGroup(strFile, m_mgr.GetGroupIdByIndex(dwSelectedGroup));
 }
 
 void CPwSafeDlg::OnSafeExportGroupHtml() 
@@ -2787,109 +3441,150 @@ void CPwSafeDlg::OnSafeExportGroupCsv()
 
 void CPwSafeDlg::OnUpdateSafeExportGroupHtml(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSafeSelectedGroup() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable(((m_dwLastSafeSelectedGroup != DWORD_MAX) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnUpdateSafeExportGroupXml(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSafeSelectedGroup() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable(((m_dwLastSafeSelectedGroup != DWORD_MAX) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnUpdateSafeExportGroupCsv(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSafeSelectedGroup() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable(((m_dwLastSafeSelectedGroup != DWORD_MAX) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnSafePrintGroup() 
 {
-	int nGroup = GetSelectedGroup();
-	ASSERT(nGroup != -1);
-	if(nGroup == -1) return;
+	DWORD dwGroup = GetSelectedGroup();
+	if(dwGroup == DWORD_MAX) return;
 
-	_PrintGroup(nGroup);
+	_PrintGroup(dwGroup);
 }
 
 void CPwSafeDlg::OnUpdateSafePrintGroup(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSafeSelectedGroup() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable(((m_dwLastSafeSelectedGroup != DWORD_MAX) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnPwlistMoveUp() 
 {
-	int nRelativeEntry = GetSelectedEntry();
-	int nGroup = GetSelectedGroup();
-	if((nRelativeEntry <= 0) || (nGroup == -1)) return;
-	m_mgr.MoveInGroup(nGroup, nRelativeEntry, nRelativeEntry - 1);
+	DWORD dwEntryIndex = _ListSelToEntryIndex();
+	DWORD dwRelativeEntry = GetSelectedEntry();
+	PW_ENTRY *p;
+
+	if(dwEntryIndex == DWORD_MAX) return;
+	if(dwRelativeEntry == 0) return;
+
+	_TouchEntry(GetSelectedEntry(), FALSE);
+
+	p = m_mgr.GetEntry(dwEntryIndex);
+	m_mgr.MoveInGroup(p->uGroupId, dwRelativeEntry, dwRelativeEntry - 1);
+
 	_List_SaveView();
 	UpdatePasswordList();
 	_List_RestoreView();
-	m_cList.SetItemState(nRelativeEntry - 1,
+	m_cList.SetItemState(dwRelativeEntry - 1,
 		LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
-	m_cList.EnsureVisible(nRelativeEntry - 1, FALSE);
+	m_cList.EnsureVisible(dwRelativeEntry - 1, FALSE);
 	m_bModified = TRUE;
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdatePwlistMoveUp(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSelectedEntry() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable((((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems == 1)) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnPwlistMoveTop() 
 {
-	int nRelativeEntry = GetSelectedEntry();
-	int nGroup = GetSelectedGroup();
-	if((nRelativeEntry <= 0) || (nGroup == -1)) return;
-	m_mgr.MoveInGroup(nGroup, nRelativeEntry, 0);
+	DWORD dwEntryIndex = _ListSelToEntryIndex();
+	DWORD dwRelativeEntry = GetSelectedEntry();
+	PW_ENTRY *p;
+
+	if(dwEntryIndex == DWORD_MAX) return;
+	if(dwRelativeEntry == 0) return;
+
+	_TouchEntry(GetSelectedEntry(), FALSE);
+
+	p = m_mgr.GetEntry(dwEntryIndex);
+	m_mgr.MoveInGroup(p->uGroupId, dwRelativeEntry, 0);
+
+	_List_SaveView();
 	UpdatePasswordList();
+	_List_RestoreView();
 	m_cList.SetItemState(0,
 		LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
+	m_cList.EnsureVisible(0, FALSE);
 	m_bModified = TRUE;
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdatePwlistMoveTop(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSelectedEntry() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable((((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems == 1)) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnPwlistMoveDown() 
 {
-	int nRelativeEntry = GetSelectedEntry();
-	int nGroup = GetSelectedGroup();
-	if((nRelativeEntry == -1) || (nGroup == -1)) return;
-	m_mgr.MoveInGroup(nGroup, nRelativeEntry, nRelativeEntry + 1);
+	DWORD dwEntryIndex = _ListSelToEntryIndex();
+	DWORD dwRelativeEntry = GetSelectedEntry();
+	DWORD dwItemCount = (DWORD)m_cList.GetItemCount();
+	PW_ENTRY *p;
+
+	if(dwEntryIndex == DWORD_MAX) return;
+	if(dwRelativeEntry == (dwItemCount - 1)) return;
+
+	_TouchEntry(GetSelectedEntry(), FALSE);
+
+	p = m_mgr.GetEntry(dwEntryIndex);
+	m_mgr.MoveInGroup(p->uGroupId, dwRelativeEntry, dwRelativeEntry + 1);
+
 	_List_SaveView();
 	UpdatePasswordList();
 	_List_RestoreView();
-	int nSel = min(nRelativeEntry + 1, m_mgr.GetNumberOfItemsInGroupN(nGroup) - 1);
+	int nSel = min(dwRelativeEntry + 1, dwItemCount - 1);
 	m_cList.SetItemState(nSel,
 		LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
 	m_cList.EnsureVisible(nSel, FALSE);
 	m_bModified = TRUE;
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdatePwlistMoveDown(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSelectedEntry() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable((((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems == 1)) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnPwlistMoveBottom() 
 {
-	int nRelativeEntry = GetSelectedEntry();
-	int nGroup = GetSelectedGroup();
-	if((nRelativeEntry == -1) || (nGroup == -1)) return;
-	m_mgr.MoveInGroup(nGroup, nRelativeEntry, m_cList.GetItemCount() - 1);
+	DWORD dwEntryIndex = _ListSelToEntryIndex();
+	DWORD dwRelativeEntry = GetSelectedEntry();
+	DWORD dwItemCount = (DWORD)m_cList.GetItemCount();
+	PW_ENTRY *p;
+
+	if(dwEntryIndex == DWORD_MAX) return;
+	if(dwRelativeEntry == (dwItemCount - 1)) return;
+
+	_TouchEntry(GetSelectedEntry(), FALSE);
+
+	p = m_mgr.GetEntry(dwEntryIndex);
+	m_mgr.MoveInGroup(p->uGroupId, dwRelativeEntry, dwItemCount - 1);
+
 	_List_SaveView();
 	UpdatePasswordList();
 	_List_RestoreView();
-	m_cList.SetItemState(m_mgr.GetNumberOfItemsInGroupN(nGroup) - 1,
+	int nSel = (int)dwItemCount - 1;
+	m_cList.SetItemState(nSel,
 		LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
-	m_cList.EnsureVisible(m_mgr.GetNumberOfItemsInGroupN(nGroup) - 1, FALSE);
+	m_cList.EnsureVisible(nSel, FALSE);
 	m_bModified = TRUE;
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdatePwlistMoveBottom(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable(((GetSelectedEntry() != -1) ? TRUE : FALSE));
+	pCmdUI->Enable((((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems == 1)) ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnBeginDragPwlist(NMHDR* pNMHDR, LRESULT* pResult) 
@@ -2898,11 +3593,10 @@ void CPwSafeDlg::OnBeginDragPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 
 	if(m_bFileOpen == FALSE) return;
-	int idxRelative = GetSelectedEntry();
-	int idxGroup = GetSelectedGroup();
-	if((idxRelative == -1) || (idxGroup == -1)) return;
-	PW_ENTRY *p = m_mgr.GetEntryByGroup(idxGroup, (DWORD)idxRelative);
-	ASSERT(p != NULL);
+	DWORD dwEntryIndex = _ListSelToEntryIndex();
+	if(dwEntryIndex == DWORD_MAX) return;
+	PW_ENTRY *p = m_mgr.GetEntry(dwEntryIndex);
+	ASSERT_ENTRY(p);
 	if(p == NULL) return;
 
 	COleDropSource *pDropSource = new COleDropSource;
@@ -2937,6 +3631,21 @@ void CPwSafeDlg::OnBeginDragPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 				case 4:
 					strData = p->pszAdditional;
 					break;
+				case 5:
+					_PwTimeToString(p->tCreation, &strData);
+					break;
+				case 6:
+					_PwTimeToString(p->tLastMod, &strData);
+					break;
+				case 7:
+					_PwTimeToString(p->tLastAccess, &strData);
+					break;
+				case 8:
+					_PwTimeToString(p->tExpire, &strData);
+					break;
+				case 9:
+					_UuidToString(p->uuid, &strData);
+					break;
 				default:
 					ASSERT(FALSE);
 					break;
@@ -2969,12 +3678,15 @@ void CPwSafeDlg::OnBeginDragPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 
 	SAFE_DELETE(pDataSource);
 	SAFE_DELETE(pDropSource);
+
+	_TouchEntry(GetSelectedEntry(), FALSE);
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnFileChangeLanguage() 
 {
 	CLanguagesDlg dlg;
-	char szFile[1024];
+	TCHAR szFile[1024];
 	STARTUPINFO sui;
 	PROCESS_INFORMATION pi;
 
@@ -2990,7 +3702,7 @@ void CPwSafeDlg::OnFileChangeLanguage()
 		{
 			CString str;
 			str = TRL("Application cannot be restarted automatically!");
-			str += "\r\n\r\n";
+			str += _T("\r\n\r\n");
 			str += TRL("Please restart KeePass manually.");
 			MessageBox(str, TRL("Loading error"), MB_OK | MB_ICONWARNING);
 		}
@@ -3016,119 +3728,70 @@ void CPwSafeDlg::OnInfoPrintLicense()
 	_OpenLocalFile(PWM_LICENSE_FILE, OLF_PRINT);
 }
 
-void CPwSafeDlg::OnViewTitle() 
+void CPwSafeDlg::_SelChangeView(UINT uID)
 {
 	UINT uState;
 	BOOL bChecked;
-	uState = m_menu.GetMenuState(ID_VIEW_TITLE, MF_BYCOMMAND);
+	BOOL *pFlag;
+	UINT uIndex = 0;
+
+	uState = m_menu.GetMenuState(uID, MF_BYCOMMAND);
 	ASSERT(uState != 0xFFFFFFFF);
+
+	if(uID == ID_VIEW_TITLE)           { pFlag = &m_bShowTitle;      uIndex = 0; }
+	else if(uID == ID_VIEW_USERNAME)   { pFlag = &m_bShowUserName;   uIndex = 1; }
+	else if(uID == ID_VIEW_URL)        { pFlag = &m_bShowURL;        uIndex = 2; }
+	else if(uID == ID_VIEW_PASSWORD)   { pFlag = &m_bShowPassword;   uIndex = 3; }
+	else if(uID == ID_VIEW_NOTES)      { pFlag = &m_bShowNotes;      uIndex = 4; }
+	else if(uID == ID_VIEW_CREATION)   { pFlag = &m_bShowCreation;   uIndex = 5; }
+	else if(uID == ID_VIEW_LASTMOD)    { pFlag = &m_bShowLastMod;    uIndex = 6; }
+	else if(uID == ID_VIEW_LASTACCESS) { pFlag = &m_bShowLastAccess; uIndex = 7; }
+	else if(uID == ID_VIEW_EXPIRE)     { pFlag = &m_bShowExpire;     uIndex = 8; }
+	else if(uID == ID_VIEW_UUID)       { pFlag = &m_bShowUUID;       uIndex = 9; }
+	else { ASSERT(FALSE); }
+
 	if(uState & MF_CHECKED) bChecked = TRUE;
 	else bChecked = FALSE;
+
 	if(bChecked == TRUE)
 	{
 		uState = MF_UNCHECKED; // Toggle
-		m_bShowTitle = FALSE;
+		*pFlag = FALSE;
 	}
 	else
 	{
 		uState = MF_CHECKED; // Toggle
-		m_bShowTitle = TRUE;
+		*pFlag = TRUE;
 	}
-	m_menu.CheckMenuItem(ID_VIEW_TITLE, MF_BYCOMMAND | uState);
-	m_bShowColumn[0] = m_bShowTitle;
+	m_menu.CheckMenuItem(uID, MF_BYCOMMAND | uState);
+	m_bShowColumn[uIndex] = *pFlag;
+	RefreshPasswordList();
 	ProcessResize();
+}
+
+void CPwSafeDlg::OnViewTitle() 
+{
+	_SelChangeView(ID_VIEW_TITLE);
 }
 
 void CPwSafeDlg::OnViewUsername() 
 {
-	UINT uState;
-	BOOL bChecked;
-	uState = m_menu.GetMenuState(ID_VIEW_USERNAME, MF_BYCOMMAND);
-	ASSERT(uState != 0xFFFFFFFF);
-	if(uState & MF_CHECKED) bChecked = TRUE;
-	else bChecked = FALSE;
-	if(bChecked == TRUE)
-	{
-		uState = MF_UNCHECKED; // Toggle
-		m_bShowUserName = FALSE;
-	}
-	else
-	{
-		uState = MF_CHECKED; // Toggle
-		m_bShowUserName = TRUE;
-	}
-	m_menu.CheckMenuItem(ID_VIEW_USERNAME, MF_BYCOMMAND | uState);
-	m_bShowColumn[1] = m_bShowUserName;
-	ProcessResize();
+	_SelChangeView(ID_VIEW_USERNAME);
 }
 
 void CPwSafeDlg::OnViewUrl() 
 {
-	UINT uState;
-	BOOL bChecked;
-	uState = m_menu.GetMenuState(ID_VIEW_URL, MF_BYCOMMAND);
-	ASSERT(uState != 0xFFFFFFFF);
-	if(uState & MF_CHECKED) bChecked = TRUE;
-	else bChecked = FALSE;
-	if(bChecked == TRUE)
-	{
-		uState = MF_UNCHECKED; // Toggle
-		m_bShowURL = FALSE;
-	}
-	else
-	{
-		uState = MF_CHECKED; // Toggle
-		m_bShowURL = TRUE;
-	}
-	m_menu.CheckMenuItem(ID_VIEW_URL, MF_BYCOMMAND | uState);
-	m_bShowColumn[2] = m_bShowURL;
-	ProcessResize();
+	_SelChangeView(ID_VIEW_URL);
 }
 
 void CPwSafeDlg::OnViewPassword() 
 {
-	UINT uState;
-	BOOL bChecked;
-	uState = m_menu.GetMenuState(ID_VIEW_PASSWORD, MF_BYCOMMAND);
-	ASSERT(uState != 0xFFFFFFFF);
-	if(uState & MF_CHECKED) bChecked = TRUE;
-	else bChecked = FALSE;
-	if(bChecked == TRUE)
-	{
-		uState = MF_UNCHECKED; // Toggle
-		m_bShowPassword = FALSE;
-	}
-	else
-	{
-		uState = MF_CHECKED; // Toggle
-		m_bShowPassword = TRUE;
-	}
-	m_menu.CheckMenuItem(ID_VIEW_PASSWORD, MF_BYCOMMAND | uState);
-	m_bShowColumn[3] = m_bShowPassword;
-	ProcessResize();
+	_SelChangeView(ID_VIEW_PASSWORD);
 }
 
 void CPwSafeDlg::OnViewNotes() 
 {
-	UINT uState;
-	BOOL bChecked;
-	uState = m_menu.GetMenuState(ID_VIEW_NOTES, MF_BYCOMMAND);
-	ASSERT(uState != 0xFFFFFFFF);
-	if(uState & MF_CHECKED) bChecked = TRUE;
-	else bChecked = FALSE;
-	if(bChecked == TRUE)
-	{
-		uState = MF_UNCHECKED; // Toggle
-		m_bShowNotes = FALSE;
-	}
-	else
-	{
-		uState = MF_CHECKED; // Toggle
-		m_bShowNotes = TRUE;
-	}
-	m_menu.CheckMenuItem(ID_VIEW_NOTES, MF_BYCOMMAND | uState);
-	m_bShowColumn[4] = m_bShowNotes;
-	ProcessResize();
+	_SelChangeView(ID_VIEW_NOTES);
 }
 
 void CPwSafeDlg::OnFileLock() 
@@ -3141,9 +3804,9 @@ void CPwSafeDlg::OnFileLock()
 
 	m_menu.GetMenuText(ID_FILE_LOCK, strMenuItem, MF_BYCOMMAND);
 
-	pSuffix = _GetCmdAccelExt("&Lock Workspace");
+	pSuffix = _GetCmdAccelExt(_T("&Lock Workspace"));
 	strExtended = TRL("&Lock Workspace");
-	strExtended += "\tCtrl+";
+	strExtended += _T("\t");
 	strExtended += pSuffix;
 
 	if((strMenuItem == TRL("&Lock Workspace")) || (strMenuItem == strExtended))
@@ -3166,13 +3829,14 @@ void CPwSafeDlg::OnFileLock()
 
 		m_bLocked = TRUE;
 		strExtended = TRL("&Unlock Workspace");
-		strExtended += "\tCtrl+";
-		strExtended += _GetCmdAccelExt("&Lock Workspace");
+		strExtended += _T("\t");
+		strExtended += _GetCmdAccelExt(_T("&Lock Workspace"));
 		m_menu.SetMenuText(ID_FILE_LOCK, strExtended, MF_BYCOMMAND);
 		m_sbStatus.SetText(TRL("Workspace locked"), 255, 0);
+		m_btnTbLock.SetTooltipText(TRL("&Unlock Workspace"));
 
-		strExtended = PWM_PRODUCT_NAME; strExtended += " [";
-		strExtended += TRL("Workspace locked"); strExtended += "]";
+		strExtended = PWM_PRODUCT_NAME; strExtended += _T(" [");
+		strExtended += TRL("Workspace locked"); strExtended += _T("]");
 		SetWindowText(strExtended);
 		m_systray.SetIcon(m_hTrayIconLocked);
 		m_systray.SetTooltipText(strExtended);
@@ -3183,8 +3847,8 @@ void CPwSafeDlg::OnFileLock()
 
 		if(m_bFileOpen == FALSE)
 		{
-			strExtended = PWM_PRODUCT_NAME; strExtended += " [";
-			strExtended += TRL("Workspace locked"); strExtended += "]";
+			strExtended = PWM_PRODUCT_NAME; strExtended += _T(" [");
+			strExtended += TRL("Workspace locked"); strExtended += _T("]");
 			SetWindowText(strExtended);
 			m_systray.SetTooltipText(strExtended);
 			m_systray.SetIcon(m_hTrayIconLocked);
@@ -3195,9 +3859,10 @@ void CPwSafeDlg::OnFileLock()
 		m_nLockCountdown = m_nLockTimeDef;
 		m_bLocked = FALSE;
 		strExtended = TRL("&Lock Workspace");
-		strExtended += "\tCtrl+";
-		strExtended += _GetCmdAccelExt("&Lock Workspace");
+		strExtended += _T("\t");
+		strExtended += _GetCmdAccelExt(_T("&Lock Workspace"));
 		m_menu.SetMenuText(ID_FILE_LOCK, strExtended, MF_BYCOMMAND);
+		m_btnTbLock.SetTooltipText(TRL("&Lock Workspace"));
 
 		UpdateGroupList();
 		m_cGroups.SetItemState(m_nLockedViewParams[1],
@@ -3216,6 +3881,8 @@ void CPwSafeDlg::OnFileLock()
 		m_systray.SetIcon(m_hTrayIconNormal);
 		m_systray.SetTooltipText(strExtended);
 	}
+
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdateFileLock(CCmdUI* pCmdUI) 
@@ -3225,9 +3892,10 @@ void CPwSafeDlg::OnUpdateFileLock(CCmdUI* pCmdUI)
 
 void CPwSafeDlg::OnGroupMoveTop() 
 {
-	int nGroup = GetSelectedGroup();
-	if(nGroup == -1) return;
-	m_mgr.MoveGroup(nGroup, 0);
+	DWORD dwGroup = GetSelectedGroup();
+	if(dwGroup == DWORD_MAX) return;
+	_TouchGroup(dwGroup, FALSE);
+	m_mgr.MoveGroup(dwGroup, 0);
 	_List_SaveView();
 	UpdateGroupList();
 	m_cGroups.SetItemState(0, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
@@ -3235,18 +3903,20 @@ void CPwSafeDlg::OnGroupMoveTop()
 	_List_RestoreView();
 	m_cGroups.EnsureVisible(0, FALSE);
 	m_bModified = TRUE;
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdateGroupMoveTop(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable((GetSafeSelectedGroup() != -1) ? TRUE : FALSE);
+	pCmdUI->Enable((m_dwLastSafeSelectedGroup != DWORD_MAX) ? TRUE : FALSE);
 }
 
 void CPwSafeDlg::OnGroupMoveBottom() 
 {
-	int nGroup = GetSelectedGroup();
-	if(nGroup == -1) return;
-	m_mgr.MoveGroup(nGroup, m_cGroups.GetItemCount() - 1);
+	DWORD dwGroup = GetSelectedGroup();
+	if(dwGroup == DWORD_MAX) return;
+	_TouchGroup(dwGroup, FALSE);
+	m_mgr.MoveGroup(dwGroup, (DWORD)m_cGroups.GetItemCount() - 1);
 	_List_SaveView();
 	UpdateGroupList();
 	m_cGroups.SetItemState(m_cGroups.GetItemCount() - 1,
@@ -3255,51 +3925,56 @@ void CPwSafeDlg::OnGroupMoveBottom()
 	_List_RestoreView();
 	m_cGroups.EnsureVisible(m_cGroups.GetItemCount() - 1, FALSE);
 	m_bModified = TRUE;
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdateGroupMoveBottom(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable((GetSafeSelectedGroup() != -1) ? TRUE : FALSE);
+	pCmdUI->Enable((m_dwLastSafeSelectedGroup != DWORD_MAX) ? TRUE : FALSE);
 }
 
 void CPwSafeDlg::OnGroupMoveUp() 
 {
-	int nGroup = GetSelectedGroup();
-	if(nGroup == -1) return;
-	BOOL b = m_mgr.MoveGroup(nGroup, nGroup - 1);
+	DWORD dwGroup = GetSelectedGroup();
+	if(dwGroup == DWORD_MAX) return;
+	_TouchGroup(dwGroup, FALSE);
+	BOOL b = m_mgr.MoveGroup(dwGroup, dwGroup - 1);
 	_List_SaveView();
 	UpdateGroupList();
-	m_cGroups.SetItemState((b == TRUE) ? (nGroup - 1) : nGroup,
+	m_cGroups.SetItemState((b == TRUE) ? (dwGroup - 1) : dwGroup,
 		LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
 	UpdatePasswordList();
 	_List_RestoreView();
-	m_cGroups.EnsureVisible((b == TRUE) ? (nGroup - 1) : nGroup, FALSE);
+	m_cGroups.EnsureVisible((b == TRUE) ? (dwGroup - 1) : dwGroup, FALSE);
 	m_bModified = TRUE;
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdateGroupMoveUp(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable((GetSafeSelectedGroup() != -1) ? TRUE : FALSE);
+	pCmdUI->Enable((m_dwLastSafeSelectedGroup != -1) ? TRUE : FALSE);
 }
 
 void CPwSafeDlg::OnGroupMoveDown() 
 {
-	int nGroup = GetSelectedGroup();
-	if(nGroup == -1) return;
-	BOOL b = m_mgr.MoveGroup(nGroup, nGroup + 1);
+	DWORD dwGroup = GetSelectedGroup();
+	if(dwGroup == DWORD_MAX) return;
+	_TouchGroup(dwGroup, FALSE);
+	BOOL b = m_mgr.MoveGroup(dwGroup, dwGroup + 1);
 	_List_SaveView();
 	UpdateGroupList();
-	m_cGroups.SetItemState((b == TRUE) ? (nGroup + 1) : nGroup,
+	m_cGroups.SetItemState((b == TRUE) ? (dwGroup + 1) : dwGroup,
 		LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
 	UpdatePasswordList();
 	_List_RestoreView();
-	m_cGroups.EnsureVisible((b == TRUE) ? (nGroup + 1) : nGroup, FALSE);
+	m_cGroups.EnsureVisible((b == TRUE) ? (dwGroup + 1) : dwGroup, FALSE);
 	m_bModified = TRUE;
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdateGroupMoveDown(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable((GetSafeSelectedGroup() != -1) ? TRUE : FALSE);
+	pCmdUI->Enable((m_dwLastSafeSelectedGroup != DWORD_MAX) ? TRUE : FALSE);
 }
 
 LRESULT CPwSafeDlg::OnTrayNotification(WPARAM wParam, LPARAM lParam)
@@ -3348,23 +4023,24 @@ void CPwSafeDlg::OnImportCsv()
 	DWORD dwGroupId;
 
 	strFilter = TRL("CSV files");
-	strFilter += " (*.csv)|*.csv|";
+	strFilter += _T(" (*.csv)|*.csv|");
 	strFilter += TRL("All files");
-	strFilter += " (*.*)|*.*||";
+	strFilter += _T(" (*.*)|*.*||");
 
 	dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
 	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 	dwFlags |= 0x00080000 | 0x00800000;
 	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "csv", "*.csv", dwFlags, strFilter, this);
+	CFileDialog dlg(TRUE, _T("csv"), _T("*.csv"), dwFlags, strFilter, this);
 
 	nRet = dlg.DoModal();
 	if(nRet == IDOK)
 	{
 		strFile = dlg.GetPathName();
 
-		dwGroupId = (DWORD)GetSelectedGroup();
-		ASSERT(dwGroupId != 0xFFFFFFFF);
+		dwGroupId = GetSelectedGroup();
+		ASSERT(dwGroupId != DWORD_MAX);
+		dwGroupId = m_mgr.GetGroupIdByIndex(dwGroupId); // Index to ID
 
 		if(pvi.ImportCsvToDb((LPCTSTR)strFile, &m_mgr, dwGroupId) == TRUE)
 		{
@@ -3377,6 +4053,7 @@ void CPwSafeDlg::OnImportCsv()
 				TRL("Password Safe"), MB_ICONWARNING);
 		}
 	}
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdateImportCsv(CCmdUI* pCmdUI) 
@@ -3387,20 +4064,32 @@ void CPwSafeDlg::OnUpdateImportCsv(CCmdUI* pCmdUI)
 void CPwSafeDlg::OnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	*pResult = 0;
+	UNREFERENCED_PARAMETER(pNMHDR);
 
-	if((GetKeyState(VK_CONTROL) & 0x8000) > 0) OnPwlistEdit();
+	// This would break the multiselect ability of the list, therefor we removed it
+	// if((GetKeyState(VK_CONTROL) & 0x8000) > 0) OnPwlistEdit();
+
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnColumnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
-	int nGroup = GetSelectedGroup();
+	DWORD dwGroupInx = GetSelectedGroup();
 	*pResult = 0;
 
-	if(nGroup == -1) return;
-	m_mgr.SortGroup(nGroup, (DWORD)pNMListView->iSubItem);
+	if(dwGroupInx == DWORD_MAX) return;
+	if(m_mgr.GetGroupIdByIndex(dwGroupInx) == m_mgr.GetGroupId(PWS_SEARCHGROUP))
+	{
+		_RemoveSearchGroup();
+		m_cList.DeleteAllItems();
+		return;
+	}
+
+	m_mgr.SortGroup(m_mgr.GetGroupIdByIndex(dwGroupInx), (DWORD)pNMListView->iSubItem);
 	m_bModified = TRUE;
 	UpdatePasswordList();
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnImportCWallet() 
@@ -3412,15 +4101,15 @@ void CPwSafeDlg::OnImportCWallet()
 	int nRet;
 
 	strFilter = TRL("Text files");
-	strFilter += " (*.txt)|*.txt|";
+	strFilter += _T(" (*.txt)|*.txt|");
 	strFilter += TRL("All files");
-	strFilter += " (*.*)|*.*||";
+	strFilter += _T(" (*.*)|*.*||");
 
 	dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
 	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 	dwFlags |= 0x00080000 | 0x00800000;
 	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "txt", "*.txt", dwFlags, strFilter, this);
+	CFileDialog dlg(TRUE, _T("txt"), _T("*.txt"), dwFlags, strFilter, this);
 
 	nRet = dlg.DoModal();
 	if(nRet == IDOK)
@@ -3439,6 +4128,7 @@ void CPwSafeDlg::OnImportCWallet()
 				TRL("Password Safe"), MB_ICONWARNING);
 		}
 	}
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdateImportCWallet(CCmdUI* pCmdUI) 
@@ -3492,23 +4182,24 @@ void CPwSafeDlg::OnImportPwSafe()
 	DWORD dwGroupId;
 
 	strFilter = TRL("Text files");
-	strFilter += " (*.txt)|*.txt|";
+	strFilter += _T(" (*.txt)|*.txt|");
 	strFilter += TRL("All files");
-	strFilter += " (*.*)|*.*||";
+	strFilter += _T(" (*.*)|*.*||");
 
 	dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
 	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 	dwFlags |= 0x00080000 | 0x00800000;
 	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "txt", "*.txt", dwFlags, strFilter, this);
+	CFileDialog dlg(TRUE, _T("txt"), _T("*.txt"), dwFlags, strFilter, this);
 
 	nRet = dlg.DoModal();
 	if(nRet == IDOK)
 	{
 		strFile = dlg.GetPathName();
 
-		dwGroupId = (DWORD)GetSelectedGroup();
-		ASSERT(dwGroupId != 0xFFFFFFFF);
+		dwGroupId = GetSelectedGroup();
+		ASSERT(dwGroupId != DWORD_MAX);
+		dwGroupId = m_mgr.GetGroupIdByIndex(dwGroupId); // Index to ID
 
 		if(pvi.ImportPwSafeToDb((LPCTSTR)strFile, &m_mgr) == TRUE)
 		{
@@ -3522,9 +4213,350 @@ void CPwSafeDlg::OnImportPwSafe()
 				TRL("Password Safe"), MB_ICONWARNING);
 		}
 	}
+	_UpdateToolBar();
 }
 
 void CPwSafeDlg::OnUpdateImportPwSafe(CCmdUI* pCmdUI) 
 {
 	pCmdUI->Enable(m_bFileOpen);
+}
+
+void CPwSafeDlg::OnViewCreation() 
+{
+	_SelChangeView(ID_VIEW_CREATION);
+}
+
+void CPwSafeDlg::OnViewLastMod() 
+{
+	_SelChangeView(ID_VIEW_LASTMOD);
+}
+
+void CPwSafeDlg::OnViewLastAccess() 
+{
+	_SelChangeView(ID_VIEW_LASTACCESS);
+}
+
+void CPwSafeDlg::OnViewExpire() 
+{
+	_SelChangeView(ID_VIEW_EXPIRE);
+}
+
+void CPwSafeDlg::OnViewUuid() 
+{
+	_SelChangeView(ID_VIEW_UUID);
+}
+
+void CPwSafeDlg::_TouchGroup(DWORD dwListIndex, BOOL bEdit)
+{
+	PW_GROUP *pGroup;
+	PW_TIME tNow;
+
+	pGroup = m_mgr.GetGroup(dwListIndex);
+	ASSERT(pGroup != NULL);
+
+	_GetCurrentPwTime(&tNow);
+
+	pGroup->tLastAccess = tNow;
+	if(bEdit == TRUE) pGroup->tLastMod = tNow;
+
+	m_bModified = TRUE;
+}
+
+void CPwSafeDlg::_TouchEntry(DWORD dwListIndex, BOOL bEdit)
+{
+	LV_ITEM lvi;
+	TCHAR szTemp[1024];
+	CString strTemp;
+	BYTE aUuid[16];
+	PW_TIME tNow;
+	PW_ENTRY *pEntry;
+
+	ASSERT(dwListIndex < (DWORD)m_cList.GetItemCount());
+	ASSERT(dwListIndex != DWORD_MAX);
+	if(dwListIndex == DWORD_MAX) return;
+
+	ZeroMemory(&lvi, sizeof(LV_ITEM));
+	lvi.iItem = (int)dwListIndex;
+	lvi.iSubItem = 9;
+	lvi.mask = LVIF_TEXT;
+	lvi.pszText = szTemp;
+	lvi.cchTextMax = 1024;
+	m_cList.GetItem(&lvi);
+
+	strTemp = lvi.pszText;
+	_StringToUuid((LPCTSTR)strTemp, aUuid);
+
+	EraseCString(&strTemp);
+
+	pEntry = m_mgr.GetEntryByUuid(aUuid);
+	ASSERT_ENTRY(pEntry);
+
+	_GetCurrentPwTime(&tNow);
+
+	pEntry->tLastAccess = tNow;
+	if(bEdit == TRUE) pEntry->tLastMod = tNow;
+
+	_List_SetEntry(dwListIndex, pEntry, FALSE, &tNow);
+
+	m_bModified = TRUE;
+}
+
+void CPwSafeDlg::OnTbOpen() 
+{
+	OnFileOpen();
+}
+
+void CPwSafeDlg::OnTbSave() 
+{
+	OnFileSave();
+}
+
+void CPwSafeDlg::_UpdateToolBar()
+{
+	DWORD dwSelectedEntry = GetSelectedEntry();
+	DWORD dwNumSelectedEntries = GetSelectedEntriesCount();
+	DWORD dwNumberOfEntries = m_mgr.GetNumberOfEntries();
+
+	CWnd *pFocusWnd = GetFocus();
+
+	if(m_bFileOpen == TRUE)
+	{
+		m_btnTbAddEntry.EnableWindow(TRUE);
+	}
+	else
+	{
+		m_btnTbAddEntry.EnableWindow(FALSE);
+	}
+
+	if(m_bLocked == FALSE)
+	{
+		m_btnTbNew.EnableWindow(TRUE);
+		m_btnTbOpen.EnableWindow(TRUE);
+	}
+	else
+	{
+		m_btnTbNew.EnableWindow(FALSE);
+		m_btnTbOpen.EnableWindow(FALSE);
+	}
+
+	if((m_bFileOpen == TRUE) && (m_bModified == TRUE))
+	{
+		m_btnTbSave.EnableWindow(TRUE);
+	}
+	else
+	{
+		m_btnTbSave.EnableWindow(FALSE);
+	}
+
+	if((dwSelectedEntry != DWORD_MAX) && (dwNumSelectedEntries == 1))
+	{
+		m_btnTbCopyUser.EnableWindow(TRUE);
+		m_btnTbCopyPw.EnableWindow(TRUE);
+		m_btnTbEditEntry.EnableWindow(TRUE);
+	}
+	else
+	{
+		m_btnTbCopyUser.EnableWindow(FALSE);
+		m_btnTbCopyPw.EnableWindow(FALSE);
+		m_btnTbEditEntry.EnableWindow(FALSE);
+	}
+
+	if((dwSelectedEntry != DWORD_MAX) && (dwNumSelectedEntries == 1))
+	{
+		m_btnTbDeleteEntry.EnableWindow(TRUE);
+	}
+	else
+	{
+		m_btnTbDeleteEntry.EnableWindow(FALSE);
+	}
+
+	if(m_bFileOpen && (m_mgr.GetNumberOfEntries() != 0))
+	{
+		m_btnTbFind.EnableWindow(TRUE);
+	}
+	else
+	{
+		m_btnTbFind.EnableWindow(FALSE);
+	}
+
+	if(m_bFileOpen || m_bLocked)
+	{
+		m_btnTbLock.EnableWindow(TRUE);
+	}
+	else
+	{
+		m_btnTbLock.EnableWindow(FALSE);
+	}
+
+	if(pFocusWnd != NULL) pFocusWnd->SetFocus(); // Restore the focus!
+}
+
+void CPwSafeDlg::OnTbNew() 
+{
+	OnFileNew();
+}
+
+void CPwSafeDlg::OnTbCopyUser() 
+{
+	OnPwlistCopyUser();
+}
+
+void CPwSafeDlg::OnTbCopyPw() 
+{
+	OnPwlistCopyPw();
+}
+
+void CPwSafeDlg::OnTbAddEntry() 
+{
+	OnPwlistAdd();
+}
+
+void CPwSafeDlg::OnTbEditEntry() 
+{
+	OnPwlistEdit();
+}
+
+void CPwSafeDlg::OnTbDeleteEntry() 
+{
+	OnPwlistDelete();
+}
+
+void CPwSafeDlg::OnTbFind() 
+{
+	OnPwlistFind();
+}
+
+void CPwSafeDlg::OnTbLock() 
+{
+	OnFileLock();
+}
+
+void CPwSafeDlg::OnTbAbout() 
+{
+	OnInfoAbout();
+}
+
+void CPwSafeDlg::OnViewShowToolBar() 
+{
+	UINT uState;
+	BOOL bChecked;
+	UINT uIndex = 0;
+
+	uState = m_menu.GetMenuState(ID_VIEW_SHOWTOOLBAR, MF_BYCOMMAND);
+	ASSERT(uState != 0xFFFFFFFF);
+
+	if(uState & MF_CHECKED) bChecked = TRUE;
+	else bChecked = FALSE;
+
+	if(bChecked == TRUE)
+	{
+		uState = MF_UNCHECKED; // Toggle
+		bChecked = FALSE;
+	}
+	else
+	{
+		uState = MF_CHECKED; // Toggle
+		bChecked = TRUE;
+	}
+	m_menu.CheckMenuItem(ID_VIEW_SHOWTOOLBAR, MF_BYCOMMAND | uState);
+
+	m_bShowToolBar = bChecked;
+
+	_ShowToolBar(m_bShowToolBar);
+	ProcessResize();
+}
+
+void CPwSafeDlg::_ShowToolBar(BOOL bShow)
+{
+	int nCommand;
+
+	if(bShow == FALSE) nCommand = SW_HIDE;
+	else nCommand = SW_SHOW;
+
+	m_btnTbNew.ShowWindow(nCommand); m_btnTbOpen.ShowWindow(nCommand);
+	m_btnTbSave.ShowWindow(nCommand); m_btnTbAddEntry.ShowWindow(nCommand);
+	m_btnTbEditEntry.ShowWindow(nCommand); m_btnTbDeleteEntry.ShowWindow(nCommand);
+	m_btnTbCopyPw.ShowWindow(nCommand); m_btnTbCopyUser.ShowWindow(nCommand);
+	m_btnTbFind.ShowWindow(nCommand); m_btnTbLock.ShowWindow(nCommand);
+	m_btnTbAbout.ShowWindow(nCommand);
+
+	GetDlgItem(IDC_STATIC_TBSEP0)->ShowWindow(nCommand); GetDlgItem(IDC_STATIC_TBSEP1)->ShowWindow(nCommand);
+	GetDlgItem(IDC_STATIC_TBSEP2)->ShowWindow(nCommand); GetDlgItem(IDC_STATIC_TBSEP3)->ShowWindow(nCommand);
+	GetDlgItem(IDC_STATIC_TBSEP4)->ShowWindow(nCommand);
+}
+
+void CPwSafeDlg::_RemoveSearchGroup()
+{
+	DWORD dwSearchGroupId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
+
+	if(dwSearchGroupId != DWORD_MAX)
+	{
+		DWORD dwSearchItemsCount = m_mgr.GetNumberOfItemsInGroupN(dwSearchGroupId);
+
+		if(dwSearchItemsCount == 0) // Delete only if the group is empty
+		{
+			DWORD dwGroupPos = m_mgr.GetGroupByIdN(dwSearchGroupId);
+			ASSERT(dwGroupPos != DWORD_MAX);
+			VERIFY(m_cGroups.DeleteItem((int)dwGroupPos)); // Remove from GUI
+			m_mgr.DeleteGroup(dwSearchGroupId); // Remove from password manager
+		}
+	}
+}
+
+void CPwSafeDlg::OnPwlistMassModify() 
+{
+	CEntryPropertiesDlg dlg;
+	UINT uState;
+	DWORD i;
+	DWORD dwIndex;
+	PW_ENTRY *p;
+	DWORD dwGroupId;
+
+	if(m_bFileOpen == FALSE) return;
+
+	dlg.m_pMgr = &m_mgr;
+	dlg.m_pParentIcons = &m_ilIcons;
+
+	if(dlg.DoModal() == TRUE)
+	{
+		dwGroupId = m_mgr.GetGroupIdByIndex((DWORD)dlg.m_nGroupInx);
+		ASSERT(dwGroupId != DWORD_MAX);
+
+		for(i = 0; i < (DWORD)m_cList.GetItemCount(); i++)
+		{
+			uState = m_cList.GetItemState((int)i, LVIS_SELECTED);
+			if(uState & LVIS_SELECTED)
+			{
+				dwIndex = _ListSelToEntryIndex(i); // Uses UUID to get the entry
+				ASSERT(dwIndex != DWORD_MAX);
+
+				p = m_mgr.GetEntry(dwIndex);
+				ASSERT(p != NULL);
+
+				if(dlg.m_bModGroup == TRUE) p->uGroupId = dwGroupId;
+				if(dlg.m_bModIcon == TRUE) p->uImageId = (DWORD)dlg.m_nIconId;
+				if(dlg.m_bModExpire == TRUE) p->tExpire = dlg.m_tExpire;
+
+				_TouchEntry(i, TRUE); // Doesn't change the entry except the time fields
+			}
+		}
+
+		if(dlg.m_bModGroup == TRUE) // We need a full update
+		{
+			_List_SaveView();
+			UpdatePasswordList();
+			_List_RestoreView();
+		}
+		else // Refresh is enough, no entries have been moved
+		{
+			RefreshPasswordList();
+		}
+
+		m_bModified = TRUE;
+	}
+}
+
+void CPwSafeDlg::OnUpdatePwlistMassModify(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable((m_bFileOpen && (m_dwLastNumSelectedItems > 1)) ? TRUE : FALSE);
 }

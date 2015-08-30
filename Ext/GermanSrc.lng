@@ -370,3 +370,31 @@
 |Default|                      |Standard|
 |More Colors...|               |Mehr Farben...|
 |Search results|               |Suchergebnisse|
+
+|Creation Time|                |Erstellungszeit|
+|Last Modification|            |Letzte Änderung|
+|Last Access|                  |Letzter Zugriff|
+|Expires|                      |Gültig bis|
+|UUID|                         |UUID|
+
+|Show &Creation Time Column|   |Erstellungs&zeit-Spalte anzeigen|
+|Show Last &Modification Time Column|          |&Letzte-Änderung-Spalte anzeigen|
+|Show Last Access &Time Column|                |Letzter-&Zugriff-Spalte anzeigen|
+|Show &Expire Time Column|                     |&Gültig-bis-Spalte anzeigen|
+|Show UU&ID Column|                            |&UUID-Spalte anzeigen|
+
+|Show &ToolBar|                |&Toolbar anzeigen|
+|Visit KeePass Homepage|       |KeePass-Homepage besuchen|
+|Field copied to clipboard.|   |Feld in die Zwischenablage kopiert.|
+
+|A key-file already exists on this drive. Do you want to overwrite it?|
+    |Auf dem Ziellaufwerk existiert bereits eine Schlüsseldatei. Möchten Sie diese überschreiben?|
+|Overwrite?|                   |Überschreiben?|
+|Expires:|                     |Gültig bis:|
+|&Delete Selected Entries|     |Ausgewählte Einträge &löschen|
+|&Mass Modify (All Selected)...|               |&Alle ausgewählten Einträge bearbeiten...|
+|Change group:|                |Gruppe ändern:|
+|Change entry icon:|           |Eintrags-Icon ändern:|
+|Change expiration time:|      |Ablaufdatum ändern:|
+|Mass Modify|                  |Alle ändern|
+|Change fields of all selected entries|        |Felder von allen ausgewählten Einträgen ändern|

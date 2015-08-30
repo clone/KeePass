@@ -30,16 +30,22 @@
 #include "StdAfx.h"
 #include "PwImport.h"
 #include "../Util/MemUtil.h"
+#include "../Util/StrUtil.h"
+
+static PW_TIME g_pwTimeNever;
+static char g_pNullString[4] = { 0, 0, 0, 0 };
 
 CPwImport::CPwImport()
 {
+	g_pwTimeNever.btDay = 28; g_pwTimeNever.btHour = 23; g_pwTimeNever.btMinute = 59;
+	g_pwTimeNever.btMonth = 12; g_pwTimeNever.btSecond = 59; g_pwTimeNever.shYear = 2999;
 }
 
 CPwImport::~CPwImport()
 {
 }
 
-char *CPwImport::_FileToMemory(const char *pszFile, unsigned long *pFileSize)
+char *CPwImport::_FileToMemory(const TCHAR *pszFile, unsigned long *pFileSize)
 {
 	FILE *fp;
 	unsigned long uFileSize;
@@ -47,9 +53,9 @@ char *CPwImport::_FileToMemory(const char *pszFile, unsigned long *pFileSize)
 
 	ASSERT(pszFile != NULL);
 	if(pszFile == NULL) return NULL;
-	if(strlen(pszFile) == 0) return NULL;
+	if(_tcslen(pszFile) == 0) return NULL;
 
-	fp = fopen(pszFile, "rb");
+	fp = _tfopen(pszFile, _T("rb"));
 	if(fp == NULL) return NULL;
 
 	fseek(fp, 0, SEEK_END);
@@ -67,7 +73,7 @@ char *CPwImport::_FileToMemory(const char *pszFile, unsigned long *pFileSize)
 	return pData;
 }
 
-BOOL CPwImport::ImportCsvToDb(const char *pszFile, CPwManager *pMgr, DWORD dwGroupId)
+BOOL CPwImport::ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwGroupId)
 {
 	unsigned long uFileSize, i, j;
 	char *pData;
@@ -126,15 +132,17 @@ BOOL CPwImport::ImportCsvToDb(const char *pszFile, CPwManager *pMgr, DWORD dwGro
 	return TRUE;
 }
 
-BOOL CPwImport::ImportCWalletToDb(const char *pszFile, CPwManager *pMgr)
+BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 {
 	char *pData;
 	CString strTitle, strURL, strUserName, strPassword, strNotes;
-	unsigned long uFileSize, i, b;
+	DWORD uFileSize, i, b;
 	CString str;
 	CString strLastCategory = _T("General");
-	int nLastGroupId;
+	DWORD dwLastGroupId;
 	BOOL bInNotes = FALSE;
+
+	ASSERT(pMgr != NULL);
 
 	pData = _FileToMemory(pszFile, &uFileSize);
 	if(pData == NULL) return FALSE;
@@ -142,7 +150,7 @@ BOOL CPwImport::ImportCWalletToDb(const char *pszFile, CPwManager *pMgr)
 	strTitle.Empty(); strURL.Empty(); strUserName.Empty();
 	strPassword.Empty(); strNotes.Empty();
 
-	i = (unsigned long)(-1);
+	i = DWORD_MAX;
 	while(1) // Processing the file
 	{
 		str.Empty();
@@ -169,9 +177,23 @@ BOOL CPwImport::ImportCWalletToDb(const char *pszFile, CPwManager *pMgr)
 				strPassword.TrimLeft(); strPassword.TrimRight();
 				strNotes.TrimLeft(); strNotes.TrimRight();
 
-				pMgr->AddEntry((DWORD)nLastGroupId, _GetPreferredIcon((LPCTSTR)strTitle),
-					(LPCTSTR)strTitle, (LPCTSTR)strURL, (LPCTSTR)strUserName,
-					(LPCTSTR)strPassword, (LPCTSTR)strNotes);
+				PW_ENTRY pwTemplate;
+				PW_TIME tNow;
+
+				_GetCurrentPwTime(&tNow);
+				memset(&pwTemplate, 0, sizeof(PW_ENTRY));
+				pwTemplate.pszAdditional = (TCHAR *)(LPCTSTR)strNotes;
+				pwTemplate.pszPassword = (TCHAR *)(LPCTSTR)strPassword;
+				pwTemplate.pszTitle = (TCHAR *)(LPCTSTR)strTitle;
+				pwTemplate.pszURL = (TCHAR *)(LPCTSTR)strURL;
+				pwTemplate.pszUserName = (TCHAR *)(LPCTSTR)strUserName;
+				pwTemplate.tCreation = tNow; pwTemplate.tExpire = g_pwTimeNever;
+				pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
+				pwTemplate.uGroupId = dwLastGroupId;
+				pwTemplate.uImageId = _GetPreferredIcon((LPCTSTR)strTitle);
+				pwTemplate.uPasswordLen = strPassword.GetLength();
+
+				pMgr->AddEntry(&pwTemplate);
 			}
 
 			strTitle.Empty(); strURL.Empty(); strUserName.Empty();
@@ -214,14 +236,22 @@ BOOL CPwImport::ImportCWalletToDb(const char *pszFile, CPwManager *pMgr)
 
 			if(strLastCategory.GetLength() == 0)
 				strLastCategory = _T("General");
-			nLastGroupId = pMgr->GetGroupId((LPCTSTR)strLastCategory);
-			if(nLastGroupId == -1)
+			dwLastGroupId = pMgr->GetGroupId((LPCTSTR)strLastCategory);
+			if(dwLastGroupId == DWORD_MAX)
 			{
-				pMgr->AddGroup(_GetPreferredIcon((LPCTSTR)strLastCategory),
-					(LPCTSTR)strLastCategory);
-				nLastGroupId = pMgr->GetGroupId((LPCTSTR)strLastCategory);
+				PW_GROUP pwT;
+				PW_TIME tNow;
+				_GetCurrentPwTime(&tNow);
+				memset(&pwT, 0, sizeof(PW_GROUP));
+				pwT.pszGroupName = (TCHAR *)(LPCTSTR)strLastCategory;
+				pwT.tCreation = tNow; pwT.tExpire = g_pwTimeNever;
+				pwT.tLastAccess = tNow; pwT.tLastMod = tNow;
+				pwT.uGroupId = 0; // 0 = create new group ID
+				pwT.uImageId = _GetPreferredIcon((LPCTSTR)strLastCategory);
+				pMgr->AddGroup(&pwT);
+				dwLastGroupId = pMgr->GetGroupId((LPCTSTR)strLastCategory);
 			}
-			ASSERT(nLastGroupId != -1);
+			ASSERT(dwLastGroupId != DWORD_MAX);
 		}
 
 		if((str.Left(6) == _T("Notes:")) && (bInNotes == FALSE))
@@ -272,13 +302,13 @@ BOOL CPwImport::ImportCWalletToDb(const char *pszFile, CPwManager *pMgr)
 	return TRUE;
 }
 
-BOOL CPwImport::ImportPwSafeToDb(const char *pszFile, CPwManager *pMgr)
+BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 {
 	char *pData;
 	unsigned long uFileSize, i;
 	int nField, j;
 	CString strGroup, strTitle, strUserName, strPassword, strNotes;
-	int nGroupId;
+	DWORD dwGroupId;
 	BOOL bInNotes = FALSE;
 
 	ASSERT(pszFile != NULL); if(pszFile == NULL) return FALSE;
@@ -323,16 +353,39 @@ BOOL CPwImport::ImportPwSafeToDb(const char *pszFile, CPwManager *pMgr)
 		}
 		else if((pData[i] == '\n') && (bInNotes == FALSE))
 		{
-			nGroupId = pMgr->GetGroupId(strGroup);
-			if(nGroupId == -1)
+			dwGroupId = pMgr->GetGroupId((LPCTSTR)strGroup);
+			if(dwGroupId == DWORD_MAX)
 			{
-				pMgr->AddGroup(_GetPreferredIcon(strGroup), strGroup);
-				nGroupId = pMgr->GetGroupId(strGroup);
+				PW_GROUP pwT;
+				PW_TIME tNow;
+				_GetCurrentPwTime(&tNow);
+				pwT.pszGroupName = (TCHAR *)(LPCTSTR)strGroup;
+				pwT.tCreation = tNow; pwT.tExpire = g_pwTimeNever;
+				pwT.tLastAccess = tNow; pwT.tLastMod = tNow;
+				pwT.uGroupId = 0; // 0 = create new group ID
+				pwT.uImageId = _GetPreferredIcon((LPCTSTR)strGroup);
+				pMgr->AddGroup(&pwT);
+				dwGroupId = pMgr->GetGroupId((LPCTSTR)strGroup);
 			}
-			ASSERT(nGroupId != -1);
+			ASSERT(dwGroupId != DWORD_MAX);
 
-			pMgr->AddEntry((DWORD)nGroupId, _GetPreferredIcon(strTitle),
-				strTitle, _T(""), strUserName, strPassword, strNotes);
+			PW_ENTRY pwTemplate;
+			PW_TIME tNow;
+
+			_GetCurrentPwTime(&tNow);
+			pwTemplate.pszAdditional = (TCHAR *)(LPCTSTR)strNotes;
+			pwTemplate.pszPassword = (TCHAR *)(LPCTSTR)strPassword;
+			pwTemplate.pszTitle = (TCHAR *)(LPCTSTR)strTitle;
+			pwTemplate.pszURL = g_pNullString;
+			pwTemplate.pszUserName = (TCHAR *)(LPCTSTR)strUserName;
+			pwTemplate.tCreation = tNow; pwTemplate.tExpire = g_pwTimeNever;
+			pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
+			pwTemplate.uImageId = _GetPreferredIcon((LPCTSTR)strTitle);
+			pwTemplate.uPasswordLen = strPassword.GetLength();
+			pwTemplate.uGroupId = dwGroupId;
+			memset(pwTemplate.uuid, 0, 16); // 0 = create new UUID
+
+			pMgr->AddEntry(&pwTemplate);
 
 			strGroup.Empty(); strTitle.Empty(); strUserName.Empty();
 			strPassword.Empty(); strNotes.Empty();
@@ -394,8 +447,25 @@ void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamS
 		p += s + 1;
 
 		if((strcmp(pTitle, "Account") != 0) && (strcmp(pPassword, "Password") != 0))
-			m_pLastMgr->AddEntry(m_dwLastGroupId, _GetPreferredIcon(pTitle), pTitle,
-				pURL, pUserName, pPassword, pNotes);
+		{
+			PW_ENTRY pwTemplate;
+			PW_TIME tNow;
+
+			_GetCurrentPwTime(&tNow);
+			pwTemplate.pszAdditional = pNotes;
+			pwTemplate.pszPassword = pPassword;
+			pwTemplate.pszTitle = pTitle;
+			pwTemplate.pszURL = pURL;
+			pwTemplate.pszUserName = pUserName;
+			pwTemplate.tCreation = tNow; pwTemplate.tExpire = g_pwTimeNever;
+			pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
+			pwTemplate.uGroupId = m_dwLastGroupId;
+			pwTemplate.uImageId = _GetPreferredIcon(pTitle);
+			pwTemplate.uPasswordLen = _tcslen(pPassword);
+			memset(pwTemplate.uuid, 0, 16); // 0 = create new UUID
+
+			m_pLastMgr->AddEntry(&pwTemplate);
+		}
 	}
 }
 

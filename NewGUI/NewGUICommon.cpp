@@ -30,6 +30,7 @@
 #include "StdAfx.h"
 #include "NewGUICommon.h"
 #include "BCMenu.h"
+#include "BtnST.h"
 #include "ShadeButtonST.h"
 #include "TranslateEx.h"
 
@@ -95,6 +96,30 @@ void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut)
 
 	if((nBitmapIn != -1) && (nBitmapOut != -1))
 		p->SetBitmaps(nBitmapIn, RGB(255, 0, 255), nBitmapOut, RGB(255, 0, 255));
+}
+
+void NewGUI_ToolBarButton(void *pButton, int nBitmapIn, int nBitmapOut)
+{
+	CButtonST *p = (CButtonST *)pButton;
+	CString strToolTip;
+
+	p->SetFlat(TRUE);
+
+	if((nBitmapIn != -1) && (nBitmapOut != -1))
+		p->SetBitmaps(nBitmapIn, RGB(255,0,255), nBitmapOut, RGB(255,0,255));
+
+	p->GetWindowText(strToolTip);
+	p->SetWindowText(_T(""));
+	p->SetTooltipText(TRL((LPCTSTR)strToolTip));
+
+	COLORREF crHighlight;
+	BYTE byRed, byGreen, byBlue;
+	p->GetColor(CButtonST::BTNST_COLOR_BK_IN, &crHighlight);
+	byRed = (BYTE)((GetRValue(crHighlight) < 240) ? GetRValue(crHighlight) + 15 : 255);
+	byGreen = (BYTE)((GetGValue(crHighlight) < 240) ? GetGValue(crHighlight) + 15 : 255);
+	byBlue = (BYTE)((GetBValue(crHighlight) < 240) ? GetBValue(crHighlight) + 15 : 255);
+	crHighlight = RGB(byRed, byGreen, byBlue);
+	p->SetColor(CButtonST::BTNST_COLOR_BK_IN, crHighlight, TRUE);
 }
 
 void NewGUI_TranslateCWnd(CWnd *pWnd)
