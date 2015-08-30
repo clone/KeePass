@@ -3518,6 +3518,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NewGUI\FontUtil.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\FontUtil.h"
+				>
+			</File>
+			<File
 				RelativePath=".\NewGUI\GlobalWindowManager.cpp"
 				>
 			</File>

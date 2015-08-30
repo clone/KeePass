@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -718,7 +718,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 		uState = pSrc->GetMenuState(i, MF_BYPOSITION);
 		pSrc->GetMenuText(i, str, MF_BYPOSITION);
 		if(str == _T("&Rearrange")) continue;
-		if(str == _T("&Export Group To")) continue;
+		if(str == _T("&Export Group")) continue;
 		if(str == _T("Find in t&his Group...")) continue;
 		// if((uID == ID_GROUP_MOVETOP) || (uID == ID_GROUP_MOVEBOTTOM)) continue;
 		// if((uID == ID_GROUP_MOVEUP) || (uID == ID_GROUP_MOVEDOWN)) continue;
@@ -1431,7 +1431,8 @@ BOOL CPwSafeDlg::OnInitDialog()
 	_UpdateToolBar(TRUE);
 	ProcessResize();
 
-	if(m_dwATHotKey != 0) RegisterGlobalHotKey(HOTKEYID_AUTOTYPE, m_dwATHotKey, FALSE, FALSE);
+	if(m_bDisableAutoType == FALSE)
+		RegisterGlobalHotKey(HOTKEYID_AUTOTYPE, m_dwATHotKey, false);
 
 	m_bRegisterRestoreHotKey = cConfig.GetBool(PWMKEY_RESTOREHOTKEY, TRUE);
 	RegisterRestoreHotKey(m_bRegisterRestoreHotKey);
@@ -1527,10 +1528,10 @@ void CPwSafeDlg::_TranslateMenu(BCMenu *pBCMenu, BOOL bAppendSuffix, BOOL *pFlag
 
 		CString strSource = strItem;
 
-		if((strItem == _T("&Import From")) || (strItem == _T("&Export To")) ||
+		if((strItem == _T("&Import")) || (strItem == _T("&Export")) ||
 			(strItem == _T("Show &Columns")) || (strItem == _T("&Rearrange")) ||
 			(strItem == _T("Auto-&Sort Password List")) || (strItem == _T("TAN View &Options")) ||
-			(strItem == _T("&Export Group To")) || (strItem == _T("Insert Field Reference")))
+			(strItem == _T("&Export Group")) || (strItem == _T("Insert Field Reference")))
 		{
 			pNext = pBCMenu->GetSubBCMenu(const_cast<LPTSTR>((LPCTSTR)strItem));
 			if(pNext != NULL) _TranslateMenu(pNext, TRUE, pFlags);
@@ -1551,14 +1552,14 @@ void CPwSafeDlg::_TranslateMenu(BCMenu *pBCMenu, BOOL bAppendSuffix, BOOL *pFlag
 
 		if(m_bMiniMode == TRUE)
 		{
-			if(strSource == _T("&Import From"))
+			if(strSource == _T("&Import"))
 			{
 				--nItem;
 				if(m_bForceAllowImport == FALSE)
 					pBCMenu->DeleteMenu(nItem, MF_BYPOSITION);
 				else ++nItem;
 			}
-			else if(strSource == _T("&Export To"))
+			else if(strSource == _T("&Export"))
 			{
 				--nItem;
 				if(m_bForceAllowExport == FALSE)
@@ -2165,7 +2166,8 @@ void CPwSafeDlg::CleanUp()
 		m_bTimer = FALSE;
 	}
 
-	if(m_dwATHotKey != 0) UnregisterHotKey(this->m_hWnd, HOTKEYID_AUTOTYPE);
+	VERIFY(RegisterGlobalHotKey(HOTKEYID_AUTOTYPE, 0, false));
+	ASSERT(m_sRegHotKeyIDs.size() == 0);
 
 	RegisterRestoreHotKey(FALSE);
 
@@ -3568,7 +3570,7 @@ void CPwSafeDlg::RebuildContextMenus()
 	m_pGroupListTrackableMenu = NewGUI_GetBCMenu(m_pGroupListMenu->GetSubMenu(0));
 
 	if(m_bMiniMode == TRUE)
-		m_pGroupListTrackableMenu->DeleteMenu(_T("&Export Group To"));
+		m_pGroupListTrackableMenu->DeleteMenu(_T("&Export Group"));
 
 	_TranslateMenu(m_pGroupListTrackableMenu, TRUE, NULL);
 
@@ -4656,8 +4658,9 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
 				{
 					CString strRepaired = CPwUtil::FormatError(nErr, PWFF_NO_INTRO |
 						PWFF_INVKEY_WITH_CODE);
-					CString strRTemp = TRL("&Repair KeePass Database File...");
+					CString strRTemp = TRL("&Repair Database File...");
 					strRTemp.Remove(_T('&'));
+					strRTemp.Trim(_T('.'));
 					CString strRTitle = strRTemp;
 
 					strRepaired += _T("\r\n\r\n");
@@ -6081,8 +6084,6 @@ void CPwSafeDlg::OnPwlistFind()
 
 void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 {
-	CFindInDbDlg dlg;
-
 	if(m_bFileOpen == FALSE) return;
 
 	const DWORD dwMaxItems = m_mgr.GetNumberOfEntries();
@@ -6090,14 +6091,24 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 
 	_SetDisplayDialog(true);
 
-	DWORD dwFindGroupIndex;
-	if(dwFindGroupId != DWORD_MAX) dwFindGroupIndex = m_mgr.GetGroupByIdN(dwFindGroupId);
-	else dwFindGroupIndex = DWORD_MAX;
+	DWORD dwFindGroupIndexMin = DWORD_MAX;
+	if(dwFindGroupId != DWORD_MAX)
+		dwFindGroupIndexMin = m_mgr.GetGroupByIdN(dwFindGroupId);
 
-	if(dwFindGroupIndex != DWORD_MAX)
+	DWORD dwFindGroupIndexMax = DWORD_MAX;
+	if(dwFindGroupIndexMin != DWORD_MAX)
+		dwFindGroupIndexMax = m_mgr.GetLastChildGroup(dwFindGroupIndexMin);
+
+	CFindInDbDlg dlg;
+	CString strGroupName; // Local copy of the group name
+	if(dwFindGroupIndexMin != DWORD_MAX)
 	{
-		const PW_GROUP *pg = m_mgr.GetGroup(dwFindGroupIndex);
-		if(pg != NULL) dlg.m_lpGroupName = pg->pszGroupName;
+		const PW_GROUP *pg = m_mgr.GetGroup(dwFindGroupIndexMin);
+		if((pg != NULL) && (pg->pszGroupName != NULL))
+		{
+			strGroupName = pg->pszGroupName;
+			dlg.m_lpGroupName = strGroupName;
+		}
 	}
 
 	if(NewGUI_DoModal(&dlg) == IDOK)
@@ -6157,7 +6168,8 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 					ASSERT(dwGroupInx != DWORD_MAX);
 
 					// Only accept entries that are stored in the specified group
-					if((dwFindGroupIndex == DWORD_MAX) || (dwFindGroupIndex == dwGroupInx))
+					if((dwFindGroupIndexMin == DWORD_MAX) || ((dwGroupInx >= dwFindGroupIndexMin) &&
+						(dwGroupInx <= dwFindGroupIndexMax)))
 					{
 						if(dlg.m_bExcludeBackups != FALSE)
 						{
@@ -10201,39 +10213,46 @@ void CPwSafeDlg::BuildPluginMenu()
 	ptrs.clear();
 }
 
-BOOL CPwSafeDlg::RegisterGlobalHotKey(int nHotKeyID, DWORD dwHotKey, BOOL bReleasePrevious, BOOL bMessageBoxOnFail)
+bool CPwSafeDlg::RegisterGlobalHotKey(int nHotKeyID, DWORD dwHotKey,
+	bool bMessageBoxOnFail)
 {
+	std::set<int>::iterator itEx = m_sRegHotKeyIDs.find(nHotKeyID);
+	if(itEx != m_sRegHotKeyIDs.end())
+	{
+		m_sRegHotKeyIDs.erase(itEx);
+		VERIFY(::UnregisterHotKey(this->m_hWnd, nHotKeyID));
+	}
+
+	if(dwHotKey == 0) return true; // Nothing to register
+
 	UINT uModifiers = 0;
 	if(((dwHotKey >> 16) & HOTKEYF_ALT) > 0) uModifiers |= MOD_ALT;
 	if(((dwHotKey >> 16) & HOTKEYF_SHIFT) > 0) uModifiers |= MOD_SHIFT;
 	if(((dwHotKey >> 16) & HOTKEYF_CONTROL) > 0) uModifiers |= MOD_CONTROL;
 
-	if(bReleasePrevious == TRUE) ::UnregisterHotKey(this->m_hWnd, nHotKeyID);
-
-	if(dwHotKey == 0) return TRUE; // Nothing to register
-
 	const BOOL b = ::RegisterHotKey(this->m_hWnd, nHotKeyID, uModifiers,
 		static_cast<UINT>(dwHotKey & 0x0000FFFF));
-
 	if(b == FALSE)
 	{
-		CString str;
+		CString str = TRL("Cannot register the global hot key.");
 
-		str = TRL("Cannot register the global hot key.");
-
-		if(bMessageBoxOnFail == TRUE)
+		if(bMessageBoxOnFail)
 		{
 			str += _T("\r\n\r\n");
-			str += TRL("Most probably another application has reserved this hot key already."); str += _T("\r\n\r\n");
+			str += TRL("Most probably another application has reserved this hot key already.");
+			str += _T("\r\n\r\n");
 			str += TRL("You can choose a different hot key combination in 'Tools' - 'Options' - 'Advanced' - 'Auto-Type'.");
 
 			// Show a (global!) warning window
 			::MessageBox(::GetDesktopWindow(), str, _T("KeePass"), MB_OK | MB_ICONWARNING);
 		}
 		else SetStatusTextEx(str);
+
+		return false;
 	}
 
-	return b;
+	m_sRegHotKeyIDs.insert(nHotKeyID);
+	return true;
 }
 
 LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)

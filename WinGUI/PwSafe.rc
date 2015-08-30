@@ -111,7 +111,7 @@ CAPTION "About KeePass"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,203,111,58,14,WS_GROUP
-    LTEXT           "Copyright © 2003-2013 Dominik Reichl.",IDC_STATIC,7,7,254,8
+    LTEXT           "Copyright © 2003-2014 Dominik Reichl.",IDC_STATIC,7,7,254,8
     LTEXT           "KeePass is OSI Certified Open Source Software.",IDC_STATIC,7,20,254,8
     LTEXT           "The program is distributed under the terms of the GNU General Public License v2 or later.",IDC_STATIC,7,33,254,17
     LTEXT           "<>",IDC_HLINK_HOMEPAGE,7,65,254,8
@@ -844,8 +844,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,26,0,0
- PRODUCTVERSION 1,26,0,0
+ FILEVERSION 1,27,0,0
+ PRODUCTVERSION 1,27,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -862,13 +862,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.26"
-            VALUE "FileVersion", "1.26.0.0"
+            VALUE "FileDescription", "KeePass Password Safe 1.27"
+            VALUE "FileVersion", "1.27.0.0"
             VALUE "InternalName", "PwSafe"
-            VALUE "LegalCopyright", "Copyright (c) 2003-2013 Dominik Reichl"
+            VALUE "LegalCopyright", "Copyright (c) 2003-2014 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.26"
-            VALUE "ProductVersion", "1.26.0.0"
+            VALUE "ProductName", "KeePass Password Safe 1.27"
+            VALUE "ProductVersion", "1.27.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -900,7 +900,7 @@ BEGIN
         MENUITEM "Print Pre&view...",           ID_FILE_PRINTPREVIEW
         MENUITEM "&Print...",                   ID_FILE_PRINT
         MENUITEM SEPARATOR
-        POPUP "&Import From"
+        POPUP "&Import"
         BEGIN
             MENUITEM "&CSV File...",                ID_IMPORT_CSV
             MENUITEM "Code&Wallet TXT File...",     ID_IMPORT_CWALLET
@@ -911,7 +911,7 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "&Get More Import Plugins...", ID_IMPORT_GETMORE
         END
-        POPUP "&Export To"
+        POPUP "&Export"
         BEGIN
             MENUITEM "&TXT File...",                ID_EXPORT_TXT
             MENUITEM "&HTML File...",               ID_EXPORT_HTML
@@ -983,7 +983,7 @@ BEGIN
         MENUITEM "Password &Generator...",      ID_EXTRAS_GENPW
         MENUITEM "&TAN Wizard...",              ID_EXTRAS_TANWIZARD
         MENUITEM SEPARATOR
-        MENUITEM "&Repair KeePass Database File...", ID_EXTRAS_REPAIRDB
+        MENUITEM "&Repair Database File...",    ID_EXTRAS_REPAIRDB
         MENUITEM SEPARATOR
         MENUITEM "Show &Expired Entries",       ID_EXTRAS_SHOWEXPIRED
         MENUITEM SEPARATOR
@@ -1072,7 +1072,7 @@ BEGIN
         MENUITEM "Find in t&his Group...",      ID_PWLIST_FINDINGROUP
         MENUITEM SEPARATOR
         MENUITEM "Pr&int Group...",             ID_SAFE_PRINTGROUP
-        POPUP "&Export Group To"
+        POPUP "&Export Group"
         BEGIN
             MENUITEM "&TXT File...",                ID_SAFE_EXPORTGROUP_TXT
             MENUITEM "&HTML File...",               ID_SAFE_EXPORTGROUP_HTML

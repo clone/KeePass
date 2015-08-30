@@ -1,3 +1,27 @@
+14/04/06 - 1.27
+- Password text boxes now use a monospace font
+- The 'Find in this Group' function now also searches in
+  subgroups of the selected group
+- {OPERA} placeholder: updated detection code to also support
+  the latest versions of Opera
+- Enhanced Internet Explorer detection
+- Added high resolution version of the KeePass application icon
+
+- Improved realization of the {CLEARFIELD} command (now using
+  Bksp instead of Del, in order to avoid Ctrl+Alt+Del issues on
+  newer Windows systems)
+- When the option 'Enable auto-type features' is deactivated,
+  the global auto-type hot key is not registered anymore
+- Improved quoted app paths parsing
+- Font handling improvements
+- Various files (e.g. 'History.txt') are now encoded using
+  UTF-8
+- Improved build system
+- Upgraded to Boost libraries version 1.55.0
+- Various UI text improvements
+- Various code optimizations
+- Minor other improvements
+
 13/07/12 - 1.26
 - New password quality estimation algorithm
 - When activating the main window while a dialog is opened, the
@@ -895,7 +919,7 @@
 - Changing the database master key now requires unsafe
   operations permission
 - Added support for auto-typing the following characters in US
-  International mode: ' " ´ ` ~
+  International mode: ', ", acute accent, grave accent, ~
 - The banner of the 'Edit Entry' dialog is hidden now if the
   screen resolution is very low (640x480 or lower)
 - New entries now by default get the icons of their container
@@ -949,8 +973,9 @@
 - Replaced help hyperlinks in 'Edit Entry' dialog by a help
   popup button
 - Added help button in TAN wizard dialog
-- Fixed a typo in the random password generation dialog ('§'
-  isn't a special character -- it's higher ANSI)
+- Fixed a typo in the random password generation dialog (the
+  section sign U+00A7 isn't a special character -- it's higher
+  ANSI)
 - Fixed a bug which could have caused the 'Select Key File'
   hyper link to be drawn incorrectly when using non-official XP
   themes
@@ -1824,7 +1849,7 @@
 
 04/01/02 - 0.86
 - Added Dutch translation (thanks to Kees Koenders!)
-- Added Swedish translation (thanks to Michael Åström!)
+- Added Swedish translation (thanks to Michael Ã…strÃ¶m!)
 - You can now change the font of the password and group lists
 - KeePass remembers the last window position and size
 - KeePass remembers the column sizes of the password list

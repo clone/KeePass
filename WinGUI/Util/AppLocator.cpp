@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "AppLocator.h"
 #include "WinUtil.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
+#include <boost/algorithm/string/predicate.hpp>
 
 bool AppLocator::m_bPathsQueried = false;
 
@@ -92,9 +93,32 @@ void AppLocator::GetPaths()
 
 void AppLocator::FindInternetExplorer()
 {
-	LPCTSTR lpPath = _T("Applications\\iexplore.exe\\shell\\open\\command");
-	m_strIEPath = AppLocator::Fix(GetRegStrEx(HKEY_CLASSES_ROOT, lpPath,
-		_T(""), 0));
+	for(int i = 0; i < 4; ++i)
+	{
+		std::basic_string<TCHAR> str;
+		if(i == 0)
+			str = GetRegStrEx(HKEY_LOCAL_MACHINE,
+				_T("SOFTWARE\\Clients\\StartMenuInternet\\IEXPLORE.EXE\\shell\\open\\command"),
+				_T(""), 0);
+		else if(i == 1)
+			str = GetRegStrEx(HKEY_LOCAL_MACHINE,
+				_T("SOFTWARE\\Wow6432Node\\Clients\\StartMenuInternet\\IEXPLORE.EXE\\shell\\open\\command"),
+				_T(""), 0);
+		else if(i == 2)
+			str = GetRegStrEx(HKEY_CLASSES_ROOT,
+				_T("IE.AssocFile.HTM\\shell\\open\\command"), _T(""), 0);
+		else if(i == 3)
+			str = GetRegStrEx(HKEY_CLASSES_ROOT,
+				_T("Applications\\iexplore.exe\\shell\\open\\command"), _T(""), 0);
+
+		str = AppLocator::Fix(str);
+		if(str.size() == 0) continue;
+		// https://sourceforge.net/p/keepass/discussion/329221/thread/6b292ede/
+		if(boost::algorithm::starts_with(str, _T("iexplore.exe"))) continue;
+
+		m_strIEPath = str;
+		break;
+	}
 }
 
 void AppLocator::FindFirefox()
@@ -124,9 +148,24 @@ void AppLocator::FindFirefox()
 
 void AppLocator::FindOpera()
 {
-	LPCTSTR lpPath = _T("SOFTWARE\\Clients\\Mail\\Opera\\shell\\open\\command");
-	m_strOperaPath = AppLocator::Fix(GetRegStrEx(HKEY_LOCAL_MACHINE,
-		lpPath, _T(""), 0));
+	for(int i = 0; i < 2; ++i)
+	{
+		std::basic_string<TCHAR> str;
+		if(i == 0) // Opera 20.0.1387.77
+			str = GetRegStrEx(HKEY_LOCAL_MACHINE,
+				_T("SOFTWARE\\Clients\\StartMenuInternet\\OperaStable\\shell\\open\\command"),
+				_T(""), 0);
+		else if(i == 1) // Old
+			str = GetRegStrEx(HKEY_LOCAL_MACHINE,
+				_T("SOFTWARE\\Clients\\StartMenuInternet\\Opera\\shell\\open\\command"),
+				_T(""), 0);
+
+		str = AppLocator::Fix(str);
+		if(str.size() == 0) continue;
+
+		m_strOperaPath = str;
+		break;
+	}
 }
 
 void AppLocator::FindChrome()

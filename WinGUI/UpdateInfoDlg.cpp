@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "UpdateInfoDlg.h"
 
 #include "NewGUI/NewGUICommon.h"
+#include "NewGUI/FontUtil.h"
 #include "../KeePassLibCpp/PwManager.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 
@@ -62,14 +63,17 @@ BOOL CUpdateInfoDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	CFont* pDialogFont = m_lblStatus.GetFont();
-	LOGFONT lf;
-	pDialogFont->GetLogFont(&lf);
-	m_fBold.CreateFont(lf.lfHeight, lf.lfWidth, lf.lfEscapement, lf.lfOrientation,
-		FW_BOLD, lf.lfItalic, lf.lfUnderline, lf.lfStrikeOut,
-		lf.lfCharSet, lf.lfOutPrecision, lf.lfClipPrecision, lf.lfQuality,
-		lf.lfPitchAndFamily, lf.lfFaceName);
-	m_lblStatus.SetFont(&m_fBold);
+	CFontUtil::SetDefaultFontFrom(&m_lblStatus);
+
+	// CFont* pDialogFont = m_lblStatus.GetFont();
+	// LOGFONT lf;
+	// pDialogFont->GetLogFont(&lf);
+	// m_fBold.CreateFont(lf.lfHeight, lf.lfWidth, lf.lfEscapement, lf.lfOrientation,
+	//	FW_BOLD, lf.lfItalic, lf.lfUnderline, lf.lfStrikeOut,
+	//	lf.lfCharSet, lf.lfOutPrecision, lf.lfClipPrecision, lf.lfQuality,
+	//	lf.lfPitchAndFamily, lf.lfFaceName);
+	// m_lblStatus.SetFont(&m_fBold);
+	CFontUtil::AssignBold(&m_lblStatus, this);
 
 	NewGUI_XPButton(m_btClose, IDB_CANCEL, IDB_CANCEL);
 
@@ -124,7 +128,7 @@ void CUpdateInfoDlg::OnCancel()
 void CUpdateInfoDlg::CleanUp()
 {
 	m_cList.SetImageList(NULL, LVSIL_SMALL);
-	m_fBold.DeleteObject();
+	// m_fBold.DeleteObject();
 }
 
 void CUpdateInfoDlg::OnBnClickedOK()

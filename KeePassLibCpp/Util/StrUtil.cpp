@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -789,15 +789,12 @@ std::basic_string<TCHAR> SU_GetQuotedPath(const std::basic_string<TCHAR>& strPat
 	boost::algorithm::trim_if(str, boost::algorithm::is_any_of(lpTrim));
 
 	if(str.size() <= 1) return str;
+	if(str[0] != _T('\"')) return str;
 
-	const std::basic_string<TCHAR>::size_type nPos = std::basic_string<TCHAR>::npos;
-	const std::basic_string<TCHAR>::size_type iStart = str.find(_T('\"'));
-	if((iStart == nPos) || (iStart == (str.size() - 1))) return str;
+	const std::basic_string<TCHAR>::size_type iSecond = str.find(_T('\"'), 1);
+	if((iSecond == str.npos) || (iSecond == 0)) return str;
 
-	const std::basic_string<TCHAR>::size_type iEnd = str.find(_T('\"'), iStart + 1);
-	if(iEnd == nPos) return str;
-
-	return str.substr(iStart + 1, iEnd - iStart - 1);
+	return str.substr(1, iSecond - 1);
 }
 #pragma warning(pop)
 #endif

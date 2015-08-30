@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1417,7 +1417,7 @@ DWORD CPwManager::GetLastChildGroup(DWORD dwParentGroupIndex) const
 	const USHORT usParentLevel = m_pGroups[dwParentGroupIndex].usLevel;
 
 	DWORD i = dwParentGroupIndex + 1;
-	while(1)
+	while(true)
 	{
 		const USHORT usLevel = m_pGroups[i].usLevel;
 		if(usLevel <= usParentLevel) return (i - 1);

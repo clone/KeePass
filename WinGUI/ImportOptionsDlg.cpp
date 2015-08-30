@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "ImportOptionsDlg.h"
 
 #include "NewGUI/NewGUICommon.h"
+#include "NewGUI/FontUtil.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 
 #ifdef _DEBUG
@@ -73,13 +74,18 @@ BOOL CImportOptionsDlg::OnInitDialog()
 	m_banner.SetTitle(TRL("Options"));
 	m_banner.SetCaption(_T(" "));
 
-	m_fBold.CreateFont(-10, 0, 0, 0, FW_BOLD, FALSE, FALSE, 0,
-		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("MS Shell Dlg"));
+	CFontUtil::SetDefaultFontFrom(GetDlgItem(IDC_RADIO_CREATENEW));
 
-	GetDlgItem(IDC_RADIO_CREATENEW)->SetFont(&m_fBold);
-	GetDlgItem(IDC_RADIO_OVERWRITE_ALWAYS)->SetFont(&m_fBold);
-	GetDlgItem(IDC_RADIO_OVERWRITE_TIMEBASED)->SetFont(&m_fBold);
+	// m_fBold.CreateFont(-10, 0, 0, 0, FW_BOLD, FALSE, FALSE, 0,
+	//	DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+	//	DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("MS Shell Dlg"));
+
+	// GetDlgItem(IDC_RADIO_CREATENEW)->SetFont(&m_fBold);
+	// GetDlgItem(IDC_RADIO_OVERWRITE_ALWAYS)->SetFont(&m_fBold);
+	// GetDlgItem(IDC_RADIO_OVERWRITE_TIMEBASED)->SetFont(&m_fBold);
+	CFontUtil::AssignBold(GetDlgItem(IDC_RADIO_CREATENEW), this);
+	CFontUtil::AssignBold(GetDlgItem(IDC_RADIO_OVERWRITE_ALWAYS), this);
+	CFontUtil::AssignBold(GetDlgItem(IDC_RADIO_OVERWRITE_TIMEBASED), this);
 
 	return TRUE;
 }
@@ -88,7 +94,7 @@ void CImportOptionsDlg::OnOK()
 {
 	UpdateData(TRUE);
 
-	VERIFY(m_fBold.DeleteObject());
+	// VERIFY(m_fBold.DeleteObject());
 	CDialog::OnOK();
 }
 
@@ -96,6 +102,6 @@ void CImportOptionsDlg::OnCancel()
 {
 	UpdateData(TRUE);
 
-	VERIFY(m_fBold.DeleteObject());
+	// VERIFY(m_fBold.DeleteObject());
 	CDialog::OnCancel();
 }

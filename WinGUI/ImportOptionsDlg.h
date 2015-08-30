@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class CImportOptionsDlg : public CDialog
 public:
 	CImportOptionsDlg(CWnd* pParent = NULL);
 
-	CFont m_fBold;
+	// CFont m_fBold;
 	CKCSideBannerWnd m_banner;
 
 	//{{AFX_DATA(CImportOptionsDlg)

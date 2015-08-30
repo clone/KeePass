@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "PermissionDlg.h"
 #include "Util/RemoteControl.h"
 #include "NewGUI/NewGUICommon.h"
+#include "NewGUI/FontUtil.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 
 IMPLEMENT_DYNAMIC(CPermissionDlg, CDialog)
@@ -88,9 +89,13 @@ BOOL CPermissionDlg::OnInitDialog()
 	m_strApp = strApp;
 	UpdateData(FALSE);
 
-	m_fBold.CreateFont(-10, 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS,
-		CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("MS Shell Dlg"));
-	GetDlgItem(IDC_STC_APP)->SetFont(&m_fBold);
+	CFontUtil::SetDefaultFontFrom(GetDlgItem(IDC_STC_APP));
+
+	// m_fBold.CreateFont(-10, 0, 0, 0, FW_BOLD, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS,
+	//	CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("MS Shell Dlg"));
+	
+	// GetDlgItem(IDC_STC_APP)->SetFont(&m_fBold);
+	CFontUtil::AssignBold(GetDlgItem(IDC_STC_APP), this);
 
 	OnTimer(INITIAL_TIMER_UPDATE_ID);
 	SetTimer(1, 1000, NULL);
@@ -107,7 +112,7 @@ void CPermissionDlg::OnOK()
 	m_nPermission = RC_PERMISSION_FULLACCESS;
 
 	KillTimer(1);
-	m_fBold.DeleteObject();
+	// m_fBold.DeleteObject();
 	CDialog::OnOK();
 }
 
@@ -116,7 +121,7 @@ void CPermissionDlg::OnCancel()
 	m_nPermission = RC_PERMISSION_DENYACCESS;
 
 	KillTimer(1);
-	m_fBold.DeleteObject();
+	// m_fBold.DeleteObject();
 	CDialog::OnCancel();
 }
 
@@ -127,7 +132,7 @@ void CPermissionDlg::OnBnClickedReadOnly()
 	m_nPermission = RC_PERMISSION_READONLYACCESS;
 
 	KillTimer(1);
-	m_fBold.DeleteObject();
+	// m_fBold.DeleteObject();
 	CDialog::OnOK();
 }
 

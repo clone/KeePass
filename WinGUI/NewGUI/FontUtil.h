@@ -17,53 +17,37 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___SEND_KEYS_EX_H___
-#define ___SEND_KEYS_EX_H___
+#ifndef ___FONT_UTIL_H___
+#define ___FONT_UTIL_H___
 
 #pragma once
 
-#include "../../KeePassLibCpp/SysDefEx.h"
-#include "SendKeys.h"
+#include <afxwin.h>
+#include <boost/utility.hpp>
 
-typedef struct _SKSTATEEX
-{
-	HWND hWndTarget;
-	DWORD dwTargetProcessID;
-	DWORD dwTargetThreadID;
-
-	DWORD dwThisThreadID;
-
-	HKL hklOriginal;
-	HKL hklCurrent;
-} SKSTATEEX;
-
-class CSendKeysEx
+class CFontUtil : boost::noncopyable
 {
 public:
-	CSendKeysEx();
-	~CSendKeysEx();
+	static void Release();
 
-	void Release();
+	static void SetDefaultFont(CFont* pf);
+	static void SetDefaultFontFrom(CWnd* pWnd);
 
-	void SendKeyUp(BYTE vKey);
-	bool SendKeys(LPCTSTR lpKeysString, bool bWait);
-
-	void SetDelay(DWORD dwDelay);
-
-	void SetEnsureSameKeyboardLayout(bool bEnable);
+	static void AssignBold(CWnd* pWnd, CWnd* pWndParent);
+	static void AssignMono(CWnd* pWnd, CWnd* pWndParent);
+	static void AssignSymbol(CWnd* pWnd, CWnd* pWndParent);
 
 private:
-	void _EnsureInitialized();
+	CFontUtil();
 
-	void _EnsureSameKeyboardLayout();
-	void _RestoreKeyboardLayout();
+	static bool EnsureBold(CWnd* pWndParent);
+	static bool EnsureMono(CWnd* pWndParent);
+	static bool EnsureSymbol(CWnd* pWndParent);
 
-	CSendKeys* m_p;
-	bool m_bReleasedOnce;
-
-	bool m_bSameKL;
-
-	SKSTATEEX m_s;
+	static LOGFONT* g_plfDefault;
+	static CFont* g_pfBold;
+	static CFont* g_pfMono;
+	static CFont* g_pfSymbol;
 };
 
-#endif // ___SEND_KEYS_EX_H___
+#endif // ___FONT_UTIL_H___

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "../KeePassLibCpp/Util/MemUtil.h"
 #include "../KeePassLibCpp/Util/StrUtil.h"
 #include "NewGUI/NewGUICommon.h"
+#include "NewGUI/FontUtil.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "../KeePassLibCpp/Util/Base64.h"
 #include "../KeePassLibCpp/Util/PwUtil.h"
@@ -172,35 +173,41 @@ BOOL CAddEntryDlg::OnInitDialog()
 	// Translate all windows
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	// The password dots font
-	m_fStyle.CreateFont(NewGUI_Scale(-12, this), 0, 0, 0, 0, FALSE, FALSE, 0,
-		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
-	m_fSymbol.CreateFont(NewGUI_Scale(-13, this), 0, 0, 0, 0, FALSE, FALSE, 0,
-		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, CPwSafeApp::GetPasswordFont());
+	// m_fStyle.CreateFont(NewGUI_Scale(-12, this), 0, 0, 0, 0, FALSE, FALSE, 0,
+	//	DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+	//	DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
+	// m_fSymbol.CreateFont(NewGUI_Scale(-13, this), 0, 0, 0, 0, FALSE, FALSE, 0,
+	//	DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+	//	DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, CPwSafeApp::GetPasswordFont());
 
 	m_pEditPw.InitEx();
 	m_pRepeatPw.InitEx();
 
+	CFontUtil::SetDefaultFontFrom(GetDlgItem(IDC_STATIC_ATTACH));
+
 	if(m_bStars == FALSE)
 	{
-		m_pEditPw.SetFont(&m_fStyle, TRUE);
-		m_pRepeatPw.SetFont(&m_fStyle, TRUE);
+		// m_pEditPw.SetFont(&m_fStyle, TRUE);
+		// m_pRepeatPw.SetFont(&m_fStyle, TRUE);
+		CFontUtil::AssignMono(&m_pEditPw, this);
+		CFontUtil::AssignMono(&m_pRepeatPw, this);
 
 		m_pEditPw.EnableSecureMode(FALSE);
 		m_pRepeatPw.EnableSecureMode(FALSE);
 	}
 	else
 	{
-		m_pEditPw.SetFont(&m_fSymbol, TRUE);
-		m_pRepeatPw.SetFont(&m_fSymbol, TRUE);
+		// m_pEditPw.SetFont(&m_fSymbol, TRUE);
+		// m_pRepeatPw.SetFont(&m_fSymbol, TRUE);
+		CFontUtil::AssignSymbol(&m_pEditPw, this);
+		CFontUtil::AssignSymbol(&m_pRepeatPw, this);
 
 		m_pEditPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
 		m_pRepeatPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
 	}
 
-	m_btHidePw.SetFont(&m_fSymbol, TRUE);
+	// m_btHidePw.SetFont(&m_fSymbol, TRUE);
+	CFontUtil::AssignSymbol(&m_btHidePw, this);
 
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
@@ -493,8 +500,8 @@ void CAddEntryDlg::CleanUp()
 {
 	m_reNotes.EmptyUndoBuffer();
 	m_cbGroups.ResetContent();
-	m_fStyle.DeleteObject();
-	m_fSymbol.DeleteObject();
+	// m_fStyle.DeleteObject();
+	// m_fSymbol.DeleteObject();
 }
 
 void CAddEntryDlg::_GetExpireTime(PW_TIME& t)
@@ -603,8 +610,10 @@ void CAddEntryDlg::OnCheckHidePw()
 		m_pEditPw.SetPasswordChar(0);
 		m_pRepeatPw.SetPasswordChar(0);
 
-		m_pEditPw.SetFont(&m_fStyle, TRUE);
-		m_pRepeatPw.SetFont(&m_fStyle, TRUE);
+		// m_pEditPw.SetFont(&m_fStyle, TRUE);
+		// m_pRepeatPw.SetFont(&m_fStyle, TRUE);
+		CFontUtil::AssignMono(&m_pEditPw, this);
+		CFontUtil::AssignMono(&m_pRepeatPw, this);
 	}
 	else // m_bStars == TRUE
 	{
@@ -616,8 +625,10 @@ void CAddEntryDlg::OnCheckHidePw()
 		m_pEditPw.SetPasswordChar(tchDot);
 		m_pRepeatPw.SetPasswordChar(tchDot);
 
-		m_pEditPw.SetFont(&m_fSymbol, TRUE);
-		m_pRepeatPw.SetFont(&m_fSymbol, TRUE);
+		// m_pEditPw.SetFont(&m_fSymbol, TRUE);
+		// m_pRepeatPw.SetFont(&m_fSymbol, TRUE);
+		CFontUtil::AssignSymbol(&m_pEditPw, this);
+		CFontUtil::AssignSymbol(&m_pRepeatPw, this);
 	}
 
 	m_tipSecClear.Activate(m_pEditPw.IsSecureModeEnabled());

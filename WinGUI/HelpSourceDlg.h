@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ private:
 	void _CleanUpEx();
 
 	CKCSideBannerWnd m_banner;
-	CFont* m_pBoldFont;
+	// CFont* m_pBoldFont;
 
 public:
 	CHelpSourceDlg(CWnd* pParent = NULL);

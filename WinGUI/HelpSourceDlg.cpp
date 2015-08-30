@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 
 #include "Util/WinUtil.h"
 #include "NewGUI/NewGUICommon.h"
+#include "NewGUI/FontUtil.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 
 IMPLEMENT_DYNAMIC(CHelpSourceDlg, CDialog)
@@ -30,7 +31,7 @@ IMPLEMENT_DYNAMIC(CHelpSourceDlg, CDialog)
 CHelpSourceDlg::CHelpSourceDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CHelpSourceDlg::IDD, pParent)
 {
-	m_pBoldFont = NULL;
+	// m_pBoldFont = NULL;
 }
 
 CHelpSourceDlg::~CHelpSourceDlg()
@@ -72,30 +73,32 @@ BOOL CHelpSourceDlg::OnInitDialog()
 	else
 		m_rbOnlineHelp.SetCheck(BST_CHECKED);
 
-	CFont* pFont = m_rbLocalHelp.GetFont();
-	if(pFont != NULL)
-	{
-		LOGFONT lf;
-		pFont->GetLogFont(&lf);
-		lf.lfWeight = FW_BOLD;
+	CFontUtil::SetDefaultFontFrom(&m_rbLocalHelp);
 
-		m_pBoldFont = new CFont();
-		VERIFY(m_pBoldFont->CreateFontIndirect(&lf));
-
-		m_rbLocalHelp.SetFont(m_pBoldFont);
-		m_rbOnlineHelp.SetFont(m_pBoldFont);
-	}
+	// CFont* pFont = m_rbLocalHelp.GetFont();
+	// if(pFont != NULL)
+	// {
+	//	LOGFONT lf;
+	//	pFont->GetLogFont(&lf);
+	//	lf.lfWeight = FW_BOLD;
+	//	m_pBoldFont = new CFont();
+	//	VERIFY(m_pBoldFont->CreateFontIndirect(&lf));
+	//	m_rbLocalHelp.SetFont(m_pBoldFont);
+	//	m_rbOnlineHelp.SetFont(m_pBoldFont);
+	// }
+	CFontUtil::AssignBold(&m_rbLocalHelp, this);
+	CFontUtil::AssignBold(&m_rbOnlineHelp, this);
 
 	return TRUE;
 }
 
 void CHelpSourceDlg::_CleanUpEx()
 {
-	if(m_pBoldFont != NULL)
-	{
-		m_pBoldFont->DeleteObject();
-		SAFE_DELETE(m_pBoldFont);
-	}
+	// if(m_pBoldFont != NULL)
+	// {
+	//	m_pBoldFont->DeleteObject();
+	//	SAFE_DELETE(m_pBoldFont);
+	// }
 }
 
 void CHelpSourceDlg::OnBnClickedOK()

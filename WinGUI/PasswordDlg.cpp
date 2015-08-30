@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include "Util/WinUtil.h"
 #include "Util/PrivateConfigEx.h"
 #include "Util/KeySourcesPool.h"
+#include "NewGUI/FontUtil.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -111,12 +112,12 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	m_fStyle.CreateFont(NewGUI_Scale(-12, this), 0, 0, 0, 0, FALSE, FALSE, 0,
-		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
-	m_fSymbol.CreateFont(NewGUI_Scale(-13, this), 0, 0, 0, 0, FALSE, FALSE, 0,
-		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, CPwSafeApp::GetPasswordFont());
+	// m_fStyle.CreateFont(NewGUI_Scale(-12, this), 0, 0, 0, 0, FALSE, FALSE, 0,
+	//	DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+	//	DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
+	// m_fSymbol.CreateFont(NewGUI_Scale(-13, this), 0, 0, 0, 0, FALSE, FALSE, 0,
+	//	DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+	//	DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, CPwSafeApp::GetPasswordFont());
 
 	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
@@ -125,19 +126,25 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	m_pEditPw.InitEx();
 
-	m_btStars.SetFont(&m_fSymbol, TRUE);
-	m_pEditPw.SetFont(&m_fSymbol, TRUE);
+	CFontUtil::SetDefaultFontFrom(GetDlgItem(IDC_STATIC_ENTERPW));
 
-	LOGFONT lf;
-	CFont* pDialogFont = GetDlgItem(IDC_STATIC_ENTERPW)->GetFont();
-	pDialogFont->GetLogFont(&lf);
-	m_fBold.CreateFont(lf.lfHeight, lf.lfWidth, lf.lfEscapement, lf.lfOrientation,
-		FW_BOLD, lf.lfItalic, lf.lfUnderline, lf.lfStrikeOut,
-		lf.lfCharSet, lf.lfOutPrecision, lf.lfClipPrecision, lf.lfQuality,
-		lf.lfPitchAndFamily, lf.lfFaceName);
+	// m_btStars.SetFont(&m_fSymbol, TRUE);
+	// m_pEditPw.SetFont(&m_fSymbol, TRUE);
+	CFontUtil::AssignSymbol(&m_btStars, this);
+	CFontUtil::AssignSymbol(&m_pEditPw, this);
 
-	GetDlgItem(IDC_STATIC_ENTERPW)->SetFont(&m_fBold);
-	GetDlgItem(IDC_STATIC_SELDISK)->SetFont(&m_fBold);
+	// LOGFONT lf;
+	// CFont* pDialogFont = GetDlgItem(IDC_STATIC_ENTERPW)->GetFont();
+	// pDialogFont->GetLogFont(&lf);
+	// m_fBold.CreateFont(lf.lfHeight, lf.lfWidth, lf.lfEscapement, lf.lfOrientation,
+	//	FW_BOLD, lf.lfItalic, lf.lfUnderline, lf.lfStrikeOut,
+	//	lf.lfCharSet, lf.lfOutPrecision, lf.lfClipPrecision, lf.lfQuality,
+	//	lf.lfPitchAndFamily, lf.lfFaceName);
+
+	// GetDlgItem(IDC_STATIC_ENTERPW)->SetFont(&m_fBold);
+	// GetDlgItem(IDC_STATIC_SELDISK)->SetFont(&m_fBold);
+	CFontUtil::AssignBold(GetDlgItem(IDC_STATIC_ENTERPW), this);
+	CFontUtil::AssignBold(GetDlgItem(IDC_STATIC_SELDISK), this);
 
 	m_btStars.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 	m_btStars.SetTooltipText(TRL("Hide passwords behind asterisks (***)."), TRUE);
@@ -410,9 +417,9 @@ void CPasswordDlg::CleanUp()
 {
 	m_cbDiskList.ResetContent();
 	m_ilIcons.DeleteImageList();
-	m_fStyle.DeleteObject();
-	m_fSymbol.DeleteObject();
-	m_fBold.DeleteObject();
+	// m_fStyle.DeleteObject();
+	// m_fSymbol.DeleteObject();
+	// m_fBold.DeleteObject();
 
 	_CallPlugins(KPM_KEYPROV_FINALIZE, 0, 0);
 }
@@ -662,7 +669,9 @@ void CPasswordDlg::OnCheckStars()
 	{
 		m_pEditPw.EnableSecureMode(FALSE);
 		m_pEditPw.SetPasswordChar(0);
-		m_pEditPw.SetFont(&m_fStyle, TRUE);
+
+		// m_pEditPw.SetFont(&m_fStyle, TRUE);
+		CFontUtil::AssignMono(&m_pEditPw, this);
 	}
 	else
 	{
@@ -670,7 +679,9 @@ void CPasswordDlg::OnCheckStars()
 		TCHAR tchDot = CPwSafeApp::GetPasswordCharacter();
 		m_pEditPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
 		m_pEditPw.SetPasswordChar(tchDot);
-		m_pEditPw.SetFont(&m_fSymbol, TRUE);
+
+		// m_pEditPw.SetFont(&m_fSymbol, TRUE);
+		CFontUtil::AssignSymbol(&m_pEditPw, this);
 	}
 
 	m_tipSecClear.Activate(m_pEditPw.IsSecureModeEnabled());

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -124,13 +124,10 @@ void COptionsAutoTypeDlg::OnBtnOK()
 	WORD wVK = 0, wMod = 0;
 	m_hkAutoType.GetHotKey(wVK, wMod);
 	const DWORD dwNewHotKey = ((DWORD)wMod << 16) | (DWORD)wVK;
-	if(dwNewHotKey != m_dwATHotKey)
-	{
-		if(m_pParentDlg->RegisterGlobalHotKey(HOTKEYID_AUTOTYPE, dwNewHotKey, (m_dwATHotKey != 0) ? TRUE : FALSE, TRUE) == FALSE)
-			return;
-
-		m_dwATHotKey = dwNewHotKey;
-	}
+	if(!m_pParentDlg->RegisterGlobalHotKey(HOTKEYID_AUTOTYPE,
+		((m_bDisableAutoType == FALSE) ? dwNewHotKey : 0), true))
+		return;
+	m_dwATHotKey = dwNewHotKey;
 
 	CDialog::OnOK();
 }

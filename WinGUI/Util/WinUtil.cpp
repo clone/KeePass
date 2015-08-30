@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2013 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -98,8 +98,8 @@ void CopyStringToClipboard(const TCHAR *lptString, PW_ENTRY *pEntryContext,
 	_tcscpy_s((TCHAR *)globalData, uDataSize, (LPCTSTR)strData); // Copy string plus NULL-byte to global memory
 	GlobalUnlock(globalHandle); // Unlock before SetClipboardData!
 
-	VERIFY(SetClipboardData(CF_TTEXTEX, globalHandle)); // Set clipboard data to our global memory block
-	VERIFY(CloseClipboard()); // Close clipboard, and done
+	VERIFY(SetClipboardData(CF_TTEXTEX, globalHandle) != NULL);
+	VERIFY(CloseClipboard());
 
 	RegisterOwnClipboardData((unsigned char *)(LPCTSTR)strData,
 		static_cast<unsigned long>(uDataSize - sizeof(TCHAR)));
