@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 #define PDCS_LOWER_VOWELS     L"aeiou"
 #define PDCS_PUNCTUATION      L",.;:"
 #define PDCS_BRACKETS         L"[]{}()<>"
-#define PDCS_PRINTASCIISPEC   L"!\"#$%&'()*+,-./:;<=>?[\\]^_{|}~"
+#define PDCS_PRINTASCIISPEC   L"!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
 #define PDCS_LOWER_HEX        L"0123456789abcdef"
 #define PDCS_UPPER_HEX        L"0123456789ABCDEF"
 

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -725,7 +725,7 @@ bool StrMatchText(LPCTSTR lpEntryData, LPCTSTR lpSearch,
 
 	ASSERT((lpSearch != NULL) && (lpSearch[0] != 0));
 
-#ifndef _WIN64
+	// #ifndef _WIN64
 	if(pUseRegex != NULL)
 	{
 		try
@@ -735,10 +735,10 @@ bool StrMatchText(LPCTSTR lpEntryData, LPCTSTR lpSearch,
 		}
 		catch(...) { return false; }
 	}
-#else
-#pragma message("No regular expression support in x64 library.")
-	UNREFERENCED_PARAMETER(pUseRegex);
-#endif
+	// #else
+	// #pragma message("No regular expression support in x64 library.")
+	// UNREFERENCED_PARAMETER(pUseRegex);
+	// #endif
 
 	if(bCaseSensitive == FALSE)
 	{

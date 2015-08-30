@@ -119,8 +119,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug Unicode|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="..\Build\WinGUI_Bin\Debug_Unicode_x64"
+			IntermediateDirectory="..\Build\WinGUI_Bin\Debug_Unicode_x64"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="1"
@@ -178,7 +178,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib gdiplus.lib"
 				OutputFile="$(OutDir)\KeePass.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -318,8 +318,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="..\Build\WinGUI_Bin\Release_x64"
+			IntermediateDirectory="..\Build\WinGUI_Bin\Release_x64"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="1"
@@ -380,7 +380,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib gdiplus.lib"
 				OutputFile="$(OutDir)\KeePass.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -519,8 +519,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release Unicode|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="..\Build\WinGUI_Bin\Release_Unicode_x64"
+			IntermediateDirectory="..\Build\WinGUI_Bin\Release_Unicode_x64"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="1"
@@ -580,7 +580,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib gdiplus.lib"
 				OutputFile="$(OutDir)\KeePass.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -716,8 +716,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="..\Build\WinGUI_Bin\Debug_x64"
+			IntermediateDirectory="..\Build\WinGUI_Bin\Debug_x64"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="1"
@@ -775,7 +775,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib gdiplus.lib"
 				OutputFile="$(OutDir)\KeePass.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -676,6 +676,22 @@ void NewGUI_DeselectAllItems(CListCtrl* pCtrl)
 			VERIFY(pCtrl->SetItemState(i, 0, LVIS_SELECTED));
 		}
 	}
+}
+
+void NewGUI_EnableSortHeader(CListCtrl* pCtrl, bool bEnable)
+{
+	if(pCtrl == NULL) { ASSERT(FALSE); return; }
+
+	CHeaderCtrl* pH = pCtrl->GetHeaderCtrl();
+	if(pH == NULL) { ASSERT(FALSE); return; }
+	HWND h = pH->m_hWnd;
+	if(h == NULL) { ASSERT(FALSE); return; }
+
+	const LONG_PTR lStyle = GetWindowLongPtr(h, GWL_STYLE);
+	const bool bCur = ((lStyle & HDS_BUTTONS) != 0);
+
+	if(bCur != bEnable)
+		SetWindowLongPtr(h, GWL_STYLE, lStyle ^ HDS_BUTTONS);
 }
 
 void NewGUI_SetShield(CButton& rButton, BOOL bSetShield)

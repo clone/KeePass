@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -246,7 +246,7 @@ void CLanguagesDlg::_LoadLanguage(LPCTSTR szLang)
 	str += TRL("Do you wish to restart KeePass now?");
 
 	int iResult = CVistaTaskDialog::ShowMessageBox(this->m_hWnd, TRL("Restart KeePass?"),
-		str, V_MTDI_QUESTION, TRL("&Yes"), IDOK, TRL("&No"), IDCANCEL);
+		str, MTDI_QUESTION, TRL("&Yes"), IDOK, TRL("&No"), IDCANCEL);
 	if(iResult < 0)
 		iResult = MessageBox(str, TRL("Restart KeePass?"), MB_YESNO | MB_ICONQUESTION);
 	if((iResult == IDOK) || (iResult == IDYES)) CDialog::OnOK();

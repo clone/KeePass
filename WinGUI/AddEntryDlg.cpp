@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -68,6 +68,7 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 	m_lpRepeatPw = NULL;
 	m_dwDefaultExpire = 0;
 	m_pOriginalEntry = NULL;
+	m_pfNotes = NULL;
 }
 
 void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
@@ -344,6 +345,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 	// m_reNotes.LimitText(0);
 	m_reNotes.SetEventMask(ENM_MOUSEEVENTS | ENM_LINK);
 	m_reNotes.SendMessage(EM_AUTOURLDETECT, TRUE, 0);
+
+	if(m_pfNotes != NULL) m_reNotes.SetFont(m_pfNotes, TRUE);
 
 #ifdef _UNICODE
 	m_reNotes.SetRTF(m_strNotes, SF_TEXT | SF_UNICODE);

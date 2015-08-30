@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 #include "StdAfx.h"
 #include "VistaTaskDialog.h"
+#include "../../../KeePassLibCpp/Util/StrUtil.h"
 #include "../../../KeePassLibCpp/Util/MemUtil.h"
 #include "../../../KeePassLibCpp/PwManager.h"
 
@@ -43,19 +44,19 @@ void CVistaTaskDialog::Clear()
 
 void CVistaTaskDialog::AddButton(LPCTSTR lpCommand, LPCTSTR lpDescription, int nResult)
 {
-	USES_CONVERSION;
+	const std::basic_string<WCHAR> strCommand = ((lpCommand != NULL) ?
+		_StringToUnicodeStl(lpCommand) : std::basic_string<WCHAR>());
+	const std::basic_string<WCHAR> strDescription = ((lpDescription != NULL) ?
+		_StringToUnicodeStl(lpDescription) : std::basic_string<WCHAR>());
 
-	LPCWSTR lpCommandW = ((lpCommand != NULL) ? T2CW(lpCommand) : L"");
-	LPCWSTR lpDescriptionW = ((lpDescription != NULL) ? T2CW(lpDescription) : NULL);
-
-	std::basic_string<WCHAR> strID = lpCommandW;
-	if(lpDescriptionW != NULL)
+	std::basic_string<WCHAR> strID = strCommand;
+	if(lpDescription != NULL)
 	{
 		strID += L"\n";
-		strID += lpDescriptionW;
+		strID += strDescription;
 	}
 
-	MY_V_TASKDIALOG_BUTTON btn;
+	MY_TASKDIALOG_BUTTON btn;
 	btn.nButtonID = nResult;
 	btn.strButtonText = strID;
 
@@ -64,26 +65,20 @@ void CVistaTaskDialog::AddButton(LPCTSTR lpCommand, LPCTSTR lpDescription, int n
 
 void CVistaTaskDialog::SetWindowTitle(LPCTSTR lpTitle)
 {
-	USES_CONVERSION;
-
 	if(lpTitle == NULL) m_strTitle.clear();
-	else m_strTitle = T2CW(lpTitle);
+	else m_strTitle = _StringToUnicodeStl(lpTitle);
 }
 
 void CVistaTaskDialog::SetMainInstruction(LPCTSTR lpText)
 {
-	USES_CONVERSION;
-
 	if(lpText == NULL) m_strInstr.clear();
-	else m_strInstr = T2CW(lpText);
+	else m_strInstr = _StringToUnicodeStl(lpText);
 }
 
 void CVistaTaskDialog::SetContent(LPCTSTR lpText)
 {
-	USES_CONVERSION;
-
 	if(lpText == NULL) m_strContent.clear();
-	else m_strContent = T2CW(lpText);
+	else m_strContent = _StringToUnicodeStl(lpText);
 }
 
 void CVistaTaskDialog::SetIcon(PCWSTR lpIcon)
@@ -96,33 +91,27 @@ void CVistaTaskDialog::SetIcon(MY_TASKDIALOG_ICON tdIcon)
 	CWinApp* pApp = AfxGetApp();
 	if(pApp == NULL) { ASSERT(FALSE); return; }
 
-	if(tdIcon == V_MTDI_QUESTION)
+	if(tdIcon == MTDI_QUESTION)
 		m_hIcon = pApp->LoadStandardIcon(IDI_QUESTION);
 	else { ASSERT(FALSE); } // Unknown icon ID
 }
 
 void CVistaTaskDialog::SetVerification(LPCTSTR lpText)
 {
-	USES_CONVERSION;
-
 	if(lpText == NULL) m_strConfirmation.clear();
-	else m_strConfirmation = T2CW(lpText);
+	else m_strConfirmation = _StringToUnicodeStl(lpText);
 }
 
 void CVistaTaskDialog::SetExpandedText(LPCTSTR lpText)
 {
-	USES_CONVERSION;
-
 	if(lpText == NULL) m_strExpandedText.clear();
-	else m_strExpandedText = T2CW(lpText);
+	else m_strExpandedText = _StringToUnicodeStl(lpText);
 }
 
 void CVistaTaskDialog::SetFooter(LPCTSTR lpText)
 {
-	USES_CONVERSION;
-
 	if(lpText == NULL) m_strFooter.clear();
-	else m_strFooter = T2CW(lpText);
+	else m_strFooter = _StringToUnicodeStl(lpText);
 }
 
 void CVistaTaskDialog::EnableHyperLinks(bool bEnable)
@@ -148,13 +137,13 @@ int CVistaTaskDialog::ShowDialog(BOOL* pVerificationResult)
 		return -1;
 	}
 
-	V_TASKDIALOGCONFIG cfg;
-	ZeroMemory(&cfg, sizeof(V_TASKDIALOGCONFIG));
+	TASKDIALOGCONFIG cfg;
+	ZeroMemory(&cfg, sizeof(TASKDIALOGCONFIG));
 
-	cfg.cbSize = sizeof(V_TASKDIALOGCONFIG);
+	cfg.cbSize = sizeof(TASKDIALOGCONFIG);
 	cfg.hwndParent = m_hParent;
 	cfg.hInstance = m_hInstance;
-	// cfg.dwCommonButtons = V_TDCBF_CANCEL_BUTTON;
+	// cfg.dwCommonButtons = TDCBF_CANCEL_BUTTON;
 	cfg.pfCallback = m_pfCallback;
 
 	if(m_strTitle.size() > 0) cfg.pszWindowTitle = m_strTitle.c_str();
@@ -164,18 +153,18 @@ int CVistaTaskDialog::ShowDialog(BOOL* pVerificationResult)
 	if(m_strExpandedText.size() > 0) cfg.pszExpandedInformation = m_strExpandedText.c_str();
 	if(m_strFooter.size() > 0) cfg.pszFooter = m_strFooter.c_str();
 
-	std::vector<V_TASKDIALOG_BUTTON> vButtons = MyButtonsToVStruct(m_vButtons);
+	std::vector<TASKDIALOG_BUTTON> vButtons = MyButtonsToVStruct(m_vButtons);
 	cfg.cButtons = static_cast<UINT>(vButtons.size());
 	if(vButtons.size() > 0) cfg.pButtons = &vButtons[0];
 
-	if(m_bCommandLinks) cfg.dwFlags |= V_TDF_USE_COMMAND_LINKS;
-	if(m_bHyperLinks) cfg.dwFlags |= V_TDF_ENABLE_HYPERLINKS;
+	if(m_bCommandLinks) cfg.dwFlags |= TDF_USE_COMMAND_LINKS;
+	if(m_bHyperLinks) cfg.dwFlags |= TDF_ENABLE_HYPERLINKS;
 
 	cfg.pszMainIcon = m_lpIcon;
 	if(m_hIcon != NULL)
 	{
 		cfg.hMainIcon = m_hIcon;
-		cfg.dwFlags |= V_TDF_USE_HICON_MAIN;
+		cfg.dwFlags |= TDF_USE_HICON_MAIN;
 	}
 
 	int nResult = 0;
@@ -197,14 +186,14 @@ int CVistaTaskDialog::ShowDialog(BOOL* pVerificationResult)
 	return nResult;
 }
 
-inline std::vector<V_TASKDIALOG_BUTTON> CVistaTaskDialog::MyButtonsToVStruct(
-	const std::vector<MY_V_TASKDIALOG_BUTTON>& vButtons)
+inline std::vector<TASKDIALOG_BUTTON> CVistaTaskDialog::MyButtonsToVStruct(
+	const std::vector<MY_TASKDIALOG_BUTTON>& vButtons)
 {
-	std::vector<V_TASKDIALOG_BUTTON> v;
+	std::vector<TASKDIALOG_BUTTON> v;
 
 	for(size_t i = 0; i < vButtons.size(); ++i)
 	{
-		V_TASKDIALOG_BUTTON btn;
+		TASKDIALOG_BUTTON btn;
 		btn.nButtonID = vButtons[i].nButtonID;
 		btn.pszButtonText = vButtons[i].strButtonText.c_str();
 		v.push_back(btn);

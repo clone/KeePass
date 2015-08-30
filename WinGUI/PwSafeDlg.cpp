@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 #include "../KeePassLibCpp/Crypto/KeyTransform_BCrypt.h"
 #include "../KeePassLibCpp/Util/MemUtil.h"
 #include "../KeePassLibCpp/Util/StrUtil.h"
+#include <boost/regex/mfc.hpp>
 #include "../KeePassLibCpp/Util/AppUtil.h"
 #include "Util/WinUtil.h"
 #include "Util/SendKeysEx.h"
@@ -117,6 +118,8 @@ CString CPwSafeDlg::m_strDefaultAutoTypeSequence;
 
 DWORD CPwSafeDlg::m_dwCachedBackupGroupID = 0;
 DWORD CPwSafeDlg::m_dwCachedBackupSrcGroupID = 0;
+
+std::map<std_string, std_string> CPwSafeDlg::m_mHtmlToRtf;
 
 const UINT WM_REG_TASKBARCREATED = ::RegisterWindowMessage(_T("TaskbarCreated"));
 const UINT WM_REG_TASKBARBUTTONCREATED = ::RegisterWindowMessage(_T("TaskbarButtonCreated"));
@@ -645,7 +648,8 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bCachedToolBarUpdate = FALSE;
 	m_bCachedPwlistUpdate = FALSE;
 	m_bDragging = FALSE;
-	m_bDisplayDialog = FALSE;
+	m_iDisplayDialog = 0;
+	m_iDisplayMenu = 0;
 	m_hDraggingGroup = NULL;
 	// m_bDraggingEntry = FALSE;
 	m_bMenuExit = FALSE;
@@ -655,9 +659,24 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_nFileRelockCountdown = -1;
 	m_bTANsOnly = FALSE;
 	m_dwPwListMode = LVS_REPORT;
+	m_nNotesFontSize = 0;
 
 	m_bHashValid = FALSE;
 	ZeroMemory(m_aHashOfFile, 32);
+
+	if(m_mHtmlToRtf.size() == 0)
+	{
+		m_mHtmlToRtf[std_string(HTMLTAG_BOLD_S)] = std_string(_T("\\b "));
+		m_mHtmlToRtf[std_string(HTMLTAG_BOLD_E)] = std_string(_T("\\b0 "));
+		m_mHtmlToRtf[std_string(HTMLTAG_ITALIC_S)] = std_string(_T("\\i "));
+		m_mHtmlToRtf[std_string(HTMLTAG_ITALIC_E)] = std_string(_T("\\i0 "));
+		m_mHtmlToRtf[std_string(HTMLTAG_ULINE_S)] = std_string(_T("\\ul "));
+		m_mHtmlToRtf[std_string(HTMLTAG_ULINE_E)] = std_string(_T("\\ul0 "));
+		m_mHtmlToRtf[std_string(HTMLTAG_STRIKE_S)] = std_string(_T("\\strike "));
+		m_mHtmlToRtf[std_string(HTMLTAG_STRIKE_E)] = std_string(_T("\\strike0 "));	
+		// _T("<center>") => _T("\\qc ");
+		// _T("</center>") => _T("\\ql ");
+	}
 
 	m_cList.m_pParentI = this;
 	m_cList.m_pbShowColumns = &m_bShowColumn[0];
@@ -856,6 +875,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bAllowSaveIfModifiedOnly = cConfig.GetBool(PWMKEY_ALLOWSAVEIFMODIFIEDONLY, FALSE);
 	m_bFocusResAfterQuickFind = cConfig.GetBool(PWMKEY_FOCUSRESAFTERQUICKFIND, FALSE);
 	m_bAutoTypeIEFix = cConfig.GetBool(PWMKEY_AUTOTYPEIEFIX, TRUE);
+	m_bAutoTypeSameKL = cConfig.GetBool(PWMKEY_AUTOTYPESAMEKEYBLAYOUTS, TRUE);
 	m_bDropToBackOnCopy = cConfig.GetBool(PWMKEY_DROPTOBACKONCOPY, FALSE);
 	m_bSortAutoTypeSelItems = cConfig.GetBool(PWMKEY_SORTAUTOTYPESELITEMS, TRUE);
 	m_bUseTransactedFileWrites = cConfig.GetBool(PWMKEY_TRANSACTEDFILEWRITE, TRUE);
@@ -1050,7 +1070,27 @@ BOOL CPwSafeDlg::OnInitDialog()
 
 	cConfig.Get(PWMKEY_LISTFONT, szTemp);
 	if(szTemp[0] == 0) _tcscpy_s(szTemp, _countof(szTemp), _T("MS Shell Dlg;8,0000"));
-	_ParseSpecAndSetFont(szTemp);
+	_ParseSpecAndSetFont(szTemp, false);
+
+	cConfig.Get(PWMKEY_NOTESFONT, szTemp);
+	if(szTemp[0] != 0) _ParseSpecAndSetFont(szTemp, true);
+
+	const CString strNotesRegex = CString(PWMKEY_NOTESREGEX) + _T("%d");
+	const CString strNotesFmt = CString(PWMKEY_NOTESFORMAT) + _T("%d");
+	for(int iRegex = 0; ; ++iRegex)
+	{
+		CString strKey;
+		strKey.Format(strNotesRegex, iRegex);
+
+		cConfig.Get(strKey, szTemp);
+		if(szTemp[0] == 0) break;
+
+		m_lNotesRegex.AddTail(szTemp);
+
+		strKey.Format(strNotesFmt, iRegex);
+		cConfig.Get(strKey, szTemp);
+		m_lNotesFormat.AddTail(szTemp);
+	}
 
 	// int nColumnWidth;
 	// RECT rect;
@@ -1405,7 +1445,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 		SetViewHideState(FALSE, FALSE);
 
 	_CallPlugins(KPM_WND_INIT_POST, 0, 0);
-	m_bDisplayDialog = FALSE;
+	if(m_iDisplayDialog != 0) { ASSERT(FALSE); m_iDisplayDialog = 0; }
 
 	SetToMiniModeIfEnabled(&m_menu, TRUE, TRUE);
 	if((m_bMiniMode == TRUE) && (m_bFileOpen == FALSE) && (m_bLocked == FALSE))
@@ -1578,9 +1618,10 @@ BOOL CPwSafeDlg::_ParseCommandLine()
 	return TRUE;
 }
 
-void CPwSafeDlg::_ParseSpecAndSetFont(const TCHAR *pszSpec)
+void CPwSafeDlg::_ParseSpecAndSetFont(const TCHAR *pszSpec, bool bNotes)
 {
-	HFONT hPre = (HFONT)m_fListFont;
+	CFont& fFont = (bNotes ? m_fNotesFont : m_fListFont);
+	HFONT hPre = (HFONT)fFont;
 	CDC *pDC = GetDC();
 	HDC hDC = pDC->m_hDC;
 	CString strFontSpec, strTemp;
@@ -1592,7 +1633,7 @@ void CPwSafeDlg::_ParseSpecAndSetFont(const TCHAR *pszSpec)
 
 	ZeroMemory(&lf, sizeof(LOGFONT));
 
-	if(hPre != NULL) m_fListFont.DeleteObject();
+	if(hPre != NULL) fFont.DeleteObject();
 
 	if(_tcslen(pszSpec) != 0) // Font spec format: <FACE>;<SIZE>,<FLAGS>
 	{
@@ -1622,18 +1663,20 @@ void CPwSafeDlg::_ParseSpecAndSetFont(const TCHAR *pszSpec)
 		_tcscpy_s(lf.lfFaceName, _countof(lf.lfFaceName), strFace);
 		lf.lfHeight = -MulDiv(nSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
 
-		m_fListFont.CreateFontIndirect(&lf);
+		fFont.CreateFontIndirect(&lf);
 	}
 	else
 	{
 		nSize = 8;
-		m_fListFont.CreateFont(nSize, 0, 0, 0, FW_NORMAL, 0, 0, 0, ANSI_CHARSET,
+		fFont.CreateFont(nSize, 0, 0, 0, FW_NORMAL, 0, 0, 0, ANSI_CHARSET,
 			OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 			DEFAULT_PITCH | FF_DONTCARE, _T("MS Shell Dlg"));
 	}
 
+	ASSERT(fFont.m_hObject != NULL);
 	ZeroMemory(&lf, sizeof(LOGFONT));
-	m_fListFont.GetLogFont(&lf);
+	fFont.GetLogFont(&lf);
+
 	strFontSpec = lf.lfFaceName;
 	strFontSpec += _T(';');
 	strTemp.Format(_T("%d"), nSize);
@@ -1644,13 +1687,23 @@ void CPwSafeDlg::_ParseSpecAndSetFont(const TCHAR *pszSpec)
 	if(lf.lfUnderline != 0) strFontSpec += _T('1'); else strFontSpec += _T('0');
 	if(lf.lfStrikeOut != 0) strFontSpec += _T('1'); else strFontSpec += _T('0');
 
-	m_strFontSpec = strFontSpec;
-	m_strListFontFace = lf.lfFaceName;
-	m_nListFontSize = nSize;
+	if(bNotes)
+	{
+		m_strNotesFontRtfSpec = _T(" ");
+		m_strNotesFontRtfSpec += lf.lfFaceName;
 
-	ASSERT(m_fListFont.m_hObject != NULL);
-	m_cGroups.SetFont(&m_fListFont, TRUE);
-	m_cList.SetFont(&m_fListFont, TRUE);
+		m_strNotesFontSpec = strFontSpec;
+		m_nNotesFontSize = nSize;
+	}
+	else
+	{
+		m_strFontSpec = strFontSpec;
+		m_strListFontFace = lf.lfFaceName;
+		m_nListFontSize = nSize;
+
+		m_cGroups.SetFont(&fFont, TRUE);
+		m_cList.SetFont(&fFont, TRUE);
+	}
 
 	ReleaseDC(pDC);
 }
@@ -1718,8 +1771,11 @@ void CPwSafeDlg::OnSysCommand(UINT nID, LPARAM lParam)
 
 	if((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
+		NotifyUserActivity();
+		_SetDisplayDialog(true);
 		CAboutDlg dlgAbout;
 		dlgAbout.DoModal();
+		_SetDisplayDialog(false);
 		return;
 	}
 	else if(nID == SC_MINIMIZE)
@@ -2276,6 +2332,7 @@ void CPwSafeDlg::SaveOptions()
 	pcfg.Set(PWMKEY_AUTOTYPEMETHOD, szTemp);
 
 	pcfg.Set(PWMKEY_LISTFONT, m_strFontSpec);
+	pcfg.Set(PWMKEY_NOTESFONT, m_strNotesFontSpec);
 
 	_SaveWindowPositionAndSize(&pcfg);
 
@@ -2343,6 +2400,7 @@ void CPwSafeDlg::SaveOptions()
 	if(m_strDefaultAutoTypeSequence.GetLength() > 0)
 		pcfg.Set(PWMKEY_DEFAULTATSEQ, m_strDefaultAutoTypeSequence);
 	pcfg.SetBool(PWMKEY_AUTOTYPEIEFIX, m_bAutoTypeIEFix);
+	pcfg.SetBool(PWMKEY_AUTOTYPESAMEKEYBLAYOUTS, m_bAutoTypeSameKL);
 
 	pcfg.SetBool(PWMKEY_USEDPAPIFORMEMPROT, *CMemoryProtectionEx::GetEnabledPtr());
 	pcfg.SetBool(PWMKEY_USECNGBCRYPTFORKEYT, *CKeyTransformBCrypt::GetEnabledPtr());
@@ -2447,15 +2505,15 @@ void CPwSafeDlg::OnFileExit()
 void CPwSafeDlg::OnInfoAbout()
 {
 	NotifyUserActivity();
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(_CallPlugins(KPM_INFO_ABOUT_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	CAboutDlg dlg;
 	dlg.DoModal();
 
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnSafeAddGroup()
@@ -2469,7 +2527,7 @@ void CPwSafeDlg::OnSafeAddGroup()
 
 	if(m_bFileOpen == FALSE) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	dlg.m_nIconId = PWM_STD_ICON_GROUP;
 	dlg.m_strGroupName.Empty();
@@ -2477,7 +2535,7 @@ void CPwSafeDlg::OnSafeAddGroup()
 	dlg.m_bEditMode = FALSE;
 
 	if(_CallPlugins(KPM_GROUP_ADD_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	if(dlg.DoModal() == IDOK)
 	{
@@ -2492,7 +2550,7 @@ void CPwSafeDlg::OnSafeAddGroup()
 		pwTemplate.usLevel = 0; pwTemplate.dwFlags = 0;
 
 		if(_CallPlugins(KPM_GROUP_ADD, (LPARAM)&pwTemplate, 0) == FALSE)
-			{ m_bDisplayDialog = FALSE; return; }
+			{ _SetDisplayDialog(false); return; }
 
 		VERIFY(m_mgr.AddGroup(&pwTemplate));
 		UpdateGroupList();
@@ -2511,7 +2569,7 @@ void CPwSafeDlg::OnSafeAddGroup()
 	}
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnViewHideStars()
@@ -2881,14 +2939,35 @@ void CPwSafeDlg::_List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEnt
 	lvi.iSubItem = 4;
 	if(m_bShowNotes == TRUE)
 	{
-		// Remove newline and break character for better display
 		strTemp = pwe->pszAdditional;
+
+		POSITION pFmt = m_lNotesFormat.GetHeadPosition();
+		for(POSITION pRegex = m_lNotesRegex.GetHeadPosition(); pRegex != NULL; )
+		{
+			const CString strRegex = m_lNotesRegex.GetNext(pRegex);
+			const CString strFormat = m_lNotesFormat.GetNext(pFmt);
+
+			try
+			{
+				boost::tregex btrExpr(strRegex);
+				strTemp = boost::regex_replace(strTemp, btrExpr, strFormat);
+			}
+			catch(...) { ASSERT(FALSE); }
+		}
+
+		for(std::map<std_string, std_string>::const_iterator it =
+			m_mHtmlToRtf.begin(); it != m_mHtmlToRtf.end(); ++it)
+			strTemp.Replace(it->first.c_str(), _T(""));
+
+		// Remove newline and break character for better display
 		const int nNotesLength = strTemp.GetLength();
 		for(int t = 0; t < nNotesLength; ++t)
 		{
-			if((strTemp.GetAt(t) == _T('\r')) || (strTemp.GetAt(t) == _T('\n')))
+			const TCHAR tch = strTemp.GetAt(t);
+			if((tch == _T('\r')) || (tch == _T('\n')) || (tch == _T('\t')))
 				strTemp.SetAt(t, _T(' '));
 		}
+
 		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strTemp);
 	}
 	else lvi.pszText = g_pNullString;
@@ -3006,7 +3085,7 @@ void CPwSafeDlg::OnPwlistAdd()
 	if(m_bFileOpen == FALSE) return;
 	if(uGroupId == DWORD_MAX) return; // No group selected or other error
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	CAddEntryDlg dlg;
 	dlg.m_pMgr = &m_mgr;
@@ -3017,6 +3096,7 @@ void CPwSafeDlg::OnPwlistAdd()
 	dlg.m_bEditMode = FALSE;
 	dlg.m_dwDefaultExpire = m_dwDefaultExpire;
 	dlg.m_strUserName = m_mgr.GetPropertyString(PWP_DEFAULT_USER_NAME).c_str();
+	if(m_fNotesFont.m_hObject != NULL) dlg.m_pfNotes = &m_fNotesFont;
 
 	dlg.m_nIconId = 0;
 	PW_GROUP *pgContainer = m_mgr.GetGroupById(uGroupId);
@@ -3049,7 +3129,7 @@ void CPwSafeDlg::OnPwlistAdd()
 	}
 
 	if(_CallPlugins(KPM_ADD_ENTRY_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	if(dlg.DoModal() == IDOK)
 	{
@@ -3073,7 +3153,7 @@ void CPwSafeDlg::OnPwlistAdd()
 		pwTemplate.pszBinaryDesc = _T("");
 
 		if(_CallPlugins(KPM_ADD_ENTRY, (LPARAM)&pwTemplate, 0) == FALSE)
-			{ m_bDisplayDialog = FALSE; return; }
+			{ _SetDisplayDialog(false); return; }
 
 		// Add the entry to the password manager
 		VERIFY(m_mgr.AddEntry(&pwTemplate));
@@ -3133,7 +3213,7 @@ void CPwSafeDlg::OnPwlistAdd()
 	EraseCString(&dlg.m_strAttachment);
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 DWORD CPwSafeDlg::_ListSelToEntryIndex(DWORD dwSelected)
@@ -3186,7 +3266,7 @@ void CPwSafeDlg::OnPwlistEdit()
 	pEntry = m_mgr.GetEntry(dwEntryIndex);
 	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	CAddEntryDlg dlg;
 	dlg.m_pMgr = &m_mgr;
@@ -3196,6 +3276,7 @@ void CPwSafeDlg::OnPwlistEdit()
 	dlg.m_bEditMode = TRUE;
 	dlg.m_bStars = m_bPasswordStars;
 	dlg.m_dwDefaultExpire = m_dwDefaultExpire;
+	if(m_fNotesFont.m_hObject != NULL) dlg.m_pfNotes = &m_fNotesFont;
 
 	dlg.m_nGroupId = (int)m_mgr.GetGroupByIdN(pEntry->uGroupId); // ID to index
 	dlg.m_strTitle = pEntry->pszTitle;
@@ -3211,7 +3292,7 @@ void CPwSafeDlg::OnPwlistEdit()
 	m_mgr.LockEntryPassword(pEntry);
 
 	if(_CallPlugins(KPM_EDIT_ENTRY_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	if(dlg.DoModal() == IDOK)
 	{
@@ -3327,7 +3408,7 @@ void CPwSafeDlg::OnPwlistEdit()
 
 	m_ullLastListParams = 0; // Invalidate
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnPwlistDelete()
@@ -3337,16 +3418,16 @@ void CPwSafeDlg::OnPwlistDelete()
 	if(m_bFileOpen == FALSE) return;
 	// if(m_dwLastNumSelectedItems == 0) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(_CallPlugins(KPM_DELETE_ENTRY_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	CVistaTaskDialog dlgTask(this->m_hWnd, AfxGetInstanceHandle(), false);
 	dlgTask.SetContent(TRL("This will remove all selected entries unrecoverably!"));
 	dlgTask.SetMainInstruction(TRL("Are you sure you want to delete all selected entries?"));
 	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
-	dlgTask.SetIcon(V_MTDI_QUESTION);
+	dlgTask.SetIcon(MTDI_QUESTION);
 	dlgTask.AddButton(TRL("&Delete"), NULL, IDOK);
 	dlgTask.AddButton(TRL("&Cancel"), NULL, IDCANCEL);
 	int nMsg = dlgTask.ShowDialog();
@@ -3359,7 +3440,7 @@ void CPwSafeDlg::OnPwlistDelete()
 		str += TRL("Are you sure you want to delete all selected entries?");
 		nMsg = MessageBox(str, TRL("Delete Entries Confirmation"), MB_ICONQUESTION | MB_YESNO);
 	}
-	if((nMsg == IDCANCEL) || (nMsg == IDNO)) { m_bDisplayDialog = FALSE; return; }
+	if((nMsg == IDCANCEL) || (nMsg == IDNO)) { _SetDisplayDialog(false); return; }
 
 	const DWORD dwInvGroup1 = m_mgr.GetGroupId(PWS_BACKUPGROUP);
 	const DWORD dwInvGroup2 = m_mgr.GetGroupId(PWS_BACKUPGROUP_SRC);
@@ -3405,7 +3486,7 @@ void CPwSafeDlg::OnPwlistDelete()
 	ShowEntryDetails(NULL);
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::RebuildContextMenus()
@@ -3503,21 +3584,23 @@ void CPwSafeDlg::OnRclickPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 
 	if(m_bFileOpen == FALSE) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	ASSERT(m_pPwListTrackableMenu != NULL);
-	if(m_pPwListTrackableMenu == NULL) { m_bDisplayDialog = FALSE; return; }
+	if(m_pPwListTrackableMenu == NULL) { _SetDisplayDialog(false); return; }
 
 	GetCursorPos(&pt);
 
 	if(_CallPlugins(KPM_PWLIST_RCLICK, (LPARAM)m_pPwListTrackableMenu, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
+	_SetDisplayMenu(true);
 	m_pPwListTrackableMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
 		pt.x, pt.y, AfxGetMainWnd());
+	_SetDisplayMenu(false);
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnClickGroupList(NMHDR* pNMHDR, LRESULT* pResult)
@@ -3553,9 +3636,9 @@ void CPwSafeDlg::OnClickGroupList(NMHDR* pNMHDR, LRESULT* pResult)
 void CPwSafeDlg::OnPwlistCopyPw()
 {
 	NotifyUserActivity();
-	m_bDisplayDialog = TRUE;
-	if(_CallPlugins(KPM_PW_COPY, 0, 0) == FALSE) { m_bDisplayDialog = FALSE; return; }
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(true);
+	if(_CallPlugins(KPM_PW_COPY, 0, 0) == FALSE) { _SetDisplayDialog(false); return; }
+	_SetDisplayDialog(false);
 
 	const DWORD dwIndex = _ListSelToEntryIndex();
 	ASSERT(dwIndex != DWORD_MAX); if(dwIndex == DWORD_MAX) return;
@@ -3636,7 +3719,7 @@ void CPwSafeDlg::OnTimer(WPARAM nIDEvent)
 			}
 		}
 
-		if((m_bLocked == FALSE) && (m_bFileOpen == TRUE) && (m_bDisplayDialog == FALSE))
+		if((m_bLocked == FALSE) && (m_bFileOpen == TRUE) && !_IsDisplayingDialog())
 		{
 			if(m_nLockTimeDef != -1)
 			{
@@ -3796,9 +3879,9 @@ void CPwSafeDlg::OnRclickGroupList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	if(m_bFileOpen == FALSE) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 	if(_CallPlugins(KPM_GROUPLIST_RCLICK, (LPARAM)pNMHDR, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	POINT pt;
 	GetCursorPos(&pt);
@@ -3812,22 +3895,24 @@ void CPwSafeDlg::OnRclickGroupList(NMHDR* pNMHDR, LRESULT* pResult)
 	m_cGroups.SelectItem(m_cGroups.HitTest(CPoint(ptClient), &uFlags));
 
 	ASSERT(m_pGroupListTrackableMenu != NULL);
-	if(m_pGroupListTrackableMenu == NULL) { m_bDisplayDialog = FALSE; return; }
+	if(m_pGroupListTrackableMenu == NULL) { _SetDisplayDialog(false); return; }
 
+	_SetDisplayMenu(true);
 	m_pGroupListTrackableMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
 		pt.x, pt.y, AfxGetMainWnd());
+	_SetDisplayMenu(false);
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnPwlistCopyUser()
 {
 	NotifyUserActivity();
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 	if(_CallPlugins(KPM_USER_COPY, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
-	m_bDisplayDialog = FALSE;
+		{ _SetDisplayDialog(false); return; }
+	_SetDisplayDialog(false);
 
 	if(m_nClipboardMethod == CM_TIMED)
 	{
@@ -3915,10 +4000,10 @@ void CPwSafeDlg::OnPwlistVisitUrl()
 
 	ASSERT(dwGroupId != DWORD_MAX); if(dwGroupId == DWORD_MAX) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 	if(_CallPlugins(KPM_URL_VISIT, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
-	m_bDisplayDialog = FALSE;
+		{ _SetDisplayDialog(false); return; }
+	_SetDisplayDialog(false);
 
 	if(m_bCopyURLs == FALSE) // Open URLs
 	{
@@ -4172,7 +4257,7 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 	if(pDbMgr == NULL) pMgr = &m_mgr;
 	else pMgr = pDbMgr;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	dlg.m_bKeyMethod = PWM_KEYMETHOD_OR;
 	dlg.m_bLoadMode = FALSE;
@@ -4180,7 +4265,7 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 	dlg.m_hWindowIcon = m_hIcon;
 	dlg.m_bChanging = ((bCreateNew == FALSE) ? TRUE : FALSE);
 
-	if(dlg.DoModal() == IDCANCEL) { m_bDisplayDialog = FALSE; return FALSE; }
+	if(dlg.DoModal() == IDCANCEL) { _SetDisplayDialog(false); return FALSE; }
 
 	if((dlg.m_bKeyFile == FALSE) || (dlg.m_bKeyMethod == PWM_KEYMETHOD_AND))
 	{
@@ -4202,7 +4287,7 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 				ASSERT((pDlg2->m_lpKey == NULL) && (pDlg2->m_lpKey2 == NULL));
 				SAFE_DELETE(pDlg2);
 				dlg.FreePasswords();
-				m_bDisplayDialog = FALSE;
+				_SetDisplayDialog(false);
 				return FALSE;
 			}
 
@@ -4235,7 +4320,7 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 			break;
 		}
 
-		if(bSuccess == FALSE) { dlg.FreePasswords(); m_bDisplayDialog = FALSE; return FALSE; }
+		if(bSuccess == FALSE) { dlg.FreePasswords(); _SetDisplayDialog(false); return FALSE; }
 	}
 
 	CPwSafeAppRI ri;
@@ -4292,7 +4377,7 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 				{
 					dlg.FreePasswords();
 					CNewDialogsEx::ShowError(this->m_hWnd, nErrCode2, 0);
-					m_bDisplayDialog = FALSE; return FALSE;
+					_SetDisplayDialog(false); return FALSE;
 				}
 			}
 			else if(nMsg == IDNO)
@@ -4308,16 +4393,16 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 				{
 					dlg.FreePasswords();
 					CNewDialogsEx::ShowError(this->m_hWnd, nErrCode2, 0);
-					m_bDisplayDialog = FALSE; return FALSE;
+					_SetDisplayDialog(false); return FALSE;
 				}
 			}
-			else { dlg.FreePasswords(); m_bDisplayDialog = FALSE; return FALSE; }
+			else { dlg.FreePasswords(); _SetDisplayDialog(false); return FALSE; }
 		}
 		else
 		{
 			dlg.FreePasswords();
 			CNewDialogsEx::ShowError(this->m_hWnd, nErrCode, 0);
-			m_bDisplayDialog = FALSE; return FALSE;
+			_SetDisplayDialog(false); return FALSE;
 		}
 	}
 
@@ -4333,7 +4418,7 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 		MessageBox(str, TRL("Success"), MB_ICONINFORMATION | MB_OK);
 	}
 
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 	return TRUE;
 }
 
@@ -4383,10 +4468,10 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
 
 	CFileDialog dlg(TRUE, NULL, NULL, dwFlags, strFilter, this);
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 	if(pszFile == NULL) nRet = dlg.DoModal();
 	else strFile = pszFile;
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 
 	if((pszFile != NULL) || (nRet == IDOK))
 	{
@@ -4449,17 +4534,17 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
 
 				if((pszPassword == NULL) && (pszKeyFile == NULL))
 				{
-					m_bDisplayDialog = TRUE;
+					_SetDisplayDialog(true);
 					++g_uMasterKeyDlgs;
 					if(pDlgPass->DoModal() == IDCANCEL)
 					{
 						delete pDlgPass; pDlgPass = NULL;
-						m_bDisplayDialog = FALSE;
+						_SetDisplayDialog(false);
 						--g_uMasterKeyDlgs;
 						CPwSafeDlg::SetLastMasterKeyDlg(NULL);
 						return;
 					}
-					m_bDisplayDialog = FALSE;
+					_SetDisplayDialog(false);
 					--g_uMasterKeyDlgs;
 					CPwSafeDlg::SetLastMasterKeyDlg(NULL);
 				}
@@ -4573,7 +4658,7 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
 							vtd.SetContent(strMessage);
 							vtd.SetMainInstruction(TRL("Open the file in read-only mode?"));
 							vtd.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
-							vtd.SetIcon(V_MTDI_QUESTION);
+							vtd.SetIcon(MTDI_QUESTION);
 
 							vtd.AddButton(TRL("Read-only"), TRL("Open the file in read-only mode. Changes to the database can be saved to a different file."), IDYES);
 							vtd.AddButton(TRL("Normal"), TRL("Take ownership of the file and open it in normal writing mode."), IDNO);
@@ -4693,14 +4778,14 @@ void CPwSafeDlg::OnFileOpen()
 
 	// if(m_bLocked == TRUE) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(_CallPlugins(KPM_FILE_OPEN_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	_OpenDatabase(NULL, NULL, NULL, NULL, FALSE, NULL, FALSE);
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::_UpdateGuiToManager()
@@ -4761,17 +4846,17 @@ void CPwSafeDlg::OnFileSave()
 	if(m_bFileOpen == FALSE) return;
 	if(m_bFileReadOnly == TRUE) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(_CallPlugins(KPM_FILE_SAVE_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	GroupSyncStates(TRUE);
 
 	if(m_strFile.IsEmpty())
 	{
 		OnFileSaveAs();
-		m_bDisplayDialog = FALSE;
+		_SetDisplayDialog(false);
 		return;
 	}
 
@@ -4791,7 +4876,7 @@ void CPwSafeDlg::OnFileSave()
 				str += TRL("Do you want to overwrite it?");
 				if(MessageBox(str, TRL("Overwrite?"), MB_YESNO | MB_ICONQUESTION) == IDNO)
 				{
-					m_bDisplayDialog = FALSE;
+					_SetDisplayDialog(false);
 					return;
 				}
 			}
@@ -4814,7 +4899,7 @@ void CPwSafeDlg::OnFileSave()
 	if(nErr != PWE_SUCCESS)
 	{
 		CNewDialogsEx::ShowError(this->m_hWnd, nErr, PWFF_DATALOSS_WITHOUT_SAVE);
-		m_bDisplayDialog = FALSE;
+		_SetDisplayDialog(false);
 		return;
 	}
 
@@ -4827,7 +4912,7 @@ void CPwSafeDlg::OnFileSave()
 	{
 		CNewDialogsEx::ShowError(this->m_hWnd, PWE_FILEERROR_VERIFY,
 			PWFF_DATALOSS_WITHOUT_SAVE);
-		m_bDisplayDialog = FALSE;
+		_SetDisplayDialog(false);
 		return;
 	}
 
@@ -4845,7 +4930,7 @@ void CPwSafeDlg::OnFileSave()
 	CKeySourcesPool::Set(GetShortestAbsolutePath(m_strFile), m_mgr.GetKeySource()); // Set or clear
 
 	_UpdateToolBar(); // Updates titlebar, too
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnFileSaveAs()
@@ -4854,10 +4939,10 @@ void CPwSafeDlg::OnFileSaveAs()
 
 	if(m_bFileOpen == FALSE) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(_CallPlugins(KPM_FILE_SAVEAS_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	GroupSyncStates(TRUE);
 
@@ -4904,7 +4989,7 @@ void CPwSafeDlg::OnFileSaveAs()
 			{
 				CNewDialogsEx::ShowError(this->m_hWnd, PWE_FILEERROR_VERIFY,
 					PWFF_DATALOSS_WITHOUT_SAVE);
-				m_bDisplayDialog = FALSE;
+				_SetDisplayDialog(false);
 				return;
 			}
 
@@ -4940,17 +5025,17 @@ void CPwSafeDlg::OnFileSaveAs()
 	}
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnFileClose()
 {
 	NotifyUserActivity();
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(_CallPlugins(KPM_FILE_CLOSE_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	GroupSyncStates(TRUE);
 
@@ -4999,7 +5084,7 @@ void CPwSafeDlg::OnFileClose()
 			dlgTask.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
 			dlgTask.SetContent(strContent);
 			dlgTask.SetMainInstruction(strMain);
-			dlgTask.SetIcon(V_MTDI_QUESTION);
+			dlgTask.SetIcon(MTDI_QUESTION);
 
 			if(bDoVerification)
 				dlgTask.SetVerification(TRL("Automatically save when closing/locking the database"));
@@ -5032,7 +5117,7 @@ void CPwSafeDlg::OnFileClose()
 				m_bAutoSaveDb = TRUE;
 		}
 
-		if(nRes == IDCANCEL) { m_bDisplayDialog = FALSE; return; }
+		if(nRes == IDCANCEL) { _SetDisplayDialog(false); return; }
 		else if(nRes == IDYES)
 		{
 			OnFileSave();
@@ -5054,7 +5139,7 @@ void CPwSafeDlg::OnFileClose()
 		else m_bModified = FALSE; // nRes == IDNO
 	}
 
-	if(m_bModified == TRUE) { m_bDisplayDialog = FALSE; return; }
+	if(m_bModified == TRUE) { _SetDisplayDialog(false); return; }
 
 	m_cQuickFind.ResetContent();
 	ASSERT(m_cQuickFind.GetWindowTextLength() == 0);
@@ -5089,7 +5174,7 @@ void CPwSafeDlg::OnFileClose()
 	_UpdateToolBar();
 
 	_CallPlugins(KPM_FILE_CLOSE_POST, 0, 0);
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 
 	m_btnTbAbout.SetFocus();
 }
@@ -5102,7 +5187,7 @@ void CPwSafeDlg::OnSafeOptions()
 	BOOL bRebuildContextMenus = FALSE, bRestartNeeded = FALSE;
 	BOOL bStartWithWindows = CPwSafeApp::GetStartWithWindows();
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	dlg.m_pParentDlg = this;
 
@@ -5117,6 +5202,7 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_bEntryGrid = m_bEntryGrid;
 	dlg.m_bAutoSave = m_bAutoSaveDb;
 	dlg.m_strFontSpec = m_strFontSpec;
+	dlg.m_strNotesFontSpec = m_strNotesFontSpec;
 	dlg.m_bLockOnMinimize = m_bLockOnMinimize;
 	dlg.m_bMinimizeOnLock = m_bMinimizeOnLock;
 	dlg.m_bMinimizeToTray = m_bMinimizeToTray;
@@ -5160,6 +5246,7 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_bAlwaysAllowIpc = m_remoteControl.GetAlwaysAllowFullAccess();
 	dlg.m_strDefaultAutoTypeSequence = m_strDefaultAutoTypeSequence;
 	dlg.m_bAutoTypeIEFix = m_bAutoTypeIEFix;
+	dlg.m_bAutoTypeSameKL = m_bAutoTypeSameKL;
 	dlg.m_bDropToBackOnCopy = m_bDropToBackOnCopy;
 	dlg.m_bSortAutoTypeSelItems = m_bSortAutoTypeSelItems;
 	dlg.m_bDeleteTANsAfterUse = m_bDeleteTANsAfterUse;
@@ -5167,7 +5254,7 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_bRememberKeySources = CKeySourcesPool::GetEnabled();
 
 	if(_CallPlugins(KPM_OPTIONS_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	if(dlg.DoModal() == IDOK)
 	{
@@ -5208,6 +5295,7 @@ void CPwSafeDlg::OnSafeOptions()
 		m_bFocusResAfterQuickFind = dlg.m_bFocusResAfterQuickFind;
 		m_strDefaultAutoTypeSequence = dlg.m_strDefaultAutoTypeSequence;
 		m_bAutoTypeIEFix = dlg.m_bAutoTypeIEFix;
+		m_bAutoTypeSameKL = dlg.m_bAutoTypeSameKL;
 		m_bDropToBackOnCopy = dlg.m_bDropToBackOnCopy;
 		m_bSortAutoTypeSelItems = dlg.m_bSortAutoTypeSelItems;
 		m_bDeleteTANsAfterUse = dlg.m_bDeleteTANsAfterUse;
@@ -5258,9 +5346,9 @@ void CPwSafeDlg::OnSafeOptions()
 		else m_nLockTimeDef = static_cast<long>(dlg.m_nLockAfter);
 
 		if(dlg.m_strFontSpec != m_strFontSpec)
-		{
-			_ParseSpecAndSetFont(dlg.m_strFontSpec);
-		}
+			_ParseSpecAndSetFont(dlg.m_strFontSpec, false);
+		if(dlg.m_strNotesFontSpec != m_strNotesFontSpec)
+			_ParseSpecAndSetFont(dlg.m_strNotesFontSpec, true);
 
 		if(dlg.m_bCopyURLs != m_bCopyURLs)
 		{
@@ -5288,7 +5376,7 @@ void CPwSafeDlg::OnSafeOptions()
 			if(nRet == IDYES)
 			{
 				m_bRestartApplication = TRUE;
-				m_bDisplayDialog = FALSE;
+				_SetDisplayDialog(false);
 				OnFileExit(); // Also calls SaveOptions!
 				return;
 			}
@@ -5301,7 +5389,7 @@ void CPwSafeDlg::OnSafeOptions()
 	m_ullLastListParams = 0; // Invalidate
 	_UpdateToolBar(TRUE);
 
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::RestartApplication()
@@ -5329,14 +5417,14 @@ void CPwSafeDlg::OnSafeRemoveGroup()
 	DWORD dwGroupId = GetSelectedGroupId();
 	ASSERT(dwGroupId != DWORD_MAX); if(dwGroupId == DWORD_MAX) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(_CallPlugins(KPM_GROUP_REMOVE_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	DWORD dwGroupIndex = m_mgr.GetGroupByIdN(dwGroupId);
 	PW_GROUP *p = m_mgr.GetGroup(dwGroupIndex);
-	ASSERT(p != NULL); if(p == NULL) { m_bDisplayDialog = FALSE; return; }
+	ASSERT(p != NULL); if(p == NULL) { _SetDisplayDialog(false); return; }
 	const USHORT usTopLevel = p->usLevel;
 
 	while(true)
@@ -5358,7 +5446,7 @@ void CPwSafeDlg::OnSafeRemoveGroup()
 	dlgTask.SetContent(TRL("Deleting a group will delete all items and subgroups in that group, too."));
 	dlgTask.SetMainInstruction(TRL("Are you sure you want to delete this group?"));
 	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
-	dlgTask.SetIcon(V_MTDI_QUESTION);
+	dlgTask.SetIcon(MTDI_QUESTION);
 	dlgTask.AddButton(TRL("&Delete"), NULL, IDOK);
 	dlgTask.AddButton(TRL("&Cancel"), NULL, IDCANCEL);
 	int nMsg = dlgTask.ShowDialog();
@@ -5391,7 +5479,7 @@ void CPwSafeDlg::OnSafeRemoveGroup()
 	}
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnFileChangeMasterPw()
@@ -5506,6 +5594,8 @@ void CPwSafeDlg::OnUpdatePwlistAdd(CCmdUI* pCmdUI)
 {
 	BOOL b = m_bFileOpen;
 	b &= ((m_mgr.GetNumberOfGroups() > 0) ? TRUE : FALSE);
+	if(!_IsDisplayingMenu())
+		b &= ((!_IsDisplayingDialog()) ? TRUE : FALSE);
 	pCmdUI->Enable(b);
 }
 
@@ -5519,7 +5609,7 @@ BOOL CPwSafeDlg::GetExportOptions(PWEXPORT_OPTIONS *pOptions,
 	ASSERT(pOptions != NULL); if(pOptions == NULL) return FALSE;
 	ASSERT(pPwExport != NULL); if(pPwExport == NULL) return FALSE;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	*pOptions = pPwExport->m_aDefaults[pPwExport->m_nFormat];
 
@@ -5606,16 +5696,16 @@ BOOL CPwSafeDlg::GetExportOptions(PWEXPORT_OPTIONS *pOptions,
 	dlg.m_dwNumParams = n + 1;
 	dlg.m_pParams = (CHKOPT_PARAM *)pa;
 
-	if(dlg.DoModal() == IDOK) { m_bDisplayDialog = FALSE; return TRUE; }
-	m_bDisplayDialog = FALSE;
+	if(dlg.DoModal() == IDOK) { _SetDisplayDialog(false); return TRUE; }
+	_SetDisplayDialog(false);
 	return FALSE;
 }
 
 CString CPwSafeDlg::GetExportFile(int nFormat, LPCTSTR lpBaseFileName, BOOL bFixFileName)
 {
-	if(m_bFileOpen == FALSE) return CString("");
+	if(m_bFileOpen == FALSE) return CString(_T(""));
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	LPCTSTR lp = _T("exp");
 	if(nFormat == PWEXP_TXT) lp = _T("txt");
@@ -5652,10 +5742,10 @@ CString CPwSafeDlg::GetExportFile(int nFormat, LPCTSTR lpBaseFileName, BOOL bFix
 		OFN_EXTENSIONDIFFERENT | OFN_EXPLORER | OFN_ENABLESIZING | OFN_NOREADONLYRETURN);
 
 	CFileDialog dlg(FALSE, lp, strSample, dwFlags, strFilter, this);
-	if(dlg.DoModal() == IDOK) { m_bDisplayDialog = FALSE; return dlg.GetPathName(); }
+	if(dlg.DoModal() == IDOK) { _SetDisplayDialog(false); return dlg.GetPathName(); }
 
 	strSample.Empty();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 	return strSample;
 }
 
@@ -5808,10 +5898,10 @@ void CPwSafeDlg::OnExtrasGenPw()
 	DWORD dwGroupId = GetSelectedGroupId();
 	BYTE aUuid[16];
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(_CallPlugins(KPM_GEN_PASSWORD_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	if((m_bFileOpen == FALSE) || (dwGroupId == DWORD_MAX))
 	{
@@ -5866,7 +5956,7 @@ void CPwSafeDlg::OnExtrasGenPw()
 	}
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnSafeModifyGroup()
@@ -5890,7 +5980,7 @@ void CPwSafeDlg::OnSafeModifyGroup()
 	ASSERT(dwGroup != DWORD_MAX);
 	if(dwGroup == DWORD_MAX) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	dlg.m_nIconId = (int)p->uImageId;
 	dlg.m_strGroupName = p->pszGroupName;
@@ -5898,7 +5988,7 @@ void CPwSafeDlg::OnSafeModifyGroup()
 	dlg.m_bEditMode = TRUE;
 
 	if(_CallPlugins(KPM_GROUP_MODIFY_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	if(dlg.DoModal() == IDOK)
 	{
@@ -5926,7 +6016,7 @@ void CPwSafeDlg::OnSafeModifyGroup()
 		_TouchGroup(dwGroupId, FALSE);
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdateSafeModifyGroup(CCmdUI* pCmdUI)
@@ -5952,7 +6042,7 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 	const DWORD dwMaxItems = m_mgr.GetNumberOfEntries();
 	if(dwMaxItems == 0) return; // Nothing to search for
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	DWORD dwFindGroupIndex;
 	if(dwFindGroupId != DWORD_MAX) dwFindGroupIndex = m_mgr.GetGroupByIdN(dwFindGroupId);
@@ -5997,7 +6087,7 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 			dwGroupId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
 		}
 		ASSERT((dwGroupId != DWORD_MAX) && (dwGroupId != 0));
-		if((dwGroupId == DWORD_MAX) || (dwGroupId == 0)) { m_bDisplayDialog = FALSE; return; }
+		if((dwGroupId == DWORD_MAX) || (dwGroupId == 0)) { _SetDisplayDialog(false); return; }
 
 		_UpdateCachedGroupIDs();
 
@@ -6082,7 +6172,7 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 	}
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdatePwlistFind(CCmdUI* pCmdUI)
@@ -6480,7 +6570,7 @@ void CPwSafeDlg::OnBeginDragPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 	PW_ENTRY *p = m_mgr.GetEntry(dwEntryIndex);
 	ASSERT_ENTRY(p); if(p == NULL) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	// Auto-type drag&drop doesn't work with Firefox (always DROPEFFECT_NONE)
 	// UINT uFlags = 0;
@@ -6593,24 +6683,25 @@ void CPwSafeDlg::OnBeginDragPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 	_TouchEntry(GetSelectedEntry(), FALSE);
 	_UpdateToolBar();
 
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnFileChangeLanguage()
 {
 	NotifyUserActivity();
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	CLanguagesDlg dlg;
 	if(dlg.DoModal() == IDOK)
 	{
 		m_bRestartApplication = TRUE;
-		m_bDisplayDialog = FALSE;
+		_SetDisplayDialog(false);
 		OnFileExit();
+		return;
 	}
 
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnInfoReadme()
@@ -6745,12 +6836,12 @@ void CPwSafeDlg::OnFileLock()
 
 	// This is a thread-critical function, therefore we fake to show a dialog, this
 	// prevents the timer function from doing anything that could interfer with us
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(_CallPlugins(KPM_FILE_LOCK_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
-	if((m_bFileOpen == FALSE) && (m_bLocked == FALSE)) { m_bDisplayDialog = FALSE; return; }
+	if((m_bFileOpen == FALSE) && (m_bLocked == FALSE)) { _SetDisplayDialog(false); return; }
 
 	CString strMenuItem;
 	m_menu.GetMenuText(ID_FILE_LOCK, strMenuItem, MF_BYCOMMAND);
@@ -6786,10 +6877,10 @@ void CPwSafeDlg::OnFileLock()
 		{
 			// MessageBox(TRL("First close the open file before opening another one!"),
 			//	PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
-			m_bDisplayDialog = FALSE; return;
+			_SetDisplayDialog(false); return;
 		}
 
-		if(m_strLastDb.IsEmpty() == TRUE) { m_bDisplayDialog = FALSE; return; }
+		if(m_strLastDb.IsEmpty() == TRUE) { _SetDisplayDialog(false); return; }
 
 		m_bLocked = TRUE;
 		strExtended = TRL("&Unlock Workspace");
@@ -6823,7 +6914,7 @@ void CPwSafeDlg::OnFileLock()
 			// MessageBox(TRL("Workspace is locked."), PWM_PRODUCT_NAME_SHORT, MB_ICONINFORMATION | MB_OK);
 			SetStatusTextEx(TRL("Workspace is locked."));
             _CallPlugins(KPM_FILE_UNLOCK_FAILED, 0, 0);
-			m_bDisplayDialog = FALSE; return;
+			_SetDisplayDialog(false); return;
 		}
 
 		NotifyUserActivity();
@@ -6869,7 +6960,7 @@ void CPwSafeDlg::OnFileLock()
 
 	_UpdateTrayIcon();
 	_UpdateToolBar(TRUE);
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 
 	if((m_bMinimizeOnLock != FALSE) && bDoLock && (m_bMinimized == FALSE) &&
 		(m_bTrayed == FALSE))
@@ -6878,7 +6969,8 @@ void CPwSafeDlg::OnFileLock()
 
 void CPwSafeDlg::OnUpdateFileLock(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable((m_bFileOpen || m_bLocked) && (!m_bDisplayDialog));
+	pCmdUI->Enable((((m_bFileOpen != FALSE) || (m_bLocked != FALSE)) &&
+		!_IsDisplayingDialog()) ? TRUE : FALSE);
 }
 
 void CPwSafeDlg::OnGroupMoveTop()
@@ -7025,7 +7117,7 @@ LRESULT CPwSafeDlg::OnUpdateClipboard(WPARAM wParam, LPARAM lParam)
 void CPwSafeDlg::OnViewHide()
 {
 	NotifyUserActivity();
-	if(m_bDisplayDialog == TRUE) return;
+	if(_IsDisplayingDialog()) return;
 	ToggleViewHideState(TRUE);
 	_UpdateToolBar(TRUE);
 }
@@ -7033,7 +7125,7 @@ void CPwSafeDlg::OnViewHide()
 void CPwSafeDlg::OnImportCsv()
 {
 	NotifyUserActivity();
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	CString strFilter = TRL("CSV Files");
 	strFilter += _T(" (*.csv)|*.csv|");
@@ -7076,7 +7168,7 @@ void CPwSafeDlg::OnImportCsv()
 	}
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdateImportCsv(CCmdUI* pCmdUI)
@@ -7106,12 +7198,11 @@ void CPwSafeDlg::_SortList(DWORD dwByField, BOOL bAutoSortCall)
 	if(dwGroupId == DWORD_MAX) return;
 	if(dwGroupId == m_mgr.GetGroupId(PWS_SEARCHGROUP))
 	{
-		if(bAutoSortCall == FALSE)
-		{
-			_RemoveSearchGroup();
-			m_cList.DeleteAllItemsEx();
-		}
-
+		// if(bAutoSortCall == FALSE)
+		// {
+		//	_RemoveSearchGroup();
+		//	m_cList.DeleteAllItemsEx();
+		// }
 		return;
 	}
 
@@ -7139,7 +7230,7 @@ void CPwSafeDlg::OnColumnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 void CPwSafeDlg::OnImportCWallet()
 {
 	NotifyUserActivity();
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	CString strFilter = TRL("Text Files");
 	strFilter += _T(" (*.txt)|*.txt|");
@@ -7170,7 +7261,7 @@ void CPwSafeDlg::OnImportCWallet()
 	}
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdateImportCWallet(CCmdUI* pCmdUI)
@@ -7275,7 +7366,7 @@ void CPwSafeDlg::OnImportPwSafe()
 {
 	NotifyUserActivity();
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	CString strFilter = TRL("Text Files");
 	strFilter += _T(" (*.txt)|*.txt|");
@@ -7305,7 +7396,7 @@ void CPwSafeDlg::OnImportPwSafe()
 	}
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdateImportPwSafe(CCmdUI* pCmdUI)
@@ -7513,6 +7604,8 @@ void CPwSafeDlg::_UpdateToolBar(BOOL bForceUpdate)
 	else
 		UTB_ENSURE_ENABLED_STATE(&m_btnTbLock, FALSE)
 
+	NewGUI_EnableSortHeader(&m_cList, !_IsSearchGroup());
+
 	if((pFocusWnd != NULL) && (bNeedSetFocus == TRUE))
 		pFocusWnd->SetFocus(); // Restore the focus!
 }
@@ -7637,7 +7730,7 @@ void CPwSafeDlg::OnPwlistMassModify()
 
 	if(m_bFileOpen == FALSE) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	CEntryPropertiesDlg dlg;
 	dlg.m_pMgr = &m_mgr;
@@ -7645,7 +7738,7 @@ void CPwSafeDlg::OnPwlistMassModify()
 	dlg.m_dwDefaultExpire = m_dwDefaultExpire;
 
 	if(_CallPlugins(KPM_MASSMODIFY_ENTRIES_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	if(dlg.DoModal() == TRUE)
 	{
@@ -7687,7 +7780,7 @@ void CPwSafeDlg::OnPwlistMassModify()
 		m_bModified = TRUE;
 	}
 
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdatePwlistMassModify(CCmdUI* pCmdUI)
@@ -7780,7 +7873,14 @@ void CPwSafeDlg::ShowEntryDetails(PW_ENTRY *p)
 	str += strTemp;
 	str += _T("\\deff0{\\fonttbl{\\f0\\fswiss MS Sans Serif;}{\\f1\\froman\\fcharset2 Symbol;}{\\f2\\fswiss ");
 	str += m_strListFontFace;
-	str += _T(";}{\\f3\\fswiss Arial;}}");
+	str += _T(";}{\\f3\\fswiss Arial;}");
+	if(!m_strNotesFontRtfSpec.IsEmpty())
+	{
+		str += _T("{\\f4");
+		str += m_strNotesFontRtfSpec;
+		str += _T(";}");
+	}
+	str += _T("}");
 	str += _T("{\\colortbl\\red0\\green0\\blue0;}");
 	str += _T("\\deflang1031\\pard\\plain\\f2\\cf0 ");
 	strTemp.Format(_T("%d"), m_nListFontSize * 2);
@@ -7891,17 +7991,49 @@ void CPwSafeDlg::ShowEntryDetails(PW_ENTRY *p)
 	if((p->pszAdditional != NULL) && (p->pszAdditional[0] != 0))
 	{
 		str += _T("\\par \\par ");
-
 		str2 = _MakeRtfString(p->pszAdditional);
 
-		str2.Replace(_T("<b>"), _T("\\b "));
-		str2.Replace(_T("</b>"), _T("\\b0 "));
-		str2.Replace(_T("<i>"), _T("\\i "));
-		str2.Replace(_T("</i>"), _T("\\i0 "));
-		str2.Replace(_T("<u>"), _T("\\ul "));
-		str2.Replace(_T("</u>"), _T("\\ul0 "));
-		// str2.Replace(_T("<center>"), _T("\\qc "));
-		// str2.Replace(_T("</center>"), _T("\\ql "));
+		if(!m_strNotesFontRtfSpec.IsEmpty())
+		{
+			strTemp.Format(_T("%d "), m_nNotesFontSize * 2);
+			str += _T("\\f4\\fs"); str += strTemp;
+
+			if(m_fNotesFont.m_hObject != NULL)
+			{
+				LOGFONT lfNotes;
+				if(m_fNotesFont.GetLogFont(&lfNotes) != FALSE)
+				{
+					if(lfNotes.lfWeight > FW_NORMAL)
+					{
+						str += _T("\\b ");
+						str2.Replace(HTMLTAG_BOLD_S, _T(""));
+						str2.Replace(HTMLTAG_BOLD_E, _T(""));
+					}
+					if(lfNotes.lfItalic != FALSE)
+					{
+						str += _T("\\i ");
+						str2.Replace(HTMLTAG_ITALIC_S, _T(""));
+						str2.Replace(HTMLTAG_ITALIC_E, _T(""));
+					}
+					if(lfNotes.lfUnderline != FALSE)
+					{
+						str += _T("\\ul ");
+						str2.Replace(HTMLTAG_ULINE_S, _T(""));
+						str2.Replace(HTMLTAG_ULINE_E, _T(""));
+					}
+					if(lfNotes.lfStrikeOut != FALSE)
+					{
+						str += _T("\\strike ");
+						str2.Replace(HTMLTAG_STRIKE_S, _T(""));
+						str2.Replace(HTMLTAG_STRIKE_E, _T(""));
+					}
+				}
+			}
+		}
+
+		for(std::map<std_string, std_string>::const_iterator it =
+			m_mHtmlToRtf.begin(); it != m_mHtmlToRtf.end(); ++it)
+			str2.Replace(it->first.c_str(), it->second.c_str());
 
 		str += str2;
 	}
@@ -8184,8 +8316,12 @@ BOOL CPwSafeDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 			ASSERT(m_pEntryViewTrackableMenu != NULL);
 
 			if(m_pEntryViewTrackableMenu != NULL)
+			{
+				_SetDisplayMenu(true);
 				m_pEntryViewTrackableMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
 					pt.x, pt.y, AfxGetMainWnd());
+				_SetDisplayMenu(false);
+			}
 		}
 		else if((LOWORD(wParam) == IDC_RE_ENTRYVIEW) && (pEL->nmhdr.code == EN_LINK) && (pEL->msg == WM_LBUTTONDOWN))
 		{
@@ -8219,6 +8355,7 @@ BOOL CPwSafeDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 							m_cList.FocusItem(static_cast<int>(dwAutoPos), TRUE);
 						}
 						ShowEntryDetails(pCmpEntry);
+						_UpdateToolBar(TRUE);
 						m_cList.SetFocus();
 					}
 				}
@@ -8249,7 +8386,7 @@ BOOL CPwSafeDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 
 			if((hitTest.flags & (HHT_ONHEADER | HHT_ONDIVIDER | HHT_ONDIVOPEN | HHT_NOWHERE)) > 0)
 			{
-				m_bDisplayDialog = TRUE;
+				_SetDisplayDialog(true);
 				m_menuColView.LoadMenu(IDR_COLVIEW_MENU);
 
 				m_menuColView.SetMenuDrawMode(BCMENU_DRAWMODE_XP); // <<<!=>>> BCMENU_DRAWMODE_ORIGINAL
@@ -8265,11 +8402,13 @@ BOOL CPwSafeDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 				{
 					_TranslateMenu(psub, TRUE, NULL);
 					_EnableViewMenuItems(psub);
+					_SetDisplayMenu(true);
 					psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, AfxGetMainWnd());
+					_SetDisplayMenu(false);
 				}
 				else { ASSERT(FALSE); }
 				m_menuColView.DestroyMenu();
-				m_bDisplayDialog = FALSE;
+				_SetDisplayDialog(false);
 			}
 		}
 	}
@@ -8313,10 +8452,10 @@ void CPwSafeDlg::OnExtrasTanWizard()
 
 	ASSERT(dwCurGroupId != DWORD_MAX); if(dwCurGroupId == DWORD_MAX) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(_CallPlugins(KPM_TANWIZARD_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	CTanWizardDlg dlg;
 
@@ -8401,7 +8540,7 @@ void CPwSafeDlg::OnExtrasTanWizard()
 	}
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdateExtrasTanWizard(CCmdUI* pCmdUI)
@@ -8424,16 +8563,16 @@ void CPwSafeDlg::OnFilePrintPreview()
 		if(IsUnsafeAllowed(this->m_hWnd) == FALSE) return;
 	}
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	cExp.SetManager(&m_mgr);
 	cExp.SetNewLineSeq(m_bWindowsNewLine);
 	cExp.SetFormat(PWEXP_HTML);
 
 	if(_CallPlugins(KPM_FILE_PRINTPREVIEW_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
-	if(GetExportOptions(&pwo, &cExp, TRUE) == FALSE) { m_bDisplayDialog = FALSE; return; }
+	if(GetExportOptions(&pwo, &cExp, TRUE) == FALSE) { _SetDisplayDialog(false); return; }
 
 	std::basic_string<TCHAR> tszFile = WU_GetTempFile(_T(".html"));
 
@@ -8442,14 +8581,14 @@ void CPwSafeDlg::OnFilePrintPreview()
 	{
 		MessageBox(TRL("Cannot open temporary file for printing!"), PWM_PRODUCT_NAME_SHORT,
 			MB_OK | MB_ICONWARNING);
-		m_bDisplayDialog = FALSE;
+		_SetDisplayDialog(false);
 		return;
 	}
 
 	ShellExecute(m_hWnd, NULL, tszFile.c_str(), NULL, NULL, SW_SHOW);
 
 	m_vTempFiles.push_back(tszFile);
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdateFilePrintPreview(CCmdUI* pCmdUI)
@@ -8460,6 +8599,7 @@ void CPwSafeDlg::OnUpdateFilePrintPreview(CCmdUI* pCmdUI)
 void CPwSafeDlg::OnInfoTranslation()
 {
 	NotifyUserActivity();
+	_SetDisplayDialog(true);
 
 	CString str = TRL("Currently Used Language"); str += _T(": ");
 	if(_tcscmp(TRL("~LANGUAGENAME"), _T("~LANGUAGENAME")) != 0)
@@ -8491,6 +8631,7 @@ void CPwSafeDlg::OnInfoTranslation()
 	else str += _T("Unknown or English version");
 
 	MessageBox(str, TRL("Translation information"), MB_OK | MB_ICONINFORMATION);
+	_SetDisplayDialog(false);
 }
 
 HTREEITEM CPwSafeDlg::_GetLastGroupItem(CTreeCtrl *pTree)
@@ -8600,10 +8741,10 @@ void CPwSafeDlg::OnSafeAddSubgroup()
 {
 	NotifyUserActivity();
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 	if(_CallPlugins(KPM_GROUP_ADD_SUBGROUP_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
-	m_bDisplayDialog = FALSE;
+		{ _SetDisplayDialog(false); return; }
+	_SetDisplayDialog(false);
 
 	DWORD dwGroupCount = m_mgr.GetNumberOfGroups();
 	ASSERT(dwGroupCount >= 1); if(dwGroupCount == 0) return;
@@ -8670,14 +8811,14 @@ void CPwSafeDlg::OnBeginDragGrouplist(NMHDR* pNMHDR, LRESULT* pResult)
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW *)pNMHDR;
 	*pResult = 0;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	CImageList* pDragImageList = NULL;
 	POINT ptOffset;
 	RECT rcItem;
 
 	pDragImageList = m_cGroups.CreateDragImage(pNMTreeView->itemNew.hItem);
-	ASSERT(pDragImageList != NULL); if(pDragImageList == NULL) { m_bDisplayDialog = FALSE; return; }
+	ASSERT(pDragImageList != NULL); if(pDragImageList == NULL) { _SetDisplayDialog(false); return; }
 
 	if(m_cGroups.GetItemRect(pNMTreeView->itemNew.hItem, &rcItem, TRUE) != FALSE)
 	{
@@ -8700,14 +8841,14 @@ void CPwSafeDlg::OnBeginDragGrouplist(NMHDR* pNMHDR, LRESULT* pResult)
 	BOOL bDragBegun = pDragImageList->BeginDrag(0, ptOffset);
 	if(bDragBegun == FALSE)
 	{
-		SAFE_DELETE(pDragImageList); ASSERT(FALSE); m_bDisplayDialog = FALSE; return;
+		SAFE_DELETE(pDragImageList); ASSERT(FALSE); _SetDisplayDialog(false); return;
 	}
 
 	CPoint ptDragEnter = pNMTreeView->ptDrag;
 	ClientToScreen(&ptDragEnter);
 	if(pDragImageList->DragEnter(NULL, ptDragEnter) == FALSE)
 	{
-		SAFE_DELETE(pDragImageList); ASSERT(FALSE); m_bDisplayDialog = FALSE; return;
+		SAFE_DELETE(pDragImageList); ASSERT(FALSE); _SetDisplayDialog(false); return;
 	}
 
 	SAFE_DELETE(pDragImageList);
@@ -8722,7 +8863,7 @@ void CPwSafeDlg::OnBeginDragGrouplist(NMHDR* pNMHDR, LRESULT* pResult)
 	// if(m_cGroups.ItemHasChildren(m_hDraggingGroup) == TRUE) m_bCanDragGroup = FALSE;
 	// else m_bCanDragGroup = TRUE;
 
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnCancelMode()
@@ -8781,6 +8922,16 @@ BOOL CPwSafeDlg::_CheckIfCanSort()
 	return FALSE;
 }
 
+void CPwSafeDlg::_UpdateSortMenuItemState(CCmdUI* pCmdUI)
+{
+	if(pCmdUI == NULL) { ASSERT(FALSE); return; }
+
+	bool bEnable = (m_bFileOpen != FALSE);
+	bEnable &= !_IsSearchGroup();
+
+	pCmdUI->Enable(bEnable ? TRUE : FALSE);
+}
+
 void CPwSafeDlg::OnPwlistSortTitle()
 {
 	NotifyUserActivity();
@@ -8790,7 +8941,7 @@ void CPwSafeDlg::OnPwlistSortTitle()
 
 void CPwSafeDlg::OnUpdatePwlistSortTitle(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_bFileOpen);
+	_UpdateSortMenuItemState(pCmdUI);
 }
 
 void CPwSafeDlg::OnPwlistSortUser()
@@ -8802,7 +8953,7 @@ void CPwSafeDlg::OnPwlistSortUser()
 
 void CPwSafeDlg::OnUpdatePwlistSortUser(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_bFileOpen);
+	_UpdateSortMenuItemState(pCmdUI);
 }
 
 void CPwSafeDlg::OnPwlistSortUrl()
@@ -8814,7 +8965,7 @@ void CPwSafeDlg::OnPwlistSortUrl()
 
 void CPwSafeDlg::OnUpdatePwlistSortUrl(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_bFileOpen);
+	_UpdateSortMenuItemState(pCmdUI);
 }
 
 void CPwSafeDlg::OnPwlistSortPassword()
@@ -8826,7 +8977,7 @@ void CPwSafeDlg::OnPwlistSortPassword()
 
 void CPwSafeDlg::OnUpdatePwlistSortPassword(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_bFileOpen);
+	_UpdateSortMenuItemState(pCmdUI);
 }
 
 void CPwSafeDlg::OnPwlistSortNotes()
@@ -8838,7 +8989,7 @@ void CPwSafeDlg::OnPwlistSortNotes()
 
 void CPwSafeDlg::OnUpdatePwlistSortNotes(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_bFileOpen);
+	_UpdateSortMenuItemState(pCmdUI);
 }
 
 void CPwSafeDlg::OnPwlistSortCreation()
@@ -8850,7 +9001,7 @@ void CPwSafeDlg::OnPwlistSortCreation()
 
 void CPwSafeDlg::OnUpdatePwlistSortCreation(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_bFileOpen);
+	_UpdateSortMenuItemState(pCmdUI);
 }
 
 void CPwSafeDlg::OnPwlistSortLastmodify()
@@ -8862,7 +9013,7 @@ void CPwSafeDlg::OnPwlistSortLastmodify()
 
 void CPwSafeDlg::OnUpdatePwlistSortLastmodify(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_bFileOpen);
+	_UpdateSortMenuItemState(pCmdUI);
 }
 
 void CPwSafeDlg::OnPwlistSortLastaccess()
@@ -8874,7 +9025,7 @@ void CPwSafeDlg::OnPwlistSortLastaccess()
 
 void CPwSafeDlg::OnUpdatePwlistSortLastaccess(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_bFileOpen);
+	_UpdateSortMenuItemState(pCmdUI);
 }
 
 void CPwSafeDlg::OnPwlistSortExpire()
@@ -8886,7 +9037,7 @@ void CPwSafeDlg::OnPwlistSortExpire()
 
 void CPwSafeDlg::OnUpdatePwlistSortExpire(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_bFileOpen);
+	_UpdateSortMenuItemState(pCmdUI);
 }
 
 void CPwSafeDlg::OnGroupMoveLeft()
@@ -9003,13 +9154,13 @@ void CPwSafeDlg::OnPwlistSaveAttach()
 	pEntry = m_mgr.GetEntry(dwSelectedInx);
 	ASSERT(pEntry != NULL); if(pEntry == NULL) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(_tcslen(pEntry->pszBinaryDesc) == 0)
 	{
 		MessageBox(TRL("There is no file attached with this entry."),
 			PWM_PRODUCT_NAME_SHORT, MB_ICONINFORMATION | MB_OK);
-		m_bDisplayDialog = FALSE;
+		_SetDisplayDialog(false);
 		return;
 	}
 
@@ -9026,7 +9177,7 @@ void CPwSafeDlg::OnPwlistSaveAttach()
 	if(dlg.DoModal() == IDOK)
 		CPwUtil::SaveBinaryData(pEntry, dlg.GetPathName());
 
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdatePwlistSaveAttach(CCmdUI* pCmdUI)
@@ -9117,7 +9268,7 @@ void CPwSafeDlg::OnFileShowDbInfo()
 
 	CDbSettingsDlg dlg;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	dlg.m_nAlgorithm = m_mgr.GetAlgorithm();
 	const int nAlgorithmOld = dlg.m_nAlgorithm;
@@ -9132,7 +9283,7 @@ void CPwSafeDlg::OnFileShowDbInfo()
 	dlg.m_clr = clrOld;
 
 	if(_CallPlugins(KPM_FILE_DBSETTINGS_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	if(dlg.DoModal() == IDOK)
 	{
@@ -9160,7 +9311,7 @@ void CPwSafeDlg::OnFileShowDbInfo()
 	NotifyUserActivity();
 	_UpdateToolBar();
 
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdateFileShowDbInfo(CCmdUI* pCmdUI)
@@ -9175,7 +9326,7 @@ void CPwSafeDlg::_ShowExpiredEntries(BOOL bShowIfNone, BOOL bShowExpired, BOOL b
 	if(m_bFileOpen == FALSE) return;
 	if(m_bGlobalAutoTypePending == TRUE) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	PW_TIME tNow;
 	_GetCurrentPwTime(&tNow);
@@ -9199,7 +9350,7 @@ void CPwSafeDlg::_ShowExpiredEntries(BOOL bShowIfNone, BOOL bShowExpired, BOOL b
 		dlg.m_nDisplayMode = ELDMODE_EXPIRED;
 	else if(bShowSoonToExpire == TRUE)
 		dlg.m_nDisplayMode = ELDMODE_SOONTOEXP;
-	else { ASSERT(FALSE); m_bDisplayDialog = FALSE; return; }
+	else { ASSERT(FALSE); _SetDisplayDialog(false); return; }
 
 	if(bShowIfNone == FALSE)
 	{
@@ -9237,7 +9388,7 @@ void CPwSafeDlg::_ShowExpiredEntries(BOOL bShowIfNone, BOOL bShowExpired, BOOL b
 			}
 		}
 
-		if(bAtLeastOneExpired == FALSE) { m_bDisplayDialog = FALSE; return; }
+		if(bAtLeastOneExpired == FALSE) { _SetDisplayDialog(false); return; }
 	}
 
 	if(dlg.DoModal() == IDOK)
@@ -9276,7 +9427,7 @@ void CPwSafeDlg::_ShowExpiredEntries(BOOL bShowIfNone, BOOL bShowExpired, BOOL b
 	NotifyUserActivity();
 	_UpdateToolBar();
 
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnExtrasShowExpired()
@@ -9292,7 +9443,7 @@ void CPwSafeDlg::OnUpdateExtrasShowExpired(CCmdUI* pCmdUI)
 void CPwSafeDlg::OnImportPvault()
 {
 	NotifyUserActivity();
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	CString strFilter = TRL("Text Files");
 	strFilter += _T(" (*.txt)|*.txt|");
@@ -9322,7 +9473,7 @@ void CPwSafeDlg::OnImportPvault()
 	}
 
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdateImportPvault(CCmdUI* pCmdUI)
@@ -9739,8 +9890,9 @@ DWORD CPwSafeDlg::_EntryUuidToListPos(BYTE *pUuid)
 void CPwSafeDlg::OnUpdateSafeOptions(CCmdUI* pCmdUI)
 {
 	if(m_bMiniMode == TRUE) pCmdUI->Enable(FALSE);
-	else pCmdUI->Enable((((m_bLocked == FALSE) ? TRUE : FALSE) &&
-		(!m_bDisplayDialog)) ? TRUE : FALSE);
+	else pCmdUI->Enable(_IsDisplayingDialog() ? FALSE : TRUE);
+	// else pCmdUI->Enable((((m_bLocked == FALSE) ? TRUE : FALSE) &&
+	//	(!m_bDisplayDialog)) ? TRUE : FALSE);
 }
 
 void CPwSafeDlg::_AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSeq,
@@ -9820,6 +9972,8 @@ void CPwSafeDlg::_AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSe
 	Sleep(50);
 
 	CSendKeysEx sk;
+	sk.SetEnsureSameKeyboardLayout((m_bAutoTypeSameKL == FALSE) ? false : true);
+
 	BOOL bToggleCapsLock = FALSE;
 	sk.SetDelay(10);
 
@@ -9899,7 +10053,7 @@ void CPwSafeDlg::OnExtrasPluginMgr()
 {
 	NotifyUserActivity();
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	CPluginsDlg dlg;
 	dlg.m_pPiMgr = &CPluginManager::Instance();
@@ -9908,7 +10062,7 @@ void CPwSafeDlg::OnExtrasPluginMgr()
 	dlg.DoModal();
 	NotifyUserActivity();
 	_UpdateToolBar();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnPluginMessage(UINT nID)
@@ -10099,14 +10253,11 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 
 		std::vector<TCHAR> vWindow(static_cast<size_t>(nLen + 3), _T('\0'));
 
-		m_bDisplayDialog = TRUE;
+		_SetDisplayDialog(true);
 
 		::GetWindowText(hWnd, &vWindow[0], nLen + 2);
 
-		PW_ENTRY *pe = NULL;
 		CString strCurWindow = &vWindow[0], strWindowExp, strWindowLookup;
-		bool bLeft, bRight;
-		int nSubLen;
 		DWORD dwWindowField, dwWindowFieldSeq, dwWindowFieldSeqFound = 0;
 		PW_UUID_STRUCT pwUuid;
 
@@ -10133,7 +10284,8 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 
 		for(DWORD i = 0; i < m_mgr.GetNumberOfEntries(); ++i)
 		{
-			pe = m_mgr.GetEntry(i); ASSERT(pe != NULL); if(pe == NULL) continue;
+			PW_ENTRY* pe = m_mgr.GetEntry(i);
+			if(pe == NULL) { ASSERT(FALSE); continue; }
 
 			if((pe->uGroupId == dwInvalidId1) || (pe->uGroupId == dwInvalidId2)) continue;
 			if(_pwtimecmp(&tNow, &pe->tExpire) > 0) continue; // Ignore expired entries
@@ -10149,17 +10301,18 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 					strWindowLookup = _T("auto-type-window:");
 
 				strWindowExp = ExtractParameterFromString(pe->pszAdditional, strWindowLookup, dwWindowField);
+				strWindowExp = SprCompile(strWindowExp, false, pe, &m_mgr, false, false);
 				strWindowExp = strWindowExp.MakeLower();
 
 				if(strWindowExp.GetLength() != 0) // An auto-type-window definition has been found
 				{
-					bLeft = (strWindowExp.Left(1) == _T("*"));
-					bRight = (strWindowExp.Right(1) == _T("*"));
+					const bool bLeft = (strWindowExp.Left(1) == _T("*"));
+					const bool bRight = (strWindowExp.Right(1) == _T("*"));
 
 					if(bLeft) strWindowExp.Delete(0, 1);
 					if(bRight) strWindowExp.Delete(strWindowExp.GetLength() - 1, 1);
 
-					nSubLen = strWindowExp.GetLength();
+					const int nSubLen = strWindowExp.GetLength();
 
 					bool bDoAdd = false;
 					if(bLeft && bRight && (nSubLen <= nLen))
@@ -10201,7 +10354,8 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 				else if((dwWindowField == 0) && (dwWindowFieldSeq == 0)) // Entry doesn't have any auto-type-window definition
 				{
 					strWindowExp = pe->pszTitle;
-					nSubLen = strWindowExp.GetLength();
+					strWindowExp = SprCompile(strWindowExp, false, pe, &m_mgr, false, false);
+					const int nSubLen = strWindowExp.GetLength();
 
 					if((nSubLen != 0) && (nSubLen <= nLen))
 					{
@@ -10222,6 +10376,7 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 		const DWORD dwMatchingEntriesCount = static_cast<DWORD>(dlg.m_vEntryList.size());
 		if(dwMatchingEntriesCount != 0)
 		{
+			PW_ENTRY* pe = NULL;
 			if(dwMatchingEntriesCount == 1)
 				pe = m_mgr.GetEntryByUuid(dlg.m_vEntryList[0].uuid);
 			else
@@ -10240,9 +10395,7 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 
 					if(CPwUtil::IsZeroUUID(dlg.m_aUuid) == FALSE)
 						pe = m_mgr.GetEntryByUuid(dlg.m_aUuid);
-					else pe = NULL;
 				}
-				else pe = NULL;
 
 				dwWindowFieldSeqFound = 0; // Set this back to zero as cannot choose the sequence of auto-type in the dialog
 			}
@@ -10254,7 +10407,7 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 					dwWindowField = 0;
 					dwWindowFieldSeq = 0;
 
-					while(1) // Search all auto-type-window strings
+					while(true) // Search all auto-type-window strings
 					{
 						if(dwWindowFieldSeq > 0)
 							strWindowLookup.Format(_T("%s%d%s"), _T("auto-type-window-"), dwWindowFieldSeq, _T(":"));
@@ -10262,17 +10415,18 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 							strWindowLookup = _T("auto-type-window:");
 
 						strWindowExp = ExtractParameterFromString(pe->pszAdditional, strWindowLookup, dwWindowField);
+						strWindowExp = SprCompile(strWindowExp, false, pe, &m_mgr, false, false);
 						strWindowExp = strWindowExp.MakeLower();
 
 						if(strWindowExp.GetLength() != 0) // An auto-type-window definition has been found
 						{
-							bLeft = (strWindowExp.Left(1) == _T("*"));
-							bRight = (strWindowExp.Right(1) == _T("*"));
+							const bool bLeft = (strWindowExp.Left(1) == _T("*"));
+							const bool bRight = (strWindowExp.Right(1) == _T("*"));
 
 							if(bLeft) strWindowExp.Delete(0, 1);
 							if(bRight) strWindowExp.Delete(strWindowExp.GetLength() - 1, 1);
 
-							nSubLen = strWindowExp.GetLength();
+							const int nSubLen = strWindowExp.GetLength();
 
 							if(bLeft && bRight && (nSubLen <= nLen))
 							{
@@ -10325,7 +10479,7 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 		dlg.m_vEntryList.clear();
 
 		m_bGlobalAutoTypePending = FALSE;
-		m_bDisplayDialog = FALSE;
+		_SetDisplayDialog(false);
 	}
 	else if(wParam == HOTKEYID_RESTORE)
 	{
@@ -10447,7 +10601,7 @@ BOOL CPwSafeDlg::OnQueryEndSession()
 	SaveOptions();
 	OnFileClose();
 
-	if(m_bDisplayDialog == TRUE) return FALSE;
+	if(_IsDisplayingDialog()) return FALSE;
 	return TRUE;
 }
 
@@ -10474,7 +10628,7 @@ BOOL CPwSafeDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	NotifyUserActivity();
 	if(pCopyDataStruct == NULL) return TRUE;
 
-	if(m_bDisplayDialog == TRUE) return TRUE; // Do nothing if a modal window is displayed
+	if(_IsDisplayingDialog()) return TRUE; // Do nothing if a modal window is displayed
 
 	if(pCopyDataStruct->lpData != NULL)
 	{
@@ -10544,15 +10698,15 @@ void CPwSafeDlg::OnExtrasRepairDb()
 
 	if(m_bLocked == TRUE) return;
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(_CallPlugins(KPM_FILE_OPEN_PRE, 0, 0) == FALSE)
-		{ m_bDisplayDialog = FALSE; return; }
+		{ _SetDisplayDialog(false); return; }
 
 	_OpenDatabase(NULL, NULL, NULL, NULL, FALSE, NULL, TRUE);
 	_UpdateToolBar();
 	_SetDefaultFocus();
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdateExtrasRepairDb(CCmdUI* pCmdUI)
@@ -10674,7 +10828,7 @@ void CPwSafeDlg::OnImportKeePass()
 
 	WU_SetCurrentDirectory(strDir.c_str());
 
-	m_bDisplayDialog = TRUE;
+	_SetDisplayDialog(true);
 
 	if(mgrImport.GetNumberOfGroups() != 0)
 	{
@@ -10682,7 +10836,7 @@ void CPwSafeDlg::OnImportKeePass()
 		_List_SaveView();
 
 		CImportOptionsDlg dlg;
-		if(dlg.DoModal() == IDCANCEL) { m_bDisplayDialog = FALSE; return; }
+		if(dlg.DoModal() == IDCANCEL) { _SetDisplayDialog(false); return; }
 
 		const BOOL bNewIDs = ((dlg.m_nImportMethod == 0) ? TRUE : FALSE);
 		const BOOL bCompareTimes = ((dlg.m_nImportMethod == 2) ? TRUE : FALSE);
@@ -10696,7 +10850,7 @@ void CPwSafeDlg::OnImportKeePass()
 		_UpdateToolBar();
 	}
 
-	m_bDisplayDialog = FALSE;
+	_SetDisplayDialog(false);
 }
 
 void CPwSafeDlg::OnUpdateImportKeePass(CCmdUI* pCmdUI)
@@ -10884,24 +11038,24 @@ void CPwSafeDlg::OnViewShowTANIndices()
 
 void CPwSafeDlg::OnUpdateFileExit(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable((m_bDisplayDialog == FALSE) ? TRUE : FALSE);
+	pCmdUI->Enable(_IsDisplayingDialog() ? FALSE : TRUE);
 }
 
 void CPwSafeDlg::OnUpdateExtrasGenPw(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable((m_bDisplayDialog == FALSE) ? TRUE : FALSE);
+	pCmdUI->Enable(_IsDisplayingDialog() ? FALSE : TRUE);
 }
 
 void CPwSafeDlg::OnUpdateInfoAbout(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable((m_bDisplayDialog == FALSE) ? TRUE : FALSE);
+	pCmdUI->Enable(_IsDisplayingDialog() ? FALSE : TRUE);
 }
 
 LRESULT CPwSafeDlg::OnWTSSessionChange(WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
-	if(m_bDisplayDialog == TRUE) return 0;
+	if(_IsDisplayingDialog()) return 0;
 
 	if(m_bLockOnWinLock == FALSE)
 	{
@@ -11190,7 +11344,7 @@ void CPwSafeDlg::SetTrayState(BOOL bMinimizeToTray)
 
 void CPwSafeDlg::OnUpdateViewHide(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable((m_bDisplayDialog == FALSE) ? TRUE : FALSE);
+	pCmdUI->Enable(_IsDisplayingDialog() ? FALSE : TRUE);
 }
 
 void CPwSafeDlg::SetToMiniModeIfEnabled(BCMenu *pMenu, BOOL bRemoveAccels,
@@ -11362,4 +11516,52 @@ void CPwSafeDlg::_SetLVItemParam(LV_ITEM* pItem, const PW_ENTRY* pe)
 
 	if((pe->uGroupId == m_dwCachedBackupGroupID) || (pe->uGroupId == m_dwCachedBackupSrcGroupID))
 		pItem->lParam |= CLCIF_HIGHLIGHT_GREEN;
+}
+
+bool CPwSafeDlg::_IsSearchGroup()
+{
+	if((m_bFileOpen == FALSE) || (m_bLocked != FALSE)) return false;
+
+	const DWORD dwSelGroup = GetSelectedGroupId();
+	const DWORD dwSearchGroup = m_mgr.GetGroupId(PWS_SEARCHGROUP);
+	return ((dwSelGroup == dwSearchGroup) && (dwSearchGroup != DWORD_MAX));
+}
+
+bool CPwSafeDlg::_IsDisplayingDialog()
+{
+	ASSERT(m_iDisplayDialog >= 0);
+	return (m_iDisplayDialog > 0);
+}
+
+void CPwSafeDlg::_SetDisplayDialog(bool bDisplay)
+{
+	if(bDisplay) ++m_iDisplayDialog;
+	else --m_iDisplayDialog;
+
+	ASSERT(m_iDisplayDialog >= 0);
+}
+
+bool CPwSafeDlg::_IsDisplayingMenu()
+{
+	ASSERT(m_iDisplayMenu >= 0);
+	return (m_iDisplayMenu > 0);
+}
+
+void CPwSafeDlg::_SetDisplayMenu(bool bDisplay)
+{
+	if(bDisplay) ++m_iDisplayMenu;
+	else --m_iDisplayMenu;
+
+	ASSERT(m_iDisplayMenu >= 0);
+}
+
+void CPwSafeDlg::_AssertDisplayCounts(int cDialogs, int cMenus)
+{
+#ifdef _DEBUG
+	ASSERT(m_iDisplayDialog == cDialogs);
+	ASSERT(m_iDisplayMenu == cMenus);
+#else
+	UNREFERENCED_PARAMETER(cDialogs);
+	UNREFERENCED_PARAMETER(cMenus);
+#endif
 }

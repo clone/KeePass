@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,11 +29,10 @@
 #include "PopularPasswords.h"
 #include "../Crypto/ARCFour.h"
 
-#define CHARSPACE_ESCAPE      60
+#define CHARSPACE_CONTROL     32
 #define CHARSPACE_ALPHA       26
 #define CHARSPACE_NUMBER      10
-#define CHARSPACE_SIMPSPECIAL 16
-#define CHARSPACE_EXTSPECIAL  17
+#define CHARSPACE_SPECIAL     33
 #define CHARSPACE_HIGH       112
 
 static const BYTE g_uuidZero[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
@@ -46,8 +45,7 @@ CPwUtil::CPwUtil()
 DWORD CPwUtil::EstimatePasswordBits(LPCTSTR lpPassword)
 {
 	BOOL bChLower = FALSE, bChUpper = FALSE, bChNumber = FALSE;
-	BOOL bChSimpleSpecial = FALSE, bChExtSpecial = FALSE, bChHigh = FALSE;
-	BOOL bChEscape = FALSE;
+	BOOL bChSpecial = FALSE, bChHigh = FALSE, bChControl = FALSE;
 	double dblEffectiveLength = 0.0;
 	std::map<TCHAR, unsigned int> vCharCounts;
 	std::map<int, unsigned int> vDifferences;
@@ -61,15 +59,15 @@ DWORD CPwUtil::EstimatePasswordBits(LPCTSTR lpPassword)
 	{
 		const TCHAR tch = lpPassword[i];
 
-		if((tch > 0) && (tch < _T(' '))) bChEscape = TRUE;
-		if((tch >= _T('A')) && (tch <= _T('Z'))) bChUpper = TRUE;
-		if((tch >= _T('a')) && (tch <= _T('z'))) bChLower = TRUE;
-		if((tch >= _T('0')) && (tch <= _T('9'))) bChNumber = TRUE;
-		if((tch >= _T(' ')) && (tch <= _T('/'))) bChSimpleSpecial = TRUE;
-		if((tch >= _T(':')) && (tch <= _T('@'))) bChExtSpecial = TRUE;
-		if((tch >= _T('[')) && (tch <= _T('`'))) bChExtSpecial = TRUE;
-		if((tch >= _T('{')) && (tch <= _T('~'))) bChExtSpecial = TRUE;
-		if((tch <= 0) || (tch > _T('~'))) bChHigh = TRUE;
+		if((tch >= 0) && (tch < _T(' '))) bChControl = TRUE;
+		else if((tch >= _T('A')) && (tch <= _T('Z'))) bChUpper = TRUE;
+		else if((tch >= _T('a')) && (tch <= _T('z'))) bChLower = TRUE;
+		else if((tch >= _T('0')) && (tch <= _T('9'))) bChNumber = TRUE;
+		else if((tch >= _T(' ')) && (tch <= _T('/'))) bChSpecial = TRUE;
+		else if((tch >= _T(':')) && (tch <= _T('@'))) bChSpecial = TRUE;
+		else if((tch >= _T('[')) && (tch <= _T('`'))) bChSpecial = TRUE;
+		else if((tch >= _T('{')) && (tch <= _T('~'))) bChSpecial = TRUE;
+		else if((tch < 0) || (tch > _T('~'))) bChHigh = TRUE;
 
 		double dblDiffFactor = 1.0;
 		if(i >= 1)
@@ -80,8 +78,9 @@ DWORD CPwUtil::EstimatePasswordBits(LPCTSTR lpPassword)
 				vDifferences[iDiff] = 1;
 			else
 			{
-				vDifferences[iDiff] = vDifferences[iDiff] + 1;
-				dblDiffFactor /= (double)vDifferences[iDiff];
+				const unsigned int uDiffCount = vDifferences[iDiff] + 1;
+				vDifferences[iDiff] = uDiffCount;
+				dblDiffFactor /= (double)uDiffCount;
 			}
 		}
 
@@ -92,18 +91,18 @@ DWORD CPwUtil::EstimatePasswordBits(LPCTSTR lpPassword)
 		}
 		else
 		{
-			vCharCounts[tch] = vCharCounts[tch] + 1;
-			dblEffectiveLength += dblDiffFactor * (1.0 / (double)vCharCounts[tch]);
+			const unsigned int uCharCount = vCharCounts[tch] + 1;
+			vCharCounts[tch] = uCharCount;
+			dblEffectiveLength += dblDiffFactor * (1.0 / (double)uCharCount);
 		}
 	}
 
 	DWORD dwCharSpace = 0;
-	if(bChEscape == TRUE) dwCharSpace += CHARSPACE_ESCAPE;
+	if(bChControl == TRUE) dwCharSpace += CHARSPACE_CONTROL;
 	if(bChUpper == TRUE) dwCharSpace += CHARSPACE_ALPHA;
 	if(bChLower == TRUE) dwCharSpace += CHARSPACE_ALPHA;
 	if(bChNumber == TRUE) dwCharSpace += CHARSPACE_NUMBER;
-	if(bChSimpleSpecial == TRUE) dwCharSpace += CHARSPACE_SIMPSPECIAL;
-	if(bChExtSpecial == TRUE) dwCharSpace += CHARSPACE_EXTSPECIAL;
+	if(bChSpecial == TRUE) dwCharSpace += CHARSPACE_SPECIAL;
 	if(bChHigh == TRUE) dwCharSpace += CHARSPACE_HIGH;
 
 	ASSERT(dwCharSpace != 0); if(dwCharSpace == 0) return 0;

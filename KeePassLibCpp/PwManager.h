@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -37,11 +37,11 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.21")
+#define PWM_VERSION_STR  _T("1.22")
 #else
-#define PWM_VERSION_STR  _T("1.21 Unicode")
+#define PWM_VERSION_STR  _T("1.22 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01020100
+#define PWM_VERSION_DW   0x01020200
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
@@ -181,10 +181,11 @@
 #define PWMKEY_GROUPONNEW_PRE   _T("KeeGroupInNewDb")
 #define PWMKEY_WNDTITLESUFFIX   _T("KeeWindowTitleSuffix")
 #define PWMKEY_MASTERPW_MINLEN  _T("KeeMasterPasswordMinLength")
-#define PWMKEY_MASTERPW_MINQUALITY _T("KeeMasterPasswordMinQuality")
-#define PWMKEY_FOCUSRESAFTERQUICKFIND _T("KeeFocusResultsAfterQuickFind")
-#define PWMKEY_AUTOTYPEIEFIX    _T("KeeAutoTypeIEFix")
-#define PWMKEY_DROPTOBACKONCOPY _T("KeeDropToBackOnCopy")
+#define PWMKEY_MASTERPW_MINQUALITY     _T("KeeMasterPasswordMinQuality")
+#define PWMKEY_FOCUSRESAFTERQUICKFIND  _T("KeeFocusResultsAfterQuickFind")
+#define PWMKEY_AUTOTYPEIEFIX        _T("KeeAutoTypeIEFix")
+#define PWMKEY_AUTOTYPESAMEKEYBLAYOUTS _T("KeeAutoTypeSameKeybLayouts")
+#define PWMKEY_DROPTOBACKONCOPY     _T("KeeDropToBackOnCopy")
 #define PWMKEY_SORTAUTOTYPESELITEMS _T("KeeSortAutoTypeSelItems")
 #define PWMKEY_CLEARCLIPONDBCLOSE   _T("KeeClearClipboardOnDbClose")
 #define PWMKEY_USEHELPCENTER        _T("KeeUseHelpCenter")
@@ -203,6 +204,9 @@
 #define PWMKEY_REMEMBERKEYSOURCES   _T("KeeRememberKeySources")
 #define PWMKEY_KEYSOURCE_ID         _T("KeeKeySourceID")
 #define PWMKEY_KEYSOURCE_VALUE      _T("KeeKeySourceValue")
+#define PWMKEY_NOTESREGEX           _T("KeeNotesRegex")
+#define PWMKEY_NOTESFORMAT          _T("KeeNotesFormat")
+#define PWMKEY_NOTESFONT            _T("KeeNotesFont")
 
 #define PWMKEY_GENPROFILE       _T("KeeGenProfile")
 #define PWMKEY_GENPROFILEAUTO   _T("KeeGenProfileAuto")

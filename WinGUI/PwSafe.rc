@@ -111,7 +111,7 @@ CAPTION "About KeePass..."
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,203,111,58,14,WS_GROUP
-    LTEXT           "Copyright © 2003-2011 Dominik Reichl.",IDC_STATIC,7,7,254,8
+    LTEXT           "Copyright © 2003-2012 Dominik Reichl.",IDC_STATIC,7,7,254,8
     LTEXT           "KeePass is OSI Certified Open Source Software.",IDC_STATIC,7,20,254,8
     LTEXT           "The program is distributed under the terms of the GNU General Public License v2 or later.",IDC_STATIC,7,33,254,17
     LTEXT           "<>",IDC_HLINK_HOMEPAGE,7,65,254,8
@@ -331,6 +331,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,198,341,10
     LTEXT           "Select a new font for the list controls:",IDC_STATIC_SELFONTTXT,18,121,337,8
     PUSHBUTTON      "Select &Font",IDC_BTN_SELFONT,18,138,82,14
+    PUSHBUTTON      "Select &Notes Font",IDC_BTN_SELNOTESFONT,260,128,117,14
     LTEXT           "Every second row has a different background color. Use this color:",IDC_STATIC_SELROWHIGHLIGHT,17,210,340,8
     PUSHBUTTON      "Color",IDC_BTN_ROWHIGHLIGHTSEL,343,0,50,14
     LTEXT           "Newline sequence:",IDC_STATIC_NEWLINETEXT,19,45,336,8
@@ -553,13 +554,13 @@ BEGIN
     PUSHBUTTON      "&Help",IDC_BTN_HELP,7,125,58,14
 END
 
-IDD_OPTIONS_AUTOTYPE_DLG DIALOGEX 0, 0, 309, 167
+IDD_OPTIONS_AUTOTYPE_DLG DIALOGEX 0, 0, 309, 173
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Auto-Type"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,187,146,56,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,246,146,56,14
+    DEFPUSHBUTTON   "&OK",IDOK,187,152,56,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,246,152,56,14
     CONTROL         "Enable auto-type features",IDC_CHECK_ENABLEAT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,295,10
     CONTROL         "Use alternative auto-type method (minimize window)",IDC_CHECK_ALTERNATIVE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,20,295,10
@@ -569,8 +570,10 @@ BEGIN
     EDITTEXT        IDC_EDIT_STDSEQ,7,87,295,14,ES_AUTOHSCROLL
     CONTROL         "Prepend special initialization sequence for Internet Explorer windows",IDC_CHECK_IEFIX,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,111,295,10
-    CONTROL         "Sort items in the auto-type entry selection dialog",IDC_CHECK_SORTATITEMS,
+    CONTROL         "Ensure same keyboard layouts during auto-type",IDC_CHECK_SAMEKL,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,124,295,10
+    CONTROL         "Sort items in the auto-type entry selection dialog",IDC_CHECK_SORTATITEMS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,137,295,10
 END
 
 IDD_FIELDREF_DLG DIALOGEX 0, 0, 418, 273
@@ -805,7 +808,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 302
         TOPMARGIN, 7
-        BOTTOMMARGIN, 160
+        BOTTOMMARGIN, 166
     END
 
     IDD_FIELDREF_DLG, DIALOG
@@ -841,8 +844,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,1,0
- PRODUCTVERSION 1,2,1,0
+ FILEVERSION 1,2,2,0
+ PRODUCTVERSION 1,2,2,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -859,13 +862,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.21"
-            VALUE "FileVersion", "1.2.1.0"
+            VALUE "FileDescription", "KeePass Password Safe 1.22"
+            VALUE "FileVersion", "1.2.2.0"
             VALUE "InternalName", "PwSafe"
-            VALUE "LegalCopyright", "Copyright (c) 2003-2011 Dominik Reichl"
+            VALUE "LegalCopyright", "Copyright (c) 2003-2012 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.21"
-            VALUE "ProductVersion", "1.2.1.0"
+            VALUE "ProductName", "KeePass Password Safe 1.22"
+            VALUE "ProductVersion", "1.2.2.0"
         END
     END
     BLOCK "VarFileInfo"

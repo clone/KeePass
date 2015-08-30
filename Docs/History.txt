@@ -1,3 +1,49 @@
+12/04/20 - 1.22
+- Auto-Type window definitions in custom window-sequence pairs
+  are now Spr-compiled (i.e. placeholders, environment
+  variables, field references, etc. can be used)
+- Auto-Type: entry titles are now Spr-compiled before being
+  compared with the target window title
+- Added support for 's' HTML tag in the notes field (in the
+  entry view of the main window the marked text is striked out)
+- Supported HTML tags (b, i, u, s) are now removed from notes
+  before showing them in the main entry list
+- Regular expression replacements can now be applied to the
+  notes before showing them in the main entry list (the
+  KeeNotesRegex# items in the configuration file specify the
+  regular expressions and KeeNotesFormat# the replacements)
+- Added option to select a different font for notes ('Tools' ->
+  'Options' -> tab 'Interface' -> button 'Select Notes Font')
+- Ensuring same keyboard layouts during auto-type is now
+  optional (option enabled by default)
+- Added regular expression support in x64 builds
+- Master key transformations are now computed in two threads in
+  x64 builds, too; on dual/multi core processors this results
+  in almost twice the performance as before (by doubling the
+  amount of rounds you'll get the same waiting time as in 1.21,
+  but the protection against dictionary and guessing attacks is
+  doubled)
+
+- Improved key transformation delay calculation
+- The program options are now also accessible while the
+  database is locked
+- Column headers in a search results list are now unclickable
+  (search results cannot be sorted anyway)
+- Improved string translation in task dialogs
+- Improved dialog display state handling
+- Added '@' and '`' to the printable 7-bit ASCII character set
+- Merged simple and extended special character spaces to one
+  special character space
+- Reduced control character space from 60 to 32
+- Upgraded to Boost libraries version 1.49.0
+- Various code optimizations
+- Minor other improvements
+
+- The 'Add Entry' tray context menu command is now disabled
+  when a dialog is displayed
+- The toolbar state is now updated after clicking a group link
+  in the entry details view
+
 11/10/12 - 1.21
 - Added option to minimize the main window after locking the
   KeePass workspace (option enabled by default)

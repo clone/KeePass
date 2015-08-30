@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -210,15 +210,15 @@ BOOL CPwSafeApp::InitInstance()
 	NSCAPI_Initialize(); // Initialize natural string comparison API
 	CTaskbarListEx::Initialize();
 
-	const INT_PTR nResponse = dlg.DoModal();
-	if(nResponse == IDOK) { }
-	else if(nResponse == IDCANCEL) { }
+	dlg.DoModal(); // IDOK, IDCANCEL
 
 	CPluginManager::Instance().UnloadAllPlugins(FALSE);
+
 	KP_ASSERT_REFS(CKpApiImpl::Instance(), 1);
 	KP_ASSERT_REFS(CKpDatabaseImpl::Instance(), 1);
 	KP_ASSERT_REFS(CKpUtilitiesImpl::Instance(), 1);
 	KP_ASSERT_REFS(CKpCommandLineImpl::Instance(), 1);
+	dlg._AssertDisplayCounts(0, 0);
 
 	CTaskbarListEx::Release(false);
 	NSCAPI_Exit(); // Clean up natural string comparison API

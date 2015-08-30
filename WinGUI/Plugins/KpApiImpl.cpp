@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -224,12 +224,12 @@ STDMETHODIMP CKpApiImpl::SetFileModified(BOOL bModified)
 
 STDMETHODIMP_(BOOL) CKpApiImpl::IsDisplayingDialog()
 {
-	return g_pMainDlg->m_bDisplayDialog;
+	return (g_pMainDlg->_IsDisplayingDialog() ? TRUE : FALSE);
 }
 
 STDMETHODIMP CKpApiImpl::SetDisplayDialog(BOOL bDialogDisplayed)
 {
-	g_pMainDlg->m_bDisplayDialog = ((bDialogDisplayed == FALSE) ? FALSE : TRUE);
+	g_pMainDlg->_SetDisplayDialog((bDialogDisplayed == FALSE) ? false : true);
 	return S_OK;
 }
 

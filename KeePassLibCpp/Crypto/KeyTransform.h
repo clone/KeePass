@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,46 +21,68 @@
 
 #include <boost/utility.hpp>
 
-#if !defined(_M_X64) && !defined(_WIN32_WCE)
+#if !defined(_WIN32_WCE)
 #include <boost/thread/thread.hpp>
 #endif
 
-class CKeyTransform
+class CKeyTransform : boost::noncopyable
 {
 public:
-	CKeyTransform();
-	CKeyTransform(const CKeyTransform& cc);
-	CKeyTransform(UINT64 qwRounds, UINT8* pBuf, const UINT8* pKey, bool* pbSucceeded);
-	virtual ~CKeyTransform();
+	CKeyTransform(UINT64 qwRounds, UINT8* pBuf, const UINT8* pKey);
 
-	void operator()();
+	void Run();
+	bool Succeeded() const { return m_bSucceeded; }
 
 	static bool Transform256(UINT64 qwRounds, UINT8* pBuffer256, const UINT8* pKeySeed256);
-
 	static UINT64 Benchmark(DWORD dwTimeMs);
 
 private:
 	UINT64 m_qwRounds;
 	UINT8* m_pBuf;
 	const UINT8* m_pKey;
-	bool* m_pbSucceeded;
+	bool m_bSucceeded;
 };
 
-class CKeyTransformBenchmark
+// boost::thread copies the callable object; wrapping is required
+// such that the thread uses the same object (to prevent losing
+// modified members of the CKeyTransform object)
+class CKeyTransformWrapper
 {
 public:
-	CKeyTransformBenchmark();
-	CKeyTransformBenchmark(const CKeyTransformBenchmark& cc);
+	CKeyTransformWrapper(CKeyTransform* p) : m_p(p) { }
+
+	void operator()() { if(m_p != NULL) m_p->Run(); else { ASSERT(FALSE); } }
+
+private:
+	CKeyTransform* m_p;
+};
+
+class CKeyTransformBenchmark : boost::noncopyable
+{
+public:
 	CKeyTransformBenchmark(DWORD dwTimeMs);
-	virtual ~CKeyTransformBenchmark();
 
-	void operator()();
+	void Run();
 
-	UINT64 GetComputedRounds();
+	UINT64 GetComputedRounds() const { return m_qwComputedRounds; }
 
 private:
 	DWORD m_dwTimeMs;
 	UINT64 m_qwComputedRounds;
+};
+
+// boost::thread copies the callable object; wrapping is required
+// such that the thread uses the same object (to prevent losing
+// modified members of the CKeyTransformBenchmark object)
+class CKeyTransformBenchmarkWrapper
+{
+public:
+	CKeyTransformBenchmarkWrapper(CKeyTransformBenchmark* p) : m_p(p) { }
+
+	void operator()() { if(m_p != NULL) m_p->Run(); else { ASSERT(FALSE); } }
+
+private:
+	CKeyTransformBenchmark* m_p;
 };
 
 #endif // ___KEY_TRANSFORM_H___

@@ -240,7 +240,6 @@
 #define IDC_HLINK_CREDITS               1204
 #define IDC_HLINK_DONATE                1205
 #define IDC_STATIC_LISTTEXT             1207
-#define IDC_RICHEDIT21                  1209
 #define IDC_CHECK_LOCKONWINLOCK         1212
 #define IDC_READONLY                    1213
 #define IDC_STC_APP                     1214
@@ -326,6 +325,8 @@
 #define IDC_STATIC_COLORVIEW            1302
 #define IDC_SLIDER_COLOR                1304
 #define IDC_CHECK_CUSTOMCOLOR           1305
+#define IDC_CHECK_SAMEKL                1306
+#define IDC_BTN_SELNOTESFONT            1308
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -550,7 +551,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        247
 #define _APS_NEXT_COMMAND_VALUE         33040
-#define _APS_NEXT_CONTROL_VALUE         1306
+#define _APS_NEXT_CONTROL_VALUE         1309
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

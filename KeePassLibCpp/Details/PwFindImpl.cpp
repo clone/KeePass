@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ DWORD CPwManager::Find(const TCHAR *pszFindString, BOOL bCaseSensitive,
 	if((strFind.GetLength() == 0) || (strFind == _T("*"))) return nStart;
 
 	scoped_ptr<boost::basic_regex<TCHAR> > spRegex;
-#ifndef _WIN64
+	// #ifndef _WIN64
 	if((searchFlags & PWMS_REGEX) != 0)
 	{
 		try
@@ -58,9 +58,9 @@ DWORD CPwManager::Find(const TCHAR *pszFindString, BOOL bCaseSensitive,
 		}
 		catch(...) { return DWORD_MAX; }
 	}
-#else
-#pragma message("No regular expression support in x64 library.")
-#endif
+	// #else
+	// #pragma message("No regular expression support in x64 library.")
+	// #endif
 
 	LPCTSTR lpSearch = strFind;
 	if(bCaseSensitive == FALSE)

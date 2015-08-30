@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ COptionsAutoTypeDlg::COptionsAutoTypeDlg(CWnd* pParent /*=NULL*/)
 	, m_strDefaultSeq(_T(""))
 	, m_bIEFix(FALSE)
 	, m_bSortAutoTypeSelItems(TRUE)
+	, m_bSameKL(TRUE)
 {
 }
 
@@ -55,6 +56,8 @@ void COptionsAutoTypeDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_HOTKEY_AUTOTYPE, m_hkAutoType);
 	DDX_Control(pDX, IDC_CHECK_SORTATITEMS, m_cbSortATItems);
 	DDX_Check(pDX, IDC_CHECK_SORTATITEMS, m_bSortAutoTypeSelItems);
+	DDX_Check(pDX, IDC_CHECK_SAMEKL, m_bSameKL);
+	DDX_Control(pDX, IDC_CHECK_SAMEKL, m_cbSameKL);
 }
 
 BEGIN_MESSAGE_MAP(COptionsAutoTypeDlg, CDialog)
@@ -103,6 +106,7 @@ void COptionsAutoTypeDlg::EnableChildControls()
 	m_tbDefaultSeq.EnableWindow(bActive);
 	m_cbIEFix.EnableWindow(bActive);
 	m_hkAutoType.EnableWindow(bActive);
+	m_cbSameKL.EnableWindow(bActive);
 	m_cbSortATItems.EnableWindow(bActive);
 
 	m_btnOK.EnableWindow((m_strDefaultSeq.GetLength() > 0) ? TRUE : FALSE);
@@ -119,7 +123,7 @@ void COptionsAutoTypeDlg::OnBtnOK()
 
 	WORD wVK = 0, wMod = 0;
 	m_hkAutoType.GetHotKey(wVK, wMod);
-	DWORD dwNewHotKey = ((DWORD)wMod << 16) | (DWORD)wVK;
+	const DWORD dwNewHotKey = ((DWORD)wMod << 16) | (DWORD)wVK;
 	if(dwNewHotKey != m_dwATHotKey)
 	{
 		if(m_pParentDlg->RegisterGlobalHotKey(HOTKEYID_AUTOTYPE, dwNewHotKey, (m_dwATHotKey != 0) ? TRUE : FALSE, TRUE) == FALSE)

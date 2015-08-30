@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ HRESULT CALLBACK NDE_HelpManualCallback(HWND hwnd, UINT uNotification,
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(dwRefData);
 
-	if(uNotification == V_TDN_HYPERLINK_CLICKED)
+	if(uNotification == TDN_HYPERLINK_CLICKED)
 	{
 		LPCWSTR lpHRef = (LPCWSTR)lParam;
 		if((lpHRef != NULL) && (*lpHRef == L'h') && (lpHRef[1] == 0))
@@ -63,7 +63,7 @@ void CNewDialogsEx::ShowError(HWND hParent, int nErrorCode, DWORD dwFlags)
 	CVistaTaskDialog dlg(hParent, AfxGetInstanceHandle(), false);
 	dlg.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
 	dlg.SetContent(strText);
-	dlg.SetIcon(V_TD_WARNING_ICON);
+	dlg.SetIcon(TD_WARNING_ICON);
 	dlg.SetFooter(strMore);
 	dlg.EnableHyperLinks(true);
 	dlg.SetCallback(NDE_HelpManualCallback);

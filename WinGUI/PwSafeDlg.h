@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@
 #include "../KeePassLibCpp/PwManager.h"
 #include "../KeePassLibCpp/DataExchange/PwExport.h"
 #include "../KeePassLibCpp/PasswordGenerator/PasswordGenerator.h"
+
+#include <map>
 
 #include "NewGUI/NewGUICommon.h"
 #include "NewGUI/KCWndUtil.h"
@@ -96,6 +98,15 @@
 #define MWS_MIN_CX 314
 #define MWS_MIN_CY 207
 
+#define HTMLTAG_BOLD_S   _T("<b>")
+#define HTMLTAG_BOLD_E   _T("</b>")
+#define HTMLTAG_ITALIC_S _T("<i>")
+#define HTMLTAG_ITALIC_E _T("</i>")
+#define HTMLTAG_ULINE_S  _T("<u>")
+#define HTMLTAG_ULINE_E  _T("</u>")
+#define HTMLTAG_STRIKE_S _T("<s>")
+#define HTMLTAG_STRIKE_E _T("</s>")
+
 /////////////////////////////////////////////////////////////////////////////
 
 class CPwSafeDlg : public CDialog
@@ -126,6 +137,12 @@ public:
 	BOOL RegisterGlobalHotKey(int nHotKeyID, DWORD dwHotKey, BOOL bReleasePrevious, BOOL bMessageBoxOnFail);
 	void AdjustPwListMode();
 	void AdjustColumnWidths();
+
+	bool _IsDisplayingDialog();
+	void _SetDisplayDialog(bool bDisplay);
+	bool _IsDisplayingMenu();
+	void _SetDisplayMenu(bool bDisplay);
+	void _AssertDisplayCounts(int cDialogs, int cMenus);
 
 	void ParseAndOpenURLWithEntryInfo(LPCTSTR lpURL, PW_ENTRY *pEntry);
 	void _AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSeq,
@@ -209,6 +226,7 @@ public:
 	void _SetColumnWidths();
 	void _SetListParameters();
 
+	bool _IsSearchGroup();
 	BOOL _RemoveSearchGroup();
 	void _DeleteBackupEntries();
 
@@ -227,6 +245,8 @@ public:
 
 	void _UpdateCachedGroupIDs();
 	static void _SetLVItemParam(LV_ITEM* pItem, const PW_ENTRY* pe);
+
+	void _UpdateSortMenuItemState(CCmdUI* pCmdUI);
 
 	void _TouchGroup(DWORD dwGroupId, BOOL bEdit);
 	void _TouchEntry(DWORD dwListIndex, BOOL bEdit);
@@ -252,7 +272,7 @@ public:
 	void _ShowExpiredEntries(BOOL bShowIfNone, BOOL bShowExpired, BOOL bShowSoonToExpire);
 
 	BOOL _ParseCommandLine();
-	void _ParseSpecAndSetFont(const TCHAR *pszSpec);
+	void _ParseSpecAndSetFont(const TCHAR *pszSpec, bool bNotes);
 
 	void _ShowToolBar(BOOL bShow);
 	void _EnableViewMenuItems(BCMenu *pMenu);
@@ -275,7 +295,6 @@ public:
 	HICON m_hTrayIconLocked;
 	HICON m_hLockOverlayIcon;
 
-	BOOL m_bDisplayDialog;
 	BOOL m_bCachedToolBarUpdate;
 	BOOL m_bCachedPwlistUpdate;
 
@@ -337,6 +356,9 @@ private:
 	BOOL m_bMinimized;
 	BOOL m_bTrayed;
 	BOOL m_bRestartApplication;
+
+	volatile int m_iDisplayDialog;
+	volatile int m_iDisplayMenu;
 
 	CSessionNotify m_sessionNotify;
 
@@ -400,6 +422,14 @@ private:
 	CFont m_fListFont;
 	CSystemTrayEx m_systray;
 	HACCEL m_hAccel;
+
+	CFont m_fNotesFont;
+	CString m_strNotesFontSpec;
+	CString m_strNotesFontRtfSpec;
+	int m_nNotesFontSize;
+
+	CStringList m_lNotesRegex;
+	CStringList m_lNotesFormat;
 
 	std::basic_string<TCHAR> m_strInitialEnvDir;
 	std::vector<std::basic_string<TCHAR> > m_vTempFiles;
@@ -466,6 +496,7 @@ private:
 	CRemoteControl m_remoteControl;
 
 	BOOL m_bAutoTypeIEFix;
+	BOOL m_bAutoTypeSameKL;
 
 	CString m_strWindowTitleSuffix;
 
@@ -480,6 +511,8 @@ private:
 
 	static DWORD m_dwCachedBackupGroupID;
 	static DWORD m_dwCachedBackupSrcGroupID;
+
+	static std::map<std_string, std_string> m_mHtmlToRtf;
 
 private:
 	void SetViewHideState(BOOL bReqVisible, BOOL bPreferTray);

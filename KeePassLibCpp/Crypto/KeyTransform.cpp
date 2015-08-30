@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,40 +26,18 @@
 #include "Rijndael.h"
 #include "../Util/MemUtil.h"
 
-CKeyTransform::CKeyTransform()
-{
-	m_qwRounds = 0;
-	m_pBuf = NULL;
-	m_pKey = NULL;
-	m_pbSucceeded = NULL;
-}
-
-CKeyTransform::CKeyTransform(const CKeyTransform& cc)
-{
-	m_qwRounds = cc.m_qwRounds;
-	m_pBuf = cc.m_pBuf;
-	m_pKey = cc.m_pKey;
-	m_pbSucceeded = cc.m_pbSucceeded;
-}
-
-CKeyTransform::CKeyTransform(UINT64 qwRounds, UINT8* pBuf, const UINT8* pKey,
-	bool* pbSucceeded)
+CKeyTransform::CKeyTransform(UINT64 qwRounds, UINT8* pBuf, const UINT8* pKey)
 {
 	m_qwRounds = qwRounds;
 	m_pBuf = pBuf;
 	m_pKey = pKey;
-	m_pbSucceeded = pbSucceeded;
+	m_bSucceeded = false;
 }
 
-CKeyTransform::~CKeyTransform()
-{
-}
-
-void CKeyTransform::operator()()
+void CKeyTransform::Run()
 {
 	ASSERT(m_pBuf != NULL); if(m_pBuf == NULL) return;
 	ASSERT(m_pKey != NULL); if(m_pKey == NULL) return;
-	ASSERT(m_pbSucceeded != NULL); if(m_pbSucceeded == NULL) return;
 
 	BYTE vData[16]; // Local copy of the data to be transformed
 	memcpy(&vData[0], m_pBuf, 16);
@@ -78,7 +56,7 @@ void CKeyTransform::operator()()
 	memcpy(m_pBuf, &vData[0], 16);
 	mem_erase(&vData[0], 16);
 
-	*m_pbSucceeded = true;
+	m_bSucceeded = true;
 }
 
 bool CKeyTransform::Transform256(UINT64 qwRounds, UINT8* pBuffer256,
@@ -93,28 +71,26 @@ bool CKeyTransform::Transform256(UINT64 qwRounds, UINT8* pBuffer256,
 	BYTE vKey[32]; // Local copy of the transformation key
 	memcpy(&vKey[0], pKeySeed256, 32);
 
-	bool bSucceededLeft = false, bSucceededRight = false;
+	CKeyTransform ktLeft(qwRounds, &vBuf[0], &vKey[0]);
+	CKeyTransform ktRight(qwRounds, &vBuf[16], &vKey[0]);
 
-	CKeyTransform ktLeft(qwRounds, &vBuf[0], &vKey[0], &bSucceededLeft);
-	CKeyTransform ktRight(qwRounds, &vBuf[16], &vKey[0], &bSucceededRight);
-
-#if defined(_M_X64) || defined(_WIN32_WCE)
-#pragma message("No multi-threading support for x64 and _WIN32_WCE builds.")
-	ktLeft();
-	ktRight();
-#else // Supports multi-threading
+	// No multi-threading support for _WIN32_WCE builds
+#if defined(_WIN32_WCE)
+	ktLeft.Run();
+	ktRight.Run();
+#else
 	try
 	{
-		boost::thread thLeft(ktLeft);
-		ktRight();
+		CKeyTransformWrapper wrLeft(&ktLeft);
+		boost::thread thLeft(wrLeft);
+		ktRight.Run();
 		thLeft.join();
 	}
 	catch(...) { ASSERT(FALSE); return false; }
 #endif
 
-	ASSERT(bSucceededLeft && bSucceededRight);
-	if((bSucceededLeft == false) || (bSucceededRight == false))
-		return false;
+	ASSERT(ktLeft.Succeeded() && ktRight.Succeeded());
+	if(!ktLeft.Succeeded() || !ktRight.Succeeded()) return false;
 
 	memcpy(pBuffer256, &vBuf[0], 32);
 	mem_erase(&vBuf[0], 32);
@@ -126,38 +102,28 @@ UINT64 CKeyTransform::Benchmark(DWORD dwTimeMs)
 {
 	CKeyTransformBenchmark ktLeft(dwTimeMs), ktRight(dwTimeMs);
 
-#if defined(_M_X64) || defined(_WIN32_WCE)
-#pragma message("No multi-threading support for x64 and _WIN32_WCE builds.")
-	ktLeft();
-	ktRight();
-#else // Supports multi-threading
+	// No multi-threading support for _WIN32_WCE builds
+#if defined(_WIN32_WCE)
+	ktLeft.Run();
+	return (ktLeft.GetComputedRounds() >> 1);
+#else
 	try
 	{
-		boost::thread thLeft(ktLeft);
-		ktRight();
+		CKeyTransformBenchmarkWrapper wrLeft(&ktLeft);
+		boost::thread thLeft(wrLeft);
+		ktRight.Run();
 		thLeft.join();
 	}
 	catch(...) { ASSERT(FALSE); return 0; }
-#endif
 
 	const UINT64 qwLeft = ktLeft.GetComputedRounds();
 	const UINT64 qwRight = ktRight.GetComputedRounds();
 	const UINT64 qwSum = qwLeft + qwRight;
-	if((qwSum < qwLeft) || (qwSum < qwRight)) return (UINT64_MAX - 8);
+	if((qwSum < qwLeft) || (qwSum < qwRight)) // Overflow
+		return ((qwLeft > qwRight) ? qwLeft : qwRight);
 
-	return qwSum;
-}
-
-CKeyTransformBenchmark::CKeyTransformBenchmark()
-{
-	m_dwTimeMs = 0;
-	m_qwComputedRounds = 0;
-}
-
-CKeyTransformBenchmark::CKeyTransformBenchmark(const CKeyTransformBenchmark& cc)
-{
-	m_dwTimeMs = cc.m_dwTimeMs;
-	m_qwComputedRounds = cc.m_qwComputedRounds;
+	return (qwSum >> 1);
+#endif
 }
 
 CKeyTransformBenchmark::CKeyTransformBenchmark(DWORD dwTimeMs)
@@ -166,16 +132,7 @@ CKeyTransformBenchmark::CKeyTransformBenchmark(DWORD dwTimeMs)
 	m_qwComputedRounds = 0;
 }
 
-CKeyTransformBenchmark::~CKeyTransformBenchmark()
-{
-}
-
-UINT64 CKeyTransformBenchmark::GetComputedRounds()
-{
-	return m_qwComputedRounds;
-}
-
-void CKeyTransformBenchmark::operator()()
+void CKeyTransformBenchmark::Run()
 {
 	ASSERT(m_dwTimeMs != 0); if(m_dwTimeMs == 0) return;
 	ASSERT(m_qwComputedRounds == 0);

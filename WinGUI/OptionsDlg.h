@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ public:
 	CKCSideBannerWnd m_banner;
 
 	CString m_strFontSpec;
+	CString m_strNotesFontSpec;
 	CWindowGroups m_wndgrp;
 	CImageList m_ilIcons;
 	CImageList m_ilOptionIcons;
@@ -64,10 +65,12 @@ public:
 	DWORD m_dwATHotKey;
 	CString m_strDefaultAutoTypeSequence;
 	BOOL m_bAutoTypeIEFix;
+	BOOL m_bAutoTypeSameKL;
 	BOOL m_bSortAutoTypeSelItems;
 
 private:
 	void AddTcItem(LPCTSTR lpName, int iImageIndex);
+	void _ChangeFont(CString& rSpec);
 
 public:
 	BOOL m_bRememberLast;
@@ -111,6 +114,7 @@ public:
 	CColourPickerXP	m_btnColorRowHighlight;
 	CTabCtrl	m_tabMenu;
 	CXPStyleButtonST	m_btSelFont;
+	CXPStyleButtonST	m_btSelNotesFont;
 	CXPStyleButtonST	m_btCancel;
 	CXPStyleButtonST	m_btOK;
 	CXPStyleButtonST	m_btnAutoType;
@@ -144,6 +148,7 @@ protected:
 	virtual void OnOK();
 	virtual void OnCancel();
 	afx_msg void OnBtnSelFont();
+	afx_msg void OnBtnSelNotesFont();
 	afx_msg void OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnBtnCreateAssoc();
 	afx_msg void OnBtnDeleteAssoc();

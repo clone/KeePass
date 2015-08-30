@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -140,11 +140,13 @@ void CDbSettingsDlg::OnOK()
 	// Check if the user has entered something valid, otherwise fix it
 	CString str;
 	GetDlgItem(IDC_EDIT_KEYENC)->GetWindowText(str);
-	str = str.Trim();
-	if(str.GetLength() > 10) m_dwNumKeyEnc = 0xFFFFFFFE; // Set to max
-	else if(str.GetLength() == 10)
+	__int64 l = _ttoi64(str);
+	if(l < 0) l = -l;
+	if(l > 0xFFFFFFFELL) m_dwNumKeyEnc = 0xFFFFFFFE;
+	else if(l != static_cast<__int64>(m_dwNumKeyEnc))
 	{
-		if(str.GetAt(0) >= _T('4')) m_dwNumKeyEnc = 0xFFFFFFFE; // Set to max
+		ASSERT(FALSE);
+		m_dwNumKeyEnc = static_cast<DWORD>(l);
 	}
 
 	if(m_bCustomColor == FALSE) m_clr = DWORD_MAX;

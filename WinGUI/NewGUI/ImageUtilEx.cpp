@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -97,7 +97,8 @@ bool NewGUI_ExtractVistaIcon(HICON hIcon, Bitmap** pOutBmp)
 			if(FAILED(CreateStreamOnHGlobal(NULL, TRUE, &pStream))) { ASSERT(FALSE); return false; }
 			if(pStream == NULL) { ASSERT(FALSE); return false; }
 
-			VERIFY(SUCCEEDED(pStream->Write(&v[uOffset], uSize, NULL)));
+			VERIFY(SUCCEEDED(pStream->Write(&v[uOffset],
+				static_cast<ULONG>(uSize), NULL)));
 
 			LARGE_INTEGER liMove;
 			ZeroMemory(&liMove, sizeof(LARGE_INTEGER));

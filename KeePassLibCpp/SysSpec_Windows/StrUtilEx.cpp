@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,23 +24,23 @@
 
 char *_StringToAnsi(const WCHAR *lptString)
 {
-	char *p = NULL;
-	int _nChars = 0;
-
 	if(lptString == NULL) { ASSERT(FALSE); return NULL; }
 
+	char *p;
+	int nChars;
+
 #ifdef _UNICODE
-	_nChars = lstrlen(lptString) + 1;
-	p = new char[_nChars * 2 + 2];
+	nChars = lstrlen(lptString) + 1;
+	p = new char[nChars * 2 + 2];
 	p[0] = 0; p[1] = 0;
 	VERIFY(WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lptString, -1, p,
-		_nChars, NULL, NULL) != ERROR_INSUFFICIENT_BUFFER);
+		nChars, NULL, NULL) != ERROR_INSUFFICIENT_BUFFER);
 #else
-	_nChars = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lptString, -1, NULL, 0, NULL, NULL);
-	p = new char[_nChars * 2 + 2];
+	nChars = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lptString, -1, NULL, 0, NULL, NULL);
+	p = new char[nChars * 2 + 2];
 	p[0] = 0; p[1] = 0;
 	VERIFY(WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lptString,
-		-1, p, _nChars, NULL, NULL) != ERROR_INSUFFICIENT_BUFFER);
+		-1, p, nChars, NULL, NULL) != ERROR_INSUFFICIENT_BUFFER);
 #endif
 
 	return p;
@@ -48,17 +48,16 @@ char *_StringToAnsi(const WCHAR *lptString)
 
 WCHAR *_StringToUnicode(const char *pszString)
 {
-	int _nChars = 0;
-
 	if(pszString == NULL) { ASSERT(FALSE); return NULL; }
 
+	int nChars;
 	WCHAR *p;
 
 #ifdef _UNICODE
 	// Determine the correct buffer size by calling the function itself with 0 as buffer size (see docs)
-	_nChars = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, NULL, 0);
+	nChars = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, NULL, 0);
 
-	p = new WCHAR[_nChars + 2];
+	p = new WCHAR[nChars + 2];
 	p[0] = 0; p[1] = 0;
 
 	// Jan 9th 2004: DonAngel {
@@ -66,20 +65,36 @@ WCHAR *_StringToUnicode(const char *pszString)
 	// the verification. This could be a bug in MultiByteToWideChar, because thou it was returning
 	// ERROR_INSUFFICIENT_BUFFER, the convertion was OK!?
 	// The problem should be investigated later, but for now - I prefer to remove the ASSERT
-	// VERIFY(MultiByteToWideChar(CP_ACP, 0, pszString, -1, p, _nChars) !=
+	// VERIFY(MultiByteToWideChar(CP_ACP, 0, pszString, -1, p, nChars) !=
 	//	ERROR_INSUFFICIENT_BUFFER);
 	// Jan 9th 2004: DonAngel }
 
-	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, p, _nChars);
+	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, p, nChars);
 #else
-	_nChars = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, NULL, 0);
-	p = new WCHAR[_nChars * 2 + 2];
+	nChars = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, NULL, 0);
+	p = new WCHAR[nChars * 2 + 2];
 	p[0] = 0; p[1] = 0;
-	VERIFY(MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, (LPWSTR) p, _nChars) !=
+	VERIFY(MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, p, nChars) !=
 		ERROR_INSUFFICIENT_BUFFER);
 #endif
 
 	return p;
+}
+
+std::basic_string<WCHAR> _StringToUnicodeStl(const TCHAR *pszString)
+{
+	std::basic_string<WCHAR> strW;
+
+#ifdef _UNICODE
+	if(pszString == NULL) { ASSERT(FALSE); return strW; }
+	strW = pszString;
+#else
+	LPWSTR lpW = _StringToUnicode(pszString);
+	if(lpW != NULL) strW = (LPCWSTR)lpW;
+	SAFE_DELETE_ARRAY(lpW);
+#endif
+
+	return strW;
 }
 
 UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)

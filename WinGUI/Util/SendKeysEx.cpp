@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@ CSendKeysEx::CSendKeysEx()
 {
 	m_p = NULL;
 	m_bReleasedOnce = false;
+
+	m_bSameKL = true;
 
 	ZeroMemory(&m_s, sizeof(SKSTATEEX));
 }
@@ -82,12 +84,19 @@ void CSendKeysEx::SetDelay(DWORD dwDelay)
 	m_p->SetDelay(dwDelay);
 }
 
+void CSendKeysEx::SetEnsureSameKeyboardLayout(bool bEnable)
+{
+	m_bSameKL = bEnable;
+}
+
 void CSendKeysEx::_EnsureSameKeyboardLayout()
 {
 	HKL hklSelf = GetKeyboardLayout(0);
 	HKL hklTarget = GetKeyboardLayout(m_s.dwTargetThreadID);
 
 	m_s.hklCurrent = hklSelf;
+
+	if(!m_bSameKL) return;
 
 	if(hklSelf != hklTarget)
 	{

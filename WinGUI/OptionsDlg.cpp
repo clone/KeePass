@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2012 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -73,6 +73,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_ROWHIGHLIGHTSEL, m_btnColorRowHighlight);
 	DDX_Control(pDX, IDC_TAB_MENU, m_tabMenu);
 	DDX_Control(pDX, IDC_BTN_SELFONT, m_btSelFont);
+	DDX_Control(pDX, IDC_BTN_SELNOTESFONT, m_btSelNotesFont);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_Radio(pDX, IDC_RADIO_NEWLINE_0, m_nNewlineSequence);
@@ -100,6 +101,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(COptionsDlg, CDialog)
 	//{{AFX_MSG_MAP(COptionsDlg)
 	ON_BN_CLICKED(IDC_BTN_SELFONT, OnBtnSelFont)
+	ON_BN_CLICKED(IDC_BTN_SELNOTESFONT, OnBtnSelNotesFont)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_MENU, OnSelChangeTabMenu)
 	ON_BN_CLICKED(IDC_BTN_CREATEASSOC, OnBtnCreateAssoc)
 	ON_BN_CLICKED(IDC_BTN_DELETEASSOC, OnBtnDeleteAssoc)
@@ -125,6 +127,7 @@ BOOL COptionsDlg::OnInitDialog()
 	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_XPButton(m_btSelFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
+	NewGUI_XPButton(m_btSelNotesFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
 	// NewGUI_XPButton(m_btnCreateAssoc, IDB_FILE, IDB_FILE);
 	// NewGUI_XPButton(m_btnDeleteAssoc, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_XPButton(m_btnAutoType, IDB_AUTOTYPE, IDB_AUTOTYPE);
@@ -160,6 +163,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(NULL, OPTGRP_GUI, TRUE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_SELFONTTXT), OPTGRP_GUI, TRUE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_SELFONT), OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_SELNOTESFONT), OPTGRP_GUI, FALSE);
 	m_wndgrp.AddWindow(NULL, OPTGRP_GUI, TRUE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_SELROWHIGHLIGHT), OPTGRP_GUI, TRUE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_ROWHIGHLIGHTSEL), OPTGRP_GUI, TRUE);
@@ -314,9 +318,12 @@ void COptionsDlg::OnCancel()
 	CDialog::OnCancel();
 }
 
-void COptionsDlg::OnBtnSelFont() 
+void COptionsDlg::_ChangeFont(CString& rSpec)
 {
-	CString strFontSpec = m_strFontSpec;
+	CString strFontSpec = rSpec;
+	if(strFontSpec.GetLength() == 0) strFontSpec = m_strFontSpec;
+	if(strFontSpec.GetLength() == 0) { ASSERT(FALSE); return; }
+
 	CString strFace, strSize, strFlags;
 	int nChars = strFontSpec.ReverseFind(_T(';'));
 	int nSizeEnd = strFontSpec.ReverseFind(_T(','));
@@ -346,22 +353,35 @@ void COptionsDlg::OnBtnSelFont()
 	_tcscpy_s(lf.lfFaceName, _countof(lf.lfFaceName), strFace);
 
 	CFontDialog dlg(&lf);
-	CString strTemp;
+	dlg.m_cf.Flags |= CF_NOSCRIPTSEL;
 
 	if(dlg.DoModal() == IDOK)
 	{
 		int dSize = dlg.GetSize();
-		dSize = (dSize >= 0) ? dSize : -dSize;
-		m_strFontSpec = dlg.GetFaceName();
-		m_strFontSpec += _T(";");
+		dSize = ((dSize >= 0) ? dSize : -dSize);
+
+		CString strNewFontSpec = dlg.GetFaceName(), strTemp;
+		strNewFontSpec += _T(";");
 		strTemp.Format(_T("%d"), dSize / 10);
-		m_strFontSpec += strTemp;
-		m_strFontSpec += _T(",");
-		m_strFontSpec += ((dlg.IsBold() == TRUE) ? _T('1') : _T('0'));
-		m_strFontSpec += ((dlg.IsItalic() == TRUE) ? _T('1') : _T('0'));
-		m_strFontSpec += ((dlg.IsUnderline() == TRUE) ? _T('1') : _T('0'));
-		m_strFontSpec += ((dlg.IsStrikeOut() == TRUE) ? _T('1') : _T('0'));
+		strNewFontSpec += strTemp;
+		strNewFontSpec += _T(",");
+		strNewFontSpec += ((dlg.IsBold() == TRUE) ? _T('1') : _T('0'));
+		strNewFontSpec += ((dlg.IsItalic() == TRUE) ? _T('1') : _T('0'));
+		strNewFontSpec += ((dlg.IsUnderline() == TRUE) ? _T('1') : _T('0'));
+		strNewFontSpec += ((dlg.IsStrikeOut() == TRUE) ? _T('1') : _T('0'));
+
+		rSpec = strNewFontSpec;
 	}
+}
+
+void COptionsDlg::OnBtnSelFont() 
+{
+	_ChangeFont(m_strFontSpec);
+}
+
+void COptionsDlg::OnBtnSelNotesFont() 
+{
+	_ChangeFont(m_strNotesFontSpec);
 }
 
 void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult) 
@@ -467,6 +487,7 @@ void COptionsDlg::OnBtnAutoType()
 	dlg.m_dwATHotKey = m_dwATHotKey;
 	dlg.m_strDefaultAutoTypeSequence = m_strDefaultAutoTypeSequence;
 	dlg.m_bAutoTypeIEFix = m_bAutoTypeIEFix;
+	dlg.m_bSameKL = m_bAutoTypeSameKL;
 	dlg.m_bSortAutoTypeSelItems = m_bSortAutoTypeSelItems;
 
 	if(dlg.DoModal() == IDOK)
@@ -476,6 +497,7 @@ void COptionsDlg::OnBtnAutoType()
 		m_dwATHotKey = dlg.m_dwATHotKey;
 		m_strDefaultAutoTypeSequence = dlg.m_strDefaultAutoTypeSequence;
 		m_bAutoTypeIEFix = dlg.m_bAutoTypeIEFix;
+		m_bAutoTypeSameKL = dlg.m_bSameKL;
 		m_bSortAutoTypeSelItems = ((dlg.m_bSortAutoTypeSelItems == FALSE) ? FALSE : TRUE);
 	}
 }
