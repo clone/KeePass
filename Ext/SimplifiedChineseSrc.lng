@@ -1,7 +1,7 @@
-05-5-16 18:18|~LANGUAGENAME|
+05-6-4 0:35|~LANGUAGENAME|
 |简体中文|
 |~LANGUAGEVERSION|
-|0.99c|
+|1.0|
 |~LANGUAGEAUTHOR|
 |窦兴强 (Leo Dou)|
 |~LANGUAGEAUTHOREMAIL|
@@ -310,7 +310,7 @@
 |密码(&P)|
 |Show Note&s Column|
 |备注(&S)|
-|Main Window &Always On Top|
+|&Always On Top|
 |总在最前(&A)|
 |Hide &Passwords Behind Asterisks (***)|
 |隐藏密码为***(&P)|
@@ -322,8 +322,8 @@
 |关于 KeePass(&A)...|
 |&Database Settings...|
 |数据库设置(&D)...|
-|&Minimize/Maximize Window To/From Tray|
-|显示窗口/最小化至托盘(&M)|
+|&Tray/Untray|
+|收缩至托盘/显示窗口(&T)|
 |Version |
 |版本 |
 |Password and repeated password aren't identical!|
@@ -934,6 +934,10 @@
 |2 周|
 |3 months|
 |3 月|
+|6 months|
+|6 月|
+|1 year|
+|1 年|
 |By default, new entries expire in the following number of days:|
 |默认情况下，新的记录在以下天数后失效:|
 |Calculate rounds for a 1-second delay on this computer|
@@ -956,3 +960,9 @@
 |使用更安全的密码编辑控件|
 |Waiting for paste command.|
 |等待粘贴命令。|
+|&Donate...|
+|捐助(&D)...|
+|Automatically generate random passwords for new entries|
+|为新建记录自动生成随机密码|
+|Include backup entries in quick searches (toolbar)|
+|快速搜索时包括备份记录（工具栏）|

@@ -37,7 +37,7 @@
 #include "NewGUI/CustomTreeCtrlEx.h"
 #include "NewGUI/SystemTray.h"
 #include "NewGUI/SystemTrayEx.h"
-#include "NewGUI/AutoRichEditCtrl.h"
+#include "NewGUI/AutoRichEditCtrlFx.h"
 #include "Util/PluginMgr.h"
 #include "Util/SInstance.h"
 #include "Util/SysDefEx.h"
@@ -60,12 +60,13 @@
 
 // #define PWS_DEFAULT_SPLITTER_Y 270
 #define PWS_DEFAULT_SPLITTER_Y 10
+#define MENU_EXTRAS_ITEMCOUNT  8
 
 #define PWS_TAN_ENTRY      TRL("<TAN>")
 #define PWS_NEW_ATTACHMENT _T(":: ")
 
-#define WM_PLUGINS_FIRST (0x9FFF)
-#define WM_PLUGINS_LAST  (0xAFFF)
+#define WM_PLUGINS_FIRST   (0x9FFF)
+#define WM_PLUGINS_LAST    (0xAFFF)
 
 #define HOTKEYID_AUTOTYPE 33
 #define HOTKEYID_RESTORE  34
@@ -77,6 +78,12 @@
 #define AUTOEXPIRE_NOSHOW  0
 #define AUTOEXPIRE_EXPIRED 1
 #define AUTOEXPIRE_SOONTO  2
+
+// Auto-type methods
+#define ATM_DROPBACK       0
+#define ATM_MINIMIZE       1
+
+#define PWM_URL_DONATE     _T("http://keepass.sourceforge.net/donate.php")
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -90,6 +97,7 @@ public:
 	static void _TranslateMenu(BCMenu *pBCMenu, BOOL bAppendSuffix = TRUE);
 	static const TCHAR *_GetCmdAccelExt(const TCHAR *psz);
 	void RestartApplication();
+	static CString _GetSecureEditTipText(const TCHAR *tszBase);
 
 	void ProcessResize();
 	void CleanUp();
@@ -126,6 +134,7 @@ public:
 
 	void _OnPwlistColumnWidthChange(int icolumn = -1, int isize = -1);
 	void _SortListIfAutoSort();
+	void ViewHideHandler();
 
 	void _HandleEntryDrop(DWORD dwDropType, HTREEITEM hTreeItem);
 
@@ -143,7 +152,9 @@ public:
 	}
 	void _Groups_SaveView(BOOL bSaveSelection = TRUE)
 	{
-		m_dwGroupsSaveFirstVisible = m_cGroups.GetItemData(m_cGroups.GetFirstVisibleItem());
+		HTREEITEM hTop = m_cGroups.GetFirstVisibleItem();
+		if(hTop != NULL) m_dwGroupsSaveFirstVisible = m_cGroups.GetItemData(hTop);
+		else m_dwGroupsSaveFirstVisible = DWORD_MAX;
 
 		m_dwGroupsSaveSelected = DWORD_MAX;
 		if(bSaveSelection == TRUE)
@@ -154,8 +165,13 @@ public:
 	}
 	void _Groups_RestoreView()
 	{
-		HTREEITEM h = _GroupIdToHTreeItem(m_dwGroupsSaveFirstVisible);
-		if(h != NULL) m_cGroups.SelectSetFirstVisible(h);
+		HTREEITEM h;
+		
+		if(m_dwGroupsSaveFirstVisible != DWORD_MAX)
+		{
+			h = _GroupIdToHTreeItem(m_dwGroupsSaveFirstVisible);
+			if(h != NULL) m_cGroups.SelectSetFirstVisible(h);
+		}
 
 		if(m_dwGroupsSaveSelected != DWORD_MAX)
 		{
@@ -195,6 +211,7 @@ public:
 	}
 
 	BOOL _RemoveSearchGroup();
+	void _DeleteBackupEntries();
 
 	void _SelChangeView(UINT uID);
 	void _List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEntry, PW_TIME *ptNow);
@@ -213,14 +230,14 @@ public:
 	void _SyncSubTree(CTreeCtrl *pTree, HTREEITEM hItem, BOOL bGuiToMgr);
 	void _SyncItem(CTreeCtrl *pTree, HTREEITEM hItem, BOOL bGuiToMgr);
 
-	void _SortList(DWORD dwByField, BOOL bAutoSortCall = FALSE);
+	void _SortList(DWORD dwByField, BOOL bAutoSortCall);
 	BOOL _CheckIfCanSort();
 
 	HTREEITEM _FindSelectInTree(CTreeCtrl *pTree, HTREEITEM hRoot, DWORD dwGroupId);
 
 	BOOL _IsUnsafeAllowed();
 
-	void _OpenDatabase(const TCHAR *pszFile, const TCHAR *pszPassword, const TCHAR *pszKeyFile, BOOL bOpenLocked, LPCTSTR lpPreSelectPath);
+	void _OpenDatabase(const TCHAR *pszFile, const TCHAR *pszPassword, const TCHAR *pszKeyFile, BOOL bOpenLocked, LPCTSTR lpPreSelectPath, BOOL bIgnoreCorrupted);
 	BOOL _ChangeMasterKey(BOOL bCreateNew);
 	void _PrintGroup(DWORD dwGroupId);
 	void _Find(DWORD dwFindGroupId);
@@ -231,7 +248,7 @@ public:
 	BOOL _ParseCommandLine();
 	void _ParseSpecAndSetFont(const TCHAR *pszSpec);
 
-	void _ShowToolBar(BOOL bShow = TRUE);
+	void _ShowToolBar(BOOL bShow);
 	void _EnableViewMenuItems(BCMenu *pMenu);
 
 	void _FinishDragging(BOOL bDraggingImageList);
@@ -254,6 +271,7 @@ public:
 	static BOOL m_bSecureEdits;
 	BOOL m_bSingleClickTrayIcon;
 	DWORD m_dwDefaultExpire;
+	BOOL m_bDeleteBackupsOnSave;
 
 	BOOL m_bExiting;
 	BOOL m_bLocked;
@@ -301,6 +319,7 @@ public:
 	BOOL m_bColAutoSize;
 	int m_nAutoSort;
 	BOOL m_bAutoPwGen;
+	int m_nAutoTypeMethod;
 
 	HICON m_hTrayIconNormal;
 	HICON m_hTrayIconLocked;
@@ -308,6 +327,7 @@ public:
 
 	BCMenu m_menu; // Our XP-style menu
 	BOOL m_bMenu; // Menu created?
+	BOOL m_bRestoreHotKeyRegistered;
 
 	BCMenu m_popmenu;
 	BCMenu m_menuColView;
@@ -394,7 +414,7 @@ public:
 	CXPStyleButtonST	m_btnTbSave;
 	CXPStyleButtonST	m_btnTbOpen;
 	CCustomListCtrlEx	m_cList;
-	CAutoRichEditCtrl	m_reEntryView;
+	CAutoRichEditCtrlFx	m_reEntryView;
 	CString	m_strQuickFind;
 	//}}AFX_DATA
 
@@ -615,6 +635,8 @@ protected:
 	afx_msg LRESULT OnHotKey(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnImportGetMore();
 	afx_msg void OnInfoDonate();
+	afx_msg void OnExtrasRepairDb();
+	afx_msg void OnUpdateExtrasRepairDb(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 
 	afx_msg void OnPluginMessage(UINT nID);

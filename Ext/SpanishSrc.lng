@@ -1,5 +1,5 @@
 |~LANGUAGENAME||Spanish (Español para España y Latinoamérica)|
-|~LANGUAGEVERSION||0.99c|
+|~LANGUAGEVERSION||1.0|
 |~LANGUAGEAUTHOR||Marcel Trujillo|
 |~LANGUAGEAUTHOREMAIL||marcelito@gmail.com|
 |&OK||&OK|
@@ -140,10 +140,8 @@
 |Show User&Name Column||Mostrar columna Usuar&io|
 |Show &URL Column||Mostrar columna &URL|
 |Show &Password Column||Mostrar columna Contra&seña|
-|Main Window &Always On Top||Ventana Principal siempre &Encima|
 |Password &Generator||&Generador de Contraseñas|
 |&About KeePass...||&Acerca de KeePass...|
-|&Minimize/Maximize Window To/From Tray||Minimizar/Maximizar Ventana de/hacia la Bandeja del Sistema|
 |Version ||Versión |
 |Password and repeated password aren't identical!||¡La contraseña y la contraseña repetida no son idénticas!|
 |Stop||Detener|
@@ -475,3 +473,10 @@
 |Use more secure password edit controls||Usar controles de edición de contraseña más seguros|
 |Waiting for paste command.||Esperando por comando de pegado.|
 |Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.||Su clave es encriptada varias veces con la finalidad de aumentar su seguridad, haciéndola más resistente a ataques de diccionario.|
+|&Always On Top||Siempre encim&a|
+|&Donate...||&Donar...|
+|&Tray/Untray||&Tray/Untray|
+|1 year||1 año|
+|6 months||6 meses|
+|Automatically generate random passwords for new entries||Generar automáticamente contraseñas aleatorias para las nuevas entradas|
+|Include backup entries in quick searches (toolbar)||Incluir entradas de respaldo en las búsquedas rápidas (barra de herramientas)|

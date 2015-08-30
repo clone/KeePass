@@ -12,7 +12,7 @@
 |Network|                       |Võrk|
 |Internet|                      |Internet|
 |eMail|                         |Elektronpost|
-|Homebanking|                   |Internetipangandu|
+|Homebanking|                   |Internetipank|
 |Entry|                         |Sissekanne|
 
 |&Title|                        |&Tiitel|
@@ -87,9 +87,9 @@
 |Special characters|
     |Erimärgid|
 |Higher ANSI characters|
-    |Suuremad ANSI tähemärgid|
+    |Kõrgemad ANSI tähemärgid|
 |Special brackets ('{', '}', '[', ...)|
-    |Sulud ('{', '}', '[', ...)|
+    |Erinevad sulud ('{', '}', '[', ...)|
 
 |Group:|                        |Grupp:|
 |Title:|                        |Tiitel:|
@@ -191,7 +191,7 @@
 |Show &URL Column|              |Näita URL veergu|
 |Show &Password Column|         |Näita parooli veergu|
 |Show Note&s Column|            |Näita &märkuste veergu|
-|Main Window &Always On Top|    |Põhiaken alati kõige pealmine|
+|&Always On Top|    |&Aken alati kõige pealmine|
 |Hide &Passwords Behind Asterisks (***)|
     |Peida &paroolid tärnide taha (***)|
 
@@ -200,7 +200,7 @@
 |Visit &KeePass Homepage|       |Külasta &KeePass kodulehekülge|
 |&About KeePass...|             |KeeP&ass tiitelandmed...|
 
-|&Minimize/Maximize Window To/From Tray|
+|&Tray/Untray|
     |Minimeeri/maksimeeri aken tegumiribale|
 
 |Version |                      |Versioon |
@@ -630,7 +630,7 @@
 |Plugin|                        |Plugin|
 |Plugin Manager|                |Pluginate haldur|
 |Plugin has been designed for:| |Plugin on disainitud selle versiooni jaoks:|
-|Success|                       |Edu|
+|Success|                       |Õnnestus|
 |Therefore save all data before you continue.|
     |Seetõttu salvesta kõik info enne jätkamist.|
 |This plugin has been designed for a different application version and may be incompatible with this one.|
@@ -653,7 +653,7 @@
 |cannot be loaded!|             |ei ole võimalik avada!|
 
 |Advanced|                      |Edasijõudnutele|
-|Backup|                        |Varukoopa|
+|Backup|                        |Varukoopia|
 |Click [Cancel] to abort changing the key.|
     |Vajuta [Katkesta] kui soovid võtme vahetamise pooleli jätta.|
 |Click [No] to reuse the selected key-file for this database.|
@@ -717,7 +717,15 @@
     |Kasuta turvalisemaid parooli muutmise juhtelemente|
 |Waiting for paste command.|    |Oodatakse kleepimise käsku.|
 
+|&Donate...|                    |&Anneta...|
+|1 year|                        |1 aasta|
+|6 months|                      |6 kuud|
+|Automatically generate random passwords for new entries|
+    |Genereeri automaatselt juhuslikud paroolid uutele sissekannetele|
+|Include backup entries in quick searches (toolbar)|
+    |Tööriistaribalt otsimine hõlmab ka varukoopiaid|
+
 |~LANGUAGENAME|                 |Estonian|
-|~LANGUAGEVERSION|              |0.99c|
+|~LANGUAGEVERSION|              |1.00|
 |~LANGUAGEAUTHOR|               |Andri Viiand|
 |~LANGUAGEAUTHOREMAIL|          |andriv@users.sourceforge.net, http://sourceforge.net/users/andriv|

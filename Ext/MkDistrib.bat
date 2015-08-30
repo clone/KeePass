@@ -39,6 +39,9 @@ Util\CprLang.exe FrenchSrc.lng French.lng
 DEL German.lng
 Util\CprLang.exe GermanSrc.lng German.lng
 
+DEL Greek.lng
+Util\CprLang.exe GreekSrc.lng Greek.lng
+
 DEL Hebrew.lng
 Util\CprLang.exe HebrewSrc.lng Hebrew.lng
 
@@ -143,6 +146,8 @@ DEL ..\Debug\Ukrainian.lng
 COPY /B Ukrainian.lng /B ..\Debug\Ukrainian.lng > NUL
 DEL ..\Debug\SimplifiedChinese.lng
 COPY /B SimplifiedChinese.lng /B ..\Debug\SimplifiedChinese.lng > NUL
+DEL ..\Debug\Greek.lng
+COPY /B Greek.lng /B ..\Debug\Greek.lng > NUL
 
 REM Copy latest language files into Release directory
 
@@ -194,6 +199,8 @@ DEL ..\Release\Ukrainian.lng
 COPY /B Ukrainian.lng /B ..\Release\Ukrainian.lng > NUL
 DEL ..\Release\SimplifiedChinese.lng
 COPY /B SimplifiedChinese.lng /B ..\Release\SimplifiedChinese.lng > NUL
+DEL ..\Release\Greek.lng
+COPY /B Greek.lng /B ..\Release\Greek.lng > NUL
 
 REM Copy language reference file
 

@@ -29,8 +29,8 @@
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
 
 // When making a Windows build, don't forget to update the verinfo resource
-#define PWM_VERSION_STR  _T("1.0")
-#define PWM_VERSION_DW   0x01000001
+#define PWM_VERSION_STR  _T("1.01")
+#define PWM_VERSION_DW   0x01000101
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -120,6 +120,8 @@
 #define PWMKEY_DEFAULTEXPIRE    _T("KeeDefaultExpire")
 #define PWMKEY_AUTOPWGEN        _T("KeeAutoPwGen")
 #define PWMKEY_QUICKFINDINCBK   _T("KeeQuickFindIncBackup")
+#define PWMKEY_AUTOTYPEMETHOD   _T("KeeAutoTypeMethod")
+#define PWMKEY_DELETEBKONSAVE   _T("KeeDeleteBackupsOnSave")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -157,10 +159,10 @@
 #define PWMF_EXPIRE           512
 #define PWMF_UUID            1024
 
-#define PWGF_EXPANDED     1
+#define PWGF_EXPANDED   1
 
-#define ALGO_AES          0
-#define ALGO_TWOFISH      1
+#define ALGO_AES        0
+#define ALGO_TWOFISH    1
 
 // Error codes
 #define PWE_UNKNOWN                0
@@ -175,6 +177,12 @@
 #define PWE_INVALID_RANDOMSOURCE   9
 #define PWE_INVALID_FILESTRUCTURE 10
 #define PWE_CRYPT_ERROR           11
+#define PWE_INVALID_FILESIZE      12
+#define PWE_INVALID_FILESIGNATURE 13
+#define PWE_INVALID_FILEHEADER    14
+
+// Format Flags
+#define PWFF_NO_INTRO   1
 
 // Password Meta Streams
 #define PMS_ID_BINDESC  _T("bin-stream")
@@ -280,6 +288,13 @@ typedef struct _PMS_SIMPLE_UI_STATE
 	DWORD dwReserved16;
 } PMS_SIMPLE_UI_STATE;
 
+typedef struct _PWDB_REPAIR_INFO
+{
+	DWORD dwOriginalGroupCount;
+	DWORD dwOriginalEntryCount;
+	DWORD dwRecognizedMetaStreamCount;
+} PWDB_REPAIR_INFO, *PPWDB_REPAIR_INFO;
+
 #pragma pack()
 
 #ifdef _DEBUG
@@ -349,7 +364,7 @@ public:
 	void UnlockEntryPassword(PW_ENTRY *pEntry); // Make password readable
 
 	void NewDatabase();
-	int OpenDatabase(const TCHAR *pszFile);
+	int OpenDatabase(const TCHAR *pszFile, PWDB_REPAIR_INFO *pRepair);
 	int SaveDatabase(const TCHAR *pszFile);
 
 	// Move entries and groups
@@ -374,14 +389,14 @@ public:
 	// Convert PW_TIME to 5-byte compressed structure and the other way round
 	static void _TimeToPwTime(BYTE *pCompressedTime, PW_TIME *pPwTime);
 	static void _PwTimeToTime(PW_TIME *pPwTime, BYTE *pCompressedTime);
-	static std::string FormatError(int nErrorCode);
+	static std::string FormatError(int nErrorCode, DWORD dwFlags);
 
 	// Get the never-expire time
 	static void _GetNeverExpireTime(PW_TIME *pPwTime);
 
 	// Checks and corrects the group tree (level order, etc.)
 	void FixGroupTree();
-	void DeleteLostEntries();
+	int DeleteLostEntries();
 
 	void SubstEntryGroupIds(DWORD dwExistingId, DWORD dwNewId);
 
@@ -412,7 +427,7 @@ private:
 	BOOL _ReadEntryFieldV2(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_ENTRY *pEntry);
 
 	BOOL _AddAllMetaStreams();
-	void _LoadAndRemoveAllMetaStreams();
+	DWORD _LoadAndRemoveAllMetaStreams();
 	BOOL _AddMetaStream(LPCTSTR lpMetaDataDesc, BYTE *pData, DWORD dwLength);
 	BOOL _IsMetaStream(PW_ENTRY *p);
 	void _ParseMetaStream(PW_ENTRY *p);

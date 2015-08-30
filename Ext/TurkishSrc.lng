@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Türkçe <Turkish>|
-|~LANGUAGEVERSION|             |0.99c|
+|~LANGUAGEVERSION|             |1.0|
 |~LANGUAGEAUTHOR|              |Erhan BURHAN|
 |~LANGUAGEAUTHOREMAIL|         |<texas@xposta.com>|
 
@@ -203,7 +203,7 @@
 |Show &URL Column|             |&URL kolonunu göster|
 |Show &Password Column|        |&Parola kolonunu göster|
 |Show Note&s Column|           |&Notlar kolonunu göster|
-|Main Window &Always On Top|   |Ana pencereyi daima üstte &tut|
+|&Always On Top|   				 |Her zaman üstte &tut|
 |Hide &Passwords Behind Asterisks (***)|       |Parolalarý yýldýz (***) iþaretleriyle &gizle|
 
 |Password &Generator|          |Parola Ü&reticisi|
@@ -213,8 +213,7 @@
 
 |&Database Settings...|        |&Veritabaný ayarlarý...|
 
-|&Minimize/Maximize Window To/From Tray|
-    |&Pencereyi bildirim alanýna küçült/ekraný kapla |
+|&Tray/Untray|						 |&Bildirim alanýna küçült/ekraný kapla|
 
 |Version |                     |Versiyon |
 
@@ -661,3 +660,8 @@
 |2 weeks|                                    |2 hafta|
 |1 month|                                    |1 ay|
 |3 months|                                   |3 ay|
+|6 months|                                   |6 ay|
+|1 year|                                     |1 yl|
+|Automatically generate random passwords for new entries| |Yeni giriþler için otomatik olarak rasgele parolalar üret|
+|Include backup entries in quick searches (toolbar)|  |Hýzlý aramalarda yedek giriþleri de aramaya dahil et|
+|&Donate...|                                 |&Baðýþ yap...|

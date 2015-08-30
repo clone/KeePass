@@ -217,6 +217,11 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 	}
 	else m_btnOK.ShowWindow(SW_SHOW);
 
+	m_tipSecClear.Create(this, 0x40);
+	m_tipSecClear.AddTool(&m_cEditPw, CPwSafeDlg::_GetSecureEditTipText(_T("Your new password:")));
+	m_tipSecClear.SetMaxTipWidth(630);
+	m_tipSecClear.Activate(m_cEditPw.IsSecureModeEnabled());
+
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), _T(""));
 	OnCheckHidePw();
 
@@ -577,9 +582,18 @@ void CPwGeneratorDlg::OnCheckHidePw()
 		m_cEditPw.SetFont(&m_fSymbol, TRUE);
 	}
 
+	m_tipSecClear.Activate(m_cEditPw.IsSecureModeEnabled());
+
 	UpdateData(FALSE);
 	m_cEditPw.RedrawWindow();
 	m_cEditPw.SetFocus();
+}
+
+BOOL CPwGeneratorDlg::PreTranslateMessage(MSG* pMsg) 
+{
+	m_tipSecClear.RelayEvent(pMsg);
+
+	return CDialog::PreTranslateMessage(pMsg);
 }
 
 #pragma warning(pop)

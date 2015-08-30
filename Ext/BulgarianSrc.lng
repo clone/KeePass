@@ -1,4 +1,4 @@
-|~LANGUAGEVERSION| |0.99c|
+|~LANGUAGEVERSION| |1.0|
 |~LANGUAGEAUTHOR|     |DonAngel|
 |~LANGUAGEAUTHOREMAIL| |public@doncho.net|
 |~LANGUAGENAME|       |Български|
@@ -182,14 +182,10 @@
 |Show User&Name Column|        |Показване на колона '&Потребителско име'|
 |Show &URL Column|             |Показване на колона '&URL'|
 |Show &Password Column|        |Показване на колона 'П&арола'|
-|Main Window &Always On Top|   |&Основният прозорец винаги най-отгоре|
 
 |Password &Generator|          |&Генератор на пароли|
 
 |&About KeePass...|            |&Относно KeePass...|
-
-|&Minimize/Maximize Window To/From Tray|
-    |Скрива/показва на/от лентата с икони|
 
 |Version |                     |Версия |
 
@@ -850,3 +846,25 @@
 |Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
 	|Вашият ключ се криптира няколко пъти, преди да се произведе финалния ключ за базата данни. Това прибавя допълнителна трудност при опит за отгатване на вашия ключ чрез речник.|
 
+
+
+|&Always On Top|
+	|&Винати отгоре|
+	
+|&Donate...|
+	|&Дарете...|
+	
+|&Tray/Untray|
+	|&Икона до часовника Да/Не|
+	
+|1 year|
+	|1 година|
+	
+|6 months|
+	|6 месеца|
+	
+|Automatically generate random passwords for new entries|
+	|Автоматично генериране на случайна парола за новите записи|
+	
+|Include backup entries in quick searches (toolbar)|
+	|Включване на резервните записи в бързото търсене (от лентата)|

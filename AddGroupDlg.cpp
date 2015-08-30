@@ -77,6 +77,11 @@ BOOL CAddGroupDlg::OnInitDialog()
 	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 
+	CString strTT = TRL("&Pick One"); strTT.Remove(_T('&'));
+	m_btSetIcon.SetTooltipText(strTT, TRUE);
+	if((m_nIconId >= 0) && (m_pParentImageList != NULL))
+		m_btSetIcon.SetIcon(m_pParentImageList->ExtractIcon(m_nIconId));
+
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY),
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
@@ -139,5 +144,8 @@ void CAddGroupDlg::OnSetIconBtn()
 	if(dlg.DoModal() == IDOK)
 	{
 		m_nIconId = dlg.m_nSelectedIcon;
+
+		if((m_nIconId >= 0) && (m_pParentImageList != NULL))
+			m_btSetIcon.SetIcon(m_pParentImageList->ExtractIcon(m_nIconId));
 	}
 }

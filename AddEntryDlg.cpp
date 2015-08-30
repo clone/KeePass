@@ -193,6 +193,11 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	m_btSelDefExpires.SetMenu(IDR_EXPIRESMENU, this->m_hWnd, TRUE, NULL, CSize(16, 15));
 
+	strTT = TRL("&Pick One"); strTT.Remove(_T('&'));
+	m_btPickIcon.SetTooltipText(strTT, TRUE);
+	if((m_nIconId >= 0) && (m_pParentIcons != NULL))
+		m_btPickIcon.SetIcon(m_pParentIcons->ExtractIcon(m_nIconId));
+
 	if(m_dwDefaultExpire != 0)
 	{
 		CString str, strTemp;
@@ -292,6 +297,12 @@ BOOL CAddEntryDlg::OnInitDialog()
 	// m_reNotes.LimitText(0);
 	m_reNotes.SetEventMask(ENM_MOUSEEVENTS);
 	m_reNotes.SetRTF(m_strNotes, SF_TEXT);
+
+	m_tipSecClear.Create(this, 0x40);
+	m_tipSecClear.AddTool(&m_pEditPw, CPwSafeDlg::_GetSecureEditTipText(_T("Enter password:")));
+	m_tipSecClear.AddTool(&m_pRepeatPw, CPwSafeDlg::_GetSecureEditTipText(_T("Enter password:")));
+	m_tipSecClear.SetMaxTipWidth(630);
+	m_tipSecClear.Activate(m_pEditPw.IsSecureModeEnabled());
 
 	UpdateData(FALSE);
 
@@ -465,6 +476,8 @@ void CAddEntryDlg::OnCheckHidePw()
 		m_pRepeatPw.SetFont(&m_fSymbol, TRUE);
 	}
 
+	m_tipSecClear.Activate(m_pEditPw.IsSecureModeEnabled());
+
 	UpdateData(FALSE);
 	m_pRepeatPw.SetFocus();
 	m_pEditPw.SetFocus();
@@ -480,6 +493,9 @@ void CAddEntryDlg::OnPickIconBtn()
 	if(dlg.DoModal() == IDOK)
 	{
 		m_nIconId = dlg.m_nSelectedIcon;
+
+		if((m_nIconId >= 0) && (m_pParentIcons != NULL))
+			m_btPickIcon.SetIcon(m_pParentIcons->ExtractIcon(m_nIconId));
 	}
 }
 
@@ -750,7 +766,7 @@ void CAddEntryDlg::SetExpireDays(DWORD dwDays)
 	t += CTimeSpan((LONG)dwDays, 0, 0, 0);
 
 	m_editDate.SetDate(t);
-	m_editTime.SetTime(t);
+	// m_editTime.SetTime(t); // Daylight saving
 
 	UpdateData(FALSE);
 	UpdateControlsStatus();
@@ -784,6 +800,13 @@ void CAddEntryDlg::OnExpires6Months()
 void CAddEntryDlg::OnExpires12Months() 
 {
 	SetExpireDays(365);
+}
+
+BOOL CAddEntryDlg::PreTranslateMessage(MSG* pMsg) 
+{
+	m_tipSecClear.RelayEvent(pMsg);
+
+	return CDialog::PreTranslateMessage(pMsg);
 }
 
 #pragma warning(pop)

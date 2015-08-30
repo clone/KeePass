@@ -75,6 +75,8 @@ public:
 	BOOL m_bSingleClickTrayIcon;
 	BOOL m_bAutoPwGen;
 	BOOL m_bQuickFindIncBackup;
+	BOOL m_bMinimizeBeforeAT;
+	BOOL m_bDeleteBackupsOnSave;
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };

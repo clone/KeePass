@@ -48,6 +48,7 @@ public:
 	CFont m_fStyle;
 	CFont m_fSymbol;
 	CKCSideBannerWnd m_banner;
+	CToolTipCtrl m_tipSecClear;
 
 	LPCTSTR m_lpPreSelectPath;
 
@@ -72,6 +73,8 @@ public:
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CPasswordDlg)
+	public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	//}}AFX_VIRTUAL

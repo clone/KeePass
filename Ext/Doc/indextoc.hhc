@@ -90,6 +90,14 @@
 			<param name="Name" value="Secure Edit Controls">
 			<param name="Local" value="secureedits.html">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Repair Databases">
+			<param name="Local" value="repair.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Tips &amp; Tricks">
+			<param name="Local" value="tips.html">
+			</OBJECT>
 	</UL>
 </UL>
 </BODY></HTML>

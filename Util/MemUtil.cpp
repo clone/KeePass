@@ -117,7 +117,9 @@ C_FN_SHARE void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWO
 C_FN_SHARE void _UnpackStructToTime(BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond)
 {
 	DWORD dw1, dw2, dw3, dw4, dw5;
-	ASSERT(pBytes != NULL);
+
+	ASSERT(pBytes != NULL); if(pBytes == NULL) return;
+
 	dw1 = (DWORD)pBytes[0]; dw2 = (DWORD)pBytes[1]; dw3 = (DWORD)pBytes[2];
 	dw4 = (DWORD)pBytes[3]; dw5 = (DWORD)pBytes[4];
 

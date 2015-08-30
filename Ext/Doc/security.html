@@ -99,13 +99,13 @@ random bytes as we need.<br />
 <br />
 <br />
 <a name="secbruteprotect"></a>
-<b>Protection against dictionary and brute-force attacks</b><br />
+<b>Protection against dictionary and guessing attacks</b><br />
 <br />
-KeePass offers some protection against brute-force and dictionary attacks.
+KeePass offers some protection against guessing and dictionary attacks.
 This is only needed when using master passwords, key-disks don't need this, they
 are more secure anyway <a href="#keydisksnorounds">[4]</a>.<br />
 <br />You
-can't really prevent dictionary and brute-force attacks, nothing prevents an attacker to just try
+can't really prevent dictionary and guessing attacks, nothing prevents an attacker to just try
 all possible keys and look if the database decrypts. But what we can do (and
 KeePass does) is to make it harder: by adding a constant time factor to the
 key initialization, we can make them as hard as we want <a href="#multihash">[5]</a>
@@ -129,7 +129,7 @@ this to a much larger value (you can set it in the database options dialog), if
 you accept a one-second delay on your PC when opening a KeePass database, you
 can even set it to a few 100.000s. Think about this: an attacker now also needs
 much longer to try a key. If it takes him one second for one key, he can almost
-forget any dictionary and brute-force attacks.<br />
+forget any dictionary and guessing attacks.<br />
 <br />
 <br />
 <a name="secmemprot"></a>

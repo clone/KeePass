@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Magyar|
-|~LANGUAGEVERSION|             |0.99c|
+|~LANGUAGEVERSION|             |1.00|
 |~LANGUAGEAUTHOR|              |documan|
 |~LANGUAGEAUTHOREMAIL|         |documan at mailbox dot hu|
 
@@ -194,7 +194,6 @@
 |Show &URL Column|             |&URL oszlop mutatása|
 |Show &Password Column|        |&Jelszó oszlop mutatása|
 |Show Note&s Column|           |Megjegyzés oszlop mutatása|
-|Main Window &Always On Top|   |A fõablak &mindig látható legyen|
 |Hide &Passwords Behind Asterisks (***)|       |Jelszavak rejtése csillagok (***) mögé|
 
 |Password &Generator|          |Jelszó &Generátor|
@@ -203,9 +202,6 @@
 |&About KeePass...|            |A KeePass névjegye...|
 
 |&Database Settings...|        |Adatbázis beállítások...|
-
-|&Minimize/Maximize Window To/From Tray|
-    |Kis méret / Elõzõ méret|
 
 |Version | |Verzió |
 
@@ -620,3 +616,11 @@
 |Use more secure password edit controls| |Még biztonságosabb jelszó szerkesztõ elemek használata|
 |Waiting for paste command.| |Várakozás a beillesztés parancsra.|
 |Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.| |Ez a kulcs több alkalommal is titkosítva lett a végleges adatbázis titkosító kulcs elkészülte elõtt. Ez biztosítja az állandósági tényezõt és megnehezíti a nyers-erejû támadásokat.|
+
+|&Always On Top| |&Mindig legfelül|
+|&Donate...| |&Hozzájárulás...|
+|&Tray/Untray| |&Tálca/Nem tálca|
+|1 year| |1 év|
+|6 months| |6 hónap|
+|Automatically generate random passwords for new entries| |Automatikus jelszógenerálás az új bejegyzésekhez|
+|Include backup entries in quick searches (toolbar)| |Biztonsági mentések figyelembevétele a gyors kereséseknél (eszköztár)|

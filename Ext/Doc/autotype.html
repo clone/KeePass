@@ -145,11 +145,11 @@ Similarly to the auto-type sequence string in the notes field above, you can def
 My e-mail I used to register: test@nowhere.com
 
 Auto-Type: {USERNAME}{TAB}{TAB}Some fixed string{TAB}{PASSWORD}{ENTER}
-<b>Auto-Type-Window: SourceForge.net*</b>
+<b>Auto-Type-Window: PayPal - Welcome*</b>
 
 Here you can continue with your notes if you wish...</pre>
 
-If you now have a window open that starts with &quot;SourceForge.net&quot; and press the global
+If you now have a window open that starts with &quot;PayPal - Welcome&quot; and press the global
 auto-type hotkey combination, KeePass performs the auto-type sequence above.<br />
 <br />
 The default Auto-Type-Window string is <b>*{TITLE}*</b>. So, if you don't define your
@@ -179,22 +179,23 @@ i.e. the middle * character is treated as '*' character instead of a wildcard.<b
 <table class="tablebox"><tr><td class="boxtitle">
 &nbsp;An example</td></tr></table>
 <br />
-Now let's have a look at a real-world example: logging in at SourceForge.net. Write the following into the notes field
-of your SourceForge.net entry:
+Now let's have a look at a real-world example: logging in at PayPal. Write the following into the notes field
+of your PayPal entry:
 
 <pre>Auto-Type: {USERNAME}{TAB}{PASSWORD}{ENTER}
-Auto-Type-Window: SourceForge.net*</pre>
+Auto-Type-Window: PayPal - Welcome*</pre>
 
 Assume you have set the global auto-type hotkey to <i>Ctrl-Alt-A</i> in the options dialog (you can change the hotkey there).
 KeePass is running in the background, you have opened your database and the workspace is unlocked.<br />
 <br />
-When you now navigate to SourceForge.net and are being prompted for your username and password, just click into the
-username field and press <i>Ctrl-Alt-A</i>. KeePass enters the username and password for you! Can it be easier?<br />
+When you now navigate to the PayPal website and are being prompted for your username and password,
+just click into the username field and press <i>Ctrl-Alt-A</i>. KeePass enters the
+username and password for you! Can it be easier?<br />
 <br />
 And last but not least: since we have used a wildcard, it'll won't just work in one browser window, it'll even work
 with different browsers! Mozilla Firefox and Internet Explorer both put the page title first in the window title, followed
-by the product name (i.e. <i>&quot;SourceForge.net - Internet Explorer&quot;</i> and
-<i>&quot;SourceForge.net - Mozilla Firefox&quot;</i>).
+by the product name (i.e. <i>&quot;PayPal - Welcome - Internet Explorer&quot;</i> and
+<i>&quot;PayPal - Welcome - Mozilla Firefox&quot;</i>).
 That means, that the sequence above will work for both browsers. Most other browsers create
 their window titles in the same way and the window definition sequence will work with them, too.<br />
 <br /><br /><br />

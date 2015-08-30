@@ -44,6 +44,7 @@ public:
 	CImageList m_ilIcons;
 	CFont m_fStyle;
 	CFont m_fSymbol;
+	CToolTipCtrl m_tipSecClear;
 
 	LPTSTR m_lpPassword;
 
@@ -68,6 +69,8 @@ public:
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CPwGeneratorDlg)
+	public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	//}}AFX_VIRTUAL

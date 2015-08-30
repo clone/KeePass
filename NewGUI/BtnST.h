@@ -247,7 +247,7 @@ private:
 
 	CDC			m_dcBk;
 	CBitmap		m_bmpBk;
-	CBitmap*	m_pbmpOldBk;
+	HBITMAP		m_pbmpOldBk;
 
 	BOOL		m_bAlwaysTrack;		// Always hilight button?
 	int			m_nCheck;			// Current value for checkbox

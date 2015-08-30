@@ -1,3 +1,10 @@
+===============================================================================
+This file is NOT up-to-date. Please see the source code of the password manager
+class (CPwManager) for more information.                         DR::2005-08-15
+===============================================================================
+
+
+
 -=-=-=-=-=-=-=-=-=-
 * : DReichl :: LATEST FORMAT
 -=-=-=-=-=-=-=-=-=-

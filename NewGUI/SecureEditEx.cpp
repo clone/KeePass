@@ -124,6 +124,11 @@ void CSecureEditEx::EnableSecureMode(BOOL bEnable)
 	DeletePassword(lpSource); lpSource = NULL;
 }
 
+BOOL CSecureEditEx::IsSecureModeEnabled()
+{
+	return m_bSecMode;
+}
+
 // Securely erase and free all memory
 void CSecureEditEx::_DeleteAll()
 {

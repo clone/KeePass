@@ -108,11 +108,20 @@ BOOL CPrivateConfig::Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue)
 	BOOL bRet = FALSE;
 
 	ASSERT(pszField != NULL); if(pszField == NULL) return FALSE;
-	ASSERT(pszValue != NULL); if(pszValue == NULL) return FALSE;
-
 	ASSERT(_tcslen(pszField) > 0); if(_tcslen(pszField) == 0) return FALSE;
+	// pszValue may be NULL
 
 #ifndef _WIN32_WCE
+	// First check if the existing value in the INI file is the same as the
+	// one to be written. If so, we don't need to write it again. For
+	// devices that cache reads but not writes, this leads to a performance
+	// improvement. Thanks to Brad Clarke for the idea and patch.
+	TCHAR tszTemp[SI_REGSIZE];
+	if((pszValue != NULL) && (Get(pszField, tszTemp) == TRUE))
+	{
+		if(_tcscmp(tszTemp, pszValue) == 0) return TRUE;
+	}
+
 	if(m_nUseDir == 0)
 		bRet = WritePrivateProfileString(PWM_EXENAME, pszField, pszValue, m_szFileLocal);
 

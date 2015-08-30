@@ -598,11 +598,11 @@ SOURCE=.\NewGUI\amsEdit.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\NewGUI\AutoRichEditCtrl.cpp
+SOURCE=.\NewGUI\AutoRichEditCtrlFx.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\NewGUI\AutoRichEditCtrl.h
+SOURCE=.\NewGUI\AutoRichEditCtrlFx.h
 # End Source File
 # Begin Source File
 

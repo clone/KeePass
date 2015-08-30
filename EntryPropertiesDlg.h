@@ -33,6 +33,8 @@ class CEntryPropertiesDlg : public CDialog
 public:
 	CEntryPropertiesDlg(CWnd* pParent = NULL);
 
+	void SetExpireDays(DWORD dwDays);
+
 	CKCSideBannerWnd m_banner;
 	CImageList *m_pParentIcons;
 
@@ -40,9 +42,12 @@ public:
 	int m_nGroupInx;
 	PW_TIME m_tExpire;
 	int m_nIconId;
+	DWORD m_dwDefaultExpire;
 
 	//{{AFX_DATA(CEntryPropertiesDlg)
 	enum { IDD = IDD_ENTRYPROPERTIES_DLG };
+	CXPStyleButtonST	m_btSetToDefaultExpire;
+	CXPStyleButtonST	m_btSelDefExpires;
 	CComboBoxEx	m_cbGroups;
 	CXPStyleButtonST	m_btSelectIcon;
 	CXPStyleButtonST	m_btCancel;
@@ -68,6 +73,13 @@ protected:
 	afx_msg void OnCheckModExpire();
 	afx_msg void OnCheckModGroup();
 	afx_msg void OnCheckModIcon();
+	afx_msg void OnSetDefaultExpireBtn();
+	afx_msg void OnExpires1Week();
+	afx_msg void OnExpires2Weeks();
+	afx_msg void OnExpires1Month();
+	afx_msg void OnExpires3Months();
+	afx_msg void OnExpires6Months();
+	afx_msg void OnExpires12Months();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

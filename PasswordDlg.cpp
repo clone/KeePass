@@ -298,6 +298,11 @@ BOOL CPasswordDlg::OnInitDialog()
 		}
 	}
 
+	m_tipSecClear.Create(this, 0x40);
+	m_tipSecClear.AddTool(&m_pEditPw, CPwSafeDlg::_GetSecureEditTipText(_T("Enter password:")));
+	m_tipSecClear.SetMaxTipWidth(630);
+	m_tipSecClear.Activate(m_pEditPw.IsSecureModeEnabled());
+
 	// Alternative password asterisk character: 0xB7 (smaller dot)
 	// TCHAR tchDot = (TCHAR)(_T('z') + 27);
 	TCHAR tchDot = (TCHAR)0xb7;
@@ -502,6 +507,8 @@ void CPasswordDlg::OnCheckStars()
 		m_pEditPw.SetFont(&m_fSymbol, TRUE);
 	}
 
+	m_tipSecClear.Activate(m_pEditPw.IsSecureModeEnabled());
+
 	UpdateData(FALSE);
 	m_pEditPw.RedrawWindow();
 	m_pEditPw.SetFocus();
@@ -637,6 +644,13 @@ void CPasswordDlg::EnableClientWindows()
 void CPasswordDlg::OnCheckKeymethodAnd() 
 {
 	EnableClientWindows();
+}
+
+BOOL CPasswordDlg::PreTranslateMessage(MSG* pMsg) 
+{
+	m_tipSecClear.RelayEvent(pMsg);
+
+	return CDialog::PreTranslateMessage(pMsg);
 }
 
 #pragma warning(pop)

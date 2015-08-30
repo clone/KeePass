@@ -1,3 +1,56 @@
+05/08/16 - 1.01
+- Added option to minimize the main window before auto-typing
+  (so, the same auto-type behaviour as in version 0.99c and
+  before); this option is turned off by default (the method of
+  1.0 is default), see the advanced options dialog to turn it
+  on if auto-typing doesn't work on your computer
+- Auto-type now works correctly with toggled caps-lock
+- Improved options-saving performance (thanks to Brad Clarke
+  for the patch), this should prevent the delays when exiting
+  the program
+- KeePass will now register the global hotkey Ctrl-Alt-K, if
+  no other application hasn't reserved it already; this hotkey
+  will bring the KeePass window to the front when you press it
+- KeePass now continues auto-typing if it has been interrupted
+  by the login screen when you tried to auto-type while the
+  workspace was locked
+- Replaced 'Pick One' buttons by icon buttons in the add-entry,
+  add-group and mass-modify dialogs
+- You can now save the database even if you don't have modified
+  anything
+- Improved menu accelerator handling, the hotkeys now also work
+  when the bottom entry preview window has the focus
+- Added buttons to select common expiry time intervals and the
+  default expiry time in the mass-modify entries dialog
+- Ascending TAN numbers in the notes field now have at least 3
+  digits (leading 0s), so you can sort them now by notes
+- Fixed a minor bug with the default entry-expiry menu in the
+  add-entry dialog (daylight saving caused the time to be
+  updated incorrectly)
+- Quick-find edit control contents are cleared now when closing
+  or locking a database
+- Added option to delete all backup entries before saving the
+  database to disk (see 'Advanced' tab in the options dialog)
+- Added tooltips for secure edit controls (in secure mode)
+- Added function to open broken/corrupted KeePass databases;
+  useful if you unplugged your USB stick before the file was
+  written completely, it of course cannot help you if you
+  forgot the master password, read CHM file for more info
+- Fixed a bug which caused the statusbar to display incorrect
+  information when selecting groups in the group list
+- Fixed incorrect window title that appeared after entering
+  3 times a wrong password when trying to unlock the workspace
+- You cannot minimize the main window any more while a
+  subdialog is open
+- Changed some strings to clearify their meanings
+- Minor improvements and clearifications in the documentation
+  manual (CHM file)
+- Minor UI improvements (balloon tooltip for quickfind, etc.)
+- For plugin authors: config keys can be deleted now by passing
+  NULL as pszValue parameter to CPrivateConfig::Set
+- Several small code changes in order to cleanly compile with
+  Microsoft 7.x compilers
+
 05/06/04 - 1.00
 - Changed window activation routine for the Auto-Type command
 - Minor improvement to the checkboxes in the advanced options

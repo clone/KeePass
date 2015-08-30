@@ -42,12 +42,16 @@ CEntryPropertiesDlg::CEntryPropertiesDlg(CWnd* pParent /*=NULL*/)
 
 	m_pMgr = NULL;
 	m_pParentIcons = NULL;
+	m_dwDefaultExpire = 0;
+	m_nIconId = 0;
 }
 
 void CEntryPropertiesDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEntryPropertiesDlg)
+	DDX_Control(pDX, IDC_SETDEFAULTEXPIRE_BTN, m_btSetToDefaultExpire);
+	DDX_Control(pDX, IDC_SELDEFEXPIRES_BTN, m_btSelDefExpires);
 	DDX_Control(pDX, IDC_COMBO_GROUPS, m_cbGroups);
 	DDX_Control(pDX, IDC_BUTTON_SELECT_ICON, m_btSelectIcon);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
@@ -66,6 +70,13 @@ BEGIN_MESSAGE_MAP(CEntryPropertiesDlg, CDialog)
 	ON_BN_CLICKED(IDC_CHECK_MODEXPIRE, OnCheckModExpire)
 	ON_BN_CLICKED(IDC_CHECK_MODGROUP, OnCheckModGroup)
 	ON_BN_CLICKED(IDC_CHECK_MODICON, OnCheckModIcon)
+	ON_BN_CLICKED(IDC_SETDEFAULTEXPIRE_BTN, OnSetDefaultExpireBtn)
+	ON_COMMAND(ID_EXPIRES_1WEEK, OnExpires1Week)
+	ON_COMMAND(ID_EXPIRES_2WEEKS, OnExpires2Weeks)
+	ON_COMMAND(ID_EXPIRES_1MONTH, OnExpires1Month)
+	ON_COMMAND(ID_EXPIRES_3MONTHS, OnExpires3Months)
+	ON_COMMAND(ID_EXPIRES_6MONTHS, OnExpires6Months)
+	ON_COMMAND(ID_EXPIRES_12MONTHS, OnExpires12Months)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -84,6 +95,32 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_XPButton(&m_btSelectIcon, -1, -1);
+	NewGUI_XPButton(&m_btSetToDefaultExpire, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
+	NewGUI_XPButton(&m_btSelDefExpires, IDB_CLOCK, IDB_CLOCK, TRUE);
+
+	CString strTT = TRL("Change expiration time:"); strTT.Remove(_T(':'));
+	m_btSelDefExpires.SetTooltipText(strTT);
+
+	m_btSelDefExpires.SetMenu(IDR_EXPIRESMENU, this->m_hWnd, TRUE, NULL, CSize(16, 15));
+
+	strTT = TRL("&Pick One"); strTT.Remove(_T('&'));
+	m_btSelectIcon.SetTooltipText(strTT, TRUE);
+	if((m_nIconId >= 0) && (m_pParentIcons != NULL))
+		m_btSelectIcon.SetIcon(m_pParentIcons->ExtractIcon(m_nIconId));
+
+	if(m_dwDefaultExpire != 0)
+	{
+		CString str, strTemp;
+		str.Format(TRL("Click to expire the entry in %u days"), m_dwDefaultExpire);
+
+		CTime t = CTime::GetCurrentTime();
+		t += CTimeSpan((LONG)m_dwDefaultExpire, 0, 0, 0);
+
+		strTemp.Format(_T(" (%04d-%02d-%02d)"), t.GetYear(), t.GetMonth(), t.GetDay());
+		str += strTemp;
+
+		m_btSetToDefaultExpire.SetTooltipText(str);
+	}
 
 	// Set the imagelist for the group selector combo box
 	m_cbGroups.SetImageList(m_pParentIcons);
@@ -136,6 +173,9 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 
 	UpdateData(FALSE);
 
+	if(m_dwDefaultExpire == 0) m_btSetToDefaultExpire.EnableWindow(FALSE); // Unchangable
+	else m_btSetToDefaultExpire.EnableWindow(TRUE);
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
 
@@ -185,6 +225,9 @@ void CEntryPropertiesDlg::OnButtonSelectIcon()
 	if(dlg.DoModal() == IDOK)
 	{
 		m_nIconId = dlg.m_nSelectedIcon;
+
+		if((m_nIconId >= 0) && (m_pParentIcons != NULL))
+			m_btSelectIcon.SetIcon(m_pParentIcons->ExtractIcon(m_nIconId));
 	}
 }
 
@@ -207,4 +250,56 @@ void CEntryPropertiesDlg::OnCheckModIcon()
 	UpdateData(TRUE);
 	if(m_bModIcon == TRUE) GetDlgItem(IDC_BUTTON_SELECT_ICON)->EnableWindow(TRUE);
 	else GetDlgItem(IDC_BUTTON_SELECT_ICON)->EnableWindow(FALSE);
+}
+
+void CEntryPropertiesDlg::OnSetDefaultExpireBtn() 
+{
+	if(m_dwDefaultExpire == 0) return;
+	SetExpireDays(m_dwDefaultExpire);
+}
+
+void CEntryPropertiesDlg::SetExpireDays(DWORD dwDays)
+{
+	UpdateData(TRUE);
+
+	m_bModExpire = TRUE;
+
+	CTime t = CTime::GetCurrentTime();
+	t += CTimeSpan((LONG)dwDays, 0, 0, 0);
+
+	m_editDate.SetDate(t);
+	// m_editTime.SetTime(t); // Daylight saving
+
+	UpdateData(FALSE);
+	OnCheckModExpire();
+}
+
+void CEntryPropertiesDlg::OnExpires1Week() 
+{
+	SetExpireDays(7);
+}
+
+void CEntryPropertiesDlg::OnExpires2Weeks() 
+{
+	SetExpireDays(14);
+}
+
+void CEntryPropertiesDlg::OnExpires1Month() 
+{
+	SetExpireDays(30);
+}
+
+void CEntryPropertiesDlg::OnExpires3Months() 
+{
+	SetExpireDays(91);
+}
+
+void CEntryPropertiesDlg::OnExpires6Months() 
+{
+	SetExpireDays(182);
+}
+
+void CEntryPropertiesDlg::OnExpires12Months() 
+{
+	SetExpireDays(365);
 }

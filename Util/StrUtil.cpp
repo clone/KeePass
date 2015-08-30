@@ -350,6 +350,8 @@ C_FN_SHARE TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 		else if(b0 < 0xF0) dwMoreBytes++;
 		dwNumChars++;
 		i += dwMoreBytes;
+
+		if(dwMoreBytes == 0) return NULL; // Invalid UTF-8 string
 	}
 	// if(dwNumChars == 0) return NULL;
 

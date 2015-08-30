@@ -328,7 +328,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 		}
 	}
 
-	return PWE_UNKNOWN;
+	// return PWE_UNKNOWN; // Unreachable anyway
 }
 
 BOOL CPwManager::SetAlgorithm(int nAlgorithm)
@@ -940,6 +940,14 @@ void CPwManager::NewDatabase()
 #define _OPENDB_FAIL \
 { \
 	_OPENDB_FAIL_LIGHT; \
+	SAFE_DELETE_ARRAY(pwGroupTemplate.pszGroupName); \
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pszTitle); \
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pszURL); \
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pszUserName); \
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pszPassword); \
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pszAdditional); \
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pszBinaryDesc); \
+	SAFE_DELETE_ARRAY(pwEntryTemplate.pBinaryData); \
 	return PWE_INVALID_FILESTRUCTURE; \
 }
 
@@ -959,7 +967,12 @@ void CPwManager::NewDatabase()
 	RESET_TIME_FIELD_NORMAL(&(ptrx)->tCreation); RESET_TIME_FIELD_NORMAL(&(ptrx)->tLastMod); \
 	RESET_TIME_FIELD_NORMAL(&(ptrx)->tLastAccess); RESET_TIME_FIELD_EXPIRE(&(ptrx)->tExpire); }
 
-int CPwManager::OpenDatabase(const TCHAR *pszFile)
+// If bIgnoreCorrupted is TRUE the manager will try to ignore all database file
+// errors, i.e. try to read as much as possible instead of breaking out at the
+// first error.
+// To open a file normally, set bIgnoreCorrupted to FALSE (default).
+// To open a file in rescue mode, set it to TRUE.
+int CPwManager::OpenDatabase(const TCHAR *pszFile, PWDB_REPAIR_INFO *pRepair)
 {
 	FILE *fp;
 	char *pVirtualFile;
@@ -969,6 +982,7 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile)
 	sha256_ctx sha32;
 	RD_UINT8 uFinalKey[32];
 	char *p;
+	char *pStart;
 	USHORT usFieldType;
 	DWORD dwFieldSize;
 	PW_GROUP pwGroupTemplate;
@@ -976,10 +990,13 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile)
 
 	ASSERT(sizeof(char) == 1);
 
-	ASSERT(pszFile != NULL);
-	if(pszFile == NULL) return PWE_INVALID_PARAM;
-	ASSERT(_tcslen(pszFile) != 0);
-	if(_tcslen(pszFile) == 0) return PWE_INVALID_PARAM;
+	ASSERT(pszFile != NULL); if(pszFile == NULL) return PWE_INVALID_PARAM;
+	ASSERT(pszFile[0] != 0); if(pszFile[0] == 0) return PWE_INVALID_PARAM; // Length != 0
+
+	RESET_PWG_TEMPLATE(&pwGroupTemplate);
+	RESET_PWE_TEMPLATE(&pwEntryTemplate);
+
+	if(pRepair != NULL) { ZeroMemory(pRepair, sizeof(PWDB_REPAIR_INFO)); }
 
 	fp = _tfopen(pszFile, _T("rb"));
 	if(fp == NULL) return PWE_NOFILEACCESS_READ;
@@ -990,13 +1007,14 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile)
 	fseek(fp, 0, SEEK_SET);
 
 	if(uFileSize < sizeof(PW_DBHEADER))
-		{ fclose(fp); return PWE_INVALID_FILESTRUCTURE; }
+		{ fclose(fp); return PWE_INVALID_FILEHEADER; }
 
 	// Allocate enough memory to hold the complete file
-	uAllocated = uFileSize + 17;
+	uAllocated = uFileSize + 16 + 1 + 8 + 4; // 16 = encryption buffer space, 1+8 = string terminating NULL (UTF-8), 4 unused
 	pVirtualFile = new char[uAllocated];
 	if(pVirtualFile == NULL) { fclose(fp); return PWE_NO_MEM; }
-	pVirtualFile[uFileSize + 17 - 1] = 0;
+	memset(&pVirtualFile[uFileSize + 17 - 1], 0, 1 + 8);
+
 	fread(pVirtualFile, 1, uFileSize, fp);
 	fclose(fp);
 
@@ -1005,7 +1023,7 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile)
 
 	// Check if we can open this
 	if((hdr.dwSignature1 != PWM_DBSIG_1) || (hdr.dwSignature2 != PWM_DBSIG_2))
-		{ _OPENDB_FAIL; }
+		{ _OPENDB_FAIL_LIGHT; return PWE_INVALID_FILESIGNATURE; }
 
 	if((hdr.dwVersion & 0xFFFFFF00) != (PWM_DBVER_DW & 0xFFFFFF00))
 	{
@@ -1027,12 +1045,12 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile)
 			}
 			return (_OpenDatabaseV1(pszFile) != FALSE) ? PWE_SUCCESS : PWE_UNKNOWN;
 		}
-		else { _OPENDB_FAIL; }
+		else { ASSERT(FALSE); _OPENDB_FAIL; }
 	}
 
-	// Only Rijndael and AES are supported currently
-	if(hdr.dwFlags & PWM_FLAG_RIJNDAEL) m_nAlgorithm = ALGO_AES;
-	else if(hdr.dwFlags & PWM_FLAG_TWOFISH) m_nAlgorithm = ALGO_TWOFISH;
+	// Select algorithm
+	if((hdr.dwFlags & PWM_FLAG_RIJNDAEL) != 0) m_nAlgorithm = ALGO_AES;
+	else if((hdr.dwFlags & PWM_FLAG_TWOFISH) != 0) m_nAlgorithm = ALGO_TWOFISH;
 	else { ASSERT(FALSE); _OPENDB_FAIL; }
 
 	m_dwKeyEncRounds = hdr.dwKeyEncRounds;
@@ -1046,8 +1064,29 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile)
 	sha256_hash(m_pTransformedMasterKey, 32, &sha32);
 	sha256_end((unsigned char *)uFinalKey, &sha32);
 
-	ASSERT(((uFileSize - sizeof(PW_DBHEADER)) % 16) == 0);
-	if(((uFileSize - sizeof(PW_DBHEADER)) % 16) != 0) { _OPENDB_FAIL; }
+	if(pRepair == NULL)
+	{
+		// ASSERT(((uFileSize - sizeof(PW_DBHEADER)) % 16) == 0);
+		if(((uFileSize - sizeof(PW_DBHEADER)) % 16) != 0)
+		{
+			_OPENDB_FAIL_LIGHT;
+			return PWE_INVALID_FILESIZE;
+		}
+	}
+	else // Repair the database
+	{
+		if(((uFileSize - sizeof(PW_DBHEADER)) % 16) != 0)
+		{
+			uFileSize -= sizeof(PW_DBHEADER); ASSERT((uFileSize & 0xF) != 0);
+			uFileSize &= ~0xF;
+			uFileSize += sizeof(PW_DBHEADER);
+		}
+
+		ASSERT(((uFileSize - sizeof(PW_DBHEADER)) % 16) == 0);
+
+		pRepair->dwOriginalGroupCount = hdr.dwGroups;
+		pRepair->dwOriginalEntryCount = hdr.dwEntries;
+	}
 
 	if(m_nAlgorithm == ALGO_AES)
 	{
@@ -1078,67 +1117,76 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile)
 	}
 
 	// Check for success
-	if((uEncryptedPartSize > 2147483446) || (uEncryptedPartSize == 0))
-		{ _OPENDB_FAIL_LIGHT; return PWE_INVALID_KEY; }
+	if(pRepair == NULL)
+		if((uEncryptedPartSize > 2147483446) || (uEncryptedPartSize == 0))
+			{ _OPENDB_FAIL_LIGHT; return PWE_INVALID_KEY; }
 
 	// Check if key is correct (with very high probability)
-	sha256_begin(&sha32);
-	sha256_hash((unsigned char *)pVirtualFile + sizeof(PW_DBHEADER), uEncryptedPartSize, &sha32);
-	sha256_end((unsigned char *)uFinalKey, &sha32);
-	if(memcmp(hdr.aContentsHash, uFinalKey, 32) != 0)
-		{ _OPENDB_FAIL_LIGHT; return PWE_INVALID_KEY; }
+	if(pRepair == NULL)
+	{
+		sha256_begin(&sha32);
+		sha256_hash((unsigned char *)pVirtualFile + sizeof(PW_DBHEADER), uEncryptedPartSize, &sha32);
+		sha256_end((unsigned char *)uFinalKey, &sha32);
+		if(memcmp(hdr.aContentsHash, uFinalKey, 32) != 0)
+			{ _OPENDB_FAIL_LIGHT; return PWE_INVALID_KEY; }
+	}
 
 	NewDatabase(); // Create a new database and initialize internal structures
-
-	memset(&pwGroupTemplate, 0, 16);
-	RESET_PWG_TEMPLATE(&pwGroupTemplate);
 
 	// Add groups from the memory file to the internal structures
 	unsigned long uCurGroup;
 	BOOL bRet;
 	pos = sizeof(PW_DBHEADER);
+	pStart = &pVirtualFile[pos];
 	for(uCurGroup = 0; uCurGroup < hdr.dwGroups; )
 	{
 		p = &pVirtualFile[pos];
 
+		if(pRepair != NULL) if(IsBadReadPtr(p, 2) != FALSE) { _OPENDB_FAIL; }
 		memcpy(&usFieldType, p, 2);
 		p += 2; pos += 2;
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 
+		if(pRepair != NULL) if(IsBadReadPtr(p, 4) != FALSE) { _OPENDB_FAIL; }
 		memcpy(&dwFieldSize, p, 4);
 		p += 4; pos += 4;
 		if(pos >= (uFileSize + dwFieldSize)) { _OPENDB_FAIL; }
 
+		if(pRepair != NULL) if(IsBadReadPtr(p, dwFieldSize) != FALSE) { _OPENDB_FAIL; }
 		bRet = ReadGroupField(usFieldType, dwFieldSize, (BYTE *)p, &pwGroupTemplate);
 		if((usFieldType == 0xFFFF) && (bRet == TRUE))
 			uCurGroup++; // Now and ONLY now the counter gets increased
 
 		p += dwFieldSize;
+		if(p < pStart) { _OPENDB_FAIL; }
 		pos += dwFieldSize;
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 	}
 	SAFE_DELETE_ARRAY(pwGroupTemplate.pszGroupName);
 
-	RESET_PWE_TEMPLATE(&pwEntryTemplate);
 	// Get the entries
 	unsigned long uCurEntry;
 	for(uCurEntry = 0; uCurEntry < hdr.dwEntries; )
 	{
 		p = &pVirtualFile[pos];
 
+		if(pRepair != NULL) if(IsBadReadPtr(p, 2) != FALSE) { _OPENDB_FAIL; }
 		memcpy(&usFieldType, p, 2);
 		p += 2; pos += 2;
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 
+		if(pRepair != NULL) if(IsBadReadPtr(p, 4) != FALSE) { _OPENDB_FAIL; }
 		memcpy(&dwFieldSize, p, 4);
 		p += 4; pos += 4;
 		if(pos >= (uFileSize + dwFieldSize)) { _OPENDB_FAIL; }
 
+		if(pRepair != NULL) if(IsBadReadPtr(p, dwFieldSize) != FALSE) { _OPENDB_FAIL; }
 		bRet = ReadEntryField(usFieldType, dwFieldSize, (BYTE *)p, &pwEntryTemplate);
 		if((usFieldType == 0xFFFF) && (bRet == TRUE))
 			uCurEntry++; // Now and ONLY now the counter gets increased
 
 		p += dwFieldSize;
+		if(p < pStart) { _OPENDB_FAIL; }
 		pos += dwFieldSize;
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 	}
@@ -1154,8 +1202,9 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile)
 	mem_erase((unsigned char *)pVirtualFile, uAllocated);
 	SAFE_DELETE_ARRAY(pVirtualFile);
 
-	_LoadAndRemoveAllMetaStreams();
-	DeleteLostEntries();
+	DWORD dwRemovedStreams = _LoadAndRemoveAllMetaStreams();
+	if(pRepair != NULL) pRepair->dwRecognizedMetaStreamCount = dwRemovedStreams;
+	VERIFY(DeleteLostEntries() == 0);
 	FixGroupTree();
 
 	return PWE_SUCCESS;
@@ -1909,7 +1958,10 @@ void CPwManager::SortGroup(DWORD idGroup, DWORD dwSortByField)
 void CPwManager::_TimeToPwTime(BYTE *pCompressedTime, PW_TIME *pPwTime)
 {
 	DWORD dwYear, dwMonth, dwDay, dwHour, dwMinute, dwSecond;
+
 	ASSERT((pCompressedTime != NULL) && (pPwTime != NULL));
+	if(pPwTime == NULL) return;
+
 	_UnpackStructToTime(pCompressedTime, &dwYear, &dwMonth, &dwDay, &dwHour, &dwMinute, &dwSecond);
 	pPwTime->shYear = (USHORT)dwYear;
 	pPwTime->btMonth = (BYTE)dwMonth;
@@ -1922,6 +1974,8 @@ void CPwManager::_TimeToPwTime(BYTE *pCompressedTime, PW_TIME *pPwTime)
 void CPwManager::_PwTimeToTime(PW_TIME *pPwTime, BYTE *pCompressedTime)
 {
 	ASSERT((pPwTime != NULL) && (pCompressedTime != NULL));
+	if(pPwTime == NULL) return;
+
 	_PackTimeToStruct(pCompressedTime, (DWORD)pPwTime->shYear, (DWORD)pPwTime->btMonth,
 		(DWORD)pPwTime->btDay, (DWORD)pPwTime->btHour, (DWORD)pPwTime->btMinute,
 		(DWORD)pPwTime->btSecond);
@@ -2280,15 +2334,16 @@ void CPwManager::SetKeyEncRounds(DWORD dwRounds)
 	else m_dwKeyEncRounds = dwRounds;
 }
 
-void CPwManager::DeleteLostEntries()
+int CPwManager::DeleteLostEntries()
 {
 	DWORD i, dwEntryCount;
 	BOOL bFixed = TRUE;
 	PW_ENTRY *pe;
 	PW_GROUP *pg;
+	int iDeletedCount = 0;
 
 	dwEntryCount = GetNumberOfEntries();
-	if(dwEntryCount == 0) return;
+	if(dwEntryCount == 0) return 0;
 
 	while(bFixed == TRUE)
 	{
@@ -2305,10 +2360,13 @@ void CPwManager::DeleteLostEntries()
 				DeleteEntry(i);
 				dwEntryCount--;
 				bFixed = TRUE;
+				iDeletedCount++;
 				break;
 			}
 		}
 	}
+
+	return iDeletedCount;
 }
 
 BOOL CPwManager::IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName)
@@ -2390,17 +2448,23 @@ BOOL CPwManager::BackupEntry(const PW_ENTRY *pe, BOOL *pbGroupCreated)
 	return dwId;
 } */
 
-std::string CPwManager::FormatError(int nErrorCode)
+std::string CPwManager::FormatError(int nErrorCode, DWORD dwFlags)
 {
 	std::string str;
 	TCHAR tszTemp[24];
 
 	_stprintf(tszTemp, _T("%08X"), (unsigned int)nErrorCode);
-	str = TRL("An error occured"); str += _T("!\r\n");
+
+	if((dwFlags & PWFF_NO_INTRO) == 0)
+	{
+		str = TRL("An error occured"); str += _T("!\r\n");
+	}
 
 	str += TRL("Error code"); str += _T(": 0x");
 	str += tszTemp;
-	str += _T("\r\n\r\n");
+
+	if((dwFlags & PWFF_NO_INTRO) == 0) str += _T("\r\n\r\n");
+	else str += _T("\r\n");
 
 	switch(nErrorCode)
 	{
@@ -2441,7 +2505,17 @@ std::string CPwManager::FormatError(int nErrorCode)
 	case PWE_CRYPT_ERROR:
 		str += TRL("Encryption/decryption error");
 		break;
+	case PWE_INVALID_FILESIZE:
+		str += TRL("Invalid/corrupted file structure");
+		break;
+	case PWE_INVALID_FILESIGNATURE:
+		str += TRL("Invalid/corrupted file structure");
+		break;
+	case PWE_INVALID_FILEHEADER:
+		str += TRL("Invalid/corrupted file structure");
+		break;
 	default:
+		ASSERT(FALSE);
 		str += TRL("Unknown error");
 		break;
 	}
@@ -2490,17 +2564,18 @@ BOOL CPwManager::_IsMetaStream(PW_ENTRY *p)
 	return TRUE;
 }
 
-void CPwManager::_LoadAndRemoveAllMetaStreams()
+DWORD CPwManager::_LoadAndRemoveAllMetaStreams()
 {
 	BOOL bChange = TRUE;
 	DWORD i;
 	DWORD dwEntryCount;
 	PW_ENTRY *p;
+	DWORD dwMetaStreamCount = 0;
 
-	if(m_pEntries == NULL) return;
-	if(m_pGroups == NULL) return;
-	if(GetNumberOfEntries() == 0) return;
-	if(GetNumberOfGroups() == 0) return;
+	if(m_pEntries == NULL) return 0;
+	if(m_pGroups == NULL) return 0;
+	if(GetNumberOfEntries() == 0) return 0;
+	if(GetNumberOfGroups() == 0) return 0;
 
 	while(bChange == TRUE)
 	{
@@ -2516,6 +2591,7 @@ void CPwManager::_LoadAndRemoveAllMetaStreams()
 			{
 				_ParseMetaStream(p);
 				VERIFY(DeleteEntry(i));
+				dwMetaStreamCount++;
 				bChange = TRUE;
 				break;
 			}
@@ -2524,6 +2600,8 @@ void CPwManager::_LoadAndRemoveAllMetaStreams()
 			i--;
 		}
 	}
+
+	return dwMetaStreamCount;
 }
 
 BOOL CPwManager::_AddAllMetaStreams()

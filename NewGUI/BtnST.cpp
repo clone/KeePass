@@ -126,7 +126,8 @@ CButtonST::~CButtonST()
 	// Restore old bitmap (if any)
 	if (m_dcBk.m_hDC && m_pbmpOldBk)
 	{
-		m_dcBk.SelectObject(m_pbmpOldBk);
+		// m_dcBk.SelectObject(m_pbmpOldBk);
+		::SelectObject(m_dcBk, m_pbmpOldBk);
 	} // if
 
 	FreeResources();
@@ -606,7 +607,8 @@ void CButtonST::PaintBk(CDC* pDC)
 	{
 		m_dcBk.CreateCompatibleDC(&clDC);
 		m_bmpBk.CreateCompatibleBitmap(&clDC, rect.Width(), rect.Height());
-		m_pbmpOldBk = m_dcBk.SelectObject(&m_bmpBk);
+		// m_pbmpOldBk = m_dcBk.SelectObject(&m_bmpBk);
+		m_pbmpOldBk = (HBITMAP)::SelectObject(m_dcBk, (HBITMAP)m_bmpBk);
 		m_dcBk.BitBlt(0, 0, rect.Width(), rect.Height(), &clDC, rect1.left, rect1.top, SRCCOPY);
 	} // if
 
@@ -2059,7 +2061,8 @@ void CButtonST::DrawTransparent(BOOL bRepaint)
 	// Restore old bitmap (if any)
 	if (m_dcBk.m_hDC != NULL && m_pbmpOldBk != NULL)
 	{
-		m_dcBk.SelectObject(m_pbmpOldBk);
+		// m_dcBk.SelectObject(m_pbmpOldBk);
+		::SelectObject(m_dcBk, m_pbmpOldBk);
 	} // if
 
 	m_bmpBk.DeleteObject();
@@ -2076,7 +2079,8 @@ DWORD CButtonST::SetBk(CDC* pDC)
 		// Restore old bitmap (if any)
 		if (m_dcBk.m_hDC != NULL && m_pbmpOldBk != NULL)
 		{
-			m_dcBk.SelectObject(m_pbmpOldBk);
+			// m_dcBk.SelectObject(m_pbmpOldBk);
+			::SelectObject(m_dcBk, m_pbmpOldBk);
 		} // if
 
 		m_bmpBk.DeleteObject();
@@ -2092,7 +2096,8 @@ DWORD CButtonST::SetBk(CDC* pDC)
 
 		m_dcBk.CreateCompatibleDC(pDC);
 		m_bmpBk.CreateCompatibleBitmap(pDC, rect.Width(), rect.Height());
-		m_pbmpOldBk = m_dcBk.SelectObject(&m_bmpBk);
+		// m_pbmpOldBk = m_dcBk.SelectObject(&m_bmpBk);
+		m_pbmpOldBk = (HBITMAP)::SelectObject(m_dcBk, (HBITMAP)m_bmpBk);
 		m_dcBk.BitBlt(0, 0, rect.Width(), rect.Height(), pDC, rect1.left, rect1.top, SRCCOPY);
 
 		return BTNST_OK;

@@ -24,7 +24,7 @@
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/XHyperLink.h"
 #include "NewGUI/amsEdit.h"
-#include "NewGUI/AutoRichEditCtrl.h"
+#include "NewGUI/AutoRichEditCtrlFx.h"
 #include "NewGUI/GradientProgressCtrl.h"
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/SecureEditEx.h"
@@ -50,6 +50,7 @@ public:
 	CFont m_fSymbol;
 	CImageList *m_pParentIcons;
 	CKCSideBannerWnd m_banner;
+	CToolTipCtrl m_tipSecClear;
 
 	BOOL m_bEditMode;
 	CPwManager *m_pMgr;
@@ -92,12 +93,14 @@ public:
 	CString	m_strTitle;
 	CString	m_strURL;
 	CString	m_strUserName;
-	CAutoRichEditCtrl	m_reNotes;
+	CAutoRichEditCtrlFx	m_reNotes;
 	CString	m_strAttachment;
 	BOOL	m_bExpires;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CAddEntryDlg)
+	public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);

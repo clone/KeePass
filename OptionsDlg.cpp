@@ -193,12 +193,16 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Start KeePass at Windows startup (for current user)"), &m_bStartWithWindows, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Single left click instead of double-click for default tray icon action"), &m_bSingleClickTrayIcon, NULL, OL_LINK_NULL);
 
+	CString strStrBuild = TRL("Use alternative auto-type method (minimize window)");
+	strStrBuild += _T(" (0.99c)");
+	m_olAdvanced.AddCheckItem(strStrBuild, &m_bMinimizeBeforeAT, NULL, OL_LINK_NULL);
+
 	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Start and Exit"), 7);
 	m_olAdvanced.AddCheckItem(TRL("Remember last opened file"), &m_bRememberLast, &m_bOpenLastDb, OL_LINK_SAME_TRIGGER_FALSE);
 	m_olAdvanced.AddCheckItem(TRL("Automatically open last used database on startup"), &m_bOpenLastDb, &m_bRememberLast, OL_LINK_SAME_TRIGGER_TRUE);
 	m_olAdvanced.AddCheckItem(TRL("Start minimized and locked"), &m_bStartMinimized, NULL, OL_LINK_NULL);
-	m_olAdvanced.AddCheckItem(TRL("Automatically save database on exit"), &m_bAutoSave, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Automatically save database on exit and workspace locking"), &m_bAutoSave, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Limit to single instance"), &m_bSingleInstance, NULL, OL_LINK_NULL);
 
 	m_olAdvanced.AddGroupText(_T(""), 0);
@@ -209,6 +213,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Backup"), 10);
 	m_olAdvanced.AddCheckItem(TRL("Save backups of modified entries into the 'Backup' group"), &m_bBackupEntries, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Delete all backup entries before saving the database"), &m_bDeleteBackupsOnSave, NULL, OL_LINK_NULL);
 
 	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Advanced"), 11);

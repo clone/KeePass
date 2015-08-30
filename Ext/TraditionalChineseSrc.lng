@@ -1,7 +1,7 @@
 |~LANGUAGENAME|
 |繁體中文(臺灣)|
 |~LANGUAGEVERSION|
-|0.99c - 2|
+|1.0 - 1|
 |~LANGUAGEAUTHOR|
 |高祥元 (Kao Shiang-Yuan)|
 |~LANGUAGEAUTHOREMAIL|
@@ -306,8 +306,8 @@
 |密碼(&P)|
 |Show Note&s Column|
 |備註(&S)|
-|Main Window &Always On Top|
-|將主視窗保持在最上層|
+|&Always On Top|
+|最上層顯示(&A)|
 |Hide &Passwords Behind Asterisks (***)|
 |用星號隱藏密碼(&P)|
 |Password &Generator|
@@ -318,8 +318,8 @@
 |關於KeePass(&A)...|
 |&Database Settings...|
 |資料庫設定(&D)...|
-|&Minimize/Maximize Window To/From Tray|
-|最小化/最大化視窗|
+|&Tray/Untray|
+|工具列顯示切換(&T)|
 |Version |
 |版本|
 |Password and repeated password aren't identical!|
@@ -954,3 +954,13 @@
 |使用更安全的密碼編輯控制項|
 |Waiting for paste command.|
 |正在等待貼上指令。|
+|&Donate...|
+|捐獻(&D)|
+|1 year|
+|1年|
+|6 months|
+|6個月|
+|Automatically generate random passwords for new entries|
+|建立新項目時自動產生隨機密碼|
+|Include backup entries in quick searches (toolbar)|
+|快速搜尋(工具列)時包含備份項目|

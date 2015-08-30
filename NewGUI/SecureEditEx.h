@@ -61,6 +61,7 @@ public:
 	CSecureEditEx();
 	virtual ~CSecureEditEx();
 	void EnableSecureMode(BOOL bEnable = TRUE);
+	BOOL IsSecureModeEnabled();
 
 	// Retrieve the currently entered password
 	LPTSTR GetPassword();

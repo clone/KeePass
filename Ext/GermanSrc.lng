@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |1.0|
+|~LANGUAGEVERSION|             |1.01|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -294,8 +294,8 @@
 |Here you can configure KeePass.|              |Hier können Sie KeePass konfigurieren.|
 |Automatically open last used database on startup|
     |Beim Start zuletzt benutzte Datenbank öffnen|
-|Automatically save database on exit|
-    |Datenbank beim Beenden automatisch speichern|
+|Automatically save database on exit and workspace locking|
+    |Beim Beenden und bei Sperrung der Arbeitsfläche die Datenbank automatisch speichern|
 |Display images on buttons|
     |Icons auf Buttons anzeigen|
 |Show grid lines in password entry list|
@@ -500,8 +500,8 @@
 |Database Summary|                        |Datenbank-Zusammenfassung|
 |Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
     |Ihr Schlüssel wird mehrmals verschlüsselt, um den finalen Datenbank-Verschlüsselungscode zu erzeugen. Dies ist ein konstanter Zeitfaktor und Wörterbuch-Attacken werden dadurch deutlich schwieriger.|
-|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
-    |Je größer diese Zahl ist, desto schwieriger sind Brute-Force-Attacken. Je größer allerdings diese Zahl ist, desto länger dauert auch das Laden und Speichern der Datenbank.|
+|The higher this number, the harder are dictionary attacks. But also the higher this number, the slower the database loading and saving.|
+    |Je größer diese Zahl ist, desto schwieriger sind Wörterbuch-Attacken. Je größer allerdings diese Zahl ist, desto länger dauert auch das Laden und Speichern der Datenbank.|
 |Number of key encryption rounds:|        |Anzahl Passwort-Verschlüsselungsrunden:|
 |bits|                                    |bits|
 |Personal &Vault TXT File...|             |Personal &Vault TXT-Datei...|
@@ -642,6 +642,8 @@
 |Paste operation completed.|              |Einfüge-Operation abgeschlossen.|
 |Limit to single instance|                |Auf eine Instanz limitieren|
 |Use more secure password edit controls|  |Sichere Passwort-Eingabefelder benutzen|
+|Press Shift-Home or Shift-End to clear this edit control|
+    |Drücken Sie Shift-Pos1 oder Shift-Ende um dieses Feld zu löschen|
 |Single left click instead of double-click for default tray icon action|
     |Einfacher Links-Klick statt Doppelklick für die Standard-Aktion des Tray-Icons|
 |Exclude entries in the '&Backup' group|  |Einträge in der '&Backup'-Gruppe ausschließen|
@@ -660,3 +662,6 @@
 |Automatically generate random passwords for new entries| |Automatisch zufällige Passwörter für neue Einträge generieren|
 |Include backup entries in quick searches (toolbar)|  |Backup-Einträge in Quick-Finds (Toolbar) aufführen|
 |&Donate...|                                 |&Spenden...|
+|Use alternative auto-type method (minimize window)|    |Alternative Auto-Type-Methode benutzen (Fenster minimieren)|
+|Delete all backup entries before saving the database|  |Alle Backup-Einträge löschen bevor die Datenbank gespeichert wird|
+|&Repair KeePass Database File...|           |KeePass-Datenbankdatei &reparieren...|

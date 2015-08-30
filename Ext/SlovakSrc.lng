@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Slovenèina|
-|~LANGUAGEVERSION|             |0.99b|
+|~LANGUAGEVERSION|             |1.0|
 |~LANGUAGEAUTHOR|              |Radoslav Bielik|
 |~LANGUAGEAUTHOREMAIL|         |rado@bielik.org, http://www.bielik.org|
 
@@ -34,7 +34,6 @@
 |Find a string in the password list|           |H¾ada reazec v zozname hesiel|
 |Find text in password list|   |H¾ada text v zozname hesiel|
 
-|Database Format Version:|     |Verzia formátu databázy:|
 |About KeePass...|             |O programe KeePass...|
 
 |Password Groups|              |Skupiny hesiel|
@@ -46,7 +45,7 @@
 
 |Ready.|                       |Pripravenı.|
 
-|Either enter the password/passphrase or select the password disk's drive.|
+|Enter the passphrase and/or select the key-disk's drive.|
     |Buï zadajte heslo/frázu alebo zvo¾te jednotku heslového disku|
 |Enter password:|              |Zadajte heslo:|
 |Select the password disk drive where the key will be stored:|
@@ -93,10 +92,12 @@
     |Mínus '-'|
 |Space ' '|
     |Medzera ' '|
-|Special characters (!, §, $, %, &, ...)|
-    |Špeciálne znaky (!, §, $, %, &, ...)|
-|Higher ANSI characters (Â, ©, É, µ, ½, ...)|
-    |Vyššie znaky ANSI (Â, ©, É, µ, ½, ...)|
+|Unable to register a global hot key.|
+	|Nebolo moné zaregistrova globálnu klávesovú skratku.|
+|Special characters|
+    |Špeciálne znaky|
+|Higher ANSI characters|
+    |Vyššie znaky ANSI|
 |Special brackets ('{', '}', '[', ...)|
     |Špeciálne zátvorky ('{', '}', '[', ...)|
 
@@ -161,7 +162,6 @@
 |&Save Database|               |&Uloi databázu|
 |Save Database &As...|         |Uloi databázu &ako...|
 |Change &Master Key For This Database...|      |Zmeni hlavné &heslo pre túto databázu...|
-|&Print Complete Password List|                |&Tlaèi celı zoznam hesiel|
 |&Lock Workspace|              |&Zamknú pracovnú plochu|
 |&Unlock Workspace|            |O&domknú pracovnú plochu|
 |E&xit|                        |&Koniec|
@@ -173,7 +173,7 @@
 |Add Password Su&bgroup...|    |Prida novú &podskupinu hesiel...|
 |Modif&y Password Group...|    |&Upravi skupinu hesiel...|
 |&Delete Password Group...|    |&Zmaza skupinu hesiel...|
-|Pr&int Group|                 |&Tlaèi skupinu...|
+|Pr&int Group...|              |&Tlaèi skupinu...|
 |Export Group To &HTML...|     |Exportova skupinu do &HTML...|
 |Export Group To &XML...|      |Exportova skupinu do &XML...|
 |Export Group To &CSV...|      |Exportova skupinu do &CSV...|
@@ -203,7 +203,6 @@
 |Show &URL Column|             |Zobrazi ståpec '&URL'|
 |Show &Password Column|        |Zobrazi ståpec '&Heslo'|
 |Show Note&s Column|           |Zobrazi ståpec '&Poznámky'|
-|Main Window &Always On Top|   |Hlavné &okno vdy navrchu|
 |Hide &Passwords Behind Asterisks (***)|       |Skry &heslá za hviezdièky (***)|
 
 |Password &Generator|          |&Generátor hesiel|
@@ -211,11 +210,6 @@
 |Visit &KeePass Homepage|      |&Navštívi web stránku programu KeePass|
 |&About KeePass...|            |&O programe KeePass...|
 
-|&Minimize/Maximize Window To/From Tray|
-    |Minimalizova/Maximalizova okno do/z notifikaènej oblasti (tray)|
-
-|%u.%u.%u.%u, compatible with %u.%u.x.x|
-    |%u.%u.%u.%u, kompatibilná s %u.%u.x.x|
 |Version |                     |Version |
 
 |Password and repeated password aren't identical!|
@@ -283,7 +277,7 @@
     |Prosím zvo¾te jazyk zo zoznamu nišie.|
 |Available Languages|          |Dostupné jazyky|
 
-|Open &Help File|              |Otvori súbor &nápovedy|
+|Open &Help File|              |Ot&vori súbor nápovedy|
 |Open &License File|           |Otvori &licenènı súbor|
 |&Print License File|          |Vy&tlaèit licenènı súbor|
 
@@ -322,8 +316,6 @@
 
 |CSV files|                    |Súbory CSV|
 |Text files|                   |Textové súbory|
-|An error occured while importing the CSV file. File cannot be imported.|
-    |Pri importovaní CSV súboru došlo ku chybe. Súbor nemôe by importovanı.|
 |An error occured while importing the file. File cannot be imported.|
     |Pri importovaní súboru došlo ku chybe. Súbor nemôe by importovanı|
 
@@ -507,8 +499,8 @@
 	|Prajete si napriek tomu ukonèi program?|
 |You have changed an option that requires restarting KeePass to get active.|
 	|Zmenili ste nastavenie ktoré sa prejaví a po reštarte programu KeePass.|
-|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
-	|Váš k¾úè je zakódovanı nieko¾ko krát za úèelom vytvorenia finálneho kódovacieho k¾úèa databázy. Tento postup pridáva konštantnı èasovı faktor a robí brute-force útoky ove¾a ašie uskutoènite¾nımi.|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
+	|Váš k¾úè je zakódovanı nieko¾ko krát za úèelom vytvorenia finálneho kódovacieho k¾úèa databázy. Tento postup pridáva konštantnı èasovı faktor a robí tipovacie a slovníkové útoky ove¾a ašie uskutoènite¾nımi.|
 
 |bits|						|bitov|
 
@@ -565,14 +557,15 @@
 |Perform Auto-&Type|
 	|&Automatické zadanie (Auto-Type)|
 |Auto-Type|						|Aut. zadanie|
+
 |Global auto-type hot key combination:|
 	|Globálna klávesová skratka pre funkciu automatické zadanie (auto-type):|
-|Most probably an other application has reserved this hot key already.|
+|Cannot register the global hot key.|
+	|Nebolo moné zaregistrova globálnu klávesovú skratku.|
+|Most probably another application has reserved this hot key already.|
 	|Iná aplikácia u pravdepodobne vyuíva túto klávesovú skratku.|
 |You can choose an other hot key combination in 'Edit - Options - Setup'.|
 	|Môete zvoli inú klávesovú skratkuv menu 'Upravi - Monosti - Inštalácia'.|
-|Unable to register a global hot key.|
-	|Nebolo moné zaregistrova globálnu klávesovú skratku.|
 
 |Error code|					|Kód chyby|
 |Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations.|
@@ -708,3 +701,43 @@
 	|Spusti minimalizovanı a uzamknutı|
 |Unable to create/remove the auto-start key of KeePass in the Windows registry!|
 	|Nebolo moné vytvori/odstráni k¾úè pre automatické spustenie programu KeePass v registroch Windows!|
+
+
+
+|&Always On Top|				|Vdy nav&rchu|
+|&Donate...|					|Po&dpori...|
+|&Print...|						|&Tlaèi...|
+|&Tray/Untray|					|&Schova/obnovi z notifikaènej oblasti (tray)|
+|1 month|						|1 mesiac|
+|1 week|						|1 tıdeò|
+|1 year|						|1 rok|
+|2 weeks|						|2 tıdne|
+|3 months|						|3 mesiace|
+|6 months|						|6 mesiacov|
+
+|Automatically generate random passwords for new entries|
+	|Automaticky generova náhodné heslá pre nové záznamy|
+|By default, new entries expire in the following number of days:|
+	|Nové záznamy budú ma predvolenú expiráciu o nasledujúci poèet dní:|
+|Click to expire the entry in %u days|
+	|Kliknutím nastavíte expiráciu o %u dní|
+|Calculate rounds for a 1-second delay on this computer|
+	|Vypoèíta poèet cyklov na 1 sekundu na tomto poèítaèi|
+
+|Exclude entries in the '&Backup' group|
+	|Vynecha záznamy v skupine '&Záloha'|
+|Include backup entries in quick searches (toolbar)|
+	|Zahrnú zálohované záznamy do vısledkov rıchleho vyh¾adávania (cez nástrojovú lištu)|
+
+|Limit to single instance|		|Povoli spustenie maximálne jednej kópie|
+|Use more secure password edit controls|
+	|Pouíva bezpeènejšie políèka na editáciu hesiel|
+
+|Waiting for paste command.|	|Èakanie na príkaz vloenia.|
+|Paste operation completed.|	|Operácia vloenia ukonèená.|
+|Field has been pasted.|		|Poloka bola vloená.|
+
+|Single left click instead of double-click for default tray icon action|
+	|Jediné kliknutie namiesto dvojitého kliknutia pre hlavnú akciu ikony notifikaènej oblasti|
+|The program is distributed under the terms of the GNU General Public License v2 or later.|
+	|Tento program je vo¾ne šírite¾nı v súlade s podmienkami licencie GNU General Public License verzie 2 alebo novšej.|

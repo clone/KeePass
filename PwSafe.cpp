@@ -54,10 +54,12 @@ CPwSafeApp theApp;
 
 BOOL CPwSafeApp::InitInstance()
 {
+#if (_MFC_VER < 0x0500)
 #ifdef _AFXDLL
 	Enable3dControls();
 #else
 	Enable3dControlsStatic();
+#endif
 #endif
 
 	// Create application's mutex object to make our presence public
