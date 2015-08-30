@@ -844,6 +844,22 @@ std::basic_string<TCHAR> SU_CompactWith3Dots(LPCTSTR lpString, size_t uMaxChars)
 	return str;
 }
 
+int SU_FindUnescapedCharW(LPCWSTR lpw, WCHAR wch)
+{
+	if(lpw == NULL) { ASSERT(FALSE); return -1; }
+
+	const size_t uLen = wcslen(lpw);
+	for(size_t i = 0; i < uLen; ++i)
+	{
+		const WCHAR wchCur = lpw[i];
+
+		if(wchCur == L'\\') ++i; // Next is escaped, skip it
+		else if(wchCur == wch) return static_cast<int>(i);
+	}
+
+	return -1;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // WCharStream class
 

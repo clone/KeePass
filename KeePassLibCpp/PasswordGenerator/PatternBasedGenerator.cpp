@@ -44,12 +44,12 @@ PWG_ERROR PbgGenerate(std::vector<WCHAR>& vOutBuffer,
 	WCHAR ch = csPattern.ReadChar();
 
 	PwCharSet pwCustomCharSet, pwUsedCharSet;
-	BOOL bInCharSetDef = FALSE;
+	bool bInCharSetDef = false;
 
 	while(ch != 0)
 	{
 		PwCharSet pwCurrentCharSet;
-		BOOL bGenerateChar = FALSE;
+		bool bGenerateChar = false;
 
 		if(ch == L'\\')
 		{
@@ -60,38 +60,38 @@ PWG_ERROR PbgGenerate(std::vector<WCHAR>& vOutBuffer,
 				break;
 			}
 
-			if(bInCharSetDef == FALSE)
+			if(!bInCharSetDef)
 			{
 				PbgAppendChar(vOutBuffer, ch, dwOutBufPos);
 				pwUsedCharSet.Add(ch);
 			}
 			else pwCustomCharSet.Add(ch);
 		}
-		else if(ch == '[')
+		else if(ch == L'[')
 		{
 			pwCustomCharSet.Clear();
-			bInCharSetDef = TRUE;
+			bInCharSetDef = true;
 		}
-		else if(ch == ']')
+		else if(ch == L']')
 		{
 			pwCurrentCharSet.Add(pwCustomCharSet.ToString().c_str());
 
-			bInCharSetDef = FALSE;
-			bGenerateChar = TRUE;
+			bInCharSetDef = false;
+			bGenerateChar = true;
 		}
-		else if(bInCharSetDef == TRUE)
+		else if(bInCharSetDef)
 		{
-			if(pwCustomCharSet.AddCharSet(ch) == false)
+			if(!pwCustomCharSet.AddCharSet(ch))
 				pwCustomCharSet.Add(ch);
 		}
-		else if(pwCurrentCharSet.AddCharSet(ch) == false)
+		else if(!pwCurrentCharSet.AddCharSet(ch))
 		{
 			PbgAppendChar(vOutBuffer, ch, dwOutBufPos);
 			pwUsedCharSet.Add(ch);
 		}
-		else bGenerateChar = TRUE;
+		else bGenerateChar = true;
 		
-		if(bGenerateChar == TRUE)
+		if(bGenerateChar)
 		{
 			PwgPrepareCharSet(&pwCurrentCharSet, pSettings);
 
@@ -139,23 +139,24 @@ PbgWString PbgExpandPattern(const PbgWString& strPattern)
 
 	while(true)
 	{
-		PbgWString::size_type nOpen = str.find(L'{');
-		PbgWString::size_type nClose = str.find('}');
+		const int iOpen = SU_FindUnescapedCharW(str.c_str(), L'{');
+		const int iClose = SU_FindUnescapedCharW(str.c_str(), L'}');
 
-		if((nOpen == PbgWString::npos) || (nClose == PbgWString::npos) ||
-			(!(nOpen >= 0)) || (nOpen > nClose))
-			break;
+		if((iOpen < 0) || (iClose < iOpen)) break;
 
-		PbgWString strCount = str.substr(nOpen + 1, nClose - nOpen - 1);
-		str.erase(nOpen, nClose - nOpen + 1);
+		const PbgWString::size_type uOpen = static_cast<PbgWString::size_type>(iOpen);
+		const PbgWString::size_type uClose = static_cast<PbgWString::size_type>(iClose);
 
-		long lRepeat = _wtol(strCount.c_str());
-		if((lRepeat >= 0) && (nOpen >= 1))
+		PbgWString strCount = str.substr(uOpen + 1, uClose - uOpen - 1);
+		str.erase(uOpen, uClose - uOpen + 1);
+
+		const long lRepeat = _wtol(strCount.c_str());
+		if((lRepeat >= 0) && (uOpen >= 1))
 		{
 			if(lRepeat == 0)
-				str.erase(nOpen - 1, 1);
+				str.erase(uOpen - 1, 1);
 			else
-				str.insert(nOpen, lRepeat - 1, str[nOpen - 1]);
+				str.insert(uOpen, lRepeat - 1, str[uOpen - 1]);
 		}
 	}
 

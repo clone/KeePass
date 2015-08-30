@@ -89,8 +89,8 @@
 				ModuleDefinitionFile=".\KeePassLib.def"
 				ProgramDatabaseFile="$(IntDir)\KeePassLibC.pdb"
 				SubSystem="2"
-				RandomizedBaseAddress="0"
-				DataExecutionPrevention="0"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
 				ImportLibrary="$(IntDir)\KeePassLibC.lib"
 				TargetMachine="1"
 			/>
@@ -189,8 +189,8 @@
 				ModuleDefinitionFile=".\KeePassLib.def"
 				ProgramDatabaseFile="$(IntDir)\KeePassLibC.pdb"
 				SubSystem="2"
-				RandomizedBaseAddress="0"
-				DataExecutionPrevention="0"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
 				ImportLibrary="$(IntDir)\KeePassLibC.lib"
 				TargetMachine="17"
 			/>
@@ -489,8 +489,8 @@
 				ModuleDefinitionFile=".\KeePassLib.def"
 				ProgramDatabaseFile="$(IntDir)\KeePassLibC.pdb"
 				SubSystem="2"
-				RandomizedBaseAddress="0"
-				DataExecutionPrevention="0"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
 				ImportLibrary="$(IntDir)\KeePassLibC.lib"
 				TargetMachine="1"
 			/>
@@ -589,8 +589,8 @@
 				ModuleDefinitionFile=".\KeePassLib.def"
 				ProgramDatabaseFile="$(IntDir)\KeePassLibC.pdb"
 				SubSystem="2"
-				RandomizedBaseAddress="0"
-				DataExecutionPrevention="0"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
 				ImportLibrary="$(IntDir)\KeePassLibC.lib"
 				TargetMachine="17"
 			/>
@@ -1033,6 +1033,14 @@
 				</File>
 				<File
 					RelativePath="..\KeePassLibCpp\Util\PopularPasswords.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\PwQualityEst.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\PwQualityEst.h"
 					>
 				</File>
 				<File

@@ -72,6 +72,9 @@ public:
 	static int ShowMessageBox(HWND hParent, LPCTSTR lpMainInstruction,
 		LPCTSTR lpContent, MY_TASKDIALOG_ICON tdIcon, LPCTSTR lpButton1, int nResult1,
 		LPCTSTR lpButton2, int nResult2);
+	static int ShowMessageBox(HWND hParent, LPCTSTR lpMainInstruction,
+		LPCTSTR lpContent, PCWSTR lpIcon, LPCTSTR lpButton1, int nResult1,
+		LPCTSTR lpButton2, int nResult2);
 
 private:
 	void Clear();

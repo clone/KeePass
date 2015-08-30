@@ -586,6 +586,7 @@ protected:
 	afx_msg void OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu);
 	virtual void OnOK();
 	virtual void OnCancel();
+	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
 	afx_msg void OnFileExit();
 	afx_msg void OnUpdateFileExit(CCmdUI *pCmdUI);
 	afx_msg void OnInfoAbout();

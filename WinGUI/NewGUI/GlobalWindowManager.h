@@ -17,41 +17,28 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___POPULAR_PASSWORDS_H___
-#define ___POPULAR_PASSWORDS_H___
+#ifndef ___GLOBAL_WINDOW_MANAGER_H___
+#define ___GLOBAL_WINDOW_MANAGER_H___
 
 #pragma once
 
-#include "../SysDefEx.h"
-#include <boost/utility.hpp>
-#include <boost/shared_ptr.hpp>
-#include <tchar.h>
 #include <vector>
-#include <set>
-#include <string>
-#include "StrUtil.h"
-#include "MemUtil.h"
+#include <boost/utility.hpp>
 
-typedef std::basic_string<WCHAR> TppWord;
-typedef std::set<TppWord> TppDict;
-typedef boost::shared_ptr<TppDict> TppDictPtr;
-
-class CPopularPasswords : boost::noncopyable
+class CGlobalWindowManager : boost::noncopyable
 {
-private:
-	CPopularPasswords();
-
 public:
-	static size_t GetMaxLength();
-	static bool ContainsLength(size_t uLen);
+	static HRESULT AddDialog(CDialog* pDlg);
+	static HRESULT RemoveDialog(CDialog* pDlg);
 
-	static bool IsPopular(LPCWSTR lpw, size_t* pdwDictSize);
+	static DWORD GetCount();
 
-	static void Add(const UTF8_BYTE* pTextUTF8);
-	static void AddResUTF8(LPCTSTR lpResName, LPCTSTR lpResType);
+	static HWND GetTopWindow();
 
 private:
-	static std::vector<TppDictPtr> m_vDicts;
+	CGlobalWindowManager();
+
+	static std::vector<CDialog*> m_vDialogs;
 };
 
-#endif // ___POPULAR_PASSWORDS_H___
+#endif // ___GLOBAL_WINDOW_MANAGER_H___

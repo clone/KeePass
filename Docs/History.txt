@@ -1,3 +1,35 @@
+13/07/12 - 1.26
+- New password quality estimation algorithm
+- When activating the main window while a dialog is opened, the
+  main window now redirects the activation to the dialog
+- Added '-preload' command line option
+- Added database repair mode warning
+
+- KeePass does not change the focus anymore when locking while
+  being minimized to tray
+- When clicking into the empty space of the groups tree view,
+  the currently selected group is not deselected anymore
+- The 'Special' GUI character set now includes '|' and '~'
+- The 'High ANSI' character set now consists of the range
+  [U+0080, U+00FF] except control and non-printable characters
+- Changed auto-type command icon
+- Shortened product name in window titles
+- Improved RC-created group time fields
+- KeePassLibC DLLs are now explicitly marked as DEP- and ASLR-
+  compatible (like the executable file)
+- In the MSI package, the version is now included in the
+  product name
+- Replaced Boost threads by Windows API threads (because Boost
+  threads can result in crashes on restricted Windows 7 x64
+  systems)
+- Upgraded to Boost libraries version 1.54.0
+- Various UI improvements
+- Various code optimizations
+- Minor other improvements
+
+- Password generation based on patterns: escaped curly brackets
+  are now parsed correctly
+
 13/01/20 - 1.25
 - Added option to show the tray icon only if the main window
   has been sent to the tray

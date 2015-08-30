@@ -59,6 +59,15 @@ void CKeyTransform::Run()
 	m_bSucceeded = true;
 }
 
+DWORD WINAPI CKeyTrf_ThreadProc(LPVOID lpParameter)
+{
+	CKeyTransform* p = (CKeyTransform*)lpParameter;
+	if(p == NULL) { ASSERT(FALSE); return 0; }
+
+	p->Run();
+	return 0;
+}
+
 bool CKeyTransform::Transform256(UINT64 qwRounds, UINT8* pBuffer256,
 	const UINT8* pKeySeed256)
 {
@@ -75,18 +84,19 @@ bool CKeyTransform::Transform256(UINT64 qwRounds, UINT8* pBuffer256,
 	CKeyTransform ktRight(qwRounds, &vBuf[16], &vKey[0]);
 
 	// No multi-threading support for _WIN32_WCE builds
-#if defined(_WIN32_WCE)
+#ifdef _WIN32_WCE
 	ktLeft.Run();
 	ktRight.Run();
 #else
-	try
-	{
-		CKeyTransformWrapper wrLeft(&ktLeft);
-		boost::thread thLeft(wrLeft);
-		ktRight.Run();
-		thLeft.join();
-	}
-	catch(...) { ASSERT(FALSE); return false; }
+	DWORD dwThreadId = 0; // Pointer may not be NULL on Windows 9x/Me
+	HANDLE hLeft = CreateThread(NULL, 0, CKeyTrf_ThreadProc,
+		&ktLeft, 0, &dwThreadId);
+	if(hLeft == NULL) { ASSERT(FALSE); return false; }
+
+	ktRight.Run();
+
+	VERIFY(WaitForSingleObject(hLeft, INFINITE) == WAIT_OBJECT_0);
+	VERIFY(CloseHandle(hLeft) != FALSE);
 #endif
 
 	ASSERT(ktLeft.Succeeded() && ktRight.Succeeded());
@@ -103,18 +113,19 @@ UINT64 CKeyTransform::Benchmark(DWORD dwTimeMs)
 	CKeyTransformBenchmark ktLeft(dwTimeMs), ktRight(dwTimeMs);
 
 	// No multi-threading support for _WIN32_WCE builds
-#if defined(_WIN32_WCE)
+#ifdef _WIN32_WCE
 	ktLeft.Run();
 	return (ktLeft.GetComputedRounds() >> 1);
 #else
-	try
-	{
-		CKeyTransformBenchmarkWrapper wrLeft(&ktLeft);
-		boost::thread thLeft(wrLeft);
-		ktRight.Run();
-		thLeft.join();
-	}
-	catch(...) { ASSERT(FALSE); return 0; }
+	DWORD dwThreadId = 0; // Pointer may not be NULL on Windows 9x/Me
+	HANDLE hLeft = CreateThread(NULL, 0, CKeyTrfBench_ThreadProc,
+		&ktLeft, 0, &dwThreadId);
+	if(hLeft == NULL) { ASSERT(FALSE); return false; }
+
+	ktRight.Run();
+
+	VERIFY(WaitForSingleObject(hLeft, INFINITE) == WAIT_OBJECT_0);
+	VERIFY(CloseHandle(hLeft) != FALSE);
 
 	const UINT64 qwLeft = ktLeft.GetComputedRounds();
 	const UINT64 qwRight = ktRight.GetComputedRounds();
@@ -167,4 +178,13 @@ void CKeyTransformBenchmark::Run()
 
 		if((timeGetTime() - dwStartTime) >= m_dwTimeMs) break;
 	}
+}
+
+DWORD WINAPI CKeyTrfBench_ThreadProc(LPVOID lpParameter)
+{
+	CKeyTransformBenchmark* p = (CKeyTransformBenchmark*)lpParameter;
+	if(p == NULL) { ASSERT(FALSE); return 0; }
+
+	p->Run();
+	return 0;
 }

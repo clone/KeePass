@@ -237,7 +237,7 @@ void CEntryPropertiesDlg::OnButtonSelectIcon()
 	dlg.m_pImageList = m_pParentIcons;
 	dlg.m_uNumIcons = static_cast<UINT>(m_pParentIcons->GetImageCount());
 
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 	{
 		m_nIconId = dlg.m_nSelectedIcon;
 

@@ -107,10 +107,10 @@ void PwCharSet::Add(LPCWSTR lpChars1, LPCWSTR lpChars2, LPCWSTR lpChars3)
 
 void PwCharSet::AddRange(WCHAR chLow, WCHAR chHigh)
 {
-	for(WCHAR ch = chLow; ch <= chHigh; ++ch)
-	{
+	for(WCHAR ch = chLow; ch < chHigh; ++ch)
 		this->Add(ch);
-	}
+
+	this->Add(chHigh);
 }
 
 bool PwCharSet::Remove(WCHAR ch)
@@ -181,8 +181,7 @@ bool PwCharSet::AddCharSet(WCHAR chCharSetIdentifier)
 		case L'v': this->Add(PDCS_LOWER_VOWELS); break;
 		case L'V': this->Add(PDCS_LOWER_VOWELS, PDCS_UPPER_VOWELS); break;
 		case L'Z': this->Add(PDCS_UPPER_VOWELS); break;
-		case L'x':
-			{ for(WCHAR ch = L'~'; ch < 255; ++ch) this->Add(ch); } break;
+		case L'x': this->Add(PwCharSet::GetHighAnsiChars().ToString().c_str()); break;
 		default: bResult = false; break;
 	}
 
@@ -194,9 +193,7 @@ std::basic_string<WCHAR> PwCharSet::ToString() const
 	LPWSTR lp = new WCHAR[m_vChars.size() + 2];
 
 	for(DWORD i = 0; i < m_vChars.size(); ++i)
-	{
 		lp[i] = m_vChars[i];
-	}
 
 	lp[m_vChars.size()] = 0;
 	lp[m_vChars.size() + 1] = 0;
@@ -213,6 +210,7 @@ PwCharSet PwCharSet::GetSpecialChars()
 	pcs.AddRange(L'!', L'/');
 	pcs.AddRange(L':', L'@');
 	pcs.AddRange(L'[', L'`');
+	pcs.Add(L"|~");
 	pcs.Remove(L"-_ ");
 	pcs.Remove(PDCS_BRACKETS);
 
@@ -222,7 +220,13 @@ PwCharSet PwCharSet::GetSpecialChars()
 PwCharSet PwCharSet::GetHighAnsiChars()
 {
 	PwCharSet pcs;
-	pcs.AddRange(L'~', 254);
+
+	// [U+0080, U+009F] are C1 control characters,
+	// U+00A0 is non-breaking space
+	pcs.AddRange(L'\x00A1', L'\x00AC');
+	// U+00AD is soft hyphen (format character)
+	pcs.AddRange(L'\x00AE', L'\x00FF');
+
 	return pcs;
 }
 

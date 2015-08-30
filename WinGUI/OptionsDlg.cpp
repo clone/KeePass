@@ -362,7 +362,7 @@ void COptionsDlg::_ChangeFont(CString& rSpec)
 	CFontDialog dlg(&lf);
 	dlg.m_cf.Flags |= CF_NOSCRIPTSEL;
 
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 	{
 		int dSize = dlg.GetSize();
 		dSize = ((dSize >= 0) ? dSize : -dSize);
@@ -497,7 +497,7 @@ void COptionsDlg::OnBtnAutoType()
 	dlg.m_bSameKL = m_bAutoTypeSameKL;
 	dlg.m_bSortAutoTypeSelItems = m_bSortAutoTypeSelItems;
 
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 	{
 		m_bDisableAutoType = dlg.m_bDisableAutoType;
 		m_bMinimizeBeforeAT = dlg.m_bMinimizeBeforeAT;

@@ -70,9 +70,6 @@ private:
 	CPwUtil();
 
 public:
-	// Very simple password quality estimation function
-	static DWORD EstimatePasswordBits(LPCTSTR lpPassword);
-
 	static BOOL LoadHexKey32(FILE *fp, BYTE *pBuf);
 	static BOOL SaveHexKey32(FILE *fp, BYTE *pBuf);
 

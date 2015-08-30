@@ -157,7 +157,7 @@ void CAddGroupDlg::OnSetIconBtn()
 	dlg.m_uNumIcons = static_cast<UINT>(m_pParentImageList->GetImageCount());
 	dlg.m_nSelectedIcon = m_nIconId;
 
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 	{
 		m_nIconId = dlg.m_nSelectedIcon;
 

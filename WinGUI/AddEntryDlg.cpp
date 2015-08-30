@@ -634,7 +634,7 @@ void CAddEntryDlg::OnPickIconBtn()
 	dlg.m_uNumIcons = static_cast<UINT>(m_pParentIcons->GetImageCount());
 	dlg.m_nSelectedIcon = m_nIconId;
 
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 	{
 		m_nIconId = dlg.m_nSelectedIcon;
 
@@ -670,7 +670,7 @@ void CAddEntryDlg::OnRandomPwBtn()
 		CPwGeneratorExDlg dlg;
 		dlg.InitEx(1, m_bStars, FALSE);
 
-		if(dlg.DoModal() == IDOK) lpPassword = dlg.GetGeneratedPassword();
+		if(NewGUI_DoModal(&dlg) == IDOK) lpPassword = dlg.GetGeneratedPassword();
 	}
 
 	if(lpPassword == NULL) return;
@@ -793,7 +793,7 @@ void CAddEntryDlg::OnSetAttachBtn()
 		OFN_ENABLESIZING | OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY);
 
 	CFileDialog dlg(TRUE, NULL, NULL, dwFlags, strFilter, this);
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 	{
 		int nRet;
 
@@ -846,7 +846,7 @@ void CAddEntryDlg::OnSaveAttachBtn()
 	dwFlags |= 0x00080000 | 0x00800000 | OFN_NOREADONLYRETURN;
 
 	CFileDialog dlg(FALSE, NULL, strSample, dwFlags, strFilter, this);
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 		CPwUtil::SaveBinaryData(pEntry, dlg.GetPathName());
 
 	UpdateData(FALSE);
@@ -1146,7 +1146,7 @@ void CAddEntryDlg::SelectFileAsUrl(LPCTSTR lpFilter)
 		OFN_NOTESTFILECREATE | OFN_PATHMUSTEXIST;
 
 	CFileDialog dlg(TRUE, _T("exe"), _T(""), dwFlags, lpFilter, this, 0);
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 	{
 		m_strURL = _T("cmd://\"");
 		m_strURL += dlg.GetPathName();
@@ -1274,7 +1274,7 @@ void CAddEntryDlg::OnAutoTypeSelectTargetWindow()
 		TRL("To specify the target window, either select an existing currently-opened window from the drop-down list, or enter the window title manually:"),
 		DWORD_MAX, _T(""), vWindows);
 
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 	{
 		CString strNew = _T("Auto-Type-Window: ");
 		strNew += dlg.GetEnteredText();
@@ -1329,7 +1329,7 @@ CString CAddEntryDlg::GetEntryFieldRef()
 	CFieldRefDlg dlg;
 	dlg.InitEx(m_pMgr, m_pParentIcons);
 
-	if(dlg.DoModal() == IDOK) return dlg.m_strFieldRef;
+	if(NewGUI_DoModal(&dlg) == IDOK) return dlg.m_strFieldRef;
 	return CString();
 }
 

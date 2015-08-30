@@ -132,6 +132,8 @@ void SU_Split(std::vector<std::basic_string<TCHAR>>& vOut, const std::basic_stri
 
 std::basic_string<TCHAR> SU_CompactWith3Dots(LPCTSTR lpString, size_t uMaxChars);
 
+int SU_FindUnescapedCharW(LPCWSTR lpw, WCHAR wch);
+
 /////////////////////////////////////////////////////////////////////////////
 // Natural string comparison API
 

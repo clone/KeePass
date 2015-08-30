@@ -18,12 +18,11 @@
 */
 
 #ifndef ___KEY_TRANSFORM_H___
+#define ___KEY_TRANSFORM_H___
+
+#pragma once
 
 #include <boost/utility.hpp>
-
-#if !defined(_WIN32_WCE)
-#include <boost/thread/thread.hpp>
-#endif
 
 class CKeyTransform : boost::noncopyable
 {
@@ -43,20 +42,6 @@ private:
 	bool m_bSucceeded;
 };
 
-// boost::thread copies the callable object; wrapping is required
-// such that the thread uses the same object (to prevent losing
-// modified members of the CKeyTransform object)
-class CKeyTransformWrapper
-{
-public:
-	CKeyTransformWrapper(CKeyTransform* p) : m_p(p) { }
-
-	void operator()() { if(m_p != NULL) m_p->Run(); else { ASSERT(FALSE); } }
-
-private:
-	CKeyTransform* m_p;
-};
-
 class CKeyTransformBenchmark : boost::noncopyable
 {
 public:
@@ -71,18 +56,8 @@ private:
 	UINT64 m_qwComputedRounds;
 };
 
-// boost::thread copies the callable object; wrapping is required
-// such that the thread uses the same object (to prevent losing
-// modified members of the CKeyTransformBenchmark object)
-class CKeyTransformBenchmarkWrapper
-{
-public:
-	CKeyTransformBenchmarkWrapper(CKeyTransformBenchmark* p) : m_p(p) { }
-
-	void operator()() { if(m_p != NULL) m_p->Run(); else { ASSERT(FALSE); } }
-
-private:
-	CKeyTransformBenchmark* m_p;
-};
+// Private:
+DWORD WINAPI CKeyTrf_ThreadProc(LPVOID lpParameter);
+DWORD WINAPI CKeyTrfBench_ThreadProc(LPVOID lpParameter);
 
 #endif // ___KEY_TRANSFORM_H___

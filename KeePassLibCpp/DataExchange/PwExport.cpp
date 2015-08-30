@@ -340,7 +340,8 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 
 			if((pg->uGroupId != dwGroupId) && (pg->usLevel <= usLevel)) break;
 
-			aGroupIds.push_back(pg->uGroupId);
+			const DWORD dwToAdd = pg->uGroupId;
+			aGroupIds.push_back(dwToAdd);
 
 			++i;
 			if(i == dwNumberOfGroups) break;
@@ -352,7 +353,9 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 		{
 			pg = m_pMgr->GetGroup(i);
 			ASSERT(pg != NULL); if(pg == NULL) continue;
-			aGroupIds.push_back(pg->uGroupId);
+
+			const DWORD dwToAdd = pg->uGroupId;
+			aGroupIds.push_back(dwToAdd);
 		}
 	}
 

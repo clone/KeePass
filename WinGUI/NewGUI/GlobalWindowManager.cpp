@@ -18,37 +18,48 @@
 */
 
 #include "StdAfx.h"
-#include "CharSetBasedGenerator.h"
-#include "../Util/StrUtil.h"
+#include "GlobalWindowManager.h"
 
-PWG_ERROR CsbgGenerate(std::vector<WCHAR>& vOutBuffer,
-	const PW_GEN_SETTINGS_EX* pSettings, CNewRandom* pRandomSource)
+std::vector<CDialog*> CGlobalWindowManager::m_vDialogs;
+
+CGlobalWindowManager::CGlobalWindowManager()
 {
-	ASSERT(pSettings != NULL);
-	if(pSettings == NULL) return PWGE_NULL_PTR;
-	ASSERT(pRandomSource != NULL);
-	if(pRandomSource == NULL) return PWGE_NULL_PTR;
+}
 
-	vOutBuffer.resize(pSettings->dwLength + 2);
-	vOutBuffer[pSettings->dwLength] = 0;
-	vOutBuffer[pSettings->dwLength + 1] = 0;
+HRESULT CGlobalWindowManager::AddDialog(CDialog* pDlg)
+{
+	if(pDlg == NULL) { ASSERT(FALSE); return E_POINTER; }
 
-	PwCharSet pwCharSet(pSettings->strCharSet.c_str());
+	m_vDialogs.push_back(pDlg);
+	return S_OK;
+}
 
-	PwgPrepareCharSet(&pwCharSet, pSettings);
+HRESULT CGlobalWindowManager::RemoveDialog(CDialog* pDlg)
+{
+	if(pDlg == NULL) { ASSERT(FALSE); return E_POINTER; }
 
-	for(DWORD i = 0; i < pSettings->dwLength; ++i)
+	for(std::vector<CDialog*>::iterator it = m_vDialogs.begin();
+		it != m_vDialogs.end(); ++it)
 	{
-		const WCHAR ch = PwgGenerateCharacter(pSettings, pRandomSource, &pwCharSet);
-
-		if(ch == 0) // Failed to generate character
+		if(pDlg == *it)
 		{
-			EraseWCharVector(vOutBuffer);
-			return PWGE_TOO_FEW_CHARACTERS;
+			m_vDialogs.erase(it);
+			return S_OK;
 		}
-
-		vOutBuffer[i] = ch;
 	}
 
-	return PWGE_SUCCESS;
+	return S_FALSE;
+}
+
+DWORD CGlobalWindowManager::GetCount()
+{
+	return static_cast<DWORD>(m_vDialogs.size());
+}
+
+HWND CGlobalWindowManager::GetTopWindow()
+{
+	if(m_vDialogs.size() == 0) return NULL;
+
+	CDialog* pDlg = m_vDialogs[m_vDialogs.size() - 1];
+	return pDlg->m_hWnd;
 }

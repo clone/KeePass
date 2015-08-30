@@ -26,6 +26,7 @@
 #include "../../KeePassLibCpp/IO/KpInternetStream.h"
 #include "../Plugins/PluginMgr.h"
 #include "../Plugins/KpApiImpl.h"
+#include "../NewGUI/NewGUICommon.h"
 #include "../NewGUI/TaskDialog/VistaTaskDialog.h"
 
 #include "../UpdateInfoDlg.h"
@@ -58,7 +59,7 @@ HRESULT CUpdateCheckEx::Check(BOOL bRunInThread, HWND hParent, CImageList* pImag
 		g_ucInitStruct.pImages = pImages;
 		g_ucInitStruct.bUIOnlyOnUpdate = bUIOnlyOnUpdate;
 
-		DWORD dwDummyID = 0; // Pointer may not be NULL on Windows 9x
+		DWORD dwDummyID = 0; // Pointer may not be NULL on Windows 9x/Me
 		HANDLE h = CreateThread(NULL, 0, CfuEx_Thread, NULL, 0, &dwDummyID);
 
 		if((h != NULL) && (h != INVALID_HANDLE_VALUE)) CloseHandle(h);
@@ -144,7 +145,7 @@ void CUpdateCheckEx::_FinalReport(const UC_COMPONENTS_LIST& vInstalled,
 		// FromHandle, not FromHandlePermanent, due to other thread
 		CUpdateInfoDlg dlg(CWnd::FromHandle(m_hParent));
 		dlg.InitEx(m_pImages, &vInstalled, lpResult);
-		dlg.DoModal();
+		NewGUI_DoModal(&dlg);
 	}
 	else
 	{

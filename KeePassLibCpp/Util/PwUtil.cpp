@@ -26,96 +26,12 @@
 #include "MemUtil.h"
 #include "StrUtil.h"
 #include "TranslateEx.h"
-#include "PopularPasswords.h"
 #include "../Crypto/ARCFour.h"
-
-#define CHARSPACE_CONTROL     32
-#define CHARSPACE_ALPHA       26
-#define CHARSPACE_NUMBER      10
-#define CHARSPACE_SPECIAL     33
-#define CHARSPACE_HIGH       112
 
 static const BYTE g_uuidZero[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
 CPwUtil::CPwUtil()
 {
-}
-
-// Very simple password quality estimation function
-DWORD CPwUtil::EstimatePasswordBits(LPCTSTR lpPassword)
-{
-	BOOL bChLower = FALSE, bChUpper = FALSE, bChNumber = FALSE;
-	BOOL bChSpecial = FALSE, bChHigh = FALSE, bChControl = FALSE;
-	double dblEffectiveLength = 0.0;
-	std::map<TCHAR, unsigned int> vCharCounts;
-	std::map<int, unsigned int> vDifferences;
-
-	ASSERT(lpPassword != NULL); if(lpPassword == NULL) return 0;
-
-	const DWORD dwLen = static_cast<DWORD>(_tcslen(lpPassword));
-	if(dwLen == 0) return 0; // Zero bits of information :)
-
-	for(DWORD i = 0; i < dwLen; ++i) // Get character types
-	{
-		const TCHAR tch = lpPassword[i];
-
-		if((tch >= 0) && (tch < _T(' '))) bChControl = TRUE;
-		else if((tch >= _T('A')) && (tch <= _T('Z'))) bChUpper = TRUE;
-		else if((tch >= _T('a')) && (tch <= _T('z'))) bChLower = TRUE;
-		else if((tch >= _T('0')) && (tch <= _T('9'))) bChNumber = TRUE;
-		else if((tch >= _T(' ')) && (tch <= _T('/'))) bChSpecial = TRUE;
-		else if((tch >= _T(':')) && (tch <= _T('@'))) bChSpecial = TRUE;
-		else if((tch >= _T('[')) && (tch <= _T('`'))) bChSpecial = TRUE;
-		else if((tch >= _T('{')) && (tch <= _T('~'))) bChSpecial = TRUE;
-		else if((tch < 0) || (tch > _T('~'))) bChHigh = TRUE;
-
-		double dblDiffFactor = 1.0;
-		if(i >= 1)
-		{
-			const int iDiff = (int)tch - (int)lpPassword[i - 1];
-
-			if(vDifferences.find(iDiff) == vDifferences.end())
-				vDifferences[iDiff] = 1;
-			else
-			{
-				const unsigned int uDiffCount = vDifferences[iDiff] + 1;
-				vDifferences[iDiff] = uDiffCount;
-				dblDiffFactor /= (double)uDiffCount;
-			}
-		}
-
-		if(vCharCounts.find(tch) == vCharCounts.end())
-		{
-			vCharCounts[tch] = 1;
-			dblEffectiveLength += dblDiffFactor;
-		}
-		else
-		{
-			const unsigned int uCharCount = vCharCounts[tch] + 1;
-			vCharCounts[tch] = uCharCount;
-			dblEffectiveLength += dblDiffFactor * (1.0 / (double)uCharCount);
-		}
-	}
-
-	DWORD dwCharSpace = 0;
-	if(bChControl == TRUE) dwCharSpace += CHARSPACE_CONTROL;
-	if(bChUpper == TRUE) dwCharSpace += CHARSPACE_ALPHA;
-	if(bChLower == TRUE) dwCharSpace += CHARSPACE_ALPHA;
-	if(bChNumber == TRUE) dwCharSpace += CHARSPACE_NUMBER;
-	if(bChSpecial == TRUE) dwCharSpace += CHARSPACE_SPECIAL;
-	if(bChHigh == TRUE) dwCharSpace += CHARSPACE_HIGH;
-
-	ASSERT(dwCharSpace != 0); if(dwCharSpace == 0) return 0;
-
-	const double dblBitsPerChar = log((double)dwCharSpace) / log(2.00);
-	double dblRating = dblBitsPerChar * dblEffectiveLength;
-
-	if(IsPopularPassword(lpPassword)) dblRating /= 8.0;
-
-	const DWORD dwBits = static_cast<DWORD>(ceil(dblRating));
-
-	ASSERT(dwBits != 0);
-	return dwBits;
 }
 
 BOOL CPwUtil::LoadHexKey32(FILE *fp, BYTE *pBuf)
@@ -852,11 +768,12 @@ void CPwUtil::CheckGroupList(CPwManager* pMgr)
 
 		ASSERT((pg->uGroupId != 0) && (pg->uGroupId != DWORD_MAX));
 
-		ASSERT(vIds.find(pg->uGroupId) == vIds.end());
+		const DWORD dwGroupId = pg->uGroupId;
+		ASSERT(vIds.find(dwGroupId) == vIds.end());
 
 		ASSERT(pg->usLevel <= (usLastLevel + 1));
 
-		vIds.insert(pg->uGroupId);
+		vIds.insert(dwGroupId);
 		usLastLevel = pg->usLevel;
 	}
 }

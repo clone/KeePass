@@ -26,6 +26,7 @@
 #include "../../KeePassLibCpp/Util/AppUtil.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
 #include "../../KeePassLibCpp/Util/MemUtil.h"
+#include "../../KeePassLibCpp/Util/PwQualityEst.h"
 #include "../../KeePassLibCpp/Util/PwUtil.h"
 #include "../../KeePassLibCpp/Util/Base64.h"
 #include "../Util/WinUtil.h"
@@ -283,7 +284,7 @@ STDMETHODIMP CKpUtilitiesImpl::HashFileSHA256(LPCTSTR lpFile, BYTE* pHashBuf)
 
 STDMETHODIMP_(DWORD) CKpUtilitiesImpl::EstimatePasswordBits(LPCTSTR lpPassword)
 {
-	return CPwUtil::EstimatePasswordBits(lpPassword);
+	return CPwQualityEst::EstimatePasswordBits(lpPassword);
 }
 
 STDMETHODIMP_(BOOL) CKpUtilitiesImpl::IsTANEntry(const PW_ENTRY* pEntry)

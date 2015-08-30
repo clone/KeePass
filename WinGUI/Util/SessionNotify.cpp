@@ -60,7 +60,10 @@ void CSessionNotify::Unregister()
 	if(m_hWTSAPI != NULL)
 	{
 		if(m_lpWTSUnRegisterSessionNotification != NULL)
-			m_lpWTSUnRegisterSessionNotification(m_hTarget);
+		{
+			try { m_lpWTSUnRegisterSessionNotification(m_hTarget); }
+			catch(...) { ASSERT(FALSE); } // RPC cancelled, exception 71A
+		}
 
 		m_lpWTSRegisterSessionNotification = NULL;
 		m_lpWTSUnRegisterSessionNotification = NULL;

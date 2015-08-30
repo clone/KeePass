@@ -18,6 +18,9 @@
 */
 
 #ifndef ___KEY_TRANSFORM_BCRYPT_H___
+#define ___KEY_TRANSFORM_BCRYPT_H___
+
+#pragma once
 
 #include <windows.h>
 #include <boost/scoped_array.hpp>

@@ -25,6 +25,7 @@
 #include "../KeePassLibCpp/Util/MemUtil.h"
 #include "../KeePassLibCpp/Util/StrUtil.h"
 #include "../KeePassLibCpp/Util/Base64.h"
+#include "../KeePassLibCpp/Util/PwQualityEst.h"
 #include "../KeePassLibCpp/Util/PwUtil.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "Util/WinUtil.h"
@@ -511,7 +512,7 @@ void CPasswordDlg::OnOK()
 		if(strMinQuality.size() > 0)
 		{
 			const long lMinQuality = _ttol(strMinQuality.c_str());
-			const DWORD lCurQuality = CPwUtil::EstimatePasswordBits(m_lpKey);
+			const DWORD lCurQuality = CPwQualityEst::EstimatePasswordBits(m_lpKey);
 			if(static_cast<long>(lCurQuality) < lMinQuality)
 			{
 				strValMsg.Format(TRL("The estimated quality of the master password must be at least %u bits!"),
@@ -769,7 +770,7 @@ void CPasswordDlg::OnBnClickedBrowseKeyFile()
 	const std::basic_string<TCHAR> strDir = WU_GetCurrentDirectory();
 
 	CFileDialog dlg(m_bLoadMode, NULL, NULL, dwFlags, strFilter, this);
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 	{
 		CString strFile = dlg.GetPathName();
 

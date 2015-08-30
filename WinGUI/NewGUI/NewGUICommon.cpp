@@ -19,6 +19,7 @@
 
 #include "StdAfx.h"
 #include "NewGUICommon.h"
+#include "../Resource.h"
 #include "BCMenu.h"
 #include "BtnST.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
@@ -26,11 +27,13 @@
 #include "KCSideBannerWnd.h"
 #include "XHyperLink.h"
 #include "XPStyleButtonST.h"
+#include "../PwSafeDlg.h"
 #include "../Util/WinUtil.h"
+#include "../Plugins/KpApiImpl.h"
 #include <algorithm>
 #include <gdiplus.h>
 
-#include "../../KeePassLibCpp/Util/PwUtil.h"
+#include "../../KeePassLibCpp/Util/PwQualityEst.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
 #include "../../KeePassLibCpp/Util/MemUtil.h"
 #include "../../KeePassLibCpp/Util/AppUtil.h"
@@ -265,7 +268,7 @@ void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, LPCTSTR pszP
 	ASSERT(pProgress != NULL); if(pProgress == NULL) return;
 	ASSERT(pStatic != NULL); if(pStatic == NULL) return;
 
-	DWORD dwBits = CPwUtil::EstimatePasswordBits(pszPassword);
+	DWORD dwBits = CPwQualityEst::EstimatePasswordBits(pszPassword);
 	if(dwBits > 9999) dwBits = 9999; // 4 characters display limit
 
 	CString strQuality;
@@ -784,4 +787,35 @@ void NewGUI_PumpMessages(HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax)
 		::TranslateMessage(&msg);
 		::DispatchMessage(&msg);
 	}
+}
+
+static CCriticalSection g_csDoModalRoot;
+INT_PTR NewGUI_DoModal(CDialog* pDlg)
+{
+	if(pDlg == NULL) { ASSERT(FALSE); return IDCANCEL; }
+
+	CPwSafeDlg* pRootDlg = (CPwSafeDlg*)KPMI_GetMainDialog();
+	ASSERT(pRootDlg != NULL);
+
+	VERIFY(g_csDoModalRoot.Lock() != FALSE);
+	if(pRootDlg != NULL)
+	{
+		pRootDlg->NotifyUserActivity();
+		pRootDlg->_SetDisplayDialog(true);
+	}
+	VERIFY(CGlobalWindowManager::AddDialog(pDlg) == S_OK);
+	VERIFY(g_csDoModalRoot.Unlock() != FALSE);
+
+	const INT_PTR r = pDlg->DoModal();
+
+	VERIFY(g_csDoModalRoot.Lock() != FALSE);
+	VERIFY(CGlobalWindowManager::RemoveDialog(pDlg) == S_OK);
+	if(pRootDlg != NULL)
+	{
+		pRootDlg->NotifyUserActivity();
+		pRootDlg->_SetDisplayDialog(false);
+	}
+	VERIFY(g_csDoModalRoot.Unlock() != FALSE);
+
+	return r;
 }

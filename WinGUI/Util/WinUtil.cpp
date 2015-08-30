@@ -35,6 +35,7 @@
 #include "PrivateConfigEx.h"
 #include "AppLocator.h"
 #include "../Plugins/PluginMgr.h"
+#include "../NewGUI/NewGUICommon.h"
 #include "../../KeePassLibCpp/Util/AppUtil.h"
 #include "../../KeePassLibCpp/Util/MemUtil.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
@@ -749,7 +750,7 @@ BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD
 	}
 
 	CFileDialog dlg(bOpenMode, lpSuffix, strSample, dwFlags, strFilter, NULL);
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 	{
 		strSample = dlg.GetPathName();
 
@@ -790,7 +791,7 @@ std::vector<std::basic_string<TCHAR> > WU_GetFileNames(BOOL bOpenMode,
 		dwFlags |= OFN_FILEMUSTEXIST;
 
 	CFileDialog dlg(bOpenMode, NULL, strInitial.c_str(), dwFlags, lpFilter, pParent);
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 	{
 		if(bAllowMultiSelect == FALSE)
 		{

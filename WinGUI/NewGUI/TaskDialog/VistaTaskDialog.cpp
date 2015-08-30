@@ -224,3 +224,18 @@ int CVistaTaskDialog::ShowMessageBox(HWND hParent, LPCTSTR lpMainInstruction,
 
 	return dlg.ShowDialog(NULL);
 }
+
+int CVistaTaskDialog::ShowMessageBox(HWND hParent, LPCTSTR lpMainInstruction,
+	LPCTSTR lpContent, PCWSTR lpIcon, LPCTSTR lpButton1, int nResult1,
+	LPCTSTR lpButton2, int nResult2)
+{
+	CVistaTaskDialog dlg(hParent, AfxGetInstanceHandle(), false);
+	dlg.AddButton(lpButton1, NULL, nResult1);
+	dlg.AddButton(lpButton2, NULL, nResult2);
+	dlg.SetContent(lpContent);
+	dlg.SetIcon(lpIcon);
+	dlg.SetMainInstruction(lpMainInstruction);
+	dlg.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
+
+	return dlg.ShowDialog(NULL);
+}

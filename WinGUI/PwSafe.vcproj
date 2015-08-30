@@ -288,7 +288,7 @@
 				ProgramDatabaseFile="$(IntDir)\KeePass.pdb"
 				SubSystem="2"
 				RandomizedBaseAddress="2"
-				DataExecutionPrevention="0"
+				DataExecutionPrevention="2"
 				TargetMachine="1"
 				AllowIsolation="true"
 			/>
@@ -389,7 +389,7 @@
 				ProgramDatabaseFile="$(IntDir)\KeePass.pdb"
 				SubSystem="2"
 				RandomizedBaseAddress="2"
-				DataExecutionPrevention="0"
+				DataExecutionPrevention="2"
 				TargetMachine="17"
 				AllowIsolation="true"
 			/>
@@ -489,7 +489,7 @@
 				SubSystem="2"
 				EntryPointSymbol="wWinMainCRTStartup"
 				RandomizedBaseAddress="2"
-				DataExecutionPrevention="0"
+				DataExecutionPrevention="2"
 				TargetMachine="1"
 				AllowIsolation="true"
 			/>
@@ -589,7 +589,7 @@
 				SubSystem="2"
 				EntryPointSymbol="wWinMainCRTStartup"
 				RandomizedBaseAddress="2"
-				DataExecutionPrevention="0"
+				DataExecutionPrevention="2"
 				TargetMachine="17"
 				AllowIsolation="true"
 			/>
@@ -2346,6 +2346,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\MostPopularPasswords.bin"
+				>
+			</File>
+			<File
 				RelativePath="res\mouse_sm.bmp"
 				>
 			</File>
@@ -3514,6 +3518,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NewGUI\GlobalWindowManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\GlobalWindowManager.h"
+				>
+			</File>
+			<File
 				RelativePath="NewGUI\GradientProgressCtrl.cpp"
 				>
 				<FileConfiguration
@@ -4626,6 +4638,14 @@
 				</File>
 				<File
 					RelativePath="..\KeePassLibCpp\Util\PopularPasswords.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\PwQualityEst.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\PwQualityEst.h"
 					>
 				</File>
 				<File

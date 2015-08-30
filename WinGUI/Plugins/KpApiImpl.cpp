@@ -561,3 +561,8 @@ void KPMI_SetMainDialog(void* pMainPwSafeDlg)
 
 	KPImplInternal_SetDatabase(&g_pMainDlg->m_mgr);
 }
+
+void* KPMI_GetMainDialog()
+{
+	return g_pMainDlg;
+}

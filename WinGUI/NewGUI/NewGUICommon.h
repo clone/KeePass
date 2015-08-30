@@ -24,6 +24,7 @@
 #include "BCMenu.h"
 #include "XPStyleButtonST.h"
 #include "AutoRichEditCtrlFx.h"
+#include "GlobalWindowManager.h"
 #include <string>
 #include <vector>
 
@@ -263,5 +264,7 @@ void NewGUI_TerminateGDIPlus();
 
 void NewGUI_PumpMessages(HWND hWnd = NULL, UINT wMsgFilterMin = 0,
 	UINT wMsgFilterMax = 0);
+
+INT_PTR NewGUI_DoModal(CDialog* pDlg);
 
 #endif // ___NEW_GUI_COMMON___

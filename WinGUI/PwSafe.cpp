@@ -216,7 +216,7 @@ BOOL CPwSafeApp::InitInstance()
 	NSCAPI_Initialize(); // Initialize natural string comparison API
 	CTaskbarListEx::Initialize();
 
-	dlg.DoModal(); // IDOK, IDCANCEL
+	dlg.DoModal(); // IDOK, IDCANCEL; not NewGUI_DoModal
 
 	CPluginManager::Instance().UnloadAllPlugins(FALSE);
 
@@ -724,6 +724,10 @@ BOOL CPwSafeApp::ProcessControlCommands()
 		cfg.Set(PWMKEY_URLOVERRIDE, strUrlOverride.c_str());
 		return TRUE;
 	}
+
+	if((strCmdLine.Right(8) == _T("-preload")) ||
+		(strCmdLine.Right(8) == _T("/preload")))
+		return TRUE;
 
 	return FALSE;
 }

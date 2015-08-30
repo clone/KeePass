@@ -160,5 +160,6 @@ private:
 #pragma pack()
 
 void KPMI_SetMainDialog(void* pMainPwSafeDlg);
+void* KPMI_GetMainDialog();
 
 #endif // ___KPAPIIMPL_H___

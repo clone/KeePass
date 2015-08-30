@@ -43,8 +43,7 @@ void CheckForUpdateAsync(HWND hParent, DWORD dwCurVer, LPCTSTR lpLatestURL, BOOL
 	g_lpCacheLatestURL = lpLatestURL;
 	g_bCacheForeground = bForeground;
 
-	HANDLE h = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CFU_Thread, NULL,
-		0, &g_dwCacheDummy);
+	HANDLE h = CreateThread(NULL, 0, CFU_Thread, NULL, 0, &g_dwCacheDummy);
 
 	if((h != NULL) && (h != INVALID_HANDLE_VALUE)) CloseHandle(h);
 	h = NULL;

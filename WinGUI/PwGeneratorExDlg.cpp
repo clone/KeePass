@@ -625,7 +625,7 @@ void CPwGeneratorExDlg::OnBnClickedBtnProfileCreate()
 		TRL("Please enter a name for the new password generator profile, or select an existing profile to overwrite it:"),
 		PWGD_MAX_PROFILE_NAME_LENGTH, _T(""), vSelectable);
 
-	if(dlg.DoModal() == IDOK)
+	if(NewGUI_DoModal(&dlg) == IDOK)
 	{
 		CString strName = dlg.GetEnteredText();
 
@@ -721,7 +721,7 @@ void CPwGeneratorExDlg::OnBnClickedGenerateBtn()
 	if(m_bCollectEntropy == TRUE)
 	{
 		CGetRandomDlg dlg;
-		if(dlg.DoModal() == IDCANCEL) return;
+		if(NewGUI_DoModal(&dlg) == IDCANCEL) return;
 
 		randomSource.AddToUserEntropyPool(dlg.m_pFinalRandom, 32);
 	}
@@ -874,7 +874,7 @@ void CPwGeneratorExDlg::OnBnClickedAdvanced()
 {
 	CPwGeneratorAdvDlg dlg;
 	dlg.InitEx(&m_pgsAdvanced);
-	if(dlg.DoModal() == IDOK) this->EnableControlsEx(TRUE);
+	if(NewGUI_DoModal(&dlg) == IDOK) this->EnableControlsEx(TRUE);
 }
 
 void CPwGeneratorExDlg::OnBnClickedPatternPermute()

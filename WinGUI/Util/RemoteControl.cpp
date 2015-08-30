@@ -167,7 +167,7 @@ BOOL CRemoteControl::ProcessRequest(LPCTSTR lpIncomingRequest)
 
 		if(m_bAlwaysAllowFullAccess == FALSE)
 		{
-			dlg.DoModal();
+			NewGUI_DoModal(&dlg);
 			dwPermission = static_cast<DWORD>(dlg.m_nPermission);
 
 			if((dwPermission == RC_PERMISSION_FULLACCESS) &&
@@ -304,11 +304,18 @@ void CRemoteControl::SplitFields(const RC_STRING& strAsm, std::vector<RC_STRING>
 
 void CRemoteControl::AddEntry(const RC_STRING& strRetrievedName, const RC_QUERY& rcQuery)
 {
+	PW_TIME tNow;
+	_GetCurrentPwTime(&tNow);
+
 	DWORD dwGroupID = m_pDefaultMgr->GetGroupId(strRetrievedName.c_str());
 	if((dwGroupID == 0) || (dwGroupID == DWORD_MAX))
 	{
 		PW_GROUP pg;
 		ZeroMemory(&pg, sizeof(PW_GROUP));
+
+		memcpy(&pg.tCreation, &tNow, sizeof(PW_TIME));
+		memcpy(&pg.tLastMod, &tNow, sizeof(PW_TIME));
+		memcpy(&pg.tLastAccess, &tNow, sizeof(PW_TIME));
 		m_pDefaultMgr->GetNeverExpireTime(&pg.tExpire);
 
 		pg.pszGroupName = (TCHAR *)strRetrievedName.c_str();
@@ -376,7 +383,7 @@ void CRemoteControl::AddEntry(const RC_STRING& strRetrievedName, const RC_QUERY&
 		dlg.m_dwNumParams = (DWORD)params.size();
 		dlg.m_pParams = &params[0];
 
-		if(dlg.DoModal() == IDOK)
+		if(NewGUI_DoModal(&dlg) == IDOK)
 		{
 			RC_STRING strNotes;
 
@@ -399,10 +406,8 @@ void CRemoteControl::AddEntry(const RC_STRING& strRetrievedName, const RC_QUERY&
 			pe.uGroupId = dwGroupID;
 			pe.pszURL = pe.pszTitle;
 			pe.pszAdditional = const_cast<TCHAR *>(strNotes.c_str());
-			m_pDefaultMgr->GetNeverExpireTime(&pe.tExpire);
 
-			PW_TIME tNow;
-			_GetCurrentPwTime(&tNow);
+			m_pDefaultMgr->GetNeverExpireTime(&pe.tExpire);
 			memcpy(&pe.tCreation, &tNow, sizeof(PW_TIME));
 			memcpy(&pe.tLastMod, &tNow, sizeof(PW_TIME));
 			memcpy(&pe.tLastAccess, &tNow, sizeof(PW_TIME));

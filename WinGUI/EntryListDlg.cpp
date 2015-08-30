@@ -90,7 +90,7 @@ BOOL CEntryListDlg::OnInitDialog()
 	m_banner.SetCaption(m_strBannerCaption);
 
 	CString strWindowText = m_strBannerTitle;
-	if(m_nDisplayMode == ELDMODE_LIST_ATITEMS) strWindowText = PWM_PRODUCT_NAME;
+	if(m_nDisplayMode == ELDMODE_LIST_ATITEMS) strWindowText = PWM_PRODUCT_NAME_SHORT;
 	SetWindowText(strWindowText);
 
 	m_cList.SetImageList(m_pImgList, LVSIL_SMALL);
