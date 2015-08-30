@@ -70,4 +70,6 @@ void str2ar(TCHAR *tszString, INT *pArray, INT nItemCount);
 // Hash a file
 BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash);
 
+BOOL _FileAccessible(LPCTSTR lpFile);
+
 #endif

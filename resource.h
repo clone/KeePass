@@ -173,6 +173,8 @@
 #define IDC_CHECK_REMEMBERLAST          1148
 #define IDC_STATIC_TBSEP5               1150
 #define IDC_EDIT_QUICKFIND              1154
+#define IDC_CHECK_PUTTYURLS             1155
+#define IDC_CHECK_SAVEONLATMOD          1156
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -317,14 +319,16 @@
 #define ID_FILE_SHOWDBINFO              32936
 #define ID_EXTRAS_SHOWEXPIRED           32937
 #define ID_IMPORT_PVAULT                32938
+#define ID_SAFE_EXPORTGROUP_TXT         32939
+#define ID_PWLIST_SELECTALL             32940
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        203
-#define _APS_NEXT_COMMAND_VALUE         32939
-#define _APS_NEXT_CONTROL_VALUE         1155
+#define _APS_NEXT_RESOURCE_VALUE        204
+#define _APS_NEXT_COMMAND_VALUE         32941
+#define _APS_NEXT_CONTROL_VALUE         1157
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |SlovenËina|
-|~LANGUAGEVERSION|             |0.96a|
+|~LANGUAGEVERSION|             |0.96b|
 |~LANGUAGEAUTHOR|              |Radoslav Bielik|
 |~LANGUAGEAUTHOREMAIL|         |rado@bielik.org, http://www.bielik.org|
 
@@ -250,6 +250,8 @@
 |Clipboard cleared.|           |Schr·nka bola vymazan·.|
 |Password copied to clipboard. Clipboard will be cleared in %d seconds.|
     |Heslo bolo skopÌrovanÈ do schr·nky. Schr·nka bude vymazan· za %d sek˙nd.|
+|Field copied to clipboard. Clipboard will be cleared in %d seconds.|
+    |Poloûka bola skopÌrovan· do schr·nky. Schr·nka bude vymazan· za %d sek˙nd.|
 
 |Failed to set the master key!|
     |Nepodarilo sa nastaviù hlavnÈ heslo!|

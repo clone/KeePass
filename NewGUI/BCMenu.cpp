@@ -1,7 +1,7 @@
 //*************************************************************************
 // BCMenu.cpp : implementation file
-// Version : 3.034
-// Date : May 2002
+// Version : 3.035
+// Date : October 2003
 // Author : Brent Corkum
 // Email :  corkum@rocscience.com
 // Latest Version : http://www.rocscience.com/~corkum/BCMenu.html
@@ -161,7 +161,7 @@ BCMenu::BCMenu()
 	// set the color used for the transparent background in all bitmaps
 	m_bitmapBackground=RGB(192,192,192); //gray
 	m_bitmapBackgroundFlag=FALSE;
-	GetCPInfo(GetACP(),&CPInfo);
+	GetCPInfo(GetACP(),&CPInfo); //< Modified by Dominik Reichl, changed CP_ACP to GetACP()
 	m_loadmenu=FALSE;
 }
 
@@ -1379,7 +1379,6 @@ BOOL BCMenu::ModifyODMenuW(wchar_t *lpstrText,wchar_t *OptionText,
 	BCMenuData *mdata;
 	
 	// Find the old BCMenuData structure:
-	CString junk=OptionText;
 	mdata=FindMenuOption(OptionText);
 	if(mdata){
 		if(lpstrText)
@@ -1403,6 +1402,60 @@ BOOL BCMenu::ModifyODMenuW(wchar_t *lpstrText,wchar_t *OptionText,
 	}
 	return(FALSE);
 }
+
+BOOL BCMenu::SetImageForPopupFromToolbarA (const char *strPopUpText, UINT toolbarID, UINT command_id_to_extract_icon_from)
+{
+	USES_CONVERSION;
+	return SetImageForPopupFromToolbarW(A2W(strPopUpText),toolbarID,command_id_to_extract_icon_from);
+}
+BOOL BCMenu::SetImageForPopupFromToolbarW (wchar_t *strPopUpText, UINT toolbarID, UINT command_id_to_extract_icon_from)
+{
+	CWnd* pWnd = AfxGetMainWnd();
+	if (pWnd == NULL)pWnd = CWnd::GetDesktopWindow();
+
+	CToolBar bar;
+	bar.Create(pWnd);
+
+	if(bar.LoadToolBar(toolbarID)){
+		BCMenuData *mdata = FindMenuOption(strPopUpText);
+		if (mdata != NULL)
+		{
+			if (mdata->bitmap != NULL){
+				mdata->bitmap->DeleteImageList();
+				delete mdata->bitmap;
+				mdata->bitmap=NULL;
+			}
+			CImageList imglist;
+			imglist.Create(m_iconX,m_iconY,ILC_COLORDDB|ILC_MASK,1,1);
+
+			if(AddBitmapToImageList (&imglist, toolbarID)){
+				int ind = bar.CommandToIndex (command_id_to_extract_icon_from);
+				if (ind < 0) { return FALSE; }
+				
+				UINT dummyID, dummyStyle;
+				int image_index;
+				bar.GetButtonInfo (ind, dummyID, dummyStyle, image_index);
+				ASSERT (dummyID == command_id_to_extract_icon_from);
+				
+				mdata->bitmap = new CImageList;
+				mdata->bitmap->Create(m_iconX,m_iconY,ILC_COLORDDB|ILC_MASK,0,1);
+				mdata->bitmap->Add (imglist.ExtractIcon (image_index));
+
+				mdata->menuIconNormal = toolbarID;
+				mdata->xoffset = 0;
+				
+				return TRUE;
+			}
+			else{
+				mdata->menuIconNormal = -1;
+				mdata->xoffset = -1;
+			}
+		}
+	}
+
+	return FALSE;
+}
+
 
 BCMenuData *BCMenu::NewODMenu(UINT pos,UINT nFlags,UINT nID,CString string)
 {
@@ -2527,20 +2580,28 @@ BOOL BCMenu::GetDisableOldStyle(void)
 
 WORD BCMenu::NumBitmapColors(LPBITMAPINFOHEADER lpBitmap)
 {
-	if ( lpBitmap->biClrUsed != 0)
-		return (WORD)lpBitmap->biClrUsed;
-	
-	switch (lpBitmap->biBitCount){
-		case 1:
-			return 2;
-		case 4:
-			return 16;
-		case 8:
-			return 256;
-		default:
-			return 0;
+	WORD returnval = 0;
+
+	if ( lpBitmap->biClrUsed != 0){
+		returnval=(WORD)lpBitmap->biClrUsed;
 	}
-	return 0;
+	else{
+		switch (lpBitmap->biBitCount){
+			case 1:
+				returnval=2;
+				break;
+			case 4:
+				returnval=16;
+				break;
+			case 8:
+				returnval=256;
+				break;
+			default:
+				returnval=0;
+				break;
+		}
+	}
+	return returnval;
 }
 
 HBITMAP BCMenu::LoadSysColorBitmap(int nResourceId)

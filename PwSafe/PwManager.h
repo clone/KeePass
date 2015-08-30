@@ -37,7 +37,7 @@
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
 
 // When making a Windows build, don't forget to update the verinfo resource
-#define PWM_VERSION_STR  _T("0.96b")
+#define PWM_VERSION_STR  _T("0.97a")
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -107,6 +107,8 @@
 #define PWMKEY_DISABLEUNSAFE    _T("KeeDisableUnsafe")
 #define PWMKEY_REMEMBERLAST     _T("KeeRememberLast")
 #define PWMKEY_HEADERORDER      _T("KeeHeaderItemOrder")
+#define PWMKEY_USEPUTTYFORURLS  _T("KeeUsePutty")
+#define PWMKEY_SAVEONLATMOD     _T("KeeSaveOnLATMod")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -145,12 +147,12 @@
 
 typedef struct _PW_TIME
 {
-	USHORT shYear; // The year, 2004 means 2004
-	BYTE btMonth;  // 1 = Jan, 12 = Dec
-	BYTE btDay;    // The first day is 1
-	BYTE btHour;   // The day begins with hour 0, max value is 23
-	BYTE btMinute; // Begins at 0, max value is 59
-	BYTE btSecond; // Begins at 0, max value is 59
+	USHORT shYear; // Year, 2004 means 2004
+	BYTE btMonth;  // Month, ranges from 1 = Jan to 12 = Dec
+	BYTE btDay;    // Day, the first day is 1
+	BYTE btHour;   // Hour, begins with hour 0, max value is 23
+	BYTE btMinute; // Minutes, begins at 0, max value is 59
+	BYTE btSecond; // Seconds, begins at 0, max value is 59
 } PW_TIME, *PPW_TIME;
 
 typedef struct _PW_DBHEADER // The database header
@@ -318,6 +320,8 @@ public:
 	BOOL AttachFileAsBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile);
 	BOOL SaveBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile);
 	BOOL RemoveBinaryData(PW_ENTRY *pEntry);
+
+	static BOOL IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName);
 
 protected:
 	virtual BOOL ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_GROUP *pGroup);

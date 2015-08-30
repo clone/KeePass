@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |0.96b|
+|~LANGUAGEVERSION|             |0.97a|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -178,9 +178,10 @@
 |Export Group To &HTML...|     |Gruppe nach &HTML exportieren...|
 |Export Group To &XML...|      |Gruppe nach &XML exportieren...|
 |Export Group To &CSV...|      |Gruppe nach &CSV exportieren...|
+|Export Group To &TXT...|      |Gruppe nach &TXT exportieren...|
 |Copy User&Name To Clipboard|  |Benutzername in Zwischenablage kopieren|
 |Copy &Password To Clipboard|  |Passwort in Zwischenablage kopieren|
-|Open &URL|                    |URL ö&ffnen|
+|Open &URL(s)|                 |URL(s) ö&ffnen|
 |&Find In Database...|         |In Datenbank &suchen...|
 |Find In This &Group...|       |In dieser &Gruppe suchen...|
 |&Add Entry...|                |Eintrag &hinzufügen...|
@@ -422,8 +423,8 @@
 |Using this wizard you can easily add TAN entries.|
     |Mit diesem Assistenten können Sie leicht TANs hinzufügen.|
 
-|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-numerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only numerical 'substrings' are added as TAN entries.|
-    |Einfach unten in das Eingabefeld die TANs einfügen. Die Formatierung ist relativ egal, alle nicht-numerischen Zeichen werden ignoriert (d.h. Neue-Zeile, Tabs, Leerzeichen, etc.) und nur numerische Teilzeichenketten werden als TAN-Einträge hinzugefügt.|
+|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-alphanumerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only alphanumerical 'substrings' are added as TAN entries.|
+    |Einfach unten in das Eingabefeld die TANs einfügen. Die Formatierung ist relativ egal, alle nicht-alphanumerischen Zeichen werden ignoriert (d.h. Neue-Zeile, Tabs, Leerzeichen, etc.) und nur alphanumerische Teilzeichenketten werden als TAN-Einträge hinzugefügt.|
 
 |<TAN>|                        |<TAN>|
 |Print Pre&view...|            |Druck&vorschau...|
@@ -520,3 +521,14 @@
 |The database file has been modified!|    |Die Datenbank-Datei wurde verändert!|
 |Most probably someone has changed the file while you were editing it.| |Wahrscheinlich hat jemand die Datenbank verändert während Sie sie editiert haben.|
 |Do you want to overwrite it?|            |Möchten Sie sie überschreiben?|
+|The group you selected cannot store entries. Please select an other group.|
+    |Die ausgewählte Gruppe kann keine Einträge speichern. Bitte wählen Sie eine andere Gruppe.|
+|This will remove all selected entries unrecoverably!|
+    |Dies wird alle ausgewählten Einträge unwiderruflich löschen!|
+|Are you sure you want to delete all selected entries?|
+    |Sind Sie sicher, dass Sie alle ausgewählten Einträge löschen möchten?|
+|Delete Entries Confirmation|             |Bestätigung Einträge löschen|
+|Use PuTTY for ssh: and telnet: URLs|     |PuTTY für ssh: und telnet: URLs benutzen|
+|Mark database as modified on last-access time change|
+    |Datenbank bei Änderung einer Letzten-Zugriffs-Zeit als geändert markieren|
+|Se&lect All|                             |A&lles markieren|

@@ -1,3 +1,47 @@
+04/09/12 - 0.97a
+- KeePass is using relative paths now to remember the last
+  opened database; so this feature can be used now with
+  removable drives that get mounted under different drive names
+- Added "Mark database as modified on last-access time change"
+  option (Edit - Options - Files)
+- Added deletion confirmation dialog for entries
+- KeePass can now open ssh: and telnet: URLs using PuTTY if you
+  wish, PuTTY's directory must be in the PATH environment
+  variable to use this feature (activate it in Edit - Options -
+  Setup, thanks to Samuel Riesland for contributing the base
+  code)
+- The "Open URL" command can now be used on N different
+  entries, which will then open N browser windows
+- The TAN wizard now also accepts simple alpha characters (0-9,
+  and now a-z, A-Z) as valid TAN characters, so your TANs can
+  be alphanumeric now
+- Added "Export group to TXT" command
+- Moved group export commands into a submenu "Export to"
+- KeePass now remembers the scrollbar position when sorting the
+  password list
+- Entries cannot be moved to the search results group any more
+- If the "auto open last db" feature is activated, KeePass now
+  first checks if the database exists before asking for a
+  password; if the database has been deleted there's no need
+  for a password
+- Your database won't be emptied any more, if you accidently
+  selected too many key encryption rounds, your computer hangs
+  and you terminate the KeePass task
+- The "X close button minimizes KeePass" option works now
+- Fixed a problem in the open-database dialog (in some cases it
+  didn't display the filename of the database)
+- Updated ReadMe file (added Hebrew, Italian, Spanish and
+  Turkish translators)
+- After searching, the correct group is selected now when
+  clicking into the group list
+- Fixed a bug in the minimize/to-tray routines (which caused
+  the double restore animation for example)
+- Improved user activity tracking; the safe won't lock up any
+  more while you're scrolling in the lists
+- Added "Select All" command to entry list context menu
+- The hotkey to add an entry now is Ctrl-Y; Ctrl-A selects all
+  entries in the entry list
+
 04/07/29 - 0.96b
 - Added quickfind edit field right of the toolbar
 - Extended clipboard clearing to all other fields, all copied

@@ -1013,9 +1013,6 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	ASSERT(_tcslen(pszFile) != 0);
 	if(_tcslen(pszFile) == 0) return FALSE;
 
-	fp = _tfopen(pszFile, _T("wb"));
-	if(fp == NULL) return FALSE;
-
 	uFileSize = sizeof(PW_DBHEADER);
 
 	BYTE *pbt;
@@ -1075,7 +1072,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	// Allocate enough memory
 	uAllocated = uFileSize + 16;
 	pVirtualFile = new char[uAllocated];
-	if(pVirtualFile == NULL) { fclose(fp); return FALSE; }
+	if(pVirtualFile == NULL) return FALSE;
 
 	// Build header structure
 	hdr.dwSignature1 = PWM_DBSIG_1;
@@ -1085,7 +1082,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 	if(m_nAlgorithm == ALGO_AES) hdr.dwFlags |= PWM_FLAG_RIJNDAEL;
 	else if(m_nAlgorithm == ALGO_TWOFISH) hdr.dwFlags |= PWM_FLAG_TWOFISH;
-	else { fclose(fp); ASSERT(FALSE); return FALSE; }
+	else { ASSERT(FALSE); return FALSE; }
 
 	hdr.dwVersion = PWM_DBVER_DW;
 	hdr.dwGroups = m_dwNumGroups;
@@ -1284,7 +1281,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 	// Generate m_pTransformedMasterKey from m_pMasterKey
 	if(_TransformMasterKey(hdr.aMasterSeed2) == FALSE)
-		{ ASSERT(FALSE); fclose(fp); fp = NULL; SAFE_DELETE_ARRAY(pVirtualFile); return FALSE; }
+		{ ASSERT(FALSE); SAFE_DELETE_ARRAY(pVirtualFile); return FALSE; }
 
 	// Hash the master password with the generated hash salt
 	sha256_begin(&sha32);
@@ -1300,7 +1297,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 		if(aes.init(Rijndael::CBC, Rijndael::Encrypt, uFinalKey,
 			Rijndael::Key32Bytes, hdr.aEncryptionIV) != RIJNDAEL_SUCCESS)
 		{
-			fclose(fp); fp = NULL; SAFE_DELETE_ARRAY(pVirtualFile);
+			SAFE_DELETE_ARRAY(pVirtualFile);
 			return FALSE;
 		}
 
@@ -1314,7 +1311,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 		if(twofish.init(uFinalKey, 32, hdr.aEncryptionIV) == false)
 		{
-			fclose(fp); fp = NULL; SAFE_DELETE_ARRAY(pVirtualFile);
+			SAFE_DELETE_ARRAY(pVirtualFile);
 			return FALSE;
 		}
 
@@ -1331,7 +1328,15 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	ASSERT((uEncryptedPartSize % 16) == 0);
 	if((uEncryptedPartSize > 2147483446) || (uEncryptedPartSize == 0))
 	{
-		ASSERT(FALSE); fclose(fp); fp = NULL; SAFE_DELETE_ARRAY(pVirtualFile);
+		ASSERT(FALSE); SAFE_DELETE_ARRAY(pVirtualFile);
+		return FALSE;
+	}
+
+	fp = _tfopen(pszFile, _T("wb"));
+	if(fp == NULL)
+	{
+		mem_erase((unsigned char *)pVirtualFile, uAllocated);
+		SAFE_DELETE_ARRAY(pVirtualFile);
 		return FALSE;
 	}
 
@@ -2089,6 +2094,14 @@ void CPwManager::DeleteLostEntries()
 			}
 		}
 	}
+}
+
+BOOL CPwManager::IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName)
+{
+	ASSERT(lpGroupName != NULL); if(lpGroupName == NULL) return FALSE;
+
+	if(_tcscmp(lpGroupName, lpSearchGroupName) == 0) return FALSE;
+	return TRUE;
 }
 
 /* DWORD CPwManager::MakeGroupTree(LPCTSTR lpTreeString, TCHAR tchSeparator)

@@ -60,6 +60,8 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	m_bCloseMinimizes = FALSE;
 	m_bDisableUnsafe = FALSE;
 	m_bRememberLast = FALSE;
+	m_bUsePuttyForURLs = FALSE;
+	m_bSaveOnLATMod = FALSE;
 	//}}AFX_DATA_INIT
 }
 
@@ -88,6 +90,8 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_CLOSEMIN, m_bCloseMinimizes);
 	DDX_Check(pDX, IDC_CHECK_DISABLEUNSAFE, m_bDisableUnsafe);
 	DDX_Check(pDX, IDC_CHECK_REMEMBERLAST, m_bRememberLast);
+	DDX_Check(pDX, IDC_CHECK_PUTTYURLS, m_bUsePuttyForURLs);
+	DDX_Check(pDX, IDC_CHECK_SAVEONLATMOD, m_bSaveOnLATMod);
 	//}}AFX_DATA_MAP
 }
 
@@ -126,6 +130,8 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_NEWLINETEXT), OPTGRP_FILES);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_NEWLINE_0), OPTGRP_FILES);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_NEWLINE_1), OPTGRP_FILES);
+	m_wndgrp.AddWindow(NULL, OPTGRP_FILES);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_SAVEONLATMOD), OPTGRP_FILES);
 
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CLIPCLEARTXT), OPTGRP_MEMORY);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_CLIPBOARDTIME), OPTGRP_MEMORY);
@@ -166,6 +172,9 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_CREATEASSOC), OPTGRP_SETUP);
 	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_DELETEASSOC), OPTGRP_SETUP);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_PUTTYURLS), OPTGRP_SETUP);
 
 	m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
 	m_wndgrp.ArrangeWindows(this);

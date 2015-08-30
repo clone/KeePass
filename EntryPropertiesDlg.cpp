@@ -173,6 +173,18 @@ void CEntryPropertiesDlg::OnOK()
 {
 	UpdateData(TRUE);
 
+	if(m_bModGroup == TRUE)
+	{
+		CString strGroupTest;
+		m_pGroups.GetLBText(m_pGroups.GetCurSel(), strGroupTest);
+		if(CPwManager::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
+		{
+			MessageBox(TRL("The group you selected cannot store entries. Please select an other group."),
+				TRL("Stop"), MB_ICONWARNING | MB_OK);
+			return;
+		}
+	}
+
 	m_tExpire.shYear = (USHORT)m_editDate.GetYear();
 	m_tExpire.btMonth = (BYTE)m_editDate.GetMonth();
 	m_tExpire.btDay = (BYTE)m_editDate.GetDay();

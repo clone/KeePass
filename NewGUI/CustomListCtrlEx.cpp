@@ -65,6 +65,8 @@ BEGIN_MESSAGE_MAP(CCustomListCtrlEx, CListCtrl)
 	//{{AFX_MSG_MAP(CCustomListCtrlEx)
 	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnCustomDraw)
 	ON_WM_SYSKEYDOWN()
+	ON_WM_MOUSEMOVE()
+	ON_WM_KEYDOWN()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -133,11 +135,15 @@ COLORREF CCustomListCtrlEx::GetColorEx()
 void CCustomListCtrlEx::SetColorEx(COLORREF rgbColor)
 {
 	m_rgbColor = rgbColor;
+	RedrawItems(0, GetItemCount() - 1);
+	UpdateWindow();
 }
 
 void CCustomListCtrlEx::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
-	ASSERT(m_pParentI != NULL); // Parent must be initialized first
+	// Parent must be initialized first
+	ASSERT(m_pParentI != NULL); if(m_pParentI == NULL) return;
+	((CPwSafeDlg *)m_pParentI)->NotifyUserActivity();
 
 	if(nFlags & 0x2000)
 	{
@@ -157,7 +163,9 @@ BOOL CCustomListCtrlEx::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	HD_NOTIFY *phdn = (HD_NOTIFY *)lParam;
 
-	ASSERT(m_pParentI != NULL); // Parent must be initialized first
+	// Parent must be initialized first
+	ASSERT(m_pParentI != NULL);
+	if(m_pParentI == NULL) return CListCtrl::OnNotify(wParam, lParam, pResult);
 
 	if((phdn->hdr.code == HDN_ITEMCHANGEDW) || (phdn->hdr.code == HDN_ITEMCHANGEDA))
 	{
@@ -167,6 +175,22 @@ BOOL CCustomListCtrlEx::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		if (phdn->pitem->mask & HDI_WIDTH)
 			((CPwSafeDlg *)m_pParentI)->_OnPwlistColumnWidthChange(phdn->iItem, phdn->pitem->cxy);
 	}
-	
+
 	return CListCtrl::OnNotify(wParam, lParam, pResult);
+}
+
+void CCustomListCtrlEx::OnMouseMove(UINT nFlags, CPoint point) 
+{
+	ASSERT(m_pParentI != NULL); if(m_pParentI == NULL) return;
+	((CPwSafeDlg *)m_pParentI)->NotifyUserActivity();
+
+	CListCtrl::OnMouseMove(nFlags, point);
+}
+
+void CCustomListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
+{
+	ASSERT(m_pParentI != NULL); if(m_pParentI == NULL) return;
+	((CPwSafeDlg *)m_pParentI)->NotifyUserActivity();
+
+	CListCtrl::OnKeyDown(nChar, nRepCnt, nFlags);
 }

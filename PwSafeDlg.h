@@ -81,6 +81,7 @@ public:
 	void ProcessResize();
 	void CleanUp();
 	void SetStatusTextEx(LPCTSTR lpStatusText, int nPane = -1);
+	void NotifyUserActivity();
 
 	void UpdateGroupList();
 	void UpdatePasswordList();
@@ -131,6 +132,8 @@ public:
 	BOOL m_bDisableUnsafe;
 	BOOL m_bDisableUnsafeAtStart;
 	BOOL m_bRememberLast;
+	BOOL m_bUsePuttyForURLs;
+	BOOL m_bSaveOnLATMod;
 
 	CStatusBarCtrl m_sbStatus;
 	BOOL m_bShowToolBar;
@@ -285,6 +288,7 @@ protected:
 	void _Find(DWORD dwFindGroupId);
 	void _RemoveSearchGroup();
 	void _DoQuickFind();
+	void _HandleSelectAll();
 
 	void _SelChangeView(UINT uID);
 	void _List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEntry, PW_TIME *ptNow);
@@ -338,6 +342,8 @@ protected:
 	LONG m_lSplitterPosVert;
 
 	INT m_aHeaderOrder[11];
+
+	BOOL m_bMenuExit;
 
 	//{{AFX_MSG(CPwSafeDlg)
 	virtual BOOL OnInitDialog();
@@ -525,6 +531,10 @@ protected:
 	afx_msg void OnUpdateExtrasShowExpired(CCmdUI* pCmdUI);
 	afx_msg void OnImportPvault();
 	afx_msg void OnUpdateImportPvault(CCmdUI* pCmdUI);
+	afx_msg void OnSafeExportGroupTxt();
+	afx_msg void OnUpdateSafeExportGroupTxt(CCmdUI* pCmdUI);
+	afx_msg void OnPwlistSelectAll();
+	afx_msg void OnUpdatePwlistSelectAll(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

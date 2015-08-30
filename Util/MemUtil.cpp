@@ -259,3 +259,12 @@ BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash)
 	SAFE_DELETE_ARRAY(pBuf);
 	return TRUE;
 }
+
+BOOL _FileAccessible(LPCTSTR lpFile)
+{
+	FILE *fp;
+	fp = _tfopen(lpFile, _T("rb"));
+	if(fp == NULL) return FALSE;
+	fclose(fp); fp = NULL;
+	return TRUE;
+}

@@ -16,18 +16,11 @@ class CAutoRichEditCtrl : public CRichEditCtrl
 public:
 	CAutoRichEditCtrl();
 
-// Attributes
-public:
+	CString m_strStreamInCache;
 
-// Operations
-public:
-
-// Overrides
-	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CAutoRichEditCtrl)
 	//}}AFX_VIRTUAL
 
-// Implementation
 public:
 	long GetSelectionFontSize();
 	CString GetSelectionFontName();

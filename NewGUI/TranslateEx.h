@@ -30,7 +30,7 @@
 #ifndef ___TRANSLATE_EX_H___
 #define ___TRANSLATE_EX_H___
 
-#define MAX_TRANSLATION_STRINGS 400
+#define MAX_TRANSLATION_STRINGS 420
 
 // Translate string, sptr must be a char*, _not_ a TCHAR* !
 #define TRL(sptr) _TRL(sptr)

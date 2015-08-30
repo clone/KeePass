@@ -429,6 +429,12 @@ BEGIN
                     WS_TABSTOP,18,202,342,10
     CONTROL         "Remember last opened file",IDC_CHECK_REMEMBERLAST,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,0,215,343,10
+    CONTROL         "Use PuTTY for ssh: and telnet: URLs",
+                    IDC_CHECK_PUTTYURLS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,0,195,344,10
+    CONTROL         "Mark database as modified on last-access time change",
+                    IDC_CHECK_SAVEONLATMOD,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,0,183,342,10
 END
 
 IDD_ENTRYPROPERTIES_DLG DIALOG DISCARDABLE  0, 0, 351, 114
@@ -462,7 +468,7 @@ BEGIN
     PUSHBUTTON      "&Cancel",IDCANCEL,307,237,64,14
     EDITTEXT        IDC_EDIT_TANS,7,36,364,192,ES_MULTILINE | ES_AUTOVSCROLL | 
                     ES_NOHIDESEL | ES_WANTRETURN | WS_VSCROLL
-    LTEXT           "Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-numerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only numerical 'substrings' are added as TAN entries.",
+    LTEXT           "Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-alphanumerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only alphanumerical 'substrings' are added as TAN entries.",
                     IDC_STATIC_INTRO,7,7,364,25
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,233,377,1
     LTEXT           "TAN Wizard",IDC_STATIC,7,242,185,8,WS_DISABLED
@@ -511,8 +517,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,9,6,2
- PRODUCTVERSION 0,9,6,2
+ FILEVERSION 0,9,7,1
+ PRODUCTVERSION 0,9,7,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -529,13 +535,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.sourceforge.net\0"
             VALUE "CompanyName", "Dominik Reichl\0"
-            VALUE "FileDescription", "KeePass Password Safe v0.96b\0"
-            VALUE "FileVersion", "0, 9, 6, 2\0"
+            VALUE "FileDescription", "KeePass Password Safe v0.97a\0"
+            VALUE "FileVersion", "0, 9, 7, 1\0"
             VALUE "InternalName", "PwSafe\0"
             VALUE "LegalCopyright", "Copyright (c) 2004 Dominik Reichl\0"
             VALUE "OriginalFilename", "KeePass.exe\0"
-            VALUE "ProductName", "KeePass Password Safe v0.96b\0"
-            VALUE "ProductVersion", "0, 9, 6, 2\0"
+            VALUE "ProductName", "KeePass Password Safe v0.97a\0"
+            VALUE "ProductVersion", "0, 9, 7, 1\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -786,7 +792,7 @@ BEGIN
     BEGIN
         MENUITEM "Copy &Password To Clipboard", ID_PWLIST_COPYPW
         MENUITEM "Copy User&Name To Clipboard", ID_PWLIST_COPYUSER
-        MENUITEM "Open &URL",                   ID_PWLIST_VISITURL
+        MENUITEM "Open &URL(s)",                ID_PWLIST_VISITURL
         MENUITEM "&Save Attached File To...",   ID_PWLIST_SAVEATTACH
         MENUITEM SEPARATOR
         MENUITEM "&Add Entry...",               ID_PWLIST_ADD
@@ -794,6 +800,7 @@ BEGIN
         MENUITEM "Dupli&cate Entry",            ID_PWLIST_DUPLICATE
         MENUITEM "&Delete Entry",               ID_PWLIST_DELETE
         MENUITEM "&Mass Modify (All Selected)...", ID_PWLIST_MASSMODIFY
+        MENUITEM "Se&lect All",                 ID_PWLIST_SELECTALL
         MENUITEM SEPARATOR
         MENUITEM "&Find In Database...",        ID_PWLIST_FIND
         MENUITEM "Find In This &Group...",      ID_PWLIST_FINDINGROUP
@@ -846,10 +853,13 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "&Print Group",                ID_SAFE_PRINTGROUP
-        MENUITEM SEPARATOR
-        MENUITEM "Export Group To &HTML...",    ID_SAFE_EXPORTGROUP_HTML
-        MENUITEM "Export Group To &XML...",     ID_SAFE_EXPORTGROUP_XML
-        MENUITEM "Export Group To &CSV...",     ID_SAFE_EXPORTGROUP_CSV
+        POPUP "Export To"
+        BEGIN
+            MENUITEM "Export Group To &TXT...",     ID_SAFE_EXPORTGROUP_TXT
+            MENUITEM "Export Group To &HTML...",    ID_SAFE_EXPORTGROUP_HTML
+            MENUITEM "Export Group To &XML...",     ID_SAFE_EXPORTGROUP_XML
+            MENUITEM "Export Group To &CSV...",     ID_SAFE_EXPORTGROUP_CSV
+        END
     END
 END
 
@@ -980,6 +990,7 @@ BEGIN
     BUTTON      ID_FILE_SHOWDBINFO
     BUTTON      ID_EXTRAS_SHOWEXPIRED
     BUTTON      ID_IMPORT_PVAULT
+    BUTTON      ID_SAFE_EXPORTGROUP_TXT
 END
 
 IDR_CLIENTICONS TOOLBAR DISCARDABLE  16, 16
@@ -1068,7 +1079,7 @@ IDB_DISK                BITMAP  DISCARDABLE     "res\\disk.bmp"
 
 IDR_ACCEL_MAIN ACCELERATORS DISCARDABLE 
 BEGIN
-    "A",            ID_PWLIST_ADD,          VIRTKEY, CONTROL, NOINVERT
+    "A",            ID_PWLIST_SELECTALL,    VIRTKEY, CONTROL, NOINVERT
     "B",            ID_PWLIST_COPYUSER,     VIRTKEY, CONTROL, NOINVERT
     "C",            ID_PWLIST_COPYPW,       VIRTKEY, CONTROL, NOINVERT
     "D",            ID_PWLIST_DELETE,       VIRTKEY, CONTROL, NOINVERT
@@ -1087,6 +1098,7 @@ BEGIN
     "U",            ID_PWLIST_VISITURL,     VIRTKEY, CONTROL, NOINVERT
     VK_F1,          ID_INFO_README,         VIRTKEY, NOINVERT
     "X",            ID_FILE_EXIT,           VIRTKEY, CONTROL, NOINVERT
+    "Y",            ID_PWLIST_ADD,          VIRTKEY, CONTROL, NOINVERT
     "Z",            ID_EXTRAS_GENPW,        VIRTKEY, CONTROL, NOINVERT
 END
 

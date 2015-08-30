@@ -57,7 +57,8 @@ void CAutoRichEditCtrl::SetRTF(CString sRTF, int nStreamType)
 	EDITSTREAM es;
 	es.dwError = 0;
 	es.pfnCallback = CBStreamIn;
-	es.dwCookie = (DWORD) &sRTF;
+	m_strStreamInCache = sRTF;
+	es.dwCookie = (DWORD) &m_strStreamInCache;
 	StreamIn(nStreamType, es);	// Do it.
 	
 }

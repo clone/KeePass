@@ -57,6 +57,7 @@ BEGIN_MESSAGE_MAP(CCustomTreeCtrlEx, CTreeCtrl)
 	//{{AFX_MSG_MAP(CCustomTreeCtrlEx)
 	ON_WM_KEYDOWN()
 	ON_WM_SYSKEYDOWN()
+	ON_WM_MOUSEMOVE()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -64,7 +65,9 @@ END_MESSAGE_MAP()
 
 void CCustomTreeCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
-	ASSERT(m_pParentI != NULL); // Parent must be initialized first
+	// Parent must be initialized first
+	ASSERT(m_pParentI != NULL); if(m_pParentI == NULL) return;
+	((CPwSafeDlg *)m_pParentI)->NotifyUserActivity();
 
 	if ((nChar == VK_UP) | (nChar == VK_DOWN) | (nChar == VK_HOME) | (nChar == VK_END) |
 		(nChar == VK_PRIOR) | (nChar == VK_NEXT) | (nChar == VK_LEFT) | (nChar == VK_RIGHT))
@@ -77,7 +80,9 @@ void CCustomTreeCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CCustomTreeCtrlEx::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
-	ASSERT(m_pParentI != NULL); // Parent must be initialized first
+	// Parent must be initialized first
+	ASSERT(m_pParentI != NULL); if(m_pParentI == NULL) return;
+	((CPwSafeDlg *)m_pParentI)->NotifyUserActivity();
 
 	if (nFlags & 0x2000)
 	{
@@ -106,6 +111,14 @@ BOOL CCustomTreeCtrlEx::InitDropHandler()
 	m_bValidDropTarget = m_drop.Register(this);
 	ASSERT(m_bValidDropTarget == TRUE);
 	return m_bValidDropTarget;
+}
+
+void CCustomTreeCtrlEx::OnMouseMove(UINT nFlags, CPoint point) 
+{
+	ASSERT(m_pParentI != NULL); if(m_pParentI == NULL) return;
+	((CPwSafeDlg *)m_pParentI)->NotifyUserActivity();
+
+	CTreeCtrl::OnMouseMove(nFlags, point);
 }
 
 void CCustomOleDropHandler::SetDragAccept(BOOL bAccept)

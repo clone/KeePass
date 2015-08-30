@@ -640,3 +640,173 @@ char *szcpy(char *szDestination, const char *szSource)
 	ASSERT(szSource != NULL); if(szSource == NULL) { szDestination[0] = 0; return szDestination; }
 	return strcpy(szDestination, szSource);
 }
+
+#ifdef _UNICODE
+#define PRPT_API_NAME "PathRelativePathToW"
+#else
+#define PRPT_API_NAME "PathRelativePathToA"
+#endif
+
+#ifndef _WIN32_WCE
+CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile)
+{
+	LPPATHRELATIVEPATHTO lpRel;
+	HINSTANCE hShl;
+	TCHAR tszPath[MAX_PATH * 2];
+	BOOL bResult;
+
+	hShl = LoadLibrary(_T("ShlWApi.dll"));
+	if(hShl == NULL) return CString(lpTargetFile);
+
+	lpRel = (LPPATHRELATIVEPATHTO)GetProcAddress(hShl, _T(PRPT_API_NAME));
+	if(lpRel != NULL)
+	{
+		bResult = lpRel(tszPath, lpBaseFile, 0, lpTargetFile, 0);
+	}
+
+	FreeLibrary(hShl);
+
+	if(bResult == TRUE) return CString(tszPath);
+	else return CString(lpTargetFile);
+}
+#else
+CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile)
+{
+	return CString(lpTargetFile);
+}
+#endif
+
+BOOL GetRegKeyEx(HKEY hkeyBase, LPCTSTR lpSubKey, LPTSTR lpRetData)
+{
+	HKEY hkey = hkeyBase;
+	LONG lRetVal = RegOpenKeyEx(hkeyBase, lpSubKey, 0, KEY_QUERY_VALUE, &hkey);
+
+	if(lRetVal == ERROR_SUCCESS)
+	{
+		LONG lDataSize = MAX_PATH;
+		TCHAR tszData[MAX_PATH];
+
+		lRetVal = RegQueryValue(hkey, NULL, tszData, &lDataSize);
+		_tcscpy(lpRetData, tszData);
+		RegCloseKey(hkey); hkey = (HKEY)NULL;
+	}
+
+	return lRetVal == ERROR_SUCCESS ? TRUE : FALSE;
+}
+
+BOOL OpenUrlInNewBrowser(LPCTSTR lpURL)
+{
+	TCHAR tszKey[MAX_PATH << 1];
+	UINT uResult = 0;
+
+	ASSERT(lpURL != NULL); if(lpURL == NULL) return FALSE;
+
+	if(GetRegKeyEx(HKEY_CLASSES_ROOT, _T(".htm"), tszKey) == TRUE)
+	{
+		_tcscat(tszKey, _T("\\shell\\open\\command"));
+
+		if(GetRegKeyEx(HKEY_CLASSES_ROOT, tszKey, tszKey) == TRUE)
+		{
+			TCHAR *pos;
+			pos = _tcsstr(tszKey, _T("\"%1\""));
+			if(pos == NULL) // No quotes found
+			{
+				pos = _tcsstr(tszKey, _T("%1")); // Check for %1, without quotes 
+				if(pos == NULL) // No parameter at all...
+					pos = tszKey + _tcslen(tszKey) - 1;
+				else
+					*pos = '\0'; // Remove the parameter
+			}
+			else *pos = '\0'; // Remove the parameter
+
+			_tcscat(pos, _T(" "));
+			_tcscat(pos, lpURL);
+
+			uResult = WinExec(tszKey, SW_SHOW);
+		}
+	}
+
+	return uResult > 31 ? TRUE : FALSE;
+}
+
+BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
+{
+	CString strURL;
+	BOOL bResult = FALSE;
+
+	ASSERT(lpURL != NULL); if(lpURL == NULL) return FALSE;
+	strURL = lpURL;
+
+	if(strURL.Find(_T("ssh:")) >= 0)
+	{
+		TCHAR tszKey[MAX_PATH << 1];
+
+		// TODO: Make this configurable
+		_tcscpy(tszKey, _T("PUTTY.EXE -ssh "));
+
+		// Parse out the "http://" and "ssh://"
+		if(strURL.Find(_T("http://")) == 0)
+			strURL = strURL.Right(strURL.GetLength() - _tcslen(_T("http://")));
+
+		strURL = strURL.Right(strURL.GetLength() - _tcslen(_T("ssh:")));
+		if(strURL.Left(1) == _T("/"))
+			strURL = strURL.Right(strURL.GetLength() - 1);
+		if(strURL.Left(1) == _T("/"))
+			strURL = strURL.Right(strURL.GetLength() - 1);
+
+		// Add pre-URL command-line parameters
+		if(lpUser != NULL)
+		{
+			if(_tcslen(lpUser) > 0)
+			{
+				_tcscat(tszKey, lpUser);
+				_tcscat(tszKey, _T("@"));
+			}
+		}
+
+		// Add the URL
+		_tcscat(tszKey, (LPCTSTR)strURL);
+
+		// Execute the ssh client
+		bResult = WinExec(tszKey, SW_SHOW) > 31 ? TRUE : FALSE;
+	}
+	else if(strURL.Find(_T("telnet:")) >= 0)
+	{
+		TCHAR tszKey[MAX_PATH << 1];
+
+		// TODO: Make this configurable
+		_tcscpy(tszKey, _T("PUTTY.EXE "));
+
+		// Parse out the "http://" and "telnet://"
+		if(strURL.Find(_T("http://")) == 0)
+			strURL = strURL.Right(strURL.GetLength() - _tcslen(_T("http://")));
+
+		strURL = strURL.Right(strURL.GetLength() - _tcslen(_T("telnet:")));
+		if(strURL.Left(1) == _T("/"))
+			strURL = strURL.Right(strURL.GetLength() - 1);
+		if(strURL.Left(1) == _T("/"))
+			strURL = strURL.Right(strURL.GetLength() - 1);
+
+		// Add the url
+		_tcscat(tszKey, _T("telnet://"));
+		_tcscat(tszKey, strURL.GetBuffer(0));
+
+		// Execute the ssh client
+		bResult = WinExec(tszKey, SW_SHOW) > 31 ? TRUE : FALSE;
+	}
+
+	return bResult;
+}
+
+void OpenUrlEx(LPCTSTR lpURL)
+{
+	ASSERT(lpURL != NULL); if(lpURL == NULL) return;
+
+	if(_tcslen(lpURL) == 0) return;
+	if(_tcsncmp(lpURL, _T("http://"), 7) == 0)
+		OpenUrlInNewBrowser(lpURL);
+	else if(_tcsncmp(lpURL, _T("https://"), 8) == 0)
+		OpenUrlInNewBrowser(lpURL);
+	else
+		ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
+}

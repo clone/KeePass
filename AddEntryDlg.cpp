@@ -241,7 +241,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	m_reNotes.LimitText(0);
+	// m_reNotes.LimitText(0);
+
 	m_reNotes.SetEventMask(ENM_MOUSEEVENTS);
 	m_reNotes.SetRTF(m_strNotes, SF_TEXT);
 
@@ -295,6 +296,15 @@ void CAddEntryDlg::CleanUp()
 void CAddEntryDlg::OnOK() 
 {
 	UpdateData(TRUE);
+
+	CString strGroupTest;
+	m_pGroups.GetLBText(m_pGroups.GetCurSel(), strGroupTest);
+	if(CPwManager::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
+	{
+		MessageBox(TRL("The group you selected cannot store entries. Please select an other group."),
+			TRL("Stop"), MB_ICONWARNING | MB_OK);
+		return;
+	}
 
 	m_tExpire.shYear = (USHORT)m_editDate.GetYear();
 	m_tExpire.btMonth = (BYTE)m_editDate.GetMonth();

@@ -34,6 +34,9 @@ Util\CprLang.exe GermanSrc.lng German.lng
 DEL Hebrew.lng
 Util\CprLang.exe HebrewSrc.lng Hebrew.lng
 
+DEL Italian.lng
+Util\CprLang.exe ItalianSrc.lng Italian.lng
+
 DEL Korean.lng
 Util\CprLang.exe KoreanSrc.lng Korean.lng
 
@@ -49,8 +52,14 @@ Util\CprLang.exe PortugueseSrc.lng Portuguese.lng
 DEL Slovak.lng
 Util\CprLang.exe SlovakSrc.lng Slovak.lng
 
+DEL Spanish.lng
+Util\CprLang.exe SpanishSrc.lng Spanish.lng
+
 DEL Swedish.lng
 Util\CprLang.exe SwedishSrc.lng Swedish.lng
+
+DEL Turkish.lng
+Util\CprLang.exe TurkishSrc.lng Turkish.lng
 
 ECHO.
 ECHO Have you updated the language information fields?
@@ -83,6 +92,12 @@ DEL ..\Debug\Polish.lng
 COPY /B Polish.lng /B ..\Debug\Polish.lng > NUL
 DEL ..\Debug\Hebrew.lng
 COPY /B Hebrew.lng /B ..\Debug\Hebrew.lng > NUL
+DEL ..\Debug\Turkish.lng
+COPY /B Turkish.lng /B ..\Debug\Turkish.lng > NUL
+DEL ..\Debug\Spanish.lng
+COPY /B Spanish.lng /B ..\Debug\Spanish.lng > NUL
+DEL ..\Debug\Italian.lng
+COPY /B Italian.lng /B ..\Debug\Italian.lng > NUL
 
 REM Copy latest language files into Release directory
 
@@ -112,6 +127,12 @@ DEL ..\Release\Polish.lng
 COPY /B Polish.lng /B ..\Release\Polish.lng > NUL
 DEL ..\Release\Hebrew.lng
 COPY /B Hebrew.lng /B ..\Release\Hebrew.lng > NUL
+DEL ..\Release\Turkish.lng
+COPY /B Turkish.lng /B ..\Release\Turkish.lng > NUL
+DEL ..\Release\Spanish.lng
+COPY /B Spanish.lng /B ..\Release\Spanish.lng > NUL
+DEL ..\Release\Italian.lng
+COPY /B Italian.lng /B ..\Release\Italian.lng > NUL
 
 REM Copy language reference file
 

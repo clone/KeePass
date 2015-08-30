@@ -35,6 +35,8 @@
 
 #define UTF8_BYTE BYTE
 
+typedef BOOL(WINAPI *LPPATHRELATIVEPATHTO)(LPTSTR pszPath, LPCTSTR pszFrom, DWORD dwAttrFrom, LPCTSTR pszTo, DWORD dwAttrTo);
+
 void EraseCString(CString *pString);
 
 #ifndef _WIN32_WCE
@@ -78,5 +80,13 @@ TCHAR *MakeSafeXmlString(TCHAR *ptString);
 // Our own simple string functions which do some additional memory checks
 size_t szlen(const char *pszString);
 char *szcpy(char *szDestination, const char *szSource);
+
+CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile);
+
+BOOL GetRegKeyEx(HKEY hkey, LPCTSTR lpSubKey, LPTSTR lpRetData);
+BOOL OpenUrlInNewBrowser(LPCTSTR lpURL);
+BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser);
+
+void OpenUrlEx(LPCTSTR lpURL);
 
 #endif

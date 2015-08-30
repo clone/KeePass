@@ -90,6 +90,8 @@ public:
 	BOOL	m_bCloseMinimizes;
 	BOOL	m_bDisableUnsafe;
 	BOOL	m_bRememberLast;
+	BOOL	m_bUsePuttyForURLs;
+	BOOL	m_bSaveOnLATMod;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(COptionsDlg)
