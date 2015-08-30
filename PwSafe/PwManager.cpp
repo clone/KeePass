@@ -148,6 +148,7 @@ void CPwManager::_AllocEntries(unsigned long uEntries)
 	DWORD dwEntries;
 
 	ASSERT(uEntries != 0);
+	if(uEntries == 0) return;
 
 	dwEntries = m_dwNumEntries;
 
@@ -288,7 +289,8 @@ int CPwManager::GetEntryByGroupN(int idGroup, DWORD dwIndex)
 {
 	DWORD i, j = 0;
 
-	ASSERT(idGroup != -1);
+	ASSERT(idGroup > -1);
+	if(idGroup < 0) return -1;
 
 	for(i = 0; i < m_dwNumEntries; i++)
 	{
@@ -397,6 +399,7 @@ BOOL CPwManager::DeleteEntry(DWORD dwIndex)
 	DWORD i;
 
 	ASSERT(dwIndex < m_dwNumEntries);
+	if(dwIndex >= m_dwNumEntries) return FALSE;
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszTitle);
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszURL);
@@ -423,6 +426,7 @@ BOOL CPwManager::DeleteGroup(int nGroupId)
 	PW_ENTRY *p;
 
 	ASSERT((DWORD)nGroupId < m_dwNumGroups);
+	if((DWORD)nGroupId >= m_dwNumGroups) return FALSE;
 
 	while(1) // Remove all items in that group
 	{
@@ -467,6 +471,7 @@ BOOL CPwManager::SetEntry(DWORD dwIndex, DWORD uGroupId, DWORD uImageId,
 	int slen;
 
 	ASSERT(dwIndex < m_dwNumEntries);
+	if(dwIndex >= m_dwNumEntries) return FALSE;
 	ASSERT(pszTitle != NULL);
 	ASSERT(pszURL != NULL);
 	ASSERT(pszUserName != NULL);
@@ -525,7 +530,9 @@ BOOL CPwManager::SetEntry(DWORD dwIndex, DWORD uGroupId, DWORD uImageId,
 void CPwManager::LockEntryPassword(PW_ENTRY *pEntry)
 {
 	ASSERT(pEntry != NULL);
+	if(pEntry == NULL) return;
 	ASSERT(pEntry->pszPassword != NULL);
+	if(pEntry->pszPassword == NULL) return;
 
 	if(pEntry->uPasswordLen != 0)
 		arcfourCrypt(pEntry->pszPassword, pEntry->uPasswordLen,
@@ -616,7 +623,7 @@ BOOL CPwManager::OpenDatabase(const char *pszFile)
 		Rijndael::Key32Bytes, hdr.aEncryptionIV) != RIJNDAEL_SUCCESS)
 		{ OPENDB_FAIL; }
 
-	// Decrypt!
+	// Decrypt! The first 48 bytes aren't encrypted (that's the header)
 	uEncryptedPartSize = aes.padDecrypt((UINT8 *)pVirtualFile + 48, uFileSize - 48,
 		(UINT8 *)pVirtualFile + 48);
 
@@ -803,7 +810,7 @@ BOOL CPwManager::SaveDatabase(const char *pszFile)
 		return FALSE;
 	}
 
-	// Encrypt!
+	// Encrypt! The first 48 bytes remain unencrypted, that's the header
 	uEncryptedPartSize = aes.padEncrypt((UINT8 *)pVirtualFile + 48, pos - 48,
 		(UINT8 *)pVirtualFile + 48);
 
@@ -891,7 +898,7 @@ void CPwManager::MoveInternal(int nFrom, int nTo)
 	int dir;
 	PW_ENTRY pe;
 
-	ASSERT(nFrom != nTo);
+	if(nFrom == nTo) return;
 	if((nFrom < 0) || (nFrom >= (int)m_dwNumEntries)) return;
 	if((nTo < 0) || (nTo >= (int)m_dwNumEntries)) return;
 

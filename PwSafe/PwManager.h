@@ -35,7 +35,7 @@
 
 // General product information
 #define PWM_PRODUCT_NAME "KeePass Password Safe"
-#define PWM_VERSION_STR  "0.8"
+#define PWM_VERSION_STR  "0.81"
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903

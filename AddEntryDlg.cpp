@@ -102,6 +102,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	// The password dots font
 	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, "Tahoma");
@@ -109,14 +110,17 @@ BOOL CAddEntryDlg::OnInitDialog()
 	GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fStyle, TRUE);
 	GetDlgItem(IDC_CHECK_HIDEPW)->SetFont(&m_fStyle, TRUE);
 
+	// The available images for the entry
 	m_ilIcons.Create(IDR_CLIENTICONS, 16, 1, RGB(255,0,255)); // Purple is transparent
 
+	// Make the buttons look cool
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_Button(&m_btRandomPw, -1, -1);
 	NewGUI_Button(&m_btPickIcon, -1, -1);
 	NewGUI_Button(&m_btHidePw, -1, -1);
 
+	// Set the imagelist for the group selector combo box
 	m_pGroups.SetXImageList(&m_ilIcons);
 
 	m_pGroups.SetBkGndColor(RGB(255,255,255));
@@ -148,8 +152,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 	ASSERT(m_nGroupId != -1); // Must have been initialized by parent
 	m_pGroups.SetCurSel(m_nGroupId);
 
+	// Configure banner control
 	m_banner.Attach(this, KCSB_ATTACH_TOP);
-
 	m_banner.SetColBkg(RGB(255,255,255));
 	m_banner.SetColBkg2(NewGUI_GetBgColor());
 	m_banner.SetColEdge(RGB(0,0,0));
@@ -169,12 +173,14 @@ BOOL CAddEntryDlg::OnInitDialog()
 		SetWindowText(TRL("Edit Entry"));
 	}
 
+	// 'z' + 27 is that black dot in Tahoma
 	CString strStars = (char)('z' + 27);
 	strStars += (char)('z' + 27); strStars += (char)('z' + 27);
 	GetDlgItem(IDC_CHECK_HIDEPW)->SetWindowText(strStars);
 	m_bStars = TRUE;
 	OnCheckHidePw();
 
+	// Configure link edit control
 	m_pURL.SetLinkOption(HEOL_AUTO);
 	m_pURL.SetUnderlineOption(HEOU_ALWAYS);
 	m_pURL.SetVisited(FALSE);
@@ -185,6 +191,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	UpdateData(FALSE);
 
+	// Translate all windows
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	return TRUE; // Return TRUE unless you set the focus to a control
@@ -209,6 +216,7 @@ void CAddEntryDlg::OnOK()
 		return;
 	}
 
+	// If the user hasn't changed the standard URL assume no URL
 	if(m_strURL == PWAE_STDURL) m_strURL.Empty();
 
 	UpdateData(FALSE);

@@ -152,7 +152,7 @@
 |Change &Master Key For This Database...|      |&Hauptschlüssel für diese Datenbank ändern...|
 |&Print Complete Password List|                |Komplette Passwortliste &drucken|
 |Export Complete Database|     |Komplette Datenbank exportieren|
-|Change &language...|          |&Sprache ändern...|
+|Change &Language...|          |&Sprache ändern...|
 |&Exit|                        |&Beenden|
 
 |&Options|                     |&Einstellungen|
@@ -265,7 +265,7 @@
 |Newline sequence:|            |Neue-Zeile-Sequenz:|
 |Windows newline sequence (\r\n)|              |Windows Neue-Zeile-Sequenz (\r\n)|
 |Unix newline sequence (\n)|   |Unix Neue-Zeile-Sequenz (\n)|
-|Clipboard auto-clear time:|   |Zwischenablage automatisch löschen nach:|
+|Clipboard auto-clear time:|   |Zw.ablage autom. löschen:|
 |sec|                          |sec|
 |Settings|                     |Einstellungen|
 |Here you can configure KeePass.|              |Hier koennen Sie KeePass konfigurieren.|

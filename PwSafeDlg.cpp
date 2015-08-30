@@ -1361,7 +1361,7 @@ void CPwSafeDlg::OnFileNew()
 	{
 		CString str;
 		str.Format("Sample #%d", iy);
-		m_mgr.AddEntry(rand() % 6, rand() % 30, (LPCTSTR)str, "google.de", "Anonymous", "The password", "");
+		m_mgr.AddEntry(rand() % 6, rand() % 30, (LPCTSTR)str, "google.com", "Anonymous", "The Password", "");
 	} */
 
 	UpdateGroupList();
@@ -2098,9 +2098,31 @@ void CPwSafeDlg::OnBeginDragPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 			CArchive ar(&file, CArchive::store);
 			TRY
 			{
-				m_mgr.UnlockEntryPassword(p);
-				CString strData = (char *)p->pszPassword;
-				m_mgr.LockEntryPassword(p);
+				CString strData;
+
+				switch(pNMListView->iSubItem)
+				{
+				case 0:
+					strData = p->pszTitle;
+					break;
+				case 1:
+					strData = p->pszUserName;
+					break;
+				case 2:
+					strData = p->pszURL;
+					break;
+				case 3:
+					m_mgr.UnlockEntryPassword(p);
+					strData = (char *)p->pszPassword;
+					m_mgr.LockEntryPassword(p);
+					break;
+				case 4:
+					strData = p->pszAdditional;
+					break;
+				default:
+					ASSERT(FALSE);
+					break;
+				}
 
 				ar.Write((LPCTSTR)strData, strData.GetLength() + sizeof(TCHAR));
 				ar.Close();

@@ -317,11 +317,11 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP,102,7,205,10
     CONTROL         "Unix newline sequence (\\n)",IDC_RADIO_NEWLINE_1,"Button",
                     BS_AUTORADIOBUTTON,102,19,205,10
-    LTEXT           "Clipboard auto-clear time:",IDC_STATIC,7,41,83,8
+    LTEXT           "Clipboard auto-clear time:",IDC_STATIC,7,41,95,8
     EDITTEXT        IDC_EDIT_CLIPBOARDTIME,103,39,182,14,ES_AUTOHSCROLL | 
                     ES_NUMBER
     LTEXT           "sec",IDC_STATIC,288,42,19,8
-    LTEXT           "Options",IDC_STATIC,7,78,82,8,WS_DISABLED
+    LTEXT           "Options",IDC_STATIC,7,78,106,8,WS_DISABLED
 END
 
 
@@ -503,7 +503,7 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
-        MENUITEM "Change &language...",         ID_FILE_CHANGELANGUAGE
+        MENUITEM "Change &Language...",         ID_FILE_CHANGELANGUAGE
         MENUITEM SEPARATOR
         MENUITEM "Show &Title Column",          ID_VIEW_TITLE, CHECKED
         MENUITEM "Show User&Name Column",       ID_VIEW_USERNAME, CHECKED

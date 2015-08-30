@@ -81,7 +81,7 @@ void CopyStringToClipboard(char *pszString)
 
 	if(::EmptyClipboard() == FALSE) return;
 
-	if(pszString == NULL)
+	if(pszString == NULL) // No string to copy => empty clipboard
 	{
 		::CloseClipboard();
 		return;
@@ -172,9 +172,11 @@ void FixURL(CString *pstrURL)
 
 	ASSERT(pstrURL != NULL);
 
+	// Load string and make lower
 	strTemp = *pstrURL;
 	strTemp.MakeLower();
 
+	// If the string begins with one of the following prefixes it is an URL
 	if(strTemp.Left(5) == "file:") bPre = TRUE;
 	if(strTemp.Left(4) == "ftp:") bPre = TRUE;
 	if(strTemp.Left(7) == "gopher:") bPre = TRUE;
@@ -187,7 +189,7 @@ void FixURL(CString *pstrURL)
 	if(strTemp.Left(7) == "telnet:") bPre = TRUE;
 	if(strTemp.Left(5) == "wais:") bPre = TRUE;
 
-	if(bPre == FALSE)
+	if(bPre == FALSE) // The string isn't a valid URL, so assume it's a HTTP
 	{
 		strTemp = "http:";
 		if(pstrURL->Left(1) != "/") strTemp += "//";

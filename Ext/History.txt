@@ -1,0 +1,5 @@
+03/11/19 - 0.81
+- Minor changes in the password manager class
+
+03/11/17 - 0.8
+- First release on sourceforge.net
