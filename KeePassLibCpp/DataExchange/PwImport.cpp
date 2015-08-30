@@ -34,24 +34,20 @@ CPwImport::~CPwImport()
 {
 }
 
-char *CPwImport::_FileToMemory(const TCHAR *pszFile, unsigned long *pFileSize)
+char *CPwImport::FileToMemory(const TCHAR *pszFile, unsigned long *pFileSize)
 {
-	FILE *fp;
-	unsigned long uFileSize;
-	char *pData;
-
 	ASSERT(pszFile != NULL); if(pszFile == NULL) return NULL;
 	if(_tcslen(pszFile) == 0) return NULL;
 
-	fp = NULL;
+	FILE *fp = NULL;
 	_tfopen_s(&fp, pszFile, _T("rb"));
 	if(fp == NULL) return NULL;
 
 	fseek(fp, 0, SEEK_END);
-	uFileSize = ftell(fp);
+	unsigned long uFileSize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	pData = new char[uFileSize + 3];
+	char *pData = new char[uFileSize + 3];
 	if(pData == NULL) { fclose(fp); fp = NULL; return NULL; }
 	pData[uFileSize] = 0; // Terminate buffer
 	pData[uFileSize + 1] = 0;
@@ -79,7 +75,7 @@ DWORD CPwImport::ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwG
 
 	if((dwGroupId == DWORD_MAX) || (dwGroupId == 0)) return 0;
 
-	pData = _FileToMemory(pszFile, &uFileSize);
+	pData = CPwImport::FileToMemory(pszFile, &uFileSize);
 	if(pData == NULL) return FALSE;
 
 	pProcessed = new char[uFileSize + 2];
@@ -89,11 +85,13 @@ DWORD CPwImport::ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwG
 	if(pData[uFileSize - 1] == '\\') pData[uFileSize - 1] = 0;
 
 	if(uFileSize > 3)
+	{
 		if((pData[0] == 0xEF) && (pData[1] == 0xBB) && (pData[2] == 0xBF))
 		{
 			j += 3; // Skip UTF-8 initialization characters
 			bUTF8 = TRUE;
 		}
+	}
 
 	if(bUTF8 == FALSE) bUTF8 = _IsUTF8String((const UTF8_BYTE *)pData);
 
@@ -171,7 +169,7 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 
 	ASSERT(pMgr != NULL);
 
-	pData = _FileToMemory(pszFile, &uFileSize);
+	pData = CPwImport::FileToMemory(pszFile, &uFileSize);
 	if(pData == NULL) return FALSE;
 
 	strTitle.Empty(); strURL.Empty(); strUserName.Empty();
@@ -346,7 +344,7 @@ BOOL CPwImport::ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr)
 
 	ASSERT(pMgr != NULL);
 
-	pData = _FileToMemory(pszFile, &uFileSize);
+	pData = CPwImport::FileToMemory(pszFile, &uFileSize);
 	if(pData == NULL) return FALSE;
 
 	strTitle.Empty(); strURL.Empty(); strUserName.Empty();
@@ -483,7 +481,7 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 	ASSERT(pszFile != NULL); if(pszFile == NULL) return FALSE;
 	ASSERT(pMgr != NULL); if(pMgr == NULL) return FALSE;
 
-	pData = _FileToMemory(pszFile, &uFileSize);
+	pData = CPwImport::FileToMemory(pszFile, &uFileSize);
 	if(pData == NULL) return FALSE;
 
 	nField = 0;

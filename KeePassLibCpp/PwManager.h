@@ -32,11 +32,11 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.08")
+#define PWM_VERSION_STR  _T("1.09")
 #else
-#define PWM_VERSION_STR  _T("1.08 Unicode")
+#define PWM_VERSION_STR  _T("1.09 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01000801
+#define PWM_VERSION_DW   0x01000901
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
@@ -62,6 +62,7 @@
 #define PWM_HELP_KEYS     _T("help/base/keys.html")
 #define PWM_HELP_TANS     _T("help/base/tans.html")
 #define PWM_HELP_PWGEN    _T("help/base/pwgenerator.html")
+#define PWM_HELP_CSV      _T("help/base/importexport.html#csv")
 
 #define PWMKEY_LANG       _T("KeeLanguage")
 #define PWMKEY_CLIPSECS   _T("KeeClipboardSeconds")
@@ -149,10 +150,14 @@
 #define PWMKEY_ENABLEREMOTECTRL _T("KeeEnableRemoteCtrl")
 #define PWMKEY_DEFAULTATSEQ     _T("KeeDefaultAutoTypeSequence")
 #define PWMKEY_USELOCALTIMEFMT  _T("KeeUseLocalTimeFormat")
+#define PWMKEY_TANCHARS         _T("KeeTANCharacters")
+#define PWMKEY_HTMURLMETHOD     _T("KeeHTMURLMethod")
 
 #define PWMKEY_GENPROFILE       _T("KeeGenProfile")
 #define PWMKEY_GENPROFILEAUTO   _T("KeeGenProfileAuto")
-#define PWMKEY_GENPROFILELAST   _T("KeeGenProfileLastName")
+#define PWMKEY_GENPROFILELASTPR _T("KeeGenProfileLast")
+
+#define PWMKEY_PREFERUSER       _T("KeePreferUserConfiguration")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -162,11 +167,13 @@
 #define PWM_KEYMETHOD_OR         FALSE
 #define PWM_KEYMETHOD_AND        TRUE
 
-#define PWS_SEARCHGROUP          TRL("Search results")
+#define PWS_SEARCHGROUP          TRL("Search Results")
 #define PWS_BACKUPGROUP_SRC      _T("Backup")
 #define PWS_BACKUPGROUP          TRL("Backup")
 #define PWS_DEFAULT_KEY_FILENAME _T("pwsafe.key")
 #define PWV_SOONTOEXPIRE_DAYS    7
+
+#define PWS_TAN_ENTRY            TRL("<TAN>")
 
 #define PWM_FLAG_SHA2            1
 #define PWM_FLAG_RIJNDAEL        2
@@ -430,6 +437,8 @@ public:
 
 	void NewDatabase();
 	int OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *pRepair);
+	// int OpenDatabaseEx(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *pRepair,
+	//	CPwErrorInfo *pErrorInfo);
 	int SaveDatabase(const TCHAR *pszFile);
 
 	// Move entries and groups
@@ -486,6 +495,8 @@ public:
 	void SetRawMasterKey(__in_ecount(32) const BYTE *pNewKey);
 
 	static BOOL IsZeroUUID(__in_ecount(16) const BYTE *pUUID);
+
+	static BOOL IsTANEntry(const PW_ENTRY *pe);
 
 	DWORD m_dwLastSelectedGroupId;
 	DWORD m_dwLastTopVisibleGroupId;

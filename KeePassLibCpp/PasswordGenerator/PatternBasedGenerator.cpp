@@ -43,9 +43,13 @@ PWG_ERROR PbgGenerate(std::vector<WCHAR>& vOutBuffer,
 	WCharStream csPattern(strExpPattern.c_str());
 	WCHAR ch = csPattern.ReadChar();
 
+	PwCharSet pwCustomCharSet;
+	BOOL bInCharSetDef = FALSE;
+
 	while(ch != 0)
 	{
 		PwCharSet pwCurrentCharSet;
+		BOOL bGenerateChar = FALSE;
 
 		if(ch == L'\\')
 		{
@@ -56,15 +60,38 @@ PWG_ERROR PbgGenerate(std::vector<WCHAR>& vOutBuffer,
 				break;
 			}
 
-			PbgAppendChar(vOutBuffer, ch, dwOutBufPos);
+			if(bInCharSetDef == FALSE)
+				PbgAppendChar(vOutBuffer, ch, dwOutBufPos);
+			else
+				pwCustomCharSet.Add(ch);
+		}
+		else if(ch == '[')
+		{
+			pwCustomCharSet.Clear();
+			bInCharSetDef = TRUE;
+		}
+		else if(ch == ']')
+		{
+			pwCurrentCharSet.Add(pwCustomCharSet.ToString().c_str());
+
+			bInCharSetDef = FALSE;
+			bGenerateChar = TRUE;
+		}
+		else if(bInCharSetDef == TRUE)
+		{
+			if(pwCustomCharSet.AddCharSet(ch) == false)
+				pwCustomCharSet.Add(ch);
 		}
 		else if(pwCurrentCharSet.AddCharSet(ch) == false)
 			PbgAppendChar(vOutBuffer, ch, dwOutBufPos);
-
-		PwgPrepareCharSet(&pwCurrentCharSet, pSettings);
-
-		if(pwCurrentCharSet.Size() > 0)
+		else bGenerateChar = TRUE;
+		
+		if(bGenerateChar == TRUE)
 		{
+			PwgPrepareCharSet(&pwCurrentCharSet, pSettings);
+
+			if(pwCurrentCharSet.Size() == 0) return PWGE_TOO_FEW_CHARACTERS;
+
 			UINT64 uIndex = *(UINT64 *)&pbRandom[dwRandomPos];
 
 			dwRandomPos += sizeof(UINT64);
@@ -90,6 +117,9 @@ PWG_ERROR PbgGenerate(std::vector<WCHAR>& vOutBuffer,
 	{
 		vOutBuffer[iRem] = 0; // Set the rest to zero
 	}
+
+	if(pSettings->bPatternPermute != FALSE)
+		PwgShufflePassword(vOutBuffer, pRandomSource);
 
 	return PWGE_SUCCESS;
 }

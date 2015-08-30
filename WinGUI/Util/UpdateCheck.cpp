@@ -104,8 +104,8 @@ DWORD WINAPI CFU_Thread(LPVOID lpParameter)
 
 				if((pDataBuf[0] != _T('0')) || (pDataBuf[1] != _T('x')))
 					CFU_Report(TRL("Loading error"), MB_ICONSTOP);
-				else if(dwVer > g_dwCacheCurVer)
-					CFU_Report(TRL("New KeePass version available!"), MB_ICONINFORMATION);
+				// else if(dwVer > g_dwCacheCurVer)
+				//	CFU_Report(TRL("New KeePass version available!"), MB_ICONINFORMATION);
 				else if(dwVer == g_dwCacheCurVer)
 					CFU_Report(TRL("You have the latest version."), MB_ICONINFORMATION);
 				else if((g_dwCacheCurVer >= 0x01000001) && (dwVer == (g_dwCacheCurVer - 1)))

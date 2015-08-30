@@ -21,10 +21,11 @@
 #include "PwSafe.h"
 #include "PwGeneratorExDlg.h"
 #include "PwSafeDlg.h"
+#include "SingleLineEditDlg.h"
 
 #include "NewGUI/NewGUICommon.h"
 #include "Util/WinUtil.h"
-#include "Util/PrivateConfig.h"
+#include "Util/PrivateConfigEx.h"
 
 #include "../KeePassLibCpp/PwManager.h"
 #include "../KeePassLibCpp/Util/MemUtil.h"
@@ -52,9 +53,12 @@ CPwGeneratorExDlg::CPwGeneratorExDlg(CWnd* pParent /*=NULL*/)
 	, m_strPattern(_T(""))
 	, m_bNoConfusing(FALSE)
 	, m_bHidePw(FALSE)
+	, m_bPatternPermute(FALSE)
 {
 	m_dwRequestedPasswords = 0;
 	m_lpPassword = NULL;
+	m_bBlockUIUpdate = FALSE;
+	m_bShowInTaskbar = FALSE;
 }
 
 CPwGeneratorExDlg::~CPwGeneratorExDlg()
@@ -107,6 +111,8 @@ void CPwGeneratorExDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_HIDEPW, m_bHidePw);
 	DDX_Control(pDX, IDC_STATIC_PWLENGTH, m_stcLength);
 	DDX_Control(pDX, IDC_EDIT_LENGTH, m_tbLength);
+	DDX_Control(pDX, IDC_CHECK_PATTERN_PERMUTE, m_cbPatternPermute);
+	DDX_Check(pDX, IDC_CHECK_PATTERN_PERMUTE, m_bPatternPermute);
 }
 
 BEGIN_MESSAGE_MAP(CPwGeneratorExDlg, CDialog)
@@ -118,7 +124,6 @@ BEGIN_MESSAGE_MAP(CPwGeneratorExDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO_PROFILES, &CPwGeneratorExDlg::OnCbnSelChangeComboProfiles)
 	ON_BN_CLICKED(IDC_BTN_PROFILE_CREATE, &CPwGeneratorExDlg::OnBnClickedBtnProfileCreate)
 	ON_BN_CLICKED(IDC_BTN_PROFILE_DELETE, &CPwGeneratorExDlg::OnBnClickedBtnProfileDelete)
-	ON_CBN_EDITCHANGE(IDC_COMBO_PROFILES, &CPwGeneratorExDlg::OnCbnEditChangeComboProfiles)
 	ON_BN_CLICKED(IDC_GENERATE_BTN, &CPwGeneratorExDlg::OnBnClickedGenerateBtn)
 	ON_BN_CLICKED(IDC_CHECK_HIDEPW, &CPwGeneratorExDlg::OnCheckHidePw)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_LENGTH, &CPwGeneratorExDlg::OnDeltaPosSpinLength)
@@ -126,6 +131,17 @@ BEGIN_MESSAGE_MAP(CPwGeneratorExDlg, CDialog)
 	ON_EN_CHANGE(IDC_EDIT_LENGTH, &CPwGeneratorExDlg::OnEnChangeEditLength)
 	ON_EN_CHANGE(IDC_EDIT_CUSTOMCHARSET, &CPwGeneratorExDlg::OnEnChangeEditCustomCharSet)
 	ON_EN_CHANGE(IDC_EDIT_PATTERN, &CPwGeneratorExDlg::OnEnChangeEditPattern)
+	ON_BN_CLICKED(IDC_CHECK_CS_UPPERCASE, &CPwGeneratorExDlg::OnBnClickedCheckCsUppercase)
+	ON_BN_CLICKED(IDC_CHECK_CS_LOWERCASE, &CPwGeneratorExDlg::OnBnClickedCheckCsLowercase)
+	ON_BN_CLICKED(IDC_CHECK_CS_NUMERIC, &CPwGeneratorExDlg::OnBnClickedCheckCsNumeric)
+	ON_BN_CLICKED(IDC_CHECK_CS_MINUS, &CPwGeneratorExDlg::OnBnClickedCheckCsMinus)
+	ON_BN_CLICKED(IDC_CHECK_CS_UNDERLINE, &CPwGeneratorExDlg::OnBnClickedCheckCsUnderline)
+	ON_BN_CLICKED(IDC_CHECK_CS_SPACE, &CPwGeneratorExDlg::OnBnClickedCheckCsSpace)
+	ON_BN_CLICKED(IDC_CHECK_CS_SPECIAL, &CPwGeneratorExDlg::OnBnClickedCheckCsSpecial)
+	ON_BN_CLICKED(IDC_CHECK_CS_BRACKETS, &CPwGeneratorExDlg::OnBnClickedCheckCsBrackets)
+	ON_BN_CLICKED(IDC_CHECK_CS_HIGHANSI, &CPwGeneratorExDlg::OnBnClickedCheckCsHighansi)
+	ON_BN_CLICKED(IDC_CHECK_NOCONFUSING, &CPwGeneratorExDlg::OnBnClickedCheckNoConfusing)
+	ON_BN_CLICKED(IDC_CHECK_COLLECT_ENTROPY, &CPwGeneratorExDlg::OnBnClickedCheckCollectEntropy)
 END_MESSAGE_MAP()
 
 BOOL CPwGeneratorExDlg::OnInitDialog()
@@ -134,29 +150,31 @@ BOOL CPwGeneratorExDlg::OnInitDialog()
 
 	NewGUI_XPButton(&m_btnOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btnCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(&m_btnProfileCreate, IDB_DISK, IDB_DISK);
-	NewGUI_XPButton(&m_btnProfileDelete, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(&m_btnProfileCreate, IDB_TB_SAVE_AS, IDB_TB_SAVE_AS, TRUE);
+	NewGUI_XPButton(&m_btnProfileDelete, IDB_CANCEL, IDB_CANCEL, TRUE);
 	NewGUI_XPButton(&m_btnHelp, IDB_HELP_SMALL, IDB_HELP_SMALL);
 	NewGUI_XPButton(&m_btnGenerate, IDB_KEY_SMALL, IDB_KEY_SMALL);
 	NewGUI_XPButton(&m_btnHidePw, -1, -1);
 
-	CString strTooltip;
+	NewGUI_TranslateCWnd(this);
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
+	CString strTooltip;
 	m_btnProfileCreate.GetWindowText(strTooltip);
 	m_btnProfileCreate.SetTooltipText(strTooltip);
 	m_btnProfileCreate.SetWindowText(_T(""));
-
 	m_btnProfileDelete.GetWindowText(strTooltip);
 	m_btnProfileDelete.SetTooltipText(strTooltip);
 	m_btnProfileDelete.SetWindowText(_T(""));
-
-	NewGUI_TranslateCWnd(this);
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	CString strConfusingText;
 	GetDlgItem(IDC_CHECK_NOCONFUSING)->GetWindowText(strConfusingText);
 	GetDlgItem(IDC_CHECK_NOCONFUSING)->SetWindowText(strConfusingText +
 		_T(" (l|1I, O0)"));
+
+	CString strSpecialChars;
+	m_cbSpecial.GetWindowText(strSpecialChars);
+	m_cbSpecial.SetWindowText(strSpecialChars + _T(" (!, $, %, &&, ...)"));
 
 	RECT rectWindow, rectWork; // Save space by removing the banner, if needed
 	this->GetWindowRect(&rectWindow);
@@ -202,8 +220,7 @@ BOOL CPwGeneratorExDlg::OnInitDialog()
 	m_btnHidePw.SetFont(&m_fSymbol, TRUE);
 
 	m_btnHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
-	CString strTT = TRL("Hide &Passwords Behind Asterisks (***)"); strTT.Remove(_T('&'));
-	m_btnHidePw.SetTooltipText(strTT, TRUE);
+	m_btnHidePw.SetTooltipText(TRL("Hide passwords behind asterisks (***)."), TRUE);
 
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
@@ -212,46 +229,56 @@ BOOL CPwGeneratorExDlg::OnInitDialog()
 	m_spinNumChars.SetPos(512);
 
 	m_tipSecClear.Create(this, 0x40);
-	m_tipSecClear.AddTool(&m_cEditPw, CPwSafeDlg::_GetSecureEditTipText(_T("Generated Password")));
+	m_tipSecClear.AddTool(&m_cEditPw, CPwSafeDlg::_GetSecureEditTipText(_T("Generated password")));
 	m_tipSecClear.SetMaxTipWidth(630);
 	m_tipSecClear.Activate(m_cEditPw.IsSecureModeEnabled());
 
 	m_rbCharSetBased.SetCheck(BST_CHECKED);
 	m_rbPatternBased.SetCheck(BST_UNCHECKED);
 
-	m_cmbProfile.LimitText(PWGD_MAX_PROFILE_NAME_LENGTH);
+	// m_cmbProfile.LimitText(PWGD_MAX_PROFILE_NAME_LENGTH);
 	m_tbCustomCharSet.LimitText(PWGD_MAX_PROFILE_CHARSET_LENGTH);
 	m_tbPattern.LimitText(PWGD_MAX_PROFILE_PATTERN_LENGTH);
 
 	CPwSafeDlg::m_pgsAutoProfile.strName = STR_AUTO_PROFILE;
 
-	LoadGenProfiles();
+	PwgGetDefaultProfile(&m_pgsLast);
 
+	LoadGenProfiles();
 	RecreateProfilesList();
 
-	if((m_cmbProfile.SelectString(-1, m_strLastProfileName) != CB_ERR) &&
-		(m_strLastProfileName != STR_CUSTOM_PROFILE))
+	PW_GEN_SETTINGS_EX pgsDefault;
+	PwgGetDefaultProfile(&pgsDefault);
+	UpdateDialogDataEx(FALSE, &pgsDefault);
+
+	CString strLast = m_pgsLast.strName.c_str();
+	if((m_cmbProfile.SelectString(-1, strLast) != CB_ERR) &&
+		(strLast != STR_CUSTOM_PROFILE))
 	{
-		ShowGenProfile(m_strLastProfileName);
+		ShowGenProfile(strLast);
 	}
 	else
 	{
 		m_cmbProfile.SelectString(-1, STR_CUSTOM_PROFILE);
-		PW_GEN_SETTINGS_EX pgsDefault = PwgGetDefaultProfile();
-		UpdateDialogDataEx(FALSE, &pgsDefault);
+		UpdateDialogDataEx(FALSE, &m_pgsLast);
 	}
 
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), _T(""));
 	OnCheckHidePw();
 
-	this->EnableControlsEx();
+	if(m_bShowInTaskbar == TRUE)
+		m_hPrevParent = WU_ShowWindowInTaskbar(this->m_hWnd, NULL, TRUE);
+
+	this->EnableControlsEx(FALSE);
 	return TRUE;
 }
 
-void CPwGeneratorExDlg::InitEx(DWORD dwRequestedPasswords, BOOL bInitialHidePw)
+void CPwGeneratorExDlg::InitEx(DWORD dwRequestedPasswords, BOOL bInitialHidePw,
+	BOOL bForceInTaskbar)
 {
 	m_dwRequestedPasswords = dwRequestedPasswords;
 	m_bHidePw = bInitialHidePw;
+	m_bShowInTaskbar = bForceInTaskbar;
 }
 
 LPTSTR CPwGeneratorExDlg::GetGeneratedPassword() const
@@ -263,11 +290,17 @@ void CPwGeneratorExDlg::OnOK()
 {
 	UpdateData(TRUE);
 
-	ASSERT(m_lpPassword == NULL); if(m_lpPassword != NULL) CSecureEditEx::DeletePassword(m_lpPassword);
+	ASSERT(m_lpPassword == NULL);
+	if(m_lpPassword != NULL) CSecureEditEx::DeletePassword(m_lpPassword);
 	m_lpPassword = m_cEditPw.GetPassword();
 	ASSERT(m_lpPassword != NULL); if(m_lpPassword == NULL) return;
 
-	if(_tcslen(m_lpPassword) == 0) { CSecureEditEx::DeletePassword(m_lpPassword); m_lpPassword = NULL; return; }
+	if(_tcslen(m_lpPassword) == 0)
+	{
+		CSecureEditEx::DeletePassword(m_lpPassword);
+		m_lpPassword = NULL;
+		return;
+	}
 
 	this->CleanUp();
 	CDialog::OnOK();
@@ -283,6 +316,9 @@ void CPwGeneratorExDlg::CleanUp()
 {
 	SaveGenProfiles();
 	CPwSafeDlg::m_pgsAutoProfile.strName = _T("");
+
+	if(m_bShowInTaskbar == TRUE)
+		WU_ShowWindowInTaskbar(this->m_hWnd, m_hPrevParent, FALSE);
 
 	m_fStyle.DeleteObject();
 	m_fSymbol.DeleteObject();
@@ -301,9 +337,7 @@ void CPwGeneratorExDlg::UpdateDialogDataEx(BOOL bDialogToInternal,
 
 	if(bDialogToInternal == TRUE)
 	{
-		CString strName;
-		m_cmbProfile.GetWindowText(strName);
-		pSettings->strName = (LPCTSTR)strName;
+		pSettings->strName = (LPCTSTR)GetCurrentGenProfile();
 
 		bool bCharSetBased = (m_rbCharSetBased.GetCheck() == BST_CHECKED);
 
@@ -343,6 +377,7 @@ void CPwGeneratorExDlg::UpdateDialogDataEx(BOOL bDialogToInternal,
 #endif
 
 		pSettings->bNoConfusing = m_bNoConfusing;
+		pSettings->bPatternPermute = m_bPatternPermute;
 	}
 	else // bSave == FALSE
 	{
@@ -381,6 +416,7 @@ void CPwGeneratorExDlg::UpdateDialogDataEx(BOOL bDialogToInternal,
 #endif
 
 		m_bNoConfusing = pSettings->bNoConfusing;
+		m_bPatternPermute = pSettings->bPatternPermute;
 
 		this->UpdateData(FALSE);
 	}
@@ -390,9 +426,16 @@ void CPwGeneratorExDlg::UpdateDialogDataEx(BOOL bDialogToInternal,
 	(v).EnableWindow(b); } }
 #define ENSURE_VISIBLE_STATE(v,b) { (v).ShowWindow(((b) == TRUE) ? SW_SHOW : SW_HIDE); }
 
-void CPwGeneratorExDlg::EnableControlsEx()
+void CPwGeneratorExDlg::EnableControlsEx(BOOL bSelectCustom)
 {
+	if(m_bBlockUIUpdate == TRUE) return;
+
+	m_bBlockUIUpdate = TRUE;
+
 	this->UpdateData(TRUE);
+
+	if(bSelectCustom)
+		m_cmbProfile.SelectString(-1, STR_CUSTOM_PROFILE);
 
 	BOOL bCharSetBased = ((m_rbCharSetBased.GetCheck() == BST_CHECKED) ? TRUE : FALSE);
 
@@ -416,16 +459,11 @@ void CPwGeneratorExDlg::EnableControlsEx()
 	BOOL bPattern = (bCharSetBased == TRUE) ? FALSE : TRUE;
 
 	ENSURE_ENABLED_STATE(m_tbPattern, bPattern);
+	ENSURE_ENABLED_STATE(m_cbPatternPermute, bPattern);
 
-	CString strCurrentName;
-	m_cmbProfile.GetWindowText(strCurrentName);
-
-	PW_GEN_SETTINGS_EX* pProfile = GetCurrentGenProfile();
-	BOOL bCreate = ((((pProfile == NULL) && (strCurrentName !=
-		STR_CUSTOM_PROFILE)) || (strCurrentName == STR_AUTO_PROFILE)) ? TRUE : FALSE);
-	BOOL bDelete = (((pProfile != NULL) && (strCurrentName !=
-		STR_CUSTOM_PROFILE) && (strCurrentName != STR_AUTO_PROFILE)) ? TRUE : FALSE);
-	ENSURE_ENABLED_STATE(m_btnProfileCreate, bCreate);
+	CString strCurrentName = GetCurrentGenProfile();
+	BOOL bDelete = (((strCurrentName != STR_CUSTOM_PROFILE) &&
+		(strCurrentName != STR_AUTO_PROFILE)) ? TRUE : FALSE);
 	ENSURE_ENABLED_STATE(m_btnProfileDelete, bDelete);
 
 	BOOL bNoAutoProfile = ((strCurrentName != STR_AUTO_PROFILE) ? TRUE : FALSE);
@@ -455,37 +493,17 @@ void CPwGeneratorExDlg::EnableControlsEx()
 		this->UpdateData(FALSE);
 	}
 
-	/* CString strProfileName;
-	m_cmbProfile.GetWindowText(strProfileName);
-	if(strProfileName.GetLength() > PWGD_MAX_PROFILE_NAME_LENGTH)
-	{
-		MessageBeep(MB_ICONASTERISK);
-		m_cmbProfile.SetWindowText(strProfileName.Left(PWGD_MAX_PROFILE_NAME_LENGTH));
-	}
-
-	if(m_strCustomCharSet.GetLength() > PWGD_MAX_PROFILE_CHARSET_LENGTH)
-	{
-		MessageBeep(MB_ICONASTERISK);
-		m_strCustomCharSet = m_strCustomCharSet.Left(PWGD_MAX_PROFILE_CHARSET_LENGTH);
-		this->UpdateData(FALSE);
-	}
-
-	if(m_strPattern.GetLength() > PWGD_MAX_PROFILE_PATTERN_LENGTH)
-	{
-		MessageBeep(MB_ICONASTERISK);
-		m_strPattern = m_strPattern.Left(PWGD_MAX_PROFILE_PATTERN_LENGTH);
-		this->UpdateData(FALSE);
-	} */
+	m_bBlockUIUpdate = FALSE;
 }
 
 void CPwGeneratorExDlg::OnRadioCharsetBased()
 {
-	this->EnableControlsEx();
+	this->EnableControlsEx(TRUE);
 }
 
 void CPwGeneratorExDlg::OnRadioPatternBased()
 {
-	this->EnableControlsEx();
+	this->EnableControlsEx(TRUE);
 }
 
 void CPwGeneratorExDlg::OnBnClickedBtnHelp()
@@ -496,8 +514,10 @@ void CPwGeneratorExDlg::OnBnClickedBtnHelp()
 void CPwGeneratorExDlg::LoadGenProfiles()
 {
 	TCHAR szTemp[SI_REGSIZE];
-	CPrivateConfig cConfig(FALSE);
+	CPrivateConfigEx cConfig(FALSE);
 	CString strProfileKey;
+
+	m_vProfiles.clear();
 
 	for(int nProfile = 0; true; ++nProfile)
 	{
@@ -508,18 +528,24 @@ void CPwGeneratorExDlg::LoadGenProfiles()
 		if(_tcscmp(szTemp, _T("0")) == 0) break;
 
 		std::basic_string<TCHAR> tstr = szTemp;
-		PW_GEN_SETTINGS_EX s = PwgStringToProfile(tstr);
+
+		PW_GEN_SETTINGS_EX s;
+		PwgStringToProfile(tstr, &s);
 
 		m_vProfiles.push_back(s);
 	}
 
-	cConfig.Get(PWMKEY_GENPROFILELAST, szTemp);
-	m_strLastProfileName = szTemp;
+	cConfig.Get(PWMKEY_GENPROFILELASTPR, szTemp);
+	if((szTemp[0] != 0) && (_tcscmp(szTemp, _T("0")) != 0))
+	{
+		std::basic_string<TCHAR> strLast = szTemp;
+		PwgStringToProfile(strLast, &m_pgsLast);
+	}
 }
 
 void CPwGeneratorExDlg::SaveGenProfiles()
 {
-	CPrivateConfig cConfig(TRUE);
+	CPrivateConfigEx cConfig(TRUE);
 	CString strProfileKey;
 
 	for(unsigned int uProfile = 0; uProfile < m_vProfiles.size(); ++uProfile)
@@ -533,6 +559,11 @@ void CPwGeneratorExDlg::SaveGenProfiles()
 
 	strProfileKey.Format(_T("%s%u"), PWMKEY_GENPROFILE, m_vProfiles.size());
 	cConfig.Set(strProfileKey, _T("0"));
+
+	UpdateDialogDataEx(TRUE, &m_pgsLast);
+	m_pgsLast.strName = (LPCTSTR)GetCurrentGenProfile();
+	std::basic_string<TCHAR> strLast = PwgProfileToString(&m_pgsLast);
+	cConfig.Set(PWMKEY_GENPROFILELASTPR, strLast.c_str());
 }
 
 PW_GEN_SETTINGS_EX* CPwGeneratorExDlg::FindGenProfile(CString strProfileName)
@@ -551,52 +582,87 @@ PW_GEN_SETTINGS_EX* CPwGeneratorExDlg::FindGenProfile(CString strProfileName)
 void CPwGeneratorExDlg::ShowGenProfile(CString strProfileName)
 {
 	PW_GEN_SETTINGS_EX* pProfile = FindGenProfile(strProfileName);
-	if(pProfile == NULL) { EnableControlsEx(); return; }
+	if(pProfile == NULL) { EnableControlsEx(FALSE); return; }
 
 	UpdateDialogDataEx(FALSE, pProfile);
-	EnableControlsEx();
+	EnableControlsEx(FALSE);
 }
 
 void CPwGeneratorExDlg::OnCbnSelChangeComboProfiles()
 {
-	this->UpdateData(TRUE);
-	CString strProfile;
-	m_cmbProfile.GetLBText(m_cmbProfile.GetCurSel(), strProfile);
-	m_cmbProfile.SetWindowText(strProfile);
+	CString strProfile = GetCurrentGenProfile();
 	ShowGenProfile(strProfile);
+	EnableControlsEx(FALSE);
 }
 
 void CPwGeneratorExDlg::OnBnClickedBtnProfileCreate()
 {
 	this->UpdateData(TRUE);
 
-	CString strName;
-	m_cmbProfile.GetWindowText(strName);
+	std::vector<std::basic_string<TCHAR> > vSelectable;
 
-	PW_GEN_SETTINGS_EX s;
-	UpdateDialogDataEx(TRUE, &s);
+	vSelectable.push_back(STR_AUTO_PROFILE);
+	for(DWORD i = 0; i < m_vProfiles.size(); ++i)
+		vSelectable.push_back(m_vProfiles[i].strName);
 
-	if(strName == STR_AUTO_PROFILE) CPwSafeDlg::m_pgsAutoProfile = s;
-	else m_vProfiles.push_back(s);
+	CSingleLineEditDlg dlg;
+	dlg.InitEx(TRL("Save as Profile"), TRL("Save current settings as password generator profile."),
+		TRL("Please enter a name for the new password generator profile, or select an existing profile to overwrite it:"),
+		PWGD_MAX_PROFILE_NAME_LENGTH, _T(""), vSelectable);
 
-	RecreateProfilesList();
-	m_cmbProfile.SelectString(-1, strName);
-	ShowGenProfile(strName);
+	if(dlg.DoModal() == IDOK)
+	{
+		CString strName = dlg.GetEnteredText();
+
+		if(strName == STR_CUSTOM_PROFILE)
+		{
+			MessageBox(TRL("Path is invalid"), TRL("Password Safe"), MB_OK | MB_ICONWARNING);
+			return;
+		}
+
+		PW_GEN_SETTINGS_EX s;
+		UpdateDialogDataEx(TRUE, &s);
+		s.strName = strName;
+
+		if(strName == STR_AUTO_PROFILE)
+		{
+			s.bCollectUserEntropy = FALSE;
+			CPwSafeDlg::m_pgsAutoProfile = s;
+		}
+		else
+		{
+			BOOL bExists = FALSE;
+			for(DWORD i = 0; i < m_vProfiles.size(); ++i)
+			{
+				if(m_vProfiles[i].strName == (LPCTSTR)strName)
+				{
+					m_vProfiles[i] = s;
+					bExists = TRUE;
+					break;
+				}
+			}
+
+			if(bExists == FALSE) m_vProfiles.push_back(s);
+		}
+
+		RecreateProfilesList();
+		m_cmbProfile.SelectString(-1, strName);
+		ShowGenProfile(strName);
+	}
 }
 
-PW_GEN_SETTINGS_EX* CPwGeneratorExDlg::GetCurrentGenProfile()
+CString CPwGeneratorExDlg::GetCurrentGenProfile()
 {
 	CString strProfile;
 	int nSel = m_cmbProfile.GetCurSel();
 	if(nSel < 0) m_cmbProfile.GetWindowText(strProfile);
 	else m_cmbProfile.GetLBText(nSel, strProfile);
-	return FindGenProfile(strProfile);
+	return strProfile;
 }
 
 void CPwGeneratorExDlg::RecreateProfilesList()
 {
-	CString strPrevText;
-	m_cmbProfile.GetWindowText(strPrevText);
+	CString strPrevText = GetCurrentGenProfile();
 
 	m_cmbProfile.ResetContent();
 
@@ -609,20 +675,19 @@ void CPwGeneratorExDlg::RecreateProfilesList()
 	if(m_cmbProfile.SelectString(-1, strPrevText) == CB_ERR)
 		m_cmbProfile.SelectString(-1, STR_CUSTOM_PROFILE);
 
-	EnableControlsEx();
+	EnableControlsEx(FALSE);
 }
 
 void CPwGeneratorExDlg::OnBnClickedBtnProfileDelete()
 {
 	this->UpdateData(TRUE);
 
-	PW_GEN_SETTINGS_EX* pProfile = GetCurrentGenProfile();
-	if(pProfile == NULL) { ASSERT(FALSE); return; }
+	CString strProfile = GetCurrentGenProfile();
 
 	for(std::vector<PW_GEN_SETTINGS_EX>::iterator it = m_vProfiles.begin();
 		it != m_vProfiles.end(); ++it)
 	{
-		if(it->strName == pProfile->strName)
+		if(it->strName == (LPCTSTR)strProfile)
 		{
 			m_vProfiles.erase(it);
 
@@ -630,11 +695,6 @@ void CPwGeneratorExDlg::OnBnClickedBtnProfileDelete()
 			break;
 		}
 	}
-}
-
-void CPwGeneratorExDlg::OnCbnEditChangeComboProfiles()
-{
-	this->EnableControlsEx();
 }
 
 void CPwGeneratorExDlg::OnBnClickedGenerateBtn()
@@ -672,7 +732,7 @@ void CPwGeneratorExDlg::OnBnClickedGenerateBtn()
 
 	EraseTCharVector(strPassword);
 
-	this->EnableControlsEx();
+	this->EnableControlsEx(FALSE);
 }
 
 void CPwGeneratorExDlg::OnCheckHidePw()
@@ -716,12 +776,12 @@ void CPwGeneratorExDlg::OnDeltaPosSpinLength(NMHDR *pNMHDR, LRESULT *pResult)
 	m_spinNumChars.SetPos(512);
 
 	UpdateData(FALSE);
-	this->EnableControlsEx();
+	this->EnableControlsEx(TRUE);
 }
 
 void CPwGeneratorExDlg::OnEnChangeEditPw()
 {
-	this->EnableControlsEx();
+	this->EnableControlsEx(FALSE);
 }
 
 BOOL CPwGeneratorExDlg::PreTranslateMessage(MSG* pMsg)
@@ -733,15 +793,70 @@ BOOL CPwGeneratorExDlg::PreTranslateMessage(MSG* pMsg)
 
 void CPwGeneratorExDlg::OnEnChangeEditLength()
 {
-	this->EnableControlsEx();
+	this->EnableControlsEx(TRUE);
 }
 
 void CPwGeneratorExDlg::OnEnChangeEditCustomCharSet()
 {
-	this->EnableControlsEx();
+	this->EnableControlsEx(TRUE);
 }
 
 void CPwGeneratorExDlg::OnEnChangeEditPattern()
 {
-	this->EnableControlsEx();
+	this->EnableControlsEx(TRUE);
+}
+
+void CPwGeneratorExDlg::OnBnClickedCheckCsUppercase()
+{
+	this->EnableControlsEx(TRUE);
+}
+
+void CPwGeneratorExDlg::OnBnClickedCheckCsLowercase()
+{
+	this->EnableControlsEx(TRUE);
+}
+
+void CPwGeneratorExDlg::OnBnClickedCheckCsNumeric()
+{
+	this->EnableControlsEx(TRUE);
+}
+
+void CPwGeneratorExDlg::OnBnClickedCheckCsMinus()
+{
+	this->EnableControlsEx(TRUE);
+}
+
+void CPwGeneratorExDlg::OnBnClickedCheckCsUnderline()
+{
+	this->EnableControlsEx(TRUE);
+}
+
+void CPwGeneratorExDlg::OnBnClickedCheckCsSpace()
+{
+	this->EnableControlsEx(TRUE);
+}
+
+void CPwGeneratorExDlg::OnBnClickedCheckCsSpecial()
+{
+	this->EnableControlsEx(TRUE);
+}
+
+void CPwGeneratorExDlg::OnBnClickedCheckCsBrackets()
+{
+	this->EnableControlsEx(TRUE);
+}
+
+void CPwGeneratorExDlg::OnBnClickedCheckCsHighansi()
+{
+	this->EnableControlsEx(TRUE);
+}
+
+void CPwGeneratorExDlg::OnBnClickedCheckNoConfusing()
+{
+	this->EnableControlsEx(TRUE);
+}
+
+void CPwGeneratorExDlg::OnBnClickedCheckCollectEntropy()
+{
+	this->EnableControlsEx(TRUE);
 }

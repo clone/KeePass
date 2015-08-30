@@ -40,7 +40,7 @@
 #include "NewGUI/SystemTrayEx.h"
 #include "NewGUI/AutoRichEditCtrlFx.h"
 #include "Plugins/PluginMgr.h"
-#include "Util/PrivateConfig.h"
+#include "Util/PrivateConfigEx.h"
 #include "Util/SInstance.h"
 #include "Util/SessionNotify.h"
 #include "Util/RemoteControl.h"
@@ -66,7 +66,6 @@
 #define PWS_DEFAULT_SPLITTER_Y 10
 #define MENU_EXTRAS_ITEMCOUNT  8
 
-#define PWS_TAN_ENTRY      TRL("<TAN>")
 #define PWS_NEW_ATTACHMENT _T(":: ")
 
 #define WM_PLUGINS_FIRST   (0x9FFF)
@@ -92,9 +91,12 @@
 #define KPCM_NULL          0
 #define KPCM_EXIT          1
 
+#define MWS_MIN_CX 314
+#define MWS_MIN_CY 207
+
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CPwSafeDlg : public CDialog
+class CPwSafeDlg : public CDialog
 {
 public:
 	CPwSafeDlg(CWnd* pParent = NULL);
@@ -113,7 +115,7 @@ public:
 	void CleanUp();
 
 	void SaveOptions();
-	void _SaveWindowPositionAndSize(CPrivateConfig* pcfg);
+	void _SaveWindowPositionAndSize(CPrivateConfigEx* pcfg);
 
 	void SetStatusTextEx(LPCTSTR lpStatusText, int nPane = -1);
 	inline void NotifyUserActivity();
@@ -152,7 +154,6 @@ public:
 
 	void CB_OnPwlistColumnWidthChange(int iColumn, int iSize);
 	void _SortListIfAutoSort();
-	void ViewHideHandler();
 
 	void _HandleEntryDrop(DWORD dwDropType, HTREEITEM hTreeItem);
 
@@ -229,7 +230,7 @@ public:
 
 	HTREEITEM _FindSelectInTree(CTreeCtrl *pTree, HTREEITEM hRoot, DWORD_PTR dwGroupId);
 
-	BOOL _IsUnsafeAllowed();
+	static BOOL IsUnsafeAllowed(HWND hWndParent);
 
 	void _OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile, const TCHAR *pszPassword, const TCHAR *pszKeyFile, BOOL bOpenLocked, LPCTSTR lpPreSelectPath, BOOL bIgnoreCorrupted);
 	BOOL _ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew);
@@ -249,6 +250,35 @@ public:
 
 	static UINT GetKeePassControlMessageID();
 
+	BCMenu m_menu; // Our XP-style menu
+	BOOL m_bMenu; // Menu created?
+
+	CImageList m_ilIcons;
+
+	BOOL m_bCheckForInstance;
+	CInstanceChecker m_instanceChecker;
+
+	HICON m_hTrayIconNormal;
+	HICON m_hTrayIconLocked;
+
+	BOOL m_bDisplayDialog;
+	BOOL m_bCachedToolBarUpdate;
+	BOOL m_bCachedPwlistUpdate;
+
+	CString m_strFile;
+	CString m_strFileAbsolute;
+	BOOL m_bFileOpen;
+	BOOL m_bModified;
+	BOOL m_bFileReadOnly;
+
+	CPwManager m_mgr;
+
+	static BOOL m_bSecureEdits;
+	static BOOL m_bDisableUnsafeAtStart;
+	static BOOL m_bUseLocalTimeFormat;
+	static PW_GEN_SETTINGS_EX m_pgsAutoProfile;
+
+private:
 	int m_nClipboardMethod;
 	BOOL m_bTimer;
 	int m_nClipboardCountdown;
@@ -265,32 +295,26 @@ public:
 	BOOL m_bAutoShowExpired;
 	BOOL m_bAutoShowExpiredSoon;
 	BOOL m_bBackupEntries;
-	static BOOL m_bSecureEdits;
 	BOOL m_bSingleClickTrayIcon;
 	DWORD m_dwDefaultExpire;
 	BOOL m_bDeleteBackupsOnSave;
 	BOOL m_bDisableAutoType;
 	BOOL m_bLockOnWinLock;
-	static BOOL m_bUseLocalTimeFormat;
 
 	BOOL m_bExiting;
 	BOOL m_bLocked;
 	long m_nLockedViewParams[3];
-	BOOL m_bShowWindow;
 	BOOL m_bWasMaximized;
+	BOOL m_bMinimized;
+	BOOL m_bTrayed;
 	BOOL m_bRestartApplication;
 
-	BOOL m_bCheckForInstance;
-	CInstanceChecker m_instanceChecker;
 	CSessionNotify m_sessionNotify;
-
-	CPwManager m_mgr;
 
 	BOOL m_bWindowsNewLine;
 	BOOL m_bPasswordStars;
 	BOOL m_bUserStars;
 	BOOL m_bDisableUnsafe;
-	BOOL m_bDisableUnsafeAtStart;
 	BOOL m_bRememberLast;
 	BOOL m_bUsePuttyForURLs;
 	BOOL m_bSaveOnLATMod;
@@ -326,12 +350,6 @@ public:
 	CString m_strURLOverride;
 	BOOL m_bAllowSaveIfModifiedOnly;
 
-	HICON m_hTrayIconNormal;
-	HICON m_hTrayIconLocked;
-	BOOL m_bDisplayDialog;
-
-	BCMenu m_menu; // Our XP-style menu
-	BOOL m_bMenu; // Menu created?
 	BCMenu *m_pPwListMenu;
 	BCMenu *m_pGroupListMenu;
 	BCMenu *m_pEntryViewMenu;
@@ -344,20 +362,11 @@ public:
 	BCMenu m_menuColView;
 	CToolTipCtrl m_tip;
 
-	CImageList m_ilIcons;
 	CFont m_fListFont;
 	CSystemTrayEx m_systray;
 	HACCEL m_hAccel;
 
-	CString m_strFile;
-	CString m_strFileAbsolute;
-	BOOL m_bFileOpen;
-	BOOL m_bModified;
-	BOOL m_bFileReadOnly;
-	BOOL m_bMinimized;
-	BOOL m_bMaximized;
-
-	CString m_strTempFile;
+	std::vector<std::basic_string<TCHAR> > m_vTempFiles;
 
 	BOOL m_bShowColumn[11];
 	int m_nColumnWidths[11];
@@ -389,9 +398,9 @@ public:
 	DWORD_PTR m_dwGroupsSaveFirstVisible;
 	DWORD_PTR m_dwGroupsSaveSelected;
 
-	BOOL m_bCachedToolBarUpdate;
-	BOOL m_bCachedPwlistUpdate;
 	BOOL m_bBlockPwListUpdate;
+	BOOL m_bIgnoreSizeEvent;
+	BOOL m_bGlobalAutoTypePending;
 
 	BOOL m_bDragging;
 	BOOL m_bDraggingHoriz;
@@ -419,7 +428,18 @@ public:
 
 	CString m_strDefaultAutoTypeSequence;
 
-	static PW_GEN_SETTINGS_EX m_pgsAutoProfile;
+private:
+	void ChangeLockStateOnWindowChange(BOOL bLocked);
+	void SetViewHideState(BOOL bReqVisible, BOOL bPreferTray);
+	void ToggleViewHideState(BOOL bPreferTray);
+	void SetTrayState(BOOL bMinimizeToTray);
+
+	LONG m_lNormalWndPosX;
+	LONG m_lNormalWndPosY;
+	LONG m_lNormalWndSizeW;
+	LONG m_lNormalWndSizeH;
+
+public:
 
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
@@ -671,6 +691,7 @@ protected:
 	afx_msg void OnUpdateExtrasGenPw(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateInfoAbout(CCmdUI *pCmdUI);
 	afx_msg void OnInfoChkForUpd();
+	afx_msg void OnUpdateViewHide(CCmdUI *pCmdUI);
 	//}}AFX_MSG
 
 	afx_msg void OnPluginMessage(UINT nID);

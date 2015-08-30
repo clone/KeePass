@@ -20,9 +20,13 @@
 #include "StdAfx.h"
 #include "FileLock.h"
 
+#include "../../KeePassLibCpp/DataExchange/PwImport.h"
 #include "../../KeePassLibCpp/Util/MemUtil.h"
+#include "../../KeePassLibCpp/Util/StrUtil.h"
 
-C_FN_SHARE BOOL FileLock_Lock(LPCTSTR lpFile, BOOL bLock)
+#include "WinUtil.h"
+
+BOOL FileLock_Lock(LPCTSTR lpFile, BOOL bLock)
 {
 	if(lpFile == NULL) return FALSE;
 	if(lpFile[0] == 0) return FALSE;
@@ -45,37 +49,56 @@ C_FN_SHARE BOOL FileLock_Lock(LPCTSTR lpFile, BOOL bLock)
 		if(fp == NULL) return FALSE;
 
 		VERIFY(fwrite(&t, sizeof(PW_TIME), 1, fp) == 1);
+
+		std::basic_string<TCHAR> tszUser = WU_GetUserName();
+		BYTE *pbUTF8 = _StringToUTF8(tszUser.c_str());
+		fwrite(pbUTF8, 1, szlen((char *)pbUTF8) + 1, fp);
+
 		fclose(fp); fp = NULL;
+
+		SAFE_DELETE_ARRAY(pbUTF8);
 	}
 	else DeleteFile(str);
 
 	return TRUE;
 }
 
-C_FN_SHARE BOOL FileLock_IsLocked(LPCTSTR lpFile)
+BOOL FileLock_IsLocked(LPCTSTR lpFile, std::basic_string<TCHAR>& strLockingUser)
 {
+	strLockingUser.clear();
+
 	if(lpFile == NULL) return FALSE;
 	if(lpFile[0] == 0) return FALSE;
 
 	CString str = lpFile;
 	str += FL_LOCK_SUFFIX;
 
-	FILE *fp = NULL;
-	_tfopen_s(&fp, str, _T("rb"));
-	if(fp == NULL) return FALSE; // No locking file -> not locked
+	unsigned long uFileSize = 0;
+	char *pData = CPwImport::FileToMemory((LPCTSTR)str, &uFileSize);
+	if(pData == NULL) return FALSE;
 
-	PW_TIME t, tNow;
-	ZeroMemory(&t, sizeof(PW_TIME));
-	VERIFY(fread(&t, sizeof(PW_TIME), 1, fp) == 1);
-	fclose(fp); fp = NULL;
-
+	PW_TIME tNow, t;
 	_GetCurrentPwTime(&tNow);
+
+	ZeroMemory(&t, sizeof(PW_TIME));
+	if(uFileSize >= sizeof(PW_TIME))
+		memcpy(&t, pData, sizeof(PW_TIME));
 
 	if((t.shYear == 0) || (_pwtimecmp(&t, &tNow) < 0))
 	{
 		FileLock_Lock(lpFile, FALSE); // Unlock the file
+		SAFE_DELETE_ARRAY(pData);
 		return FALSE; // It's not locked any more
 	}
 
+	char *pUser = pData + sizeof(PW_TIME); // pData is null-terminated
+	TCHAR *tszUser = _UTF8ToString((UTF8_BYTE *)pUser);
+	if(tszUser != NULL)
+	{
+		strLockingUser = tszUser;
+		SAFE_DELETE_ARRAY(tszUser);
+	}
+
+	SAFE_DELETE_ARRAY(pData);
 	return TRUE; // File is actively locked
 }

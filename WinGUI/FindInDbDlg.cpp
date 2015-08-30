@@ -89,7 +89,7 @@ BOOL CFindInDbDlg::OnInitDialog()
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_SEARCH),
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("Find"));
-	m_banner.SetCaption(TRL("Find a string in the password list"));
+	m_banner.SetCaption(TRL("Find a string in the password list."));
 
 	GetDlgItem(IDC_EDIT_FINDTEXT)->SetFocus();
 

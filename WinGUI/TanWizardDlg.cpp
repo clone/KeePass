@@ -23,6 +23,7 @@
 
 #include "NewGUI/NewGUICommon.h"
 #include "Util/WinUtil.h"
+#include "Util/PrivateConfigEx.h"
 #include "../KeePassLibCpp/PwManager.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 
@@ -36,6 +37,7 @@ static char THIS_FILE[] = __FILE__;
 
 CTanWizardDlg::CTanWizardDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CTanWizardDlg::IDD, pParent)
+	, m_strTANChars(_T(""))
 {
 	//{{AFX_DATA_INIT(CTanWizardDlg)
 	m_strTans = _T("");
@@ -54,6 +56,7 @@ void CTanWizardDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_TANS, m_strTans);
 	DDX_Check(pDX, IDC_CHECK_NUMBERING, m_bAssignNumbers);
 	DDX_Text(pDX, IDC_EDIT_NUMBERING_START, m_dwStartNumber);
+	DDX_Text(pDX, IDC_EDIT_TANCHARS, m_strTANChars);
 	//}}AFX_DATA_MAP
 }
 
@@ -85,19 +88,36 @@ BOOL CTanWizardDlg::OnInitDialog()
 
 	GetDlgItem(IDC_EDIT_NUMBERING_START)->EnableWindow(FALSE);
 
-	return TRUE;
+	TCHAR lpTANChars[SI_REGSIZE + 1];
+	CPrivateConfigEx cfg(FALSE);
+	if(cfg.Get(PWMKEY_TANCHARS, lpTANChars) == TRUE) m_strTANChars = lpTANChars;
+	else m_strTANChars = TW_DEFAULTCHARS;
+
+	UpdateData(FALSE);
+
+	GetDlgItem(IDC_EDIT_TANS)->SetFocus();
+	return FALSE;
 }
 
 void CTanWizardDlg::OnOK() 
 {
-	UpdateData(TRUE);
-
+	CleanUpEx();
 	CDialog::OnOK();
 }
 
 void CTanWizardDlg::OnCancel() 
 {
+	CleanUpEx();
+	m_strTans = _T("");
 	CDialog::OnCancel();
+}
+
+void CTanWizardDlg::CleanUpEx()
+{
+	UpdateData(TRUE);
+
+	CPrivateConfigEx cfg(TRUE);
+	cfg.Set(PWMKEY_TANCHARS, m_strTANChars);
 }
 
 void CTanWizardDlg::OnCheckNumbering() 

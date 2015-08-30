@@ -21,7 +21,7 @@
 #include "../Util/MemUtil.h"
 #include "../Util/StrUtil.h"
 
-C_FN_SHARE char *_StringToAnsi(const WCHAR *lptString)
+char *_StringToAnsi(const WCHAR *lptString)
 {
 	char *p = NULL;
 	int _nChars = 0;
@@ -45,7 +45,7 @@ C_FN_SHARE char *_StringToAnsi(const WCHAR *lptString)
 	return p;
 }
 
-C_FN_SHARE WCHAR *_StringToUnicode(const char *pszString)
+WCHAR *_StringToUnicode(const char *pszString)
 {
 	int _nChars = 0;
 

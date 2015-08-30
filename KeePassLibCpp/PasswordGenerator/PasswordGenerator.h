@@ -33,7 +33,7 @@
 #define PWGE_UNKNOWN_GENERATOR 2
 #define PWGE_TOO_FEW_CHARACTERS 3
 
-#define PWGD_VERSION_BYTE 1
+#define PWGD_VERSION_BYTE 2
 
 #define PWGT_NULL 0
 #define PWGT_CHARSET 1
@@ -53,6 +53,7 @@
 	LPWSTR lpCharSet;
 
 	LPWSTR lpPattern;
+	BOOL bPatternPermute;
 
 	BOOL bNoConfusing;
 } PW_GEN_SETTINGS; */
@@ -69,6 +70,7 @@ typedef struct _PW_GEN_SETTINGS_EX
 	std::basic_string<WCHAR> strCharSet;
 
 	std::basic_string<WCHAR> strPattern;
+	BOOL bPatternPermute;
 
 	BOOL bNoConfusing;
 } PW_GEN_SETTINGS_EX;
@@ -84,16 +86,17 @@ WCHAR PwgGenerateCharacter(const PW_GEN_SETTINGS_EX* pSettings,
 
 void PwgPrepareCharSet(PwCharSet* pCharSet, const PW_GEN_SETTINGS_EX* pSettings);
 
+void PwgShufflePassword(std::vector<WCHAR>& vBuffer, CNewRandom* pRandom);
+
 LPCTSTR PwgErrorToString(PWG_ERROR uError);
 
 // std::basic_string<WCHAR> HexStrToWCharStr(LPCTSTR lpString);
 // std::basic_string<TCHAR> WCharVecToHexStr(const std::vector<WCHAR>& str);
 
 std::basic_string<TCHAR> PwgProfileToString(const PW_GEN_SETTINGS_EX* pSettings);
-PW_GEN_SETTINGS_EX PwgStringToProfile(const std::basic_string<TCHAR>& strProfile);
+void PwgStringToProfile(const std::basic_string<TCHAR>& strProfile,
+	PW_GEN_SETTINGS_EX* s);
 
-PW_GEN_SETTINGS_EX PwgGetDefaultProfile();
-
-
+void PwgGetDefaultProfile(PW_GEN_SETTINGS_EX* s);
 
 #endif // ___PASSWORD_GENERATOR_MAIN_H___

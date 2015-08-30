@@ -41,7 +41,7 @@ CEntryListDlg::CEntryListDlg(CWnd* pParent /*=NULL*/)
 	//{{AFX_DATA_INIT(CEntryListDlg)
 	//}}AFX_DATA_INIT
 
-	m_nDisplayMode = ELDMODE_UNKNOWN;
+	m_nDisplayMode = ELDMODE_NONE;
 	m_pMgr = NULL;
 	ZeroMemory(m_aUuid, 16);
 	m_bPasswordStars = TRUE;
@@ -73,7 +73,7 @@ BOOL CEntryListDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	ASSERT(m_pMgr != NULL);
-	ASSERT(m_nDisplayMode != ELDMODE_UNKNOWN);
+	ASSERT(m_nDisplayMode != ELDMODE_NONE);
 	ASSERT(m_pImgList != NULL);
 
 	// Translate all windows
@@ -85,8 +85,8 @@ BOOL CEntryListDlg::OnInitDialog()
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY), KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 
-	m_banner.SetTitle(m_strBannerTitle); // TRL("Expired Entries")
-	m_banner.SetCaption(m_strBannerCaption); // TRL("This is a list of all expired entries")
+	m_banner.SetTitle(m_strBannerTitle);
+	m_banner.SetCaption(m_strBannerCaption);
 
 	CString strWindowText = m_strBannerTitle;
 	if(m_nDisplayMode == ELDMODE_LIST) strWindowText = PWM_PRODUCT_NAME;
@@ -168,7 +168,7 @@ BOOL CEntryListDlg::OnInitDialog()
 	}
 	else // Expired entries mode
 	{
-		DWORD dwDateNow, dwDate;
+		DWORD dwDate;
 		PW_TIME tNow;
 		BOOL bAdded;
 		DWORD dwInvalid1, dwInvalid2;
@@ -177,7 +177,8 @@ BOOL CEntryListDlg::OnInitDialog()
 		dwInvalid2 = m_pMgr->GetGroupId(PWS_BACKUPGROUP);
 
 		_GetCurrentPwTime(&tNow);
-		dwDateNow = ((DWORD)tNow.shYear << 16) | ((DWORD)tNow.btMonth << 8) | ((DWORD)tNow.btDay & 0xff);
+		DWORD dwDateNow = ((DWORD)tNow.shYear << 16) | ((DWORD)tNow.btMonth << 8) |
+			((DWORD)tNow.btDay & 0xFF);
 
 		for(i = 0; i < m_pMgr->GetNumberOfEntries(); i++)
 		{
@@ -185,6 +186,7 @@ BOOL CEntryListDlg::OnInitDialog()
 			ASSERT(p != NULL); if(p == NULL) continue;
 
 			if((p->uGroupId == dwInvalid1) || (p->uGroupId == dwInvalid2)) continue;
+			if(CPwManager::IsTANEntry(p) == TRUE) continue;
 
 			bAdded = FALSE;
 			if((m_nDisplayMode == ELDMODE_EXPIRED) || (m_nDisplayMode == ELDMODE_EXPSOONEXP))
@@ -200,7 +202,8 @@ BOOL CEntryListDlg::OnInitDialog()
 			{
 				if((m_nDisplayMode == ELDMODE_SOONTOEXP) || (m_nDisplayMode == ELDMODE_EXPSOONEXP))
 				{
-					dwDate = ((DWORD)p->tExpire.shYear << 16) | ((DWORD)p->tExpire.btMonth << 8) | ((DWORD)p->tExpire.btDay & 0xff);
+					dwDate = ((DWORD)p->tExpire.shYear << 16) | ((DWORD)p->tExpire.btMonth << 8) |
+						((DWORD)p->tExpire.btDay & 0xFF);
 
 					if((dwDate >= dwDateNow) && ((dwDate - dwDateNow) <= PWV_SOONTOEXPIRE_DAYS))
 						_AddEntryToList(p, FALSE);

@@ -33,7 +33,7 @@
 #define CHARSPACE_HIGH       112
 
 // Very simple password quality estimation function
-C_FN_SHARE DWORD EstimatePasswordBits(LPCTSTR pszPassword)
+DWORD EstimatePasswordBits(LPCTSTR pszPassword)
 {
 	DWORD i, dwLen, dwCharSpace, dwBits;
 	BOOL bChLower = FALSE, bChUpper = FALSE, bChNumber = FALSE;
@@ -107,7 +107,7 @@ C_FN_SHARE DWORD EstimatePasswordBits(LPCTSTR pszPassword)
 	return dwBits;
 }
 
-C_FN_SHARE BOOL LoadHexKey32(FILE *fp, BYTE *pBuf)
+BOOL LoadHexKey32(FILE *fp, BYTE *pBuf)
 {
 	char buf[65], ch1, ch2;
 	BYTE bt;
@@ -133,7 +133,7 @@ C_FN_SHARE BOOL LoadHexKey32(FILE *fp, BYTE *pBuf)
 	return TRUE;
 }
 
-C_FN_SHARE BOOL SaveHexKey32(FILE *fp, BYTE *pBuf)
+BOOL SaveHexKey32(FILE *fp, BYTE *pBuf)
 {
 	char buf[65], ch1, ch2;
 	int i;
@@ -188,7 +188,7 @@ void ConvertHexToStrEx(BYTE bt, char& ch1, char& ch2)
 	else ch2 = (char)(chq - 10 + 'a');
 }
 
-CPP_FN_SHARE CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags)
+CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags)
 {
 	CString str;
 
@@ -276,3 +276,56 @@ CPP_FN_SHARE CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags)
 
 	return str;
 }
+
+/* CPwErrorInfo::CPwErrorInfo()
+{
+	m_nPwErrorCode = PWE_SUCCESS;
+	m_dwLastError = 0;
+}
+
+void CPwErrorInfo::SetInfo(const std::basic_string<TCHAR>& strText,
+	int nPwErrorCode, BOOL bUseLastError)
+{
+	m_strText = strText;
+	m_nPwErrorCode = nPwErrorCode;
+
+	if(bUseLastError == TRUE) m_dwLastError = GetLastError();
+	else m_dwLastError = 0;
+
+	this->FormatInfo();
+}
+
+void CPwErrorInfo::FormatInfo()
+{
+	std::basic_string<TCHAR> str;
+
+	if(m_strText.size() > 0)
+	{
+		str += m_strText;
+		str += _T("\r\n\r\n");
+	}
+
+	str += PWM_FormatStaticError(m_nPwErrorCode, 0);
+	str += _T("\r\n\r\n");
+
+	if(m_dwLastError != 0)
+	{
+		LPTSTR lpBuffer = NULL;
+
+		if(FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+			NULL, m_dwLastError, 0, (LPTSTR)&lpBuffer, 1, NULL) != 0)
+		{
+			str += lpBuffer;
+		}
+
+		if(lpBuffer != NULL) { LocalFree(lpBuffer); lpBuffer = NULL; }
+	}
+
+	m_strFinal = str;
+}
+
+std::basic_string<TCHAR> CPwErrorInfo::ToString() const
+{
+	return m_strFinal;
+}
+*/

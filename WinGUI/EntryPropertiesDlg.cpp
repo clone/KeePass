@@ -101,13 +101,13 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 	NewGUI_XPButton(&m_btSetToDefaultExpire, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
 	NewGUI_XPButton(&m_btSelDefExpires, IDB_CLOCK, IDB_CLOCK, TRUE);
 
-	CString strTT = TRL("Change expiration time:"); strTT.Remove(_T(':'));
+	CString strTT = TRL("Change expiration time:");
+	strTT.Remove(_T(':')); strTT += _T(".");
 	m_btSelDefExpires.SetTooltipText(strTT);
 
 	m_btSelDefExpires.SetMenu(IDR_EXPIRESMENU, this->m_hWnd, TRUE, NULL, CSize(16, 15));
 
-	strTT = TRL("&Pick One"); strTT.Remove(_T('&'));
-	m_btSelectIcon.SetTooltipText(strTT, TRUE);
+	m_btSelectIcon.SetTooltipText(TRL("Choose an icon."), TRUE);
 	if((m_nIconId >= 0) && (m_pParentIcons != NULL))
 		m_btSelectIcon.SetIcon(m_pParentIcons->ExtractIcon(m_nIconId));
 
@@ -120,7 +120,7 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 		t += CTimeSpan((LONG)m_dwDefaultExpire, 0, 0, 0);
 
 		strTemp.Format(_T(" (%04d-%02d-%02d)"), t.GetYear(), t.GetMonth(), t.GetDay());
-		str += strTemp;
+		str += strTemp + _T(".");
 
 		m_btSetToDefaultExpire.SetTooltipText(str);
 	}
@@ -153,7 +153,8 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY), KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 
 	m_banner.SetTitle(TRL("Mass Modify"));
-	m_banner.SetCaption(TRL("Change fields of all selected entries"));
+	CString strBannerCap = TRL("Change fields of all selected entries"); strBannerCap += _T(".");
+	m_banner.SetCaption(strBannerCap);
 	SetWindowText(TRL("Mass Modify"));
 
 	COleDateTime oleMin = AMS_MIN_OLEDATETIME;
@@ -173,6 +174,7 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 	m_bModExpire = FALSE;
 	m_editTime.EnableWindow(FALSE);
 	m_editDate.EnableWindow(FALSE);
+	m_btSelDefExpires.EnableWindow(FALSE);
 
 	UpdateData(FALSE);
 
@@ -237,22 +239,24 @@ void CEntryPropertiesDlg::OnButtonSelectIcon()
 void CEntryPropertiesDlg::OnCheckModExpire() 
 {
 	UpdateData(TRUE);
-	if(m_bModExpire == TRUE) { m_editTime.EnableWindow(TRUE); m_editDate.EnableWindow(TRUE); }
-	else { m_editTime.EnableWindow(FALSE); m_editDate.EnableWindow(FALSE); }
+
+	m_editTime.EnableWindow(m_bModExpire);
+	m_editDate.EnableWindow(m_bModExpire);
+	m_btSelDefExpires.EnableWindow(m_bModExpire);
 }
 
 void CEntryPropertiesDlg::OnCheckModGroup() 
 {
 	UpdateData(TRUE);
-	if(m_bModGroup == TRUE) m_cbGroups.EnableWindow(TRUE);
-	else m_cbGroups.EnableWindow(FALSE);
+	
+	m_cbGroups.EnableWindow(m_bModGroup);
 }
 
 void CEntryPropertiesDlg::OnCheckModIcon() 
 {
 	UpdateData(TRUE);
-	if(m_bModIcon == TRUE) GetDlgItem(IDC_BUTTON_SELECT_ICON)->EnableWindow(TRUE);
-	else GetDlgItem(IDC_BUTTON_SELECT_ICON)->EnableWindow(FALSE);
+	
+	m_btSelectIcon.EnableWindow(m_bModIcon);
 }
 
 void CEntryPropertiesDlg::OnSetDefaultExpireBtn() 

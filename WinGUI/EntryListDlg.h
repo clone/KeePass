@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#define ELDMODE_UNKNOWN    0
+#define ELDMODE_NONE       0
 #define ELDMODE_EXPIRED    1
 #define ELDMODE_SOONTOEXP  2
 #define ELDMODE_EXPSOONEXP 3

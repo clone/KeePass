@@ -19,11 +19,13 @@
 
 #include "../../KeePassLibCpp/SysDefEx.h"
 
+#include <string>
+
 #define FL_LOCK_SUFFIX       _T(".lock")
 
 // Times in minutes
 #define FL_TIME_RELOCK_AFTER 9
 #define FL_TIME_LOCKING      12
 
-C_FN_SHARE BOOL FileLock_Lock(LPCTSTR lpFile, BOOL bLock);
-C_FN_SHARE BOOL FileLock_IsLocked(LPCTSTR lpFile);
+BOOL FileLock_Lock(LPCTSTR lpFile, BOOL bLock);
+BOOL FileLock_IsLocked(LPCTSTR lpFile, std::basic_string<TCHAR>& strLockingUser);

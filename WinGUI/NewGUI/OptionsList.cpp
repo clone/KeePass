@@ -64,7 +64,8 @@ void COptionsList::InitOptionListEx(CImageList *pImages, BOOL bTwoColumns)
 
 	m_bTwoColumns = bTwoColumns;
 
-	PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_SI_MENU | LVS_EX_FULLROWSELECT);
+	PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_SI_MENU |
+		LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	SetImageList(m_pImages, LVSIL_SMALL);
 
@@ -81,63 +82,17 @@ void COptionsList::InitOptionListEx(CImageList *pImages, BOOL bTwoColumns)
 
 void COptionsList::OnClick(NMHDR* pNMHDR, LRESULT* pResult) 
 {
-	CPoint pointM;
-
-	GetCursorPos(&pointM);
-
 	UNREFERENCED_PARAMETER(pNMHDR);
 
+	CPoint pointM;
+	GetCursorPos(&pointM);
 	ScreenToClient(&pointM);
 
 	UINT nFlags = 0;
 	int nHitItem = HitTest(pointM, &nFlags);
 
 	if(((nFlags & LVHT_ONITEM) != 0) && (nHitItem >= 0))
-	{
-		BOOL *pb = (BOOL *)m_ptrs[nHitItem];
-
-		if(pb != NULL)
-		{
-			*pb = (*pb == TRUE) ? FALSE : TRUE;
-
-			SetListItemCheck(nHitItem, *pb);
-
-			BOOL *pbl = (BOOL *)m_ptrsLinked[nHitItem];
-			if(pbl != NULL)
-			{
-				int n = FindItemPointer((void *)pbl);
-
-				if(n != -1)
-				{
-					switch(m_aLinkType[nHitItem])
-					{
-					case OL_LINK_SAME_TRIGGER_TRUE:
-						if(*pb == TRUE) { *pbl = TRUE; SetListItemCheck(n, TRUE); }
-						break;
-					case OL_LINK_SAME_TRIGGER_FALSE:
-						if(*pb == FALSE) { *pbl = FALSE; SetListItemCheck(n, FALSE); }
-						break;
-					case OL_LINK_SAME_TRIGGER_ALWAYS:
-						*pbl = *pb;
-						SetListItemCheck(n, *pb);
-						break;
-					case OL_LINK_INV_TRIGGER_TRUE:
-						if(*pb == TRUE) { *pbl = FALSE; SetListItemCheck(n, FALSE); }
-						break;
-					case OL_LINK_INV_TRIGGER_FALSE:
-						if(*pb == FALSE) { *pbl = TRUE; SetListItemCheck(n, TRUE); }
-						break;
-					case OL_LINK_INV_TRIGGER_ALWAYS:
-						*pbl = (*pb == TRUE) ? FALSE : TRUE;
-						SetListItemCheck(n, *pbl);
-						break;
-					default:
-						break;
-					}
-				}
-			}
-		}
-	}
+		ToggleItem(nHitItem);
 
 	*pResult = 0;
 }
@@ -227,4 +182,84 @@ void COptionsList::AddCheckItemEx(LPCTSTR lpItemText, LPCTSTR lpSubItemText, BOO
 	lvi.cchTextMax = static_cast<int>(_tcslen(lpSubItemText));
 
 	SetItem(&lvi);
+}
+
+BOOL COptionsList::PreTranslateMessage(MSG* pMsg)
+{
+	ASSERT(pMsg != NULL);
+
+	if(pMsg->message == WM_KEYDOWN)
+	{
+		if(pMsg->wParam == VK_SPACE)
+		{
+			ToggleSelectedItems();
+			return TRUE;
+		}
+	}
+	else if(pMsg->message == WM_KEYUP)
+	{
+		if(pMsg->wParam == VK_SPACE) return TRUE; // Ignore
+	}
+
+	return CListCtrl::PreTranslateMessage(pMsg);
+}
+
+void COptionsList::ToggleItem(int nItem)
+{
+	ASSERT((nItem >= 0) && (nItem < (int)m_ptrs.size()));
+	if((nItem < 0) || (nItem >= (int)m_ptrs.size())) return;
+
+	BOOL *pb = (BOOL *)m_ptrs[nItem];
+
+	if(pb != NULL)
+	{
+		*pb = (*pb == TRUE) ? FALSE : TRUE;
+
+		SetListItemCheck(nItem, *pb);
+
+		BOOL *pbl = (BOOL *)m_ptrsLinked[nItem];
+		if(pbl != NULL)
+		{
+			int n = FindItemPointer((void *)pbl);
+
+			if(n != -1)
+			{
+				switch(m_aLinkType[nItem])
+				{
+				case OL_LINK_SAME_TRIGGER_TRUE:
+					if(*pb == TRUE) { *pbl = TRUE; SetListItemCheck(n, TRUE); }
+					break;
+				case OL_LINK_SAME_TRIGGER_FALSE:
+					if(*pb == FALSE) { *pbl = FALSE; SetListItemCheck(n, FALSE); }
+					break;
+				case OL_LINK_SAME_TRIGGER_ALWAYS:
+					*pbl = *pb;
+					SetListItemCheck(n, *pb);
+					break;
+				case OL_LINK_INV_TRIGGER_TRUE:
+					if(*pb == TRUE) { *pbl = FALSE; SetListItemCheck(n, FALSE); }
+					break;
+				case OL_LINK_INV_TRIGGER_FALSE:
+					if(*pb == FALSE) { *pbl = TRUE; SetListItemCheck(n, TRUE); }
+					break;
+				case OL_LINK_INV_TRIGGER_ALWAYS:
+					*pbl = (*pb == TRUE) ? FALSE : TRUE;
+					SetListItemCheck(n, *pbl);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+}
+
+void COptionsList::ToggleSelectedItems()
+{
+	for(DWORD i = 0; i < static_cast<DWORD>(m_ptrs.size()); ++i)
+	{
+		UINT uState = this->GetItemState(static_cast<int>(i), LVIS_SELECTED);
+		if((uState & LVIS_SELECTED) != 0)
+			ToggleItem(static_cast<int>(i));
+	}
 }

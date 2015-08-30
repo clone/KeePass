@@ -190,22 +190,22 @@ BOOL CAddEntryDlg::OnInitDialog()
 	NewGUI_XPButton(&m_btHelp, IDB_HELP_SMALL_POPUP, IDB_HELP_SMALL_POPUP, TRUE);
 
 	m_btHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
-	CString strTT = TRL("Hide &Passwords Behind Asterisks (***)"); strTT.Remove(_T('&'));
-	m_btHidePw.SetTooltipText(strTT, TRUE);
+	m_btHidePw.SetTooltipText(TRL("Hide passwords behind asterisks (***)."), TRUE);
 
 	m_btRandomPw.SetTooltipText(TRL("Generate a random password..."));
 	m_btSetAttachment.SetTooltipText(TRL("Open file and set as attachment..."));
 	m_btSaveAttachment.SetTooltipText(TRL("Save attached file to disk..."));
-	m_btRemoveAttachment.SetTooltipText(TRL("Remove the currently attached file"));
+	CString strRemoveTT = TRL("Remove the currently attached file"); strRemoveTT += _T(".");
+	m_btRemoveAttachment.SetTooltipText(strRemoveTT);
 
-	strTT = TRL("Change expiration time:"); strTT.Remove(_T(':'));
+	CString strTT = TRL("Change expiration time:");
+	strTT.Remove(_T(':')); strTT += _T(".");
 	m_btSelDefExpires.SetTooltipText(strTT);
 
 	m_btSelDefExpires.SetMenu(IDR_EXPIRESMENU, this->m_hWnd, TRUE, NULL, CSize(16, 15));
 	m_btHelp.SetMenu(IDR_ENTRYHELP_MENU, this->m_hWnd, TRUE, NULL, CSize(16, 16));
 
-	strTT = TRL("&Pick One"); strTT.Remove(_T('&'));
-	m_btPickIcon.SetTooltipText(strTT, TRUE);
+	m_btPickIcon.SetTooltipText(TRL("Choose an icon."), TRUE);
 	if((m_nIconId >= 0) && (m_pParentIcons != NULL))
 		m_btPickIcon.SetIcon(m_pParentIcons->ExtractIcon(m_nIconId));
 
@@ -218,7 +218,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 		t += CTimeSpan((LONG)m_dwDefaultExpire, 0, 0, 0);
 
 		strTemp.Format(_T(" (%04d-%02d-%02d)"), t.GetYear(), t.GetMonth(), t.GetDay());
-		str += strTemp;
+		str += strTemp + _T(".");
 
 		m_btSetToDefaultExpire.SetTooltipText(str);
 	}
@@ -275,13 +275,13 @@ BOOL CAddEntryDlg::OnInitDialog()
 	if(m_bEditMode == FALSE)
 	{
 		m_banner.SetTitle(TRL("Add Entry"));
-		m_banner.SetCaption(TRL("Add a new password entry"));
+		m_banner.SetCaption(TRL("Create a new password entry."));
 		SetWindowText(TRL("Add Entry"));
 	}
 	else
 	{
 		m_banner.SetTitle(TRL("Edit Entry"));
-		m_banner.SetCaption(TRL("Modify a password entry"));
+		m_banner.SetCaption(TRL("Modify existing password entry."));
 		SetWindowText(TRL("Edit Entry"));
 	}
 
@@ -417,7 +417,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	LPTSTR lpTemp = m_pEditPw.GetPassword();
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lpTemp);
-	m_pEditPw.DeletePassword(lpTemp); lpTemp = NULL;
+	CSecureEditEx::DeletePassword(lpTemp); lpTemp = NULL;
 
 	CString strTest;
 	m_btRandomPw.GetWindowText(strTest);
@@ -464,9 +464,9 @@ void CAddEntryDlg::OnOK()
 	if(m_editDate.GetWindowTextLength() == 0) m_editDate.SetDate(2999, 12, 28);
 	if(m_editTime.GetWindowTextLength() == 0) m_editTime.SetTime(23, 59, 59);
 
-	ASSERT(m_lpPassword == NULL); if(m_lpPassword != NULL) CSecureEditEx::DeletePassword(m_lpPassword);
+	if(m_lpPassword != NULL) CSecureEditEx::DeletePassword(m_lpPassword);
 	m_lpPassword = m_pEditPw.GetPassword();
-	ASSERT(m_lpRepeatPw == NULL); if(m_lpRepeatPw != NULL) CSecureEditEx::DeletePassword(m_lpRepeatPw);
+	if(m_lpRepeatPw != NULL) CSecureEditEx::DeletePassword(m_lpRepeatPw);
 	m_lpRepeatPw = m_pRepeatPw.GetPassword();
 
 	CString strGroupTest;
@@ -576,21 +576,21 @@ void CAddEntryDlg::OnRandomPwBtn()
 
 	UpdateData(TRUE);
 
-	dlg.InitEx(1, m_bStars);
+	dlg.InitEx(1, m_bStars, FALSE);
 
 	if(dlg.DoModal() == IDOK)
 	{
 		LPTSTR lpPassword = dlg.GetGeneratedPassword();
-		m_pEditPw.SetPassword(lpPassword);
+		m_pEditPw.SetPassword(lpPassword); // Allows NULL
 		m_pRepeatPw.SetPassword(lpPassword);
 		CSecureEditEx::DeletePassword(lpPassword); lpPassword = NULL;
 
 		UpdateData(FALSE);
 
-		LPTSTR lp = m_pEditPw.GetPassword();
-		NewGUI_ShowQualityMeter(&m_cPassQuality,
-			GetDlgItem(IDC_STATIC_PASSBITS), lp);
-		CSecureEditEx::DeletePassword(lp); lp = NULL;
+		LPTSTR lpCur = m_pEditPw.GetPassword();
+		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS),
+			lpCur);
+		CSecureEditEx::DeletePassword(lpCur); lpCur = NULL;
 	}
 }
 
@@ -766,7 +766,7 @@ void CAddEntryDlg::UpdateControlsStatus()
 		m_btRemoveAttachment.EnableWindow(TRUE);
 	}
 
-	if(m_strTitle == CString(PWS_TAN_ENTRY)) m_btSetAttachment.EnableWindow(FALSE); // Unchangable
+	if(m_strTitle == PWS_TAN_ENTRY) m_btSetAttachment.EnableWindow(FALSE); // Unchangable
 
 	if(m_bExpires == TRUE)
 	{
@@ -788,7 +788,7 @@ void CAddEntryDlg::OnChangeEditPassword()
 
 	LPTSTR lp = m_pEditPw.GetPassword();
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lp);
-	m_pEditPw.DeletePassword(lp); lp = NULL;
+	CSecureEditEx::DeletePassword(lp); lp = NULL;
 }
 
 void CAddEntryDlg::OnCheckExpires() 
@@ -886,7 +886,8 @@ void CAddEntryDlg::OnReNotesClickLink(NMHDR* pNMHDR, LRESULT* pResult)
 
 		m_reNotes.SetSel(cr); // Pop current user selection
 
-		if(strSelectedURL.GetLength() != 0) OpenUrlEx(strSelectedURL);
+		if(strSelectedURL.GetLength() != 0)
+			OpenUrlEx(strSelectedURL, this->m_hWnd);
 	}
 
 	*pResult = 0;

@@ -22,48 +22,76 @@
 
 #include "../../KeePassLibCpp/SysDefEx.h"
 
+#include <string>
+
 #define OLF_OPEN 0
 #define OLF_PRINT 1
 #define OLF_EXPLORE 2
 
 #define KPSW_SHOWDEFAULT SW_SHOWDEFAULT
 
+// The following definitions must be at least 256, maximum 32767
+#define WU_MAX_USER_LEN    1024
+#define WU_MAX_MACHINE_LEN 1024
+
+#define CFN_CLIPBOARD_VIEWER_IGNORE _T("Clipboard Viewer Ignore")
+
 #ifndef _WIN32_WCE
-C_FN_SHARE void CopyStringToClipboard(const TCHAR *lptString);
-C_FN_SHARE void ClearClipboardIfOwner();
+void CopyStringToClipboard(const TCHAR *lptString);
+void ClearClipboardIfOwner();
 
 void RegisterOwnClipboardData(unsigned char* pData, unsigned long dwDataSize);
 
 // Thanks to Gabe Martin for the contribution of the following
 // two secure clipboard functions!
 // http://sourceforge.net/tracker/index.php?func=detail&aid=1102906&group_id=95013&atid=609910
-C_FN_SHARE BOOL MakeClipboardDelayRender(HWND hOwner, HWND *phNextCB);
-C_FN_SHARE void CopyDelayRenderedClipboardData(const TCHAR *lptString);
+BOOL MakeClipboardDelayRender(HWND hOwner, HWND *phNextCB);
+void CopyDelayRenderedClipboardData(const TCHAR *lptString);
+
+void SetClipboardIgnoreFormat();
 #endif
 
-CPP_FN_SHARE CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile);
-CPP_FN_SHARE CString GetShortestAbsolutePath(LPCTSTR lpFilePath);
+CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile);
+CString GetShortestAbsolutePath(LPCTSTR lpFilePath);
 
-C_FN_SHARE BOOL GetRegKeyEx(HKEY hkey, LPCTSTR lpSubKey, LPTSTR lpRetData);
-C_FN_SHARE BOOL OpenUrlInNewBrowser(LPCTSTR lpURL);
-C_FN_SHARE BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser);
+BOOL GetRegKeyEx(HKEY hkey, LPCTSTR lpSubKey, LPTSTR lpRetData);
+BOOL OpenUrlInNewBrowser(LPCTSTR lpURL);
+BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser);
 
-C_FN_SHARE void OpenUrlEx(LPCTSTR lpURL);
+// If hParent is not NULL, the function will show an error message if
+// the URL cannot be opened
+void OpenUrlEx(LPCTSTR lpURL, HWND hParent);
 
-C_FN_SHARE BOOL _FileAccessible(LPCTSTR lpFile);
-C_FN_SHARE BOOL _FileWritable(LPCTSTR lpFile);
+// Internal functions
+void OpenUrlShellExec(LPCTSTR lpURL, HWND hParent);
+void OpenUrlProcess(LPCTSTR lpURL, HWND hParent);
 
+void WU_SysShellExecute(LPCTSTR lpFile, LPCTSTR lpParameters, HWND hParent);
+
+BOOL _FileAccessible(LPCTSTR lpFile);
+BOOL _FileWritable(LPCTSTR lpFile);
+
+// Must be exported:
 C_FN_SHARE int _OpenLocalFile(LPCTSTR szFile, int nMode);
-
 C_FN_SHARE BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD dwBufLen);
 
-C_FN_SHARE BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile);
+BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile);
 
-C_FN_SHARE UINT TWinExec(LPCTSTR lpCmdLine, WORD uCmdShow);
+UINT TWinExec(LPCTSTR lpCmdLine, WORD uCmdShow);
 
-C_FN_SHARE BOOL WU_IsWin9xSystem();
+BOOL WU_IsWin9xSystem();
+BOOL WU_SupportsMultiLineTooltips();
+
+std::basic_string<TCHAR> WU_GetTempFile();
+std::basic_string<TCHAR> WU_GetUserName();
 
 // BOOL ContainsChildWindow(HWND hWndContainer, LPCTSTR lpChildWindowText);
 // BOOL CALLBACK CcwEnumChildProc(HWND hWnd, LPARAM lParam);
+
+void SafeActivateNextWindow(HWND hWndBase);
+
+HWND WU_ShowWindowInTaskbar(HWND hWndShow, HWND hParent, BOOL bShow);
+
+std::basic_string<TCHAR> WU_FormatSystemMessage(DWORD dwLastErrorCode);
 
 #endif

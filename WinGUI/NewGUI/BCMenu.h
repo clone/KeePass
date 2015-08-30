@@ -99,7 +99,7 @@ typedef enum {BCMENU_NONE, BCMENU_HEAD, BCMENU_TAIL, BCMENU_BOTH} BC_Seperator;
 #endif
 
 
-class CPP_CLASS_SHARE BCMenu : public CMenu
+class BCMenu : public CMenu
 {
 	DECLARE_DYNAMIC( BCMenu )
 public:
@@ -144,7 +144,7 @@ public:
 	BOOL InsertODMenuW(UINT nPosition,wchar_t *lpstrText,UINT nFlags = MF_OWNERDRAW,UINT nID = 0,int nIconNormal = -1);  
 	BOOL InsertODMenuA(UINT nPosition,LPCSTR lpstrText,UINT nFlags,UINT nID,CImageList *il,int xoffset);
 	BOOL InsertODMenuW(UINT nPosition,wchar_t *lpstrText,UINT nFlags,UINT nID,CImageList *il,int xoffset);
-	
+
 	// functions for modifying a menu option, use the ModifyODMenu call (see above define)
 	BOOL ModifyODMenuA(const char *lpstrText,UINT nID=0,int nIconNormal=-1);
 	BOOL ModifyODMenuA(const char *lpstrText,UINT nID,CImageList *il,int xoffset);
@@ -162,7 +162,7 @@ public:
 	// courtesy of Warren Stevens
 	BOOL ModifyODMenuA(const char *lpstrText,UINT nID,COLORREF fill,COLORREF border,int hatchstyle=-1,CSize *pSize=NULL);
 	BOOL ModifyODMenuW(wchar_t *lpstrText,UINT nID,COLORREF fill,COLORREF border,int hatchstyle=-1,CSize *pSize=NULL);
-	
+
 	// for deleting and removing menu options
 	BOOL	RemoveMenu(UINT uiId,UINT nFlags);
 	BOOL	DeleteMenu(UINT uiId,UINT nFlags);
@@ -231,9 +231,9 @@ public:
 	void SetBitmapBackground(COLORREF color);
 	void UnSetBitmapBackground(void);
 	// obsolete functions for setting how menu images are dithered for disabled menu options
-	BOOL GetDisableOldStyle(void);
+	/* BOOL GetDisableOldStyle(void);
 	void SetDisableOldStyle(void);
-	void UnSetDisableOldStyle(void);
+	void UnSetDisableOldStyle(void); */
 	static COLORREF LightenColor(COLORREF col,double factor);
 	static COLORREF DarkenColor(COLORREF col,double factor);
 

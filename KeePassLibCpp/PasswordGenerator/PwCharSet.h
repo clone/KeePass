@@ -32,6 +32,7 @@
 #define PDCS_LOWER_VOWELS     L"aeiou"
 #define PDCS_PUNCTUATION      L",.;:"
 #define PDCS_BRACKETS         L"[]{}()<>"
+#define PDCS_PRINTASCIISPEC   L"!\"#$%&'()*+,-./:;<=>?[\\]^_{|}~"
 #define PDCS_LOWER_HEX        L"0123456789abcdef"
 #define PDCS_UPPER_HEX        L"0123456789ABCDEF"
 
@@ -47,10 +48,12 @@ public:
 	PwCharSet(LPCWSTR lpCharacters);
 	~PwCharSet();
 
+	void Clear();
+
 	unsigned int Size() const;
 
-	bool Contains(WCHAR ch);
-	bool Contains(LPCWSTR lpCharacters);
+	bool Contains(WCHAR ch) const;
+	bool Contains(LPCWSTR lpCharacters) const;
 
 	WCHAR GetAt(unsigned int uPos) const;
 

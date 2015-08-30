@@ -23,7 +23,7 @@
 #pragma warning(push)
 #pragma warning(disable: 4244)
 
-C_FN_SHARE void ARCFourCrypt(UINT8 *pBuf, UINT32 uBufLen, const UINT8 *pKey, UINT32 uKeyLen)
+void ARCFourCrypt(UINT8 *pBuf, UINT32 uBufLen, const UINT8 *pKey, UINT32 uKeyLen)
 {
 	UINT8 S[256];
 	UINT8 i, j, t;

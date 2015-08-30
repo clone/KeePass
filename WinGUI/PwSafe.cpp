@@ -23,9 +23,9 @@
 
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "../KeePassLibCpp/Util/MemUtil.h"
+#include "Util/PrivateConfigEx.h"
 #include "Util/CmdLine/CmdArgs.h"
 #include "Util/CmdLine/Executable.h"
-#include "Util/PrivateConfig.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -105,7 +105,7 @@ BOOL CPwSafeApp::InitInstance()
 	CPwSafeDlg dlg;
 	m_pMainWnd = &dlg;
 
-	CPrivateConfig *pc = new CPrivateConfig(FALSE);
+	CPrivateConfigEx *pc = new CPrivateConfigEx(FALSE);
 	if(pc != NULL)
 	{
 		dlg.m_bCheckForInstance = pc->GetBool(PWMKEY_SINGLEINSTANCE, FALSE);

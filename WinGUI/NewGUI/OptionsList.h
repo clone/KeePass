@@ -61,11 +61,14 @@ public:
 	void AddCheckItemEx(LPCTSTR lpItemText, LPCTSTR lpSubItemText, BOOL *pValueStorage, BOOL *pLinkedValue, int nLinkType);
 
 	//{{AFX_VIRTUAL(COptionsList)
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	//}}AFX_VIRTUAL
 
 private:
 	void SetListItemCheck(int nItem, BOOL bCheck);
 	int FindItemPointer(void *p);
+	void ToggleItem(int nItem);
+	void ToggleSelectedItems();
 
 	BOOL m_bTwoColumns;
 

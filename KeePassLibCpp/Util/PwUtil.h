@@ -21,16 +21,36 @@
 #define ___PW_UTIL_H___
 
 #include "../SysDefEx.h"
+#include <string>
 
 // Very simple password quality estimation function
-C_FN_SHARE DWORD EstimatePasswordBits(LPCTSTR pszPassword);
+DWORD EstimatePasswordBits(LPCTSTR pszPassword);
 
-C_FN_SHARE BOOL LoadHexKey32(FILE *fp, BYTE *pBuf);
-C_FN_SHARE BOOL SaveHexKey32(FILE *fp, BYTE *pBuf);
+BOOL LoadHexKey32(FILE *fp, BYTE *pBuf);
+BOOL SaveHexKey32(FILE *fp, BYTE *pBuf);
 
 BOOL ConvertStrToHexEx(char ch1, char ch2, BYTE& bt);
 void ConvertHexToStrEx(BYTE bt, char& ch1, char& ch2);
 
-CPP_FN_SHARE CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags);
+/* class CPwErrorInfo
+{
+public:
+	CPwErrorInfo();
+	void SetInfo(const std::basic_string<TCHAR>& strText, int nPwErrorCode,
+		BOOL bUseLastError);
+
+	std::basic_string<TCHAR> ToString() const;
+
+private:
+	void FormatInfo();
+
+	std::basic_string<TCHAR> m_strText;
+	int m_nPwErrorCode;
+	DWORD m_dwLastError;
+
+	std::basic_string<TCHAR> m_strFinal;
+}; */
+
+CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags);
 
 #endif // ___PW_UTIL_H___

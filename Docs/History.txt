@@ -1,3 +1,112 @@
+07/10/12 - 1.09
+- Added option to permute passwords generated using a pattern
+  (this allows generating passwords that follow complex rules)
+- Added ability to specify custom character sets in password
+  generation patterns
+- Implemented new URL opening method (as workaround for buggy
+  Firefox file handler registration on some systems)
+- Documents can now be opened using cmd:// URLs (shell execute)
+- Added support for CF_CLIPBOARD_VIEWER_IGNORE clipboard format
+  (clipboard viewers/extenders compliant with this format
+  ignore data copied by KeePass)
+- Improved window position/size/state handling (added support
+  for Win+M / 'Show Desktop' command, window managers, ...)
+- Improved window positioning (PX=0/PY=0 works now)
+- Added -readonly command line switch; if present, the database
+  will be opened in read-only mode
+- Added ability to specify the characters a TAN can consist of
+- KeePass now stores the user and machine name in .lock files,
+  so it can show who's currently editing the file when trying
+  to open a locked file
+- Added support for subitem infotips in various list controls
+  (languages list, export options, plugins, ...)
+- Added support for toggling items in option lists by pressing
+  the Spacebar key
+- Installer can now associate .kdb files with KeePass
+- The password generator now remembers the last used settings
+  (even if they are not saved manually as a profile)
+- Network administrators: cascading configuration model now
+  uses a separate enforced configuration file
+- Improved configuration saving/loading (improved behavior
+  under Windows Vista when using the installer, improved out of
+  the box support for installation by admin / usage by user,
+  better limited user account handling, ...)
+- Added pattern placeholder 'S' to generate printable 7-bit
+  ASCII characters
+- Added pattern placeholder 'b' to generate brackets
+- Added quick key file accessibility test in the password
+  dialog (shows helpful system message on error)
+- Temporary files are now named randomly
+- The password generator dialog is now shown in the Windows
+  taskbar if the main window is minimized to tray
+- KeePass now offers to open the help file when importing a CSV
+  file fails
+- The 'About' dialog is now automatically closed when clicking
+  an hyperlink
+- Expired/used TAN entries are not shown in the expired entries
+  dialog any more
+- Expired entries are not shown any more in the auto-type entry
+  selection dialog
+- Improved password generator profile management (UI)
+- KeePass now shows a descriptive system error message if
+  executing a cmd:// URL fails
+- Improved text in password generator window to allow easier
+  translation
+- Changed password pattern placeholders to support ANSI
+- '-' is now treated as TAN character by default, not as
+  separator any more
+- The main window title now shows 'File - KeePass Password
+  Safe' instead of 'KeePass Password Safe [File]'; improved
+  tooltip text for tray icon
+- Unhiding the master password now requires unsafe operations
+  permission
+- After searching, the first entry is automatically selected
+  (but the quick-search box still has the focus)
+- The option to automatically open the last database is enabled
+  now by default
+- Database is now marked as modified when generating a password
+- Minimizing to tray is now enabled by default
+- Renamed some menu commands to be more consistent with Windows
+- Removed duplicate message box that appeared when checking for
+  updates and a new version is available
+- Removed deprecated API exports; new API must be used by
+  plugins from now on
+- Main window does not move any more when trying to go below
+  the minimum size
+- UI now mostly follows the Windows Vista UI text guidelines
+- Improved high ANSI characters support in command lines
+- Improved installer (added start menu link to the CHM help
+  file, publisher information, ...)
+- KeePassLibC: Improved 64-bit compatibility
+- The expired entries dialog is not shown any more when the
+  database is unlocked because of a global auto-type operation
+- "Tray/Untray" menu item is now correctly disabled when a
+  dialog is open
+- 'New' and 'Open' menu commands are now also enabled when the
+  workspace is locked
+- Unified dialog elements
+- Fixed various problems that occured when KeePass was
+  minimized to tray ('--exit-all' not working, problems at
+  Windows shutdown, IPC problems, ...)
+- Fixed a bug in the tray icon third-party component that could
+  leave an unresponsive button in the Windows task bar
+- The tray icon does not freeze any more when the Windows
+  workspace is locked
+- Fixed various drawing bugs that occured when disabling the
+  'Display images on buttons' option
+- The button tooltips in the password generator dialog are
+  translated correctly now
+- The hot key to bring the KeePass window to front now also
+  works when the 'Disable all auto-type features' option is
+  enabled
+- KeePass now selects the correct group when navigating to a
+  group after performing a search
+- Jumping to an entry from the expired entries dialog now also
+  works correctly when unlocking a database
+- The password list is now updated correctly after
+  drag&dropping entries into another group (view restoration)
+- Various other minor improvements and bugfixes
+
 07/09/01 - 1.08
 - Completely new password generator; it now supports saving
   options as profiles, password generation based on patterns,

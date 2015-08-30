@@ -78,11 +78,11 @@ BOOL CDbSettingsDlg::OnInitDialog()
 
 	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(&m_btCalcRounds, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE);
+	NewGUI_XPButton(&m_btCalcRounds, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
 
 	CString str;
 	m_btCalcRounds.GetWindowText(str);
-	m_btCalcRounds.SetTooltipText(str);
+	m_btCalcRounds.SetTooltipText(str + _T("."));
 	m_btCalcRounds.SetWindowText(_T(""));
 
 	str = TRL("Open &Help File"); str.Remove(_T('&'));

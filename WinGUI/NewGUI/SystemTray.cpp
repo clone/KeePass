@@ -1,3 +1,6 @@
+// Modified version of Chris Maunder's system tray class.
+// Changes are marked with "DR:".
+
 /////////////////////////////////////////////////////////////////////////////
 // SystemTray.cpp : implementation file
 //
@@ -102,9 +105,11 @@ IMPLEMENT_DYNAMIC(CSystemTray, CWnd)
 const UINT CSystemTray::m_nTimerID    = 4567;
 UINT CSystemTray::m_nMaxTooltipLength  = 64;     // This may change...
 const UINT CSystemTray::m_nTaskbarCreatedMsg = ::RegisterWindowMessage(_T("TaskbarCreated"));
-CWnd  CSystemTray::m_wndInvisible;
 
-// Added by D. Reichl to avoid level 4 compiler warnings
+// DR: Changed CWnd to CMsgRelayWnd to allow message relaying
+CMsgRelayWnd CSystemTray::m_wndInvisible;
+
+// DR: Added pragmas to avoid level 4 compiler warnings
 #pragma warning(push)
 #pragma warning(disable: 4100)
 
@@ -219,6 +224,8 @@ BOOL CSystemTray::Create(CWnd* pParent, UINT uCallbackMessage, LPCTSTR szToolTip
     m_tnd.hIcon  = icon;
     m_tnd.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
     m_tnd.uCallbackMessage = uCallbackMessage;
+
+	// DR: Changed _tcsncpy to _tcsncpy_s (secure CRT function)
     _tcsncpy_s(m_tnd.szTip, _countof(m_tnd.szTip), szToolTip, m_nMaxTooltipLength-1);
 
 #ifdef SYSTEMTRAY_USEW2K
@@ -244,6 +251,7 @@ BOOL CSystemTray::Create(CWnd* pParent, UINT uCallbackMessage, LPCTSTR szToolTip
 
         m_tnd.uFlags |= NIF_INFO;
 
+		// DR: Changed _tcsncpy to _tcsncpy_s (secure CRT function)
         _tcsncpy_s(m_tnd.szInfo, _countof(m_tnd.szInfo), szBalloonTip, 255);
         if (szBalloonTitle)
             _tcsncpy_s(m_tnd.szInfoTitle, _countof(m_tnd.szInfoTitle), szBalloonTitle, 63);
@@ -291,6 +299,9 @@ CSystemTray::~CSystemTray()
     RemoveIcon();
     m_IconList.RemoveAll();
     DestroyWindow();
+
+	// DR: Added the following:
+	m_wndInvisible.DestroyWindow();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -506,7 +517,7 @@ BOOL CSystemTray::SetIconList(HICON* pHIconList, UINT nNumIcons)
 
 BOOL CSystemTray::Animate(UINT nDelayMilliSeconds, int nNumSeconds /*=-1*/)
 {
-	if (m_IconList.GetSize() == 0)
+	if (m_IconList.GetSize() == 0) // DR: Changed IsEmpty() to GetSize() == 0
 		return FALSE;
 
     StopAnimation();
@@ -561,6 +572,8 @@ BOOL CSystemTray::SetTooltipText(LPCTSTR pszTip)
         return FALSE;
 
     m_tnd.uFlags = NIF_TIP;
+
+	// DR: Changed _tcsncpy to _tcsncpy_s (secure CRT function)
     _tcsncpy_s(m_tnd.szTip, _countof(m_tnd.szTip), pszTip, m_nMaxTooltipLength-1);
 
     if (m_bHidden)
@@ -649,6 +662,7 @@ BOOL CSystemTray::ShowBalloon(LPCTSTR szText,
 
 
     m_tnd.uFlags = NIF_INFO;
+	// DR: Changed _tcsncpy to _tcsncpy_s (secure CRT function)
     _tcsncpy_s(m_tnd.szInfo, _countof(m_tnd.szInfo), szText, 256);
     if (szTitle)
         _tcsncpy_s(m_tnd.szInfoTitle, _countof(m_tnd.szInfoTitle), szTitle, 64);
@@ -788,6 +802,7 @@ BEGIN_MESSAGE_MAP(CSystemTray, CWnd)
     ON_REGISTERED_MESSAGE(CSystemTray::m_nTaskbarCreatedMsg, OnTaskbarCreated)
 END_MESSAGE_MAP()
 
+// DR: Changed UINT to WPARAM
 void CSystemTray::OnTimer(WPARAM nIDEvent) 
 {
     if (nIDEvent != m_uIDTimer)
@@ -826,12 +841,14 @@ void CSystemTray::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 
     if (uFlags == SPI_SETWORKAREA)
     {
-        m_bShowIconPending = !m_bHidden;
-        InstallIconPending();	
+		// DR: Commented out the following two lines:
+        // m_bShowIconPending = !m_bHidden;
+        // InstallIconPending();
     }
 }
 #endif
 
+// DR: Changed UINT/LONG to WPARAM/LPARAM
 LRESULT CSystemTray::OnTrayNotification(WPARAM wParam, LPARAM lParam) 
 {
     //Return quickly if its not for this tray icon
@@ -942,7 +959,7 @@ void CSystemTray::InstallIconPending()
     // If it's STILL hidden, then have another go next time...
     m_bShowIconPending = m_bHidden;
 
-    // ASSERT(m_bHidden == FALSE);
+    // ASSERT(m_bHidden == FALSE); // DR: Commented out the ASSERT
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1083,6 +1100,9 @@ BOOL CSystemTray::RemoveTaskbarIcon(CWnd* pWnd)
 			return FALSE;
     }
 
+    // DR: Added the following line (see MSDN documentation of ::SetParent)
+    pWnd->ModifyStyle(WS_POPUP, WS_CHILD);
+
     pWnd->SetParent(&m_wndInvisible);
 
     return TRUE;
@@ -1106,7 +1126,8 @@ void CSystemTray::MinimiseToTray(CWnd* pWnd, BOOL bForceAnimation /*= FALSE*/)
 #endif
 }
 
-void CSystemTray::MaximiseFromTray(CWnd* pWnd, BOOL bForceAnimation /*= TRUE*/)
+// DR: Changed signature to allow restoring to maximized mode
+void CSystemTray::MaximiseFromTray(CWnd* pWnd, BOOL bForceAnimation, BOOL bMaximize)
 {
 #ifndef _WIN32_WCE
     if (bForceAnimation || GetDoWndAnimation())
@@ -1123,6 +1144,15 @@ void CSystemTray::MaximiseFromTray(CWnd* pWnd, BOOL bForceAnimation /*= TRUE*/)
     else
         pWnd->SetParent(NULL);
 
+    // DR: Added the following line (see MSDN documentation of ::SetParent)
+    pWnd->ModifyStyle(WS_CHILD, WS_POPUP);
+
+	// DR: Added the following code
+	if(bMaximize == TRUE)
+	{
+		pWnd->ShowWindow(SW_MAXIMIZE);
+	}
+
     pWnd->ModifyStyle(0, WS_VISIBLE);
     pWnd->RedrawWindow(NULL, NULL, RDW_UPDATENOW | RDW_ALLCHILDREN | RDW_FRAME |
                                    RDW_INVALIDATE | RDW_ERASE);
@@ -1135,4 +1165,5 @@ void CSystemTray::MaximiseFromTray(CWnd* pWnd, BOOL bForceAnimation /*= TRUE*/)
 #endif
 }
 
+// DR: End warning pragmas
 #pragma warning(pop)

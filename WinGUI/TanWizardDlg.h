@@ -24,6 +24,8 @@
 #include "NewGUI/KCSideBannerWnd.h"
 #include "../KeePassLibCpp/SysDefEx.h"
 
+#define TW_DEFAULTCHARS _T("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")
+
 /////////////////////////////////////////////////////////////////////////////
 
 class CTanWizardDlg : public CDialog
@@ -33,6 +35,10 @@ public:
 
 	CKCSideBannerWnd m_banner;
 
+private:
+	void CleanUpEx();
+
+public:
 	//{{AFX_DATA(CTanWizardDlg)
 	enum { IDD = IDD_TANWIZARD_DLG };
 	CXPStyleButtonST	m_btHelp;
@@ -41,6 +47,7 @@ public:
 	CString	m_strTans;
 	BOOL	m_bAssignNumbers;
 	DWORD	m_dwStartNumber;
+	CString m_strTANChars;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CTanWizardDlg)
@@ -57,7 +64,6 @@ protected:
 	afx_msg void OnCheckNumbering();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-public:
 };
 
 //{{AFX_INSERT_LOCATION}}

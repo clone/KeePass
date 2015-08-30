@@ -68,7 +68,9 @@ BOOL CPermissionDlg::OnInitDialog()
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEYHOLE),
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("Incoming IPC Request"));
-	m_banner.SetCaption(TRL("An application requests access through inter-process communication"));
+	CString strIPCCap = TRL("An application requests access through inter-process communication");
+	strIPCCap += _T(".");
+	m_banner.SetCaption(strIPCCap);
 
 	m_btnOK.EnableWindow(FALSE);
 	m_btnReadOnly.EnableWindow(FALSE);

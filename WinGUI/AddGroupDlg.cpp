@@ -78,8 +78,7 @@ BOOL CAddGroupDlg::OnInitDialog()
 	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 
-	CString strTT = TRL("&Pick One"); strTT.Remove(_T('&'));
-	m_btSetIcon.SetTooltipText(strTT, TRUE);
+	m_btSetIcon.SetTooltipText(TRL("Choose an icon."), TRUE);
 	if((m_nIconId >= 0) && (m_pParentImageList != NULL))
 		m_btSetIcon.SetIcon(m_pParentImageList->ExtractIcon(m_nIconId));
 
@@ -90,13 +89,13 @@ BOOL CAddGroupDlg::OnInitDialog()
 	if(m_bEditMode == FALSE)
 	{
 		m_banner.SetTitle(TRL("Add Group"));
-		m_banner.SetCaption(TRL("Add a new password group"));
+		m_banner.SetCaption(TRL("Create a new password group."));
 		SetWindowText(TRL("Add Group"));
 	}
 	else
 	{
 		m_banner.SetTitle(TRL("Edit Group"));
-		m_banner.SetCaption(TRL("Modify a password group"));
+		m_banner.SetCaption(TRL("Modify existing password group."));
 		SetWindowText(TRL("Edit Group"));
 	}
 

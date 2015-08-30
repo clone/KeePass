@@ -25,7 +25,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CCustomListCtrlEx : public CListCtrl
+class CCustomListCtrlEx : public CListCtrl
 {
 public:
 	CCustomListCtrlEx();

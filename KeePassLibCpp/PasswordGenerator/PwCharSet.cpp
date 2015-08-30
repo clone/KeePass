@@ -24,17 +24,12 @@
 
 PwCharSet::PwCharSet()
 {
-	ASSERT(sizeof(WCHAR) == 2);
-
-	memset(m_vTab, 0, PCS_TABSIZE);
+	this->Clear();
 }
 
 PwCharSet::PwCharSet(LPCWSTR lpCharacters)
 {
-	ASSERT(sizeof(WCHAR) == 2);
-
-	memset(m_vTab, 0, PCS_TABSIZE);
-
+	this->Clear();
 	this->Add(lpCharacters);
 }
 
@@ -42,17 +37,25 @@ PwCharSet::~PwCharSet()
 {
 }
 
-unsigned int PwCharSet::Size() const
+void PwCharSet::Clear()
 {
-	return m_vChars.size();
+	ASSERT(sizeof(WCHAR) == 2);
+
+	memset(m_vTab, 0, PCS_TABSIZE);
+	m_vChars.clear();
 }
 
-bool PwCharSet::Contains(WCHAR ch)
+unsigned int PwCharSet::Size() const
+{
+	return static_cast<unsigned int>(m_vChars.size());
+}
+
+bool PwCharSet::Contains(WCHAR ch) const
 {
 	return (((m_vTab[ch / 8] >> (ch % 8)) & 1) != 0);
 }
 
-bool PwCharSet::Contains(LPCWSTR lpCharacters)
+bool PwCharSet::Contains(LPCWSTR lpCharacters) const
 {
 	DWORD i = 0;
 
@@ -78,7 +81,7 @@ void PwCharSet::Add(WCHAR ch)
 {
 	if(this->Contains(ch)) return;
 
-	m_vTab[ch / 8] |= ((WCHAR)1 << (ch % 8));
+	m_vTab[ch / 8] |= ((BYTE)1 << (ch % 8));
 	m_vChars.push_back(ch);
 }
 
@@ -159,23 +162,26 @@ bool PwCharSet::AddCharSet(WCHAR chCharSetIdentifier)
 		case L'a': this->Add(PDCS_LOWER_CASE, PDCS_NUMERIC); break;
 		case L'A': this->Add(PDCS_LOWER_CASE, PDCS_UPPER_CASE,
 			PDCS_NUMERIC); break;
-		case L'\x00C2': this->Add(PDCS_UPPER_CASE, PDCS_NUMERIC); break;
+		case L'U': this->Add(PDCS_UPPER_CASE, PDCS_NUMERIC); break;
 		case L'c': this->Add(PDCS_LOWER_CONSONANTS); break;
 		case L'C': this->Add(PDCS_LOWER_CONSONANTS,
 			PDCS_UPPER_CONSONANTS); break;
-		case L'\x0108': this->Add(PDCS_UPPER_CONSONANTS); break;
+		case L'z': this->Add(PDCS_UPPER_CONSONANTS); break;
 		case L'd': this->Add(PDCS_NUMERIC); break; // Digit
 		case L'h': this->Add(PDCS_LOWER_HEX); break;
 		case L'H': this->Add(PDCS_UPPER_HEX); break;
 		case L'l': this->Add(PDCS_LOWER_CASE); break;
 		case L'L': this->Add(PDCS_LOWER_CASE, PDCS_UPPER_CASE); break;
-		case L'\x013D': this->Add(PDCS_UPPER_CASE); break;
+		case L'u': this->Add(PDCS_UPPER_CASE); break;
 		case L'p': this->Add(PDCS_PUNCTUATION); break;
+		case L'b': this->Add(PDCS_BRACKETS); break;
+		case L'S': this->Add(PDCS_UPPER_CASE, PDCS_LOWER_CASE);
+			this->Add(PDCS_NUMERIC, PDCS_PRINTASCIISPEC); break;
 		case L'v': this->Add(PDCS_LOWER_VOWELS); break;
 		case L'V': this->Add(PDCS_LOWER_VOWELS, PDCS_UPPER_VOWELS); break;
-		case L'\x0177': this->Add(PDCS_UPPER_VOWELS); break;
+		case L'Z': this->Add(PDCS_UPPER_VOWELS); break;
 		case L'x':
-			{ for(WCHAR ch = L'~'; ch <= 255; ++ch) this->Add(ch); } break;
+			{ for(WCHAR ch = L'~'; ch < 255; ++ch) this->Add(ch); } break;
 		default: bResult = false; break;
 	}
 
@@ -215,7 +221,7 @@ PwCharSet PwCharSet::GetSpecialChars()
 PwCharSet PwCharSet::GetHighAnsiChars()
 {
 	PwCharSet pcs;
-	pcs.AddRange(L'~', 255);
+	pcs.AddRange(L'~', 254);
 	return pcs;
 }
 

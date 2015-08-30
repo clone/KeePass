@@ -17,23 +17,21 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___TEST_IMPL_H___
-#define ___TEST_IMPL_H___
+/*
+#ifndef ___RESTART_MANAGER_EX_H___
+#define ___RESTART_MANAGER_EX_H___
 
-#include "../SysDefEx.h"
+typedef HRESULT(WINAPI *LPREGISTERAPPLICATIONRESTART)(PCWSTR pwzCommandLine,
+	DWORD dwFlags);
 
-#define TI_ERR_SHAVAR32          1
-#define TI_ERR_SHAVAR64          2
-#define TI_ERR_SHACMP256         4
-#define TI_ERR_SHACMP512         8
-#define TI_ERR_RIJNDAEL_ENCRYPT 16
-#define TI_ERR_RIJNDAEL_DECRYPT 32
-#define TI_ERR_ARCFOUR_CRYPT    64
-#define TI_ERR_TWOFISH         128
-#define TI_ERR_UINT_TYPE       256
-#define TI_ERR_INT_TYPE        512
+class CRestartManagerEx
+{
+private:
+	CRestartManagerEx();
 
-UINT32 TestCryptoImpl();
-UINT32 TestTypeDefs();
+public:
+	static void Register();
+};
 
-#endif
+#endif // ___RESTART_MANAGER_EX_H___
+*/

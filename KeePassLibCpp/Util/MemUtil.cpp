@@ -23,7 +23,7 @@
 #include "NewRandom.h"
 #include "../Crypto/SHA2/SHA2.h"
 
-C_FN_SHARE void mem_erase(unsigned char *p, size_t u)
+void mem_erase(unsigned char *p, size_t u)
 {
 	ASSERT(sizeof(unsigned char) == 1);
 	ASSERT(p != NULL); if(p == NULL) return;
@@ -45,7 +45,7 @@ C_FN_SHARE void mem_erase(unsigned char *p, size_t u)
 // Byte bits: 11111111 22222222 33333333 44444444 55555555
 // Contents : 00YYYYYY YYYYYYMM MMDDDDDH HHHHMMMM MMSSSSSS
 
-C_FN_SHARE void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWORD dwDay, DWORD dwHour, DWORD dwMinute, DWORD dwSecond)
+void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWORD dwDay, DWORD dwHour, DWORD dwMinute, DWORD dwSecond)
 {
 	ASSERT(pBytes != NULL); if(pBytes == NULL) return;
 	// Pack the time to a 5 byte structure
@@ -56,7 +56,7 @@ C_FN_SHARE void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWO
 	pBytes[4] = (BYTE)(((dwMinute & 0x00000003) << 6) | (dwSecond & 0x0000003F));
 }
 
-C_FN_SHARE void _UnpackStructToTime(const BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond)
+void _UnpackStructToTime(const BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond)
 {
 	DWORD dw1, dw2, dw3, dw4, dw5;
 
@@ -74,19 +74,20 @@ C_FN_SHARE void _UnpackStructToTime(const BYTE *pBytes, DWORD *pdwYear, DWORD *p
 	*pdwSecond = dw5 & 0x0000003F;
 }
 
-C_FN_SHARE void _GetCurrentPwTime(PW_TIME *p)
+void _GetCurrentPwTime(PW_TIME *p)
 {
-	SYSTEMTIME t;
-
 	ASSERT(p != NULL); if(p == NULL) return;
 
+	SYSTEMTIME t;
 	GetLocalTime(&t);
+
+	ZeroMemory(p, sizeof(PW_TIME));
 	p->btDay = (BYTE)t.wDay; p->btHour = (BYTE)t.wHour;
 	p->btMinute = (BYTE)t.wMinute; p->btMonth = (BYTE)t.wMonth;
 	p->btSecond = (BYTE)t.wSecond; p->shYear = (USHORT)t.wYear;
 }
 
-C_FN_SHARE int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2)
+int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2)
 {
 	if(pt1->shYear < pt2->shYear) return -1;
 	else if(pt1->shYear > pt2->shYear) return 1;
@@ -110,7 +111,7 @@ C_FN_SHARE int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2)
 }
 
 // Fast arithmetic time addition, possibly incorrect calendar-day
-C_FN_SHARE void _pwtimeadd(PW_TIME *pTime, const PW_TIME *pTimeAdd)
+void _pwtimeadd(PW_TIME *pTime, const PW_TIME *pTimeAdd)
 {
 	ASSERT((pTime != NULL) && (pTimeAdd != NULL));
 	if((pTime == NULL) || (pTimeAdd == NULL)) return;
@@ -186,7 +187,7 @@ void str2ar(TCHAR *tszString, INT *pArray, INT nItemCount)
 	}
 }
 
-C_FN_SHARE BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash)
+BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash)
 {
 	FILE *fp = NULL;
 	unsigned char *pBuf = NULL;

@@ -40,11 +40,12 @@ const CmdArgs& CmdArgs::instance() {
     return singleton;
 }
 
-CmdArgs::CmdArgs() {
+CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false) {
 
     // Command line options:
     const CommandLineOption keyfile  (_T("keyfile:"));
     const CommandLineOption preselect(_T("preselect:"));
+    const CommandLineOption readonly (_T("readonly"));
     const CommandLineOption pw       (_T("pw:"));
 
     // For each command line argument ...
@@ -93,6 +94,11 @@ CmdArgs::CmdArgs() {
                 if(password.empty()) CommandLineTokens::displayIgnoredMessage(argument, TRL("Password is empty"));
                 else m_Password = password;
                 }
+            }
+
+        // readonly option:
+        else if(readonly.isOption(argument)) {
+            m_isReadOnly = true;
             }
 
         // Plugin options:

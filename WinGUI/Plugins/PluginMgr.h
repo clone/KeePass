@@ -23,6 +23,8 @@
 #include "KeePluginDef.h"
 #include <vector>
 
+#define DUMMY_COMMAND_LINE_OPT _T("--nop")
+
 typedef std::basic_string<TCHAR> std_string;
 
 class CPluginManager

@@ -116,6 +116,42 @@ void PwgPrepareCharSet(PwCharSet* pCharSet, const PW_GEN_SETTINGS_EX* pSettings)
 		pCharSet->Remove(PDCS_CONFUSING);
 }
 
+void PwgShufflePassword(std::vector<WCHAR>& vBuffer, CNewRandom* pRandom)
+{
+	ASSERT(pRandom != NULL); if(pRandom == NULL) return;
+
+	DWORD dwLength = static_cast<DWORD>(vBuffer.size());
+
+	if(dwLength <= 1) return; // Nothing to permute
+
+	// Update length by finding the first 0 character
+	for(DWORD dwScan = 0; dwScan < vBuffer.size(); ++dwScan)
+	{
+		if(vBuffer[dwScan] == 0)
+		{
+			dwLength = dwScan;
+			break;
+		}
+	}
+
+	ASSERT(sizeof(UINT64) == 8);
+	UINT64 uRandomIndex;
+	WCHAR wchTemp;
+	for(DWORD dwSelect = 0; dwSelect < (dwLength - 1); ++dwSelect)
+	{
+		pRandom->GetRandomBuffer((BYTE *)&uRandomIndex, sizeof(UINT64));
+		uRandomIndex %= (UINT64)(dwLength - dwSelect);
+
+		ASSERT((dwSelect + (DWORD)uRandomIndex) < dwLength);
+
+		wchTemp = vBuffer[dwSelect];
+		vBuffer[dwSelect] = vBuffer[dwSelect + (DWORD)uRandomIndex];
+		vBuffer[dwSelect + (DWORD)uRandomIndex] = wchTemp;
+	}
+
+	ASSERT(wcslen(&vBuffer[0]) == dwLength);
+}
+
 LPCTSTR PwgErrorToString(PWG_ERROR uError)
 {
 	if(uError == PWGE_SUCCESS) return _T("Success");
@@ -221,10 +257,11 @@ std::basic_string<TCHAR> PwgProfileToString(const PW_GEN_SETTINGS_EX* pSettings)
 	s.push_back(0);
 
 	s.push_back((BYTE)((pSettings->bNoConfusing == TRUE) ? 'N' : 'A'));
+	s.push_back((BYTE)((pSettings->bPatternPermute == TRUE) ? 'P' : 'N'));
 
-	DWORD dwOutSize = s.size() * 4 + 12;
+	DWORD dwOutSize = static_cast<DWORD>(s.size() * 4 + 12);
 	BYTE *pBase64 = new BYTE[dwOutSize];
-	if(CBase64Codec::Encode(&s[0], s.size(), pBase64, &dwOutSize) == false)
+	if(CBase64Codec::Encode(&s[0], (DWORD)s.size(), pBase64, &dwOutSize) == false)
 	{
 		ASSERT(FALSE);
 		return strEmpty;
@@ -246,9 +283,10 @@ std::basic_string<TCHAR> PwgProfileToString(const PW_GEN_SETTINGS_EX* pSettings)
 	return strFinal;
 }
 
-PW_GEN_SETTINGS_EX PwgStringToProfile(const std::basic_string<TCHAR>& strProfile)
+void PwgStringToProfile(const std::basic_string<TCHAR>& strProfile,
+	PW_GEN_SETTINGS_EX* s)
 {
-	PW_GEN_SETTINGS_EX s;
+	ASSERT(s != NULL); if(s == NULL) return;
 
 #ifdef _UNICODE
 	const char *lpEncoded = _StringToAnsi(strProfile.c_str());
@@ -256,30 +294,30 @@ PW_GEN_SETTINGS_EX PwgStringToProfile(const std::basic_string<TCHAR>& strProfile
 	const char *lpEncoded = strProfile.c_str();
 #endif
 
-	DWORD dwDecodedSize = strProfile.size() + 120;
+	DWORD dwDecodedSize = static_cast<DWORD>(strProfile.size() + 120);
 	BYTE *pDecoded = new BYTE[dwDecodedSize];
 	memset(pDecoded, 0, dwDecodedSize);
 
 	if(CBase64Codec::Decode((BYTE *)lpEncoded, szlen(lpEncoded), pDecoded,
-		&dwDecodedSize) == false) { ASSERT(FALSE); return s; }
+		&dwDecodedSize) == false) { ASSERT(FALSE); return; }
 
-	ASSERT(pDecoded[0] == PWGD_VERSION_BYTE);
+	ASSERT(pDecoded[0] <= PWGD_VERSION_BYTE);
 
 	TCHAR *lpName = _UTF8ToString(&pDecoded[1]);
 
-	s.strName = lpName;
+	s->strName = lpName;
 
 	BYTE *pb = (BYTE *)memchr(pDecoded, 0, dwDecodedSize);
-	if(pb == NULL) { ASSERT(FALSE); return s; }
+	if(pb == NULL) { ASSERT(FALSE); return; }
 
 	++pb;
-	s.btGeneratorType = *pb; ++pb;
-	s.bCollectUserEntropy = ((*pb == (BYTE)'U') ? TRUE : FALSE); ++pb;
+	s->btGeneratorType = *pb; ++pb;
+	s->bCollectUserEntropy = ((*pb == (BYTE)'U') ? TRUE : FALSE); ++pb;
 
-	s.dwLength = (DWORD)(*pb) << 24; ++pb;
-	s.dwLength |= (DWORD)(*pb) << 16; ++pb;
-	s.dwLength |= (DWORD)(*pb) << 8; ++pb;
-	s.dwLength |= (DWORD)(*pb); ++pb;
+	s->dwLength = (DWORD)(*pb) << 24; ++pb;
+	s->dwLength |= (DWORD)(*pb) << 16; ++pb;
+	s->dwLength |= (DWORD)(*pb) << 8; ++pb;
+	s->dwLength |= (DWORD)(*pb); ++pb;
 
 	USHORT usFlags = (USHORT)(*pb) << 8; ++pb;
 	usFlags |= (USHORT)(*pb); ++pb;
@@ -294,37 +332,38 @@ PW_GEN_SETTINGS_EX PwgStringToProfile(const std::basic_string<TCHAR>& strProfile
 		if((bt1 == 0) && (bt2 == 0)) break;
 		pcs.Add(((WCHAR)bt1 << 8) | (WCHAR)bt2);
 	}
-	s.strCharSet = pcs.ToString();
+	s->strCharSet = pcs.ToString();
 
 	while(true)
 	{
 		BYTE bt1 = *pb; ++pb;
 		BYTE bt2 = *pb; ++pb;
 		if((bt1 == 0) && (bt2 == 0)) break;
-		s.strPattern += (WCHAR)(((WCHAR)bt1 << 8) | (WCHAR)bt2);
+		s->strPattern += (WCHAR)(((WCHAR)bt1 << 8) | (WCHAR)bt2);
 	}
 
 	ASSERT((*pb == (BYTE)'N') || (*pb == (BYTE)'A'));
-	s.bNoConfusing = ((*pb == (BYTE)'N') ? TRUE : FALSE);
+	s->bNoConfusing = ((*pb == (BYTE)'N') ? TRUE : FALSE); ++pb;
+	ASSERT((*pb == (BYTE)'P') || (*pb == (BYTE)'N') || (*pb == 0));
+	s->bPatternPermute = ((*pb == (BYTE)'P') ? TRUE : FALSE);
 
 	SAFE_DELETE_ARRAY(lpName);
 	SAFE_DELETE_ARRAY(pDecoded);
-
-	return s;
 }
 
-PW_GEN_SETTINGS_EX PwgGetDefaultProfile()
+void PwgGetDefaultProfile(PW_GEN_SETTINGS_EX* s)
 {
-	PW_GEN_SETTINGS_EX s;
-	s.btGeneratorType = PWGT_CHARSET;
-	s.dwLength = 20;
+	ASSERT(s != NULL); if(s == NULL) return;
+
+	s->btGeneratorType = PWGT_CHARSET;
+	s->dwLength = 20;
 
 	PwCharSet pcs;
 	pcs.Add(PDCS_UPPER_CASE, PDCS_LOWER_CASE, PDCS_NUMERIC);
-	s.strCharSet = pcs.ToString();
+	s->strCharSet = pcs.ToString();
 
-	s.bCollectUserEntropy = FALSE;
-	s.bNoConfusing = FALSE;
+	s->bCollectUserEntropy = FALSE;
+	s->bNoConfusing = FALSE;
 
-	return s;
+	s->bPatternPermute = FALSE;
 }

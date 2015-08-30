@@ -163,29 +163,29 @@ typedef struct _MY_GRADIENT_RECT
 #define TTS_BALLOON 0
 #endif
 
-C_FN_SHARE COLORREF NewGUI_GetBgColor();
-C_FN_SHARE COLORREF NewGUI_GetBtnColor();
-/* C_FN_SHARE COLORREF NewGUI_LightenColor(COLORREF crColor, double dblFactor); */
+COLORREF NewGUI_GetBgColor();
+COLORREF NewGUI_GetBtnColor();
+/* COLORREF NewGUI_LightenColor(COLORREF crColor, double dblFactor); */
 
-C_FN_SHARE void NewGUI_SetImgButtons(BOOL bImageButtons);
-C_FN_SHARE void NewGUI_Button(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1, BOOL bForceImage = FALSE);
-C_FN_SHARE void NewGUI_XPButton(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage = FALSE);
-C_FN_SHARE void NewGUI_ToolBarButton(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1);
+void NewGUI_SetImgButtons(BOOL bImageButtons);
+void NewGUI_Button(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1, BOOL bForceImage = FALSE);
+void NewGUI_XPButton(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage = FALSE);
+void NewGUI_ToolBarButton(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1);
 
-C_FN_SHARE void NewGUI_SetThemeHelper(void *pThemeHelper);
+void NewGUI_SetThemeHelper(void *pThemeHelper);
 
-C_FN_SHARE void NewGUI_ConfigQualityMeter(void *pWnd);
-C_FN_SHARE void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword);
+void NewGUI_ConfigQualityMeter(void *pWnd);
+void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword);
 
-CPP_FN_SHARE void NewGUI_TranslateCWnd(CWnd *pWnd);
+void NewGUI_TranslateCWnd(CWnd *pWnd);
 
 C_FN_SHARE BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam);
 
-C_FN_SHARE void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd);
+void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd);
 
-C_FN_SHARE BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount);
-C_FN_SHARE BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount);
+BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount);
+BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount);
 
-C_FN_SHARE void NewGUI_MakeHyperLink(void *pXHyperLink);
+void NewGUI_MakeHyperLink(void *pXHyperLink);
 
 #endif // ___NEW_GUI_COMMON___

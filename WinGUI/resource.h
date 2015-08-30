@@ -77,6 +77,8 @@
 #define IDR_ENTRYHELP_MENU              231
 #define IDB_HELP_SMALL_POPUP            232
 #define IDD_PW_GENERATOR_EX_DLG         233
+#define IDB_TB_SAVE_AS                  234
+#define IDD_SINGLELINEEDIT_DLG          235
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -259,10 +261,13 @@
 #define IDC_BTN_HELP                    1246
 #define IDC_STATIC_CUSTOMCHARSET        1247
 #define IDC_STATIC_PWLENGTH             1249
-#define IDC_BUTTON1                     1250
 #define IDC_BTN_BROWSE_KEYFILE          1251
-#define IDC_EDIT1                       1252
-#define IDC_EDIT_CUSTOMCHARSET          1253
+#define IDC_EDIT_INPUT                  1252
+#define IDC_EDIT_TANCHARS               1253
+#define IDC_EDIT_CUSTOMCHARSET          1254
+#define IDC_STATIC_PROMPT               1255
+#define IDC_COMBO_INPUT                 1256
+#define IDC_CHECK_PATTERN_PERMUTE       1257
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -464,9 +469,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        234
+#define _APS_NEXT_RESOURCE_VALUE        236
 #define _APS_NEXT_COMMAND_VALUE         33005
-#define _APS_NEXT_CONTROL_VALUE         1254
+#define _APS_NEXT_CONTROL_VALUE         1258
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -23,7 +23,7 @@
 
 #include "../KeePassLibCpp/PwManager.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
-#include "Util/PrivateConfig.h"
+#include "Util/PrivateConfigEx.h"
 #include "NewGUI/NewGUICommon.h"
 #include "Util/CmdLine/Executable.h"
 
@@ -74,7 +74,7 @@ BOOL CLanguagesDlg::OnInitDialog()
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_WORLD),
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
-	m_banner.SetTitle(TRL("Load a language file"));
+	m_banner.SetTitle(TRL("Load a Language File"));
 	m_banner.SetCaption(TRL("Select one of the languages in the list below."));
 
 	RECT rcList;
@@ -82,20 +82,22 @@ BOOL CLanguagesDlg::OnInitDialog()
 	int nColSize = rcList.right - rcList.left - GetSystemMetrics(SM_CXVSCROLL) - 8;
 	nColSize /= 4;
 	m_listLang.InsertColumn(0, TRL("Available Languages"), LVCFMT_LEFT, nColSize, 0);
-	m_listLang.InsertColumn(1, TRL("Language file version"), LVCFMT_LEFT, nColSize, 1);
+	m_listLang.InsertColumn(1, TRL("Language File Version"), LVCFMT_LEFT, nColSize, 1);
 	m_listLang.InsertColumn(2, TRL("Author"), LVCFMT_LEFT, nColSize, 2);
-	m_listLang.InsertColumn(3, TRL("Translation author contact"), LVCFMT_LEFT, nColSize, 3);
+	m_listLang.InsertColumn(3, TRL("Translation Author Contact"), LVCFMT_LEFT, nColSize, 3);
 
 	// m_ilIcons.Create(CPwSafeApp::GetClientIconsResourceID(), 16, 1, RGB(255,0,255));
 	CPwSafeApp::CreateHiColorImageList(&m_ilIcons, IDB_CLIENTICONS_EX, 16);
 	m_listLang.SetImageList(&m_ilIcons, LVSIL_SMALL);
 
-	m_listLang.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0,
-		LVS_EX_SI_REPORT | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_ONECLICKACTIVATE | LVS_EX_UNDERLINEHOT);
-
-	LV_ITEM lvi;
+	m_listLang.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_SI_REPORT |
+		LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_ONECLICKACTIVATE |
+		LVS_EX_UNDERLINEHOT | LVS_EX_INFOTIP);
 
 	m_listLang.DeleteAllItems();
+
+	LV_ITEM lvi;
+	ZeroMemory(&lvi, sizeof(LV_ITEM));
 	lvi.iItem = m_listLang.InsertItem(LVIF_TEXT | LVIF_IMAGE, m_listLang.GetItemCount(),
 		_T("English"), 0, 0, 1, NULL);
 
@@ -209,7 +211,7 @@ void CLanguagesDlg::OnClickLanguagesList(NMHDR* pNMHDR, LRESULT* pResult)
 void CLanguagesDlg::_LoadLanguage(LPCTSTR szLang)
 {
 	FILE *fp = NULL;
-	CPrivateConfig cConfig(TRUE);
+	CPrivateConfigEx cConfig(TRUE);
 
 	// GetModuleFileName(NULL, szFile, MAX_PATH * 2);
 	// for(i = _tcslen(szFile)-1; i > 1; i--) // Extract dir

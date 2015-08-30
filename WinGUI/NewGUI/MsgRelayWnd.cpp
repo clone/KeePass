@@ -17,20 +17,40 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-// KeePass: The CSystemTrayEx translates CSystemTray menus
+#include "StdAfx.h"
+#include "MsgRelayWnd.h"
 
-#ifndef ___SYSTEM_TRAY_EX_H___
-#define ___SYSTEM_TRAY_EX_H___
+#include <algorithm>
 
-#include "../../KeePassLibCpp/SysDefEx.h"
-#include "NewGUICommon.h"
-#include "BCMenu.h"
-#include "SystemTray.h"
+BOOL CMsgRelayWnd::m_bRelayEnabled = FALSE;
+HWND CMsgRelayWnd::m_hRelayTarget = NULL;
+std::vector<UINT> CMsgRelayWnd::m_vRelayedMessages;
 
-class CSystemTrayEx : public CSystemTray
+void CMsgRelayWnd::EnableRelaying(BOOL bEnable)
 {
-protected:
-	virtual void CustomizeMenu(CMenu *pMenu);
-};
+	m_bRelayEnabled = bEnable;
+}
 
-#endif
+void CMsgRelayWnd::SetRelayTarget(HWND hWndTarget)
+{
+	m_hRelayTarget = hWndTarget;
+}
+
+void CMsgRelayWnd::AddRelayedMessage(UINT uMessage)
+{
+	m_vRelayedMessages.push_back(uMessage);
+}
+
+LRESULT CMsgRelayWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	if(m_bRelayEnabled != FALSE) // Relaying enabled
+	{
+		if(std::find(m_vRelayedMessages.begin(), m_vRelayedMessages.end(),
+			message) != m_vRelayedMessages.end())
+		{
+			::PostMessage(m_hRelayTarget, message, wParam, lParam);
+		}
+	}
+
+	return CWnd::WindowProc(message, wParam, lParam);
+}

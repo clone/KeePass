@@ -1991,6 +1991,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\SingleLineEditDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
@@ -2216,6 +2220,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SingleLineEditDlg.h"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.h"
 				>
 			</File>
@@ -2385,6 +2393,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\tb_save1.bmp"
+				>
+			</File>
+			<File
 				RelativePath=".\res\tb_saved.bmp"
 				>
 			</File>
@@ -2545,11 +2557,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Util\PrivateConfigEx.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\PrivateConfigEx.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Util\RemoteControl.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Util\RemoteControl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\RestartManagerEx.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\RestartManagerEx.h"
 				>
 			</File>
 			<File
@@ -3510,6 +3538,14 @@
 			</File>
 			<File
 				RelativePath="NewGUI\MemDC.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\MsgRelayWnd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\MsgRelayWnd.h"
 				>
 			</File>
 			<File

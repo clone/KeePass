@@ -30,7 +30,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CPasswordDlg : public CDialog
+class CPasswordDlg : public CDialog
 {
 public:
 	CPasswordDlg(CWnd* pParent = NULL);

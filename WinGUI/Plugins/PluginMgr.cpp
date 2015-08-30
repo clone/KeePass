@@ -448,5 +448,7 @@ BOOL CPluginManager::UsesCmdArg(const std_string& argument) const
 		if(commandLineOption.isOption(argument)) return true;
 	}
 
+	if(argument == DUMMY_COMMAND_LINE_OPT) return true;
+
 	return false;
 }

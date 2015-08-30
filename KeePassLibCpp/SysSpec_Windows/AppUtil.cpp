@@ -22,7 +22,7 @@
 #include "../Util/MemUtil.h"
 #include "../Util/NewRandom.h"
 
-C_FN_SHARE BOOL GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpecial, BOOL bMakeURL)
+BOOL GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpecial, BOOL bMakeURL)
 {
 	int i, j = 0;
 
@@ -58,7 +58,7 @@ C_FN_SHARE BOOL GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL 
 }
 
 #ifndef _WIN32_WCE
-C_FN_SHARE BOOL SecureDeleteFile(LPCTSTR pszFilePath)
+BOOL SecureDeleteFile(LPCTSTR pszFilePath)
 {
 	HANDLE hFile;
 	DWORD i, m, dwSizeLo, dwTmp;

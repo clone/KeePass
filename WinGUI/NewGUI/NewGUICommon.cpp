@@ -33,7 +33,7 @@
 static BOOL g_bImgButtons = 0;
 static CThemeHelperST *g_pThemeHelper = NULL;
 
-C_FN_SHARE COLORREF NewGUI_GetBgColor()
+COLORREF NewGUI_GetBgColor()
 {
 	// HDC hDC = NULL;
 	// int nBitsPerPixel = 0;
@@ -49,7 +49,7 @@ C_FN_SHARE COLORREF NewGUI_GetBgColor()
 	return GetSysColor(COLOR_BTNFACE);
 }
 
-C_FN_SHARE COLORREF NewGUI_GetBtnColor()
+COLORREF NewGUI_GetBtnColor()
 {
 	COLORREF clr;
 
@@ -59,13 +59,13 @@ C_FN_SHARE COLORREF NewGUI_GetBtnColor()
 	return clr;
 }
 
-C_FN_SHARE void NewGUI_SetImgButtons(BOOL bImageButtons)
+void NewGUI_SetImgButtons(BOOL bImageButtons)
 {
 	ASSERT((bImageButtons == TRUE) || (bImageButtons == FALSE));
 	g_bImgButtons = bImageButtons;
 }
 
-C_FN_SHARE void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage)
+void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage)
 {
 	CButtonST *p = (CButtonST *)pButton;
 
@@ -82,7 +82,7 @@ C_FN_SHARE void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL
 		p->SetBitmaps(nBitmapIn, RGB(255, 0, 255), nBitmapOut, RGB(255, 0, 255));
 }
 
-C_FN_SHARE void NewGUI_SetThemeHelper(void *pThemeHelper)
+void NewGUI_SetThemeHelper(void *pThemeHelper)
 {
 	ASSERT(pThemeHelper != NULL);
 	g_pThemeHelper = (CThemeHelperST *)pThemeHelper;
@@ -94,7 +94,7 @@ C_FN_SHARE void NewGUI_SetThemeHelper(void *pThemeHelper)
 	}
 }
 
-C_FN_SHARE void NewGUI_XPButton(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage)
+void NewGUI_XPButton(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage)
 {
 	CXPStyleButtonST *p = (CXPStyleButtonST *)pButton;
 
@@ -143,7 +143,7 @@ C_FN_SHARE void NewGUI_XPButton(void *pButton, int nBitmapIn, int nBitmapOut, BO
 */
 
 /*
-C_FN_SHARE COLORREF NewGUI_LightenColor(COLORREF crColor, double dblFactor)
+COLORREF NewGUI_LightenColor(COLORREF crColor, double dblFactor)
 {
 	BYTE byRed, byGreen, byBlue, byLightRed, byLightGreen, byLightBlue;
 
@@ -161,7 +161,7 @@ C_FN_SHARE COLORREF NewGUI_LightenColor(COLORREF crColor, double dblFactor)
 }
 */
 
-C_FN_SHARE void NewGUI_ToolBarButton(void *pButton, int nBitmapIn, int nBitmapOut)
+void NewGUI_ToolBarButton(void *pButton, int nBitmapIn, int nBitmapOut)
 {
 	CXPStyleButtonST *p = (CXPStyleButtonST *)pButton;
 	CString strToolTip;
@@ -197,7 +197,7 @@ C_FN_SHARE void NewGUI_ToolBarButton(void *pButton, int nBitmapIn, int nBitmapOu
 	p->DrawAsToolbar(TRUE);
 }
 
-CPP_FN_SHARE void NewGUI_TranslateCWnd(CWnd *pWnd)
+void NewGUI_TranslateCWnd(CWnd *pWnd)
 {
 	CString str;
 	ASSERT(pWnd != NULL); if(pWnd == NULL) return;
@@ -223,7 +223,7 @@ C_FN_SHARE BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
 	return TRUE;
 }
 
-C_FN_SHARE void NewGUI_ConfigQualityMeter(void *pWnd)
+void NewGUI_ConfigQualityMeter(void *pWnd)
 {
 	CGradientProgressCtrl *p = (CGradientProgressCtrl *)pWnd;
 
@@ -235,7 +235,7 @@ C_FN_SHARE void NewGUI_ConfigQualityMeter(void *pWnd)
 	p->SetPos(0);
 }
 
-C_FN_SHARE void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword)
+void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword)
 {
 	CGradientProgressCtrl *pProgress = (CGradientProgressCtrl *)pProgressBar;
 	CStatic *pStatic = (CStatic *)pStaticDesc;
@@ -255,7 +255,7 @@ C_FN_SHARE void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, c
 	pProgress->SetPos((int)dwBits);
 }
 
-C_FN_SHARE void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
+void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
 {
 	CKCSideBannerWnd *p = (CKCSideBannerWnd *)pBanner;
 	CWnd *pParent = (CWnd *)pParentWnd;
@@ -274,7 +274,7 @@ C_FN_SHARE void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
 	p->SetColEdge(RGB(0,0,0));
 }
 
-C_FN_SHARE BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
+BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
 {
 	HWND hHeader;
 
@@ -292,7 +292,7 @@ C_FN_SHARE BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnC
 	return TRUE;
 }
 
-C_FN_SHARE BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
+BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
 {
 	HWND hHeader;
 
@@ -310,7 +310,7 @@ C_FN_SHARE BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnC
 	return TRUE;
 }
 
-C_FN_SHARE void NewGUI_MakeHyperLink(void *pXHyperLink)
+void NewGUI_MakeHyperLink(void *pXHyperLink)
 {
 	CXHyperLink *p = (CXHyperLink *)pXHyperLink;
 	ASSERT(p != NULL); if(p == NULL) return;

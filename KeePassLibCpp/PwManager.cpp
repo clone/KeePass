@@ -478,7 +478,7 @@ DWORD CPwManager::GetNumberOfGroups() const
 
 PW_ENTRY *CPwManager::GetEntry(DWORD dwIndex)
 {
-	ASSERT(dwIndex < m_dwNumEntries);
+	// ASSERT(dwIndex < m_dwNumEntries);
 	if(dwIndex >= m_dwNumEntries) return NULL;
 
 	return &m_pEntries[dwIndex];
@@ -526,7 +526,7 @@ PW_ENTRY *CPwManager::GetEntryByUuid(const BYTE *pUuid)
 
 	DWORD dwEntryIndex = GetEntryByUuidN(pUuid);
 
-	ASSERT(dwEntryIndex != DWORD_MAX);
+	// ASSERT(dwEntryIndex != DWORD_MAX); // Do not assert!
 	if(dwEntryIndex == DWORD_MAX) return NULL;
 
 	return &m_pEntries[dwEntryIndex];
@@ -948,6 +948,11 @@ void CPwManager::NewDatabase()
 	memset(ptrx, 0, sizeof(PW_ENTRY)); \
 	RESET_TIME_FIELD_NORMAL(&(ptrx)->tCreation); RESET_TIME_FIELD_NORMAL(&(ptrx)->tLastMod); \
 	RESET_TIME_FIELD_NORMAL(&(ptrx)->tLastAccess); RESET_TIME_FIELD_EXPIRE(&(ptrx)->tExpire); }
+
+// int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *pRepair)
+// {
+//	return this->OpenDatabaseEx(pszFile, pRepair, NULL);
+// }
 
 // If bIgnoreCorrupted is TRUE the manager will try to ignore all database file
 // errors, i.e. try to read as much as possible instead of breaking out at the
@@ -2824,6 +2829,13 @@ BOOL CPwManager::IsZeroUUID(__in_ecount(16) const BYTE *pUUID)
 {
 	if(pUUID == NULL) return TRUE;
 	return (memcmp(pUUID, g_uuidZero, 16) == 0) ? TRUE : FALSE;
+}
+
+BOOL CPwManager::IsTANEntry(const PW_ENTRY *pe)
+{
+	ASSERT(pe != NULL); if(pe == NULL) return FALSE;
+
+	return ((_tcscmp(pe->pszTitle, PWS_TAN_ENTRY) != 0) ? FALSE : TRUE);
 }
 
 const PW_DBHEADER *CPwManager::GetLastDatabaseHeader() const

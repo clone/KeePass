@@ -22,6 +22,6 @@
 
 #include "../SysDefEx.h"
 
-C_FN_SHARE void ARCFourCrypt(UINT8 *pBuf, UINT32 uBufLen, const UINT8 *pKey, UINT32 uKeyLen);
+void ARCFourCrypt(UINT8 *pBuf, UINT32 uBufLen, const UINT8 *pKey, UINT32 uKeyLen);
 
 #endif

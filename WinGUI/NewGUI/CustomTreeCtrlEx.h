@@ -44,7 +44,7 @@ private:
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CCustomTreeCtrlEx : public CTreeCtrl
+class CCustomTreeCtrlEx : public CTreeCtrl
 {
 public:
 	CCustomTreeCtrlEx();

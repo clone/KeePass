@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005-2006, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2005-2007, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -175,9 +175,7 @@ void CSecureEditEx::DeleteTPtr(LPTSTR lp, BOOL bIsArray, BOOL bIsString)
 // Retrieve the currently entered password
 LPTSTR CSecureEditEx::GetPassword()
 {
-	int i, nNumChars;
-	LPTSTR tchp;
-	LPTSTR lp;
+	int nNumChars;
 
 	if(m_bSecMode == TRUE)
 	{
@@ -187,21 +185,21 @@ LPTSTR CSecureEditEx::GetPassword()
 	if(m_bSecMode == FALSE)
 	{
 		nNumChars = GetWindowTextLength();
-		lp = new TCHAR[nNumChars + 1];
-		ASSERT(lp != NULL); if(lp == NULL) return NULL;
-		GetWindowText(lp, nNumChars + 1);
-		return lp;
+		LPTSTR lpNew = new TCHAR[nNumChars + 1];
+		ASSERT(lpNew != NULL); if(lpNew == NULL) return NULL;
+		GetWindowText(lpNew, nNumChars + 1);
+		return lpNew;
 	}
 
 	nNumChars = (int)m_apChars.GetSize();
 
-	lp = new TCHAR[nNumChars + 1];
+	LPTSTR lp = new TCHAR[nNumChars + 1];
 	ASSERT(lp != NULL); if(lp == NULL) return NULL;
 
-	for(i = 0; i < nNumChars; i++)
+	for(int i = 0; i < nNumChars; i++)
 	{
 		// Get one character
-		tchp = (LPTSTR)m_apChars.GetAt(i);
+		LPTSTR tchp = (LPTSTR)m_apChars.GetAt(i);
 		ASSERT(tchp != NULL); if(tchp == NULL) continue;
 
 		lp[i] = (TCHAR)((*tchp) ^ m_pXorPad[i % SE_XORPAD_SIZE]); // Decrypt

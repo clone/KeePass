@@ -24,7 +24,7 @@
 #include "MemUtil.h"
 
 // Securely erase a CString object
-CPP_FN_SHARE void EraseCString(CString *pString)
+void EraseCString(CString *pString)
 {
 	ASSERT(pString != NULL); if(pString == NULL) return;
 
@@ -55,7 +55,7 @@ void EraseTCharVector(std::vector<TCHAR>& vBuffer)
 	vBuffer.clear();
 }
 
-CPP_FN_SHARE void FixURL(CString *pstrURL)
+void FixURL(CString *pstrURL)
 {
 	CString strTemp;
 	BOOL bPre = FALSE;
@@ -98,7 +98,7 @@ CPP_FN_SHARE void FixURL(CString *pstrURL)
 	}
 }
 
-CPP_FN_SHARE void _PwTimeToString(PW_TIME t, CString *pstrDest)
+void _PwTimeToString(PW_TIME t, CString *pstrDest)
 {
 	CString strFormatted;
 	_PwTimeToStringEx(t, strFormatted, FALSE);
@@ -150,7 +150,7 @@ void _PwTimeToStringEx(const PW_TIME& t, CString& strDest, BOOL bUseLocalFormat)
 	}
 }
 
-CPP_FN_SHARE void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest)
+void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest)
 {
 	ASSERT(pstrDest != NULL);
 	pstrDest->Empty();
@@ -158,7 +158,7 @@ CPP_FN_SHARE void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest)
 		t.btDay, t.btHour, t.btMinute, t.btSecond);
 }
 
-CPP_FN_SHARE void _UuidToString(const BYTE *pUuid, CString *pstrDest)
+void _UuidToString(const BYTE *pUuid, CString *pstrDest)
 {
 	CString strTemp;
 	ASSERT(pstrDest != NULL);
@@ -205,7 +205,7 @@ C_FN_SHARE void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 	}
 }
 
-CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes)
+void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes)
 {
 	CString str, strTemp;
 	int nPos;
@@ -360,7 +360,7 @@ CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimStri
 	EraseCString(&str);
 }
 
-CPP_FN_SHARE CString CsRemoveMeta(CString *psString)
+CString CsRemoveMeta(CString *psString)
 {
 	CString str = _T(""), strLower;
 	int nPos, nCount;
@@ -397,7 +397,7 @@ CPP_FN_SHARE CString CsRemoveMeta(CString *psString)
 	return str;
 }
 
-CPP_FN_SHARE CString CsFileOnly(const CString *psFilePath)
+CString CsFileOnly(const CString *psFilePath)
 {
 	CString str;
 	int i, j, k;
@@ -419,7 +419,7 @@ CPP_FN_SHARE CString CsFileOnly(const CString *psFilePath)
 #pragma warning(push)
 #pragma warning(disable: 4996) // _tcscpy deprecated
 
-C_FN_SHARE TCHAR *MakeSafeXmlString(const TCHAR *ptString)
+TCHAR *MakeSafeXmlString(const TCHAR *ptString)
 {
 	size_t i, j;
 	size_t dwStringLen, dwNeededChars = 0, dwOutPos = 0;
@@ -489,7 +489,7 @@ C_FN_SHARE TCHAR *MakeSafeXmlString(const TCHAR *ptString)
 	return pFinal;
 }
 
-C_FN_SHARE char *szcpy(char *szDestination, const char *szSource)
+char *szcpy(char *szDestination, const char *szSource)
 {
 	ASSERT(szDestination != NULL); if(szDestination == NULL) return NULL;
 	ASSERT(szSource != NULL); if(szSource == NULL) { szDestination[0] = 0; return szDestination; }
@@ -498,7 +498,7 @@ C_FN_SHARE char *szcpy(char *szDestination, const char *szSource)
 
 #pragma warning(pop) // _tcscpy / strcpy deprecated
 
-C_FN_SHARE DWORD szlen(const char *pszString)
+DWORD szlen(const char *pszString)
 {
 	ASSERT(pszString != NULL); if(pszString == NULL) return 0;
 
@@ -507,7 +507,8 @@ C_FN_SHARE DWORD szlen(const char *pszString)
 
 // Extracts a substring from the lpstr string
 // Example: to extract the auto-type command, pass "auto-type:" in lpStart
-CPP_FN_SHARE CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart, DWORD dwInstance)
+CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart,
+	DWORD dwInstance)
 {
 	TCHAR *lp;
 	TCHAR tch;
@@ -553,7 +554,7 @@ CPP_FN_SHARE CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart, 
 	return str;
 }
 
-CPP_FN_SHARE CString TagSimString(LPCTSTR lpString)
+CString TagSimString(LPCTSTR lpString)
 {
 	int i;
 	CString str = _T("");
@@ -611,7 +612,7 @@ C_FN_SHARE void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath)
 
 #pragma warning(pop) */
 
-CPP_FN_SHARE TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource)
+TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource)
 {
 	TCHAR *ptsz;
 
@@ -630,7 +631,7 @@ CPP_FN_SHARE TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource)
 	return ptsz;
 }
 
-CPP_FN_SHARE void RemoveAcceleratorTip(CString *pString)
+void RemoveAcceleratorTip(CString *pString)
 {
 	ASSERT(pString != NULL); if(pString == NULL) return;
 

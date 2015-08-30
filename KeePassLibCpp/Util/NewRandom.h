@@ -24,7 +24,7 @@
 #include "../Crypto/SHA2/SHA2.h"
 #include <vector>
 
-class CPP_CLASS_SHARE CNewRandom
+class CNewRandom
 {
 public:
 	CNewRandom();
@@ -44,7 +44,7 @@ private:
 	DWORD m_dwCounter;
 };
 
-class CPP_CLASS_SHARE CNewRandomInterface
+class CNewRandomInterface
 {
 public:
 	virtual ~CNewRandomInterface() { }
@@ -57,6 +57,6 @@ void srandXorShift(unsigned long *pSeed128);
 unsigned long randXorShift();
 
 // Must be able to hold at least 16 bytes
-CPP_FN_SHARE void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource);
+void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource);
 
 #endif

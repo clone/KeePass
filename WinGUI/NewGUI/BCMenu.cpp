@@ -2580,6 +2580,7 @@ void BCMenu::DitherBlt3(CDC *drawdc, int nXDest, int nYDest, int nWidth,
 	dc.DeleteDC();
 }
 
+/*
 void BCMenu::SetDisableOldStyle(void)
 {
 	disable_old_style=TRUE;
@@ -2594,7 +2595,7 @@ BOOL BCMenu::GetDisableOldStyle(void)
 {
 	return(disable_old_style);
 }
-
+*/
 
 WORD BCMenu::NumBitmapColors(LPBITMAPINFOHEADER lpBitmap)
 {

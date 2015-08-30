@@ -1,7 +1,5 @@
-// Modified version of Chris Maunder's system tray class
-// Changes:
-// - Replaced all UINT_PTR by unsigned long
-// - Changed IsEmpty() to (GetSize() == 0) for CArrays
+// Modified version of Chris Maunder's system tray class.
+// Changes are marked with "DR:".
 
 /////////////////////////////////////////////////////////////////////////////
 // SystemTray.h : header file
@@ -37,6 +35,8 @@
 // #include <afxwin.h>
 #include <afxtempl.h>
 #include <afxdisp.h>    // COleDateTime
+
+#include "MsgRelayWnd.h" // DR: Include message relaying window header
 
 /////////////////////////////////////////////////////////////////////////////
 // CSystemTray window
@@ -111,12 +111,15 @@ public:
     BOOL  SetCallbackMessage(UINT uCallbackMessage);
     UINT  GetCallbackMessage() const;
 
+	// DR: Changed UINT_PTR to unsigned long
     unsigned long GetTimerID() const   { return m_nTimerID; }
 
 // Static functions
 public:
     static void MinimiseToTray(CWnd* pWnd, BOOL bForceAnimation = FALSE);
-    static void MaximiseFromTray(CWnd* pWnd, BOOL bForceAnimation = FALSE);
+
+	// DR: Changed signature to allow restoring to maximized mode
+    static void MaximiseFromTray(CWnd* pWnd, BOOL bForceAnimation, BOOL bMaximize);
 
 public:
     // Default handler for tray notification message
@@ -148,7 +151,7 @@ protected:
 
     CArray<HICON, HICON> m_IconList;
     UINT_PTR     m_uIDTimer;
-    int          m_nCurrentIcon;
+    int          m_nCurrentIcon; // DR: Changed INT_PTR to int
     COleDateTime m_StartTime;
     UINT         m_nAnimationPeriod;
     HICON        m_hSavedIcon;
@@ -163,7 +166,7 @@ protected:
     static const UINT m_nTimerID;
     static UINT  m_nMaxTooltipLength;
     static const UINT m_nTaskbarCreatedMsg;
-    static CWnd  m_wndInvisible;
+    static CMsgRelayWnd  m_wndInvisible; // DR: Changed CWnd to CMsgRelayWnd
 
     static BOOL GetW2K();
 #ifndef _WIN32_WCE
@@ -174,7 +177,7 @@ protected:
 // Generated message map functions
 protected:
 	//{{AFX_MSG(CSystemTray)
-	afx_msg void OnTimer(WPARAM nIDEvent);
+	afx_msg void OnTimer(WPARAM nIDEvent); // DR: Changed UINT to WPARAM
 	//}}AFX_MSG
 #ifndef _WIN32_WCE
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);

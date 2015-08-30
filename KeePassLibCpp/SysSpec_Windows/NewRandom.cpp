@@ -195,11 +195,13 @@ void CNewRandom::GetRandomBuffer(__out_bcount(dwSize) BYTE *pBuf, DWORD dwSize)
 		sha256_begin(&hashctx);
 
 		if(m_vPseudoRandom.size() > 0)
-			sha256_hash(&m_vPseudoRandom[0], m_vPseudoRandom.size(), &hashctx);
+			sha256_hash(&m_vPseudoRandom[0], (unsigned long)m_vPseudoRandom.size(),
+				&hashctx);
 		else { ASSERT(FALSE); }
 
 		if(m_vUserRandom.size() > 0)
-			sha256_hash(&m_vUserRandom[0], m_vUserRandom.size(), &hashctx);
+			sha256_hash(&m_vUserRandom[0], (unsigned long)m_vUserRandom.size(),
+				&hashctx);
 
 		sha256_hash((BYTE *)&m_dwCounter, 4, &hashctx);
 		sha256_end(aTemp, &hashctx);
@@ -246,7 +248,7 @@ unsigned long randXorShift()
 	return g_xorW;
 }
 
-CPP_FN_SHARE void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource)
+void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource)
 {
 	BYTE *p = pUUID16;
 	DWORD *pdw1 = (DWORD *)pUUID16, *pdw2 = (DWORD *)&pUUID16[4],

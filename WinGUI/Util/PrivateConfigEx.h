@@ -17,40 +17,47 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-// CONFIGURATION FILE MANAGER
-// Created: Dominik Reichl, 2003
-
-#ifndef ___PRIVATE_CONFIG_H___
-#define ___PRIVATE_CONFIG_H___
+#ifndef ___PRIVATE_CONFIG_EX_H___
+#define ___PRIVATE_CONFIG_EX_H___
 
 #include "../../KeePassLibCpp/SysDefEx.h"
+#include "PrivateConfig.h" // Definitions
 
-#define SI_REGSIZE 2048
+#include <string>
 
-// A GUID used to detect non-existing keys in queries
-#define PCFG_NOTFOUND _T("2C3317110FC211DA94B900E08161165F")
+#define CFG_VAL_TRUE      _T("True")
+#define CFG_VAL_FALSE     _T("False")
 
-// WINSHELLAPI (DECLSPEC_IMPORT?)
-typedef HRESULT(WINAPI *LPSHGETSPECIALFOLDERPATH)(HWND hwndOwner, LPTSTR lpszPath, int nFolder, BOOL fCreate);
+#define CFG_ID_ENFORCED 0
+#define CFG_ID_GLOBAL   1
+#define CFG_ID_USER     2
+#define CFG_ID_COUNT    3
 
-// Export for plugins:
-class CPP_CLASS_SHARE CPrivateConfig
+#define CFG_SUFFIX_STD _T(".ini")
+#define CFG_SUFFIX_ENF _T(".enforced.ini")
+
+class CPrivateConfigEx
 {
 public:
-	CPrivateConfig(BOOL bRequireWriteAccess);
-	virtual ~CPrivateConfig();
+	CPrivateConfigEx(BOOL bRequireWriteAccess);
+	virtual ~CPrivateConfigEx();
 
-	BOOL Set(LPCTSTR pszField, LPCTSTR pszValue);
 	BOOL Get(LPCTSTR pszField, LPTSTR pszValue);
+	BOOL Set(LPCTSTR pszField, LPCTSTR pszValue);
 
-	BOOL SetBool(const TCHAR *pszField, BOOL bValue);
 	BOOL GetBool(const TCHAR *pszField, BOOL bDefault);
+	BOOL SetBool(const TCHAR *pszField, BOOL bValue);
 
 private:
-	int m_nUseDir;
-	TCHAR m_szFileLocal[MAX_PATH * 2];
-	TCHAR m_szFileUser[MAX_PATH * 2];
-	TCHAR m_szFileGeneric[MAX_PATH];
+	void GetConfigPaths(BOOL bRequireWriteAccess);
+	BOOL GetIn(LPCTSTR pszField, LPTSTR pszValue, int nConfigID);
+	BOOL SetIn(LPCTSTR pszField, LPCTSTR pszValue, int nConfigID);
+
+	std::basic_string<TCHAR> m_strFileEnforced;
+	std::basic_string<TCHAR> m_strFileGlobal;
+	std::basic_string<TCHAR> m_strFileUser;
+
+	BOOL m_bPreferUser;
 };
 
-#endif // ___PRIVATE_CONFIG_H___
+#endif // ___PRIVATE_CONFIG_EX_H___

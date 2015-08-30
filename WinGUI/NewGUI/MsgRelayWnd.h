@@ -17,23 +17,27 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___TEST_IMPL_H___
-#define ___TEST_IMPL_H___
+#ifndef ___CMSGRELAYWND_H___
+#define ___CMSGRELAYWND_H___
 
-#include "../SysDefEx.h"
+#pragma once
 
-#define TI_ERR_SHAVAR32          1
-#define TI_ERR_SHAVAR64          2
-#define TI_ERR_SHACMP256         4
-#define TI_ERR_SHACMP512         8
-#define TI_ERR_RIJNDAEL_ENCRYPT 16
-#define TI_ERR_RIJNDAEL_DECRYPT 32
-#define TI_ERR_ARCFOUR_CRYPT    64
-#define TI_ERR_TWOFISH         128
-#define TI_ERR_UINT_TYPE       256
-#define TI_ERR_INT_TYPE        512
+#include <vector>
 
-UINT32 TestCryptoImpl();
-UINT32 TestTypeDefs();
+class CMsgRelayWnd : public CWnd
+{
+public:
+	static void EnableRelaying(BOOL bEnable);
+	static void SetRelayTarget(HWND hWndTarget);
+	static void AddRelayedMessage(UINT uMessage);
 
-#endif
+protected:
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+
+private:
+	static BOOL m_bRelayEnabled;
+	static HWND m_hRelayTarget;
+	static std::vector<UINT> m_vRelayedMessages;
+};
+
+#endif // ___CMSGRELAYWND_H___

@@ -26,10 +26,10 @@
 #define SDF_BUF_SIZE 4096
 
 // Get the application's directory; without \\ at the end
-C_FN_SHARE BOOL GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpecial, BOOL bMakeURL);
+BOOL GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpecial, BOOL bMakeURL);
 
 #ifndef _WIN32_WCE
-C_FN_SHARE BOOL SecureDeleteFile(LPCTSTR pszFilePath);
+BOOL SecureDeleteFile(LPCTSTR pszFilePath);
 #endif
 
 #endif

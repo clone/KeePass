@@ -38,9 +38,10 @@ public:
 	BOOL ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr);
 	BOOL ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr);
 
+	static char *FileToMemory(const TCHAR *pszFile, unsigned long *pFileSize);
+
 private:
 	void _AddStringStreamToDb(const char *pStream, unsigned long uStreamSize, BOOL bUTF8);
-	char *_FileToMemory(const TCHAR *pszFile, unsigned long *pFileSize);
 	unsigned long _GetPreferredIcon(LPCTSTR pszGroup);
 
 	CPwManager *m_pLastMgr;

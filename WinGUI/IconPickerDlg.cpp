@@ -94,7 +94,7 @@ BOOL CIconPickerDlg::OnInitDialog()
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_ICONPIC),
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("Pick an Icon"));
-	m_banner.SetCaption(TRL("Pick an icon from the list and click OK to set it."));
+	m_banner.SetCaption(TRL("Choose an icon from the list of available entry and group icons."));
 
 	return TRUE; // Return TRUE unless you set the focus to a control
 }

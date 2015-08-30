@@ -57,6 +57,22 @@ private:
 
 typedef std::basic_istream<TCHAR> std_istream;
 
+/*
+Note 21Sep2007 by Dominik Reichl, edited by Bill Rubin:
+
+The isSpace() function fixes a recently-discovered subtle bug caused by
+failure to properly convert characters to int before passing to std::isspace.
+Microsoft's CRT 2005 implementation of isspace asserts that the incoming
+character (of type int) is nonnegative.  When the application is compiled 
+in ANSI mode, passing high ( > 127) ANSI codepage-dependent characters 
+(like 'é') directly to isspace, a negative value is passed as function parameter 
+(automatic conversion from char to int), thus causing the assertion to fail. 
+This can be avoided using the to_int_type function,
+which correctly converts the char into an int in range 0 to 255.
+*/
+inline bool isSpace(const TCHAR c) {return 0 != std::isspace(std::char_traits<TCHAR>::to_int_type(c));}
+
+
     /*
     As long as operator>>() returns with valid istream,
     it will be called again.  Once it has caused istream to
@@ -79,7 +95,7 @@ std_istream& operator>>(std_istream& is, Token& token) {
     // Skip whitespace:
     do {
         if(!is.get(c)) return is;  // EOF caused by valid command line (no unmatched quotes)
-        } while(std::isspace(c));
+        } while(isSpace(c));
     
     bool outsideQuotedString = true;
 
@@ -100,7 +116,7 @@ std_istream& operator>>(std_istream& is, Token& token) {
                 }
             }
 
-        else if(outsideQuotedString && std::isspace(c)) return is;  // End of space-delimited token.  (Stream is not at EOF.)
+        else if(outsideQuotedString && isSpace(c)) return is;  // End of space-delimited token.  (Stream is not at EOF.).
 
         else token += c;  // Most common case.
         

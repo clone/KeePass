@@ -82,7 +82,7 @@ BOOL CGetRandomDlg::OnInitDialog()
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY),
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
-	m_banner.SetTitle(TRL("Get random data for key generation"));
+	m_banner.SetTitle(TRL("Get Random Data for Key Generation"));
 	m_banner.SetCaption(TRL("Move the mouse and type some random text to generate random values."));
 
 	CNewRandom cRand;

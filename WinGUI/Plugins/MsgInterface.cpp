@@ -18,9 +18,11 @@
 */
 
 #include "StdAfx.h"
-#include "../Resource.h"
 #include "MsgInterface.h"
+
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
+
+#include "../Resource.h"
 #include "../PwSafeDlg.h"
 #include "../Util/WinUtil.h"
 

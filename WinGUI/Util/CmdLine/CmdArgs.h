@@ -46,11 +46,12 @@ CmdArgs objects are immutable.
 
 class CmdArgs {
 public:
-    static CPP_FN_SHARE const CmdArgs& instance();   
-    
+    static CPP_FN_SHARE const CmdArgs& instance();
+
     const FullPathName& getDatabase() const {return m_database;}
     const FullPathName&  getKeyfile() const {return m_keyfile;}
     bool        preselectIsInEffect() const {return m_isPreselect;}
+    bool         readonlyIsInEffect() const {return m_isReadOnly;}
     const std_string&   getPassword() const {return m_Password;}
 
 private:
@@ -59,5 +60,6 @@ private:
     FullPathName m_database;
     FullPathName m_keyfile;
     bool         m_isPreselect;
-    std_string   m_Password;  // empty() <==> not set    
+    bool         m_isReadOnly;
+    std_string   m_Password;  // empty() <==> not set
 };

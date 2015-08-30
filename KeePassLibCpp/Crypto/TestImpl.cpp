@@ -102,7 +102,7 @@ static const unsigned char g_uVectTwofishCipher[16] =
 	0x9F, 0x0C, 0xFC, 0xCA, 0xE8, 0x7C, 0xFA, 0x20
 };
 
-C_FN_SHARE UINT32 TestCryptoImpl()
+UINT32 TestCryptoImpl()
 {
 	UINT32 uTestMask;
 	sha256_ctx hash256;

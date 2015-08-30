@@ -130,8 +130,7 @@ BOOL CPasswordDlg::OnInitDialog()
 	GetDlgItem(IDC_STATIC_SELDISK)->SetFont(&m_fBold);
 
 	m_btStars.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
-	CString strTT = TRL("Hide &Passwords Behind Asterisks (***)"); strTT.Remove(_T('&'));
-	m_btStars.SetTooltipText(strTT, TRUE);
+	m_btStars.SetTooltipText(TRL("Hide passwords behind asterisks (***)."), TRUE);
 
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
@@ -143,7 +142,7 @@ BOOL CPasswordDlg::OnInitDialog()
 	ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
 	cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
 	cbi.iItem = 0;
-	cbi.pszText = (LPTSTR)TRL("<No Key File Selected>");
+	cbi.pszText = (LPTSTR)TRL("(No key file selected)");
 	cbi.cchTextMax = (int)_tcslen(cbi.pszText);
 	cbi.iImage = cbi.iSelectedImage = ICOIDX_NODRIVE;
 	cbi.iIndent = 0;
@@ -199,12 +198,11 @@ BOOL CPasswordDlg::OnInitDialog()
 	{
 		if(m_bLoadMode == FALSE)
 		{
-			NewGUI_XPButton(&m_btBrowseKeyFile, IDB_TB_SAVE, IDB_TB_SAVE);
-			lp = TRL("Save Key File Manually To...");
+			NewGUI_XPButton(&m_btBrowseKeyFile, IDB_TB_SAVE, IDB_TB_SAVE, TRUE);
+			lp = TRL("Save key file manually to...");
 			m_btBrowseKeyFile.SetTooltipText(lp);
 
-			CString str;
-			str = TRL("Set Composite Master Key");
+			CString str = TRL("Set Composite Master Key");
 			if(m_strDescriptiveName.GetLength() != 0)
 				str = m_strDescriptiveName;
 			m_banner.SetTitle(str);
@@ -229,8 +227,8 @@ BOOL CPasswordDlg::OnInitDialog()
 		}
 		else // m_bConfirm == FALSE, m_bLoadMode == TRUE
 		{
-			NewGUI_XPButton(&m_btBrowseKeyFile, IDB_TB_OPEN, IDB_TB_OPEN);
-			lp = TRL("Select Key File Manually...");
+			NewGUI_XPButton(&m_btBrowseKeyFile, IDB_TB_OPEN, IDB_TB_OPEN, TRUE);
+			lp = TRL("Select key file manually...");
 			m_btBrowseKeyFile.SetTooltipText(lp);
 
 			CString str;
@@ -378,13 +376,13 @@ void CPasswordDlg::FreePasswords()
 
 	if(m_lpKey != NULL)
 	{
-		m_pEditPw.DeletePassword(m_lpKey);
+		CSecureEditEx::DeletePassword(m_lpKey);
 		m_lpKey = NULL;
 	}
 
 	if(m_lpKey2 != NULL)
 	{
-		m_pEditPw.DeletePassword(m_lpKey2);
+		CSecureEditEx::DeletePassword(m_lpKey2);
 		m_lpKey2 = NULL;
 	}
 }
@@ -430,7 +428,7 @@ void CPasswordDlg::OnOK()
 	{
 		m_bKeyFile = FALSE;
 	}
-	else
+	else // Key file provided
 	{
 		m_cbDiskList.GetLBText(m_cbDiskList.GetCurSel(), strTemp);
 
@@ -472,6 +470,28 @@ void CPasswordDlg::OnOK()
 			fclose(fpTest); Sleep(100);
 			DeleteFile(strTemp2);
 		}
+		else // Load the key file
+		{
+			const DWORD dwDummyErrorCode = 0x6F4B1C80;
+			::SetLastError(dwDummyErrorCode);
+			HANDLE hKeyFile = CreateFile(strTemp, GENERIC_READ, FILE_SHARE_READ,
+				NULL, OPEN_EXISTING, 0, NULL);
+			if(hKeyFile != INVALID_HANDLE_VALUE) CloseHandle(hKeyFile);
+			else // hKeyFile == INVALID_HANDLE_VALUE
+			{
+				DWORD dwKeyFileError = ::GetLastError();
+				if(dwKeyFileError != dwDummyErrorCode)
+				{
+					std::basic_string<TCHAR> strKeyError = strTemp;
+					strKeyError += _T("\r\n\r\n");
+					strKeyError += WU_FormatSystemMessage(dwKeyFileError);
+
+					MessageBox(strKeyError.c_str(), TRL("Password Safe"), MB_OK | MB_ICONWARNING);
+					FreePasswords();
+					return;
+				}
+			}
+		}
 
 		m_bKeyFile = TRUE;
 
@@ -498,7 +518,17 @@ void CPasswordDlg::OnCancel()
 
 void CPasswordDlg::OnCheckStars() 
 {
+	BOOL bPrevState = m_bStars;
+
 	UpdateData(TRUE);
+
+	if((bPrevState == TRUE) && (m_bStars == FALSE) &&
+		(CPwSafeDlg::IsUnsafeAllowed(this->m_hWnd) == FALSE))
+	{
+		m_bStars = TRUE;
+		UpdateData(FALSE);
+		return;
+	}
 
 	if(m_bStars == FALSE)
 	{

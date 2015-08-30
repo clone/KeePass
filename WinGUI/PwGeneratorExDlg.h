@@ -26,13 +26,13 @@
 
 #include "afxcmn.h"
 
+#include "../KeePassLibCpp/SysDefEx.h"
+#include "../KeePassLibCpp/PasswordGenerator/PasswordGenerator.h"
+
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/SecureEditEx.h"
 #include "NewGUI/GradientProgressCtrl.h"
-#include "Util/PrivateConfig.h"
-
-#include "../KeePassLibCpp/PasswordGenerator/PasswordGenerator.h"
 
 #define STR_CUSTOM_PROFILE TRL("(Custom)")
 #define STR_AUTO_PROFILE TRL("(Automatically generated passwords for new entries)")
@@ -54,7 +54,7 @@ private:
 	void CleanUp();
 
 	void UpdateDialogDataEx(BOOL bDialogToInternal, PW_GEN_SETTINGS_EX* pSettings);
-	void EnableControlsEx();
+	void EnableControlsEx(BOOL bSelectCustom);
 	void ShowGenProfile(CString strProfileName);
 
 	void RecreateProfilesList();
@@ -63,7 +63,7 @@ private:
 	void SaveGenProfiles();
 	PW_GEN_SETTINGS_EX* FindGenProfile(CString strProfileName);
 
-	PW_GEN_SETTINGS_EX* GetCurrentGenProfile();
+	CString GetCurrentGenProfile();
 
 	CKCSideBannerWnd m_banner;
 
@@ -71,20 +71,24 @@ private:
 	CFont m_fSymbol;
 	CFont m_fBold;
 	CToolTipCtrl m_tipSecClear;
+	HWND m_hPrevParent;
 
 	DWORD m_dwRequestedPasswords;
 
 	std::vector<PW_GEN_SETTINGS_EX> m_vProfiles;
-
-	CString m_strLastProfileName;
+	PW_GEN_SETTINGS_EX m_pgsLast;
 
 	LPTSTR m_lpPassword;
+
+	BOOL m_bBlockUIUpdate;
+	BOOL m_bShowInTaskbar;
 
 public:
 	CPwGeneratorExDlg(CWnd* pParent = NULL);
 	virtual ~CPwGeneratorExDlg();
 
-	void InitEx(DWORD dwRequestedPasswords, BOOL bInitialHidePw);
+	void InitEx(DWORD dwRequestedPasswords, BOOL bInitialHidePw,
+		BOOL bForceInTaskbar);
 
 	LPTSTR GetGeneratedPassword() const;
 
@@ -94,7 +98,6 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
-
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()
@@ -141,7 +144,6 @@ public:
 	afx_msg void OnBnClickedBtnProfileCreate();
 	afx_msg void OnBnClickedBtnProfileDelete();
 	CButton m_rbCharSetBased;
-	afx_msg void OnCbnEditChangeComboProfiles();
 	CButton m_rbPatternBased;
 	CButton m_cbCollectEntropy;
 	afx_msg void OnBnClickedGenerateBtn();
@@ -159,6 +161,19 @@ public:
 	afx_msg void OnEnChangeEditLength();
 	afx_msg void OnEnChangeEditCustomCharSet();
 	afx_msg void OnEnChangeEditPattern();
+	afx_msg void OnBnClickedCheckCsUppercase();
+	afx_msg void OnBnClickedCheckCsLowercase();
+	afx_msg void OnBnClickedCheckCsNumeric();
+	afx_msg void OnBnClickedCheckCsMinus();
+	afx_msg void OnBnClickedCheckCsUnderline();
+	afx_msg void OnBnClickedCheckCsSpace();
+	afx_msg void OnBnClickedCheckCsSpecial();
+	afx_msg void OnBnClickedCheckCsBrackets();
+	afx_msg void OnBnClickedCheckCsHighansi();
+	afx_msg void OnBnClickedCheckNoConfusing();
+	afx_msg void OnBnClickedCheckCollectEntropy();
+	CButton m_cbPatternPermute;
+	BOOL m_bPatternPermute;
 };
 
 #endif // ___PW_GENERATOR_EX_DLG_H___
