@@ -1,3 +1,17 @@
+04/06/05 - 0.95b
+- The XML exports now contain ALL information, times are
+  encoded as strings, attached files are encoded in base 64
+- Improved the group tree sort algorithm: the new one doesn't
+  destroy the tree structure any more (levels remain)
+- Added ability to import Personal Vault TXT files
+- The number of key encryption rounds was reset to the default
+  6000 each time you opened the database, fixed this
+- Fixed a small translation bug in the database settings dialog
+- Removed annoying notify message when creating a new database
+- The mass modify command now is available for single
+  selections, too
+- Expired entries don't lose their icons any more
+
 04/05/31 - 0.95a
 - Instead of hashing the password only once, the password is
   now 1x hashed (SHA-256), N times encrypted (AES, you can set

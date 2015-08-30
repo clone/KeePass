@@ -198,7 +198,9 @@ void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR 
 	if(dwBits > 9999) dwBits = 9999;
 
 	CString strQuality;
-	strQuality.Format(_T("%u bits"), dwBits);
+	strQuality.Format(_T("%u"), dwBits);
+	strQuality += _T(" ");
+	strQuality += TRL("bits");
 	pStatic->SetWindowText((LPCTSTR)strQuality);
 	if(dwBits > 128) dwBits = 128;
 	pProgress->SetPos((int)dwBits);

@@ -31,6 +31,7 @@
 #include "PwImport.h"
 #include "../Util/MemUtil.h"
 #include "../Util/StrUtil.h"
+#include "../NewGUI/TranslateEx.h"
 
 static char g_pNullString[4] = { 0, 0, 0, 0 };
 
@@ -232,7 +233,7 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 			}
 
 			if(strLastCategory.GetLength() == 0)
-				strLastCategory = _T("General");
+				strLastCategory = TRL("General");
 			dwLastGroupId = pMgr->GetGroupId((LPCTSTR)strLastCategory);
 			if(dwLastGroupId == DWORD_MAX)
 			{
@@ -286,6 +287,137 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 		{
 			if(str.Left(5) == _T("PIN: ")) {strPassword = str.Right(str.GetLength() - 5); b=1;}
 		}
+
+		if((b == 0) && (bInNotes == FALSE))
+		{
+			if(strNotes.GetLength() != 0) strNotes += _T("\r\n");
+			strNotes += str;
+		}
+	}
+
+	SAFE_DELETE_ARRAY(pData);
+
+	return TRUE;
+}
+
+BOOL CPwImport::ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr)
+{
+	char *pData;
+	CString strTitle, strURL, strUserName, strPassword, strNotes;
+	DWORD uFileSize, i, b;
+	CString str;
+	CString strLastCategory = _T("General");
+	DWORD dwLastGroupId;
+	BOOL bInNotes = FALSE;
+
+	ASSERT(pMgr != NULL);
+
+	pData = _FileToMemory(pszFile, &uFileSize);
+	if(pData == NULL) return FALSE;
+
+	strTitle.Empty(); strURL.Empty(); strUserName.Empty();
+	strPassword.Empty(); strNotes.Empty();
+
+	i = DWORD_MAX;
+	while(1) // Processing the file
+	{
+		str.Empty();
+
+		while(1) // Loading one line to CString
+		{
+			i++;
+			if(i >= uFileSize) break;
+
+			if(pData[i] == '\n') break;
+			if(pData[i] != '\r') str += pData[i];
+		}
+
+		// Add the entry
+		if((str == DEF_PV_SEPENTRY) || (i >= uFileSize) || (str.Left(12) == DEF_PV_CATEGORY))
+		{
+			if((strTitle.IsEmpty() == FALSE) || (strUserName.IsEmpty() == FALSE) ||
+				(strURL.IsEmpty() == FALSE) || (strPassword.IsEmpty() == FALSE))
+			{
+				strTitle.TrimLeft(); strTitle.TrimRight();
+				strURL.TrimLeft(); strURL.TrimRight();
+				strUserName.TrimLeft(); strUserName.TrimRight();
+				strPassword.TrimLeft(); strPassword.TrimRight();
+				strNotes.TrimLeft(); strNotes.TrimRight();
+
+				PW_ENTRY pwTemplate;
+				PW_TIME tNow;
+
+				_GetCurrentPwTime(&tNow);
+				memset(&pwTemplate, 0, sizeof(PW_ENTRY));
+				pwTemplate.pszAdditional = (TCHAR *)(LPCTSTR)strNotes;
+				pwTemplate.pszPassword = (TCHAR *)(LPCTSTR)strPassword;
+				pwTemplate.pszTitle = (TCHAR *)(LPCTSTR)strTitle;
+				pwTemplate.pszURL = (TCHAR *)(LPCTSTR)strURL;
+				pwTemplate.pszUserName = (TCHAR *)(LPCTSTR)strUserName;
+				pwTemplate.tCreation = tNow; CPwManager::_GetNeverExpireTime(&pwTemplate.tExpire);
+				pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
+				pwTemplate.uGroupId = dwLastGroupId;
+				pwTemplate.uImageId = _GetPreferredIcon((LPCTSTR)strTitle);
+				pwTemplate.uPasswordLen = strPassword.GetLength();
+
+				pMgr->AddEntry(&pwTemplate);
+			}
+
+			strTitle.Empty(); strURL.Empty(); strUserName.Empty();
+			strPassword.Empty(); strNotes.Empty();
+			bInNotes = FALSE;
+		}
+
+		if(i >= uFileSize) break;
+
+		if(bInNotes == TRUE)
+		{
+			if(strNotes.GetLength() != 0) strNotes += _T("\r\n");
+			strNotes += str.Right(str.GetLength() - 14);
+		}
+
+		if((str.Left(12) == DEF_PV_CATEGORY) && (str.Right(12) == DEF_PV_CATEGORY))
+		{
+			strLastCategory = str.Right(str.GetLength() - 12);
+			strLastCategory = strLastCategory.Left(strLastCategory.GetLength() - 12);
+			strLastCategory.TrimLeft(); strLastCategory.TrimRight();
+
+			if(strLastCategory.GetLength() == 0)
+				strLastCategory = TRL("General");
+			dwLastGroupId = pMgr->GetGroupId((LPCTSTR)strLastCategory);
+			if(dwLastGroupId == DWORD_MAX)
+			{
+				PW_GROUP pwT;
+				PW_TIME tNow;
+				_GetCurrentPwTime(&tNow);
+				memset(&pwT, 0, sizeof(PW_GROUP));
+				pwT.pszGroupName = (TCHAR *)(LPCTSTR)strLastCategory;
+				pwT.tCreation = tNow; CPwManager::_GetNeverExpireTime(&pwT.tExpire);
+				pwT.tLastAccess = tNow; pwT.tLastMod = tNow;
+				pwT.uGroupId = 0; // 0 = create new group ID
+				pwT.uImageId = _GetPreferredIcon((LPCTSTR)strLastCategory);
+				pMgr->AddGroup(&pwT);
+				dwLastGroupId = pMgr->GetGroupId((LPCTSTR)strLastCategory);
+			}
+			ASSERT(dwLastGroupId != DWORD_MAX);
+		}
+
+		if((str.Left(9) == _T("Comments:")) && (bInNotes == FALSE))
+		{
+			bInNotes = TRUE;
+			str = str.Right(str.GetLength() - 9);
+			if(str.GetLength() != 0) strNotes = str;
+			continue;
+		}
+
+		if(str.Left(9) == _T("Account: ")) {strTitle = str.Right(str.GetLength() - 9); b=1;}
+
+		b=0;
+		if(str.Left(11) == _T("User Name: ")) {strUserName = str.Right(str.GetLength() - 11); b=1;}
+
+		if(str.Left(11) == _T("Hyperlink: ")) {strURL = str.Right(str.GetLength() - 11); b=1;}
+
+		if(str.Left(10) == _T("Password: ")) {strPassword = str.Right(str.GetLength() - 10); b=1;}
 
 		if((b == 0) && (bInNotes == FALSE))
 		{

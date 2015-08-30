@@ -759,8 +759,6 @@ void CPwManager::UnlockEntryPassword(PW_ENTRY *pEntry)
 
 void CPwManager::NewDatabase()
 {
-	m_dwKeyEncRounds = PWM_STD_KEYENCROUNDS;
-
 	_DeleteEntryList(TRUE); // Delete really everything, the strings too
 	_DeleteGroupList(TRUE);
 
@@ -1486,11 +1484,74 @@ void CPwManager::MoveInGroup(DWORD idGroup, DWORD nFrom, DWORD nTo)
 
 void CPwManager::SortGroupList()
 {
-	DWORD i;
+	DWORD i, j;
 	BOOL bSwapped = TRUE;
-	PPW_GROUP p, q;
+	PPW_GROUP p = NULL;
+	LPTSTR *pList = NULL;
+	LPTSTR *pParents = NULL;
+	LPTSTR lpTemp = NULL;
+	LPTSTR lp = NULL;
+	DWORD dwMaxString = 0;
+	USHORT usMaxLevel = 0;
+	TCHAR tszTemp[16];
+	DWORD dw;
+	PW_GROUP pwt;
 
 	if(m_dwNumGroups <= 1) return; // Nothing to sort
+
+	// Search list for longest group name and maximum level
+	for(i = 0; i < m_dwNumGroups; i++)
+	{
+		j = (DWORD)_tcslen(m_pGroups[i].pszGroupName);
+		if(j > dwMaxString) dwMaxString = j;
+
+		if(m_pGroups[i].usLevel > usMaxLevel) usMaxLevel = m_pGroups[i].usLevel;
+	}
+
+	// Allocate pointer list to parent items
+	pParents = new LPTSTR[usMaxLevel + 2];
+	ASSERT(pParents != NULL); if(pParents == NULL) return;
+
+	// Calculate maximum length of the biggest FQGN (fully qualified group name)
+	// (numchars(base10(0xFFFFFFFF)) = 10) + char(NULL) + char(/n) + char(/n) = 13
+	dwMaxString = (dwMaxString + 1) * (usMaxLevel + 1) + 13;
+
+	pList = new LPTSTR[m_dwNumGroups]; // Allocate FQGN list (array of pointers)
+	ASSERT(pList != NULL);
+	lpTemp = new TCHAR[dwMaxString];
+	ASSERT(lpTemp != NULL);
+
+	// Build FQGN list
+	for(i = 0; i < m_dwNumGroups; i++)
+	{
+		pList[i] = new TCHAR[dwMaxString];
+		ASSERT(pList[i] != NULL);
+		if(pList[i] == NULL)
+		{
+			for(j = 0; j < i; j++) SAFE_DELETE_ARRAY(pList[j]);
+			SAFE_DELETE_ARRAY(pList); SAFE_DELETE_ARRAY(pParents); SAFE_DELETE_ARRAY(lpTemp);
+			return; // Failed, too few memory available
+		}
+		*pList[i] = 0;
+
+		p = &m_pGroups[i]; ASSERT(p != NULL);
+		if(p->usLevel != 0)
+		{
+			for(j = 0; j < p->usLevel; j++)
+			{
+				_tcscat(pList[i], pParents[j]);
+				_tcscat(pList[i], _T("\n"));
+			}
+		}
+		pParents[p->usLevel] = p->pszGroupName;
+		_tcscat(pList[i], p->pszGroupName);
+		_tcscat(pList[i], _T("\n\n"));
+
+		_ltot((long)p->uGroupId, tszTemp, 10);
+		_tcscat(pList[i], tszTemp);
+
+		ASSERT(_tcslen(pList[i]) < dwMaxString);
+	}
 
 	while(bSwapped == TRUE) // Stable bubble-sort on the group list
 	{
@@ -1498,18 +1559,44 @@ void CPwManager::SortGroupList()
 
 		for(i = 0; i < (m_dwNumGroups - 1); i++)
 		{
-			p = GetGroup(i);
-			q = GetGroup(i + 1);
-
-			p->usLevel = 0; q->usLevel = 0;
-
-			if(_tcsicmp(p->pszGroupName, q->pszGroupName) > 0)
+			if(_tcsicmp(pList[i], pList[i+1]) > 0)
 			{
-				MoveGroup(i, i + 1);
+				_tcscpy(lpTemp, pList[i]); // Swap strings
+				_tcscpy(pList[i], pList[i+1]);
+				_tcscpy(pList[i+1], lpTemp);
+
 				bSwapped = TRUE;
 			}
 		}
 	}
+
+	for(i = 0; i < (m_dwNumGroups - 1); i++)
+	{
+		lp = &pList[i][_tcslen(pList[i]) - 1];
+		while(1)
+		{
+			if(*lp == _T('\n')) break;
+			lp--;
+		}
+		lp++;
+
+		dw = (DWORD)_ttol(lp);
+		ASSERT(GetGroupById(dw) != NULL);
+
+		for(j = i; j < m_dwNumGroups; j++)
+		{
+			if(m_pGroups[j].uGroupId == dw) break;
+		}
+
+		pwt = m_pGroups[i];
+		m_pGroups[i] = m_pGroups[j];
+		m_pGroups[j] = pwt;
+	}
+
+	for(i = 0; i < m_dwNumGroups; i++) SAFE_DELETE_ARRAY(pList[i]);
+	SAFE_DELETE_ARRAY(pList); SAFE_DELETE_ARRAY(pParents); SAFE_DELETE_ARRAY(lpTemp);
+
+	FixGroupTree();
 }
 
 void CPwManager::SortGroup(DWORD idGroup, DWORD dwSortByField)

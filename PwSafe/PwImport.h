@@ -33,6 +33,8 @@
 #include "PwManager.h"
 
 #define DEF_CW_CATEGORY _T("----------------------------------------")
+#define DEF_PV_SEPENTRY _T("----------------------")
+#define DEF_PV_CATEGORY _T("************")
 
 class CPwImport
 {
@@ -43,6 +45,7 @@ public:
 	BOOL ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwGroupId);
 	BOOL ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr);
 	BOOL ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr);
+	BOOL ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr);
 
 private:
 	void _AddStringStreamToDb(const char *pStream, unsigned long uStreamSize);

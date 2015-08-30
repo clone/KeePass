@@ -509,6 +509,8 @@ protected:
 	afx_msg void OnUpdateFileShowDbInfo(CCmdUI* pCmdUI);
 	afx_msg void OnExtrasShowExpired();
 	afx_msg void OnUpdateExtrasShowExpired(CCmdUI* pCmdUI);
+	afx_msg void OnImportPvault();
+	afx_msg void OnUpdateImportPvault(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

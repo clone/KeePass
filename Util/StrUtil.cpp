@@ -228,6 +228,14 @@ void _PwTimeToString(PW_TIME t, CString *pstrDest)
 		t.btDay, t.btHour, t.btMinute, t.btSecond);
 }
 
+void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest)
+{
+	ASSERT(pstrDest != NULL);
+	pstrDest->Empty();
+	pstrDest->Format(_T("%04u-%02u-%02uT%02u:%02u:%02u"), t.shYear, t.btMonth,
+		t.btDay, t.btHour, t.btMinute, t.btSecond);
+}
+
 void _UuidToString(const BYTE *pUuid, CString *pstrDest)
 {
 	CString strTemp;
@@ -561,11 +569,11 @@ TCHAR *MakeSafeXmlString(TCHAR *ptString)
 	TCHAR *pFinal;
 
 	TCHAR aChar[LOCAL_NUMXMLCONV] = {
-		_T('<'), _T('>'), _T('&'), _T('\"'), _T('²'), _T('³'), _T('©')
+		_T('<'), _T('>'), _T('&'), _T('\"'), _T('\'')
 	};
 
 	TCHAR *pTrans[LOCAL_NUMXMLCONV] = {
-		_T("&lt;"), _T("&gt;"), _T("&amp;"), _T("&quot;"), _T("&sup2;"), _T("&sup3;"), _T("&copy;")
+		_T("&lt;"), _T("&gt;"), _T("&amp;"), _T("&quot;"), _T("&apos;")
 	};
 
 	ASSERT(ptString != NULL); if(ptString == NULL) return NULL;

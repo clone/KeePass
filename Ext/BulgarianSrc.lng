@@ -71,7 +71,6 @@
 |This will generate a random password.|        |Тук се генерира произволна парола.|
 |Options|                      |Опции|
 |Password Generation Options|  |Опции за генерация на парола|
-|Only the following characters:|               |Само тези символи:|
 |Number of characters:|        |Брой символи:|
 |Your new password:|           |Вашата нова парола:|
 |&Generate|                    |&Генериране|
@@ -437,9 +436,9 @@
 
 |Show &Columns| |Показване на колони|
 
-|~LANGUAGEVERSION| |0.92a|
+|~LANGUAGEVERSION| |0.95a|
 |~LANGUAGEAUTHOR|     |Дончо Ангелов|
-|~LANGUAGEAUTHOREMAIL| |public@doncho.net|
+|~LANGUAGEAUTHOREMAIL| |kppc@doncho.net|
 |~LANGUAGENAME|       |Български|
 
 |Show &Entry View|     |Показване на изгледът на записа|
@@ -468,3 +467,72 @@
 |Twofish (128-bit block cipher using 256-bit key)|
     |Twofish (128-битово криптиране с 256-битов ключ)|
 |Using this wizard you can easily add TAN entries.|    |Използвайки този помощник може лесно да прибавяте TAN записи.|
+
+
+|&Only the following characters:| |&Само тези символи:|
+|&Open with KeePass| |&Отваряне с KeePass|
+|&Remove Association| |&Премахване на асоциацията|
+|Collect &entropy (recommended for strong passwords)| 
+    |Събира &ентропията (препоръчва се за силна парола)|
+|Create &Association| |Създава &асоциация|
+|Here you can associate .kdb files with KeePass (so KeePass opens the file when double-clicking on it):|
+    |Тук може да асоциирате .kdb файловете с KeePass (така че KeePass ще отваря файловете при двойно кликване върху тях):|
+|KeePass Password Database| |База с пароли на KeePass|
+|Successfully associated KeePass with .kdb files! A double-click on a .kdb file will now start KeePass automatically!|
+    |KeePass беше успешно асоцииран с .kdb файловете! Вече двойно кликване върху .kdb файл автоматично ще стартира KeePass с него!|
+|Successfully removed association! KeePass won't be started any more when double-clicking on a .kdb file!|
+    |Асоциациирането беше премахнато! Вече KeePass няма да се стартира при двойно кликване на .kdb файл!|
+
+|&Database Settings...|
+    |&Настройки на базата данни...|
+|Cannot access the selected drive.|
+    |Избраното устройство е недостъпно.|
+|Click on an entry to jump to it.|
+    |Изберете запис, за да отидете на него.|
+|Database Settings|
+    |Настройки на базата данни|
+|Database Summary|
+    |Общо за базата данни|
+|Disable unsafe (security-critical) operations like exports, etc.|
+    |Забрана на критичните за сигурността операции като експортиране и т.н.|
+|Exit?|
+    |Изход?|
+|Expired Entries|
+    |Изтекли записи|
+|Here you can configure the current database.|
+    |Тук се настройва текущата база с данни.|
+|If you exit now, all changes to the current database will be lost.|
+    |Ако излезете сега, всички промени в текущата база с данни ще се загубят.|
+|Make sure a writable medium is inserted.|
+    |Уверете се, че има поставен носител, на който може да се пише.|
+|Maybe it's read-only or the storage media has been removed.|
+    |Може би носителят е само за четене или е бил изваден.|
+|Not enough free disk space!|
+    |Липсва достатъчно свободно място!|
+|Number of key encryption rounds:|
+    |Брой шифровъчни цикъла:|
+|Password List|
+    |Списък с пароли|
+|Quality:|
+    |Качество:|
+|Setup|
+    |Настройка|
+|Show All &Expired Entries...|
+    |Показва всички &изтекли записи...|
+|The file couldn't be saved.|
+    |Файлът не може да бъде записан.|
+|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
+    |Колкото числото е по-голямо, толкова по-трудна става атаката с груба сила. Но и толкова по-бавно ще е зареждането и записването на базата.|
+|This is a list of all expired entries|
+    |Това е списък на всички изтекли записи|
+|To execute this operation you must enable unsafe operations in the options dialog.|
+    |За да се изпълни тази операция, в настройките трябва да са разрешени "несигурни операции".|
+|Unsafe operations are disabled.|
+    |Несигурните операции са забранени.|
+|Would you like to exit anyway?|
+    |Желаете ли изход въпреки това?|
+|You have changed an option that requires restarting KeePass to get active.|
+    |Сменена е настройка, която изисква рестартиране на KeePass, за да стане активна.|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
+    |Вашият ключ се криптира няколко пъти при създаването на ключът за базата данни. Това прибавя константно забавяне, но и прави атаката с груба сила много по-трудна.|
+

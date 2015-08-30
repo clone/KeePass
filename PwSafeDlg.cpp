@@ -371,6 +371,8 @@ BEGIN_MESSAGE_MAP(CPwSafeDlg, CDialog)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SHOWDBINFO, OnUpdateFileShowDbInfo)
 	ON_COMMAND(ID_EXTRAS_SHOWEXPIRED, OnExtrasShowExpired)
 	ON_UPDATE_COMMAND_UI(ID_EXTRAS_SHOWEXPIRED, OnUpdateExtrasShowExpired)
+	ON_COMMAND(ID_IMPORT_PVAULT, OnImportPvault)
+	ON_UPDATE_COMMAND_UI(ID_IMPORT_PVAULT, OnUpdateImportPvault)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -2112,6 +2114,7 @@ void CPwSafeDlg::_List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEnt
 	LV_ITEM lvi;
 	DWORD t;
 	CString strTemp;
+	DWORD uImageId;
 
 	if((dwInsertPos == DWORD_MAX) && (bIsNewEntry == TRUE))
 		dwInsertPos = (DWORD)m_cList.GetItemCount();
@@ -2121,14 +2124,15 @@ void CPwSafeDlg::_List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEnt
 	lvi.iSubItem = 0;
 
 	// Set 'expired' image if necessary
-	if(_pwtimecmp(&pwe->tExpire, ptNow) <= 0) pwe->uImageId = 45;
+	if(_pwtimecmp(&pwe->tExpire, ptNow) <= 0) uImageId = 45;
+	else uImageId = pwe->uImageId;
 
 	lvi.mask = LVIF_TEXT | LVIF_IMAGE;
 	if(m_bShowTitle == TRUE)
 		lvi.pszText = pwe->pszTitle;
 	else
 		lvi.pszText = g_pNullString;
-	lvi.iImage = pwe->uImageId;
+	lvi.iImage = uImageId;
 
 	if(bIsNewEntry == TRUE)
 		m_cList.InsertItem(&lvi); // Add
@@ -2857,8 +2861,8 @@ void CPwSafeDlg::OnFileNew()
 	if(m_bFileOpen == TRUE) OnFileClose();
 	if(m_bFileOpen == TRUE)
 	{
-		MessageBox(TRL("First close the open file before opening another one!"), TRL("Password Safe"),
-			MB_OK | MB_ICONWARNING);
+		// MessageBox(TRL("First close the open file before opening another one!"), TRL("Password Safe"),
+		//	MB_OK | MB_ICONWARNING);
 		return;
 	}
 
@@ -3105,6 +3109,7 @@ void CPwSafeDlg::OnFileOpen()
 	m_bDisplayDialog = TRUE;
 	_OpenDatabase(NULL);
 	_UpdateToolBar();
+	m_cGroups.SetFocus();
 	m_bDisplayDialog = FALSE;
 }
 
@@ -5277,7 +5282,7 @@ void CPwSafeDlg::OnPwlistMassModify()
 
 void CPwSafeDlg::OnUpdatePwlistMassModify(CCmdUI* pCmdUI) 
 {
-	pCmdUI->Enable((m_bFileOpen && (m_dwLastNumSelectedItems > 1)) ? TRUE : FALSE);
+	pCmdUI->Enable((m_bFileOpen && (m_dwLastNumSelectedItems >= 1)) ? TRUE : FALSE);
 }
 
 void CPwSafeDlg::OnKeyDownPwlist(NMHDR* pNMHDR, LRESULT* pResult) 
@@ -6422,4 +6427,55 @@ void CPwSafeDlg::OnExtrasShowExpired()
 void CPwSafeDlg::OnUpdateExtrasShowExpired(CCmdUI* pCmdUI) 
 {
 	pCmdUI->Enable(m_bFileOpen);	
+}
+
+void CPwSafeDlg::OnImportPvault() 
+{
+	CPwImport pvi;
+	CString strFile;
+	DWORD dwFlags;
+	CString strFilter;
+	int nRet;
+	DWORD dwGroupId;
+
+	m_bDisplayDialog = TRUE;
+
+	strFilter = TRL("Text files");
+	strFilter += _T(" (*.txt)|*.txt|");
+	strFilter += TRL("All files");
+	strFilter += _T(" (*.*)|*.*||");
+
+	dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
+	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
+	dwFlags |= 0x00080000 | 0x00800000;
+	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	CFileDialog dlg(TRUE, _T("txt"), _T("*.txt"), dwFlags, strFilter, this);
+
+	nRet = dlg.DoModal();
+	if(nRet == IDOK)
+	{
+		strFile = dlg.GetPathName();
+
+		dwGroupId = GetSelectedGroupId();
+		ASSERT(dwGroupId != DWORD_MAX);
+
+		if(pvi.ImportPVaultToDb((LPCTSTR)strFile, &m_mgr) == TRUE)
+		{
+			_Groups_SaveView(); UpdateGroupList(); _Groups_RestoreView();
+			UpdatePasswordList();
+			m_bModified = TRUE;
+		}
+		else
+		{
+			MessageBox(TRL("An error occured while importing the file. File cannot be imported."),
+				TRL("Password Safe"), MB_ICONWARNING);
+		}
+	}
+	_UpdateToolBar();
+	m_bDisplayDialog = FALSE;
+}
+
+void CPwSafeDlg::OnUpdateImportPvault(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(m_bFileOpen);
 }

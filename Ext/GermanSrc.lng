@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |0.95a|
+|~LANGUAGEVERSION|             |0.95b|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -511,3 +511,5 @@
 |The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
     |Je größer diese Zahl ist, desto schwieriger sind Brute-Force-Attacken. Je größer allerdings diese Zahl ist, desto länger dauert auch das Laden und Speichern der Datenbank.|
 |Number of key encryption rounds:|        |Anzahl Passwort-Verschlüsselungsrunden:|
+|bits|                                    |bits|
+|Import From Personal &Vault TXT|         |Personal &Vault TXT-Datei importieren|

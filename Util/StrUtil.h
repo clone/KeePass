@@ -63,6 +63,7 @@ DWORD _UTF8BytesNeeded(const TCHAR *pszString);
 
 // Convert PW_TIME structure to a CString
 void _PwTimeToString(PW_TIME t, CString *pstrDest);
+void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest);
 
 // Convert UUID to string and the other way round
 void _UuidToString(const BYTE *pUuid, CString *pstrDest);

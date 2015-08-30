@@ -32,6 +32,7 @@
 
 #include "../Util/MemUtil.h"
 #include "../Util/StrUtil.h"
+#include "../Util/base64.h"
 #include "../NewGUI/TranslateEx.h"
 
 CPwExport::CPwExport()
@@ -98,6 +99,8 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 	PW_ENTRY *p;
 	PW_GROUP *pg;
 	BYTE aInitUTF8[3] = { 0xEF, 0xBB, 0xBF };
+	CString str;
+	CBase64Codec base64;
 
 	ASSERT(pszFile != NULL);
 	if(pszFile == NULL) return FALSE;
@@ -249,6 +252,59 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 			PWEXPSTR(_T("\t<notes>"));
 			PWEXPSTRXML(p->pszAdditional);
 			PWEXPSTR(_T("</notes>")); PWEXPSTR(m_pszNewLine);
+
+			PWEXPSTR(_T("\t<uuid>"));
+			_UuidToString(p->uuid, &str);
+			PWEXPSTR((LPCTSTR)str);
+			PWEXPSTR(_T("</uuid>")); PWEXPSTR(m_pszNewLine);
+
+			PWEXPSTR(_T("\t<image>"));
+			str.Format(_T("%u"), p->uImageId);
+			PWEXPSTR((LPCTSTR)str);
+			PWEXPSTR(_T("</image>")); PWEXPSTR(m_pszNewLine);
+
+			PWEXPSTR(_T("\t<creationtime>"));
+			_PwTimeToXmlTime(p->tCreation, &str);
+			PWEXPSTR((LPCTSTR)str);
+			PWEXPSTR(_T("</creationtime>")); PWEXPSTR(m_pszNewLine);
+
+			PWEXPSTR(_T("\t<lastmodtime>"));
+			_PwTimeToXmlTime(p->tLastMod, &str);
+			PWEXPSTR((LPCTSTR)str);
+			PWEXPSTR(_T("</lastmodtime>")); PWEXPSTR(m_pszNewLine);
+
+			PWEXPSTR(_T("\t<lastaccesstime>"));
+			_PwTimeToXmlTime(p->tLastAccess, &str);
+			PWEXPSTR((LPCTSTR)str);
+			PWEXPSTR(_T("</lastaccesstime>")); PWEXPSTR(m_pszNewLine);
+
+			PWEXPSTR(_T("\t<expiretime>"));
+			_PwTimeToXmlTime(p->tExpire, &str);
+			PWEXPSTR((LPCTSTR)str);
+			PWEXPSTR(_T("</expiretime>")); PWEXPSTR(m_pszNewLine);
+
+			if(_tcslen(p->pszBinaryDesc) != 0)
+			{
+				PWEXPSTR(_T("\t<attachdesc>"));
+				PWEXPSTRXML(p->pszBinaryDesc);
+				PWEXPSTR(_T("</attachdesc>")); PWEXPSTR(m_pszNewLine);
+			}
+
+			if(p->uBinaryDataLen != 0)
+			{
+				DWORD dwBufSize = (((p->uBinaryDataLen + 2) / 3) << 2) + 1;
+				BYTE *pTempBuf = new BYTE[dwBufSize + 1];
+
+				if(base64.Encode(p->pBinaryData, p->uBinaryDataLen, pTempBuf, &dwBufSize) == true)
+				{
+					PWEXPSTR(_T("\t<attachment>"));
+					PWEXPSTR((TCHAR *)pTempBuf);
+					PWEXPSTR(_T("</attachment>")); PWEXPSTR(m_pszNewLine);
+				}
+				else { ASSERT(FALSE); }
+
+				SAFE_DELETE_ARRAY(pTempBuf);
+			}
 
 			PWEXPSTR(_T("</pwentry>")); PWEXPSTR(m_pszNewLine);
 		}
