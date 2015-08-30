@@ -69,7 +69,7 @@ public:
 	BOOL ExportAll(const TCHAR *pszFile, const PWEXPORT_OPTIONS *pOptions, CPwManager *pStoreMgr);
 	BOOL ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPORT_OPTIONS *pOptions, CPwManager *pStoreMgr);
 
-	CString MakeGroupTreeString(DWORD dwGroupId) const;
+	CString MakeGroupTreeString(DWORD dwGroupId, bool bXmlEncode) const;
 
 	PWEXPORT_OPTIONS m_aDefaults[PWEXP_LAST];
 	int m_nFormat;

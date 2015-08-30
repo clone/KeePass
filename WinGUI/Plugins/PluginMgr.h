@@ -63,6 +63,8 @@ private:
 	BOOL IsPluginValid(LPCTSTR lpFile);
 	void CleanUp();
 
+	static void ClearStructure(KP_PLUGIN_INSTANCE* p);
+
 	DWORD m_dwFreePluginID;
 	DWORD m_dwFirstCommand;
 	DWORD m_dwLastCommand;

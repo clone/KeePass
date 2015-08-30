@@ -35,10 +35,6 @@ using boost::scoped_ptr;
 static PW_TIME g_pwTimeNever = { 2999, 12, 28, 23, 59, 59 };
 static char g_pNullString[4] = { 0, 0, 0, 0 };
 
-#ifdef _UNICODE
-#pragma message("Unicode builds are not supported. It is recommended to switch to ANSI configuration.")
-#endif
-
 CPwManager::CPwManager()
 {
 	m_pEntries = NULL;

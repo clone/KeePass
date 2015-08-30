@@ -21,6 +21,7 @@
 #include "../Util/AppUtil.h"
 #include "../Util/MemUtil.h"
 #include "../Util/NewRandom.h"
+#include "../Util/PwUtil.h"
 #include "../PwManager.h"
 
 BOOL GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpecial, BOOL bMakeURL)
@@ -123,9 +124,15 @@ BOOL SecureDeleteFile(LPCTSTR pszFilePath)
 
 int AU_WriteBigFile(LPCTSTR lpFilePath, const BYTE* pData, DWORD dwDataSize)
 {
-	HANDLE hFile = CreateFile(lpFilePath, GENERIC_WRITE, 0, NULL,
-		CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if(hFile == INVALID_HANDLE_VALUE) return PWE_NOFILEACCESS_WRITE;
+	const bool bMadeUnhidden = CPwUtil::UnhideFile(lpFilePath);
+
+	HANDLE hFile = CreateFile(lpFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL, NULL);
+	if(hFile == INVALID_HANDLE_VALUE)
+	{
+		if(bMadeUnhidden) CPwUtil::HideFile(lpFilePath, true);
+		return PWE_NOFILEACCESS_WRITE;
+	}
 
 	int nResult = PWE_SUCCESS;
 	DWORD dwRemaining = dwDataSize, dwPosition = 0;
@@ -149,5 +156,7 @@ int AU_WriteBigFile(LPCTSTR lpFilePath, const BYTE* pData, DWORD dwDataSize)
 
 	VERIFY(FlushFileBuffers(hFile));
 	VERIFY(CloseHandle(hFile));
+
+	if(bMadeUnhidden) CPwUtil::HideFile(lpFilePath, true);
 	return nResult;
 }

@@ -86,7 +86,9 @@ DWORD CPwImport::ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwG
 
 	if(uFileSize > 3)
 	{
-		if((pData[0] == 0xEF) && (pData[1] == 0xBB) && (pData[2] == 0xBF))
+		if((static_cast<unsigned char>(pData[0]) == 0xEF) &&
+			(static_cast<unsigned char>(pData[1]) == 0xBB) &&
+			(static_cast<unsigned char>(pData[2]) == 0xBF))
 		{
 			j += 3; // Skip UTF-8 initialization characters
 			bUTF8 = TRUE;
@@ -161,7 +163,7 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 {
 	char *pData;
 	CString strTitle, strURL, strUserName, strPassword, strNotes;
-	DWORD uFileSize, i, b;
+	DWORD uFileSize, i = DWORD_MAX, b;
 	CString str;
 	CString strLastCategory = _T("General");
 	DWORD dwLastGroupId = 0;
@@ -175,11 +177,18 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 	strTitle.Empty(); strURL.Empty(); strUserName.Empty();
 	strPassword.Empty(); strNotes.Empty();
 
-	i = DWORD_MAX;
+	if((uFileSize > 3) && (static_cast<unsigned char>(pData[0]) == 0xEF) &&
+		(static_cast<unsigned char>(pData[1]) == 0xBB) &&
+		(static_cast<unsigned char>(pData[2]) == 0xBF))
+		i += 3; // Skip UTF-8 initialization characters
 
-	if(uFileSize > 3)
-		if((pData[0] == 0xEF) && (pData[1] == 0xBB) && (pData[2] == 0xBF))
-			i += 3; // Skip UTF-8 initialization characters
+	bool bUnicodeMode = false;
+	if((uFileSize > 2) && (static_cast<unsigned char>(pData[0]) == 0xFF) &&
+		(static_cast<unsigned char>(pData[1]) == 0xFE))
+	{
+		i += 2; // Skip Unicode initialization characters
+		bUnicodeMode = true;
+	}
 
 	while(1) // Processing the file
 	{
@@ -187,19 +196,27 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 
 		while(1) // Loading one line to CString
 		{
-			i++;
+			++i;
 			if(i >= uFileSize) break;
 
-			if(pData[i] == '\n') break;
-			if(pData[i] != '\r') str += pData[i];
+			const char chReadCx = pData[i];
+
+			if(bUnicodeMode) ++i;
+
+			if(chReadCx == '\n') break;
+			if(chReadCx != '\r') str += chReadCx;
 		}
 
 		// Add the entry
 		if(((str.Left(1) == _T("[")) && (str.Right(1) == _T("]"))) ||
-			(str == DEF_CW_CATEGORY) || (i >= uFileSize))
+			(str == DEF_CW_CATEGORY) || (str == DEF_CW_CATEGORY_NEW) || (i >= uFileSize))
 		{
+			CString strTrimmedNotes = strNotes;
+			strTrimmedNotes = strTrimmedNotes.Trim();
+
 			if((strTitle.IsEmpty() == FALSE) || (strUserName.IsEmpty() == FALSE) ||
-				(strURL.IsEmpty() == FALSE) || (strPassword.IsEmpty() == FALSE))
+				(strURL.IsEmpty() == FALSE) || (strPassword.IsEmpty() == FALSE) ||
+				(strTrimmedNotes.IsEmpty() == FALSE))
 			{
 				strTitle = strTitle.Trim();
 				strURL = strURL.Trim();
@@ -207,10 +224,10 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 				strPassword = strPassword.Trim();
 				strNotes = strNotes.Trim();
 
-				PW_ENTRY pwTemplate;
 				PW_TIME tNow;
-
 				_GetCurrentPwTime(&tNow);
+
+				PW_ENTRY pwTemplate;
 				memset(&pwTemplate, 0, sizeof(PW_ENTRY));
 				pwTemplate.pszAdditional = (TCHAR *)(LPCTSTR)strNotes;
 				pwTemplate.pszPassword = (TCHAR *)(LPCTSTR)strPassword;
@@ -220,10 +237,10 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 				pwTemplate.tCreation = tNow; CPwManager::GetNeverExpireTime(&pwTemplate.tExpire);
 				pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
 				pwTemplate.uGroupId = dwLastGroupId;
-				pwTemplate.uImageId = _GetPreferredIcon((LPCTSTR)strTitle);
+				pwTemplate.uImageId = _GetPreferredIcon(strTitle);
 				pwTemplate.uPasswordLen = strPassword.GetLength();
 
-				pMgr->AddEntry(&pwTemplate);
+				if(pwTemplate.uGroupId != 0) pMgr->AddEntry(&pwTemplate);
 			}
 
 			strTitle.Empty(); strURL.Empty(); strUserName.Empty();
@@ -244,12 +261,22 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 		if(bInNotes == TRUE)
 		{
 			if(strNotes.GetLength() != 0) strNotes += _T("\r\n");
-			strNotes += str;
+
+			if((str != DEF_CW_CATEGORY) && (str != DEF_CW_CATEGORY_NEW))
+				strNotes += str;
 		}
 
-		if(str.Left(10) == _T("Category: "))
+		const std::basic_string<TCHAR> strFxCategory = _T("Category: ");
+		const std::basic_string<TCHAR> strFxFolder = _T("Folder: ");
+		const bool bStartsCat = (str.Left(static_cast<int>(strFxCategory.size())) ==
+			strFxCategory.c_str());
+		const bool bStartsFld = (str.Left(static_cast<int>(strFxFolder.size())) ==
+			strFxFolder.c_str());
+
+		if(bStartsCat || bStartsFld)
 		{
-			strLastCategory = str.Right(str.GetLength() - 10);
+			strLastCategory = str.Right(str.GetLength() - static_cast<int>(bStartsCat ?
+				strFxCategory.size() : strFxFolder.size()));
 			strLastCategory = strLastCategory.Trim();
 
 			while(1)
@@ -323,12 +350,13 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 		if((b == 0) && (bInNotes == FALSE))
 		{
 			if(strNotes.GetLength() != 0) strNotes += _T("\r\n");
-			strNotes += str;
+
+			if((str != DEF_CW_CATEGORY) && (str != DEF_CW_CATEGORY_NEW))
+				strNotes += str;
 		}
 	}
 
 	SAFE_DELETE_ARRAY(pData);
-
 	return TRUE;
 }
 
@@ -353,7 +381,9 @@ BOOL CPwImport::ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr)
 	i = DWORD_MAX;
 
 	if(uFileSize > 3)
-		if((pData[0] == 0xEF) && (pData[1] == 0xBB) && (pData[2] == 0xBF))
+		if((static_cast<unsigned char>(pData[0]) == 0xEF) &&
+			(static_cast<unsigned char>(pData[1]) == 0xBB) &&
+			(static_cast<unsigned char>(pData[2]) == 0xBF))
 			i += 3; // Skip UTF-8 initialization characters
 
 	while(1) // Processing the file
@@ -362,7 +392,7 @@ BOOL CPwImport::ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr)
 
 		while(1) // Loading one line to CString
 		{
-			i++;
+			++i;
 			if(i >= uFileSize) break;
 
 			if(pData[i] == '\n') break;
@@ -394,7 +424,7 @@ BOOL CPwImport::ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr)
 				pwTemplate.tCreation = tNow; CPwManager::GetNeverExpireTime(&pwTemplate.tExpire);
 				pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
 				pwTemplate.uGroupId = dwLastGroupId;
-				pwTemplate.uImageId = _GetPreferredIcon((LPCTSTR)strTitle);
+				pwTemplate.uImageId = _GetPreferredIcon(strTitle);
 				pwTemplate.uPasswordLen = strPassword.GetLength();
 
 				pMgr->AddEntry(&pwTemplate);
@@ -489,7 +519,9 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 	strGroup.Empty(); strTitle.Empty(); strUserName.Empty(); strPassword.Empty(); strNotes.Empty();
 
 	if(uFileSize > 3)
-		if((pData[0] == 0xEF) && (pData[1] == 0xBB) && (pData[2] == 0xBF))
+		if((static_cast<unsigned char>(pData[0]) == 0xEF) &&
+			(static_cast<unsigned char>(pData[1]) == 0xBB) &&
+			(static_cast<unsigned char>(pData[2]) == 0xBF))
 			i += 3; // Skip UTF-8 initialization characters
 
 	while(1)

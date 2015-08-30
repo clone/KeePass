@@ -28,14 +28,7 @@
 */
 
 /////////////////////////////////////////////////////////////////////////////
-// Version History:
-// 2005-04-18: v1.1
-// - EnableSecureMode now doesn't just clear the control, it converts the
-//   entered password
-// - Made DeletePassword, SetMemoryEx and DeleteTPtr static public functions
-//
-// 2005-04-17: v1.0
-// - First release
+// For version history see the source file.
 
 #if !defined(AFX_SECUREEDITEX_H__83B26DEE_A42E_11D9_BF17_0050BF14F5CC__INCLUDED_)
 #define AFX_SECUREEDITEX_H__83B26DEE_A42E_11D9_BF17_0050BF14F5CC__INCLUDED_

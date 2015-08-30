@@ -29,6 +29,9 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // Version History:
+// 2008-06-06: v1.2
+// - Added ability to accept text drops
+//
 // 2005-04-18: v1.1
 // - EnableSecureMode now doesn't just clear the control, it converts the
 //   entered password
@@ -142,13 +145,10 @@ BOOL CSecureEditEx::IsSecureModeEnabled()
 // Securely erase and free all memory
 void CSecureEditEx::_DeleteAll()
 {
-	int i;
-	LPTSTR lp;
-
 	// Securely free the password characters
-	for(i = 0; i < m_apChars.GetSize(); i++)
+	for(int i = 0; i < m_apChars.GetSize(); ++i)
 	{
-		lp = (LPTSTR)m_apChars.GetAt(i);
+		LPTSTR lp = (LPTSTR)m_apChars.GetAt(i);
 		DeleteTPtr(lp, FALSE, FALSE);
 	}
 
@@ -191,8 +191,6 @@ void CSecureEditEx::DeleteTPtr(LPTSTR lp, BOOL bIsArray, BOOL bIsString)
 // Retrieve the currently entered password
 LPTSTR CSecureEditEx::GetPassword()
 {
-	int nNumChars;
-
 	if(m_bSecMode == TRUE)
 	{
 		ASSERT(GetWindowTextLength() == m_apChars.GetSize()); // Sync failed?
@@ -200,14 +198,14 @@ LPTSTR CSecureEditEx::GetPassword()
 
 	if(m_bSecMode == FALSE)
 	{
-		nNumChars = GetWindowTextLength();
-		LPTSTR lpNew = new TCHAR[nNumChars + 1];
+		const int nPlainChars = GetWindowTextLength();
+		LPTSTR lpNew = new TCHAR[nPlainChars + 1];
 		ASSERT(lpNew != NULL); if(lpNew == NULL) return NULL;
-		GetWindowText(lpNew, nNumChars + 1);
+		GetWindowText(lpNew, nPlainChars + 1);
 		return lpNew;
 	}
 
-	nNumChars = (int)m_apChars.GetSize();
+	const int nNumChars = static_cast<int>(m_apChars.GetSize());
 
 	LPTSTR lp = new TCHAR[nNumChars + 1];
 	ASSERT(lp != NULL); if(lp == NULL) return NULL;
@@ -284,26 +282,27 @@ void CSecureEditEx::OnEnUpdate()
 
 	if(iDiff == 0) return; // No change?
 
-	size_t sizeWindowBuffer = iWndLen + 1;
+	const size_t sizeWindowBuffer = iWndLen + 1;
 	LPTSTR lpWnd = new TCHAR[sizeWindowBuffer];
 	ASSERT(lpWnd != NULL); if(lpWnd == NULL) return;
 	GetWindowText(lpWnd, iWndLen + 1);
-	const DWORD dwPos = GetSel() & 0xffff; // Get the *new* cursor position
+	const DWORD dwPos = (GetSel() & 0xFFFF); // Get the *new* cursor position
 
 	if(iDiff < 0)
 	{
 		ASSERT(iDiff == -1);
-		_DeleteCharacters(dwPos, (unsigned int)(-iDiff));
+		_DeleteCharacters(dwPos, static_cast<unsigned int>(-iDiff));
 	}
 	else
-		_InsertCharacters(dwPos - (DWORD)iDiff, &lpWnd[dwPos - (DWORD)iDiff], (unsigned int)iDiff);
+		_InsertCharacters(dwPos - static_cast<DWORD>(iDiff), &lpWnd[dwPos -
+			static_cast<DWORD>(iDiff)], static_cast<unsigned int>(iDiff));
 
 	ASSERT(m_apChars.GetSize() == iWndLen);
 
-	m_nOldLen = (int)m_apChars.GetSize();
+	m_nOldLen = static_cast<int>(m_apChars.GetSize());
 	_tcsset_s(lpWnd, sizeWindowBuffer, TCH_STDPWCHAR);
 	SetWindowText(lpWnd);
-	SetSel((int)dwPos, (int)dwPos, FALSE);
+	SetSel(static_cast<int>(dwPos), static_cast<int>(dwPos), FALSE);
 	DeleteTPtr(lpWnd, TRUE, FALSE); // Memory overwritten already
 }
 
@@ -321,23 +320,20 @@ void CSecureEditEx::_InsertCharacters(unsigned int uPos, LPCTSTR lpSource, unsig
 	ASSERT(lpSource != NULL); if(lpSource == NULL) return;
 	ASSERT(uNumChars != 0); if(uNumChars == 0) return;
 
-	ASSERT(uPos <= (unsigned int)(m_apChars.GetSize() + 1));
-	if(uPos > (unsigned int)(m_apChars.GetSize() + 1)) return;
+	ASSERT(uPos <= static_cast<unsigned int>(m_apChars.GetSize() + 1));
+	if(uPos > static_cast<unsigned int>(m_apChars.GetSize() + 1)) return;
 
 	_EncryptBuffer(FALSE);
 
-	LPTSTR lp;
-	unsigned int i;
-	BOOL bAppend = (uPos == (unsigned int)m_apChars.GetSize()) ? TRUE : FALSE;
-
-	for(i = 0; i < uNumChars; i++)
+	const bool bAppend = (uPos == static_cast<unsigned int>(m_apChars.GetSize()));
+	for(unsigned int i = 0; i < uNumChars; ++i)
 	{
-		lp = new TCHAR;
+		LPTSTR lp = new TCHAR;
 		ASSERT(lp != NULL); if(lp == NULL) continue;
 
 		*lp = lpSource[i];
 
-		if(bAppend == FALSE) m_apChars.InsertAt((int)(uPos + i), lp, 1);
+		if(bAppend) m_apChars.InsertAt(static_cast<int>(uPos + i), lp, 1);
 		else m_apChars.Add(lp);
 	}
 

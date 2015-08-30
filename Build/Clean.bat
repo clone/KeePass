@@ -18,4 +18,7 @@ DEL ..\KeePassIPC\*.user
 DEL ..\KeePass.ncb
 DEL /A:H ..\KeePass.suo
 
+DEL /A:H ..\Ext\KeePassMsi\KeePassMsi.suo
+RMDIR /S /Q KeePassMsi
+
 CLS

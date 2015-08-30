@@ -72,6 +72,10 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+#ifdef _UNICODE
+#pragma message("Unicode builds are not supported. It is recommended to switch to ANSI configuration.")
+#endif
+
 #define WM_MY_SYSTRAY_NOTIFY (WM_APP + 10)
 #define WM_MY_UPDATECLIPBOARD (WM_APP + 11)
 
@@ -788,8 +792,9 @@ BOOL CPwSafeDlg::OnInitDialog()
 
 	m_bLockOnMinimize = cConfig.GetBool(PWMKEY_LOCKMIN, FALSE);
 	m_bMinimizeToTray = cConfig.GetBool(PWMKEY_MINTRAY, TRUE);
-	m_bStartMinimized = cConfig.GetBool(PWMKEY_STARTMINIMIZED, FALSE);
 	m_bCloseMinimizes = cConfig.GetBool(PWMKEY_CLOSEMIN, FALSE);
+
+	m_bStartMinimized = cConfig.GetBool(PWMKEY_STARTMINIMIZED, FALSE);
 
 	m_bBackupEntries = cConfig.GetBool(PWMKEY_BACKUPENTRIES, TRUE);
 	m_bSecureEdits = cConfig.GetBool(PWMKEY_SECUREEDITS, TRUE);
@@ -1470,9 +1475,10 @@ BOOL CPwSafeDlg::_ParseCommandLine()
 	const TCHAR* const lpKeyFile = ((fpnKeyFile.getState() & PATH_EXISTS) ?
 		fpnKeyFile.getFullPathName().c_str() : NULL);
 	const bool bPreSelectIsInEffect = CmdArgs::instance().preselectIsInEffect();
+	const BOOL bLocked = (CmdArgs::instance().lockIsInEffect() ? TRUE : FALSE);
 
 	_OpenDatabase(NULL, lpFileName, strPassword.empty() ? NULL : strPassword.c_str(),
-		(!bPreSelectIsInEffect) ? lpKeyFile : NULL, FALSE, 
+		(!bPreSelectIsInEffect) ? lpKeyFile : NULL, bLocked,
 		bPreSelectIsInEffect ? lpKeyFile : NULL, FALSE);
 
 	return TRUE;
@@ -4207,7 +4213,9 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 }
 
 // When pszFile == NULL a file selection dialog is displayed
-void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile, const TCHAR *pszPassword, const TCHAR *pszKeyFile, BOOL bOpenLocked, LPCTSTR lpPreSelectPath, BOOL bIgnoreCorrupted)
+void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
+	const TCHAR *pszPassword, const TCHAR *pszKeyFile, BOOL bOpenLocked,
+	LPCTSTR lpPreSelectPath, BOOL bIgnoreCorrupted)
 {
 	NotifyUserActivity();
 
@@ -4768,8 +4776,7 @@ void CPwSafeDlg::OnFileClose()
 	{
 		int nRes;
 
-		if((m_bExiting == TRUE) && (m_bAutoSaveDb == TRUE))
-			nRes = IDYES;
+		if(m_bAutoSaveDb == TRUE) nRes = IDYES;
 		else
 		{
 			SetForegroundWindow();
@@ -4813,7 +4820,7 @@ void CPwSafeDlg::OnFileClose()
 			dlgTask.SetIcon(V_MTDI_QUESTION);
 
 			if(bDoVerification)
-				dlgTask.SetVerification(TRL("Automatically save database on exit and workspace locking"));
+				dlgTask.SetVerification(TRL("Automatically save when closing/locking the database"));
 
 			dlgTask.AddButton(TRL("Save"), strSaveText, IDYES);
 			dlgTask.AddButton(TRL("Discard changes"), strDiscardText, IDNO);
@@ -6255,25 +6262,31 @@ void CPwSafeDlg::OnBeginDragPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 			TRY
 			{
 				CString strData;
+				bool bDereferenceData = false;
 
 				switch(pNMListView->iSubItem)
 				{
 				case 0:
 					strData = p->pszTitle;
+					bDereferenceData = true;
 					break;
 				case 1:
 					strData = p->pszUserName;
+					bDereferenceData = true;
 					break;
 				case 2:
 					strData = p->pszURL;
+					bDereferenceData = true;
 					break;
 				case 3:
 					m_mgr.UnlockEntryPassword(p);
 					strData = p->pszPassword;
 					m_mgr.LockEntryPassword(p);
+					bDereferenceData = true;
 					break;
 				case 4:
 					strData = p->pszAdditional;
+					bDereferenceData = true;
 					break;
 				case 5:
 					_PwTimeToStringEx(p->tCreation, strData, CPwSafeDlg::m_bUseLocalTimeFormat);
@@ -6292,15 +6305,18 @@ void CPwSafeDlg::OnBeginDragPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 					break;
 				case 10:
 					strData = p->pszBinaryDesc;
+					bDereferenceData = true;
 					break;
 				default:
 					ASSERT(FALSE);
 					break;
 				}
 
-				// if(bAutoType) EraseCString(&strData);
+				CString strToTransfer;
+				if(bDereferenceData == false) strToTransfer = strData;
+				else strToTransfer = SprCompile(strData, false, p, &m_mgr, false, false);
 
-				ar.Write((LPCTSTR)strData, strData.GetLength() + sizeof(TCHAR));
+				ar.Write((LPCTSTR)strToTransfer, strToTransfer.GetLength() + sizeof(TCHAR));
 				ar.Close();
 			}
 			CATCH_ALL(eInner)
@@ -9768,7 +9784,7 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 		if(m_bFileOpen == FALSE) { m_bGlobalAutoTypePending = FALSE; return 0; }
 
 		HWND hWnd = ::GetForegroundWindow();
-		int nLen = ::GetWindowTextLength(hWnd);
+		const int nLen = ::GetWindowTextLength(hWnd);
 		if(nLen <= 0) { m_bGlobalAutoTypePending = FALSE; return 0; }
 
 		TCHAR *pszWindow = new TCHAR[nLen + 3];
@@ -9778,7 +9794,6 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 
 		::GetWindowText(hWnd, pszWindow, nLen + 2);
 
-		DWORD i;
 		PW_ENTRY *pe = NULL;
 		CString strCurWindow = pszWindow;
 		CString strWindowExp;
@@ -9788,9 +9803,9 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 		DWORD dwWindowField;
 		DWORD dwWindowFieldSeq;
 		DWORD dwWindowFieldSeqFound = 0;
-		CEntryListDlg dlg;
 		PW_UUID_STRUCT pwUuid;
 
+		CEntryListDlg dlg;
 		dlg.m_nDisplayMode = ELDMODE_LIST_ATITEMS;
 		dlg.m_pMgr = &m_mgr;
 		dlg.m_pImgList = &m_ilIcons;
@@ -9803,11 +9818,11 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 		PW_TIME tNow;
 		_GetCurrentPwTime(&tNow);
 
-		DWORD dwInvalidId1 = m_mgr.GetGroupId(PWS_BACKUPGROUP_SRC);
-		DWORD dwInvalidId2 = m_mgr.GetGroupId(PWS_BACKUPGROUP);
+		const DWORD dwInvalidId1 = m_mgr.GetGroupId(PWS_BACKUPGROUP_SRC);
+		const DWORD dwInvalidId2 = m_mgr.GetGroupId(PWS_BACKUPGROUP);
 		strCurWindow = strCurWindow.MakeLower();
 
-		for(i = 0; i < m_mgr.GetNumberOfEntries(); i++)
+		for(DWORD i = 0; i < m_mgr.GetNumberOfEntries(); ++i)
 		{
 			pe = m_mgr.GetEntry(i); ASSERT(pe != NULL); if(pe == NULL) continue;
 
@@ -9838,7 +9853,6 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 					nSubLen = strWindowExp.GetLength();
 
 					bool bDoAdd = false;
-
 					if(bLeft && bRight && (nSubLen <= nLen))
 					{
 						if(strCurWindow.Find(strWindowExp, 0) != -1)
@@ -9868,12 +9882,12 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 						break;
 					}
 
-					dwWindowField++;
+					++dwWindowField;
 				}
 				else if(dwWindowField != 0) // Previous auto-type-window field was found but did not match, so increment sequence and search again
 				{
 					dwWindowField = 0;
-					dwWindowFieldSeq++;
+					++dwWindowFieldSeq;
 				}
 				else if((dwWindowField == 0) && (dwWindowFieldSeq == 0)) // Entry doesn't have any auto-type-window definition
 				{
@@ -9896,13 +9910,11 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 			}
 		}
 
-		DWORD dwMatchingEntriesCount = (DWORD)dlg.m_vEntryList.size();
+		const DWORD dwMatchingEntriesCount = static_cast<DWORD>(dlg.m_vEntryList.size());
 		if(dwMatchingEntriesCount != 0)
 		{
 			if(dwMatchingEntriesCount == 1)
-			{
 				pe = m_mgr.GetEntryByUuid(dlg.m_vEntryList[0].uuid);
-			}
 			else
 			{
 				SetForegroundWindow();
@@ -9982,12 +9994,12 @@ LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 								}
 							}
 
-							dwWindowField++;
+							++dwWindowField;
 						}
 						else if(dwWindowField != 0) // Previous auto-type-window field was found but did not match, so increment sequence and search again
 						{
 							dwWindowField = 0;
-							dwWindowFieldSeq++;
+							++dwWindowFieldSeq;
 						}
 						else break; // Entry doesn't have any auto-type-window definition
 					}

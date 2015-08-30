@@ -40,12 +40,35 @@ void AppLocator::FillPlaceholders(CString* pString, const SPR_CONTENT_FLAGS* pcf
 
 	AppLocator::GetPaths();
 
-	pString->Replace(_T("{INTERNETEXPLORER}"), SprTransformContent(
-		m_strIEPath.c_str(), pcf));
-	pString->Replace(_T("{FIREFOX}"), SprTransformContent(
-		m_strFirefoxPath.c_str(), pcf));
-	pString->Replace(_T("{OPERA}"), SprTransformContent(
-		m_strOperaPath.c_str(), pcf));
+	AppLocator::ReplacePath(pString, _T("{INTERNETEXPLORER}"), m_strIEPath, pcf);
+	AppLocator::ReplacePath(pString, _T("{FIREFOX}"), m_strFirefoxPath, pcf);
+	AppLocator::ReplacePath(pString, _T("{OPERA}"), m_strOperaPath, pcf);
+}
+
+void AppLocator::ReplacePath(CString* p, LPCTSTR lpPlaceholder,
+	const std::basic_string<TCHAR>& strFill, const SPR_CONTENT_FLAGS* pcf)
+{
+	if(p == NULL) { ASSERT(FALSE); return; }
+	if(lpPlaceholder == NULL) { ASSERT(FALSE); return; }
+	if(lpPlaceholder[0] == 0) { ASSERT(FALSE); return; }
+
+	std::basic_string<TCHAR> str;
+	if((pcf != NULL) && pcf->bMakeCmdQuotes)
+	{
+		str = _T("\"");
+		str += SprTransformContent(strFill.c_str(), pcf);
+		str += _T("\"");
+	}
+	else
+	{
+		std::basic_string<TCHAR> strWithQ = _T("\"");
+		strWithQ += strFill;
+		strWithQ += _T("\"");
+
+		str = SprTransformContent(strWithQ.c_str(), pcf);
+	}
+
+	p->Replace(lpPlaceholder, str.c_str());
 }
 
 void AppLocator::GetPaths()
@@ -88,9 +111,5 @@ void AppLocator::FindOpera()
 
 std::basic_string<TCHAR> AppLocator::Fix(const std::basic_string<TCHAR>& strPath)
 {
-	std::basic_string<TCHAR> str = _T("\"");
-	str += GetQuotedAppPath(strPath);
-	str += _T("\"");
-
-	return str;
+	return GetQuotedAppPath(strPath);
 }

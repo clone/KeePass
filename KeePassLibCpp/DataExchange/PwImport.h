@@ -26,7 +26,11 @@
 #include "../SysDefEx.h"
 #include <boost/utility.hpp>
 
-#define DEF_CW_CATEGORY _T("----------------------------------------")
+// CodeWallet definitions
+#define DEF_CW_CATEGORY     _T("----------------------------------------")
+#define DEF_CW_CATEGORY_NEW _T("*---------------------------------------------------")
+
+// Personal Vault definitions
 #define DEF_PV_SEPENTRY _T("----------------------")
 #define DEF_PV_CATEGORY _T("************")
 

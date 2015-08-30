@@ -93,7 +93,8 @@ void CopyStringToClipboard(const TCHAR *lptString, PW_ENTRY *pEntryContext,
 	VERIFY(SetClipboardData(CF_TTEXTEX, globalHandle)); // Set clipboard data to our global memory block
 	VERIFY(CloseClipboard()); // Close clipboard, and done
 
-	RegisterOwnClipboardData((unsigned char *)(LPCTSTR)strData, uDataSize - sizeof(TCHAR));
+	RegisterOwnClipboardData((unsigned char *)(LPCTSTR)strData,
+		static_cast<unsigned long>(uDataSize - sizeof(TCHAR)));
 }
 
 void RegisterOwnClipboardData(unsigned char* pData, unsigned long dwDataSize)
@@ -191,7 +192,8 @@ void CopyDelayRenderedClipboardData(const TCHAR *lptString, CPwManager *pReferen
 	// Put the delayed clipboard data in the clipboard.
 	SetClipboardData(CF_TTEXTEX, hglb);
 
-	RegisterOwnClipboardData((unsigned char *)(LPCTSTR)strData, cch * sizeof(TCHAR));
+	RegisterOwnClipboardData((unsigned char *)(LPCTSTR)strData,
+		static_cast<unsigned long>(cch * sizeof(TCHAR)));
 }
 
 void SetClipboardIgnoreFormat()

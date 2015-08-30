@@ -247,12 +247,11 @@ BOOL CPwExport::ExportAll(const TCHAR *pszFile, const PWEXPORT_OPTIONS *pOptions
 	return ExportGroup(pszFile, DWORD_MAX, pOptions, pStoreMgr);
 }
 
-CString CPwExport::MakeGroupTreeString(DWORD dwGroupId) const
+CString CPwExport::MakeGroupTreeString(DWORD dwGroupId, bool bXmlEncode) const
 {
-	PW_GROUP *pg;
 	CString str;
 
-	pg = m_pMgr->GetGroupById(dwGroupId);
+	PW_GROUP *pg = m_pMgr->GetGroupById(dwGroupId);
 	ASSERT(pg != NULL); if(pg == NULL) return str;
 
 	const USHORT usLevel = pg->usLevel;
@@ -263,16 +262,24 @@ CString CPwExport::MakeGroupTreeString(DWORD dwGroupId) const
 
 	if(m_pMgr->GetGroupTree(dwGroupId, pdwIndices) == TRUE)
 	{
-		for(DWORD i = 0; i < (DWORD)usLevel; i++)
+		for(USHORT i = 0; i < usLevel; ++i)
 		{
 			pg = m_pMgr->GetGroup(pdwIndices[i]);
 
 			if(pg != NULL)
 			{
-				if(i > 0) str += _T("\\");
+				if(i != 0) str += _T("\\");
 
-				CString strTemp = pg->pszGroupName;
-				strTemp.Replace(_T("\\"), _T("/"));
+				CString strTemp;
+				if(bXmlEncode)
+				{
+					TCHAR *tszSafeGroup = MakeSafeXmlString(pg->pszGroupName);
+					strTemp = tszSafeGroup;
+					SAFE_DELETE_ARRAY(tszSafeGroup);
+				}
+				else strTemp = pg->pszGroupName;
+
+				strTemp.Replace(_T("\\"), _T("/")); // Avoid ambiguity with tree separator
 				str += strTemp;
 			}
 		}
@@ -335,7 +342,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 
 			aGroupIds.push_back(pg->uGroupId);
 
-			i++;
+			++i;
 			if(i == dwNumberOfGroups) break;
 		}
 	}
@@ -489,7 +496,8 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 				_PwTimeToString(p->tExpire, &strExpireTime);
 			}
 
-			strGroupTree = MakeGroupTreeString(pg->uGroupId);
+			strGroupTree = MakeGroupTreeString(pg->uGroupId, ((m_nFormat == PWEXP_XML) ||
+				(m_nFormat == PWEXP_HTML)));
 
 			ASSERT(p->pszBinaryDesc != NULL);
 

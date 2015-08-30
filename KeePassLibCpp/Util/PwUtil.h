@@ -84,6 +84,9 @@ public:
 	static void CheckGroupList(CPwManager* pMgr);
 #endif
 
+	static bool UnhideFile(LPCTSTR lpFile);
+	static bool HideFile(LPCTSTR lpFile, bool bHide);
+
 private:
 	inline static BOOL ConvertStrToHex(char ch1, char ch2, BYTE& bt);
 	inline static void ConvertHexToStr(BYTE bt, char& ch1, char& ch2);

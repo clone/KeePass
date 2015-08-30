@@ -710,3 +710,32 @@ void CPwUtil::CheckGroupList(CPwManager* pMgr)
 	}
 }
 #endif
+
+bool CPwUtil::UnhideFile(LPCTSTR lpFile)
+{
+	if(lpFile == NULL) { ASSERT(FALSE); return false; }
+
+	const DWORD dwAttrib = GetFileAttributes(lpFile);
+	if(dwAttrib == INVALID_FILE_ATTRIBUTES) return false;
+
+	if((dwAttrib & FILE_ATTRIBUTE_HIDDEN) == 0) return false;
+
+	return CPwUtil::HideFile(lpFile, false);
+}
+
+bool CPwUtil::HideFile(LPCTSTR lpFile, bool bHide)
+{
+	if(lpFile == NULL) { ASSERT(FALSE); return false; }
+
+	DWORD dwAttrib = GetFileAttributes(lpFile);
+	if(dwAttrib == INVALID_FILE_ATTRIBUTES) return false;
+
+	if(bHide) dwAttrib = ((dwAttrib & ~FILE_ATTRIBUTE_NORMAL) | FILE_ATTRIBUTE_HIDDEN);
+	else // Unhide
+	{
+		dwAttrib &= ~FILE_ATTRIBUTE_HIDDEN;
+		if(dwAttrib == 0) dwAttrib |= FILE_ATTRIBUTE_NORMAL;
+	}
+
+	return (SetFileAttributes(lpFile, dwAttrib) != FALSE);
+}

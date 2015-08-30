@@ -578,7 +578,7 @@ CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart,
 
 	CString strSource = lpstr;
 	strSource = strSource.MakeLower();
-	TCHAR *lp = (TCHAR *)lpstr;
+	TCHAR *lp = const_cast<TCHAR *>(lpstr);
 
 	int nPos = -1, nSearchFrom = 0;
 
@@ -607,7 +607,7 @@ CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart,
 			else if(tch == '\r') { }
 			else str += tch;
 
-			lp++;
+			++lp;
 		}
 	}
 

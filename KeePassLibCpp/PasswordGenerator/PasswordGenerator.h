@@ -52,6 +52,7 @@ typedef struct _PW_GEN_SETTINGS_EX
 
 	DWORD dwLength;
 
+	BYTE vStructAlignmentPadding0[7];
 	std::basic_string<WCHAR> strCharSet;
 
 	std::basic_string<WCHAR> strPattern;
@@ -60,6 +61,7 @@ typedef struct _PW_GEN_SETTINGS_EX
 	BOOL bNoConfusing;
 	BOOL bNoRepeat;
 
+	BYTE vStructAlignmentPadding1[4];
 	std::basic_string<WCHAR> strExcludeChars;
 } PW_GEN_SETTINGS_EX;
 

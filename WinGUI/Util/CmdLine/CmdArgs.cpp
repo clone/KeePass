@@ -28,6 +28,9 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGE.
 ==========================================================================*/
+
+// DR 2008-09-10: Added 'lock' command line option
+
 #include "StdAfx.h"
 #include "CmdArgs.h"
 #include "CommandLineTokens.h"
@@ -40,13 +43,14 @@ const CmdArgs& CmdArgs::instance() {
     return singleton;
 }
 
-CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false) {
+CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false), m_isLock(false) {
 
     // Command line options:
     const CommandLineOption keyfile  (_T("keyfile:"));
     const CommandLineOption preselect(_T("preselect:"));
     const CommandLineOption readonly (_T("readonly"));
     const CommandLineOption pw       (_T("pw:"));
+    const CommandLineOption lockcw   (_T("lock"));
 
     // For each command line argument ...
     typedef CommandLineTokens::const_iterator const_iterator;
@@ -99,6 +103,11 @@ CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false) {
         // readonly option:
         else if(readonly.isOption(argument)) {
             m_isReadOnly = true;
+            }
+
+        // minimize option:
+        else if(lockcw.isOption(argument)) {
+            m_isLock = true;
             }
 
         // Plugin options:

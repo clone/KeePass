@@ -490,7 +490,7 @@ bool CSendKeys::SendKeys(LPCTSTR KeysString, bool Wait)
             m_nDelayAlways = _ttoi(p + 1); // Take number after the '=' character
           else
             // set "sleep now"
-            m_nDelayNow = _ttoi(p);
+            m_nDelayNow += _ttoi(p); // DR: consecutive delays add up
         }
         // not command special keys, then process as keystring to VKey
         else

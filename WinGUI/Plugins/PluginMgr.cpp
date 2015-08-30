@@ -59,6 +59,17 @@ void CPluginManager::CleanUp()
 	ZeroMemory(&m_kpAppInfo, sizeof(KP_APP_INFO));
 }
 
+void CPluginManager::ClearStructure(KP_PLUGIN_INSTANCE* p)
+{
+	if(p == NULL) { ASSERT(FALSE); return; }
+
+	p->lpInit = NULL; p->lpCall = NULL; p->lpExit = NULL;
+
+	p->info.cmdLineArgPrefix = NULL;
+
+	p->info.dwNumCommands = 0; p->info.pMenuItems = NULL;
+}
+
 BOOL CPluginManager::SetAppInfo(const KP_APP_INFO *pAppInfo)
 {
 	ASSERT(pAppInfo != NULL); if(pAppInfo == NULL) return FALSE;
@@ -108,7 +119,7 @@ BOOL CPluginManager::AssignPluginCommands()
 				if(p->info.pMenuItems[j].lpCommandString == NULL)
 					p->info.pMenuItems[j].lpCommandString = _T("");
 
-				posCmd++;
+				++posCmd;
 			}
 		}
 	}
@@ -119,11 +130,9 @@ BOOL CPluginManager::AssignPluginCommands()
 
 BOOL CPluginManager::AddPlugin(LPCTSTR lpFile, BOOL bEnable)
 {
-	KP_PLUGIN_INSTANCE kppi;
-	KP_PLUGIN_INSTANCE *p;
-
 	ASSERT(lpFile != NULL); if(lpFile == NULL) return FALSE;
 
+	KP_PLUGIN_INSTANCE kppi;
 	ZeroMemory(&kppi, sizeof(KP_PLUGIN_INSTANCE));
 
 	if(IsPluginValid(lpFile) == FALSE) return FALSE;
@@ -132,11 +141,10 @@ BOOL CPluginManager::AddPlugin(LPCTSTR lpFile, BOOL bEnable)
 	kppi.hinstDLL = NULL;
 	_tcsncpy_s(kppi.tszFile, _countof(kppi.tszFile), lpFile, MAX_PATH - 1);
 
-	int i;
 	bool bInListAlready = false;
-	for(i = 0; i < (int)m_plugins.size(); i++)
+	for(size_t i = 0; i < m_plugins.size(); ++i)
 	{
-		p = &m_plugins[i];
+		KP_PLUGIN_INSTANCE* p = &m_plugins[i];
 
 		if(_tcscmp(lpFile, p->tszFile) == 0)
 		{
@@ -286,15 +294,15 @@ BOOL CPluginManager::LoadAllPlugins()
 			str += TRL("Therefore save all data before you continue."); str += _T("\r\n\r\n");
 			str += TRL("Do you want to load the plugin?");
 
-			int nRet;
-			nRet = MessageBox(GetDesktopWindow(), str, TRL("Plugin Manager"), MB_YESNO | MB_ICONQUESTION);
+			const int nRet = MessageBox(GetDesktopWindow(), str, TRL("Plugin Manager"),
+				MB_YESNO | MB_ICONQUESTION);
 
 			if(nRet == IDNO)
 			{
 				p->lpExit(0, 0);
 				p->bEnabled = FALSE;
-				p->lpInit = NULL; p->lpCall = NULL; p->lpExit = NULL;
 				FreeLibrary(p->hinstDLL); p->hinstDLL = NULL;
+				CPluginManager::ClearStructure(p);
 				continue;
 			}
 		}
@@ -316,9 +324,9 @@ BOOL CPluginManager::UnloadAllPlugins()
 		{
 			ASSERT(p->lpExit != NULL);
 			if(p->lpExit != NULL) p->lpExit(0, 0);
-			p->lpInit = NULL; p->lpCall = NULL; p->lpExit = NULL;
 
 			FreeLibrary(p->hinstDLL); p->hinstDLL = NULL;
+			CPluginManager::ClearStructure(p);
 		}
 	}
 
@@ -397,8 +405,8 @@ BOOL CPluginManager::CallPlugins(DWORD dwCode, LPARAM lParamW, LPARAM lParamL)
 {
 	BOOL bRet = TRUE;
 	unsigned int i, j;
-	KP_PLUGIN_INSTANCE *p;
-	KP_MENU_ITEM *pMenuItems;
+	KP_PLUGIN_INSTANCE* p;
+	KP_MENU_ITEM* pMenuItems;
 
 	if(dwCode == KPM_DIRECT_EXEC)
 	{
@@ -433,12 +441,13 @@ BOOL CPluginManager::CallPlugins(DWORD dwCode, LPARAM lParamW, LPARAM lParamL)
 
 BOOL CPluginManager::UsesCmdArg(const std_string& argument) const
 {
-	typedef std::vector<KP_PLUGIN_INSTANCE>::const_iterator const_iterator;
-	const const_iterator end(m_plugins.end());
+	typedef std::vector<KP_PLUGIN_INSTANCE>::const_iterator kpi_const_iterator;
+	const kpi_const_iterator kpi_end(m_plugins.end());
 
-	for(const_iterator it = m_plugins.begin(); it != end; ++it)
+	for(kpi_const_iterator it = m_plugins.begin(); it != kpi_end; ++it)
 	{
 		ASSERT(it->hinstDLL != NULL); // Assure plugin is loaded.
+		if(it->hinstDLL == NULL) continue;
 
 		const TCHAR* const cmdLineArgPrefix = it->info.cmdLineArgPrefix;
 		if(cmdLineArgPrefix == NULL) continue; // Plugin has no command line options

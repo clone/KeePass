@@ -327,7 +327,7 @@ void PwgStringToProfile(const std::basic_string<TCHAR>& strProfile,
 
 	ASSERT(pDecoded.get()[0] <= PWGD_VERSION_BYTE);
 
-	TCHAR *lpName = _UTF8ToString(&pDecoded.get()[1]);
+	TCHAR* lpName = _UTF8ToString(&pDecoded.get()[1]);
 	s->strName = lpName;
 
 	BYTE *pb = (BYTE *)memchr(pDecoded.get(), 0, dwDecodedSize);
@@ -337,10 +337,10 @@ void PwgStringToProfile(const std::basic_string<TCHAR>& strProfile,
 	s->btGeneratorType = *pb; ++pb;
 	s->bCollectUserEntropy = ((*pb == (BYTE)'U') ? TRUE : FALSE); ++pb;
 
-	s->dwLength = (DWORD)(*pb) << 24; ++pb;
-	s->dwLength |= (DWORD)(*pb) << 16; ++pb;
-	s->dwLength |= (DWORD)(*pb) << 8; ++pb;
-	s->dwLength |= (DWORD)(*pb); ++pb;
+	s->dwLength = (static_cast<DWORD>(*pb) << 24); ++pb;
+	s->dwLength |= (static_cast<DWORD>(*pb) << 16); ++pb;
+	s->dwLength |= (static_cast<DWORD>(*pb) << 8); ++pb;
+	s->dwLength |= static_cast<DWORD>(*pb); ++pb;
 
 	USHORT usFlags = (USHORT)(*pb) << 8; ++pb;
 	usFlags |= (USHORT)(*pb); ++pb;

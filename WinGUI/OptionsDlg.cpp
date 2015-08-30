@@ -212,7 +212,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Remember last opened file"), &m_bRememberLast, &m_bOpenLastDb, OL_LINK_SAME_TRIGGER_FALSE);
 	m_olAdvanced.AddCheckItem(TRL("Automatically open last used database on startup"), &m_bOpenLastDb, &m_bRememberLast, OL_LINK_SAME_TRIGGER_TRUE);
 	m_olAdvanced.AddCheckItem(TRL("Start minimized and locked"), &m_bStartMinimized, NULL, OL_LINK_NULL);
-	m_olAdvanced.AddCheckItem(TRL("Automatically save database on exit and workspace locking"), &m_bAutoSave, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Automatically save when closing/locking the database"), &m_bAutoSave, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Limit to single instance"), &m_bSingleInstance, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Check for update at KeePass startup"), &m_bCheckForUpdate, NULL, OL_LINK_NULL);
 

@@ -28,6 +28,9 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGE.
 ==========================================================================*/
+
+// DR 2008-09-10: Added 'lock' command line option
+
 #pragma once
 #include "FullPathName.h"
 
@@ -53,6 +56,7 @@ public:
     bool        preselectIsInEffect() const {return m_isPreselect;}
     bool         readonlyIsInEffect() const {return m_isReadOnly;}
     const std_string&   getPassword() const {return m_Password;}
+	bool             lockIsInEffect() const {return m_isLock;}
 
 private:
     CmdArgs();
@@ -62,4 +66,5 @@ private:
     bool         m_isPreselect;
     bool         m_isReadOnly;
     std_string   m_Password;  // empty() <==> not set
+    bool         m_isLock;
 };

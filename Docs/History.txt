@@ -1,3 +1,26 @@
+08/10/18 - 1.14
+- KeePass is now also available as MSI package
+- Entry field references are now dereferenced in drag&drop
+  operations
+- Added support for writing databases to hidden files
+- Added '-lock' command line option
+
+- Improved compatibility of browser placeholders with cmd://
+  URLs
+- Improved compatibility of the database auto-saving option
+  (at exit and locking) with other options
+- Consecutive delays now add up
+- Improved encoding detection in file import routines
+- Several 64-bit code improvements
+- Various code optimizations
+- Minor other improvements
+
+- Fixed crash that happened when clicking 'No' in the plugin
+  incompatibility message box while passing a plugin command
+  line argument
+- Special XML characters in group names are now encoded
+  correctly in XML exports (group tree attribute)
+
 08/09/07 - 1.13
 - Completely new auto-type/URL placeholder replacement and
   field reference engine

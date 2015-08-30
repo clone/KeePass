@@ -45,6 +45,9 @@ private:
 
 	static std::basic_string<TCHAR> Fix(const std::basic_string<TCHAR>& strPath);
 
+	static void ReplacePath(CString* p, LPCTSTR lpPlaceholder,
+		const std::basic_string<TCHAR>& strFill, const SPR_CONTENT_FLAGS* pcf);
+
 	static std::basic_string<TCHAR> m_strIEPath;
 	static std::basic_string<TCHAR> m_strFirefoxPath;
 	static std::basic_string<TCHAR> m_strOperaPath;

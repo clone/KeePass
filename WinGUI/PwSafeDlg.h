@@ -234,7 +234,9 @@ public:
 
 	static BOOL IsUnsafeAllowed(HWND hWndParent);
 
-	void _OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile, const TCHAR *pszPassword, const TCHAR *pszKeyFile, BOOL bOpenLocked, LPCTSTR lpPreSelectPath, BOOL bIgnoreCorrupted);
+	void _OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile, const TCHAR *pszPassword,
+		const TCHAR *pszKeyFile, BOOL bOpenLocked, LPCTSTR lpPreSelectPath,
+		BOOL bIgnoreCorrupted);
 	BOOL _ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew);
 	void _PrintGroup(DWORD dwGroupId);
 	void _Find(DWORD dwFindGroupId);

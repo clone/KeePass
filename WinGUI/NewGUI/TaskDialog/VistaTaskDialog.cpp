@@ -135,7 +135,7 @@ int CVistaTaskDialog::ShowDialog(BOOL* pVerificationResult)
 	if(m_strConfirmation.size() > 0) cfg.pszVerificationText = m_strConfirmation.c_str();
 
 	std::vector<V_TASKDIALOG_BUTTON> vButtons = MyButtonsToVStruct(m_vButtons);
-	cfg.cButtons = vButtons.size();
+	cfg.cButtons = static_cast<UINT>(vButtons.size());
 	if(vButtons.size() > 0) cfg.pButtons = &vButtons[0];
 
 	if(m_bCommandLinks) cfg.dwFlags |= V_TDF_USE_COMMAND_LINKS;

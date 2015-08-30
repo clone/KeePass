@@ -46,7 +46,7 @@ void SprAddRefToCache(LPCTSTR lpRef, LPCTSTR lpValue, SprRefsCache& vRefs);
 
 void SprInitializeInternalStatic()
 {
-	VERIFY(GetApplicationDirectory(g_tszAppDir, SPRE_MAX_PATH_LEN - 1, TRUE, FALSE) == TRUE);
+	VERIFY(GetApplicationDirectory(g_tszAppDir, SPRE_MAX_PATH_LEN - 1, TRUE, FALSE));
 }
 
 CString SprCompile(LPCTSTR lpText, bool bIsAutoTypeSequence, PW_ENTRY* pEntry,

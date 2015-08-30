@@ -20,7 +20,10 @@
 #ifndef ___KEY_TRANSFORM_H___
 
 #include <boost/utility.hpp>
+
+#if !defined(_M_X64) && !defined(_WIN32_WCE)
 #include <boost/thread/thread.hpp>
+#endif
 
 class CKeyTransform
 {
