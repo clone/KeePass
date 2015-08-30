@@ -44,6 +44,9 @@ void CopyStringToClipboard(const TCHAR *lptString);
 // Fix an URL if necessary (check protocol, form, etc.)
 void FixURL(CString *pstrURL);
 
+// Replace placeholders in pString by data in pEntry
+void ParseURL(CString *pString, PW_ENTRY *pEntry);
+
 // String conversion functions
 char *_StringToAscii(const TCHAR *lptString);
 TCHAR *_StringToUnicode(const char *pszString);

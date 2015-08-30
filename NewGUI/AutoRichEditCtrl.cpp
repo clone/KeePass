@@ -28,7 +28,7 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CAutoRichEditCtrl message handlers
 
-CString CAutoRichEditCtrl::GetRTF()
+CString CAutoRichEditCtrl::GetRTF(int nStreamType)
 {
 	// Return the RTF string of the text in the control.
 	
@@ -41,14 +41,14 @@ CString CAutoRichEditCtrl::GetRTF()
 
 	es.dwCookie = (DWORD) &sRTF;	// so sRTF receives the string
 	
-	StreamOut(SF_RTF, es);			// Call CRichEditCtrl::StreamOut to get the string.
+	StreamOut(nStreamType, es);			// Call CRichEditCtrl::StreamOut to get the string.
 	///
 
 	return sRTF;
 
 }
 
-void CAutoRichEditCtrl::SetRTF(CString sRTF)
+void CAutoRichEditCtrl::SetRTF(CString sRTF, int nStreamType)
 {
 	// Put the RTF string sRTF into the rich edit control.
 
@@ -57,7 +57,7 @@ void CAutoRichEditCtrl::SetRTF(CString sRTF)
 	es.dwError = 0;
 	es.pfnCallback = CBStreamIn;
 	es.dwCookie = (DWORD) &sRTF;
-	StreamIn(SF_RTF, es);	// Do it.
+	StreamIn(nStreamType, es);	// Do it.
 	
 }
 

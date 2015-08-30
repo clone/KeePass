@@ -30,6 +30,8 @@
 #include "StdAfx.h"
 #include "PwExport.h"
 
+#include "../NewGUI/TranslateEx.h"
+
 CPwExport::CPwExport()
 {
 	m_pMgr = NULL;
@@ -109,8 +111,19 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 		PWEXPSTR(m_pszNewLine);
 		PWEXPSTR(_T("<html><head><title>Password List</title></head><body>"));
 		PWEXPSTR(m_pszNewLine);
-		PWEXPSTR(_T("<table width=\"100%\" border=\"1px\"><tr><td><b>Group</b></td><td><b>Title</b></td><td><b>UserName</b></td>"));
-		PWEXPSTR(_T("<td><b>URL</b></td><td><b>Password</b></td><td><b>Notes</b></td></tr>"));
+		PWEXPSTR(_T("<table width=\"100%\" border=\"1px\"><tr><td><b>"));
+		PWEXPSTR(TRL("Group:"));
+		PWEXPSTR(_T("</b></td><td><b>"));
+		PWEXPSTR(TRL("Title"));
+		PWEXPSTR(_T(":</b></td><td><b>"));
+		PWEXPSTR(TRL("UserName"));
+		PWEXPSTR(_T(":</b></td><td><b>"));
+		PWEXPSTR(TRL("URL"));
+		PWEXPSTR(_T(":</b></td><td><b>"));
+		PWEXPSTR(TRL("Password"));
+		PWEXPSTR(_T(":</b></td><td><b>"));
+		PWEXPSTR(TRL("Notes"));
+		PWEXPSTR(_T(":</b></td></tr>"));
 		PWEXPSTR(m_pszNewLine);
 	}
 	else if(m_nFormat == PWEXP_XML)

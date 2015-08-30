@@ -49,6 +49,8 @@
 #define IDB_TB_LOCK                     183
 #define IDB_TB_ABOUT                    184
 #define IDD_ENTRYPROPERTIES_DLG         188
+#define IDR_RECTX_MENU                  189
+#define IDD_TANWIZARD_DLG               190
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -144,6 +146,8 @@
 #define IDC_CHECK_MODEXPIRE             1113
 #define IDC_RE_ENTRYVIEW                1117
 #define IDC_CHECK_COLAUTOSIZE           1120
+#define IDC_RE_NOTES                    1124
+#define IDC_EDIT_TANS                   1125
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -259,14 +263,24 @@
 #define ID_BUTTON32904                  32904
 #define ID_BUTTON32905                  32905
 #define ID_VIEW_ENTRYVIEW               32906
+#define ID_RE_COPYSEL                   32907
+#define ID_RE_COPYALL                   32908
+#define ID_RE_PASTE                     32911
+#define ID_RE_DELETE                    32912
+#define ID_RE_SELECTALL                 32913
+#define ID_RE_CUT                       32914
+#define ID_RE_UNDO                      32915
+#define ID_EXTRAS_TANWIZARD             32916
+#define ID_FILE_PRINTPREVIEW            32917
+#define ID_INFO_TRANSLATION             32918
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        189
-#define _APS_NEXT_COMMAND_VALUE         32907
-#define _APS_NEXT_CONTROL_VALUE         1121
+#define _APS_NEXT_RESOURCE_VALUE        191
+#define _APS_NEXT_COMMAND_VALUE         32919
+#define _APS_NEXT_CONTROL_VALUE         1126
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -62,6 +62,8 @@
 
 #define PWS_DEFAULT_SPLITTER_Y 270
 
+#define PWS_TAN_ENTRY TRL("<TAN>")
+
 /////////////////////////////////////////////////////////////////////////////
 
 class CPwSafeDlg : public CDialog
@@ -70,6 +72,9 @@ public:
 	CPwSafeDlg(CWnd* pParent = NULL);
 
 	void OnUpdateFlush(CMenu *pMenu); // BCMenu function
+
+	static void _TranslateMenu(BCMenu *pBCMenu); // Translate this menu
+	static const TCHAR *_GetCmdAccelExt(const TCHAR *psz);
 
 	void ProcessResize();
 	void CleanUp();
@@ -130,7 +135,6 @@ public:
 
 	HICON m_hTrayIconNormal;
 	HICON m_hTrayIconLocked;
-	BOOL m_bWindowInvalid;
 	BOOL m_bDisplayDialog;
 
 	BCMenu m_menu; // Our XP-style menu
@@ -185,6 +189,7 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
+	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	//}}AFX_VIRTUAL
 
 protected:
@@ -200,7 +205,6 @@ protected:
 		if(m_nSaveView < nItemCount)
 			m_cList.EnsureVisible(m_nSaveView, FALSE);
 	}
-	void _TranslateMenu(BCMenu *pBCMenu); // Translate this menu
 	void _CalcColumnSizes()
 	{
 		RECT rect;
@@ -219,8 +223,7 @@ protected:
 	}
 	void _SetColumnWidths()
 	{
-		for(int i = 0; i < 10; i++)
-			m_cList.SetColumnWidth(i, m_nColumnWidths[i]);
+		for(int i = 0; i < 10; i++) m_cList.SetColumnWidth(i, m_nColumnWidths[i]);
 	}
 	void _SetListParameters()
 	{
@@ -245,7 +248,6 @@ protected:
 	void _DeleteTemporaryFiles();
 	BOOL _ParseCommandLine();
 	void _ParseSpecAndSetFont(const TCHAR *pszSpec);
-	const TCHAR *_GetCmdAccelExt(const TCHAR *psz);
 
 	void _UpdateToolBar();
 	void _ShowToolBar(BOOL bShow = TRUE);
@@ -257,6 +259,7 @@ protected:
 
 	int m_nSaveView;
 	LPARAM m_dwOldListParameters;
+	PW_ENTRY *m_pPreLockItem;
 
 	BOOL m_bCachedToolBarUpdate;
 
@@ -409,6 +412,14 @@ protected:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnViewEntryView();
+	afx_msg void OnReCopySel();
+	afx_msg void OnReCopyAll();
+	afx_msg void OnReSelectAll();
+	afx_msg void OnExtrasTanWizard();
+	afx_msg void OnUpdateExtrasTanWizard(CCmdUI* pCmdUI);
+	afx_msg void OnFilePrintPreview();
+	afx_msg void OnUpdateFilePrintPreview(CCmdUI* pCmdUI);
+	afx_msg void OnInfoTranslation();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

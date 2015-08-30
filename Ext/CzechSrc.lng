@@ -1,0 +1,629 @@
+|~LanguageName|
+	|~Èeština|
+|~LanguageVersion|
+	|~KeyPass 0.90a, Czech 1.0|
+|~LanguageAuthor|
+	|~Luboš Stanìk|
+|~LanguageAuthorEmail|
+	|~stanekl@atlas.cz|
+|&OK|
+	|&OK|
+|&Cancel|
+	|&Storno|
+|&Close|
+	|&Zavøít|
+|Password Safe|
+	|Heslovı trezor|
+
+|&Generate Random Password|
+	|&Generovat náhodné heslo|
+|&Pick One|
+	|&Vybrat|
+|&Gen|
+	|&Gen|
+
+|General|
+	|Obecná|
+|Windows|
+	|Windows|
+|Network|
+	|Sí|
+|Internet|
+	|Internet|
+|eMail|
+	|eMail|
+|Homebanking|
+	|Domácí bankovnictví|
+
+|Entry|
+	|Záznam|
+
+|&Title|
+	|&Název|
+|User &Name|
+	|Uivatelské &jméno|
+|&URL|
+	|&URL|
+|&Password|
+	|&Heslo|
+|N&otes|
+	|&Poznámky|
+|&Case sensitive|
+	|rozlišovat &velikost písmen|
+|Search in|
+	|Hledat v polokách|
+|Search this text:|
+	|Hledat text:|
+|Find|
+	|Najít|
+|&Find|
+	|&Najít|
+|Find a string in the password list|
+	|Hledat øetìzec v seznamu hesel|
+|Find text in password list|
+	|Hledat text v seznamu hesel|
+
+|Database Format Version:|
+	|Verze formátu databáze:|
+|About KeePass...|
+	|O aplikaci KeePass...|
+
+|Password Groups|
+	|Skupiny hesel|
+|Title|
+	|Název|
+|UserName|
+	|Uivatelské jméno|
+|URL|
+	|URL|
+|Password|
+	|Heslo|
+|Notes|
+	|Poznámky|
+
+|Ready.|
+	|Ready.|
+
+|Either enter the password/passphrase or select the password disk's drive.|
+	|Buï zadejte heslo/frázi nebo zvolte jednotku heslového disku.|
+|Enter password:|
+	|Zadejte heslo:|
+|or|
+	|nebo|
+|Select the password disk drive where the key will be stored:|
+	|Zvolte jednotku heslového disku, kam bude klíè uloen:|
+|Create a new password database - Enter master key|
+	|Vytvoøit novou databázi hesel - Zadejte hlavní heslo:|
+|Set master key|
+	|Nastavit hlavní heslo|
+|Enter the master key for the new database.|
+	|Zadejte hlavní heslo pro novou databázi.|
+|Create a new password database - Repeat master key|
+	|Vytvoøit novou databázi hesel - Zopakujte hlavní heslo|
+|Repeat master password|
+	|Zopakujte hlavní heslo|
+|Repeat the master key for the new database.|
+	|Zopakujte hlavní heslo pro novou databázi.|
+|Select the password disk drive to load the key from:|
+	|Zvolte jednotku heslového disku, odkud se naète klíè:|
+|Open database - Enter master key|
+	|Otevøít databázi - Zadejte hlavní heslo|
+|Enter master key|
+	|Zadejte hlavní heslo|
+|Enter the master key for this database.|
+	|Zadejte hlavní heslo pro tuto databázi.|
+|Key|
+	|Heslo|
+|<no drive selected>|
+	|<disk nebyl zvolen>|
+
+|Password Generator|
+	|Generátor hesel|
+|This will generate a random password.|
+	|V tomto dialogu mùete vytvoøit náhodné heslo.|
+|Options|
+	|Monosti|
+|Password Generation Options|
+	|Monosti tvorby hesla|
+|Only the following characters:|
+	|Jen uvedené znaky:|
+|Number of characters:|
+	|Poèet znakù:|
+|Your new password:|
+	|Vaše nové heslo:|
+|&Generate|
+	|&Generovat|
+|&Accept|
+	|&Pøijmout|
+|Upper alphabetic characters (A, B, C, ...)|
+	|Velká písmena (A, B, C, ...)|
+|Lower alphabetic characters (a, b, c, ...)|
+	|Malá písmena (a, b, c, ...)|
+|Numerical characters (1, 2, 3, ...)|
+	|Èísla (1, 2, 3, ...)|
+|Underline character '_'|
+	|Znak podtrítka '_'|
+|Minus '-'|
+	|Mínus '-'|
+|Space ' '|
+	|Mezera ' '|
+|Special characters (!, §, $, %, &, ...)|
+	|Speciální znaky (!, §, $, %, &, ...)|
+|Higher ANSI characters (Â, ©, É, µ, ½, ...)|
+	|Vyšší znaky ANSI (Â, ©, É, µ, ½, ...)|
+|Special brackets ('{', '}', '[', ...)|
+	|Znaky závorek ('{', '}', '[', ...)|
+
+|Group:|
+	|Skupina:|
+|Title:|
+	|Název:|
+|UserName:|
+	|Uivatelské jméno:|
+|URL:|
+	|URL:|
+|Icon:|
+	|Ikona:|
+|Password:|
+	|Heslo:|
+|Repeat Password:|
+	|Opakovat heslo:|
+|Notes:|
+	|Poznámky:|
+|***|
+	|***|
+
+|Add Entry|
+	|Pøidat záznam|
+|Add a new password entry|
+	|Pøidat novı záznam hesla|
+|Edit Entry|
+	|Upravit záznam|
+|Modify a password entry|
+	|Upravit záznam hesla|
+
+|Group Name:|
+	|Název skupiny:|
+
+|Add Group|
+	|Pøidat skupinu|
+|Add a new password group|
+	|Pøidat novou skupinu hesel|
+|Edit Group|
+	|Upravit skupinu|
+|Modify a password group|
+	|Upravit skupinu hesel|
+
+|Random mouse input|
+	|Náhodnı vstup myši|
+|Click to begin:|
+	|Start klikem:|
+|Use &Mouse As Random Source|
+	|Pouít &myš jako zdroj nahodilosti|
+|Move the mouse in the field above until this is full:|
+	|Pohybujte myší v poli vıše, a je ukazatel vyplnìn:|
+|Hint: It is best to use both mouse and keyboard random sources.|
+	|Tip: Nejlepší je pouít jako zdroj nahodilosti jak myš, tak i klávesnici.|
+|Random keyboard input|
+	|Náhodnı vstup z klávesnice|
+|Just hack some random keys into the edit box above.|
+	|Do pole vıše nìco náhodnì napište z klávesnice.|
+|You don't have to remember the keys you type in. They are used to generate a random value.|
+	|Nemusíte si pamatovat text, kterı zadáte. Ten je pouit ke generování náhodné hodnoty.|
+|So, the more the better. The different, the better.| \
+	|Více je lépe. Rozmanitost je lepší.| \
+|The random the better.|       THIS ISN'T A ONE-TO-ONE TRANSLATION!
+	|Nahodilost je lepší.| /
+|Get Random|
+	|Získání náhodnıch dat|
+|Get random data for key generation|
+	|Získání náhodnıch dat pro generaci klíèe|
+|Move the mouse and type some random text to generate random values.|
+	|Pohybujte myší a napište nìjakı náhodnı text pro generování náhodnıch hodnot.|
+
+|Pick an icon|
+	|Vyberte ikonu|
+|Pick an Icon|
+	|Vyberte ikonu|
+|Pick an icon from the list and click OK to set it.|
+	|Vyberte ikonu ze seznamu a kliknutím na OK ji nastavíte.|
+
+|&File|
+	|&Soubor|
+|&Edit|
+	|Úpr&avy|
+|&View|
+	|&Zobrazit|
+|&Extras|
+	|&Extra|
+|&?|
+	|&?|
+
+|&New Database...|
+	|&Nová databáze...|
+|&Open Database...|
+	|&Otevøít databázi...|
+|&Close Database|
+	|&Zavøít databázi|
+|&Save Database|
+	|&Uloit databázi|
+|Save Database &As...|
+	|Uloit databázi &jako...|
+|Change &Master Key For This Database...|
+	|Zmìnit &hlavní heslo této databáze...|
+|&Print Complete Password List|
+	|Vy&tisknout kompletní seznam hesel|
+|Export Complete Database|
+	|Exportovat celou databázi|
+|&Lock Workspace|
+	|&Uzamknout pracovní prostøedí|
+|&Unlock Workspace|
+	|&Odemknout pracovní prostøedí|
+|&Exit|
+	|&Konec|
+
+|&Lock/Unlock Workspace|
+	|&Uzamknout/Odemknout pracovní prostøedí|
+
+|&Options|
+	|&Monosti|
+|&Add Password Group...|
+	|&Nová skupina hesel...|
+|&Modify Password Group...|
+	|&Upravit skupinu hesel...|
+|&Delete Password Group...|
+	|S&mazat skupinu hesel...|
+|&Print Group|
+	|Vy&tisknout skupinu...|
+|Export Group To &HTML...|
+	|Exportovat skupinu do &HTML...|
+|Export Group To &XML...|
+	|Exportovat skupinu do &XML...|
+|Export Group To &CSV...|
+	|Exportovat skupinu do &CSV...|
+|Copy User&Name To Clipboard|
+	|Zkopírovat uivatelské jmé&no do schránky|
+|Copy &Password To Clipboard|
+	|Zkopírovat heslo do schránky|
+|Open &URL|
+	|Otebøít &URL|
+|&Find In Database...|
+	|&Najít v databázi...|
+|Find In This &Group...|
+	|Najít v této &skupinì...|
+|&Add Entry...|
+	|&Pøidat záznam...|
+|&Edit/View Entry...|
+	|&Upravit/Zobrazit záznam...|
+|&Delete Entry|
+	|S&mazat záznam|
+|Dupli&cate Entry|
+	|&Duplikát záznamu|
+|Move Entry To &Top|
+	|Pøesunout záznam na &zaèátek|
+|Move Entry &One Up|
+	|Pøesunout záznam o &jeden vıše|
+|Mo&ve Entry One Down|
+	|Pøesunout záznam o jeden &níe|
+|Move Entry To &Bottom|
+	|Pøesunout záznam na &konec|
+
+|Move Group To &Top|
+	|Pøesunout skupinu na &zaèátek|
+|Move Group One &Up|
+	|Pøesunout skupinu o &jednu vıše|
+|Move Group &One Down|
+	|Pøesunout skupinu o jednu &níe|
+|Move Group To &Bottom|
+	|Pøesunout skupinu na &konec|
+
+|Change &Language...|
+	|Zmìna &jazyka...|
+|Show &Title Column|
+	|Zobrazit sloupec &Název|
+|Show User&Name Column|
+	|Zobrazit sloupec Uivatelské jméno|
+|Show &URL Column|
+	|Zobrazit sloupec &URL|
+|Show &Password Column|
+	|Zobrazit sloupec &Heslo|
+|Show &Notes Column|
+	|Zobrazit sloupec &Poznámky|
+|Main Window &Always On Top|
+	|Halvní okno &vdy navrchu|
+|&Hide Passwords Behind Asterisks (***)|
+	|S&krıt heslo pod hvìzdièkami (***)|
+
+|Password &Generator|
+	|&Generátor hesel|
+
+|Visit KeePass &Homepage|
+	|&Navštívit domácí stránku aplikace KeePass|
+|&About KeePass...|
+	|&O aplikaci KeePass...|
+
+|&Minimize/Maximize Window To/From Tray|
+	|Minimalizovat/Maximalizovat okno na lištu/z lišty|
+
+|%u.%u.%u.%u, compatible with %u.%u.x.x|
+	|%u.%u.%u.%u, kompatibilní s %u.%u.x.x|
+|Version |
+	|Verze |
+
+|Password and repeated password aren't identical!|
+	|Heslo a jeho opakování nejsou identická!|
+
+|Stop|
+	|Stop|
+
+|Enter a group name!|
+	|Zadejte název skupiny!|
+|You must generate some random values using the random mouse input box or the edit field before you can close this dialog.|
+	|Musíte vygenerovat nìjaké náhodné hodnoty za pouití pole náhodného vstupu myši nebo pole vstupu z klávesnice, ne mùete tento dialog zavøít.|
+|No random input|
+	|ádnı náhodnı vstup|
+|EITHER enter a password/passphrase OR select a key disk drive.|
+	|BUÏ zadejte heslo/frázi NEBO zvolte jednotku heslového disku.|
+|The password must consist of at least one character!|
+	|Heslo musí obsahovat alespoò jesen znak!|
+|Select at least one of the options in the list above!|
+	|Zvolte alespoò jednu z moností v seznamu nahoøe!|
+
+|The following self-tests failed:|
+	|Následující testy sebe sama se nezdaøily:|
+|- SHA 32-bit variables|
+	|- 32-bitové promìnné SHA|
+|- SHA 64-bit variables|
+	|- 64-bitové promìnné SHA|
+|- SHA-256 test vector(s)|
+	|- testovací vektor(y) SHA-256|
+|- SHA-512 test vector(s)|
+	|- testovací vektor(y) SHA-512|
+|- Rijndael encryption|
+	|- šifrování Rijndael|
+|- Rijndael decryption|
+	|- dešifrování Rijndael|
+|- Arcfour crypto routine|
+	|- šifrovací rutina Arcfour|
+|- Twofish algorithm|
+	|- algoritmus Twofish|
+
+|The program will exit now.|
+	|Program nyní skonèí.|
+|Self-Test(s) Failed|
+	|Test(y) sebe sama se nepodaøil(y)|
+
+|Clipboard cleared.|
+	|Schránka byla vyprázdnìna.|
+|Password copied to clipboard. Clipboard will be cleared in %d seconds.|
+	|Heslo bylo zkopírováno do schránky. Schránka bude vyprázdnìna za %d sekund.|
+
+|Failed to set the master key!|
+	|Nepodaøilo se nastavit hlavní heslo!|
+|File cannot be opened!|
+	|Soubor nelze otevøít!|
+|File cannot be saved!|
+	|Soubor nelze uloit!|
+
+|Password Safe files|
+	|Soubory Heslového trezoru|
+|All files|
+	|Všechny soubory|
+
+|The current file has been modified.|
+	|Aktuální soubor byl zmìnìn.|
+|Do you want to save the changes before closing?|
+	|Chcete pøed uzavøením souboru uloit zmìny?|
+|Save Before Close?|
+	|Uloit pøed uzavøením?|
+
+|Deleting a group will delete all items in that group, too.|
+	|Smazáním skupiny smaete také všechny záznamy této skupiny.|
+|Are you sure you want to delete this group?|
+	|Opravdu chcete smazat tuto skupinu?|
+|Delete Group Confirmation|
+	|Potvrzení smazání skupiny|
+
+|Cannot open temporary file for printing!|
+	|Nelze otevít doèasnı soubor pro tisk!|
+
+|Load language file|
+	|Naèíst jazykovı soubor|
+|Load a language file|
+	|Naèíst jazykovı soubor|
+|Select one of the languages in the list below.|
+	|Zvolte jeden z jazykù v seznamu níe.|
+|Available Languages|
+	|Dostupné jazyky|
+
+|Open &ReadMe File|
+	|Otevøít soubo&r Ètimne|
+|Open &License File|
+	|Otevøít soubor &licence|
+|&Print License File|
+	|Vy&tisknout soubor licence|
+
+|Newline sequence:|
+	|Sekvence nového øádku:|
+|Windows newline sequence (\r\n)|
+	|Sekvence nového øádku Windows (\r\n)|
+|Unix newline sequence (\n)|
+	|Sekvence nového øádku Unix (\n)|
+|Clipboard auto-clear time (seconds):|
+	|Èas automatického vyprázdnìní schránky (sekundy):|
+|Settings|
+	|Monosti|
+|Here you can configure KeePass.|
+	|Zde lze konfigurovat KeePass.|
+|Automatically open last used database on startup|
+	|Automaticky otevøít poslední pouívanou databázi pøi startu|
+|Automatically save database on exit|
+	|Automaticky uloit databázi pøi ukonèení|
+|GUI: Display images on buttons|
+	|GUI: Zobrazit ikony a tlaèítka|
+|GUI: Show grid lines in password entry list|
+	|GUI: Zobrazit møíku v seznamu hesel|
+|Workspace cannot be unlocked!|
+	|Pracovní prostøedí nelze odemknout!|
+|Workspace locked|
+	|Pracovní prostøedí je zamèeno|
+
+|Loading error|
+	|Chyba naèítání|
+|Language file cannot be opened!|
+	|Jazykovı soubor nelze otevøít!|
+|Language file cannot be registered!|
+	|Jazykovı soubor nelze zaregistrovat!|
+|The language file has been installed.|
+	|Jazykovı soubor byl nainstalován.|
+|You must restart KeePass in order to use the new language.|
+	|Musíte restartovat KeePass, aby bylo moné pouít novı jazyk.|
+|Do you wish to restart KeePass now?|
+	|Chcete restartovat KeePass nyní?|
+|Restart KeePass?|
+	|Restartovat KeePass?|
+|Application cannot be restarted automatically!|
+	|Aplikace nemùe bıt restartována automaticky!|
+|Please restart KeePass manually.|
+	|Prosím, restartujte KeePass ruènì.|
+
+|CSV files|
+	|Soubory CSV|
+|Text files|
+	|Textové soubory|
+|An error occured while importing the CSV file. File cannot be imported.|
+	|Nastala chyba pøi importu souboru CSV. Soubor nelze importovat.|
+|An error occured while importing the file. File cannot be imported.|
+	|Nastala chyba pøi importu souboru. Soubor nelze importovat.|
+|&Import From CSV|
+	|&Import ze souboru CSV|
+|Import From Code&Wallet|
+	|Import z programu Code&Wallet|
+|Import From &PwSafe v2 TXT|
+	|Import z textového souboru &PwSafe v2|
+|Select &Font|
+	|Vıbìr &písma|
+|Select a new font for the list controls.|
+	|Zvolte novı typ písma pro seznam.|
+
+|Import From Code&Wallet|
+	|Importovat z programu Code&Wallet|
+|&TXT Format...|
+	|Jako formát &TXT...|
+|&HTML Format...|
+	|Jako formát &HTML...|
+|&XML Format...|
+	|Jako formát &XML...|
+|&CSV Format...|
+	|Jako formát &CSV...|
+|Import To Database|
+	|Import do databáze|
+
+|&Get more languages...|
+	|Získat další &jazyky...|
+|Start and Exit|
+	|Start a Ukonèení|
+|Interface (GUI)|
+	|Rozhraní (GUI)|
+|Files|
+	|Soubory|
+|Memory|
+	|Pamì|
+|Lock workspace when minimizing the main window|
+	|Uzamknout pracovní prostøedí pøi minimalizaci aplikace|
+|Minimize to tray instead of taskbar|
+	|Minimalizovat do lišty nástrojù místo na hlavní panel|
+
+|Encryption algorithm to use (for this database):|
+	|Pouít šifrovací algoritmus (pro tuto databázi):|
+|Advanced Encryption Standard (AES) (128-bit block cipher)|
+	|Advanced Encryption Standard (AES) (128-bitová bloková šifra)|
+|Twofish (128-bit block cipher)|
+	|Twofish (128-bitová bloková šifra)|
+|Security|
+	|Zabezpeèení|
+|KeePass is OSI Certified Open Source Software.|
+	|KeePass je OSI certifikovanı Open Source Software.|
+|KeePass usage:|
+	|Pouití KeePass:|
+|db = Path to database you wish to open on KeePass startup|
+	|db = Cesta k databázi, kterou si pøejete otevøít pøi startu KeePass|
+|Automatically lock workspace after the following number of seconds:|
+	|Automaticky uzamknout pracovní prostøedí po tolika sekundách:|
+|&Group Name|
+	|Název &skupiny|
+|First close the open file before opening another one!|
+	|Nejprve uzavøete otevøenı soubor ne otevøete další!|
+|Every second row has a different background color. Use this color:|
+	|Kadá druhá døádka má odlišnou barvu pozadí. Pouít tuto barvu:|
+|Start:|
+	|Start:|
+|Exit:|
+	|Ukonèení:|
+|Default|
+	|Vıchozí|
+|More Colors...|
+	|Více barev...|
+|Search results|
+	|Hledat ve vısledcích|
+
+|Creation Time|
+	|Èas vytvoøení|
+|Last Modification|
+	|Poslední zmìny|
+|Last Access|
+	|Poslední pøístup|
+|Expires|
+	|Platné do|
+|UUID|
+	|UUID|
+
+|Show &Creation Time Column|
+	|Zobrazit sloupec èas vy&tvoøení|
+|Show Last &Modification Time Column|
+	|Zobrazit sloupec èas poslední z&mìny|
+|Show Last Access &Time Column|
+	|Zobrazit sloupec èas posledního &pøístupu|
+|Show &Expire Time Column|
+	|Zobrazit sloupec &vypršení platnosti|
+|Show UU&ID Column|
+	|Zobrazit sloupec &UUID|
+
+|Show &ToolBar|
+	|Zobrazit &lištu nástrojù|
+|Visit KeePass Homepage|
+	|Navštívit domácí stránku aplikace KeePass|
+|Field copied to clipboard.|
+	|Poloka je zkopírována do schránky.|
+
+|A key-file already exists on this drive. Do you want to overwrite it?|
+	|Soubor klíèe ji na tomto disku existuje. Chcete jej pøepsat?|
+|Overwrite?|
+	|Pøepsat?|
+|Expires:|
+	|Platné do:|
+|&Delete Selected Entries|
+	|&Smazat vybrané záznamy|
+|&Mass Modify (All Selected)...|
+	|&Hromadná zmìna (všech vybranıch)...|
+|Change group:|
+	|Zmìna skupiny:|
+|Change entry icon:|
+	|Zmìna ikony záznamu:|
+|Change expiration time:|
+	|Zmìna vypršení platnosti:|
+|Mass Modify|
+	|Hromadná zmìna|
+|Change fields of all selected entries|
+	|Zmìnit poloky všech vybranıch záznamù|
+|Show &Columns|
+	|Zobrazit &sloupce|
+|Show &Entry View|
+	|&Zobrazit vıpis záznamu|
+|Mobile devices|
+	|Mobilní zaøízení|
+|Credit cards|
+	|Kreditní karty|
+
+|GUI: Automatically resize table columns when resizing the main window|
+	|GUI: Automaticky upravit velikost sloupcù tabulky, kdy se mìní velikost hlavního okna|

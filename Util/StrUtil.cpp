@@ -385,3 +385,45 @@ TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 
 	return p;
 }
+
+void ParseURL(CString *pString, PW_ENTRY *pEntry)
+{
+	CString str;
+	int nPos;
+
+	ASSERT(pString != NULL); if(pString == NULL) return;
+	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return;
+
+	str = *pString;
+
+	while(1)
+	{
+		nPos = str.Find("%TITLE%");
+		if(nPos == -1) break;
+		str = str.Left(nPos) + CString(pEntry->pszTitle) + str.Right(str.GetLength() - nPos - 7);
+	}
+
+	while(1)
+	{
+		nPos = str.Find("%USERNAME%");
+		if(nPos == -1) break;
+		str = str.Left(nPos) + CString(pEntry->pszUserName) + str.Right(str.GetLength() - nPos - 10);
+	}
+
+	while(1)
+	{
+		nPos = str.Find("%PASSWORD%");
+		if(nPos == -1) break;
+		str = str.Left(nPos) + CString(pEntry->pszPassword) + str.Right(str.GetLength() - nPos - 10);
+	}
+
+	while(1)
+	{
+		nPos = str.Find("%NOTES%");
+		if(nPos == -1) break;
+		str = str.Left(nPos) + CString(pEntry->pszAdditional) + str.Right(str.GetLength() - nPos - 7);
+	}
+
+	*pString = str;
+	EraseCString(&str);
+}

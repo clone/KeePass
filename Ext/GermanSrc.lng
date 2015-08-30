@@ -1,3 +1,8 @@
+|~LANGUAGENAME|                |German (Deutsch, Standard)|
+|~LANGUAGEVERSION|             |0.90a|
+|~LANGUAGEAUTHOR|              |Dominik Reichl|
+|~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://keepass.sourceforge.net|
+
 |&OK|                          |&OK|
 |&Cancel|                      |&Abbrechen|
 |&Close|                       |&Schließen|
@@ -405,3 +410,28 @@
 
 |GUI: Automatically resize table columns when resizing the main window|
     |GUI: Spaltenbreite automatisch anpassen wenn die Größe des Hauptfensters verändert wird|
+|&Copy|                        |&Kopieren|
+|Copy &All|                    |&Alles kopieren|
+|&Undo|                        |&Rückgängig|
+|&Paste|                       |&Einfügen|
+|Cu&t|                         |&Ausschneiden|
+|&Select All|                  |Alles &markieren|
+|&Delete|                      |&Löschen|
+|&TAN Wizard|                  |&TAN-Assistent|
+|TAN Wizard|                   |TAN-Assistent|
+
+|Using this wizard you can easily add TAN entries.|
+    |Mit diesem Assistenten können Sie leicht TANs hinzufügen.|
+
+|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-numerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only numerical 'substrings' are added as TAN entries.|
+    |Einfach unten in das Eingabefeld die TANs einfügen. Die Formatierung ist relativ egal, alle nicht-numerischen Zeichen werden ignoriert (d.h. Neue-Zeile, Tabs, Leerzeichen, etc.) und nur numerische Teilzeichenketten werden als TAN-Einträge hinzugefügt.|
+
+|<TAN>|                        |<TAN>|
+|Print Pre&view...|            |Druck&vorschau...|
+
+|About &Translation...|        |Über Übersetzung...|
+|Translation information|      |Informationen über die aktuelle Übersetzung|
+|Currently used language|      |Im Moment benutzte Übersetzung|
+|Language file version|        |Sprachdatei-Version|
+|Author|                       |Autor|
+|Translation author contact|   |Übersetzungs-Autor Kontakt|

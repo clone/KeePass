@@ -59,8 +59,8 @@ public:
 	void SetSelectionItalic();
 	void SetSelectionUnderlined();
 
-	void SetRTF(CString sRTF);
-	CString GetRTF();
+	void SetRTF(CString sRTF, int nStreamType = SF_RTF);
+	CString GetRTF(int nStreamType = SF_RTF);
 	virtual ~CAutoRichEditCtrl();
 
 	// Generated message map functions

@@ -1,3 +1,34 @@
+04/02/21 - 0.91
+- Added Czech translation (thanks to Lubos Stanek!)
+- Added Estonian translation (thanks to Andri Viiand!)
+- Added context menu for the entry view (copy selection to the
+  Windows clipboard, etc.)
+- The 'notes' field is now able to hold 2^31-1 characters
+  (2147483647) instead of only ~32000
+- Fixed a bug in the window translation routine
+- Changed resizing priorities (the group and password lists are
+  now the windows which are resized first when resizing the
+  main window, not the entry view any more)
+- The entry view is cleared now when locking the workspace
+- Added TAN support (just paste your TANs into an edit field
+  and the wizard generates password entries from them, which
+  automatically expire when copying them to the clipboard)
+- Column titles of HTML export files and printing are
+  translated now
+- Closing the currently open database is delayed until the user
+  selected the new file to open and clicked OK
+- Fixed a bug which caused KeePass to ignore the view columns
+  options when auto-resizing of the columns is disabled
+- URL field supports placeholders (%USERNAME% inserts the user-
+  name of the current entry, %PASSWORD% the password, %TITLE%
+  and %NOTES% insert the title and the notes)
+- Added support of translation information fields (see Help -
+  About Translation...)
+
+04/02/11 - 0.90a
+- Fixed some small bugs (threading/timer bug, translation bug,
+  two bugs in the routines of the entry details view)
+
 04/02/10 - 0.89
 - Added optional entry view (a view at the bottom of the main
   window which shows the details of the currently selected

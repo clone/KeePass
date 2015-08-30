@@ -27,91 +27,42 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef AFX_ADDENTRYDLG_H__C5D4C3E0_0BAE_11D8_BF16_0050BF14F5CC__INCLUDED_
-#define AFX_ADDENTRYDLG_H__C5D4C3E0_0BAE_11D8_BF16_0050BF14F5CC__INCLUDED_
+#ifndef AFX_TANWIZARDDLG_H__C738F700_624E_11D8_BF16_0050BF14F5CC__INCLUDED_
+#define AFX_TANWIZARDDLG_H__C738F700_624E_11D8_BF16_0050BF14F5CC__INCLUDED_
 
-#include "NewGUI/WzComboBox.h"
-#include "NewGUI/KCSideBannerWnd.h"
-#include "NewGUI/HyperEdit.h"
 #include "NewGUI/ShadeButtonST.h"
-#include "NewGUI/amsEdit.h"
-#include "NewGUI/AutoRichEditCtrl.h"
-
-#include "PwSafe/PwManager.h"
-
-#define PWAE_STDURL_A ""
-#define PWAE_STDURL   _T(PWAE_STDURL_A)
+#include "NewGUI/KCSideBannerWnd.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CAddEntryDlg : public CDialog
+class CTanWizardDlg : public CDialog
 {
 public:
-	CAddEntryDlg(CWnd* pParent = NULL);
+	CTanWizardDlg(CWnd* pParent = NULL);
 
-	void CleanUp();
-
-	CFont m_fStyle;
-	CImageList *m_pParentIcons;
 	CKCSideBannerWnd m_banner;
 
-	BOOL m_bEditMode;
-	CPwManager *m_pMgr;
-	int m_nGroupId;
-	int m_nIconId;
-
-	CString m_strNotes;
-	PW_TIME m_tExpire;
-
-	BCMenu m_popmenu;
-
-	//{{AFX_DATA(CAddEntryDlg)
-	enum { IDD = IDD_ADDENTRY_DLG };
-	CAMSTimeEdit	m_editTime;
-	CAMSDateEdit	m_editDate;
-	CShadeButtonST	m_btHidePw;
-	CShadeButtonST	m_btOK;
+	//{{AFX_DATA(CTanWizardDlg)
+	enum { IDD = IDD_TANWIZARD_DLG };
 	CShadeButtonST	m_btCancel;
-	CShadeButtonST	m_btRandomPw;
-	CShadeButtonST	m_btPickIcon;
-	CHyperEdit	m_pURL;
-	CEdit	m_pRepeatPw;
-	CEdit	m_pEditPw;
-	CWzComboBox	m_pGroups;
-	BOOL	m_bStars;
-	CString	m_strPassword;
-	CString	m_strRepeatPw;
-	CString	m_strTitle;
-	CString	m_strURL;
-	CString	m_strUserName;
-	CAutoRichEditCtrl	m_reNotes;
+	CShadeButtonST	m_btOK;
+	CString	m_strTans;
 	//}}AFX_DATA
 
-	//{{AFX_VIRTUAL(CAddEntryDlg)
+	//{{AFX_VIRTUAL(CTanWizardDlg)
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
-	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	//}}AFX_VIRTUAL
 
 protected:
-	//{{AFX_MSG(CAddEntryDlg)
+	//{{AFX_MSG(CTanWizardDlg)
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	virtual void OnCancel();
-	afx_msg void OnCheckHidePw();
-	afx_msg void OnPickIconBtn();
-	afx_msg void OnRandomPwBtn();
-	afx_msg void OnReCopyAll();
-	afx_msg void OnReCopySel();
-	afx_msg void OnReDelete();
-	afx_msg void OnRePaste();
-	afx_msg void OnReSelectAll();
-	afx_msg void OnReCut();
-	afx_msg void OnReUndo();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
 
 //{{AFX_INSERT_LOCATION}}
 
-#endif // AFX_ADDENTRYDLG_H__C5D4C3E0_0BAE_11D8_BF16_0050BF14F5CC__INCLUDED_
+#endif // AFX_TANWIZARDDLG_H__C738F700_624E_11D8_BF16_0050BF14F5CC__INCLUDED_

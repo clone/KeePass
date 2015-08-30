@@ -131,9 +131,9 @@ void NewGUI_TranslateCWnd(CWnd *pWnd)
 
 BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
 {
-	char sz[1024];
+	TCHAR sz[1024];
 	UNREFERENCED_PARAMETER(lParam);
 	GetWindowText(hwnd, sz, 1023);
-	SetWindowText(hwnd, TRL(sz));
+	if(_tcslen(sz) <= 1021) SetWindowText(hwnd, TRL(sz));
 	return TRUE;
 }

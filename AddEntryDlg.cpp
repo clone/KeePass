@@ -29,11 +29,14 @@
 
 #include "StdAfx.h"
 #include "PwSafe.h"
+#include "PwSafeDlg.h"
 #include "AddEntryDlg.h"
 
 #include "IconPickerDlg.h"
 #include "PwGeneratorDlg.h"
+#include "Util/MemUtil.h"
 #include "Util/StrUtil.h"
+#include "NewGUI/NewGUICommon.h"
 #include "NewGUI/TranslateEx.h"
 #include "Util/base64.h"
 
@@ -50,7 +53,6 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 {
 	//{{AFX_DATA_INIT(CAddEntryDlg)
 	m_bStars = TRUE;
-	m_strNotes = _T("");
 	m_strPassword = _T("");
 	m_strRepeatPw = _T("");
 	m_strTitle = _T("");
@@ -63,6 +65,7 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 	m_nIconId = 0;
 	m_bEditMode = FALSE;
 	m_pParentIcons = NULL;
+	m_strNotes = _T("");
 }
 
 void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
@@ -81,12 +84,12 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_PASSWORD, m_pEditPw);
 	DDX_Control(pDX, IDC_COMBO_GROUPS, m_pGroups);
 	DDX_Check(pDX, IDC_CHECK_HIDEPW, m_bStars);
-	DDX_Text(pDX, IDC_EDIT_NOTES, m_strNotes);
 	DDX_Text(pDX, IDC_EDIT_PASSWORD, m_strPassword);
 	DDX_Text(pDX, IDC_EDIT_REPEATPW, m_strRepeatPw);
 	DDX_Text(pDX, IDC_EDIT_TITLE, m_strTitle);
 	DDX_Text(pDX, IDC_EDIT_URL, m_strURL);
 	DDX_Text(pDX, IDC_EDIT_USERNAME, m_strUserName);
+	DDX_Control(pDX, IDC_RE_NOTES, m_reNotes);
 	//}}AFX_DATA_MAP
 }
 
@@ -95,6 +98,13 @@ BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	ON_BN_CLICKED(IDC_CHECK_HIDEPW, OnCheckHidePw)
 	ON_BN_CLICKED(IDC_PICKICON_BTN, OnPickIconBtn)
 	ON_BN_CLICKED(IDC_RANDOMPW_BTN, OnRandomPwBtn)
+	ON_COMMAND(ID_RE_COPYALL, OnReCopyAll)
+	ON_COMMAND(ID_RE_COPYSEL, OnReCopySel)
+	ON_COMMAND(ID_RE_DELETE, OnReDelete)
+	ON_COMMAND(ID_RE_PASTE, OnRePaste)
+	ON_COMMAND(ID_RE_SELECTALL, OnReSelectAll)
+	ON_COMMAND(ID_RE_CUT, OnReCut)
+	ON_COMMAND(ID_RE_UNDO, OnReUndo)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -203,6 +213,10 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	UpdateData(FALSE);
 
+	m_reNotes.LimitText(0);
+	m_reNotes.SetEventMask(ENM_MOUSEEVENTS);
+	m_reNotes.SetRTF(m_strNotes, SF_TEXT);
+
 	// removed m_bStars = TRUE; -> Parent can decide to show the password or not
 	OnCheckHidePw(); // Update GUI based on m_bStars flag
 
@@ -213,19 +227,30 @@ BOOL CAddEntryDlg::OnInitDialog()
 	{
 		CNewRandom *pRand = new CNewRandom();
 		CBase64Codec base64;
+		ASSERT(pRand != NULL);
 		DWORD dwSize = 32;
 		BYTE pbRandom[16], pbString[32];
 		pRand->Initialize(); // Get system entropy
 		pRand->GetRandomBuffer(pbRandom, 16);
 		VERIFY(base64.Encode(pbRandom, 16, pbString, &dwSize));
-		delete pRand; pRand = NULL;
+		SAFE_DELETE(pRand);
 		pbString[strlen((char *)pbString) - 3] = 0;
 		m_strPassword = (char *)(pbString + 1);
 		m_strRepeatPw = (char *)(pbString + 1);
 		UpdateData(FALSE);
 	}
 
-	GetDlgItem(IDC_EDIT_TITLE)->SetFocus();
+	if(m_strTitle == PWS_TAN_ENTRY)
+	{
+		GetDlgItem(IDC_EDIT_TITLE)->EnableWindow(FALSE);
+		GetDlgItem(IDC_EDIT_PASSWORD)->SetFocus();
+	}
+	else
+	{
+		GetDlgItem(IDC_EDIT_TITLE)->EnableWindow(TRUE);
+		GetDlgItem(IDC_EDIT_TITLE)->SetFocus();
+	}
+
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
 
@@ -245,6 +270,7 @@ void CAddEntryDlg::OnOK()
 	m_tExpire.btHour = (BYTE)m_editTime.GetHour();
 	m_tExpire.btMinute = (BYTE)m_editTime.GetMinute();
 	m_tExpire.btSecond = (BYTE)m_editTime.GetSecond();
+	m_strNotes = m_reNotes.GetRTF(SF_TEXT);
 
 	m_nGroupId = m_pGroups.GetCurSel();
 
@@ -320,4 +346,72 @@ void CAddEntryDlg::OnRandomPwBtn()
 
 		UpdateData(FALSE);
 	}
+}
+
+void CAddEntryDlg::OnReCopyAll() 
+{
+	long lStart, lEnd;
+	m_reNotes.GetSel(lStart, lEnd);
+	m_reNotes.SetSel(0, -1);
+	m_reNotes.Copy();
+	m_reNotes.SetSel(lStart, lEnd);
+}
+
+void CAddEntryDlg::OnReCopySel() 
+{
+	m_reNotes.Copy();
+}
+
+void CAddEntryDlg::OnReDelete() 
+{
+	m_reNotes.Clear();
+}
+
+void CAddEntryDlg::OnRePaste() 
+{
+	m_reNotes.Paste();
+}
+
+void CAddEntryDlg::OnReSelectAll() 
+{
+	m_reNotes.SetSel(0, -1);
+}
+
+void CAddEntryDlg::OnReCut() 
+{
+	m_reNotes.Cut();
+}
+
+void CAddEntryDlg::OnReUndo() 
+{
+	m_reNotes.Undo();
+}
+
+BOOL CAddEntryDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult) 
+{
+	MSGFILTER *lpMsgFilter = (MSGFILTER *)lParam;
+
+	if((wParam == IDC_RE_NOTES) && (lpMsgFilter->nmhdr.code == EN_MSGFILTER)
+		&& (lpMsgFilter->msg == WM_RBUTTONDOWN))
+	{
+		POINT pt;
+		GetCursorPos(&pt);
+
+		m_popmenu.LoadMenu(IDR_RECTX_MENU);
+
+		m_popmenu.SetMenuDrawMode(BCMENU_DRAWMODE_XP); // <<<!=>>> BCMENU_DRAWMODE_ORIGINAL
+		m_popmenu.SetSelectDisableMode(FALSE);
+		m_popmenu.SetXPBitmap3D(TRUE);
+		m_popmenu.SetBitmapBackground(RGB(255, 0, 255));
+		m_popmenu.SetIconSize(16, 16);
+
+		m_popmenu.LoadToolbar(IDR_INFOICONS);
+
+		BCMenu *psub = (BCMenu *)m_popmenu.GetSubMenu(0);
+		CPwSafeDlg::_TranslateMenu(psub);
+		psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, this);
+		m_popmenu.DestroyMenu();
+	}
+	
+	return CDialog::OnNotify(wParam, lParam, pResult);
 }
