@@ -52,6 +52,7 @@ public:
 
 	//{{AFX_DATA(CGetRandomDlg)
 	enum { IDD = IDD_GETRANDOM_DLG };
+	CShadeButtonST	m_btCancel;
 	CShadeButtonST	m_btOK;
 	CShadeButtonST	m_btMouseInput;
 	CProgressCtrl	m_cMouseProgress;
@@ -69,6 +70,7 @@ protected:
 	virtual void OnOK();
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnBeginMouseInput();
+	virtual void OnCancel();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

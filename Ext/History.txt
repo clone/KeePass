@@ -1,3 +1,24 @@
+04/03/19 - 0.94a
+- Integrated standard settings from initialization file to
+  KeePass, i.e. your settings won't be overwritten any more
+  when updating to a new version (both ZIP and installer)
+- Added option to associate .kdb files with KeePass (i.e. a
+  double-click on a .kdb file in the Windows Explorer will
+  automatically open the file with KeePass)
+- Password generation options are remembered now
+- Made entropy collection in the password generation dialog
+  optional
+- Added spin button control right of the password character
+  number edit field in the password generator dialog
+- Fixed a bug in the hotkey handling routines
+- Reduced flicker when double-clicking into the passwords list
+- The mass modify menu displays the groups as tree now too, not
+  as simple list any more
+- Entry view is cleared now when closing the database
+- Added cancel button to entropy collection dialog
+- Fixed some bugs in the import functions
+- Some other minor improvements
+
 04/03/04 - 0.93a
 - Replaced group list by a group tree, you can now create
   subgroups

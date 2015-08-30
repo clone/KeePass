@@ -27,40 +27,31 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#if !defined(AFX_PWSAFE_H__206CC2C1_063D_11D8_BF16_0050BF14F5CC__INCLUDED_)
-#define AFX_PWSAFE_H__206CC2C1_063D_11D8_BF16_0050BF14F5CC__INCLUDED_
-
-#if _MSC_VER >= 1000
-#pragma once
-#endif // _MSC_VER >= 1000
-
-#ifndef __AFXWIN_H__
-	#error include 'stdafx.h' before including this file for PCH
-#endif
-
-#include "afxmt.h"
-#include "resource.h"
+#ifndef AFX_CUSTOMTREECTRLEX_H__EE7BE580_7102_11D8_BF16_0050BF14F5CC__INCLUDED_
+#define AFX_CUSTOMTREECTRLEX_H__EE7BE580_7102_11D8_BF16_0050BF14F5CC__INCLUDED_
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPwSafeApp : public CWinApp
+class CCustomTreeCtrlEx : public CTreeCtrl
 {
 public:
-	CPwSafeApp();
+	CCustomTreeCtrlEx();
 
-	static BOOL RegisterShellAssociation();
-	static BOOL UnregisterShellAssociation();
+	CWnd *m_pParentI;
 
-	CMutex *m_pAppMutex;
-
-	//{{AFX_VIRTUAL(CPwSafeApp)
-	public:
-	virtual BOOL InitInstance();
-	virtual int ExitInstance();
+public:
+	//{{AFX_VIRTUAL(CCustomTreeCtrlEx)
 	//}}AFX_VIRTUAL
 
-	//{{AFX_MSG(CPwSafeApp)
+public:
+	virtual ~CCustomTreeCtrlEx();
+
+protected:
+	//{{AFX_MSG(CCustomTreeCtrlEx)
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	//}}AFX_MSG
+
 	DECLARE_MESSAGE_MAP()
 };
 
@@ -68,4 +59,4 @@ public:
 
 //{{AFX_INSERT_LOCATION}}
 
-#endif // !defined(AFX_PWSAFE_H__206CC2C1_063D_11D8_BF16_0050BF14F5CC__INCLUDED_)
+#endif // AFX_CUSTOMTREECTRLEX_H__EE7BE580_7102_11D8_BF16_0050BF14F5CC__INCLUDED_

@@ -349,9 +349,9 @@
     |Minimeeri süsteemisalve tegumiriba asemel|
 
 |Encryption algorithm to use (for this database):| |Kasutatav krüpteerimisalgoritm (selle andmebaasi jaoks):|
-|Advanced Encryption Standard (AES) (128-bit block cipher)|
-    |Advanced Encryption Standard (AES) (128-bit Block-Cipher)|
-|Twofish (128-bit block cipher)|               |Twofish (128-bit Block-Cipher)|
+|Advanced Encryption Standard (AES) (128-bit block cipher using 256-bit key)|
+	|Advanced Encryption Standard (AES) (128-bitine blokk-siffer kasutades 256-bitist võtit)|
+|Twofish (128-bit block cipher using 256-bit key)|               |Twofish (128-bitine blokk-siffer kasutade 256-bitist võtit)|
 |Security|                     |Turvalisus|
 |KeePass is OSI Certified Open Source Software.|
     |KeePass on OSI Sertifitseeritud Avatud Koodiga Tarkvara.|
@@ -425,7 +425,61 @@
 |Author|                       |Autor|
 |Translation author contact|   |Tõlke autori kontaktandmed|
 
+|Add Password &Subgroup...|	   |Lisa uus paroolide &alamgrupp...|
+|&Rearrange|                   |&Korralda ümber|
+|&Sort Group List|			   |&Sorteeri gruppide nimekiri|
+|Move Group One &Left|		   |Liiguta grupp koha võrra &vasakule|
+|Move Group One &Right|		   |Liiguta grupp koha võrra &paremale|
+
+|&Sort List By Title|		   |Sorteeri nimekiri &nime järgi|
+|Sort List By User&Name|	   |Sorteeri nimekiri &kasutajanime järgi|
+|Sort List By &URL|			   |Sorteeri nimekiri &URL järgi|
+|Sort List By &Password|	   |Sorteeri nimekiri &parooli järgi|
+|Sort List By Note&s|		   |Sorteeri nimekiri &märkmete järgi|
+|Sort List By &Creation Time|  |Sorteeri nimekiri &loomisaja järgi|
+
+|Sort List By Last &Modify Time|	
+	|Sorteeri nimekiri &viimase muutmisaja järgi|
+|Sort List By Last &Access Time|
+	|Sorteeri nimekiri v&iimase kasutamise aja järgi|
+|Sort List By &Expiration Time|
+	|Sorteeri nimekiri kehtivise kautamise aja järgi|
+
+|Hide UserNames Behind &Asterisks (***)|
+	|Peida kasutajanimed tätnide taha (***)|
+
+|Attachment:|				   |Manus:|
+
+|Attachment|				   |Manus|
+|Show &Attachment Column|	   |Näita manuse veergu|
+
+|Generate a random password...| 
+	|Genereeri juhuslik parool...|
+|Open file and set as attachment...|
+	|Ava fail ja lisa manusena...|
+
+|Save attached file to disk...|
+	|Salvesta manusfail kettale...|
+|Remove the currently attached file|
+	|Kustuta manusena lisatud fail|
+
+|There already is a file attached with this entry.|
+	|Käesoleva sissekandega on juba seotud manusfail.|
+|Do you want to overwrite the current attachment?|
+	|Kas te soovite käesoleva manusfaili ümbervahetada?|
+
+|&Save Attached File To...|
+	|&Salvesta manusfail...|
+
+|There is no file attached with this entry.|
+	|Käesoleva sissekandega ei ole seotud ühtegi manusfaili.|
+
+|Close button [X] minimizes the main window instead of terminating the application|
+	|Sulgemise nupp [X] minimeerib põhiakna, mitte ei sulge seda|
+|Show &Entry View|			   |Näita sissekande infot|
+|GUI: Automatically resize table columns when resizing the main window|
+	|Muuda automaatselt ka veergude suurust kui muudetakse põhiakna suurust|
 |~LANGUAGENAME|                |Estonian|
-|~LANGUAGEVERSION|             |Designed for KeePass 0.91|
+|~LANGUAGEVERSION|             |0.93b|
 |~LANGUAGEAUTHOR|              |Andri Viiand|
 |~LANGUAGEAUTHOREMAIL|         |andriv@users.sourceforge.net, http://sourceforge.net/users/andriv|

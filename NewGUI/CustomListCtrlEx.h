@@ -36,13 +36,14 @@
 
 class CCustomListCtrlEx : public CListCtrl
 {
-// Konstruktion
 public:
 	CCustomListCtrlEx();
 	virtual ~CCustomListCtrlEx();
 
 	COLORREF GetColorEx();
 	void SetColorEx(COLORREF rgbColor);
+
+	CWnd *m_pParentI;
 
 	//{{AFX_VIRTUAL(CCustomListCtrlEx)
 	protected:
@@ -56,6 +57,7 @@ private:
 protected:
 	//{{AFX_MSG(CCustomListCtrlEx)
 	afx_msg void OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()

@@ -28,7 +28,9 @@
 */
 
 #include "stdafx.h"
+#include "../resource.h"
 #include "CustomListCtrlEx.h"
+#include "../PwSafeDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -51,6 +53,8 @@ CCustomListCtrlEx::CCustomListCtrlEx()
 	else m_bColorize = FALSE;
 
 	m_rgbColor = RGB(238,238,255);
+
+	m_pParentI = NULL;
 }
 
 CCustomListCtrlEx::~CCustomListCtrlEx()
@@ -60,6 +64,7 @@ CCustomListCtrlEx::~CCustomListCtrlEx()
 BEGIN_MESSAGE_MAP(CCustomListCtrlEx, CListCtrl)
 	//{{AFX_MSG_MAP(CCustomListCtrlEx)
 	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnCustomDraw)
+	ON_WM_SYSKEYDOWN()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -128,4 +133,22 @@ COLORREF CCustomListCtrlEx::GetColorEx()
 void CCustomListCtrlEx::SetColorEx(COLORREF rgbColor)
 {
 	m_rgbColor = rgbColor;
+}
+
+void CCustomListCtrlEx::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags) 
+{
+	ASSERT(m_pParentI != NULL); // Parent must be initialized first
+
+	if(nFlags & 0x2000)
+	{
+		if(nChar == VK_UP) ((CPwSafeDlg *)m_pParentI)->_ProcessListKey(nChar);
+		else if(nChar == VK_DOWN) ((CPwSafeDlg *)m_pParentI)->_ProcessListKey(nChar);
+		else if(nChar == VK_HOME) ((CPwSafeDlg *)m_pParentI)->_ProcessListKey(nChar);
+		else if(nChar == VK_END) ((CPwSafeDlg *)m_pParentI)->_ProcessListKey(nChar);
+		else CListCtrl::OnSysKeyDown(nChar, nRepCnt, nFlags);
+	}
+	else
+	{
+		CListCtrl::OnSysKeyDown(nChar, nRepCnt, nFlags);
+	}
 }

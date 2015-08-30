@@ -50,8 +50,12 @@ public:
 	CKCSideBannerWnd m_banner;
 	CImageList m_ilIcons;
 
+	static void SetOptions(CString strOptions, CString strCharSet, UINT nCharacters);
+	static void GetOptions(CString *pstrOptions, CString *pstrCharSet, UINT *pnCharacters);
+
 	//{{AFX_DATA(CPwGeneratorDlg)
 	enum { IDD = IDD_PW_GENERATOR_DLG };
+	CSpinButtonCtrl	m_spinNumChars;
 	CShadeButtonST	m_btGenerate;
 	CShadeButtonST	m_btnCancel;
 	CShadeButtonST	m_btnOK;
@@ -60,6 +64,7 @@ public:
 	CString	m_strPassword;
 	BOOL	m_bCharSpec;
 	CString	m_strCharSet;
+	BOOL	m_bGetEntropy;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CPwGeneratorDlg)
@@ -76,6 +81,7 @@ protected:
 	afx_msg void OnCheckCharSpec();
 	afx_msg void OnClickListOptions(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnRclickListOptions(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnDeltaPosSpinNumChars(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

@@ -31,6 +31,7 @@
 #include "PwSafe.h"
 #include "OptionsDlg.h"
 
+#include "NewGUI/NewGUICommon.h"
 #include "NewGUI/TranslateEx.h"
 
 #ifdef _DEBUG
@@ -65,6 +66,8 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COptionsDlg)
+	DDX_Control(pDX, IDC_BTN_DELETEASSOC, m_btnDeleteAssoc);
+	DDX_Control(pDX, IDC_BTN_CREATEASSOC, m_btnCreateAssoc);
 	DDX_Control(pDX, IDC_BTN_ROWHIGHLIGHTSEL, m_btnColorRowHighlight);
 	DDX_Control(pDX, IDC_TAB_MENU, m_tabMenu);
 	DDX_Control(pDX, IDC_COMBO_ENCALGO, m_cEncAlgos);
@@ -91,6 +94,8 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialog)
 	//{{AFX_MSG_MAP(COptionsDlg)
 	ON_BN_CLICKED(IDC_BTN_SELFONT, OnBtnSelFont)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_MENU, OnSelChangeTabMenu)
+	ON_BN_CLICKED(IDC_BTN_CREATEASSOC, OnBtnCreateAssoc)
+	ON_BN_CLICKED(IDC_BTN_DELETEASSOC, OnBtnDeleteAssoc)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -103,6 +108,8 @@ BOOL COptionsDlg::OnInitDialog()
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_Button(&m_btSelFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
+	NewGUI_Button(&m_btnCreateAssoc, IDB_FILE, IDB_FILE);
+	NewGUI_Button(&m_btnDeleteAssoc, IDB_CANCEL, IDB_CANCEL);
 
 	m_banner.Attach(this, KCSB_ATTACH_TOP);
 	m_banner.SetColBkg(RGB(255,255,255));
@@ -150,6 +157,12 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_LOCKAFTERTIME), OPTGRP_SECURITY);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_LOCKSECONDS), OPTGRP_SECURITY);
 
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_ASSOC), OPTGRP_SETUP);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_CREATEASSOC), OPTGRP_SETUP);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_DELETEASSOC), OPTGRP_SETUP);
+
 	m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
 	m_wndgrp.ArrangeWindows(this);
 
@@ -170,6 +183,8 @@ BOOL COptionsDlg::OnInitDialog()
 	tci.iImage = 26; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
 	tci.cchTextMax = _tcslen(TRL(OPTSZ_MEMORY)); tci.pszText = (char *)TRL(OPTSZ_MEMORY);
 	tci.iImage = 42; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_SETUP)); tci.pszText = (char *)TRL(OPTSZ_SETUP);
+	tci.iImage = 30; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
 
 	m_cEncAlgos.AddString(TRL("Advanced Encryption Standard (AES) (128-bit block cipher using 256-bit key)"));
 	m_cEncAlgos.AddString(TRL("Twofish (128-bit block cipher using 256-bit key)"));
@@ -275,10 +290,56 @@ void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult)
 	case OPTGRP_SECURITY:
 		m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
 		break;
+	case OPTGRP_SETUP:
+		m_wndgrp.HideAllExcept(OPTGRP_SETUP);
+		break;
 	default:
 		ASSERT(FALSE);
 		break;
 	}
 
 	*pResult = 0;
+}
+
+void COptionsDlg::OnBtnCreateAssoc() 
+{
+	if(CPwSafeApp::RegisterShellAssociation() == TRUE)
+	{
+		NotifyAssocChanged();
+
+		MessageBox(TRL("Successfully associated KeePass with .kdb files! A double-click on a .kdb file will now start KeePass automatically!"),
+			TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+	}
+}
+
+void COptionsDlg::OnBtnDeleteAssoc() 
+{
+	if(CPwSafeApp::UnregisterShellAssociation() == TRUE)
+	{
+		NotifyAssocChanged();
+
+		MessageBox(TRL("Successfully removed association! KeePass won't be started any more when double-clicking on a .kdb file!"),
+			TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+	}
+}
+
+void COptionsDlg::NotifyAssocChanged()
+{
+	LPSHCHANGENOTIFY lpSHChangeNotify;
+	HINSTANCE hShell32;
+
+	hShell32 = LoadLibrary(_T("Shell32.dll"));
+	if(hShell32 != NULL)
+	{
+		lpSHChangeNotify = (LPSHCHANGENOTIFY)GetProcAddress(hShell32, _T("SHChangeNotify"));
+
+		if(lpSHChangeNotify != NULL)
+		{
+			lpSHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+		}
+		else { ASSERT(FALSE); }
+
+		FreeLibrary(hShell32);
+	}
+	else { ASSERT(FALSE); }
 }

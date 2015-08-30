@@ -113,13 +113,25 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 	if(pDC != NULL) ReleaseDC(pDC);
 
 	ASSERT(m_pMgr != NULL); // Must have been initialized by parent
-	unsigned int i; PW_GROUP *p;
-	for(i = 0; i < m_pMgr->GetNumberOfGroups(); i++)
+	unsigned int i, j; PW_GROUP *p; USHORT uLevel;
+	CString strAdd;
+	for(i = 0; i < m_pMgr->GetNumberOfGroups(); i++) // Add groups to combo box
 	{
 		p = m_pMgr->GetGroup(i);
 		ASSERT(p != NULL);
-		m_pGroups.AddCTString(WZ_ROOT_INDEX, (BYTE)p->uImageId, p->pszGroupName);
+
+		strAdd.Empty();
+		for(uLevel = 0; uLevel < p->usLevel; uLevel++) strAdd += _T("        ");
+
+		for(j = 0; j < (unsigned int)_tcslen(p->pszGroupName); j++)
+		{
+			if(p->pszGroupName[j] != _T('&')) strAdd += p->pszGroupName[j];
+			else strAdd += _T("&&");
+		}
+
+		m_pGroups.AddCTString(WZ_ROOT_INDEX, (BYTE)p->uImageId, strAdd);
 	}
+
 
 	m_pGroups.SetCurSel(0);
 

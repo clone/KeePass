@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |0.93a|
+|~LANGUAGEVERSION|             |0.94a|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://keepass.sourceforge.net|
 
@@ -76,9 +76,10 @@
 |This will generate a random password.|        |Ein neues zufälliges Passwort generieren.|
 |Options|                      |Optionen|
 |Password Generation Options|  |Passwort-Optionen|
-|Only the following characters:|               |Nur folgende Zeichen erlaubt:|
+|&Only the following characters:|              |&Nur folgende Zeichen erlaubt:|
+|Collect &entropy (recommended for strong passwords)|   |&Entropie sammeln (empfohlen für starke Passwörter)|
 |Number of characters:|        |Anzahl Zeichen:|
-|Your new password:|           |Das neue Passwort:|
+|Your new password:|           |Generiertes Passwort:|
 |&Generate|                    |&Generieren|
 |&Accept|                      |&Akzeptieren|
 |Upper alphabetic characters (A, B, C, ...)|
@@ -407,8 +408,6 @@
 |Change fields of all selected entries|        |Felder von allen ausgewählten Einträgen ändern|
 |Show &Columns|                |&Spalten anzeigen|
 |Show &Entry View|             |&Eintrags-Ansicht anzeigen|
-|Mobile devices|               |Mobile Geräte|
-|Credit cards|                 |Kreditkarten|
 
 |GUI: Automatically resize table columns when resizing the main window|
     |GUI: Spaltenbreite automatisch anpassen wenn die Größe des Hauptfensters verändert wird|
@@ -468,3 +467,15 @@
 
 |Close button [X] minimizes the main window instead of terminating the application|
     |Der Schließen-Knopf [X] minimiert das Hauptfenster anstatt die Anwendung zu beenden|
+
+|KeePass Password Database|               |KeePass Passwort-Datenbank|
+|&Open with KeePass|                      |Mit KeePass &öffnen|
+|Here you can associate .kdb files with KeePass (so KeePass opens the file when double-clicking on it):|
+    |Hier können Sie KeePass mit .kdb-Dateien assoziieren (KeePass wird dann bei einem Doppelklick gestartet):|
+|Successfully associated KeePass with .kdb files! A double-click on a .kdb file will now start KeePass automatically!|
+    |KeePass wurde erfolgreich mit .kdb-Dateien assoziiert! Beim Doppelklick auf eine .kdb-Datei wird jetzt automatisch KeePass gestartet!|
+|Successfully removed association! KeePass won't be started any more when double-clicking on a .kdb file!|
+    |Assoziation erfolgreich gelöscht! KeePass wird jetzt nicht mehr bei einem Doppelklick auf eine .kdb-Datei gestartet!|
+|Create &Association|                     |&Assoziation erstellen|
+|&Remove Association|                     |Assoziation &löschen|
+|Setup|                                   |Setup|

@@ -369,6 +369,7 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 			PW_ENTRY pwTemplate;
 			PW_TIME tNow;
 
+			memset(&pwTemplate, 0, sizeof(PW_ENTRY));
 			_GetCurrentPwTime(&tNow);
 			pwTemplate.pszAdditional = (TCHAR *)(LPCTSTR)strNotes;
 			pwTemplate.pszPassword = (TCHAR *)(LPCTSTR)strPassword;
@@ -380,7 +381,7 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 			pwTemplate.uImageId = _GetPreferredIcon((LPCTSTR)strTitle);
 			pwTemplate.uPasswordLen = strPassword.GetLength();
 			pwTemplate.uGroupId = dwGroupId;
-			memset(pwTemplate.uuid, 0, 16); // 0 = create new UUID
+			// UUID is zero -> create new UUID
 
 			pMgr->AddEntry(&pwTemplate);
 
@@ -448,6 +449,7 @@ void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamS
 			PW_ENTRY pwTemplate;
 			PW_TIME tNow;
 
+			memset(&pwTemplate, 0, sizeof(PW_ENTRY));
 			_GetCurrentPwTime(&tNow);
 			pwTemplate.pszAdditional = pNotes;
 			pwTemplate.pszPassword = pPassword;
@@ -459,7 +461,7 @@ void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamS
 			pwTemplate.uGroupId = m_dwLastGroupId;
 			pwTemplate.uImageId = _GetPreferredIcon(pTitle);
 			pwTemplate.uPasswordLen = _tcslen(pPassword);
-			memset(pwTemplate.uuid, 0, 16); // 0 = create new UUID
+			// UUID is zero -> create new UUID
 
 			m_pLastMgr->AddEntry(&pwTemplate);
 		}

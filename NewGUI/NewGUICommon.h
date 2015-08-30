@@ -116,6 +116,12 @@ typedef struct _MY_GRADIENT_RECT
 #define TTS_BALLOON 0
 #endif
 
+#ifndef SHCNE_ASSOCCHANGED
+#define SHCNE_ASSOCCHANGED 0x08000000L
+#define SHCNF_IDLIST 0x0000
+#endif
+typedef void(WINAPI *LPSHCHANGENOTIFY)(LONG wEventId, UINT uFlags, LPCVOID dwItem1, LPCVOID dwItem2);
+
 #ifndef UNREFERENCED_PARAMETER
 #define UNREFERENCED_PARAMETER(p) ((void)0)
 #endif

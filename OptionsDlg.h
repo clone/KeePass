@@ -40,12 +40,15 @@
 #define OPTGRP_GUI       2
 #define OPTGRP_FILES     3
 #define OPTGRP_MEMORY    4
+#define OPTGRP_SETUP     5
 
-#define OPTSZ_FILES "Files"
-#define OPTSZ_MEMORY "Memory"
+// No _T, will be TRL-ed
+#define OPTSZ_FILES     "Files"
+#define OPTSZ_MEMORY    "Memory"
 #define OPTSZ_STARTEXIT "Start and Exit"
-#define OPTSZ_GUI "Interface (GUI)"
-#define OPTSZ_SECURITY "Security"
+#define OPTSZ_GUI       "Interface (GUI)"
+#define OPTSZ_SECURITY  "Security"
+#define OPTSZ_SETUP     "Setup"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -62,8 +65,12 @@ public:
 
 	COLORREF m_rgbRowHighlight;
 
+	static void NotifyAssocChanged();
+
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };
+	CShadeButtonST	m_btnDeleteAssoc;
+	CShadeButtonST	m_btnCreateAssoc;
 	CColourPickerXP	m_btnColorRowHighlight;
 	CTabCtrl	m_tabMenu;
 	CComboBox	m_cEncAlgos;
@@ -97,6 +104,8 @@ protected:
 	virtual void OnCancel();
 	afx_msg void OnBtnSelFont();
 	afx_msg void OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnBtnCreateAssoc();
+	afx_msg void OnBtnDeleteAssoc();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

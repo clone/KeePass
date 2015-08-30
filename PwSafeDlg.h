@@ -42,6 +42,7 @@
 #include "NewGUI/BCMenu.h"
 #include "NewGUI/BtnST.h"
 #include "NewGUI/CustomListCtrlEx.h"
+#include "NewGUI/CustomTreeCtrlEx.h"
 #include "NewGUI/SystemTray.h"
 #include "NewGUI/SystemTrayEx.h"
 #include "NewGUI/AutoRichEditCtrl.h"
@@ -98,6 +99,9 @@ public:
 	void GroupSyncStates(BOOL bGuiToMgr = TRUE);
 
 	HTREEITEM _GroupIdToHTreeItem(DWORD dwGroupId);
+
+	void _ProcessGroupKey(UINT nChar, UINT nFlags);
+	void _ProcessListKey(UINT nChar);
 
 	BOOL m_bTimer;
 	int m_nClipboardCountdown;
@@ -175,7 +179,7 @@ public:
 
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
-	CTreeCtrl	m_cGroups;
+	CCustomTreeCtrlEx	m_cGroups;
 	CButtonST	m_btnTbNew;
 	CButtonST	m_btnTbLock;
 	CButtonST	m_btnTbFind;
@@ -294,11 +298,13 @@ protected:
 	int m_nSaveView;
 	LPARAM m_dwOldListParameters;
 	BYTE m_pPreLockItemUuid[16];
+	ULONGLONG m_ullLastListParams;
 
 	DWORD m_dwGroupsSaveFirstVisible;
 	DWORD m_dwGroupsSaveSelected;
 
 	BOOL m_bCachedToolBarUpdate;
+	BOOL m_bCachedPwlistUpdate;
 
 	BOOL m_bDragging;
 	BOOL m_bDraggingHoriz;
@@ -312,6 +318,7 @@ protected:
 
 	LONG m_lSplitterPosHoriz;
 	LONG m_lSplitterPosVert;
+
 
 	//{{AFX_MSG(CPwSafeDlg)
 	virtual BOOL OnInitDialog();

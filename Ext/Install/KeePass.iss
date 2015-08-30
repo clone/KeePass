@@ -6,9 +6,9 @@
 ; The name of the application should remain consistent across languages
 #define CrossAppName "KeePass"
 #define CrossAppFullName "KeePass Password Safe"
-#define KeeVersion "0.93b"
+#define KeeVersion "0.94a"
 ; VersionInfo cannot contain letters, use 3rd number
-#define KeeVVersion "4.0.93.20"
+#define KeeVVersion "4.0.94.10"
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"; LicenseFile: "License.txt"
@@ -39,6 +39,7 @@ AllowNoIcons=yes
 OutputDir="..\..\Distrib"
 OutputBaseFilename={#CrossAppName}-{#KeeVersion}-Setup
 UninstallDisplayIcon={app}\{#CrossAppName}.exe
+AppMutex=KeePassApplicationMutex
 
 ;[Tasks]
 ; NOTE: The following entry contains English phrases ("Create a desktop icon" and "Additional icons"). You are free to translate them into another language if required.

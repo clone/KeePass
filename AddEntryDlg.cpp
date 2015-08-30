@@ -366,6 +366,7 @@ void CAddEntryDlg::OnRandomPwBtn()
 
 	UpdateData(TRUE);
 
+	dlg.m_bCanAccept = TRUE;
 	if(dlg.DoModal() == IDOK)
 	{
 		m_strPassword = dlg.m_strPassword;

@@ -1,15 +1,11 @@
 |~LANGUAGENAME|        The translated string should look like English for example
 	|Èeština|
 |~LANGUAGEVERSION|     Example: 0.90a
-	|0.93a|
+	|0.94a|
 |~LANGUAGEAUTHOR|      Example: Dominik Reichl
 	|Luboš Stanìk|
 |~LANGUAGEAUTHOREMAIL| Example: blabala@yourprovider.net, http://youhaveahomepage.net
 	|lubek@users.sourceforge.net, http://sourceforge.net/users/lubek/|
-|~LANGUAGEHELP|		Example: name of the help file
-	|KeePass-Czech.html|
-|~LANGUAGELICENSE|	Example: name of the license file
-	|License-Czech.html|
 
 |&OK|
 	|&OK|
@@ -126,20 +122,25 @@
 	|Generátor hesel|
 |This will generate a random password.|
 	|V tomto dialogu mùete vytvoøit náhodné heslo.|
-|Options|
-	|Monosti|
 |Password Generation Options|
 	|Monosti tvorby hesla|
-|Only the following characters:|
-	|Jen uvedené znaky:|
+|&Only the following characters:|
+	|&Jen uvedené znaky:|
 |Number of characters:|
 	|Poèet znakù:|
+|Collect &entropy (recommended for strong passwords)|
+	|Získání náhodnıch dat (doporuèeno pro silná hesla)|
 |Your new password:|
 	|Vaše nové heslo:|
 |&Generate|
 	|&Generovat|
 |&Accept|
 	|&Pøijmout|
+
+
+|Options|
+	|Monosti|
+
 |Upper alphabetic characters (A, B, C, ...)|
 	|Velká písmena (A, B, C, ...)|
 |Lower alphabetic characters (a, b, c, ...)|
@@ -526,14 +527,20 @@
 
 |&Get more languages...|
 	|Získat další &jazyky...|
-|Start and Exit|
-	|Start a Ukonèení|
-|Interface (GUI)|
-	|Rozhraní (GUI)|
+
 |Files|
 	|Soubory|
 |Memory|
 	|Pamì|
+|Start and Exit|
+	|Start a Ukonèení|
+|Interface (GUI)|
+	|Rozhraní (GUI)|
+|Security|
+	|Zabezpeèení|
+|Setup|
+	|Instalace|
+
 |Lock workspace when minimizing the main window|
 	|Uzamknout pracovní prostøedí pøi minimalizaci aplikace|
 |Minimize to tray instead of taskbar|
@@ -546,8 +553,6 @@
 |Twofish (128-bit block cipher using 256-bit key)|
 	|Twofish (128-bitová bloková šifra s 256-bitovım klíèem)|
 
-|Security|
-	|Zabezpeèení|
 |KeePass is OSI Certified Open Source Software.|
 	|KeePass je OSI certifikovanı Open Source Software.|
 |KeePass usage:|
@@ -626,10 +631,6 @@
 	|Zobrazit &sloupce|
 |Show &Entry View|
 	|&Zobrazit vıpis záznamu|
-|Mobile devices|
-	|Mobilní zaøízení|
-|Credit cards|
-	|Kreditní karty|
 
 |GUI: Automatically resize table columns when resizing the main window|
 	|GUI: Automaticky upravit velikost sloupcù tabulky, kdy se mìní velikost hlavního okna|
@@ -739,3 +740,21 @@
 
 |Close button [X] minimizes the main window instead of terminating the application|
 	|Tlaèítko ukonèení [X] minimalizuje hlavní okno namísto ukonèení aplikace|
+
+
+|Here you can associate .kdb files with KeePass (so KeePass opens the file when double-clicking on it):|
+	|Zde mùete pøidruit soubory typu .kdb k programu KeePass (pak se soubor otevøe pøímo v programu KeePass, kdy na nìj dvakrát kliknete):|
+|Create &Association|
+	|Vytvoøit &asociaci|
+|&Remove Association|
+	|&Odstranit asociaci|
+|Successfully associated KeePass with .kdb files! A double-click on a .kdb file will now start KeePass automatically!|
+	|Program KeePass byl úspìšnì pøidruen k souborùm typu .kdb! Dvojklik na souboru .kdb nyní automaticky spustí program KeePass!|
+|Successfully removed association! KeePass won't be started any more when double-clicking on a .kdb file!|
+	|Asociace byla úspìšnì odstranìna! Program KeePass ji nebude automaticky spuštìn po dvojkliku na souboru .kdb!|
+|KeePass Password Database|
+	|Databáze hesel KeePass|
+|&Open with KeePass|
+	|&Otevøít aplikací KeePass|
+
+

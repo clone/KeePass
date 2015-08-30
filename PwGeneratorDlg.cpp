@@ -46,16 +46,21 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+static CString g_strOptions = _T("");
+static CString g_strCharSet = _T("");
+static UINT g_nChars = 16;
+
 /////////////////////////////////////////////////////////////////////////////
 
 CPwGeneratorDlg::CPwGeneratorDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CPwGeneratorDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CPwGeneratorDlg)
-	m_nCharacters = 12;
+	m_nCharacters = 16;
 	m_strPassword = _T("");
 	m_bCharSpec = FALSE;
 	m_strCharSet = _T("");
+	m_bGetEntropy = FALSE;
 	//}}AFX_DATA_INIT
 
 	m_bCanAccept = TRUE;
@@ -65,6 +70,7 @@ void CPwGeneratorDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CPwGeneratorDlg)
+	DDX_Control(pDX, IDC_SPIN_NUMCHARS, m_spinNumChars);
 	DDX_Control(pDX, IDC_GENERATE_BTN, m_btGenerate);
 	DDX_Control(pDX, IDCANCEL, m_btnCancel);
 	DDX_Control(pDX, IDOK, m_btnOK);
@@ -73,6 +79,7 @@ void CPwGeneratorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_PW, m_strPassword);
 	DDX_Check(pDX, IDC_CHECK_CHARSPEC, m_bCharSpec);
 	DDX_Text(pDX, IDC_EDIT_ONLYCHARSPEC, m_strCharSet);
+	DDX_Check(pDX, IDC_CHECK_GETENTROPY, m_bGetEntropy);
 	//}}AFX_DATA_MAP
 }
 
@@ -82,6 +89,7 @@ BEGIN_MESSAGE_MAP(CPwGeneratorDlg, CDialog)
 	ON_BN_CLICKED(IDC_CHECK_CHARSPEC, OnCheckCharSpec)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_OPTIONS, OnClickListOptions)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_OPTIONS, OnRclickListOptions)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_NUMCHARS, OnDeltaPosSpinNumChars)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -137,14 +145,51 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
 		TRL("Special brackets ('{', '}', '[', ...)"), 0, 0, 0, 0); j++;
 
-	for(int nItem = 0; nItem < 9; nItem++)
+	if(g_strOptions.GetLength() != 11) g_strOptions = _T("11100000001");
+	ASSERT(g_strOptions.GetLength() == 11);
+
+	TCHAR tch;
+	int nItem;
+	for(nItem = 0; nItem < 9; nItem++)
 	{
-		_SetCheck(nItem, FALSE);
+		tch = g_strOptions.GetAt(nItem);
+		if(tch == _T('1')) _SetCheck(nItem, TRUE);
+		else _SetCheck(nItem, FALSE);
 	}
 
-	GetDlgItem(IDC_EDIT_ONLYCHARSPEC)->EnableWindow(FALSE);
-	m_bCharSpec = FALSE;
+	tch = g_strOptions.GetAt(9);
+	if(tch == _T('1')) m_bCharSpec = TRUE;
+	else m_bCharSpec = FALSE;
+
+	tch = g_strOptions.GetAt(10);
+	if(tch == _T('0')) m_bGetEntropy = FALSE;
+	else m_bGetEntropy = TRUE;
+
+	if(m_bCharSpec == FALSE)
+	{
+		m_cList.EnableWindow(TRUE);
+		GetDlgItem(IDC_EDIT_ONLYCHARSPEC)->EnableWindow(FALSE);
+	}
+	else
+	{
+		m_cList.EnableWindow(FALSE);
+		GetDlgItem(IDC_EDIT_ONLYCHARSPEC)->EnableWindow(TRUE);
+	}
+
+	m_strCharSet = g_strCharSet;
+	m_nCharacters = g_nChars;
 	UpdateData(FALSE);
+
+	m_spinNumChars.SetBase(0);
+	m_spinNumChars.SetRange(0, 1024);
+	m_spinNumChars.SetPos(512);
+
+	if(m_bCanAccept == FALSE)
+	{
+		m_btnOK.ShowWindow(SW_HIDE);
+		m_btnCancel.SetWindowText(_T("&Close"));
+	}
+	else m_btnOK.ShowWindow(SW_SHOW);
 
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
@@ -162,6 +207,21 @@ void CPwGeneratorDlg::OnOK()
 	UpdateData(TRUE);
 
 	if(m_strPassword.GetLength() == 0) return;
+
+	int i;
+	g_strOptions.Empty();
+	for(i = 0; i < 9; i++)
+	{
+		if(_GetCheck(i) == FALSE) g_strOptions += _T("0");
+		else g_strOptions += _T("1");
+	}
+	if(m_bCharSpec == FALSE) g_strOptions += _T("0");
+	else g_strOptions += _T("1");
+	if(m_bGetEntropy == FALSE) g_strOptions += _T("0");
+	else g_strOptions += _T("1");
+
+	g_strCharSet = m_strCharSet;
+	g_nChars = m_nCharacters;
 
 	CleanUp();
 	CDialog::OnOK();
@@ -192,7 +252,7 @@ void CPwGeneratorDlg::OnGenerateBtn()
 
 	newrand.Initialize();
 
-	if(m_nCharacters == 0) m_nCharacters = 12;
+	if(m_nCharacters == 0) m_nCharacters = 16;
 
 	if((m_bCharSpec == TRUE) && (m_strCharSet.GetLength() == 0))
 	{
@@ -223,7 +283,14 @@ void CPwGeneratorDlg::OnGenerateBtn()
 		}
 	}
 
-	if(dlg.DoModal() == IDCANCEL) return;
+	if(m_bGetEntropy == TRUE)
+	{
+		if(dlg.DoModal() == IDCANCEL) return;
+	}
+	else
+	{
+		newrand.GetRandomBuffer(dlg.m_pFinalRandom, 32);
+	}
 
 	j = 32;
 	while(1)
@@ -389,4 +456,35 @@ void CPwGeneratorDlg::OnClickListOptions(NMHDR* pNMHDR, LRESULT* pResult)
 void CPwGeneratorDlg::OnRclickListOptions(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	*pResult = 0;
+}
+
+void CPwGeneratorDlg::SetOptions(CString strOptions, CString strCharSet, UINT nCharacters)
+{
+	g_strOptions = strOptions;
+	g_strCharSet = strCharSet;
+	g_nChars = nCharacters;
+}
+
+void CPwGeneratorDlg::GetOptions(CString *pstrOptions, CString *pstrCharSet, UINT *pnCharacters)
+{
+	*pstrOptions = g_strOptions;
+	*pstrCharSet = g_strCharSet;
+	*pnCharacters = g_nChars;
+}
+
+void CPwGeneratorDlg::OnDeltaPosSpinNumChars(NMHDR* pNMHDR, LRESULT* pResult) 
+{
+	NM_UPDOWN* pNMUpDown = (NM_UPDOWN*)pNMHDR;
+	*pResult = 0;
+
+	UpdateData(TRUE);
+
+	int nPos = (int)m_nCharacters;
+	nPos += pNMUpDown->iDelta;
+	if(nPos < 0) nPos = 0;
+	m_nCharacters = (UINT)nPos;
+
+	m_spinNumChars.SetPos(512);
+
+	UpdateData(FALSE);
 }

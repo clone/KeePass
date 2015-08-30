@@ -155,6 +155,11 @@
 #define IDC_SAVEATTACH_BTN              1129
 #define IDC_REMOVEATTACH_BTN            1130
 #define IDC_CHECK_CLOSEMIN              1131
+#define IDC_CHECK_GETENTROPY            1132
+#define IDC_SPIN_NUMCHARS               1133
+#define IDC_BTN_CREATEASSOC             1134
+#define IDC_BTN_DELETEASSOC             1135
+#define IDC_STATIC_ASSOC                1136
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -303,7 +308,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        193
 #define _APS_NEXT_COMMAND_VALUE         32936
-#define _APS_NEXT_CONTROL_VALUE         1132
+#define _APS_NEXT_CONTROL_VALUE         1138
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

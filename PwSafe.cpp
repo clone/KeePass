@@ -31,6 +31,9 @@
 #include "PwSafe.h"
 #include "PwSafeDlg.h"
 
+#include "NewGUI/TranslateEx.h"
+#include "Util/MemUtil.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -66,6 +69,10 @@ BOOL CPwSafeApp::InitInstance()
 	Enable3dControlsStatic();
 #endif
 
+	// Create application's mutex object to make our presence public
+	m_pAppMutex = new CMutex(FALSE, _T("KeePassApplicationMutex"), NULL);
+	if(m_pAppMutex == NULL) return FALSE;
+ 
 	AfxOleInit();
 	AfxEnableControlContainer();
 	AfxInitRichEdit();
@@ -86,4 +93,139 @@ BOOL CPwSafeApp::InitInstance()
 	}
 
 	return FALSE;
+}
+
+int CPwSafeApp::ExitInstance() 
+{
+	// Release application's mutex object
+	if(m_pAppMutex != NULL)
+	{
+		m_pAppMutex->Unlock();
+		SAFE_DELETE(m_pAppMutex);
+	}
+	
+	return CWinApp::ExitInstance();
+}
+
+BOOL CPwSafeApp::RegisterShellAssociation()
+{
+	LONG l;
+	HKEY hBase, hShell, hTemp, hTemp2;
+	TCHAR tszTemp[MAX_PATH * 2];
+	TCHAR tszMe[MAX_PATH * 2];
+	DWORD dw;
+
+	VERIFY(GetModuleFileName(NULL, tszMe, MAX_PATH * 2 - 2) != 0);
+
+	// HKEY_CLASSES_ROOT/.kdb
+
+	l = RegCreateKey(HKEY_CLASSES_ROOT, _T(".kdb"), &hBase);
+	if(l != ERROR_SUCCESS) return FALSE;
+
+	_tcscpy(tszTemp, _T("kdbfile"));
+	dw = (_tcslen(tszTemp) + 1) * sizeof(TCHAR);
+	l = RegSetValueEx(hBase, _T(""), 0, REG_SZ, (CONST BYTE *)tszTemp, dw);
+	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hBase); return FALSE; }
+
+	RegCloseKey(hBase);
+
+	// HKEY_CLASSES_ROOT/kdbfile
+
+	l = RegCreateKey(HKEY_CLASSES_ROOT, _T("kdbfile"), &hBase);
+	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) return FALSE;
+
+	_tcscpy(tszTemp, TRL("KeePass Password Database"));
+	dw = (_tcslen(tszTemp) + 1) * sizeof(TCHAR);
+	l = RegSetValueEx(hBase, _T(""), 0, REG_SZ, (CONST BYTE *)tszTemp, dw);
+	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hBase); return FALSE; }
+
+	_tcscpy(tszTemp, _T(""));
+	dw = (_tcslen(tszTemp) + 1) * sizeof(TCHAR);
+	l = RegSetValueEx(hBase, _T("AlwaysShowExt"), 0, REG_SZ, (CONST BYTE *)tszTemp, dw);
+	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hBase); return FALSE; }
+
+	l = RegCreateKey(hBase, _T("DefaultIcon"), &hTemp);
+	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) return FALSE;
+
+	_tcscpy(tszTemp, tszMe);
+	_tcscat(tszTemp, _T(",0"));
+	dw = (_tcslen(tszTemp) + 1) * sizeof(TCHAR);
+	l = RegSetValueEx(hTemp, _T(""), 0, REG_SZ, (CONST BYTE *)tszTemp, dw);
+	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hTemp); RegCloseKey(hBase); return FALSE; }
+
+	RegCloseKey(hTemp);
+
+	// HKEY_CLASSES_ROOT/kdbfile/shell
+
+	l = RegCreateKey(hBase, _T("shell"), &hShell);
+	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) return FALSE;
+
+	// HKEY_CLASSES_ROOT/kdbfile/shell/open
+
+	l = RegCreateKey(hShell, _T("open"), &hTemp);
+
+	_tcscpy(tszTemp, TRL("&Open with KeePass"));
+	dw = (_tcslen(tszTemp) + 1) * sizeof(TCHAR);
+	l = RegSetValueEx(hTemp, _T(""), 0, REG_SZ, (CONST BYTE *)tszTemp, dw);
+	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hTemp); RegCloseKey(hShell); RegCloseKey(hBase); return FALSE; }
+
+	l = RegCreateKey(hTemp, _T("command"), &hTemp2);
+	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) return FALSE;
+
+	_tcscpy(tszTemp, _T("\""));
+	_tcscat(tszTemp, tszMe);
+	_tcscat(tszTemp, _T("\" \"%1\""));
+	dw = (_tcslen(tszTemp) + 1) * sizeof(TCHAR);
+	l = RegSetValueEx(hTemp2, _T(""), 0, REG_SZ, (CONST BYTE *)tszTemp, dw);
+	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hTemp); RegCloseKey(hShell); RegCloseKey(hBase); return FALSE; }
+
+	VERIFY(RegCloseKey(hTemp2) == ERROR_SUCCESS);
+	VERIFY(RegCloseKey(hTemp) == ERROR_SUCCESS);
+
+	VERIFY(RegCloseKey(hShell) == ERROR_SUCCESS);
+
+	VERIFY(RegCloseKey(hBase) == ERROR_SUCCESS);
+
+	return TRUE;
+}
+
+BOOL CPwSafeApp::UnregisterShellAssociation()
+{
+	HKEY hBase, hShell, hOpen, hCommand;
+	LONG l;
+
+	l = RegOpenKeyEx(HKEY_CLASSES_ROOT, _T(".kdb"), 0, KEY_WRITE, &hBase);
+	if(l != ERROR_SUCCESS) return FALSE;
+
+	RegDeleteValue(hBase, _T(""));
+	VERIFY(RegCloseKey(hBase) == ERROR_SUCCESS);
+
+	VERIFY(RegDeleteKey(HKEY_CLASSES_ROOT, _T(".kdb")) == ERROR_SUCCESS);
+
+	l = RegOpenKeyEx(HKEY_CLASSES_ROOT, _T("kdbfile"), 0, KEY_WRITE, &hBase);
+	if(l != ERROR_SUCCESS) return FALSE;
+
+	l = RegOpenKeyEx(hBase, _T("shell"), 0, KEY_WRITE, &hShell);
+	if(l != ERROR_SUCCESS) return FALSE;
+
+	l = RegOpenKeyEx(hShell, _T("open"), 0, KEY_WRITE, &hOpen);
+	if(l != ERROR_SUCCESS) return FALSE;
+
+	l = RegOpenKeyEx(hOpen, _T("command"), 0, KEY_WRITE, &hCommand);
+	if(l != ERROR_SUCCESS) return FALSE;
+
+	RegDeleteValue(hCommand, _T(""));
+	VERIFY(RegCloseKey(hCommand) == ERROR_SUCCESS);
+
+	RegDeleteValue(hOpen, _T(""));
+	VERIFY(RegCloseKey(hOpen) == ERROR_SUCCESS);
+
+	RegDeleteValue(hShell, _T(""));
+	VERIFY(RegCloseKey(hShell) == ERROR_SUCCESS);
+
+	RegDeleteValue(hBase, _T(""));
+	RegDeleteValue(hBase, _T("AlwaysShowExt"));
+	VERIFY(RegCloseKey(hBase) == ERROR_SUCCESS);
+
+	return TRUE;
 }

@@ -138,13 +138,6 @@ SOURCE=.\PwSafe.cpp
 # Begin Source File
 
 SOURCE=.\PwSafe.rc
-
-!IF  "$(CFG)" == "PwSafe - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "PwSafe - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -543,6 +536,15 @@ SOURCE=.\NewGUI\CustomListCtrlEx.cpp
 # Begin Source File
 
 SOURCE=.\NewGUI\CustomListCtrlEx.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\CustomTreeCtrlEx.cpp
+# ADD CPP /I ".."
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\CustomTreeCtrlEx.h
 # End Source File
 # Begin Source File
 

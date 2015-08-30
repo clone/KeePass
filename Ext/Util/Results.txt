@@ -1,0 +1,11 @@
+===============================================================
+= The following strings are missing in your translation:
+
+|Setup|
+
+
+
+===============================================================
+= The following strings are not needed any more and you should
+= remove them from your translation file:
+

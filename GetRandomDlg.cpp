@@ -55,6 +55,7 @@ void CGetRandomDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CGetRandomDlg)
+	DDX_Control(pDX, IDCANCEL, m_btCancel);
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_Control(pDX, IDC_BEGIN_MOUSEINPUT, m_btMouseInput);
 	DDX_Control(pDX, IDC_PROGRESS_MOUSE, m_cMouseProgress);
@@ -82,6 +83,7 @@ BOOL CGetRandomDlg::OnInitDialog()
 	m_bMouseActive = FALSE;
 
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
+	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_Button(&m_btMouseInput, IDB_MOUSE_SMALL, IDB_MOUSE_SMALL);
 
 	m_banner.Attach(this, KCSB_ATTACH_TOP);
@@ -179,4 +181,9 @@ void CGetRandomDlg::OnBeginMouseInput()
 
 	m_dwCurPoint = 0;
 	m_bMouseActive = TRUE;
+}
+
+void CGetRandomDlg::OnCancel() 
+{
+	CDialog::OnCancel();
 }

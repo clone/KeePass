@@ -35,7 +35,7 @@
 
 // General product information
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
-#define PWM_VERSION_STR  _T("0.93b")
+#define PWM_VERSION_STR  _T("0.94a")
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -99,6 +99,9 @@
 #define PWMKEY_SHOWUUID         _T("KeeShowUUID")
 #define PWMKEY_SHOWTOOLBAR      _T("KeeShowToolBar")
 #define PWMKEY_COLAUTOSIZE      _T("KeeColAutoSize")
+#define PWMKEY_PWGEN_OPTIONS    _T("KeePwGenOptions")
+#define PWMKEY_PWGEN_CHARS      _T("KeePwGenChars")
+#define PWMKEY_PWGEN_NUMCHARS   _T("KeePwGenNumChars")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
