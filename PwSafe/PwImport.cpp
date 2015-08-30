@@ -32,13 +32,10 @@
 #include "../Util/MemUtil.h"
 #include "../Util/StrUtil.h"
 
-static PW_TIME g_pwTimeNever;
 static char g_pNullString[4] = { 0, 0, 0, 0 };
 
 CPwImport::CPwImport()
 {
-	g_pwTimeNever.btDay = 28; g_pwTimeNever.btHour = 23; g_pwTimeNever.btMinute = 59;
-	g_pwTimeNever.btMonth = 12; g_pwTimeNever.btSecond = 59; g_pwTimeNever.shYear = 2999;
 }
 
 CPwImport::~CPwImport()
@@ -187,7 +184,7 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 				pwTemplate.pszTitle = (TCHAR *)(LPCTSTR)strTitle;
 				pwTemplate.pszURL = (TCHAR *)(LPCTSTR)strURL;
 				pwTemplate.pszUserName = (TCHAR *)(LPCTSTR)strUserName;
-				pwTemplate.tCreation = tNow; pwTemplate.tExpire = g_pwTimeNever;
+				pwTemplate.tCreation = tNow; CPwManager::_GetNeverExpireTime(&pwTemplate.tExpire);
 				pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
 				pwTemplate.uGroupId = dwLastGroupId;
 				pwTemplate.uImageId = _GetPreferredIcon((LPCTSTR)strTitle);
@@ -244,7 +241,7 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 				_GetCurrentPwTime(&tNow);
 				memset(&pwT, 0, sizeof(PW_GROUP));
 				pwT.pszGroupName = (TCHAR *)(LPCTSTR)strLastCategory;
-				pwT.tCreation = tNow; pwT.tExpire = g_pwTimeNever;
+				pwT.tCreation = tNow; CPwManager::_GetNeverExpireTime(&pwT.tExpire);
 				pwT.tLastAccess = tNow; pwT.tLastMod = tNow;
 				pwT.uGroupId = 0; // 0 = create new group ID
 				pwT.uImageId = _GetPreferredIcon((LPCTSTR)strLastCategory);
@@ -360,7 +357,7 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 				PW_TIME tNow;
 				_GetCurrentPwTime(&tNow);
 				pwT.pszGroupName = (TCHAR *)(LPCTSTR)strGroup;
-				pwT.tCreation = tNow; pwT.tExpire = g_pwTimeNever;
+				pwT.tCreation = tNow; CPwManager::_GetNeverExpireTime(&pwT.tExpire);
 				pwT.tLastAccess = tNow; pwT.tLastMod = tNow;
 				pwT.uGroupId = 0; // 0 = create new group ID
 				pwT.uImageId = _GetPreferredIcon((LPCTSTR)strGroup);
@@ -378,7 +375,7 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 			pwTemplate.pszTitle = (TCHAR *)(LPCTSTR)strTitle;
 			pwTemplate.pszURL = g_pNullString;
 			pwTemplate.pszUserName = (TCHAR *)(LPCTSTR)strUserName;
-			pwTemplate.tCreation = tNow; pwTemplate.tExpire = g_pwTimeNever;
+			pwTemplate.tCreation = tNow; CPwManager::_GetNeverExpireTime(&pwTemplate.tExpire);
 			pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
 			pwTemplate.uImageId = _GetPreferredIcon((LPCTSTR)strTitle);
 			pwTemplate.uPasswordLen = strPassword.GetLength();
@@ -457,7 +454,7 @@ void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamS
 			pwTemplate.pszTitle = pTitle;
 			pwTemplate.pszURL = pURL;
 			pwTemplate.pszUserName = pUserName;
-			pwTemplate.tCreation = tNow; pwTemplate.tExpire = g_pwTimeNever;
+			pwTemplate.tCreation = tNow; CPwManager::_GetNeverExpireTime(&pwTemplate.tExpire);
 			pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
 			pwTemplate.uGroupId = m_dwLastGroupId;
 			pwTemplate.uImageId = _GetPreferredIcon(pTitle);

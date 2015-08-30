@@ -81,6 +81,7 @@ public:
 	int		m_nAlgorithm;
 	BOOL	m_bLockAfterTime;
 	UINT	m_nLockAfter;
+	BOOL	m_bColAutoSize;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(COptionsDlg)

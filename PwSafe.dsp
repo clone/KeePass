@@ -481,6 +481,14 @@ SOURCE=.\NewGUI\amsEdit.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\NewGUI\AutoRichEditCtrl.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\AutoRichEditCtrl.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\NewGUI\BCMenu.cpp
 # End Source File
 # Begin Source File

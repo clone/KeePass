@@ -391,3 +391,58 @@
 |- Twofish algorithm|
 |Import From &PwSafe v2 TXT|
 |Importera från &PwSafe v2 TXT|
+
+|Creation Time|
+|Skapad tidpunkt|
+|Last Modification|
+|Modifierad tidpunkt|
+|Last Access|
+|Senast använd tidpunkt|
+|Expires|
+|Utgår|
+|Expires:|
+|Utgår:|
+|UUID|
+|UUID|
+
+|Show &Creation Time Column|
+|Visa kolumnen &Skapad tidpunkt|
+|Show Last &Modification Time Column|
+|Visa kolumnen &Modifierad tidpunkt|
+|Show Last Access &Time Column|
+|Visa kolumnen &Senast använd tidpunkt|
+|Show &Expire Time Column|
+|Visa kolumnen &Utgår tidpunkt|
+|Show UU&ID Column|
+|Visa UU&ID kolumnen|
+
+|Show &ToolBar|
+|Visa &Verktygslist|
+
+|Visit KeePass Homepage|
+|Besök KeePass hemsida|
+
+|Field copied to clipboard.|
+|Fältet kopierat till klippboken.|
+
+|A key-file already exists on this drive. Do you want to overwrite it?|
+|En nyckel-fil finns redan på enheten. Vill du skriva över den?|
+|Overwrite?|
+|Skriv över?|
+
+|&Delete Selected Entries|
+|&Ta bort valda poster|
+
+|Mass Modify|         
+|Mass modifiering|           
+|&Mass Modify (All Selected)...|
+|&Mass modifiering (alla valda)...| 
+|Change fields of all selected entries|
+|Ändra fältet för alla valda poster|
+
+|Change group:|
+|Ändra grupp:|
+|Change entry icon:|
+|Ändra post ikon:|
+|Change expiration time:|
+|Ändra tidpunkten för utgång:|

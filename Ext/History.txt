@@ -1,3 +1,21 @@
+04/02/09 - 0.89
+- Added resizing grippers (group list, password list and entry
+  view can be resized now)
+- Added optional entry view (a view at the bottom of the main
+  window which shows the details of the currently selected
+  password entry)
+- The hide-password option (display stars) of the main window
+  is now synced with the hide-password option of the edit/view
+  entry dialog
+- Fixed a bug which could have caused KeePass display a hidden
+  message box when minimizing the main window
+- Window position and size is saved only if the main window
+  isn't maximized or minimized
+- Fixed a small bug which caused KeePass not to update the
+  toolbar when using the keyboard to select pw entries
+- The automatic resizing of the password list columns is now
+  optional, you can disable it (see options dialog)
+
 04/02/01 - 0.88
 - Added more entry fields: creation time, last modification,
   last access time, expires and UUID

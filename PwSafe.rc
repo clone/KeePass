@@ -120,7 +120,7 @@ FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "",IDC_MENULINE,"Static",SS_ETCHEDHORZ,0,0,69,1
     CONTROL         "List1",IDC_PWLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,185,73,144,
+                    LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,135,27,144,
                     129
     CONTROL         "List1",IDC_GROUPLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | 
@@ -142,6 +142,9 @@ BEGIN
     PUSHBUTTON      "&Lock Workspace",IDC_TB_LOCK,169,3,15,14
     CONTROL         "",IDC_STATIC_TBSEP4,"Static",SS_ETCHEDVERT,187,3,1,15
     PUSHBUTTON      "&About KeePass...",IDC_TB_ABOUT,191,3,15,14
+    CONTROL         "",IDC_RE_ENTRYVIEW,"RICHEDIT",ES_MULTILINE | 
+                    ES_AUTOVSCROLL | ES_READONLY | ES_WANTRETURN | WS_BORDER | 
+                    WS_VSCROLL | WS_TABSTOP,136,162,248,52
 END
 
 IDD_PASSWORD_DLG DIALOG DISCARDABLE  0, 0, 352, 119
@@ -333,13 +336,13 @@ BEGIN
                     14
 END
 
-IDD_OPTIONS_DLG DIALOG DISCARDABLE  0, 0, 394, 197
+IDD_OPTIONS_DLG DIALOG DISCARDABLE  0, 0, 394, 215
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Options"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,269,176,56,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,331,176,56,14
+    DEFPUSHBUTTON   "&OK",IDOK,269,194,56,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,331,194,56,14
     LTEXT           "Newline sequence:",IDC_STATIC_NEWLINETEXT,19,45,336,8
     CONTROL         "Windows newline sequence (\\r\\n)",IDC_RADIO_NEWLINE_0,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP,18,68,337,10
@@ -371,16 +374,19 @@ BEGIN
                     IDC_STATIC_CIPHERTEXT,19,38,334,8
     COMBOBOX        IDC_COMBO_ENCALGO,19,28,336,74,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Tab1",IDC_TAB_MENU,"SysTabControl32",0x0,7,7,380,161
+    CONTROL         "Tab1",IDC_TAB_MENU,"SysTabControl32",0x0,7,7,380,178
     CONTROL         "Automatically lock workspace after the following number of seconds:",
                     IDC_CHECK_LOCKAFTERTIME,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,18,171,336,10
     EDITTEXT        IDC_EDIT_LOCKSECONDS,19,0,336,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Color",IDC_BTN_ROWHIGHLIGHTSEL,343,0,50,14
     LTEXT           "Every second row has a different background color. Use this color:",
-                    IDC_STATIC_SELROWHIGHLIGHT,17,182,340,8
+                    IDC_STATIC_SELROWHIGHLIGHT,17,200,340,8
     LTEXT           "Start:",IDC_STATIC_START,0,172,105,8
-    LTEXT           "Exit:",IDC_STATIC_EXIT,0,182,105,8
+    LTEXT           "Exit:",IDC_STATIC_EXIT,0,200,105,8
+    CONTROL         "GUI: Automatically resize table columns when resizing the main window",
+                    IDC_CHECK_COLAUTOSIZE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,18,185,341,10
 END
 
 IDD_ENTRYPROPERTIES_DLG DIALOG DISCARDABLE  0, 0, 351, 114
@@ -542,7 +548,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 387
         TOPMARGIN, 7
-        BOTTOMMARGIN, 190
+        BOTTOMMARGIN, 208
     END
 
     IDD_ENTRYPROPERTIES_DLG, DIALOG
@@ -602,25 +608,33 @@ BEGIN
         MENUITEM "Change &Language...",         ID_FILE_CHANGELANGUAGE
         MENUITEM SEPARATOR
         MENUITEM "Show &ToolBar",               ID_VIEW_SHOWTOOLBAR, CHECKED
+        MENUITEM "Show &Entry View",            ID_VIEW_ENTRYVIEW, CHECKED
+        MENUITEM SEPARATOR
         MENUITEM "Main Window &Always On Top",  ID_VIEW_ALWAYSONTOP, CHECKED
         MENUITEM SEPARATOR
         MENUITEM "&Hide Passwords Behind Asterisks (***)", ID_VIEW_HIDESTARS
         , CHECKED
         MENUITEM SEPARATOR
-        MENUITEM "Show &Title Column",          ID_VIEW_TITLE, CHECKED
-        MENUITEM "Show User&Name Column",       ID_VIEW_USERNAME, CHECKED
-        MENUITEM "Show &URL Column",            ID_VIEW_URL, CHECKED
-        MENUITEM "Show &Password Column",       ID_VIEW_PASSWORD, CHECKED
-        MENUITEM "Show &Notes Column",          ID_VIEW_NOTES, CHECKED
-        MENUITEM SEPARATOR
-        MENUITEM "Show &Creation Time Column",  ID_VIEW_CREATION, CHECKED
-        MENUITEM "Show Last &Modification Time Column", ID_VIEW_LASTMOD
-        , CHECKED
-        MENUITEM "Show Last Access &Time Column", ID_VIEW_LASTACCESS
-        , CHECKED
-        MENUITEM "Show &Expire Time Column",    ID_VIEW_EXPIRE, CHECKED
-        MENUITEM SEPARATOR
-        MENUITEM "Show UU&ID Column",           ID_VIEW_UUID, CHECKED
+        POPUP "Show &Columns"
+        BEGIN
+            MENUITEM "Show &Title Column",          ID_VIEW_TITLE, CHECKED
+            MENUITEM "Show User&Name Column",       ID_VIEW_USERNAME
+            , CHECKED
+            MENUITEM "Show &URL Column",            ID_VIEW_URL, CHECKED
+            MENUITEM "Show &Password Column",       ID_VIEW_PASSWORD
+            , CHECKED
+            MENUITEM "Show &Notes Column",          ID_VIEW_NOTES, CHECKED
+            MENUITEM "",                            1
+            MENUITEM "Show &Creation Time Column",  ID_VIEW_CREATION
+            , CHECKED
+            MENUITEM "Show Last &Modification Time Column", ID_VIEW_LASTMOD
+            , CHECKED
+            MENUITEM "Show Last Access &Time Column", ID_VIEW_LASTACCESS
+            , CHECKED
+            MENUITEM "Show &Expire Time Column",    ID_VIEW_EXPIRE, CHECKED
+            MENUITEM SEPARATOR
+            MENUITEM "Show UU&ID Column",           ID_VIEW_UUID, CHECKED
+        END
     END
     POPUP "&Extras"
     BEGIN

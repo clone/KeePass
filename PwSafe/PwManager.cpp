@@ -38,14 +38,11 @@
 #include <string.h>
 
 static const BYTE g_uuidZero[16] = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-static PW_TIME g_pwTimeNever;
+static PW_TIME g_pwTimeNever = { 2999, 12, 28, 23, 59, 59 };
 static char g_pNullString[4] = { 0, 0, 0, 0 };
 
 CPwManager::CPwManager()
 {
-	g_pwTimeNever.btDay = 28; g_pwTimeNever.btHour = 23; g_pwTimeNever.btMinute = 59;
-	g_pwTimeNever.btMonth = 12; g_pwTimeNever.btSecond = 59; g_pwTimeNever.shYear = 2999;
-
 	m_pEntries = NULL;
 	m_dwNumEntries = 0;
 	m_dwMaxEntries = 0;
@@ -1844,4 +1841,10 @@ BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pDa
 	}
 
 	return TRUE; // Field processed
+}
+
+void CPwManager::_GetNeverExpireTime(PW_TIME *pPwTime)
+{
+	ASSERT(pPwTime != NULL);
+	memcpy(pPwTime, &g_pwTimeNever, sizeof(PW_TIME));
 }

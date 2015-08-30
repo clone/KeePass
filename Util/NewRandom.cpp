@@ -33,10 +33,10 @@
 
 static DWORD g_dwNewRandomInstanceCounter = 0;
 
-static unsigned long g_xorW;
-static unsigned long g_xorX;
-static unsigned long g_xorY;
-static unsigned long g_xorZ;
+static unsigned long g_xorW = 0;
+static unsigned long g_xorX = 0;
+static unsigned long g_xorY = 0;
+static unsigned long g_xorZ = 0;
 
 CNewRandom::CNewRandom()
 {
@@ -65,7 +65,9 @@ void CNewRandom::Initialize()
 	POINT pt;
 	MEMORYSTATUS ms;
 	SYSTEM_INFO si;
+#ifndef _WIN32_WCE
 	STARTUPINFO sui;
+#endif
 
 	g_dwNewRandomInstanceCounter++;
 
@@ -217,9 +219,13 @@ void CNewRandom::GetRandomBuffer(BYTE *pBuf, DWORD dwSize)
 // Seed the xorshift random number generator
 void srandXorShift(unsigned long *pSeed128)
 {
-	ASSERT(pSeed128 != NULL);
+	ASSERT((g_xorW == 0) && (g_xorX == 0) && (g_xorY == 0) && (g_xorZ == 0)); // Call this function only once
+	ASSERT(pSeed128 != NULL); // No NULL parameter allowed
+
 	g_xorW = pSeed128[0]; g_xorX = pSeed128[1];
 	g_xorY = pSeed128[2]; g_xorZ = pSeed128[3];
+
+	if((g_xorW + g_xorX + g_xorY + g_xorZ) == 0) g_xorX += 0xB7E15163;
 }
 
 // Fast XorShift random number generator

@@ -35,7 +35,7 @@
 
 // General product information
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
-#define PWM_VERSION_STR  _T("0.88a")
+#define PWM_VERSION_STR  _T("0.89")
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -81,6 +81,9 @@
 #define PWMKEY_COLWIDTH7 _T("KeeColumnWidth7")
 #define PWMKEY_COLWIDTH8 _T("KeeColumnWidth8")
 #define PWMKEY_COLWIDTH9 _T("KeeColumnWidth9")
+#define PWMKEY_SPLITTERX _T("KeeSplitterX")
+#define PWMKEY_SPLITTERY _T("KeeSplitterY")
+#define PWMKEY_ENTRYVIEW _T("KeeEntryView")
 #define PWMKEY_LOCKMIN   _T("KeeLockOnMinimize")
 #define PWMKEY_MINTRAY   _T("KeeMinimizeToTray")
 #define PWMKEY_LOCKTIMER _T("KeeLockAfterTime")
@@ -91,6 +94,7 @@
 #define PWMKEY_SHOWEXPIRE       _T("KeeShowExpire")
 #define PWMKEY_SHOWUUID         _T("KeeShowUUID")
 #define PWMKEY_SHOWTOOLBAR      _T("KeeShowToolBar")
+#define PWMKEY_COLAUTOSIZE      _T("KeeColAutoSize")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -280,6 +284,9 @@ public:
 	// Convert PW_TIME to 5-byte compressed structure and the other way round
 	static void _TimeToPwTime(BYTE *pCompressedTime, PW_TIME *pPwTime);
 	static void _PwTimeToTime(PW_TIME *pPwTime, BYTE *pCompressedTime);
+
+	// Get the never-expire time
+	static void _GetNeverExpireTime(PW_TIME *pPwTime);
 
 protected:
 	virtual BOOL ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_GROUP *pGroup);

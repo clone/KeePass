@@ -73,7 +73,6 @@ BOOL CPrivateConfig::Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue)
 	bRet = FALSE; // This will cause an assertion, implement before using on WinCE
 #endif
 
-	ASSERT(bRet == TRUE);
 	return bRet;
 }
 

@@ -142,6 +142,8 @@
 #define IDC_CHECK_MODICON               1111
 #define IDC_BUTTON_SELECT_ICON          1112
 #define IDC_CHECK_MODEXPIRE             1113
+#define IDC_RE_ENTRYVIEW                1117
+#define IDC_CHECK_COLAUTOSIZE           1120
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -256,14 +258,15 @@
 #define ID_PWLIST_MASSMODIFY            32903
 #define ID_BUTTON32904                  32904
 #define ID_BUTTON32905                  32905
+#define ID_VIEW_ENTRYVIEW               32906
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        189
-#define _APS_NEXT_COMMAND_VALUE         32906
-#define _APS_NEXT_CONTROL_VALUE         1117
+#define _APS_NEXT_COMMAND_VALUE         32907
+#define _APS_NEXT_CONTROL_VALUE         1121
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

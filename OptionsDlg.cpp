@@ -56,6 +56,7 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	m_nAlgorithm = -1;
 	m_bLockAfterTime = FALSE;
 	m_nLockAfter = 0;
+	m_bColAutoSize = FALSE;
 	//}}AFX_DATA_INIT
 }
 
@@ -80,6 +81,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_CBIndex(pDX, IDC_COMBO_ENCALGO, m_nAlgorithm);
 	DDX_Check(pDX, IDC_CHECK_LOCKAFTERTIME, m_bLockAfterTime);
 	DDX_Text(pDX, IDC_EDIT_LOCKSECONDS, m_nLockAfter);
+	DDX_Check(pDX, IDC_CHECK_COLAUTOSIZE, m_bColAutoSize);
 	//}}AFX_DATA_MAP
 }
 
@@ -127,6 +129,7 @@ BOOL COptionsDlg::OnInitDialog()
 
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_IMGBUTTONS), OPTGRP_GUI);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_ENTRYGRID), OPTGRP_GUI);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_COLAUTOSIZE), OPTGRP_GUI);
 	m_wndgrp.AddWindow(NULL, OPTGRP_GUI);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_MINTRAY), OPTGRP_GUI);
 	m_wndgrp.AddWindow(NULL, OPTGRP_GUI);

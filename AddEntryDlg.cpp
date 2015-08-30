@@ -50,7 +50,6 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 {
 	//{{AFX_DATA_INIT(CAddEntryDlg)
 	m_bStars = TRUE;
-	m_idGroup = -1;
 	m_strNotes = _T("");
 	m_strPassword = _T("");
 	m_strRepeatPw = _T("");
@@ -82,7 +81,6 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_PASSWORD, m_pEditPw);
 	DDX_Control(pDX, IDC_COMBO_GROUPS, m_pGroups);
 	DDX_Check(pDX, IDC_CHECK_HIDEPW, m_bStars);
-	DDX_CBIndex(pDX, IDC_COMBO_GROUPS, m_idGroup);
 	DDX_Text(pDX, IDC_EDIT_NOTES, m_strNotes);
 	DDX_Text(pDX, IDC_EDIT_PASSWORD, m_strPassword);
 	DDX_Text(pDX, IDC_EDIT_REPEATPW, m_strRepeatPw);
@@ -146,7 +144,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	ASSERT(m_pMgr != NULL); // Must have been initialized by parent
 	unsigned int i; PW_GROUP *p;
-	for(i = 0; i < m_pMgr->GetNumberOfGroups(); i++)
+	for(i = 0; i < m_pMgr->GetNumberOfGroups(); i++) // Add groups to combo box
 	{
 		p = m_pMgr->GetGroup(i);
 		ASSERT(p != NULL);
@@ -181,8 +179,6 @@ BOOL CAddEntryDlg::OnInitDialog()
 	CString strStars = (TCHAR)(_T('z') + 27);
 	strStars += (TCHAR)(_T('z') + 27); strStars += (TCHAR)(_T('z') + 27);
 	GetDlgItem(IDC_CHECK_HIDEPW)->SetWindowText(strStars);
-	m_bStars = TRUE;
-	OnCheckHidePw();
 
 	// Configure link edit control
 	m_pURL.SetLinkOption(HEOL_AUTO);
@@ -206,6 +202,9 @@ BOOL CAddEntryDlg::OnInitDialog()
 		(int)(unsigned int)m_tExpire.btMinute, (int)(unsigned int)m_tExpire.btSecond);
 
 	UpdateData(FALSE);
+
+	// removed m_bStars = TRUE; -> Parent can decide to show the password or not
+	OnCheckHidePw(); // Update GUI based on m_bStars flag
 
 	// Translate all windows
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);

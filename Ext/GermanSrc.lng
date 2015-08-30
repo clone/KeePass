@@ -398,3 +398,10 @@
 |Change expiration time:|      |Ablaufdatum ändern:|
 |Mass Modify|                  |Alle ändern|
 |Change fields of all selected entries|        |Felder von allen ausgewählten Einträgen ändern|
+|Show &Columns|                |&Spalten anzeigen|
+|Show &Entry View|             |&Eintrags-Ansicht anzeigen|
+|Mobile devices|               |Mobile Geräte|
+|Credit cards|                 |Kreditkarten|
+
+|GUI: Automatically resize table columns when resizing the main window|
+    |GUI: Spaltenbreite automatisch anpassen wenn die Größe des Hauptfensters verändert wird|

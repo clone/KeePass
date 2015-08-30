@@ -67,6 +67,8 @@ BOOL CPwSafeApp::InitInstance()
 #endif
 
 	AfxOleInit();
+	AfxEnableControlContainer();
+	AfxInitRichEdit();
 
 	// SetDialogBkColor(NewGUI_GetBgColor(), CR_FRONT); // Setup the "new" dialog look
 

@@ -75,7 +75,6 @@ public:
 	CEdit	m_pEditPw;
 	CWzComboBox	m_pGroups;
 	BOOL	m_bStars;
-	int		m_idGroup;
 	CString	m_strNotes;
 	CString	m_strPassword;
 	CString	m_strRepeatPw;

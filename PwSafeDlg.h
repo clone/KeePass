@@ -44,12 +44,14 @@
 #include "NewGUI/CustomListCtrlEx.h"
 #include "NewGUI/SystemTray.h"
 #include "NewGUI/SystemTrayEx.h"
+#include "NewGUI/AutoRichEditCtrl.h"
 
 #define GUI_GROUPLIST_EXT 170
 // Standard Windows Dialog GUI_SPACER = 11
 #define GUI_SPACER 4
 
-#define APPWND_TIMER_ID 1
+#define APPWND_TIMER_ID         1
+#define APPWND_TIMER_ID_UPDATER 2
 
 #define ICOIDX_REMOVABLE 16
 #define ICOIDX_FIXED 17
@@ -57,6 +59,8 @@
 #define ICOIDX_CDROM 19
 #define ICOIDX_RAMDISK 20
 #define ICOIDX_NODRIVE 21
+
+#define PWS_DEFAULT_SPLITTER_Y 270
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -81,6 +85,9 @@ public:
 
 	CString GetExportFile(int nFormat);
 	void ExportSelectedGroup(int nFormat);
+
+	CString _MakeRtfString(LPCTSTR lptString);
+	void ShowEntryDetails(PW_ENTRY *p);
 
 	BOOL m_bTimer;
 	int m_nClipboardCountdown;
@@ -118,9 +125,12 @@ public:
 	BOOL m_bShowUUID;
 	BOOL m_bLockOnMinimize;
 	BOOL m_bMinimizeToTray;
+	BOOL m_bEntryView;
+	BOOL m_bColAutoSize;
 
 	HICON m_hTrayIconNormal;
 	HICON m_hTrayIconLocked;
+	BOOL m_bWindowInvalid;
 
 	BCMenu m_menu; // Our XP-style menu
 	BOOL m_bMenu; // Menu created?
@@ -136,6 +146,7 @@ public:
 	BOOL m_bFileOpen;
 	BOOL m_bModified;
 	BOOL m_bMinimized;
+	BOOL m_bMaximized;
 
 	CString m_strTempFile;
 
@@ -165,6 +176,7 @@ public:
 	CStatic	m_stcMenuLine;
 	CListCtrl	m_cGroups;
 	CCustomListCtrlEx	m_cList;
+	CAutoRichEditCtrl	m_reEntryView;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CPwSafeDlg)
@@ -244,6 +256,16 @@ protected:
 
 	int m_nSaveView;
 	LPARAM m_dwOldListParameters;
+
+	BOOL m_bCachedToolBarUpdate;
+
+	BOOL m_bDragging;
+	BOOL m_bDraggingHoriz;
+	HCURSOR m_hArrowCursor;
+	HCURSOR m_hDragLeftRight;
+	HCURSOR m_hDragUpDown;
+	LONG m_lSplitterPosHoriz;
+	LONG m_lSplitterPosVert;
 
 	//{{AFX_MSG(CPwSafeDlg)
 	virtual BOOL OnInitDialog();
@@ -381,6 +403,11 @@ protected:
 	afx_msg void OnViewShowToolBar();
 	afx_msg void OnPwlistMassModify();
 	afx_msg void OnUpdatePwlistMassModify(CCmdUI* pCmdUI);
+	afx_msg void OnKeyDownPwlist(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnViewEntryView();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
