@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -43,6 +43,11 @@ BEGIN_MESSAGE_MAP(CAutoRichEditCtrlFx, CRichEditCtrl)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
+
+void CAutoRichEditCtrlFx::InitEx()
+{
+	LimitText(0x7FFFFFF0);
+}
 
 CString CAutoRichEditCtrlFx::_StreamOutEx(int nFormat)
 {

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2005-2015 Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without

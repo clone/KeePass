@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -224,7 +224,7 @@ BOOL CPwGeneratorExDlg::OnInitDialog()
 
 	// m_cEditPw.SetFont(&m_fStyle, TRUE);
 	// m_btnHidePw.SetFont(&m_fSymbol, TRUE);
-	CFontUtil::AssignMono(&m_cEditPw, this);
+	CFontUtil::AssignPassword(&m_cEditPw, this);
 	CFontUtil::AssignSymbol(&m_btnHidePw, this);
 
 	m_btnHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
@@ -766,7 +766,7 @@ void CPwGeneratorExDlg::OnCheckHidePw()
 		m_cEditPw.SetPasswordChar(0);
 
 		// m_cEditPw.SetFont(&m_fStyle, TRUE);
-		CFontUtil::AssignMono(&m_cEditPw, this);
+		CFontUtil::AssignPassword(&m_cEditPw, this);
 	}
 	else
 	{

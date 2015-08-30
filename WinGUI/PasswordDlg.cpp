@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -685,7 +685,7 @@ void CPasswordDlg::OnCheckStars()
 		m_pEditPw.SetPasswordChar(0);
 
 		// m_pEditPw.SetFont(&m_fStyle, TRUE);
-		CFontUtil::AssignMono(&m_pEditPw, this);
+		CFontUtil::AssignPassword(&m_pEditPw, this);
 	}
 	else
 	{

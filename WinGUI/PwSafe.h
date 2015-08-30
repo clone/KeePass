@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -41,6 +41,8 @@
 #define KPCLOPT_FILEEXT_UNREG_ALT _T("-UnregisterFileExt")
 #define KPCLOPT_FILEEXT_REG       _T("/RegisterFileExt")
 #define KPCLOPT_FILEEXT_REG_ALT   _T("-RegisterFileExt")
+
+#define KPENV_CFG_LOCAL _T("KP1_CFG_LOCAL")
 
 typedef BOOL(WINAPI *LPINITIALIZESECURITYDESCRIPTOR)(
 	PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD dwRevision);

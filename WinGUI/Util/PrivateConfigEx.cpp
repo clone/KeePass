@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -374,10 +374,28 @@ std::basic_string<TCHAR> CPrivateConfigEx::GetSafe(const TCHAR *pszField) const
 	return std::basic_string<TCHAR>(tszTemp);
 }
 
-void CPrivateConfigEx::LoadStaticConfigFileOverrides()
+void CPrivateConfigEx::LoadStaticConfigFileOverrides(bool bPreserveExisting)
 {
-	g_strFileOverrideGlobal = this->GetSafe(PWMKEY_CFGOVERRIDE_GLOBAL);
-	g_strFileOverrideUser = this->GetSafe(PWMKEY_CFGOVERRIDE_USER);
+	std::basic_string<TCHAR> str;
+
+	str = this->GetSafe(PWMKEY_CFGOVERRIDE_GLOBAL);
+	if((g_strFileOverrideGlobal.size() == 0) || !bPreserveExisting)
+		g_strFileOverrideGlobal = str;
+
+	str = this->GetSafe(PWMKEY_CFGOVERRIDE_USER);
+	if((g_strFileOverrideUser.size() == 0) || !bPreserveExisting)
+		g_strFileOverrideUser = str;
 
 	ApplyFileOverrides();
+}
+
+void CPrivateConfigEx::SetConfigFileOverride(int nConfigID, LPCTSTR lpPath)
+{
+	if(lpPath == NULL) { ASSERT(FALSE); return; }
+
+	if(nConfigID == CFG_ID_GLOBAL)
+		g_strFileOverrideGlobal = lpPath;
+	else if(nConfigID == CFG_ID_USER)
+		g_strFileOverrideUser = lpPath;
+	else { ASSERT(FALSE); }
 }

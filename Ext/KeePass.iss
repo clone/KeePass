@@ -11,11 +11,11 @@
 #define MyAppUrlName "KeePass.url"
 #define MyAppHelpName "KeePass.chm"
 
-#define KeeVersionStr "1.28"
-#define KeeVersionWin "1.28.0.0"
-#define KeeVersionWinShort "1.28"
+#define KeeVersionStr "1.29"
+#define KeeVersionWin "1.29.0.0"
+#define KeeVersionWinShort "1.29"
 
-#define KeeDevPeriod "2003-2014"
+#define KeeDevPeriod "2003-2015"
 
 [Setup]
 AppName={#MyAppFullName}
@@ -87,7 +87,7 @@ Root: HKCR; Subkey: .kdb; Flags: uninsdeletekey; Tasks: not fileassoc
 Root: HKCR; Subkey: kdbfile; Flags: uninsdeletekey; Tasks: not fileassoc
 ; Register .kdb association at install, and unregister at uninstall
 Root: HKCR; Subkey: .kdb; ValueType: string; ValueData: kdbfile; Flags: uninsdeletekey; Tasks: fileassoc
-Root: HKCR; Subkey: kdbfile; ValueType: string; ValueData: KeePass Password Database; Flags: uninsdeletekey; Tasks: fileassoc
+Root: HKCR; Subkey: kdbfile; ValueType: string; ValueData: KeePass Database; Flags: uninsdeletekey; Tasks: fileassoc
 Root: HKCR; Subkey: kdbfile; ValueType: string; ValueName: AlwaysShowExt; Flags: uninsdeletekey; Tasks: fileassoc
 Root: HKCR; Subkey: kdbfile\DefaultIcon; ValueType: string; ValueData: """{app}\{#MyAppExeName}"",0"; Flags: uninsdeletekey; Tasks: fileassoc
 Root: HKCR; Subkey: kdbfile\shell\open; ValueType: string; ValueData: &Open with {#MyAppName}; Flags: uninsdeletekey; Tasks: fileassoc

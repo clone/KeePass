@@ -1,3 +1,27 @@
+15/04/03 - 1.29
+- The font used in password text boxes can now be changed
+  ('Tools' -> 'Options' -> tab 'Interface' -> button 'Select
+  Password Font')
+- {FIREFOX} placeholder: if no regular Firefox is installed,
+  KeePass now looks for Firefox ESR
+- In the field reference dialog, the field in which the
+  reference will be inserted is now selected as source field by
+  default
+- Increased notes size limit to about 2 GB
+- The path of the local configuration file can now be changed
+  using the 'KP1_CFG_LOCAL' environment variable
+- All KeePass program binaries are now digitally signed (thanks
+  to Certum/Unizeto)
+
+- Removed 'O' and 'C' access keys from 'OK' and 'Cancel'
+  buttons (instead, press Enter for 'OK' and Esc for 'Cancel')
+- Upgraded to Boost libraries version 1.57.0
+- Various code optimizations
+- Minor other improvements
+
+- AltGr+E (i.e. Ctrl+Alt+E) does not focus the quick search box
+  anymore
+
 14/10/01 - 1.28
 - The estimated password quality (in bits) is now displayed on
   the quality progress bar, and right of the quality progress

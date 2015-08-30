@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "OptionsDlg.h"
 
 #include "NewGUI/NewGUICommon.h"
+#include "NewGUI/FontUtil.h"
 #include "Util/WinUtil.h"
 #include "Util/CmdLine/Executable.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
@@ -74,6 +75,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_TAB_MENU, m_tabMenu);
 	DDX_Control(pDX, IDC_BTN_SELFONT, m_btSelFont);
 	DDX_Control(pDX, IDC_BTN_SELNOTESFONT, m_btSelNotesFont);
+	DDX_Control(pDX, IDC_BTN_SELPWFONT, m_btSelPwFont);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_Radio(pDX, IDC_RADIO_NEWLINE_0, m_nNewlineSequence);
@@ -102,6 +104,7 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialog)
 	//{{AFX_MSG_MAP(COptionsDlg)
 	ON_BN_CLICKED(IDC_BTN_SELFONT, OnBtnSelFont)
 	ON_BN_CLICKED(IDC_BTN_SELNOTESFONT, OnBtnSelNotesFont)
+	ON_BN_CLICKED(IDC_BTN_SELPWFONT, OnBtnSelPasswordFont)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_MENU, OnSelChangeTabMenu)
 	ON_BN_CLICKED(IDC_BTN_CREATEASSOC, OnBtnCreateAssoc)
 	ON_BN_CLICKED(IDC_BTN_DELETEASSOC, OnBtnDeleteAssoc)
@@ -124,10 +127,13 @@ BOOL COptionsDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
+	CFontUtil::SetDefaultFontFrom(GetDlgItem(IDC_STATIC_CLIPCLEARTXT));
+
 	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_XPButton(m_btSelFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
 	NewGUI_XPButton(m_btSelNotesFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
+	NewGUI_XPButton(m_btSelPwFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
 	// NewGUI_XPButton(m_btnCreateAssoc, IDB_FILE, IDB_FILE);
 	// NewGUI_XPButton(m_btnDeleteAssoc, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_XPButton(m_btnAutoType, IDB_AUTOTYPE, IDB_AUTOTYPE);
@@ -165,8 +171,9 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_CLOSEMIN), OPTGRP_GUI, TRUE);
 	m_wndgrp.AddWindow(NULL, OPTGRP_GUI, TRUE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_SELFONTTXT), OPTGRP_GUI, TRUE);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_SELFONT), OPTGRP_GUI, TRUE);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_SELNOTESFONT), OPTGRP_GUI, FALSE);
+	m_wndgrp.AddWindow(&m_btSelFont, OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(&m_btSelPwFont, OPTGRP_GUI, FALSE);
+	m_wndgrp.AddWindow(&m_btSelNotesFont, OPTGRP_GUI, FALSE);
 	m_wndgrp.AddWindow(NULL, OPTGRP_GUI, TRUE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_SELROWHIGHLIGHT), OPTGRP_GUI, TRUE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_ROWHIGHLIGHTSEL), OPTGRP_GUI, TRUE);
@@ -325,70 +332,53 @@ void COptionsDlg::OnCancel()
 	CDialog::OnCancel();
 }
 
-void COptionsDlg::_ChangeFont(CString& rSpec)
+void COptionsDlg::_ChangeFont(CString& rSpec, const LOGFONT* plfOverride)
 {
-	CString strFontSpec = rSpec;
-	if(strFontSpec.GetLength() == 0) strFontSpec = m_strFontSpec;
-	if(strFontSpec.GetLength() == 0) { ASSERT(FALSE); return; }
-
-	CString strFace, strSize, strFlags;
-	int nChars = strFontSpec.ReverseFind(_T(';'));
-	int nSizeEnd = strFontSpec.ReverseFind(_T(','));
-	strFace = strFontSpec.Left(nChars);
-	strSize = strFontSpec.Mid(nChars + 1, nSizeEnd - nChars - 1);
-	strFlags = strFontSpec.Right(4);
-	int nSize = _ttoi((LPCTSTR)strSize);
-	int nWeight = FW_NORMAL;
-	if(strFlags.GetAt(0) == _T('1')) nWeight = FW_BOLD;
-	BYTE bItalic = (BYTE)((strFlags.GetAt(1) == _T('1')) ? TRUE : FALSE);
-	BYTE bUnderlined = (BYTE)((strFlags.GetAt(2) == _T('1')) ? TRUE : FALSE);
-	BYTE bStrikeOut = (BYTE)((strFlags.GetAt(3) == _T('1')) ? TRUE : FALSE);
-
 	LOGFONT lf;
-	CDC *pDC = GetDC();
-	HDC hDC = pDC->m_hDC;
-	ASSERT(hDC != NULL);
-	if(hDC != NULL) lf.lfHeight = -MulDiv(nSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
-	else { ASSERT(FALSE); lf.lfHeight = -nSize; }
-	ReleaseDC(pDC); pDC = NULL;
+	if(plfOverride == NULL)
+	{
+		CString strFontSpec = rSpec;
+		if(strFontSpec.GetLength() == 0) strFontSpec = m_strFontSpec;
+		if(strFontSpec.GetLength() == 0) { ASSERT(FALSE); return; }
 
-	lf.lfWidth = 0; lf.lfEscapement = 0; lf.lfOrientation = 0;
-	lf.lfWeight = nWeight; lf.lfItalic = bItalic; lf.lfUnderline = bUnderlined;
-	lf.lfStrikeOut = bStrikeOut; lf.lfCharSet = DEFAULT_CHARSET;
-	lf.lfOutPrecision = OUT_DEFAULT_PRECIS; lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
-	lf.lfQuality = DEFAULT_QUALITY; lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-	_tcscpy_s(lf.lfFaceName, _countof(lf.lfFaceName), strFace);
+		CFontUtil::Deserialize(&lf, strFontSpec, m_hWnd);
+	}
+	else memcpy(&lf, plfOverride, sizeof(LOGFONT));
 
 	CFontDialog dlg(&lf);
 	dlg.m_cf.Flags |= CF_NOSCRIPTSEL;
 
 	if(NewGUI_DoModal(&dlg) == IDOK)
-	{
-		int dSize = dlg.GetSize();
-		dSize = ((dSize >= 0) ? dSize : -dSize);
-
-		CString strNewFontSpec = dlg.GetFaceName(), strTemp;
-		strNewFontSpec += _T(";");
-		strTemp.Format(_T("%d"), dSize / 10);
-		strNewFontSpec += strTemp;
-		strNewFontSpec += _T(",");
-		strNewFontSpec += ((dlg.IsBold() == TRUE) ? _T('1') : _T('0'));
-		strNewFontSpec += ((dlg.IsItalic() == TRUE) ? _T('1') : _T('0'));
-		strNewFontSpec += ((dlg.IsUnderline() == TRUE) ? _T('1') : _T('0'));
-		strNewFontSpec += ((dlg.IsStrikeOut() == TRUE) ? _T('1') : _T('0'));
-
-		rSpec = strNewFontSpec;
-	}
+		rSpec = CFontUtil::Serialize(dlg);
 }
 
 void COptionsDlg::OnBtnSelFont() 
 {
-	_ChangeFont(m_strFontSpec);
+	_ChangeFont(m_strFontSpec, NULL);
 }
 
 void COptionsDlg::OnBtnSelNotesFont() 
 {
-	_ChangeFont(m_strNotesFontSpec);
+	_ChangeFont(m_strNotesFontSpec, NULL);
+}
+
+void COptionsDlg::OnBtnSelPasswordFont()
+{
+	if(m_strPasswordFontSpec.GetLength() > 0)
+		_ChangeFont(m_strPasswordFontSpec, NULL);
+	else
+	{
+		CFont* pfMono = CFontUtil::GetMonoFont(this);
+		if(pfMono != NULL)
+		{
+			LOGFONT lf;
+			ZeroMemory(&lf, sizeof(LOGFONT));
+			if(pfMono->GetLogFont(&lf) != 0)
+				_ChangeFont(m_strPasswordFontSpec, &lf);
+			else { ASSERT(FALSE); }
+		}
+		else { ASSERT(FALSE); }
+	}
 }
 
 void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult) 

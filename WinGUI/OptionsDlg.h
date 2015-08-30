@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@ public:
 
 	CString m_strFontSpec;
 	CString m_strNotesFontSpec;
+	CString m_strPasswordFontSpec;
 	CWindowGroups m_wndgrp;
 	CImageList m_ilIcons;
 	CImageList m_ilOptionIcons;
@@ -70,7 +71,7 @@ public:
 
 private:
 	void AddTcItem(LPCTSTR lpName, int iImageIndex);
-	void _ChangeFont(CString& rSpec);
+	void _ChangeFont(CString& rSpec, const LOGFONT* plfOverride);
 
 public:
 	BOOL m_bRememberLast;
@@ -116,6 +117,7 @@ public:
 	CTabCtrl	m_tabMenu;
 	CXPStyleButtonST	m_btSelFont;
 	CXPStyleButtonST	m_btSelNotesFont;
+	CXPStyleButtonST	m_btSelPwFont;
 	CXPStyleButtonST	m_btCancel;
 	CXPStyleButtonST	m_btOK;
 	CXPStyleButtonST	m_btnAutoType;
@@ -150,6 +152,7 @@ protected:
 	virtual void OnCancel();
 	afx_msg void OnBtnSelFont();
 	afx_msg void OnBtnSelNotesFont();
+	afx_msg void OnBtnSelPasswordFont();
 	afx_msg void OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnBtnCreateAssoc();
 	afx_msg void OnBtnDeleteAssoc();

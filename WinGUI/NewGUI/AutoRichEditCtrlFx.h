@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -42,13 +42,14 @@ BOOL PASCAL AfxInitRichEditEx();
 
 class CAutoRichEditCtrlFx : public CRichEditCtrl
 {
-// Construction
 public:
 	CAutoRichEditCtrlFx();
 	virtual ~CAutoRichEditCtrlFx();
 
 	//{{AFX_VIRTUAL(CAutoRichEditCtrlFx)
 	//}}AFX_VIRTUAL
+
+	void InitEx();
 
 	void SetRTF(CString sRTF, int nStreamType);
 	CString GetRTF();

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@
 #include <afxwin.h>
 #include <boost/utility.hpp>
 
+#define CFU_MONO_FONT_FACE _T("Courier New")
+
 class CFontUtil : boost::noncopyable
 {
 public:
@@ -33,9 +35,17 @@ public:
 	static void SetDefaultFont(CFont* pf);
 	static void SetDefaultFontFrom(CWnd* pWnd);
 
+	static void SetPasswordFont(LPCTSTR lpFont, HWND hWndParent);
+
+	static CFont* GetMonoFont(CWnd* pWndParent);
+
 	static void AssignBold(CWnd* pWnd, CWnd* pWndParent);
 	static void AssignMono(CWnd* pWnd, CWnd* pWndParent);
 	static void AssignSymbol(CWnd* pWnd, CWnd* pWndParent);
+	static void AssignPassword(CWnd* pWnd, CWnd* pWndParent);
+
+	static CString Serialize(const CFontDialog& dlg);
+	static bool Deserialize(LOGFONT* pFont, LPCTSTR lpFont, HWND hWnd);
 
 private:
 	CFontUtil();
@@ -48,6 +58,7 @@ private:
 	static CFont* g_pfBold;
 	static CFont* g_pfMono;
 	static CFont* g_pfSymbol;
+	static CFont* g_pfPassword;
 };
 
 #endif // ___FONT_UTIL_H___

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -438,6 +438,8 @@ private:
 
 	CStringList m_lNotesRegex;
 	CStringList m_lNotesFormat;
+
+	CString m_strPasswordFontSpec;
 
 	std::basic_string<TCHAR> m_strInitialEnvDir;
 	std::vector<std::basic_string<TCHAR> > m_vTempFiles;

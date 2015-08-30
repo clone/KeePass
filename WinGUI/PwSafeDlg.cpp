@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -59,6 +59,7 @@
 #include "NewGUI/NewDialogsEx.h"
 #include "NewGUI/NewColorizerEx.h"
 #include "NewGUI/DwmUtil.h"
+#include "NewGUI/FontUtil.h"
 #include "Plugins/KpApiImpl.h"
 
 #include "PasswordDlg.h"
@@ -1107,6 +1108,10 @@ BOOL CPwSafeDlg::OnInitDialog()
 		m_lNotesFormat.AddTail(szTemp);
 	}
 
+	cConfig.Get(PWMKEY_PASSWORDFONT, szTemp);
+	m_strPasswordFontSpec = szTemp;
+	CFontUtil::SetPasswordFont(m_strPasswordFontSpec, m_hWnd);
+
 	// int nColumnWidth;
 	// RECT rect;
 	// m_cGroups.GetClientRect(&rect);
@@ -1177,7 +1182,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bOpenLastDb = cConfig.GetBool(PWMKEY_OPENLASTB, TRUE);
 	m_bAutoSaveDb = cConfig.GetBool(PWMKEY_AUTOSAVEB, FALSE);
 
-	m_reEntryView.LimitText(0);
+	m_reEntryView.InitEx();
 	m_reEntryView.SetEventMask(ENM_MOUSEEVENTS | ENM_LINK);
 	m_reEntryView.SendMessage(EM_AUTOURLDETECT, TRUE, 0);
 	m_reEntryView.SetBackgroundColor(FALSE, GetSysColor(COLOR_3DFACE));
@@ -2371,6 +2376,7 @@ void CPwSafeDlg::SaveOptions()
 
 	pcfg.Set(PWMKEY_LISTFONT, m_strFontSpec);
 	pcfg.Set(PWMKEY_NOTESFONT, m_strNotesFontSpec);
+	pcfg.Set(PWMKEY_PASSWORDFONT, m_strPasswordFontSpec);
 
 	_SaveWindowPositionAndSize(&pcfg);
 
@@ -3493,7 +3499,7 @@ void CPwSafeDlg::OnPwlistDelete()
 	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
 	dlgTask.SetIcon(MTDI_QUESTION);
 	dlgTask.AddButton(TRL("&Delete"), NULL, IDOK);
-	dlgTask.AddButton(TRL("&Cancel"), NULL, IDCANCEL);
+	dlgTask.AddButton(TRL("Cancel"), NULL, IDCANCEL);
 	int nMsg = dlgTask.ShowDialog();
 
 	if(nMsg < 0) // No task dialog support?
@@ -5182,7 +5188,7 @@ void CPwSafeDlg::OnFileClose()
 
 			dlgTask.AddButton(TRL("&Save"), strSaveText, IDYES);
 			dlgTask.AddButton(TRL("&Discard changes"), strDiscardText, IDNO);
-			dlgTask.AddButton(TRL("&Cancel"), strCancelText, IDCANCEL);
+			dlgTask.AddButton(TRL("Cancel"), strCancelText, IDCANCEL);
 
 			BOOL bAutoSaveCB = FALSE;
 			nRes = dlgTask.ShowDialog(bDoVerification ? &bAutoSaveCB : NULL);
@@ -5295,6 +5301,7 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_bAutoSave = m_bAutoSaveDb;
 	dlg.m_strFontSpec = m_strFontSpec;
 	dlg.m_strNotesFontSpec = m_strNotesFontSpec;
+	dlg.m_strPasswordFontSpec = m_strPasswordFontSpec;
 	dlg.m_bLockOnMinimize = m_bLockOnMinimize;
 	dlg.m_bMinimizeOnLock = m_bMinimizeOnLock;
 	dlg.m_bMinimizeToTray = m_bMinimizeToTray;
@@ -5443,6 +5450,11 @@ void CPwSafeDlg::OnSafeOptions()
 			_ParseSpecAndSetFont(dlg.m_strFontSpec, false);
 		if(dlg.m_strNotesFontSpec != m_strNotesFontSpec)
 			_ParseSpecAndSetFont(dlg.m_strNotesFontSpec, true);
+		if(dlg.m_strPasswordFontSpec != m_strPasswordFontSpec)
+		{
+			m_strPasswordFontSpec = dlg.m_strPasswordFontSpec;
+			CFontUtil::SetPasswordFont(m_strPasswordFontSpec, m_hWnd);
+		}
 
 		if(dlg.m_bCopyURLs != m_bCopyURLs)
 		{
@@ -5543,7 +5555,7 @@ void CPwSafeDlg::OnSafeRemoveGroup()
 	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
 	dlgTask.SetIcon(MTDI_QUESTION);
 	dlgTask.AddButton(TRL("&Delete"), NULL, IDOK);
-	dlgTask.AddButton(TRL("&Cancel"), NULL, IDCANCEL);
+	dlgTask.AddButton(TRL("Cancel"), NULL, IDCANCEL);
 	int nMsg = dlgTask.ShowDialog();
 
 	if(nMsg < 0) // No task dialog support?
@@ -7427,9 +7439,12 @@ BOOL CPwSafeDlg::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 
-	// When changing Ctrl+E, also change the tooltip text of the quick search box
+	// When changing Ctrl+E, also change the tooltip text of the quick find box
 	if(((pMsg->message == WM_KEYDOWN) || (pMsg->message == WM_KEYUP)) &&
-		(pMsg->wParam == 'E') && ((GetKeyState(VK_CONTROL) & 0x8000) != 0))
+		(pMsg->wParam == 'E') && ((GetKeyState(VK_CONTROL) & 0x8000) != 0) &&
+		// Enforce that Alt is up (e.g. on Polish systems AltGr+E,
+		// i.e. Ctrl+Alt+E, is used to enter a character)
+		((GetKeyState(VK_MENU) & 0x8000) == 0))
 	{
 		if(pMsg->message == WM_KEYDOWN) m_cQuickFind.SetFocus();
 		return TRUE;

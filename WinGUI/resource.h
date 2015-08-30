@@ -329,6 +329,7 @@
 #define IDC_CHECK_CUSTOMCOLOR           1305
 #define IDC_CHECK_SAMEKL                1306
 #define IDC_BTN_SELNOTESFONT            1308
+#define IDC_BTN_SELPWFONT               1309
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -553,7 +554,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        251
 #define _APS_NEXT_COMMAND_VALUE         33040
-#define _APS_NEXT_CONTROL_VALUE         1309
+#define _APS_NEXT_CONTROL_VALUE         1310
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

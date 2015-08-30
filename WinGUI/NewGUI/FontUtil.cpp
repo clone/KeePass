@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ LOGFONT* CFontUtil::g_plfDefault = NULL;
 CFont* CFontUtil::g_pfBold = NULL;
 CFont* CFontUtil::g_pfMono = NULL;
 CFont* CFontUtil::g_pfSymbol = NULL;
+CFont* CFontUtil::g_pfPassword = NULL;
 
 CFontUtil::CFontUtil()
 {
@@ -59,6 +60,13 @@ void CFontUtil::Release()
 		delete g_pfSymbol;
 		g_pfSymbol = NULL;
 	}
+
+	if(g_pfPassword != NULL)
+	{
+		VERIFY(g_pfPassword->DeleteObject());
+		delete g_pfPassword;
+		g_pfPassword = NULL;
+	}
 }
 
 void CFontUtil::SetDefaultFont(CFont* pf)
@@ -85,6 +93,34 @@ void CFontUtil::SetDefaultFontFrom(CWnd* pWnd)
 	CFontUtil::SetDefaultFont(pWnd->GetFont());
 }
 
+void CFontUtil::SetPasswordFont(LPCTSTR lpFont, HWND hWndParent)
+{
+	if(g_pfPassword != NULL)
+	{
+		VERIFY(g_pfPassword->DeleteObject());
+		delete g_pfPassword;
+		g_pfPassword = NULL;
+	}
+
+	if(lpFont == NULL) { ASSERT(FALSE); return; }
+	if(lpFont[0] == 0) return; // No assert
+
+	LOGFONT lf;
+	if(!CFontUtil::Deserialize(&lf, lpFont, hWndParent))
+	{
+		ASSERT(FALSE);
+		return;
+	}
+
+	g_pfPassword = new CFont();
+	if(g_pfPassword->CreateFontIndirect(&lf) == FALSE)
+	{
+		ASSERT(FALSE);
+		delete g_pfPassword;
+		g_pfPassword = NULL;
+	}
+}
+
 bool CFontUtil::EnsureBold(CWnd* pWndParent)
 {
 	UNREFERENCED_PARAMETER(pWndParent);
@@ -109,6 +145,12 @@ bool CFontUtil::EnsureBold(CWnd* pWndParent)
 	return true;
 }
 
+CFont* CFontUtil::GetMonoFont(CWnd* pWndParent)
+{
+	CFontUtil::EnsureMono(pWndParent);
+	return g_pfMono;
+}
+
 bool CFontUtil::EnsureMono(CWnd* pWndParent)
 {
 	if(g_pfMono == NULL)
@@ -124,7 +166,7 @@ bool CFontUtil::EnsureMono(CWnd* pWndParent)
 		if(g_pfMono->CreateFont(nHeight, 0, 0, 0, FW_NORMAL,
 			FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
 			CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, (DEFAULT_PITCH | FF_MODERN),
-			_T("Courier New")) == FALSE)
+			CFU_MONO_FONT_FACE) == FALSE)
 		{
 			ASSERT(FALSE);
 			delete g_pfMono;
@@ -185,4 +227,88 @@ void CFontUtil::AssignSymbol(CWnd* pWnd, CWnd* pWndParent)
 	if(!CFontUtil::EnsureSymbol(pWndParent)) return;
 
 	pWnd->SetFont(g_pfSymbol);
+}
+
+void CFontUtil::AssignPassword(CWnd* pWnd, CWnd* pWndParent)
+{
+	if(pWnd == NULL) { ASSERT(FALSE); return; }
+
+	if(g_pfPassword != NULL) pWnd->SetFont(g_pfPassword);
+	else CFontUtil::AssignMono(pWnd, pWndParent);
+}
+
+CString CFontUtil::Serialize(const CFontDialog& dlg)
+{
+	CString str = dlg.GetFaceName();
+	str += _T(';');
+
+	int dSize = dlg.GetSize();
+	dSize = ((dSize >= 0) ? dSize : -dSize);
+	CString strTemp;
+	strTemp.Format(_T("%d"), dSize / 10);
+	str += strTemp;
+
+	str += _T(',');
+	str += ((dlg.IsBold() != FALSE) ? _T('1') : _T('0'));
+	str += ((dlg.IsItalic() != FALSE) ? _T('1') : _T('0'));
+	str += ((dlg.IsUnderline() != FALSE) ? _T('1') : _T('0'));
+	str += ((dlg.IsStrikeOut() != FALSE) ? _T('1') : _T('0'));
+
+	return str;
+}
+
+bool CFontUtil::Deserialize(LOGFONT* pFont, LPCTSTR lpFont, HWND hWnd)
+{
+	if(pFont == NULL) { ASSERT(FALSE); return false; }
+
+	ZeroMemory(pFont, sizeof(LOGFONT));
+
+	if(lpFont == NULL) { ASSERT(FALSE); return false; }
+	CString strFontSpec = lpFont;
+
+	const int nChars = strFontSpec.ReverseFind(_T(';'));
+	const int nSizeEnd = strFontSpec.ReverseFind(_T(','));
+	if(nChars < 0) { ASSERT(FALSE); return false; }
+	if(nSizeEnd <= nChars) { ASSERT(FALSE); return false; }
+
+	CString strFace, strSize, strFlags;
+	strFace = strFontSpec.Left(nChars);
+	strSize = strFontSpec.Mid(nChars + 1, nSizeEnd - nChars - 1);
+	strFlags = strFontSpec.Mid(nSizeEnd + 1);
+	if(strFlags.GetLength() < 4) { ASSERT(FALSE); return false; }
+
+	const int nSize = _ttoi(strSize);
+	const bool bBold = (strFlags.GetAt(0) == _T('1'));
+	const bool bItalic = (strFlags.GetAt(1) == _T('1'));
+	const bool bUnderlined = (strFlags.GetAt(2) == _T('1'));
+	const bool bStrikeOut = (strFlags.GetAt(3) == _T('1'));
+
+	HDC hDC = GetDC(hWnd);
+	if(hDC != NULL)
+		pFont->lfHeight = -MulDiv(nSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
+	else { ASSERT(FALSE); pFont->lfHeight = -nSize; }
+	ReleaseDC(hWnd, hDC);
+
+	// pFont->lfWidth = 0;
+	// pFont->lfEscapement = 0;
+	// pFont->lfOrientation = 0;
+	pFont->lfWeight = (bBold ? FW_BOLD : FW_NORMAL);
+	pFont->lfItalic = (bItalic ? TRUE : FALSE);
+	pFont->lfUnderline = (bUnderlined ? TRUE : FALSE);
+	pFont->lfStrikeOut = (bStrikeOut ? TRUE : FALSE);
+	pFont->lfCharSet = DEFAULT_CHARSET;
+	pFont->lfOutPrecision = OUT_DEFAULT_PRECIS;
+	pFont->lfClipPrecision = CLIP_DEFAULT_PRECIS;
+	pFont->lfQuality = DEFAULT_QUALITY;
+	pFont->lfPitchAndFamily = (DEFAULT_PITCH | FF_DONTCARE);
+
+	BOOST_STATIC_ASSERT(_countof(pFont->lfFaceName) == LF_FACESIZE);
+	if(strFace.GetLength() >= LF_FACESIZE)
+	{
+		ASSERT(FALSE);
+		strFace = strFace.Left(LF_FACESIZE - 1);
+	}
+	_tcscpy_s(pFont->lfFaceName, strFace);
+
+	return true;
 }

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1459,4 +1459,35 @@ std::basic_string<TCHAR> WU_StdInReadPassword()
 	}
 
 	return g_strStdInPw;
+}
+
+std::basic_string<TCHAR> WU_GetEnv(LPCTSTR lpVarName, bool bExpand)
+{
+	std::basic_string<TCHAR> str;
+	if(lpVarName == NULL) { ASSERT(FALSE); return str; }
+	if(lpVarName[0] == 0) { ASSERT(FALSE); return str; }
+
+	const DWORD cchBuf = 32767;
+	const DWORD cchAlloc = cchBuf + 5;
+
+	scoped_array<TCHAR> vBuf(new TCHAR[cchAlloc]);
+	ZeroMemory(vBuf.get(), sizeof(TCHAR) * cchAlloc);
+
+	if(GetEnvironmentVariable(lpVarName, vBuf.get(), cchBuf) == 0)
+		return str;
+
+	str = vBuf.get();
+
+	if(bExpand)
+	{
+		ZeroMemory(vBuf.get(), sizeof(TCHAR) * cchAlloc);
+
+		// Plus 1 required by documentation of ExpandEnvironmentStrings
+		if(ExpandEnvironmentStrings(str.c_str(), vBuf.get(), cchBuf + 1) != 0)
+		{
+			if(vBuf.get()[0] != 0) str = vBuf.get();
+		}
+	}
+
+	return str;
 }

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ CFieldRefDlg::CFieldRefDlg(CWnd* pParent /*=NULL*/)
 {
 	m_pMgr = NULL;
 	m_pImages = NULL;
+	m_dwDefaultRef = 0;
 	m_bClosing = FALSE;
 }
 
@@ -95,17 +96,32 @@ BOOL CFieldRefDlg::OnInitDialog()
 
 	NewGUI_SortList(&m_lvEntries);
 
-	this->CheckRadioButton(IDC_RADIO_REFTITLE, IDC_RADIO_REFNOTES, IDC_RADIO_REFPW);
-	this->CheckRadioButton(IDC_RADIO_IDTITLE, IDC_RADIO_IDUUID, IDC_RADIO_IDUUID);
+	CheckRadioButton(IDC_RADIO_IDTITLE, IDC_RADIO_IDUUID, IDC_RADIO_IDUUID);
 
-	this->EnableChildControls();
+	const int nRefIDMin = IDC_RADIO_REFTITLE;
+	const int nRefIDMax = IDC_RADIO_REFNOTES;
+	if(m_dwDefaultRef == PWMF_TITLE)
+		CheckRadioButton(nRefIDMin, nRefIDMax, IDC_RADIO_REFTITLE);
+	else if(m_dwDefaultRef == PWMF_USER)
+		CheckRadioButton(nRefIDMin, nRefIDMax, IDC_RADIO_REFUSER);
+	// else if(m_dwDefaultRef == PWMF_PASSWORD)
+	//	CheckRadioButton(nRefIDMin, nRefIDMax, IDC_RADIO_REFPW);
+	else if(m_dwDefaultRef == PWMF_URL)
+		CheckRadioButton(nRefIDMin, nRefIDMax, IDC_RADIO_REFURL);
+	else if(m_dwDefaultRef == PWMF_ADDITIONAL)
+		CheckRadioButton(nRefIDMin, nRefIDMax, IDC_RADIO_REFNOTES);
+	else CheckRadioButton(nRefIDMin, nRefIDMax, IDC_RADIO_REFPW);
+
+	EnableChildControls();
 	return TRUE; // return TRUE unless you set the focus to a control
 }
 
-void CFieldRefDlg::InitEx(CPwManager* pMgr, CImageList* pImages)
+void CFieldRefDlg::InitEx(CPwManager* pMgr, CImageList* pImages,
+	DWORD dwDefaultRef)
 {
 	m_pMgr = pMgr;
 	m_pImages = pImages;
+	m_dwDefaultRef = dwDefaultRef;
 }
 
 void CFieldRefDlg::_AddEntryToList(PW_ENTRY *p)

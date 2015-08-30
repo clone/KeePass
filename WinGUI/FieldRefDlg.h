@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ public:
 	CFieldRefDlg(CWnd* pParent = NULL);
 	virtual ~CFieldRefDlg();
 
-	void InitEx(CPwManager* pMgr, CImageList* pImages);
+	void InitEx(CPwManager* pMgr, CImageList* pImages, DWORD dwDefaultRef);
 
 	CString m_strFieldRef;
 
@@ -48,6 +48,7 @@ private:
 	BOOL m_bClosing;
 	CPwManager* m_pMgr;
 	CImageList* m_pImages;
+	DWORD m_dwDefaultRef;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

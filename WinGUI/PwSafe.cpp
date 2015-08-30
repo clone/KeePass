@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -135,10 +135,14 @@ BOOL CPwSafeApp::InitInstance()
 	CPwSafeDlg dlg;
 	m_pMainWnd = &dlg;
 
+	std::basic_string<TCHAR> strCfgLocal = WU_GetEnv(KPENV_CFG_LOCAL, true);
+	if(strCfgLocal.size() > 0)
+		CPrivateConfigEx::SetConfigFileOverride(CFG_ID_USER, strCfgLocal.c_str());
+
 	CPrivateConfigEx* pc = new CPrivateConfigEx(FALSE);
 	if(pc != NULL)
 	{
-		pc->LoadStaticConfigFileOverrides();
+		pc->LoadStaticConfigFileOverrides(true);
 
 		dlg.m_bCheckForInstance = pc->GetBool(PWMKEY_SINGLEINSTANCE, FALSE);
 		CMemoryProtectionEx::SetEnabledAtStart(pc->GetBool(PWMKEY_USEDPAPIFORMEMPROT, TRUE));

@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 // DR 2008-11-25: Added 'set-urloverride' command line option
 // DR 2009-06-05: Added 'minimize' command line option
 // DR 2012-08-14: Added 'pw-stdin' command line option
+// DR 2014-10-25: Added 'cfg-local' command line option
 
 #include "StdAfx.h"
 #include "CmdArgs.h"
@@ -58,6 +59,7 @@ CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false), m_isLock(false),
     const CommandLineOption lockcw     (_T("lock"));
     const CommandLineOption mincw      (_T("minimize"));
     const CommandLineOption urloverride(_T("set-urloverride:"));
+    // const CommandLineOption cfgLocal   (_T("cfg-local:"));
 
     // For each command line argument ...
     typedef CommandLineTokens::const_iterator const_iterator;
@@ -130,6 +132,11 @@ CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false), m_isLock(false),
         else if(urloverride.isOption(argument)) {
             m_urlOverride = urloverride.optionValue(argument);
             }
+
+        // // cfg-local option:
+        // else if(cfgLocal.isOption(argument)) {
+        //    m_cfgLocal = cfgLocal.optionValue(argument);
+        //    }
 
         // Plugin options:
         else if(CPluginManager::Instance().UsesCmdArg(argument));  // Do nothing.  This option is used by a plugin.

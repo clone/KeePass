@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 // DR 2008-11-25: Added 'set-urloverride' command line option
 // DR 2009-06-05: Added 'minimize' command line option
 // DR 2012-08-14: Added 'pw-stdin' command line option
+// DR 2014-10-25: Added 'cfg-local' command line option
 
 #pragma once
 #include "FullPathName.h"
@@ -63,6 +64,7 @@ public:
     bool              lockIsInEffect() const {return m_isLock;}
     bool            minimizeInEffect() const {return m_isMin;}
     const std_string& getUrlOverride() const {return m_urlOverride;}
+    // const std_string&    getCfgLocal() const {return m_cfgLocal;}
 
 private:
     CmdArgs();
@@ -76,4 +78,5 @@ private:
     bool         m_isLock;
     bool         m_isMin;
     std_string   m_urlOverride;
+    // std_string   m_cfgLocal;
 };

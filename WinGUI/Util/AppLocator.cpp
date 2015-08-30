@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -123,21 +123,40 @@ void AppLocator::FindInternetExplorer()
 
 void AppLocator::FindFirefox()
 {
-	LPCTSTR lpVer = _T("SOFTWARE\\Mozilla\\Mozilla Firefox");
-	LPCTSTR lpVer32 = _T("SOFTWARE\\Wow6432Node\\Mozilla\\Mozilla Firefox");
-	LPCTSTR lpRel = lpVer;
+	LPCTSTR lpRoot = _T("SOFTWARE\\Mozilla\\Mozilla Firefox");
+	LPCTSTR lpRoot32 = _T("SOFTWARE\\Wow6432Node\\Mozilla\\Mozilla Firefox");
+	LPCTSTR lpRootESR = _T("SOFTWARE\\Mozilla\\Mozilla Firefox ESR");
+	LPCTSTR lpRootESR32 = _T("SOFTWARE\\Wow6432Node\\Mozilla\\Mozilla Firefox ESR");
 
 	std::basic_string<TCHAR> strVer = GetRegStrEx(HKEY_LOCAL_MACHINE,
-		lpVer, _T("CurrentVersion"), 0);
+		lpRoot, _T("CurrentVersion"), 0);
+	LPCTSTR lpInfoRoot = lpRoot;
+
 	if(strVer.size() == 0)
 	{
-		strVer = GetRegStrEx(HKEY_LOCAL_MACHINE, lpVer32, _T("CurrentVersion"), 0);
-		lpRel = lpVer32;
-
-		if(strVer.size() == 0) return;
+		strVer = GetRegStrEx(HKEY_LOCAL_MACHINE, lpRoot32, _T("CurrentVersion"), 0);
+		lpInfoRoot = lpRoot32;
 	}
 
-	std::basic_string<TCHAR> strCur = lpRel;
+	// The ESR version stores the 'CurrentVersion' value under
+	// 'Mozilla Firefox ESR', but the version-specific info
+	// under 'Mozilla Firefox\\<Version>' (without 'ESR')
+
+	if(strVer.size() == 0)
+	{
+		strVer = GetRegStrEx(HKEY_LOCAL_MACHINE, lpRootESR, _T("CurrentVersion"), 0);
+		lpInfoRoot = lpRoot; // Not 'ESR'
+	}
+
+	if(strVer.size() == 0)
+	{
+		strVer = GetRegStrEx(HKEY_LOCAL_MACHINE, lpRootESR32, _T("CurrentVersion"), 0);
+		lpInfoRoot = lpRoot32; // Not 'ESR'
+	}
+
+	if(strVer.size() == 0) return;
+
+	std::basic_string<TCHAR> strCur = lpInfoRoot;
 	strCur += _T("\\");
 	strCur += strVer;
 	strCur += _T("\\Main");

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2014 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2015 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -189,8 +189,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 	{
 		// m_pEditPw.SetFont(&m_fStyle, TRUE);
 		// m_pRepeatPw.SetFont(&m_fStyle, TRUE);
-		CFontUtil::AssignMono(&m_pEditPw, this);
-		CFontUtil::AssignMono(&m_pRepeatPw, this);
+		CFontUtil::AssignPassword(&m_pEditPw, this);
+		CFontUtil::AssignPassword(&m_pRepeatPw, this);
 
 		m_pEditPw.EnableSecureMode(FALSE);
 		m_pRepeatPw.EnableSecureMode(FALSE);
@@ -351,7 +351,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	if(_pwtimecmp(&tNever, &m_tExpire) == 0) m_bExpires = FALSE;
 	else m_bExpires = TRUE;
 
-	// m_reNotes.LimitText(0);
+	m_reNotes.InitEx();
 	m_reNotes.SetEventMask(ENM_MOUSEEVENTS | ENM_LINK);
 	m_reNotes.SendMessage(EM_AUTOURLDETECT, TRUE, 0);
 
@@ -612,8 +612,8 @@ void CAddEntryDlg::OnCheckHidePw()
 
 		// m_pEditPw.SetFont(&m_fStyle, TRUE);
 		// m_pRepeatPw.SetFont(&m_fStyle, TRUE);
-		CFontUtil::AssignMono(&m_pEditPw, this);
-		CFontUtil::AssignMono(&m_pRepeatPw, this);
+		CFontUtil::AssignPassword(&m_pEditPw, this);
+		CFontUtil::AssignPassword(&m_pRepeatPw, this);
 	}
 	else // m_bStars == TRUE
 	{
@@ -1335,10 +1335,10 @@ void CAddEntryDlg::UrlToCombo(bool bGuiToInternals)
 	}
 }
 
-CString CAddEntryDlg::GetEntryFieldRef()
+CString CAddEntryDlg::GetEntryFieldRef(DWORD dwDefaultRef)
 {
 	CFieldRefDlg dlg;
-	dlg.InitEx(m_pMgr, m_pParentIcons);
+	dlg.InitEx(m_pMgr, m_pParentIcons, dwDefaultRef);
 
 	if(NewGUI_DoModal(&dlg) == IDOK) return dlg.m_strFieldRef;
 	return CString();
@@ -1347,14 +1347,14 @@ CString CAddEntryDlg::GetEntryFieldRef()
 void CAddEntryDlg::OnInsertFieldReferenceInTitleField()
 {
 	UpdateData(TRUE);
-	m_strTitle += GetEntryFieldRef();
+	m_strTitle += GetEntryFieldRef(PWMF_TITLE);
 	UpdateData(FALSE);
 }
 
 void CAddEntryDlg::OnInsertFieldReferenceInUserNameField()
 {
 	UpdateData(TRUE);
-	m_strUserName += GetEntryFieldRef();
+	m_strUserName += GetEntryFieldRef(PWMF_USER);
 	UpdateData(FALSE);
 }
 
@@ -1363,7 +1363,7 @@ void CAddEntryDlg::OnInsertFieldReferenceInPasswordField()
 	LPTSTR lpPw = m_pEditPw.GetPassword();
 	LPTSTR lpRe = m_pRepeatPw.GetPassword();
 
-	CString strNew = GetEntryFieldRef();
+	CString strNew = GetEntryFieldRef(PWMF_PASSWORD);
 	CString strPw = CString(lpPw) + strNew;
 	CString strRe = CString(lpRe) + strNew;
 
@@ -1379,13 +1379,13 @@ void CAddEntryDlg::OnInsertFieldReferenceInPasswordField()
 void CAddEntryDlg::OnInsertFieldReferenceInUrlField()
 {
 	UpdateData(TRUE);
-	m_strURL += GetEntryFieldRef();
+	m_strURL += GetEntryFieldRef(PWMF_URL);
 	UpdateData(FALSE);
 }
 
 void CAddEntryDlg::OnInsertFieldReferenceInNotesField()
 {
-	CString strNew = GetEntryFieldRef();
+	CString strNew = GetEntryFieldRef(PWMF_ADDITIONAL);
 	NewGUI_AppendToRichEditCtrl(&m_reNotes, strNew, true);
 }
 
