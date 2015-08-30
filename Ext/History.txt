@@ -1,3 +1,11 @@
+04/02/22 - 0.92a
+- Smaller Windows installer
+- The default filename suggestions of export files now depend
+  on what you are exporting (i.e. database name or group name)
+- The filename of the currently opened database is shown in the
+  title bar now
+- Fixed a bug in the notes field processing
+
 04/02/21 - 0.91
 - Added Czech translation (thanks to Lubos Stanek!)
 - Added Estonian translation (thanks to Andri Viiand!)

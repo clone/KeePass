@@ -1,11 +1,12 @@
-|~LanguageName|
-	|~Èeština|
-|~LanguageVersion|
-	|~KeyPass 0.90a, Czech 1.0|
-|~LanguageAuthor|
-	|~Luboš Stanìk|
-|~LanguageAuthorEmail|
-	|~stanekl@atlas.cz|
+|~LANGUAGENAME|        The translated string should look like English for example
+	|Èeština|
+|~LANGUAGEVERSION|     Example: Designed for KeePass 0.90a
+	|Navržen pro KeePass 0.91|
+|~LANGUAGEAUTHOR|      Example: Dominik Reichl
+	|Luboš Stanìk|
+|~LANGUAGEAUTHOREMAIL| Example: blabala@yourprovider.net, http://youhaveahomepage.net
+	|lubek@users.sourceforge.net, http://sourceforge.net/users/lubek/|
+
 |&OK|
 	|&OK|
 |&Cancel|
@@ -13,7 +14,7 @@
 |&Close|
 	|&Zavøít|
 |Password Safe|
-	|Heslový trezor|
+	|Password Safe|
 
 |&Generate Random Password|
 	|&Generovat náhodné heslo|
@@ -197,7 +198,7 @@
 |Random mouse input|
 	|Náhodný vstup myši|
 |Click to begin:|
-	|Start klikem:|
+	|Kliknutím zahajte:|
 |Use &Mouse As Random Source|
 	|Použít &myš jako zdroj nahodilosti|
 |Move the mouse in the field above until this is full:|
@@ -406,7 +407,7 @@
 	|Soubor nelze uložit!|
 
 |Password Safe files|
-	|Soubory Heslového trezoru|
+	|Soubory Password Safe|
 |All files|
 	|Všechny soubory|
 
@@ -555,7 +556,7 @@
 |First close the open file before opening another one!|
 	|Nejprve uzavøete otevøený soubor než otevøete další!|
 |Every second row has a different background color. Use this color:|
-	|Každá druhá døádka má odlišnou barvu pozadí. Použít tuto barvu:|
+	|Každá druhá øádka má odlišnou barvu pozadí. Použít tuto barvu:|
 |Start:|
 	|Start:|
 |Exit:|
@@ -627,3 +628,45 @@
 
 |GUI: Automatically resize table columns when resizing the main window|
 	|GUI: Automaticky upravit velikost sloupcù tabulky, když se mìní velikost hlavního okna|
+
+|TAN Wizard|
+	|Prùvodce kódy TAN|
+|&TAN Wizard|
+	|Prùvodce kódy &TAN|
+|Using this wizard you can easily add TAN entries.|
+	|S pomocí tohoto prùvodce mùžete snadno pøidat záznamy kódù TAN.|
+|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-numerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only numerical 'substrings' are added as TAN entries.|
+	|Do okna editace níže vložte vaše kódy TAN. Formátování ve skuteènosti nehraje roli, všechny neèíselné znaky jsou ignorovány (t.j. konce øádkù, tabulátory, mezery, atd...) a pouze èíselné 'èásti textu' jsou pøidány jako položky kódù TAN.|
+|<TAN>|
+	|<TAN>|
+
+|&Copy|
+	|&Kopírovat|
+|Copy &All|
+	|Zkopírovat vš&e|
+|&Undo|
+	|&Zpìt|
+|&Paste|
+	|V&ložit|
+|Cu&t|
+	|&Vyjmout|
+|&Select All|
+	|Vybr&at vše|
+|&Delete|
+	|Vy&mazat|
+
+|Print Pre&view...|
+	|&Náhled tisku...|
+
+|About &Translation...|
+	|O pøekladu...|
+|Translation information|
+	|Informace o pøekladu|
+|Currently used language|
+	|Aktuální jazyk|
+|Language file version|
+	|Verze jazykového souboru|
+|Author|
+	|Autor|
+|Translation author contact|
+	|Kontakt na autora pøekladu|

@@ -88,7 +88,7 @@ public:
 	DWORD GetSelectedGroup();
 	DWORD GetSafeSelectedGroup();
 
-	CString GetExportFile(int nFormat);
+	CString GetExportFile(int nFormat, LPCTSTR lpFileName = NULL);
 	void ExportSelectedGroup(int nFormat);
 
 	CString _MakeRtfString(LPCTSTR lptString);

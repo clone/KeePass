@@ -28,7 +28,7 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CAutoRichEditCtrl message handlers
 
-CString CAutoRichEditCtrl::GetRTF(int nStreamType)
+CString CAutoRichEditCtrl::GetRTF()
 {
 	// Return the RTF string of the text in the control.
 	
@@ -37,11 +37,12 @@ CString CAutoRichEditCtrl::GetRTF(int nStreamType)
 	es.dwError = 0;
 	es.pfnCallback = CBStreamOut;		// Set the callback
 
-	CString sRTF = "";
+	CString sRTF;
+	sRTF.Empty();
 
 	es.dwCookie = (DWORD) &sRTF;	// so sRTF receives the string
-	
-	StreamOut(nStreamType, es);			// Call CRichEditCtrl::StreamOut to get the string.
+
+	StreamOut(SF_RTF, es);			// Call CRichEditCtrl::StreamOut to get the string.
 	///
 
 	return sRTF;
@@ -99,14 +100,13 @@ DWORD CALLBACK CAutoRichEditCtrl::CBStreamIn(DWORD dwCookie, LPBYTE pbBuff, LONG
 DWORD CALLBACK CAutoRichEditCtrl::CBStreamOut(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
 	// Address of our string var is in psEntry
-	CString *psEntry = (CString*) dwCookie;
-	
+	CString *psEntry = (CString *)dwCookie;
 
-	CString tmpEntry = "";
-	tmpEntry = (CString) pbBuff;
+	CString tmpEntry;
+	tmpEntry = CString((LPCSTR)pbBuff);
 
 	// And write it!!!
-	*psEntry += tmpEntry.Left(cb);
+	if(cb != 0) *psEntry += tmpEntry.Left(cb);
 
 	return 0;
 }

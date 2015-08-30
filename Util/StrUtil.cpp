@@ -427,3 +427,22 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry)
 	*pString = str;
 	EraseCString(&str);
 }
+
+CString CsFileOnly(CString *psFilePath)
+{
+	CString str;
+	int i;
+
+	ASSERT(psFilePath != NULL); if(psFilePath == NULL) return CString("");
+
+	i = psFilePath->ReverseFind(_T('\\'));
+	if(i == -1) i = psFilePath->ReverseFind(_T('/'));
+
+	if(i == -1) str = *psFilePath;
+	else
+	{
+		str = psFilePath->Right(psFilePath->GetLength() - i - 1);
+	}
+
+	return str;
+}

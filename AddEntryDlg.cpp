@@ -270,7 +270,7 @@ void CAddEntryDlg::OnOK()
 	m_tExpire.btHour = (BYTE)m_editTime.GetHour();
 	m_tExpire.btMinute = (BYTE)m_editTime.GetMinute();
 	m_tExpire.btSecond = (BYTE)m_editTime.GetSecond();
-	m_strNotes = m_reNotes.GetRTF(SF_TEXT);
+	m_reNotes.GetWindowText(m_strNotes);
 
 	m_nGroupId = m_pGroups.GetCurSel();
 

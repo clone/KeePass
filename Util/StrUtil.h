@@ -65,4 +65,7 @@ void _PwTimeToString(PW_TIME t, CString *pstrDest);
 void _UuidToString(const BYTE *pUuid, CString *pstrDest);
 void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid);
 
+// Get the filename of the file in psFilePath
+CString CsFileOnly(CString *psFilePath);
+
 #endif

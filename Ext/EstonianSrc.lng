@@ -399,3 +399,33 @@
 |Mass Modify|                  |Muuda kõiki|
 |Change fields of all selected entries|        |Muuda kõikide valitud sissekannete väljasid|
 
+|&Copy|						   |&Kopeeri|
+|Copy &All|                    |K&opeeri kõik|
+|&Undo|						   |&Ennista|
+|&Paste|                       |Kleeb&i|
+|Cu&t|                         |&Lõika|
+|&Select All|				   |&Vali kõik|
+|&Delete|                      |K&ustuta|
+
+|TAN Wizard|                   |TAN Viisard|
+|&TAN Wizard|                  |&TAN Viisard|
+|Using this wizard you can easily add TAN entries.|
+	|Kasutades seda viisardit võite kergesti lisada TAN sissekandeid.|
+
+|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-numerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only numerical 'substrings' are added as TAN entries.|
+	|Lihtsalt kleepige oma TAN-id allolevasse aknasse. Formaatimine ei ole oluline, kõik mitte-numbrilised tähed ignoreeritakse (uue rea sümbolid, taandread, tühikud jne...) ja ainult numbrilsed 'alamsõned' lisatakse TAN sissekannete hulka.|
+|<TAN>|                        |<TAN>|
+
+|Print Pre&view...|            |Printimise eel&vaade...|
+
+|About &Translation...|		   |Tõlke &Tiitelinfo...|
+|Translation information|      |Tõlke informatsioon|
+|Currently used language|      |Hetkel kasutuses olev keel|
+|Language file version|        |Keelefaili versioon|
+|Author|                       |Autor|
+|Translation author contact|   |Tõlke autori kontaktandmed|
+
+|~LANGUAGENAME|                |Estonian|
+|~LANGUAGEVERSION|             |Designed for KeePass 0.91|
+|~LANGUAGEAUTHOR|              |Andri Viiand|
+|~LANGUAGEAUTHOREMAIL|         |andriv@users.sourceforge.net, http://sourceforge.net/users/andriv|

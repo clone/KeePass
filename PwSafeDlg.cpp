@@ -2845,6 +2845,8 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 	}
 
 	strText = PWM_PRODUCT_NAME;
+	strText += _T(" - ");
+	strText += CsFileOnly(&m_strFile);
 	SetWindowText(strText);
 	m_systray.SetIcon(m_hTrayIconNormal);
 	m_systray.SetTooltipText(strText);
@@ -2874,6 +2876,13 @@ void CPwSafeDlg::OnFileSave()
 
 	m_strLastDb = m_strFile;
 	m_bModified = FALSE;
+
+	CString strText;
+	strText = PWM_PRODUCT_NAME;
+	strText += _T(" - ");
+	strText += CsFileOnly(&m_strFile);
+	SetWindowText(strText);
+
 	_UpdateToolBar();
 }
 
@@ -2911,8 +2920,15 @@ void CPwSafeDlg::OnFileSaveAs()
 			m_strFile = strFile;
 			m_bModified = FALSE;
 			m_strLastDb = strFile;
+
+			CString strText;
+			strText = PWM_PRODUCT_NAME;
+			strText += _T(" - ");
+			strText += CsFileOnly(&m_strFile);
+			SetWindowText(strText);
 		}
 	}
+
 	_UpdateToolBar();
 }
 
@@ -3195,7 +3211,7 @@ void CPwSafeDlg::OnUpdatePwlistAdd(CCmdUI* pCmdUI)
 	pCmdUI->Enable(m_bFileOpen);
 }
 
-CString CPwSafeDlg::GetExportFile(int nFormat)
+CString CPwSafeDlg::GetExportFile(int nFormat, LPCTSTR lpFileName)
 {
 	DWORD dwFlags;
 	LPTSTR lp;
@@ -3210,7 +3226,9 @@ CString CPwSafeDlg::GetExportFile(int nFormat)
 	else if(nFormat == PWEXP_CSV) lp = _T("csv");
 	else { ASSERT(FALSE); }
 
-	strSample = _T("Export.");
+	if(lpFileName == NULL) strSample = _T("Export");
+	else strSample = lpFileName;
+	strSample += _T(".");
 	strSample += lp;
 
 	strFilter = TRL("All files");
@@ -3235,7 +3253,7 @@ void CPwSafeDlg::OnExportTxt()
 	cExp.SetManager(&m_mgr);
 	cExp.SetNewLineSeq(m_bWindowsNewLine);
 	cExp.SetFormat(PWEXP_TXT);
-	strFile = GetExportFile(PWEXP_TXT);
+	strFile = GetExportFile(PWEXP_TXT, CsFileOnly(&m_strFile));
 	if(strFile.GetLength() != 0) cExp.ExportAll(strFile);
 }
 
@@ -3247,7 +3265,7 @@ void CPwSafeDlg::OnExportHtml()
 	cExp.SetManager(&m_mgr);
 	cExp.SetNewLineSeq(m_bWindowsNewLine);
 	cExp.SetFormat(PWEXP_HTML);
-	strFile = GetExportFile(PWEXP_HTML);
+	strFile = GetExportFile(PWEXP_HTML, CsFileOnly(&m_strFile));
 	if(strFile.GetLength() != 0) cExp.ExportAll(strFile);
 }
 
@@ -3259,7 +3277,7 @@ void CPwSafeDlg::OnExportXml()
 	cExp.SetManager(&m_mgr);
 	cExp.SetNewLineSeq(m_bWindowsNewLine);
 	cExp.SetFormat(PWEXP_XML);
-	strFile = GetExportFile(PWEXP_XML);
+	strFile = GetExportFile(PWEXP_XML, CsFileOnly(&m_strFile));
 	if(strFile.GetLength() != 0) cExp.ExportAll(strFile);
 }
 
@@ -3271,7 +3289,7 @@ void CPwSafeDlg::OnExportCsv()
 	cExp.SetManager(&m_mgr);
 	cExp.SetNewLineSeq(m_bWindowsNewLine);
 	cExp.SetFormat(PWEXP_CSV);
-	strFile = GetExportFile(PWEXP_CSV);
+	strFile = GetExportFile(PWEXP_CSV, CsFileOnly(&m_strFile));
 	if(strFile.GetLength() != 0) cExp.ExportAll(strFile);
 }
 
@@ -3612,7 +3630,7 @@ void CPwSafeDlg::ExportSelectedGroup(int nFormat)
 	cExp.SetManager(&m_mgr);
 	cExp.SetNewLineSeq(m_bWindowsNewLine);
 	cExp.SetFormat(nFormat);
-	strFile = GetExportFile(nFormat);
+	strFile = GetExportFile(nFormat, m_mgr.GetGroup(dwSelectedGroup)->pszGroupName);
 	if(strFile.GetLength() != 0) cExp.ExportGroup(strFile, m_mgr.GetGroupIdByIndex(dwSelectedGroup));
 }
 
@@ -4091,6 +4109,8 @@ void CPwSafeDlg::OnFileLock()
 		m_sbStatus.SetText(TRL("Ready."), 255, 0);
 
 		strExtended = PWM_PRODUCT_NAME;
+		strExtended += _T(" - ");
+		strExtended += CsFileOnly(&m_strFile);
 		SetWindowText(strExtended);
 		m_systray.SetIcon(m_hTrayIconNormal);
 		m_systray.SetTooltipText(strExtended);
