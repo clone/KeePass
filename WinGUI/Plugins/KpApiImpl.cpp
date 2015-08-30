@@ -62,6 +62,7 @@ STDMETHODIMP CKpApiImpl::QueryInterface(REFIID riid, void** ppvObject)
 	KP_SUPPORT_INTERFACE(IID_IKpUnknown, IKpUnknown);
 	KP_SUPPORT_INTERFACE(IID_IKpAPI, IKpAPI);
 	KP_SUPPORT_INTERFACE(IID_IKpAPI2, IKpAPI2);
+	KP_SUPPORT_INTERFACE(IID_IKpAPI3, IKpAPI3);
 
 	*ppvObject = NULL;
 	return E_NOINTERFACE;
@@ -175,8 +176,13 @@ STDMETHODIMP_(DWORD) CKpApiImpl::GetDebugLevel()
 
 STDMETHODIMP_(HWND) CKpApiImpl::GetMainWindowHandle()
 {
-	CWnd* pWnd = AfxGetMainWnd();
-	return ((pWnd != NULL) ? pWnd->m_hWnd : NULL);
+	if(g_pMainDlg == NULL)
+	{
+		CWnd* pWnd = AfxGetMainWnd();
+		return ((pWnd != NULL) ? pWnd->m_hWnd : NULL);
+	}
+
+	return g_pMainDlg->m_hWnd;
 }
 
 STDMETHODIMP_(HIMAGELIST) CKpApiImpl::GetClientIconsImageList()
@@ -370,6 +376,137 @@ STDMETHODIMP CKpApiImpl::SetProperty(DWORD dwID, void* pNewValue)
 	UNREFERENCED_PARAMETER(pNewValue);
 
 	return E_NOTIMPL;
+}
+
+STDMETHODIMP_(BOOL) CKpApiImpl::IsFileLocked()
+{
+	return g_pMainDlg->m_bLocked;
+}
+
+STDMETHODIMP CKpApiImpl::LockFile(BOOL bLock)
+{
+	g_pMainDlg->_ChangeLockState(bLock);
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CKpApiImpl::IsFileReadOnly()
+{
+	return g_pMainDlg->m_bFileReadOnly;
+}
+
+STDMETHODIMP CKpApiImpl::NotifyUserActivity()
+{
+	g_pMainDlg->NotifyUserActivity();
+	return S_OK;
+}
+
+STDMETHODIMP CKpApiImpl::ParseAndOpenUrlWithEntryInfo(LPCTSTR lpUrl, PW_ENTRY* pEntry)
+{
+	g_pMainDlg->ParseAndOpenURLWithEntryInfo(lpUrl, pEntry);
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CKpApiImpl::CanSort()
+{
+	return g_pMainDlg->_CheckIfCanSort();
+}
+
+STDMETHODIMP CKpApiImpl::SortListIfAutoSort()
+{
+	g_pMainDlg->_SortListIfAutoSort();
+	return S_OK;
+}
+
+STDMETHODIMP CKpApiImpl::SortList(DWORD dwByField, BOOL bAutoSortCall)
+{
+	g_pMainDlg->_SortList(dwByField, bAutoSortCall);
+	return S_OK;
+}
+
+STDMETHODIMP CKpApiImpl::EntryListSaveView()
+{
+	g_pMainDlg->_List_SaveView();
+	return S_OK;
+}
+
+STDMETHODIMP CKpApiImpl::EntryListRestoreView()
+{
+	g_pMainDlg->_List_RestoreView();
+	return S_OK;
+}
+
+STDMETHODIMP CKpApiImpl::GroupTreeSaveView(BOOL bSaveSelection)
+{
+	g_pMainDlg->_Groups_SaveView(bSaveSelection);
+	return S_OK;
+}
+
+STDMETHODIMP CKpApiImpl::GroupTreeRestoreView()
+{
+	g_pMainDlg->_Groups_RestoreView();
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CKpApiImpl::RemoveSearchGroup()
+{
+	return g_pMainDlg->_RemoveSearchGroup();
+}
+
+STDMETHODIMP CKpApiImpl::UpdateTitleBar()
+{
+	g_pMainDlg->_UpdateTitleBar();
+	return S_OK;
+}
+
+STDMETHODIMP CKpApiImpl::UpdateTrayIcon()
+{
+	g_pMainDlg->_UpdateTrayIcon();
+	return S_OK;
+}
+
+STDMETHODIMP CKpApiImpl::UpdateGuiToManager()
+{
+	g_pMainDlg->_UpdateGuiToManager();
+	return S_OK;
+}
+
+STDMETHODIMP CKpApiImpl::UpdateCachedGroupIDs()
+{
+	g_pMainDlg->_UpdateCachedGroupIDs();
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CKpApiImpl::IsUnsafeAllowed(HWND hWndParent)
+{
+	return CPwSafeDlg::IsUnsafeAllowed(hWndParent);
+}
+
+STDMETHODIMP CKpApiImpl::Find(DWORD dwFindGroupId)
+{
+	g_pMainDlg->_Find(dwFindGroupId);
+	return S_OK;
+}
+
+STDMETHODIMP CKpApiImpl::QuickFind(LPCTSTR lpText)
+{
+	g_pMainDlg->_DoQuickFind(lpText);
+	return S_OK;
+}
+
+STDMETHODIMP CKpApiImpl::ShowToolBar(BOOL bShow)
+{
+	g_pMainDlg->_ShowToolBar(bShow);
+	return S_OK;
+}
+
+STDMETHODIMP_(UINT) CKpApiImpl::GetControlMessageID()
+{
+	return CPwSafeDlg::GetKeePassControlMessageID();
+}
+
+STDMETHODIMP_(BOOL) CKpApiImpl::IsInMiniMode()
+{
+	return CPwSafeDlg::m_bMiniMode;
 }
 
 // ////////////////////////////////////////////////////////////////////////

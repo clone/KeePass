@@ -285,7 +285,7 @@ void CFieldRefDlg::EnableChildControls()
 
 void CFieldRefDlg::OnBnClickedBtnHelp()
 {
-	WU_OpenAppHelp(PWM_HELP_FIELDREFS);
+	WU_OpenAppHelp(PWM_HELP_FIELDREFS, m_hWnd);
 }
 
 void CFieldRefDlg::OnNMClickListEntries(NMHDR *pNMHDR, LRESULT *pResult)

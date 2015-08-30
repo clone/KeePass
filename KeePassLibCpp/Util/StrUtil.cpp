@@ -25,7 +25,10 @@
 #include "../Crypto/MemoryProtectionEx.h"
 
 #ifndef _WIN32_WCE
+#pragma warning(push)
+#pragma warning(disable: 4996) // SCL warning
 #include <boost/algorithm/string.hpp>
+#pragma warning(pop)
 #endif
 
 // Securely erase a CString object
@@ -776,6 +779,8 @@ std::vector<std::basic_string<TCHAR> > SU_SplitSearchTerms(LPCTSTR lpSearch)
 }
 
 #ifndef _WIN32_WCE
+#pragma warning(push)
+#pragma warning(disable: 4996) // SCL warning
 std::basic_string<TCHAR> SU_GetQuotedPath(const std::basic_string<TCHAR>& strPath)
 {
 	std::basic_string<TCHAR> str = strPath;
@@ -794,6 +799,7 @@ std::basic_string<TCHAR> SU_GetQuotedPath(const std::basic_string<TCHAR>& strPat
 
 	return str.substr(iStart + 1, iEnd - iStart - 1);
 }
+#pragma warning(pop)
 #endif
 
 CString SU_ConvertNewLines(LPCTSTR lpText, LPCTSTR lpNewLineSeq)
@@ -806,6 +812,21 @@ CString SU_ConvertNewLines(LPCTSTR lpText, LPCTSTR lpNewLineSeq)
 	str.Replace(_T("\n"), lpNewLineSeq);
 	return str;
 }
+
+#pragma warning(push)
+#pragma warning(disable: 4996) // SCL warning
+void SU_Split(std::vector<std::basic_string<TCHAR>>& vOut, const std::basic_string<TCHAR>& strData,
+	LPCTSTR lpSplitChars)
+{
+	if((lpSplitChars == NULL) || (lpSplitChars[0] == 0))
+	{
+		vOut.push_back(strData);
+		return;
+	}
+
+	boost::algorithm::split(vOut, strData, boost::algorithm::is_any_of(lpSplitChars));
+}
+#pragma warning(pop)
 
 /////////////////////////////////////////////////////////////////////////////
 // WCharStream class

@@ -36,7 +36,6 @@
 #include "NewGUI/ThemeHelperST.h"
 #include "NewGUI/CustomListCtrlEx.h"
 #include "NewGUI/CustomTreeCtrlEx.h"
-#include "NewGUI/SystemTray.h"
 #include "NewGUI/SystemTrayEx.h"
 #include "NewGUI/AutoRichEditCtrlFx.h"
 #include "Plugins/PluginMgr.h"
@@ -135,6 +134,8 @@ public:
 	void UpdateGroupList();
 	void UpdatePasswordList();
 	void RefreshPasswordList(); // Refresh entries by UUID
+
+	void _ChangeLockState(BOOL bLocked);
 
 	DWORD GetSelectedEntry();
 	DWORD GetSelectedEntriesCount();
@@ -282,6 +283,7 @@ public:
 	CString m_strFileAbsolute;
 	BOOL m_bFileOpen;
 	BOOL m_bModified;
+	BOOL m_bLocked;
 	BOOL m_bFileReadOnly;
 	BOOL m_bInitialCmdLineFile;
 
@@ -330,7 +332,6 @@ private:
 
 	BOOL m_bExiting;
 	BOOL m_bIsLocking;
-	BOOL m_bLocked;
 	long m_nLockedViewParams[3];
 	BOOL m_bWasMaximized;
 	BOOL m_bMinimized;
@@ -368,6 +369,7 @@ private:
 	BOOL m_bShowUUID;
 	BOOL m_bShowAttach;
 	BOOL m_bLockOnMinimize;
+	BOOL m_bMinimizeOnLock;
 	BOOL m_bMinimizeToTray;
 	BOOL m_bCloseMinimizes;
 	BOOL m_bEntryView;
@@ -480,7 +482,6 @@ private:
 	static DWORD m_dwCachedBackupSrcGroupID;
 
 private:
-	void _ChangeLockState(BOOL bLocked);
 	void SetViewHideState(BOOL bReqVisible, BOOL bPreferTray);
 	void ToggleViewHideState(BOOL bPreferTray);
 	void SetTrayState(BOOL bMinimizeToTray);
@@ -676,6 +677,7 @@ protected:
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnViewEntryView();
 	afx_msg void OnReCopySel();
+	afx_msg void OnUpdateReCopySel(CCmdUI* pCmdUI);
 	afx_msg void OnReCopyAll();
 	afx_msg void OnReSelectAll();
 	afx_msg void OnExtrasTanWizard();
@@ -773,6 +775,7 @@ protected:
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 
 	afx_msg LRESULT OnTaskbarCreated(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnTaskbarButtonCreated(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnProcessMailslot(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnKeePassControlMessage(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnWTSSessionChange(WPARAM wParam, LPARAM lParam);

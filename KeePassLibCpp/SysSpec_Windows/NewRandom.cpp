@@ -167,7 +167,7 @@ void CNewRandom::Initialize()
 	AddRandomObject(&g_dwNewRandomInstanceCounter, 4);
 }
 
-void CNewRandom::AddRandomObject(__in_bcount(uSize) const void *pObj, size_t uSize)
+void CNewRandom::AddRandomObject(_In_bytecount_(uSize) const void *pObj, size_t uSize)
 {
 	ASSERT(pObj != NULL); if(pObj == NULL) return;
 
@@ -192,7 +192,7 @@ void CNewRandom::ClearUserEntropyPool()
 	m_vUserRandom.clear();
 }
 
-void CNewRandom::GetRandomBuffer(__out_bcount(dwSize) BYTE *pBuf, DWORD dwSize)
+void CNewRandom::GetRandomBuffer(_Out_bytecap_(dwSize) BYTE *pBuf, DWORD dwSize)
 {
 	sha256_ctx hashctx;
 	BYTE aTemp[32];

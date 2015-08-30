@@ -30,8 +30,7 @@
 #include "Util/WinUtil.h"
 #include "afxwin.h"
 
-#define PWAE_STDURL_A ""
-#define PWAE_STDURL   _T(PWAE_STDURL_A)
+#define PWAE_STDURL   _T("")
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -129,11 +128,16 @@ protected:
 	afx_msg void OnRandomPwBtn();
 	afx_msg void OnReCopyAll();
 	afx_msg void OnReCopySel();
+	afx_msg void OnUpdateReCopySel(CCmdUI* pCmdUI);
 	afx_msg void OnReDelete();
+	afx_msg void OnUpdateReDelete(CCmdUI* pCmdUI);
 	afx_msg void OnRePaste();
+	afx_msg void OnUpdateRePaste(CCmdUI* pCmdUI);
 	afx_msg void OnReSelectAll();
 	afx_msg void OnReCut();
+	afx_msg void OnUpdateReCut(CCmdUI* pCmdUI);
 	afx_msg void OnReUndo();
+	afx_msg void OnUpdateReUndo(CCmdUI* pCmdUI);
 	afx_msg void OnSetAttachBtn();
 	afx_msg void OnSaveAttachBtn();
 	afx_msg void OnRemoveAttachBtn();

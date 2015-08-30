@@ -45,13 +45,6 @@ struct KP_DECL_INTERFACE("D55D9ADD-49DD-4704-BED1-539A5797B16C") IKpFullPathName
 	public IKpUnknown
 {
 public:
-	// *** IKpUnknown methods ***
-	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObject) = 0;
-	STDMETHOD_(ULONG, AddRef)() = 0;
-	STDMETHOD_(ULONG, Release)() = 0;
-
-	// *** IKpFullPathName methods ***
-
 	/// Get the state of this object.
 	/// @return Possible return values are:
 	/// - KPFPN_UNINITIALIZED. The object has not been initialized yet.

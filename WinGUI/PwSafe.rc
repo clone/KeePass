@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Deutsch (Deutschland) resources
+// German (Germany) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
 #ifdef _WIN32
@@ -57,12 +57,12 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Deutsch (Deutschland) resources
+#endif    // German (Germany) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Englisch (USA) resources
+// English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -841,8 +841,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,0,0
- PRODUCTVERSION 1,2,0,0
+ FILEVERSION 1,2,1,0
+ PRODUCTVERSION 1,2,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -859,13 +859,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.20"
-            VALUE "FileVersion", "1.2.0.0"
+            VALUE "FileDescription", "KeePass Password Safe 1.21"
+            VALUE "FileVersion", "1.2.1.0"
             VALUE "InternalName", "PwSafe"
             VALUE "LegalCopyright", "Copyright (c) 2003-2011 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.20"
-            VALUE "ProductVersion", "1.2.0.0"
+            VALUE "ProductName", "KeePass Password Safe 1.21"
+            VALUE "ProductVersion", "1.2.1.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -984,8 +984,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Show &Expired Entries",       ID_EXTRAS_SHOWEXPIRED
         MENUITEM SEPARATOR
-        MENUITEM "&Options...",                 ID_SAFE_OPTIONS
         MENUITEM "&Plugins...",                 ID_EXTRAS_PLUGINMGR
+        MENUITEM "&Options...",                 ID_SAFE_OPTIONS
     END
     POPUP "&Help"
     BEGIN
@@ -1389,7 +1389,7 @@ BEGIN
     IDS_ABOUTBOX            "&About KeePass..."
 END
 
-#endif    // Englisch (USA) resources
+#endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

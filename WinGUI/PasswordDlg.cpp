@@ -31,8 +31,6 @@
 #include "Util/PrivateConfigEx.h"
 #include "Util/KeySourcesPool.h"
 
-#include <boost/algorithm/string.hpp>
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -683,7 +681,7 @@ void CPasswordDlg::OnCheckStars()
 
 void CPasswordDlg::OnHelpBtn() 
 {
-	WU_OpenAppHelp(PWM_HELP_KEYS);
+	WU_OpenAppHelp(PWM_HELP_KEYS, m_hWnd);
 }
 
 void CPasswordDlg::OnChangeEditPassword() 

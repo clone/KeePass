@@ -45,13 +45,6 @@ struct KP_DECL_INTERFACE("29A5C55A-7100-4A1E-B74D-986C0E085AB2") IKpDatabase :
 	public IKpUnknown
 {
 public:
-	// *** IKpUnknown methods ***
-	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObject) = 0;
-	STDMETHOD_(ULONG, AddRef)() = 0;
-	STDMETHOD_(ULONG, Release)() = 0;
-
-	// *** IKpDatabase methods ***
-
 	/// Used by KeePass internally, plugins must not call this method.
 	STDMETHOD(InitPrimaryInstance)() = 0;
 

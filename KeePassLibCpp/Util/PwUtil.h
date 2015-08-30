@@ -79,25 +79,25 @@ public:
 	static LPCTSTR GetUniCvtPtr(LPCTSTR lpBase, BOOL bTranslate);
 	static CString FormatError(int nErrorCode, DWORD dwFlags);
 
-	static BOOL MemAllocCopyEntry(__in_ecount(1) const PW_ENTRY *pExisting,
-		__out_ecount(1) PW_ENTRY *pDestination);
-	static void MemFreeEntry(__inout_ecount(1) PW_ENTRY *pEntry);
+	static BOOL MemAllocCopyEntry(_In_ const PW_ENTRY *pExisting,
+		_Out_ PW_ENTRY *pDestination);
+	static void MemFreeEntry(_Inout_ PW_ENTRY *pEntry);
 
 	// Convert PW_TIME to 5-byte compressed structure and the other way round
-	static void TimeToPwTime(__in_ecount(5) const BYTE *pCompressedTime,
-		__out_ecount(1) PW_TIME *pPwTime);
-	static void PwTimeToTime(__in_ecount(1) const PW_TIME *pPwTime,
-		__out_ecount(5) BYTE *pCompressedTime);
+	static void TimeToPwTime(_In_bytecount_c_(5) const BYTE *pCompressedTime,
+		_Out_ PW_TIME *pPwTime);
+	static void PwTimeToTime(_In_ const PW_TIME *pPwTime,
+		_Out_bytecap_c_(5) BYTE *pCompressedTime);
 
-	static BOOL AttachFileAsBinaryData(__inout_ecount(1) PW_ENTRY *pEntry,
+	static BOOL AttachFileAsBinaryData(_Inout_ PW_ENTRY *pEntry,
 		const TCHAR *lpFile);
-	static BOOL SaveBinaryData(__in_ecount(1) const PW_ENTRY *pEntry,
+	static BOOL SaveBinaryData(_In_ const PW_ENTRY *pEntry,
 		const TCHAR *lpFile);
-	static BOOL RemoveBinaryData(__inout_ecount(1) PW_ENTRY *pEntry);
+	static BOOL RemoveBinaryData(_Inout_ PW_ENTRY *pEntry);
 
 	static BOOL IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName);
 
-	static BOOL IsZeroUUID(__in_ecount(16) const BYTE *pUUID);
+	static BOOL IsZeroUUID(_In_bytecount_c_(16) const BYTE *pUUID);
 	static CString CreateUUIDStr(CNewRandom* pRandomSource);
 	static DWORD GetUniCPT(LPCTSTR lp);
 

@@ -44,13 +44,6 @@ struct KP_DECL_INTERFACE("9700114E-9178-4337-A26F-34A6DA91FBB4") IKpUtilities :
 	public IKpUnknown
 {
 public:
-	// *** IKpUnknown methods ***
-	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObject) = 0;
-	STDMETHOD_(ULONG, AddRef)() = 0;
-	STDMETHOD_(ULONG, Release)() = 0;
-
-	// *** IKpUtilities methods ***
-
 	STDMETHOD(ShowFileDialog)(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf,
 		DWORD dwBufLen) = 0;
 

@@ -36,9 +36,15 @@
 #include "IKpUnknown.h"
 
 // Interface names
+#ifndef _UNICODE
 #define KP_I_CREATEINSTANCE "KpCreateInstance"
 #define KP_I_INITIALIZELIB  "KpInitializeLibrary"
 #define KP_I_RELEASELIB     "KpReleaseLibrary"
+#else
+#define KP_I_CREATEINSTANCE "KpCreateInstanceW"
+#define KP_I_INITIALIZELIB  "KpInitializeLibraryW"
+#define KP_I_RELEASELIB     "KpReleaseLibraryW"
+#endif
 
 #define KP_I_CREATEINSTANCE_DECL KpCreateInstance
 #define KP_I_INITIALIZELIB_DECL  KpInitializeLibrary
@@ -150,6 +156,8 @@ typedef HRESULT(KP_API *LPKPLIBFUNC)(IKpUnknown* pAPI);
 
 #define KPM_DELAYED_INIT 58
 
+#define KPM_CLEANUP 72
+
 // General notifications
 
 #define KPM_INIT_MENU_POPUP 4
@@ -242,6 +250,8 @@ typedef HRESULT(KP_API *LPKPLIBFUNC)(IKpUnknown* pAPI);
 #define KPM_KEYPROV_QUERY_KEY_EX     70
 #define KPM_KEYPROV_FINALIZE         62
 
+// Other messages
+
 #define KPM_OPTIONS_SAVE_GLOBAL      63
 
 #define KPM_VALIDATE_MASTERPASSWORD  64
@@ -253,11 +263,15 @@ typedef HRESULT(KP_API *LPKPLIBFUNC)(IKpUnknown* pAPI);
 #define KPM_USERAPP_GETFIRST         68
 #define KPM_USERAPP_GETNEXT          69
 
+#define KPM_TRAY_NOTIFY              71
+#define KPM_TRAY_CUSTOMIZE_PRE       73
+#define KPM_TRAY_CUSTOMIZE_POST      74
+
 // The following is unused; it's always the last command ID + 1;
 // do not use this value under any circumstances (it will break
 // upward compatibility, if you do!)
 #if (0 == 1)
-#define KPM_NEXT                     71
+#define KPM_NEXT                     75
 #error Your build will not be upward-compatible.
 #endif
 
@@ -319,6 +333,7 @@ typedef HRESULT(KP_API *LPKPLIBFUNC)(IKpUnknown* pAPI);
 // Plugin string identifiers (used for GetProperty method)
 
 #define KPPS_COMMANDLINEARGPREFIX _T("CommandLineArgPrefix")
+#define KPPS_UNLOAD_LATE          _T("UnloadLate")
 
 /////////////////////////////////////////////////////////////////////////////
 // Open mode for IKpUtilities::ShellOpenLocalFile

@@ -16,9 +16,8 @@ COPY /B ..\Docs\License.txt /B WinGUI_Distrib\License.txt
 DEL WinGUI_Distrib\KeePass.ini
 COPY /B ..\Ext\KeePass.ini /B WinGUI_Distrib\KeePass.ini
 
-PING 127.0.0.1 -n 5 > NUL
-
-..\3rdParty\Upx\upx.exe --best --compress-icons=0 WinGUI_Distrib\KeePass.exe
+REM PING 127.0.0.1 -n 5 > NUL
+REM ..\3rdParty\Upx\upx.exe --best --compress-icons=0 WinGUI_Distrib\KeePass.exe
 
 PAUSE
 CLS

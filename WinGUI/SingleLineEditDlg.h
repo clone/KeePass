@@ -21,7 +21,7 @@
 #define ___SINGLE_LINE_EDIT_DLG_H___
 
 #pragma once
-#include "afxwin.h"
+#include <afxwin.h>
 #include "../KeePassLibCpp/SysDefEx.h"
 #include <vector>
 

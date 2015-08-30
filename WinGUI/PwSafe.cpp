@@ -30,6 +30,8 @@
 #include "Util/WinUtil.h"
 #include "Util/CmdLine/CmdArgs.h"
 #include "Util/CmdLine/Executable.h"
+#include "Plugins/KpApiImpl.h"
+#include "Plugins/KpDatabaseImpl.h"
 #include "Plugins/KpCommandLineImpl.h"
 #include "Plugins/KpUtilitiesImpl.h"
 #include "NewGUI/TaskbarListEx/TaskbarListEx.h"
@@ -211,6 +213,12 @@ BOOL CPwSafeApp::InitInstance()
 	const INT_PTR nResponse = dlg.DoModal();
 	if(nResponse == IDOK) { }
 	else if(nResponse == IDCANCEL) { }
+
+	CPluginManager::Instance().UnloadAllPlugins(FALSE);
+	KP_ASSERT_REFS(CKpApiImpl::Instance(), 1);
+	KP_ASSERT_REFS(CKpDatabaseImpl::Instance(), 1);
+	KP_ASSERT_REFS(CKpUtilitiesImpl::Instance(), 1);
+	KP_ASSERT_REFS(CKpCommandLineImpl::Instance(), 1);
 
 	CTaskbarListEx::Release(false);
 	NSCAPI_Exit(); // Clean up natural string comparison API

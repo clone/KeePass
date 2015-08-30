@@ -19,23 +19,27 @@
 
 #include "StdAfx.h"
 #include "SystemTrayEx.h"
+#include "../Plugins/PluginMgr.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
 
 void CSystemTrayEx::CustomizeMenu(CMenu *pMenu)
 {
+	if(pMenu == NULL) { ASSERT(FALSE); return; }
+
+	_CallPlugins(KPM_TRAY_CUSTOMIZE_PRE, (LPARAM)(pMenu->m_hMenu), 0);
+
 	// Translate the menu
-
-	CString strItem, strNew;
-	UINT nItem = 0, nItemID = 0;
-
-	for(nItem = 0; nItem < pMenu->GetMenuItemCount(); nItem++)
+	for(UINT uItem = 0; uItem < pMenu->GetMenuItemCount(); ++uItem)
 	{
-		nItemID = pMenu->GetMenuItemID((int)nItem);
-		if(nItemID == 0) { continue; }
+		const UINT uItemID = pMenu->GetMenuItemID(static_cast<int>(uItem));
+		if(uItemID == 0) continue;
 
-		pMenu->GetMenuString(nItem, strItem, MF_BYPOSITION);
+		CString strItem;
+		pMenu->GetMenuString(uItem, strItem, MF_BYPOSITION);
 
-		strNew = TRL_VAR(strItem);
-		VERIFY(pMenu->ModifyMenu(nItem, MF_BYPOSITION | MF_STRING, nItemID, strNew));
+		CString strNew = TRL_VAR(strItem);
+		VERIFY(pMenu->ModifyMenu(uItem, MF_BYPOSITION | MF_STRING, uItemID, strNew));
 	}
+
+	_CallPlugins(KPM_TRAY_CUSTOMIZE_POST, (LPARAM)(pMenu->m_hMenu), 0);
 }

@@ -25,7 +25,7 @@
 
 #pragma pack(1)
 
-class CKpApiImpl : public IKpAPI2
+class CKpApiImpl : public IKpAPI3
 {
 private:
 	CKpApiImpl();
@@ -90,6 +90,43 @@ public:
 
 	STDMETHODIMP GetProperty(DWORD dwID, void* pOutValue);
 	STDMETHODIMP SetProperty(DWORD dwID, void* pNewValue);
+
+	STDMETHODIMP_(BOOL) IsFileLocked();
+	STDMETHODIMP LockFile(BOOL bLock);
+
+	STDMETHODIMP_(BOOL) IsFileReadOnly();
+
+	STDMETHODIMP NotifyUserActivity();
+
+	STDMETHODIMP ParseAndOpenUrlWithEntryInfo(LPCTSTR lpUrl, PW_ENTRY* pEntry);
+
+	STDMETHODIMP_(BOOL) CanSort();
+	STDMETHODIMP SortListIfAutoSort();
+	STDMETHODIMP SortList(DWORD dwByField, BOOL bAutoSortCall);
+
+	STDMETHODIMP EntryListSaveView();
+	STDMETHODIMP EntryListRestoreView();
+
+	STDMETHODIMP GroupTreeSaveView(BOOL bSaveSelection);
+	STDMETHODIMP GroupTreeRestoreView();
+
+	STDMETHODIMP_(BOOL) RemoveSearchGroup();
+
+	STDMETHODIMP UpdateTitleBar();
+	STDMETHODIMP UpdateTrayIcon();
+	STDMETHODIMP UpdateGuiToManager();
+	STDMETHODIMP UpdateCachedGroupIDs();
+
+	STDMETHODIMP_(BOOL) IsUnsafeAllowed(HWND hWndParent);
+
+	STDMETHODIMP Find(DWORD dwFindGroupId);
+	STDMETHODIMP QuickFind(LPCTSTR lpText);
+
+	STDMETHODIMP ShowToolBar(BOOL bShow);
+
+	STDMETHODIMP_(UINT) GetControlMessageID();
+
+	STDMETHODIMP_(BOOL) IsInMiniMode();
 
 private:
 	KP_DECL_STDREFIMPL;

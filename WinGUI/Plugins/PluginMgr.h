@@ -26,6 +26,11 @@
 
 #define DUMMY_COMMAND_LINE_OPT _T("--nop")
 
+#ifndef CFG_VAL_TRUE
+#define CFG_VAL_TRUE      _T("True")
+#define CFG_VAL_FALSE     _T("False")
+#endif
+
 typedef std::basic_string<TCHAR> std_string;
 
 typedef struct
@@ -57,7 +62,7 @@ public:
 	KP_PLUGIN_INSTANCE* GetPluginByID(DWORD dwID);
 
 	BOOL LoadAllPlugins();
-	BOOL UnloadAllPlugins();
+	void UnloadAllPlugins(BOOL bSkipIfLateUnloadReq);
 
 	BOOL CallSinglePlugin(DWORD dwPluginID, DWORD dwCode, LPARAM lParamW, LPARAM lParamL);
 	BOOL CallPlugins(DWORD dwCode, LPARAM lParamW, LPARAM lParamL);

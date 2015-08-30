@@ -44,13 +44,6 @@ struct KP_DECL_INTERFACE("0934C282-6EDC-4073-913F-28B98C0420F8") IKpCommandLine 
 	public IKpUnknown
 {
 public:
-	// *** IKpUnknown methods ***
-	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObject) = 0;
-	STDMETHOD_(ULONG, AddRef)() = 0;
-	STDMETHOD_(ULONG, Release)() = 0;
-
-	// *** IKpCommandLine methods ***
-
 	/// Get the complete command line string for the KeePass process.
 	/// @kpstaticstring
 	STDMETHOD_(LPCTSTR, GetFullCommandLine)() = 0;

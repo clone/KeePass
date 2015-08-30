@@ -93,8 +93,8 @@ std::vector<std::basic_string<TCHAR> > WU_GetFileNames(BOOL bOpenMode,
 
 int WU_GetAppHelpSource();
 void WU_SetAppHelpSource(int nSource);
-BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile);
-// void WU_RemoveAppHelpZoneIdentifier();
+BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile, HWND hParent);
+void WU_RemoveAppHelpZoneIdentifier();
 
 UINT TWinExec(LPCTSTR lpCmdLine, WORD uCmdShow);
 

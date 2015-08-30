@@ -322,8 +322,8 @@ CString CPwUtil::FormatError(int nErrorCode, DWORD dwFlags)
 	return str;
 }
 
-BOOL CPwUtil::MemAllocCopyEntry(__in_ecount(1) const PW_ENTRY *pExisting,
-	__out_ecount(1) PW_ENTRY *pDestination)
+BOOL CPwUtil::MemAllocCopyEntry(_In_ const PW_ENTRY *pExisting,
+	_Out_ PW_ENTRY *pDestination)
 {
 	ASSERT_ENTRY(pExisting); ASSERT(pDestination != NULL);
 	if((pExisting == NULL) || (pDestination == NULL)) return FALSE;
@@ -359,7 +359,7 @@ BOOL CPwUtil::MemAllocCopyEntry(__in_ecount(1) const PW_ENTRY *pExisting,
 	return TRUE;
 }
 
-void CPwUtil::MemFreeEntry(__inout_ecount(1) PW_ENTRY *pEntry)
+void CPwUtil::MemFreeEntry(_Inout_ PW_ENTRY *pEntry)
 {
 	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return;
 
@@ -374,8 +374,8 @@ void CPwUtil::MemFreeEntry(__inout_ecount(1) PW_ENTRY *pEntry)
 	ZeroMemory(pEntry, sizeof(PW_ENTRY));
 }
 
-void CPwUtil::TimeToPwTime(__in_ecount(5) const BYTE *pCompressedTime,
-	__out_ecount(1) PW_TIME *pPwTime)
+void CPwUtil::TimeToPwTime(_In_bytecount_c_(5) const BYTE *pCompressedTime,
+	_Out_ PW_TIME *pPwTime)
 {
 	DWORD dwYear, dwMonth, dwDay, dwHour, dwMinute, dwSecond;
 
@@ -391,8 +391,8 @@ void CPwUtil::TimeToPwTime(__in_ecount(5) const BYTE *pCompressedTime,
 	pPwTime->btSecond = (BYTE)dwSecond;
 }
 
-void CPwUtil::PwTimeToTime(__in_ecount(1) const PW_TIME *pPwTime,
-	__out_ecount(5) BYTE *pCompressedTime)
+void CPwUtil::PwTimeToTime(_In_ const PW_TIME *pPwTime,
+	_Out_bytecap_c_(5) BYTE *pCompressedTime)
 {
 	ASSERT((pPwTime != NULL) && (pCompressedTime != NULL));
 	if(pPwTime == NULL) return;
@@ -402,7 +402,7 @@ void CPwUtil::PwTimeToTime(__in_ecount(1) const PW_TIME *pPwTime,
 		(DWORD)pPwTime->btSecond);
 }
 
-BOOL CPwUtil::AttachFileAsBinaryData(__inout_ecount(1) PW_ENTRY *pEntry,
+BOOL CPwUtil::AttachFileAsBinaryData(_Inout_ PW_ENTRY *pEntry,
 	const TCHAR *lpFile)
 {
 	FILE *fp = NULL;
@@ -447,7 +447,7 @@ BOOL CPwUtil::AttachFileAsBinaryData(__inout_ecount(1) PW_ENTRY *pEntry,
 	return TRUE;
 }
 
-BOOL CPwUtil::SaveBinaryData(__in_ecount(1) const PW_ENTRY *pEntry,
+BOOL CPwUtil::SaveBinaryData(_In_ const PW_ENTRY *pEntry,
 	const TCHAR *lpFile)
 {
 	FILE *fp = NULL;
@@ -466,7 +466,7 @@ BOOL CPwUtil::SaveBinaryData(__in_ecount(1) const PW_ENTRY *pEntry,
 	return TRUE;
 }
 
-BOOL CPwUtil::RemoveBinaryData(__inout_ecount(1) PW_ENTRY *pEntry)
+BOOL CPwUtil::RemoveBinaryData(_Inout_ PW_ENTRY *pEntry)
 {
 	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return FALSE;
 
@@ -486,7 +486,7 @@ BOOL CPwUtil::IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName
 	return TRUE;
 }
 
-BOOL CPwUtil::IsZeroUUID(__in_ecount(16) const BYTE *pUUID)
+BOOL CPwUtil::IsZeroUUID(_In_bytecount_c_(16) const BYTE *pUUID)
 {
 	if(pUUID == NULL) return TRUE;
 	return ((memcmp(pUUID, g_uuidZero, 16) == 0) ? TRUE : FALSE);

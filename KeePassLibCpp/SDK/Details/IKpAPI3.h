@@ -27,33 +27,69 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ___IKPAPI2_H___
-#define ___IKPAPI2_H___
+#ifndef ___IKPAPI3_H___
+#define ___IKPAPI3_H___
 
 #pragma once
 
 #include "../../SysDefEx.h"
 #include "IKpUnknown.h"
 #include "../../PwStructs.h"
-#include "IKpAPI.h"
+#include "IKpAPI2.h"
 
 #pragma pack(1)
 
 /// KeePass API for plugins, provides access to all objects in
 /// KeePass (singletons, instantiable objects, utility method classes, etc).
-struct KP_DECL_INTERFACE("5E6B4B05-4C29-407A-81D4-2BB0D866BA7F") IKpAPI2 :
-	public IKpAPI
+struct KP_DECL_INTERFACE("25BA9CB9-DE60-4076-AAD9-ABC74663A872") IKpAPI3 :
+	public IKpAPI2
 {
 public:
-	STDMETHOD_(BOOL, IsInitialCommandLineFile)() = 0;
+	/// Get whether the current file/workspace is locked or not.
+	STDMETHOD_(BOOL, IsFileLocked)() = 0;
 
-	/// Reserved for future use.
-	STDMETHOD(GetProperty)(DWORD dwID, void* pOutValue) = 0;
+	/// Lock or unlock the workspace.
+	STDMETHOD(LockFile)(BOOL bLock) = 0;
 
-	/// Reserved for future use.
-	STDMETHOD(SetProperty)(DWORD dwID, void* pNewValue) = 0;
+	STDMETHOD_(BOOL, IsFileReadOnly)() = 0;
+
+	STDMETHOD(NotifyUserActivity)() = 0;
+
+	STDMETHOD(ParseAndOpenUrlWithEntryInfo)(LPCTSTR lpUrl, PW_ENTRY* pEntry) = 0;
+
+	STDMETHOD_(BOOL, CanSort)() = 0;
+	STDMETHOD(SortListIfAutoSort)() = 0;
+	STDMETHOD(SortList)(DWORD dwByField, BOOL bAutoSortCall) = 0;
+
+	STDMETHOD(EntryListSaveView)() = 0;
+	STDMETHOD(EntryListRestoreView)() = 0;
+
+	STDMETHOD(GroupTreeSaveView)(BOOL bSaveSelection) = 0;
+	STDMETHOD(GroupTreeRestoreView)() = 0;
+
+	STDMETHOD_(BOOL, RemoveSearchGroup)() = 0;
+
+	STDMETHOD(UpdateTitleBar)() = 0;
+	STDMETHOD(UpdateTrayIcon)() = 0;
+
+	/// Save various view parameters (last selected group and
+	/// entry, ...) into the database.
+	STDMETHOD(UpdateGuiToManager)() = 0;
+	
+	STDMETHOD(UpdateCachedGroupIDs)() = 0;
+
+	STDMETHOD_(BOOL, IsUnsafeAllowed)(HWND hWndParent) = 0;
+
+	STDMETHOD(Find)(DWORD dwFindGroupId) = 0;
+	STDMETHOD(QuickFind)(LPCTSTR lpText) = 0;
+
+	STDMETHOD(ShowToolBar)(BOOL bShow) = 0;
+
+	STDMETHOD_(UINT, GetControlMessageID)() = 0;
+
+	STDMETHOD_(BOOL, IsInMiniMode)() = 0;
 };
 
 #pragma pack()
 
-#endif // ___IKPAPI2_H___
+#endif // ___IKPAPI3_H___

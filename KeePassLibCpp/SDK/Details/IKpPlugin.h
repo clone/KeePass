@@ -43,13 +43,6 @@ struct KP_DECL_INTERFACE("F0A52511-81F0-4F3F-96CF-89B8D02CAC08") IKpPlugin :
 	public IKpUnknown
 {
 public:
-	// *** IKpUnknown methods ***
-	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObject) = 0;
-	STDMETHOD_(ULONG, AddRef)() = 0;
-	STDMETHOD_(ULONG, Release)() = 0;
-
-	// *** IKpPlugin methods ***
-
 	/// Plugins are notified of events using this method.
 	/// @return In general you should always return TRUE. Only return FALSE if
 	/// you want to block further code execution in KeePass in some cases.

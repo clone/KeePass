@@ -305,5 +305,5 @@ LRESULT CPluginsDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
 
 void CPluginsDlg::OnBtnClickedPlgHelp()
 {
-	WU_OpenAppHelp(PWM_HELP_PLUGINS);
+	WU_OpenAppHelp(PWM_HELP_PLUGINS, m_hWnd);
 }

@@ -80,6 +80,7 @@
     
 #include "stdafx.h"
 #include "SystemTray.h"
+#include "../Plugins/PluginMgr.h" // DR: Added
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -859,6 +860,10 @@ LRESULT CSystemTray::OnTrayNotification(WPARAM wParam, LPARAM lParam)
     CWnd *pTargetWnd = GetTargetWnd();
     if (!pTargetWnd)
         return 0L;
+
+	// DR: Added plugins notification
+	if(_CallPlugins(KPM_TRAY_NOTIFY, (LPARAM)&m_tnd, lParam) == FALSE)
+		return 1;
 
     // Clicking with right button brings up a context menu
 #if defined(_WIN32_WCE) //&& _WIN32_WCE < 211

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name="PwSafe"
 	ProjectGUID="{C739C9F5-288C-4A5B-B9D8-38A406796A75}"
 	RootNamespace="PwSafe"
 	Keyword="MFCProj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -52,7 +53,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE;_UNICODE"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
@@ -88,6 +89,8 @@
 				ProgramDatabaseFile="$(IntDir)\KeePass.pdb"
 				SubSystem="2"
 				EntryPointSymbol="wWinMainCRTStartup"
+				RandomizedBaseAddress="0"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -109,9 +112,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -151,7 +151,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE;_UNICODE"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
@@ -187,6 +187,8 @@
 				ProgramDatabaseFile="$(IntDir)\KeePass.pdb"
 				SubSystem="2"
 				EntryPointSymbol="wWinMainCRTStartup"
+				RandomizedBaseAddress="0"
+				DataExecutionPrevention="0"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -208,9 +210,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -288,6 +287,8 @@
 				GenerateDebugInformation="false"
 				ProgramDatabaseFile="$(IntDir)\KeePass.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 				AllowIsolation="true"
 			/>
@@ -310,9 +311,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -390,6 +388,8 @@
 				GenerateDebugInformation="false"
 				ProgramDatabaseFile="$(IntDir)\KeePass.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="0"
 				TargetMachine="17"
 				AllowIsolation="true"
 			/>
@@ -412,9 +412,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -456,7 +453,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				InlineFunctionExpansion="1"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE;_UNICODE"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="false"
@@ -491,6 +488,8 @@
 				ProgramDatabaseFile="$(IntDir)\KeePass.pdb"
 				SubSystem="2"
 				EntryPointSymbol="wWinMainCRTStartup"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 				AllowIsolation="true"
 			/>
@@ -513,9 +512,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -557,7 +553,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				InlineFunctionExpansion="1"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE;_UNICODE"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="false"
@@ -592,6 +588,8 @@
 				ProgramDatabaseFile="$(IntDir)\KeePass.pdb"
 				SubSystem="2"
 				EntryPointSymbol="wWinMainCRTStartup"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="0"
 				TargetMachine="17"
 				AllowIsolation="true"
 			/>
@@ -614,9 +612,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -691,6 +686,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(IntDir)\KeePass.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="0"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -712,9 +709,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -789,6 +783,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(IntDir)\KeePass.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="0"
+				DataExecutionPrevention="0"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -810,9 +806,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -4724,6 +4717,10 @@
 					</File>
 					<File
 						RelativePath="..\KeePassLibCpp\SDK\Details\IKpAPI2.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpAPI3.h"
 						>
 					</File>
 					<File

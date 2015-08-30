@@ -52,7 +52,7 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 	//{{AFX_DATA_INIT(CAddEntryDlg)
 	m_bStars = TRUE;
 	m_strTitle = _T("");
-	m_strURL = _T(PWAE_STDURL_A);
+	m_strURL = PWAE_STDURL;
 	m_strUserName = _T("");
 	m_strAttachment = _T("");
 	m_bExpires = FALSE;
@@ -112,11 +112,16 @@ BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	ON_BN_CLICKED(IDC_RANDOMPW_BTN, OnRandomPwBtn)
 	ON_COMMAND(ID_RE_COPYALL, OnReCopyAll)
 	ON_COMMAND(ID_RE_COPYSEL, OnReCopySel)
+	ON_UPDATE_COMMAND_UI(ID_RE_COPYSEL, OnUpdateReCopySel)
 	ON_COMMAND(ID_RE_DELETE, OnReDelete)
+	ON_UPDATE_COMMAND_UI(ID_RE_DELETE, OnUpdateReDelete)
 	ON_COMMAND(ID_RE_PASTE, OnRePaste)
+	ON_UPDATE_COMMAND_UI(ID_RE_PASTE, OnUpdateRePaste)
 	ON_COMMAND(ID_RE_SELECTALL, OnReSelectAll)
 	ON_COMMAND(ID_RE_CUT, OnReCut)
+	ON_UPDATE_COMMAND_UI(ID_RE_CUT, OnUpdateReCut)
 	ON_COMMAND(ID_RE_UNDO, OnReUndo)
+	ON_UPDATE_COMMAND_UI(ID_RE_UNDO, OnUpdateReUndo)
 	ON_BN_CLICKED(IDC_SETATTACH_BTN, OnSetAttachBtn)
 	ON_BN_CLICKED(IDC_SAVEATTACH_BTN, OnSaveAttachBtn)
 	ON_BN_CLICKED(IDC_REMOVEATTACH_BTN, OnRemoveAttachBtn)
@@ -661,17 +666,32 @@ void CAddEntryDlg::OnReCopySel()
 	m_reNotes.Copy();
 }
 
-void CAddEntryDlg::OnReDelete() 
+void CAddEntryDlg::OnUpdateReCopySel(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_reNotes.GetSelText().IsEmpty() ? FALSE : TRUE);
+}
+
+void CAddEntryDlg::OnReDelete()
 {
 	m_reNotes.Clear();
 }
 
-void CAddEntryDlg::OnRePaste() 
+void CAddEntryDlg::OnUpdateReDelete(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_reNotes.GetSelText().IsEmpty() ? FALSE : TRUE);
+}
+
+void CAddEntryDlg::OnRePaste()
 {
 	m_reNotes.Paste();
 }
 
-void CAddEntryDlg::OnReSelectAll() 
+void CAddEntryDlg::OnUpdateRePaste(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_reNotes.CanPaste());
+}
+
+void CAddEntryDlg::OnReSelectAll()
 {
 	m_reNotes.SetSel(0, -1);
 }
@@ -681,9 +701,19 @@ void CAddEntryDlg::OnReCut()
 	m_reNotes.Cut();
 }
 
+void CAddEntryDlg::OnUpdateReCut(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_reNotes.GetSelText().IsEmpty() ? FALSE : TRUE);
+}
+
 void CAddEntryDlg::OnReUndo() 
 {
 	m_reNotes.Undo();
+}
+
+void CAddEntryDlg::OnUpdateReUndo(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_reNotes.CanUndo());
 }
 
 BOOL CAddEntryDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult) 
@@ -710,7 +740,7 @@ BOOL CAddEntryDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		BCMenu *pSub = NewGUI_GetBCMenu(menu.GetSubMenu(0));
 		if(pSub == NULL) { ASSERT(FALSE); pSub = &menu; }
 		CPwSafeDlg::_TranslateMenu(pSub, TRUE, NULL);
-		
+
 		pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, this);
 		menu.DestroyMenu();
 	}
@@ -948,12 +978,12 @@ void CAddEntryDlg::OnReNotesClickLink(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CAddEntryDlg::OnHelpURLFieldFeatures()
 {
-	WU_OpenAppHelp(PWM_HELP_URLS);
+	WU_OpenAppHelp(PWM_HELP_URLS, m_hWnd);
 }
 
 void CAddEntryDlg::OnHelpAutoType()
 {
-	WU_OpenAppHelp(PWM_HELP_AUTOTYPE);
+	WU_OpenAppHelp(PWM_HELP_AUTOTYPE, m_hWnd);
 }
 
 void CAddEntryDlg::PerformMiniModeAdjustments()

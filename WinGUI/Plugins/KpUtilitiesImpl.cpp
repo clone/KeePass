@@ -131,7 +131,7 @@ STDMETHODIMP CKpUtilitiesImpl::OpenUrl(LPCTSTR lpURL, HWND hParent)
 
 STDMETHODIMP CKpUtilitiesImpl::OpenAppHelp(LPCTSTR lpTopicFile)
 {
-	return ((WU_OpenAppHelp(lpTopicFile) == FALSE) ? E_FAIL : S_OK);
+	return ((WU_OpenAppHelp(lpTopicFile, NULL) == FALSE) ? E_FAIL : S_OK);
 }
 
 STDMETHODIMP CKpUtilitiesImpl::Base64Encode(const BYTE* pbIn, DWORD cbInLen,

@@ -26,11 +26,11 @@
 
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/XHyperLink.h"
-#include "afxcmn.h"
+#include <afxcmn.h>
 #include "Resource.h"
 
 #include "Util/UpdateCheckEx.h"
-#include "afxwin.h"
+#include <afxwin.h>
 
 class CUpdateInfoDlg : public CDialog
 {

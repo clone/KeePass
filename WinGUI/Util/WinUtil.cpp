@@ -43,7 +43,6 @@
 #include "../../KeePassLibCpp/PwStructsEx.h"
 
 #include <boost/scoped_array.hpp>
-#include <boost/algorithm/string.hpp>
 
 using boost::scoped_array;
 
@@ -579,7 +578,7 @@ void WU_SysExecute(LPCTSTR lpFile, LPCTSTR lpParameters, HWND hParent)
 	ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 
 	sei.cbSize = sizeof(SHELLEXECUTEINFO);
-	sei.fMask = SEE_MASK_FLAG_NO_UI;
+	sei.fMask = SEE_MASK_FLAG_NO_UI; // | SEE_MASK_NOZONECHECKS
 	sei.hwnd = hParent;
 	sei.lpFile = lpFile;
 	sei.lpParameters = lpParameters;
@@ -824,16 +823,17 @@ void WU_SetAppHelpSource(int nSource)
 	g_nAppHelpSource = nSource;
 }
 
-BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
+BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile, HWND hParent)
 {
 	if(g_nAppHelpSource == APPHS_LOCAL)
 	{
-		// WU_RemoveAppHelpZoneIdentifier();
+		WU_RemoveAppHelpZoneIdentifier();
 
 		TCHAR tszBuf[MAX_PATH * 2];
 		AU_GetApplicationDirectory(tszBuf, MAX_PATH * 2 - 2, TRUE, TRUE);
 
-		CString str = _T("hh.exe ms-its:");
+		// CString str = _T("hh.exe ms-its:");
+		CString str = _T("\"ms-its:");
 		str += tszBuf;
 		str += _T("/");
 		str += PWM_README_FILE;
@@ -844,7 +844,10 @@ BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
 			str += lpTopicFile;
 		}
 
-		TWinExec(str, KPSW_SHOWDEFAULT);
+		str += _T("\"");
+
+		// TWinExec(str, KPSW_SHOWDEFAULT);
+		WU_SysExecute(_T("hh.exe"), str, hParent);
 	}
 	else // APPHS_ONLINE
 	{
@@ -858,7 +861,7 @@ BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
 	return TRUE;
 }
 
-/* void WU_RemoveAppHelpZoneIdentifier()
+void WU_RemoveAppHelpZoneIdentifier()
 {
 	TCHAR tszLocalDir[MAX_PATH * 2];
 	AU_GetApplicationDirectory(tszLocalDir, MAX_PATH * 2 - 2, FALSE, FALSE);
@@ -868,7 +871,7 @@ BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
 	strLocal += PWM_README_FILE;
 
 	AU_RemoveZoneIdentifier(strLocal);
-} */
+}
 
 UINT TWinExec(LPCTSTR lpCmdLine, WORD wCmdShow)
 {
@@ -1309,9 +1312,8 @@ HRESULT WU_CreateDirectoryTree(LPCTSTR lpDirPath)
 	ASSERT(lpDirPath != NULL); if(lpDirPath == NULL) return E_POINTER;
 
 	std::basic_string<TCHAR> strPath = lpDirPath;
-	std::basic_string<TCHAR> strSeps = _T("/\\");
 	std::vector<std::basic_string<TCHAR> > vDirs;
-	boost::algorithm::split(vDirs, strPath, boost::algorithm::is_any_of(strSeps));
+	SU_Split(vDirs, strPath, _T("/\\"));
 
 	std::basic_string<TCHAR> strCur;
 	for(size_t i = 0; i < vDirs.size(); ++i)
@@ -1375,6 +1377,7 @@ BOOL WU_RunElevated(LPCTSTR lpExe, LPCTSTR lpArgs, HWND hParent)
 	ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 
 	sei.cbSize = sizeof(SHELLEXECUTEINFO);
+	// sei.fMask = SEE_MASK_NOZONECHECKS;
 	sei.hwnd = hParent;
 	sei.lpFile = lpExe;
 	sei.lpParameters = lpArgs;

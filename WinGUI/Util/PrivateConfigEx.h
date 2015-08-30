@@ -29,8 +29,10 @@
 #include <vector>
 #include <boost/utility.hpp>
 
+#ifndef CFG_VAL_TRUE
 #define CFG_VAL_TRUE      _T("True")
 #define CFG_VAL_FALSE     _T("False")
+#endif
 
 #define CFG_ID_ENFORCED 0
 #define CFG_ID_GLOBAL   1

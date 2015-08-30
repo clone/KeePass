@@ -55,7 +55,7 @@ CPluginManager::~CPluginManager()
 
 void CPluginManager::CleanUp()
 {
-	this->UnloadAllPlugins();
+	this->UnloadAllPlugins(FALSE);
 
 	m_plugins.clear();
 	// m_vKnownNames.clear();
@@ -250,7 +250,7 @@ void CPluginManager::FreePluginDllEx(HMODULE h)
 	FreeLibrary(h);
 }
 
-BOOL CPluginManager::UnloadAllPlugins()
+void CPluginManager::UnloadAllPlugins(BOOL bSkipIfLateUnloadReq)
 {
 	for(size_t i = 0; i < m_plugins.size(); ++i)
 	{
@@ -260,6 +260,13 @@ BOOL CPluginManager::UnloadAllPlugins()
 		{
 			if(p->pInterface != NULL)
 			{
+				if(bSkipIfLateUnloadReq != FALSE)
+				{
+					LPCTSTR lpSkip = p->pInterface->GetProperty(KPPS_UNLOAD_LATE);
+					if((lpSkip != NULL) && (_tcsicmp(lpSkip, CFG_VAL_TRUE) == 0))
+						continue;
+				}
+
 				VERIFY(p->pInterface->Release() == 0);
 				p->pInterface = NULL;
 			}
@@ -268,8 +275,6 @@ BOOL CPluginManager::UnloadAllPlugins()
 			p->hinstDLL = NULL;
 		}
 	}
-
-	return TRUE;
 }
 
 // BOOL CPluginManager::EnablePluginByID(DWORD dwPluginID, BOOL bEnable)

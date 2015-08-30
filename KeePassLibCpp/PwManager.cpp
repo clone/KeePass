@@ -649,7 +649,7 @@ DWORD CPwManager::GetEntryByUuidN(const BYTE *pUuid) const
 	return DWORD_MAX;
 }
 
-DWORD CPwManager::GetEntryPosInGroup(__in_ecount(1) const PW_ENTRY *pEntry) const
+DWORD CPwManager::GetEntryPosInGroup(_In_ const PW_ENTRY *pEntry) const
 {
 	ASSERT(pEntry != NULL); if(pEntry == NULL) return DWORD_MAX;
 
@@ -737,7 +737,7 @@ DWORD CPwManager::GetNumberOfItemsInGroupN(DWORD idGroup) const
 	return n;
 }
 
-BOOL CPwManager::AddEntry(__in_ecount(1) const PW_ENTRY *pTemplate)
+BOOL CPwManager::AddEntry(_In_ const PW_ENTRY *pTemplate)
 {
 	// Don't ASSERT_ENTRY the pTemplate!
 	ASSERT(pTemplate != NULL); if(pTemplate == NULL) return FALSE;
@@ -768,7 +768,7 @@ BOOL CPwManager::AddEntry(__in_ecount(1) const PW_ENTRY *pTemplate)
 	return SetEntry(m_dwNumEntries - 1, &pT);
 }
 
-BOOL CPwManager::AddGroup(__in_ecount(1) const PW_GROUP *pTemplate)
+BOOL CPwManager::AddGroup(_In_ const PW_GROUP *pTemplate)
 {
 	DWORD t = 0;
 
@@ -803,7 +803,7 @@ BOOL CPwManager::AddGroup(__in_ecount(1) const PW_GROUP *pTemplate)
 	return SetGroup(m_dwNumGroups - 1, &pT);
 }
 
-BOOL CPwManager::SetGroup(DWORD dwIndex, __in_ecount(1) const PW_GROUP *pTemplate)
+BOOL CPwManager::SetGroup(DWORD dwIndex, _In_ const PW_GROUP *pTemplate)
 {
 	ASSERT(dwIndex < m_dwNumGroups);
 	ASSERT(pTemplate != NULL);
@@ -897,7 +897,7 @@ BOOL CPwManager::DeleteGroupById(DWORD uGroupId, BOOL bCreateBackupEntries)
 	return TRUE;
 }
 
-BOOL CPwManager::SetEntry(DWORD dwIndex, __in_ecount(1) const PW_ENTRY *pTemplate)
+BOOL CPwManager::SetEntry(DWORD dwIndex, _In_ const PW_ENTRY *pTemplate)
 {
 	ASSERT(dwIndex < m_dwNumEntries);
 	if(dwIndex >= m_dwNumEntries) return FALSE;
@@ -971,7 +971,7 @@ BOOL CPwManager::SetEntry(DWORD dwIndex, __in_ecount(1) const PW_ENTRY *pTemplat
 	return TRUE;
 }
 
-void CPwManager::LockEntryPassword(__inout_ecount(1) PW_ENTRY *pEntry)
+void CPwManager::LockEntryPassword(_Inout_ PW_ENTRY *pEntry)
 {
 	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return;
 	ASSERT(pEntry->pszPassword != NULL); if(pEntry->pszPassword == NULL) return;
@@ -987,7 +987,7 @@ void CPwManager::LockEntryPassword(__inout_ecount(1) PW_ENTRY *pEntry)
 	ASSERT(pEntry->pszPassword[pEntry->uPasswordLen] == 0);
 }
 
-void CPwManager::UnlockEntryPassword(__inout_ecount(1) PW_ENTRY *pEntry)
+void CPwManager::UnlockEntryPassword(_Inout_ PW_ENTRY *pEntry)
 {
 	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return;
 	ASSERT(pEntry->pszPassword != NULL); if(pEntry->pszPassword == NULL) return;
@@ -1387,7 +1387,7 @@ void CPwManager::SortGroup(DWORD idGroup, DWORD dwSortByField)
 	SAFE_DELETE_ARRAY(p);
 }
 
-void CPwManager::GetNeverExpireTime(__out_ecount(1) PW_TIME *pPwTime)
+void CPwManager::GetNeverExpireTime(_Out_ PW_TIME *pPwTime)
 {
 	ASSERT(pPwTime != NULL); if(pPwTime == NULL) return;
 	memcpy(pPwTime, &g_pwTimeNever, sizeof(PW_TIME));
@@ -1535,8 +1535,8 @@ DWORD CPwManager::DeleteLostEntries()
 	return dwDeletedCount;
 }
 
-BOOL CPwManager::BackupEntry(__in_ecount(1) const PW_ENTRY *pe,
-	__out_opt BOOL *pbGroupCreated)
+BOOL CPwManager::BackupEntry(_In_ const PW_ENTRY *pe,
+	_Out_opt_ BOOL *pbGroupCreated)
 {
 	ASSERT_ENTRY(pe); if(pe == NULL) return FALSE;
 
@@ -1786,7 +1786,7 @@ BOOL CPwManager::_CanIgnoreUnknownMetaStream(const PWDB_META_STREAM& msUnknown) 
 	return TRUE;
 }
 
-void CPwManager::MergeIn(__inout_ecount(1) CPwManager *pDataSource,
+void CPwManager::MergeIn(_Inout_ CPwManager *pDataSource,
 	BOOL bCreateNewUUIDs, BOOL bCompareTimes)
 {
 	ASSERT(pDataSource != NULL); if(pDataSource == NULL) return;
@@ -1937,7 +1937,7 @@ const PW_DBHEADER *CPwManager::GetLastDatabaseHeader() const
 	return &m_dbLastHeader;
 }
 
-void CPwManager::GetRawMasterKey(__out_ecount(32) BYTE *pStorage)
+void CPwManager::GetRawMasterKey(_Out_bytecap_c_(32) BYTE *pStorage)
 {
 	ASSERT(pStorage != NULL); if(pStorage == NULL) return;
 
@@ -1946,7 +1946,7 @@ void CPwManager::GetRawMasterKey(__out_ecount(32) BYTE *pStorage)
 	ProtectMasterKey(true);
 }
 
-void CPwManager::SetRawMasterKey(__in_ecount(32) const BYTE *pNewKey)
+void CPwManager::SetRawMasterKey(_In_bytecount_c_(32) const BYTE *pNewKey)
 {
 	if(pNewKey != NULL)
 	{

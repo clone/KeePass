@@ -27,7 +27,7 @@
 
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
-#include "afxwin.h"
+#include <afxwin.h>
 
 class CPwGeneratorAdvDlg : public CDialog
 {

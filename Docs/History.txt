@@ -1,3 +1,36 @@
+11/10/12 - 1.21
+- Added option to minimize the main window after locking the
+  KeePass workspace (option enabled by default)
+- Added {SAFARI} browser path placeholder
+- KeePass now removes zone identifiers from the CHM help file
+- Address space layout randomization (ASLR) is supported now
+- Plugins: added new COM interface IKpAPI3, which extends
+  IKpAPI2 by a lot of useful functions
+- Plugins: added tray and cleanup notification and
+  customization messages
+- Plugins: added ability to delay unloading until the main
+  window has been closed
+
+- The overlay icon for the taskbar button (on Windows 7) is now
+  restored when Windows Explorer crashes and when starting in
+  minimized and locked mode
+- The buttons in file save dialogs now have accelerator keys
+- Improved opening of CHM help file
+- Improved command availability updating of rich text context
+  menus
+- KeePass is now developed and compiled using Visual Studio
+  2008 (with MFC 9.0); older compilers, IDEs and Windows 9x
+  aren't supported anymore
+- Updated SAL annotations
+- Upgraded to Boost libraries version 1.47.0
+- KeePass.exe isn't compressed using UPX anymore
+- Plugins: IKpAPI::GetMainWindowHandle now always returns the
+  handle of the KeePass main window, independent from which
+  thread the function is called
+- Various UI text improvements
+- Various code optimizations
+- Minor other improvements
+
 11/06/28 - 1.20
 - Added option to specify a database color; by specifying a
   color, the main window icon and the tray icon are recolored

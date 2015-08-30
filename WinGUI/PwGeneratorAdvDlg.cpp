@@ -147,5 +147,5 @@ void CPwGeneratorAdvDlg::OnBtnCancel()
 
 void CPwGeneratorAdvDlg::OnBtnHelp()
 {
-	WU_OpenAppHelp(PWM_HELP_PWGEN_ADV);
+	WU_OpenAppHelp(PWM_HELP_PWGEN_ADV, m_hWnd);
 }

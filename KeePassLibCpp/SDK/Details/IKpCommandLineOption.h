@@ -45,13 +45,6 @@ struct KP_DECL_INTERFACE("8831B009-0194-4919-A880-67AC170A5DF1") IKpCommandLineO
 	public IKpUnknown
 {
 public:
-	// *** IKpUnknown methods ***
-	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObject) = 0;
-	STDMETHOD_(ULONG, AddRef)() = 0;
-	STDMETHOD_(ULONG, Release)() = 0;
-
-	// *** IKpCommandLineOption methods ***
-
 	/// Returns the option's name (with which the object was initialized).
 	/// @kpstaticstring
 	STDMETHOD_(LPCTSTR, GetOptionName)() = 0;

@@ -37,11 +37,11 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.20")
+#define PWM_VERSION_STR  _T("1.21")
 #else
-#define PWM_VERSION_STR  _T("1.20 Unicode")
+#define PWM_VERSION_STR  _T("1.21 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01020000
+#define PWM_VERSION_DW   0x01020100
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
@@ -117,6 +117,7 @@
 #define PWMKEY_SPLITTERY  _T("KeeSplitterY")
 #define PWMKEY_ENTRYVIEW  _T("KeeEntryView")
 #define PWMKEY_LOCKMIN    _T("KeeLockOnMinimize")
+#define PWMKEY_MINLOCK    _T("KeeMinimizeOnLock")
 #define PWMKEY_MINTRAY    _T("KeeMinimizeToTray")
 #define PWMKEY_CLOSEMIN   _T("KeeCloseMinimizes")
 #define PWMKEY_LOCKTIMER  _T("KeeLockAfterTime")
@@ -398,7 +399,7 @@ public:
 	DWORD GetEntryByGroupN(DWORD idGroup, DWORD dwIndex) const;
 	PW_ENTRY *GetEntryByUuid(const BYTE *pUuid);
 	DWORD GetEntryByUuidN(const BYTE *pUuid) const; // Returns the index of the item with pUuid
-	DWORD GetEntryPosInGroup(__in_ecount(1) const PW_ENTRY *pEntry) const;
+	DWORD GetEntryPosInGroup(_In_ const PW_ENTRY *pEntry) const;
 	PW_ENTRY *GetLastEditedEntry();
 
 	// Access group information
@@ -411,26 +412,26 @@ public:
 	BOOL GetGroupTree(DWORD idGroup, DWORD *pGroupIndexes) const;
 
 	// Add entries and groups
-	BOOL AddGroup(__in_ecount(1) const PW_GROUP *pTemplate);
-	BOOL AddEntry(__in_ecount(1) const PW_ENTRY *pTemplate);
-	BOOL BackupEntry(__in_ecount(1) const PW_ENTRY *pe, __out_opt
+	BOOL AddGroup(_In_ const PW_GROUP *pTemplate);
+	BOOL AddEntry(_In_ const PW_ENTRY *pTemplate);
+	BOOL BackupEntry(_In_ const PW_ENTRY *pe, _Out_opt_
 		BOOL *pbGroupCreated); // pe must be unlocked already
 
 	// Delete entries and groups
 	BOOL DeleteEntry(DWORD dwIndex);
 	BOOL DeleteGroupById(DWORD uGroupId, BOOL bCreateBackupEntries);
 
-	BOOL SetGroup(DWORD dwIndex, __in_ecount(1) const PW_GROUP *pTemplate);
-	BOOL SetEntry(DWORD dwIndex, __in_ecount(1) const PW_ENTRY *pTemplate);
+	BOOL SetGroup(DWORD dwIndex, _In_ const PW_GROUP *pTemplate);
+	BOOL SetEntry(DWORD dwIndex, _In_ const PW_ENTRY *pTemplate);
 	// DWORD MakeGroupTree(LPCTSTR lpTreeString, TCHAR tchSeparator);
 
 	// Use these functions to make passwords in PW_ENTRY structures readable
-	void LockEntryPassword(__inout_ecount(1) PW_ENTRY *pEntry); // Lock password, encrypt it
-	void UnlockEntryPassword(__inout_ecount(1) PW_ENTRY *pEntry); // Make password readable
+	void LockEntryPassword(_Inout_ PW_ENTRY *pEntry); // Lock password, encrypt it
+	void UnlockEntryPassword(_Inout_ PW_ENTRY *pEntry); // Make password readable
 
 	void NewDatabase();
-	int OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *pRepair);
-	// int OpenDatabaseEx(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *pRepair,
+	int OpenDatabase(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *pRepair);
+	// int OpenDatabaseEx(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *pRepair,
 	//	CPwErrorInfo *pErrorInfo);
 	int SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32);
 
@@ -444,7 +445,7 @@ public:
 	void SortGroup(DWORD idGroup, DWORD dwSortByField);
 	void SortGroupList();
 
-	void MergeIn(__inout_ecount(1) CPwManager *pDataSource, BOOL bCreateNewUUIDs,
+	void MergeIn(_Inout_ CPwManager *pDataSource, BOOL bCreateNewUUIDs,
 		BOOL bCompareTimes);
 
 	// Find an item
@@ -463,7 +464,7 @@ public:
 	void SetKeyEncRounds(DWORD dwRounds);
 
 	// Get the never-expire time
-	static void GetNeverExpireTime(__out_ecount(1) PW_TIME *pPwTime);
+	static void GetNeverExpireTime(_Out_ PW_TIME *pPwTime);
 
 	// Checks and corrects the group tree (level order, etc.)
 	void FixGroupTree();
@@ -471,8 +472,8 @@ public:
 	void SubstEntryGroupIds(DWORD dwExistingId, DWORD dwNewId);
 
 	const PW_DBHEADER *GetLastDatabaseHeader() const;
-	void GetRawMasterKey(__out_ecount(32) BYTE *pStorage);
-	void SetRawMasterKey(__in_ecount(32) const BYTE *pNewKey);
+	void GetRawMasterKey(_Out_bytecap_c_(32) BYTE *pStorage);
+	void SetRawMasterKey(_In_bytecount_c_(32) const BYTE *pNewKey);
 	void ClearMasterKey(BOOL bClearKey, BOOL bClearTransformedKey);
 
 	LPCTSTR GetKeySource() const;

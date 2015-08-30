@@ -44,13 +44,6 @@ struct KP_DECL_INTERFACE("723A18EE-9769-4843-A79E-53B82DF5C9CA") IKpFileTransact
 	public IKpUnknown
 {
 public:
-	// *** IKpUnknown methods ***
-	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObject) = 0;
-	STDMETHOD_(ULONG, AddRef)() = 0;
-	STDMETHOD_(ULONG, Release)() = 0;
-
-	// *** IKpFileTransaction methods ***
-
 	/// Begin a file write transaction.
 	/// @param lpOutBufferFilePath KeePass will copy the path of the file
 	/// into this buffer (which should be able to hold at least MAX_PATH

@@ -71,7 +71,7 @@
 	RESET_TIME_FIELD_NORMAL(&(ptrx)->tCreation); RESET_TIME_FIELD_NORMAL(&(ptrx)->tLastMod); \
 	RESET_TIME_FIELD_NORMAL(&(ptrx)->tLastAccess); RESET_TIME_FIELD_EXPIRE(&(ptrx)->tExpire); }
 
-// int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *pRepair)
+// int CPwManager::OpenDatabase(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *pRepair)
 // {
 //	return this->OpenDatabaseEx(pszFile, pRepair, NULL);
 // }
@@ -81,7 +81,7 @@
 // first error.
 // To open a file normally, set bIgnoreCorrupted to FALSE (default).
 // To open a file in rescue mode, set it to TRUE.
-int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *pRepair)
+int CPwManager::OpenDatabase(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *pRepair)
 {
 	char *pVirtualFile;
 	unsigned long uFileSize, uAllocated, uEncryptedPartSize;

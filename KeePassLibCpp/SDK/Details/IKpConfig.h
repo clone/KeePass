@@ -44,13 +44,6 @@ struct KP_DECL_INTERFACE("6F7B9713-FC6E-4FD6-BF55-044DF9E701B0") IKpConfig :
 	public IKpUnknown
 {
 public:
-	// *** IKpUnknown methods ***
-	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObject) = 0;
-	STDMETHOD_(ULONG, AddRef)() = 0;
-	STDMETHOD_(ULONG, Release)() = 0;
-
-	// *** IKpConfig methods ***
-
 	/// Get the string value of a configuration item.
 	/// @param pszValue This output buffer must be able to hold at
 	/// least SI_REGSIZE characters (TCHARs).

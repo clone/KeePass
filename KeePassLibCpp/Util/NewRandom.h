@@ -31,14 +31,14 @@ public:
 	CNewRandom();
 	virtual ~CNewRandom();
 
-	void GetRandomBuffer(__out_bcount(dwSize) BYTE *pBuf, DWORD dwSize);
+	void GetRandomBuffer(_Out_bytecap_(dwSize) BYTE *pBuf, DWORD dwSize);
 
 	void AddToUserEntropyPool(const BYTE *pData, DWORD dwSize);
 	void ClearUserEntropyPool();
 
 private:
 	void Initialize();
-	void AddRandomObject(__in_bcount(uSize) const void *pObj, size_t uSize);
+	void AddRandomObject(_In_bytecount_(uSize) const void *pObj, size_t uSize);
 
 	static void SysCryptGetRandom(BYTE *pBuf, DWORD dwSize);
 

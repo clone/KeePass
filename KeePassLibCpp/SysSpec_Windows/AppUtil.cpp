@@ -74,7 +74,7 @@ BOOL AU_GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterS
 
 	lpStoreBuf[0] = 0; lpStoreBuf[1] = 0;
 	GetModuleFileName(NULL, lpStoreBuf, dwBufLen);
-	for(i = (int)_tcslen(lpStoreBuf) - 1; i > 1; i--) // Extract dir
+	for(i = (int)_tcslen(lpStoreBuf) - 1; i > 1; --i) // Extract dir
 	{
 		if((lpStoreBuf[i] == _T('\\')) || (lpStoreBuf[i] == _T('/')))
 		{
@@ -83,7 +83,7 @@ BOOL AU_GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterS
 		}
 	}
 
-	for(i = 0; i < (int)_tcslen(lpStoreBuf); i++)
+	for(i = 0; i < (int)_tcslen(lpStoreBuf); ++i)
 	{
 		if((bMakeURL == TRUE) && (lpStoreBuf[i] == _T('\\'))) lpStoreBuf[i] = _T('/');
 
@@ -152,8 +152,10 @@ BOOL AU_SecureDeleteFile(LPCTSTR pszFilePath)
 	SAFE_DELETE_ARRAY(pBuf);
 
 	if(DeleteFile(pszFilePath) == FALSE)
+	{
 		if(_tremove(pszFilePath) != 0)
 			return FALSE;
+	}
 
 	return TRUE;
 }
@@ -232,25 +234,26 @@ BOOL AU_IsAtLeastWinVistaSystem()
 	return (g_bIsAtLeastWinVistaSystem ? TRUE : FALSE);
 }
 
-/*
 #ifndef _WIN32_WCE
-BOOL _AU_RemoveZoneIdentifier(LPCTSTR lpFile)
+/* BOOL _AU_RemoveZoneIdentifier(LPCTSTR lpFile)
 {
 	USES_CONVERSION;
 
 	IPersistFile* pf = NULL;
 	if(CoCreateInstance(CLSID_PersistentZoneIdentifier, NULL, CLSCTX_INPROC_SERVER,
 		IID_IPersistFile, (LPVOID*)&pf) != S_OK) return FALSE;
+	if(pf == NULL) { ASSERT(FALSE); return FALSE; }
 
 	LPCOLESTR lpOleFile = T2OLE(lpFile);
 	if(pf->Load(lpOleFile, STGM_READWRITE | STGM_SHARE_EXCLUSIVE) != S_OK) return FALSE;
 
 	IZoneIdentifier* pz = NULL;
 	if(pf->QueryInterface(IID_IZoneIdentifier, (void**)&pz) != S_OK) return FALSE;
+	if(pz == NULL) { ASSERT(FALSE); pf->Release(); return FALSE; }
 
 	DWORD dwZone = 0;
 	VERIFY(pz->GetId(&dwZone) == S_OK);
-	if(dwZone == URLZONE_INTERNET)
+	if((dwZone == URLZONE_INTERNET) || (dwZone == URLZONE_UNTRUSTED))
 	{
 		VERIFY(pz->Remove() == S_OK);
 		VERIFY(pf->Save(NULL, TRUE) == S_OK);
@@ -276,6 +279,19 @@ BOOL AU_RemoveZoneIdentifier(LPCTSTR lpFile)
 
 	CoUninitialize();
 	return bResult;
+} */
+
+BOOL AU_RemoveZoneIdentifier(LPCTSTR lpFile)
+{
+	if((lpFile == NULL) || (lpFile[0] == 0)) { ASSERT(FALSE); return FALSE; }
+
+	std::basic_string<TCHAR> str = lpFile;
+	str += _T(":Zone.Identifier");
+
+	if(GetFileAttributes(str.c_str()) != INVALID_FILE_ATTRIBUTES)
+		DeleteFile(str.c_str());
+	else return FALSE;
+
+	return TRUE;
 }
 #endif // _WIN32_WCE
-*/

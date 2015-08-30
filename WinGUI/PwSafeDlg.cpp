@@ -19,10 +19,9 @@
 
 #include "StdAfx.h"
 #include <afxadv.h>
-#include <winable.h>
+#include <winuser.h>
 #include <mmsystem.h>
-
-#include <boost/algorithm/string.hpp>
+#include <set>
 
 #include "PwSafe.h"
 #include "PwSafeDlg.h"
@@ -56,9 +55,6 @@
 #include "NewGUI/NewDialogsEx.h"
 #include "NewGUI/NewColorizerEx.h"
 #include "Plugins/KpApiImpl.h"
-#include "Plugins/KpDatabaseImpl.h"
-#include "Plugins/KpUtilitiesImpl.h"
-#include "Plugins/KpCommandLineImpl.h"
 
 #include "PasswordDlg.h"
 #include "AddEntryDlg.h"
@@ -123,6 +119,7 @@ DWORD CPwSafeDlg::m_dwCachedBackupGroupID = 0;
 DWORD CPwSafeDlg::m_dwCachedBackupSrcGroupID = 0;
 
 const UINT WM_REG_TASKBARCREATED = ::RegisterWindowMessage(_T("TaskbarCreated"));
+const UINT WM_REG_TASKBARBUTTONCREATED = ::RegisterWindowMessage(_T("TaskbarButtonCreated"));
 const UINT WM_REG_PROCESSMAILSLOT = ::RegisterWindowMessage(_T("KeePassProcessMailslot"));
 const UINT WM_REG_KEEPASSCONTROL = ::RegisterWindowMessage(_T("KeePassControl"));
 
@@ -422,6 +419,7 @@ BEGIN_MESSAGE_MAP(CPwSafeDlg, CDialog)
 	ON_WM_LBUTTONUP()
 	ON_COMMAND(ID_VIEW_ENTRYVIEW, OnViewEntryView)
 	ON_COMMAND(ID_RE_COPYSEL, OnReCopySel)
+	ON_UPDATE_COMMAND_UI(ID_RE_COPYSEL, OnUpdateReCopySel)
 	ON_COMMAND(ID_RE_COPYALL, OnReCopyAll)
 	ON_COMMAND(ID_RE_SELECTALL, OnReSelectAll)
 	ON_COMMAND(ID_EXTRAS_TANWIZARD, OnExtrasTanWizard)
@@ -521,6 +519,7 @@ BEGIN_MESSAGE_MAP(CPwSafeDlg, CDialog)
 	ON_MESSAGE(WM_WTSSESSION_CHANGE, OnWTSSessionChange)
 
 	ON_REGISTERED_MESSAGE(WM_REG_TASKBARCREATED, OnTaskbarCreated)
+	ON_REGISTERED_MESSAGE(WM_REG_TASKBARBUTTONCREATED, OnTaskbarButtonCreated)
 	ON_REGISTERED_MESSAGE(WM_REG_PROCESSMAILSLOT, OnProcessMailslot)
 	ON_REGISTERED_MESSAGE(WM_REG_KEEPASSCONTROL, OnKeePassControlMessage)
 END_MESSAGE_MAP()
@@ -606,11 +605,11 @@ LRESULT CAboutDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
 	if(wParam == IDC_HLINK_HOMEPAGE)
 		ShellExecute(NULL, NULL, PWM_HOMEPAGE, NULL, NULL, SW_SHOW);
 	else if(wParam == IDC_HLINK_HELPFILE)
-		WU_OpenAppHelp(NULL);
+		WU_OpenAppHelp(NULL, m_hWnd);
 	else if(wParam == IDC_HLINK_LICENSEFILE)
 		_OpenLocalFile(PWM_LICENSE_FILE, OLF_OPEN);
 	else if(wParam == IDC_HLINK_CREDITS)
-		WU_OpenAppHelp(PWM_HELP_CREDITS);
+		WU_OpenAppHelp(PWM_HELP_CREDITS, m_hWnd);
 	else if(wParam == IDC_HLINK_DONATE)
 		ShellExecute(NULL, NULL, PWM_URL_DONATE, NULL, NULL, SW_SHOW);
 	else return 0;
@@ -839,6 +838,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bUserStars = cConfig.GetBool(PWMKEY_HIDEUSERS, FALSE);
 
 	m_bLockOnMinimize = cConfig.GetBool(PWMKEY_LOCKMIN, FALSE);
+	m_bMinimizeOnLock = cConfig.GetBool(PWMKEY_MINLOCK, TRUE);
 	m_bMinimizeToTray = cConfig.GetBool(PWMKEY_MINTRAY, FALSE);
 	m_bCloseMinimizes = cConfig.GetBool(PWMKEY_CLOSEMIN, FALSE);
 
@@ -1150,6 +1150,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	CMsgRelayWnd::AddRelayedMessage(WM_COPYDATA);
 	CMsgRelayWnd::AddRelayedMessage(WM_WTSSESSION_CHANGE);
 	CMsgRelayWnd::AddRelayedMessage(WM_REG_TASKBARCREATED);
+	CMsgRelayWnd::AddRelayedMessage(WM_REG_TASKBARBUTTONCREATED);
 	CMsgRelayWnd::AddRelayedMessage(WM_REG_PROCESSMAILSLOT);
 	CMsgRelayWnd::AddRelayedMessage(WM_REG_KEEPASSCONTROL);
 
@@ -2080,6 +2081,7 @@ void CPwSafeDlg::ProcessResize()
 void CPwSafeDlg::CleanUp()
 {
 	SaveOptions();
+	_CallPlugins(KPM_CLEANUP, 0, 0);
 
 	m_sessionNotify.Unregister();
 	m_remoteControl.FreeStatic();
@@ -2094,12 +2096,7 @@ void CPwSafeDlg::CleanUp()
 
 	RegisterRestoreHotKey(FALSE);
 
-	CPluginManager::Instance().UnloadAllPlugins();
-
-	KP_ASSERT_REFS(CKpApiImpl::Instance(), 1);
-	KP_ASSERT_REFS(CKpDatabaseImpl::Instance(), 1);
-	KP_ASSERT_REFS(CKpUtilitiesImpl::Instance(), 1);
-	KP_ASSERT_REFS(CKpCommandLineImpl::Instance(), 1);
+	CPluginManager::Instance().UnloadAllPlugins(TRUE);
 
 	if(m_bMenu == TRUE)
 	{
@@ -2245,6 +2242,7 @@ void CPwSafeDlg::SaveOptions()
 	pcfg.SetBool(PWMKEY_HIDEUSERS, m_bUserStars);
 	pcfg.SetBool(PWMKEY_ALWAYSTOP, m_bAlwaysOnTop);
 	pcfg.SetBool(PWMKEY_LOCKMIN, m_bLockOnMinimize);
+	pcfg.SetBool(PWMKEY_MINLOCK, m_bMinimizeOnLock);
 	pcfg.SetBool(PWMKEY_MINTRAY, m_bMinimizeToTray);
 	pcfg.SetBool(PWMKEY_CLOSEMIN, m_bCloseMinimizes);
 	pcfg.SetBool(PWMKEY_SHOWTOOLBAR, m_bShowToolBar);
@@ -2412,7 +2410,7 @@ void CPwSafeDlg::OnCancel()
 	}
 
 	// Are we called because of an Esc key-press?
-	if((GetKeyState(27) & 0x8000) != 0)
+	if((GetKeyState(VK_ESCAPE) & 0x8000) != 0)
 	{
 		if(m_bLocked == FALSE) OnFileLock();
 		return;
@@ -3350,7 +3348,7 @@ void CPwSafeDlg::OnPwlistDelete()
 	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
 	dlgTask.SetIcon(V_MTDI_QUESTION);
 	dlgTask.AddButton(TRL("&Delete"), NULL, IDOK);
-	dlgTask.AddButton(TRL("Do&n't delete"), NULL, IDCANCEL);
+	dlgTask.AddButton(TRL("&Cancel"), NULL, IDCANCEL);
 	int nMsg = dlgTask.ShowDialog();
 
 	if(nMsg < 0) // No task dialog support?
@@ -4049,8 +4047,7 @@ void CPwSafeDlg::OnFileNew()
 			std::basic_string<TCHAR> strSplit = strSpec.substr(0, 1);
 			std::basic_string<TCHAR> strDef = strSpec.substr(1);
 			std::vector<std::basic_string<TCHAR> > vSpec;
-			boost::algorithm::split(vSpec, strDef,
-				boost::algorithm::is_any_of(strSplit));
+			SU_Split(vSpec, strDef, strSplit.c_str());
 
 			pwTemplate.pszGroupName = const_cast<TCHAR *>(TRL("General"));
 			if((vSpec.size() > 0) && (vSpec[0].size() > 0))
@@ -5007,9 +5004,9 @@ void CPwSafeDlg::OnFileClose()
 			if(bDoVerification)
 				dlgTask.SetVerification(TRL("Automatically save when closing/locking the database"));
 
-			dlgTask.AddButton(TRL("Save"), strSaveText, IDYES);
-			dlgTask.AddButton(TRL("Discard changes"), strDiscardText, IDNO);
-			dlgTask.AddButton(TRL("Cancel"), strCancelText, IDCANCEL);
+			dlgTask.AddButton(TRL("&Save"), strSaveText, IDYES);
+			dlgTask.AddButton(TRL("&Discard changes"), strDiscardText, IDNO);
+			dlgTask.AddButton(TRL("&Cancel"), strCancelText, IDCANCEL);
 
 			BOOL bAutoSaveCB = FALSE;
 			nRes = dlgTask.ShowDialog(bDoVerification ? &bAutoSaveCB : NULL);
@@ -5121,6 +5118,7 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_bAutoSave = m_bAutoSaveDb;
 	dlg.m_strFontSpec = m_strFontSpec;
 	dlg.m_bLockOnMinimize = m_bLockOnMinimize;
+	dlg.m_bMinimizeOnLock = m_bMinimizeOnLock;
 	dlg.m_bMinimizeToTray = m_bMinimizeToTray;
 	dlg.m_bCloseMinimizes = m_bCloseMinimizes;
 	dlg.m_bLockAfterTime = ((m_nLockTimeDef != -1) ? TRUE : FALSE);
@@ -5181,6 +5179,7 @@ void CPwSafeDlg::OnSafeOptions()
 		m_bEntryGrid = dlg.m_bEntryGrid;
 		m_bAutoSaveDb = dlg.m_bAutoSave;
 		m_bLockOnMinimize = dlg.m_bLockOnMinimize;
+		m_bMinimizeOnLock = dlg.m_bMinimizeOnLock;
 		m_bMinimizeToTray = dlg.m_bMinimizeToTray;
 		m_bCloseMinimizes = dlg.m_bCloseMinimizes;
 		if(dlg.m_rgbRowHighlight == 0xFF000000) dlg.m_rgbRowHighlight = RGB(238, 238, 255);
@@ -5361,7 +5360,7 @@ void CPwSafeDlg::OnSafeRemoveGroup()
 	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
 	dlgTask.SetIcon(V_MTDI_QUESTION);
 	dlgTask.AddButton(TRL("&Delete"), NULL, IDOK);
-	dlgTask.AddButton(TRL("Do&n't delete"), NULL, IDCANCEL);
+	dlgTask.AddButton(TRL("&Cancel"), NULL, IDCANCEL);
 	int nMsg = dlgTask.ShowDialog();
 
 	if(nMsg < 0) // No task dialog support?
@@ -6617,7 +6616,7 @@ void CPwSafeDlg::OnFileChangeLanguage()
 void CPwSafeDlg::OnInfoReadme()
 {
 	NotifyUserActivity();
-	WU_OpenAppHelp(NULL);
+	WU_OpenAppHelp(NULL, m_hWnd);
 }
 
 // void CPwSafeDlg::OnInfoLicense()
@@ -6751,20 +6750,19 @@ void CPwSafeDlg::OnFileLock()
 	if(_CallPlugins(KPM_FILE_LOCK_PRE, 0, 0) == FALSE)
 		{ m_bDisplayDialog = FALSE; return; }
 
-	CString strMenuItem;
-	CString strExtended;
-	const TCHAR *pSuffix = _T("");
-
 	if((m_bFileOpen == FALSE) && (m_bLocked == FALSE)) { m_bDisplayDialog = FALSE; return; }
 
+	CString strMenuItem;
 	m_menu.GetMenuText(ID_FILE_LOCK, strMenuItem, MF_BYCOMMAND);
 
-	pSuffix = _GetCmdAccelExt(_T("&Lock Workspace"));
-	strExtended = TRL("&Lock Workspace");
+	LPCTSTR lpSuffix = _GetCmdAccelExt(_T("&Lock Workspace"));
+	CString strExtended = TRL("&Lock Workspace");
 	strExtended += _T("\t");
-	strExtended += pSuffix;
+	strExtended += lpSuffix;
 
-	if((strMenuItem == TRL("&Lock Workspace")) || (strMenuItem == strExtended)) // Lock
+	const bool bDoLock = ((strMenuItem == TRL("&Lock Workspace")) ||
+		(strMenuItem == strExtended));
+	if(bDoLock) // Lock
 	{
 		_DeleteTemporaryFiles();
 
@@ -6872,6 +6870,10 @@ void CPwSafeDlg::OnFileLock()
 	_UpdateTrayIcon();
 	_UpdateToolBar(TRUE);
 	m_bDisplayDialog = FALSE;
+
+	if((m_bMinimizeOnLock != FALSE) && bDoLock && (m_bMinimized == FALSE) &&
+		(m_bTrayed == FALSE))
+		SetViewHideState(FALSE, FALSE);
 }
 
 void CPwSafeDlg::OnUpdateFileLock(CCmdUI* pCmdUI)
@@ -7069,7 +7071,7 @@ void CPwSafeDlg::OnImportCsv()
 			str += TRL("The help file contains detailed information about the expected input format. Do you want to open the help file?");
 
 			if(MessageBox(str, PWM_PRODUCT_NAME_SHORT, MB_ICONWARNING | MB_YESNO) == IDYES)
-				WU_OpenAppHelp(PWM_HELP_CSV);
+				WU_OpenAppHelp(PWM_HELP_CSV, m_hWnd);
 		}
 	}
 
@@ -8279,6 +8281,11 @@ void CPwSafeDlg::OnReCopySel()
 {
 	NotifyUserActivity();
 	m_reEntryView.Copy();
+}
+
+void CPwSafeDlg::OnUpdateReCopySel(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_reEntryView.GetSelText().IsEmpty() ? FALSE : TRUE);
 }
 
 void CPwSafeDlg::OnReCopyAll()
@@ -10797,6 +10804,15 @@ LRESULT CPwSafeDlg::OnTaskbarCreated(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+LRESULT CPwSafeDlg::OnTaskbarButtonCreated(WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
+	_UpdateTrayIcon(); // Set overlay icon
+	return 0;
+}
+
 void CPwSafeDlg::_CalcColumnSizes()
 {
 	RECT rect;
@@ -10999,9 +11015,9 @@ LRESULT CPwSafeDlg::OnKeePassControlMessage(WPARAM wParam, LPARAM lParam)
 
 void CPwSafeDlg::_ChangeLockState(BOOL bLocked)
 {
-	if((bLocked == TRUE) && (m_bLocked == FALSE)) // Should lock
+	if((bLocked != FALSE) && (m_bLocked == FALSE)) // Should lock
 		OnFileLock();
-	else if((bLocked == FALSE) && (m_bLocked == TRUE)) // Should unlock
+	else if((bLocked == FALSE) && (m_bLocked != FALSE)) // Should unlock
 		OnFileLock();
 }
 

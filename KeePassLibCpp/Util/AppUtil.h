@@ -61,8 +61,8 @@ void Priv_AU_EnsureOSInitialized();
 BOOL AU_IsWin9xSystem();
 BOOL AU_IsAtLeastWinVistaSystem();
 
-// #ifndef _WIN32_WCE
-// BOOL AU_RemoveZoneIdentifier(LPCTSTR lpFile);
-// #endif // _WIN32_WCE
+#ifndef _WIN32_WCE
+BOOL AU_RemoveZoneIdentifier(LPCTSTR lpFile);
+#endif // _WIN32_WCE
 
 #endif // ___APPLICATION_UTILITIES_H___

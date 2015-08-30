@@ -523,7 +523,7 @@ void CPwGeneratorExDlg::OnRadioPatternBased()
 
 void CPwGeneratorExDlg::OnBnClickedBtnHelp()
 {
-	WU_OpenAppHelp(PWM_HELP_PWGEN);
+	WU_OpenAppHelp(PWM_HELP_PWGEN, m_hWnd);
 }
 
 void CPwGeneratorExDlg::LoadGenProfiles()

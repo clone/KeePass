@@ -43,6 +43,7 @@ private:
 	static void FindFirefox();
 	static void FindOpera();
 	static void FindChrome();
+	static void FindSafari();
 
 	static std::basic_string<TCHAR> Fix(const std::basic_string<TCHAR>& strPath);
 
@@ -53,6 +54,7 @@ private:
 	static std::basic_string<TCHAR> m_strFirefoxPath;
 	static std::basic_string<TCHAR> m_strOperaPath;
 	static std::basic_string<TCHAR> m_strChromePath;
+	static std::basic_string<TCHAR> m_strSafariPath;
 };
 
 #endif // ___APPLICATION_LOCATOR_H___

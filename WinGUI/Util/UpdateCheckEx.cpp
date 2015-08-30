@@ -20,8 +20,6 @@
 #include "StdAfx.h"
 #include "UpdateCheckEx.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../../KeePassLibCpp/Util/StrUtil.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
 #include "../../KeePassLibCpp/PwManager.h"
@@ -205,7 +203,7 @@ HRESULT CUpdateCheckEx::ParseInfoFile(BYTE* pbData, UC_COMPONENTS_LIST& vList)
 	SAFE_DELETE_ARRAY(lpData);
 
 	std::vector<std_string> vItems;
-	boost::algorithm::split(vItems, strData, boost::algorithm::is_any_of(_T("\r\n")));
+	SU_Split(vItems, strData, _T("\r\n"));
 
 	for(size_t i = 0; i < vItems.size(); ++i)
 		CUpdateCheckEx::AddComponent(vItems[i], vList);
@@ -220,11 +218,11 @@ void CUpdateCheckEx::AddComponent(const std_string& strLine, UC_COMPONENTS_LIST&
 	if(strLine[0] == _T('#')) { ASSERT(FALSE); return; } // Reserved for future use
 
 	std::vector<std_string> vInfo;
-	boost::algorithm::split(vInfo, strLine, boost::algorithm::is_any_of(_T("#")));
+	SU_Split(vInfo, strLine, _T("#"));
 	if(vInfo.size() < 2) { ASSERT(FALSE); return; }
 
 	std::vector<std_string> vVersion;
-	boost::algorithm::split(vVersion, vInfo[1], boost::algorithm::is_any_of(_T(".")));
+	SU_Split(vVersion, vInfo[1], _T("."));
 	if(vVersion.size() < 4) { ASSERT(FALSE); return; }
 
 	UC_COMPONENT_INFO c;

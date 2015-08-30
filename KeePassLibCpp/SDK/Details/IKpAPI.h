@@ -44,13 +44,6 @@ struct KP_DECL_INTERFACE("F023A34A-C6A9-41BA-AAF9-8D9EC329A435") IKpAPI :
 	public IKpUnknown
 {
 public:
-	// *** IKpUnknown methods ***
-	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObject) = 0;
-	STDMETHOD_(ULONG, AddRef)() = 0;
-	STDMETHOD_(ULONG, Release)() = 0;
-
-	// *** IKpAPI methods ***
-
 	/// Create an object of the class associated with a specified class ID.
 	/// Class IDs supported by this method typically start with CLSID_.
 	/// @param rclsid Class ID. Supported class IDs include but are not limited to:

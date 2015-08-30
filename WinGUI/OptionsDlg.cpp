@@ -237,6 +237,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddGroupText(TRL("Advanced"), 11);
 	// m_olAdvanced.AddCheckItem(TRL("Automatically generate random passwords for new entries"), &m_bAutoPwGen, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Remember key sources (key file paths, provider names, ...)"), &m_bRememberKeySources, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Minimize main window after locking the workspace"), &m_bMinimizeOnLock, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Exit program instead of locking the workspace after the specified time"), &m_bExitInsteadOfLockAT, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Show full path in the title bar (instead of file name only)"), &m_bShowFullPath, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Disable 'Save' button if the database hasn't been modified"), &m_bAllowSaveIfModifiedOnly, NULL, OL_LINK_NULL);

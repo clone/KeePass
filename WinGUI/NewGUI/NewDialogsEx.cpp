@@ -35,7 +35,7 @@ HRESULT CALLBACK NDE_HelpManualCallback(HWND hwnd, UINT uNotification,
 	{
 		LPCWSTR lpHRef = (LPCWSTR)lParam;
 		if((lpHRef != NULL) && (*lpHRef == L'h') && (lpHRef[1] == 0))
-			WU_OpenAppHelp(PWM_HELP_ERRORS);
+			WU_OpenAppHelp(PWM_HELP_ERRORS, NULL);
 		else { ASSERT(FALSE); }
 	}
 

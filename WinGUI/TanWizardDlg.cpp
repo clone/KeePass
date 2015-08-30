@@ -142,5 +142,5 @@ void CTanWizardDlg::OnCheckNumbering()
 
 void CTanWizardDlg::OnTANHelpBtn()
 {
-	WU_OpenAppHelp(PWM_HELP_TANS);
+	WU_OpenAppHelp(PWM_HELP_TANS, m_hWnd);
 }

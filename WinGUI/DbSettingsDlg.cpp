@@ -174,7 +174,7 @@ void CDbSettingsDlg::OnBtnCalcRounds()
 
 void CDbSettingsDlg::OnBtnClickedHelp()
 {
-	WU_OpenAppHelp(PWM_HELP_SECURITY);
+	WU_OpenAppHelp(PWM_HELP_SECURITY, m_hWnd);
 }
 
 void CDbSettingsDlg::OnSliderColorChanged(NMHDR *pNMHDR, LRESULT *pResult)
