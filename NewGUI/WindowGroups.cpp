@@ -27,30 +27,86 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ___PW_IMPORT_H___
-#define ___PW_IMPORT_H___
+#include "StdAfx.h"
+#include "WindowGroups.h"
 
-#include "PwManager.h"
-
-#define DEF_CW_CATEGORY _T("----------------------------------------")
-
-class CPwImport
+CWindowGroups::CWindowGroups()
 {
-public:
-	CPwImport();
-	virtual ~CPwImport();
+	m_aWindows.RemoveAll();
+	m_aGroupIDs.RemoveAll();
+}
 
-	BOOL ImportCsvToDb(const char *pszFile, CPwManager *pMgr, DWORD dwGroupId);
-	BOOL ImportCWalletToDb(const char *pszFile, CPwManager *pMgr);
-	BOOL ImportPwSafeToDb(const char *pszFile, CPwManager *pMgr);
+CWindowGroups::~CWindowGroups()
+{
+	m_aWindows.RemoveAll();
+	m_aGroupIDs.RemoveAll();
+}
 
-private:
-	void _AddStringStreamToDb(const char *pStream, unsigned long uStreamSize);
-	char *_FileToMemory(const char *pszFile, unsigned long *pFileSize);
-	unsigned long _GetPreferredIcon(const char *pszGroup);
+BOOL CWindowGroups::AddWindow(CObject *pWindow, DWORD dwGroupID)
+{
+	m_aWindows.Add(pWindow);
+	m_aGroupIDs.Add(dwGroupID);
+	return TRUE;
+}
 
-	CPwManager *m_pLastMgr;
-	DWORD m_dwLastGroupId;
-};
+BOOL CWindowGroups::HideAllExcept(DWORD dwGroupID)
+{
+	int i;
+	CWnd *p;
 
-#endif
+	ASSERT(m_aWindows.GetSize() == m_aGroupIDs.GetSize());
+
+	for(i = 0; i < m_aWindows.GetSize(); i++)
+	{
+		p = (CWnd *)m_aWindows.GetAt(i);
+
+		if(p == NULL) continue;
+
+		if(m_aGroupIDs.GetAt(i) != dwGroupID)
+		{
+			p->ShowWindow(SW_HIDE);
+			p->EnableWindow(FALSE);
+		}
+		else
+		{
+			p->EnableWindow(TRUE);
+			p->ShowWindow(TRUE);
+		}
+	}
+
+	return TRUE;
+}
+
+BOOL CWindowGroups::ArrangeWindows(CWnd *pParentWindow)
+{
+	CWnd *p;
+	CDWordArray aPos;
+	int i;
+	RECT rect;
+
+	aPos.RemoveAll();
+
+	for(i = 0; i < m_aWindows.GetSize(); i++) aPos.Add(WG_OFFSET_TOP);
+
+	for(i = 0; i < m_aWindows.GetSize(); i++)
+	{
+		p = (CWnd *)m_aWindows.GetAt(i);
+
+		if(p != NULL)
+		{
+			p->GetWindowRect(&rect);
+			rect.right = rect.right - rect.left; // Coords to sizes
+			rect.bottom = rect.bottom - rect.top;
+		}
+		rect.top = (LONG)aPos.GetAt((int)m_aGroupIDs.GetAt(i));
+		rect.left = WG_OFFSET_LEFT;
+
+		if(p != NULL)
+			p->MoveWindow(rect.left, rect.top, rect.right, rect.bottom, TRUE);
+
+		aPos.SetAt((int)m_aGroupIDs.GetAt(i), (DWORD)rect.top + WG_Y_STEP);
+	}
+
+	aPos.RemoveAll();
+	return TRUE;
+}

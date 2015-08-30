@@ -35,6 +35,7 @@
 #include "PwGeneratorDlg.h"
 #include "Util/MemUtil.h"
 #include "NewGUI/TranslateEx.h"
+#include "Util/base64.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -195,6 +196,22 @@ BOOL CAddEntryDlg::OnInitDialog()
 	// Translate all windows
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
+	if(m_bEditMode == FALSE) // Generate a pseudo-random password
+	{
+		CNewRandom *pRand = new CNewRandom();
+		CBase64Codec base64;
+		DWORD dwSize = 32;
+		BYTE pbRandom[16], pbString[32];
+		pRand->Initialize(); // Get system entropy
+		pRand->GetRandomBuffer(pbRandom, 16);
+		VERIFY(base64.Encode(pbRandom, 16, pbString, &dwSize));
+		delete pRand; pRand = NULL;
+		pbString[strlen((char *)pbString) - 3] = 0;
+		m_strPassword = (char *)(pbString + 1);
+		m_strRepeatPw = (char *)(pbString + 1);
+		UpdateData(FALSE);
+	}
+
 	GetDlgItem(IDC_EDIT_TITLE)->SetFocus();
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
@@ -249,10 +266,10 @@ void CAddEntryDlg::OnCheckHidePw()
 	}
 
 	UpdateData(FALSE);
-	m_pEditPw.RedrawWindow();
 	m_pRepeatPw.RedrawWindow();
-	m_pEditPw.SetFocus();
+	m_pEditPw.RedrawWindow();
 	m_pRepeatPw.SetFocus();
+	m_pEditPw.SetFocus();
 }
 
 void CAddEntryDlg::OnPickIconBtn() 

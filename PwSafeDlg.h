@@ -57,7 +57,7 @@
 #define ICOIDX_RAMDISK 20
 #define ICOIDX_NODRIVE 21
 
-#define PWS_SEARCHGROUP "Search results"
+#define PWS_SEARCHGROUP TRL("Search results")
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -96,6 +96,8 @@ public:
 	BOOL m_bImgButtons;
 	BOOL m_bEntryGrid;
 	BOOL m_bAutoSaveDb;
+	long m_nLockTimeDef;
+	long m_nLockCountdown;
 
 	BOOL m_bExiting;
 	BOOL m_bLocked;
@@ -115,6 +117,11 @@ public:
 	BOOL m_bShowURL;
 	BOOL m_bShowPassword;
 	BOOL m_bShowNotes;
+	BOOL m_bLockOnMinimize;
+	BOOL m_bMinimizeToTray;
+
+	HICON m_hTrayIconNormal;
+	HICON m_hTrayIconLocked;
 
 	BCMenu m_menu; // Our XP-style menu
 	BOOL m_bMenu; // Menu created?
@@ -129,6 +136,7 @@ public:
 	CString m_strFile;
 	BOOL m_bFileOpen;
 	BOOL m_bModified;
+	BOOL m_bMinimized;
 
 	CString m_strTempFile;
 
@@ -312,6 +320,11 @@ protected:
 	afx_msg void OnColumnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnImportCWallet();
 	afx_msg void OnUpdateImportCWallet(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateFileNew(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateFileOpen(CCmdUI* pCmdUI);
+	afx_msg void OnColumnClickGroupList(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnImportPwSafe();
+	afx_msg void OnUpdateImportPwSafe(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

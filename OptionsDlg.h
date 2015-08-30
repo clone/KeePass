@@ -32,6 +32,20 @@
 
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/ShadeButtonST.h"
+#include "NewGUI/WindowGroups.h"
+#include "NewGUI/ColourPickerXP.h"
+
+#define OPTGRP_SECURITY  0
+#define OPTGRP_STARTEXIT 1
+#define OPTGRP_GUI       2
+#define OPTGRP_FILES     3
+#define OPTGRP_MEMORY    4
+
+#define OPTSZ_FILES "Files"
+#define OPTSZ_MEMORY "Memory"
+#define OPTSZ_STARTEXIT "Start and Exit"
+#define OPTSZ_GUI "Interface (GUI)"
+#define OPTSZ_SECURITY "Security"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -43,9 +57,16 @@ public:
 	CKCSideBannerWnd m_banner;
 
 	CString m_strFontSpec;
+	CWindowGroups m_wndgrp;
+	CImageList m_ilIcons;
+
+	COLORREF m_rgbRowHighlight;
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };
+	CColourPickerXP	m_btnColorRowHighlight;
+	CTabCtrl	m_tabMenu;
+	CComboBox	m_cEncAlgos;
 	CShadeButtonST	m_btSelFont;
 	CShadeButtonST	m_btCancel;
 	CShadeButtonST	m_btOK;
@@ -55,6 +76,11 @@ public:
 	BOOL	m_bImgButtons;
 	BOOL	m_bEntryGrid;
 	BOOL	m_bAutoSave;
+	BOOL	m_bLockOnMinimize;
+	BOOL	m_bMinimizeToTray;
+	int		m_nAlgorithm;
+	BOOL	m_bLockAfterTime;
+	UINT	m_nLockAfter;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(COptionsDlg)
@@ -68,6 +94,7 @@ protected:
 	virtual void OnOK();
 	virtual void OnCancel();
 	afx_msg void OnBtnSelFont();
+	afx_msg void OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

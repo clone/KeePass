@@ -30,8 +30,6 @@
 #include "StdAfx.h"
 #include "base64.h"
 
-#if 0
-
 static const char *g_pCodes =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -142,5 +140,3 @@ bool CBase64Codec::Decode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOut
 	*uOutLen = z;
 	return true;
 }
-
-#endif

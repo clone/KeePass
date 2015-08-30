@@ -1382,7 +1382,7 @@ void Rijndael::keySched(RD_UINT8 key[_MAX_KEY_COLUMNS][4])
 	int t = 0;
 
 	// copy values into round key array
-	for(j = 0;(j < uKeyColumns) && (r <= m_uRounds); )
+	for(j = 0;(j < uKeyColumns) && (r <= (int)m_uRounds); )
 	{
 		for(;(j < uKeyColumns) && (t < 4); j++, t++)
 		{
@@ -1397,7 +1397,7 @@ void Rijndael::keySched(RD_UINT8 key[_MAX_KEY_COLUMNS][4])
 		}
 	}
 		
-	while(r <= m_uRounds)
+	while(r <= (int)m_uRounds)
 	{
 		tempKey[0][0] ^= S[tempKey[uKeyColumns-1][1]];
 		tempKey[0][1] ^= S[tempKey[uKeyColumns-1][2]];
@@ -1425,7 +1425,7 @@ void Rijndael::keySched(RD_UINT8 key[_MAX_KEY_COLUMNS][4])
 				*((RD_UINT32*)tempKey[j]) ^= *((RD_UINT32*)tempKey[j-1]);
 			}
 		}
-		for(j = 0; (j < uKeyColumns) && (r <= m_uRounds); )
+		for(j = 0; (j < uKeyColumns) && (r <= (int)m_uRounds); )
 		{
 			for(; (j < uKeyColumns) && (t < 4); j++, t++)
 			{
@@ -1445,7 +1445,7 @@ void Rijndael::keyEncToDec()
 	int r;
 	RD_UINT8 *w;
 
-	for(r = 1; r < m_uRounds; r++)
+	for(r = 1; r < (int)m_uRounds; r++)
 	{
 		w = m_expandedKey[r][0];
 		*((RD_UINT32*)w) = *((RD_UINT32*)U1[w[0]]) ^ *((RD_UINT32*)U2[w[1]]) ^ *((RD_UINT32*)U3[w[2]]) ^ *((RD_UINT32*)U4[w[3]]);
@@ -1483,7 +1483,7 @@ void Rijndael::encrypt(const RD_UINT8 a[16], RD_UINT8 b[16])
 						^ *((RD_UINT32*)T2[temp[0][1]])
 						^ *((RD_UINT32*)T3[temp[1][2]]) 
 						^ *((RD_UINT32*)T4[temp[2][3]]);
-	for(r = 1; r < m_uRounds-1; r++)
+	for(r = 1; r < (int)m_uRounds-1; r++)
 	{
 		*((RD_UINT32*)temp[0]) = *((RD_UINT32*)(b   )) ^ *((RD_UINT32*)m_expandedKey[r][0]);
 		*((RD_UINT32*)temp[1]) = *((RD_UINT32*)(b+ 4)) ^ *((RD_UINT32*)m_expandedKey[r][1]);

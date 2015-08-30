@@ -53,6 +53,7 @@ public:
 	BOOL	m_bUserName;
 	CString	m_strFind;
 	BOOL	m_bCaseSensitive;
+	BOOL	m_bGroupName;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CFindInDbDlg)

@@ -1,4 +1,29 @@
-XX/XX/XX - 0.86
+XX/XX/XX - 0.87
+- Added Twofish as alternative file encryption algorithm
+- Added option to lock the workspace when minimizing the window
+- Added option to minimize the window to tray instead of
+  taskbar
+- Added option to lock the workspace after a user-defined time
+  period
+- Tray icon changes when the workspace is being locked
+- Added command-line switch /? to show some help on available
+  command-line options
+- Extended options dialog (multi-page dialog)
+- A pseudo-random password based on the system entropy (times,
+  counters, etc.) is automatically generated and filled in
+  the password edit box when adding a new entry to the list
+- Added ability to search in database based on group names
+- The group list can be sorted now, just click on the column
+  header
+- The background color of every second row can be changed now
+- Fixed a bug which caused KeePass to display no error message
+  when saving a database wasn't successful
+- Added a cancel button to the file save confirmation dialog
+- The system tray icon is now high-color
+- PwSafe v2 TXT exports can be imported now (the files exported
+  by the latest version [v2] of CounterPane's PwSafe)
+
+04/01/02 - 0.86
 - Added Dutch translation (thanks to Kees Koenders!)
 - Added Swedish translation (thanks to Michael Åström!)
 - You can now change the font of the password and group lists

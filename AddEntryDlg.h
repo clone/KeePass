@@ -37,7 +37,7 @@
 
 #include "PwSafe/PwManager.h"
 
-#define PWAE_STDURL_A "http://www."
+#define PWAE_STDURL_A ""
 #define PWAE_STDURL   _T(PWAE_STDURL_A)
 
 /////////////////////////////////////////////////////////////////////////////

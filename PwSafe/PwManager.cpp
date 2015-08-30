@@ -46,6 +46,8 @@ CPwManager::CPwManager()
 	m_dwNumGroups = 0;
 	m_dwMaxGroups = 0;
 
+	m_nAlgorithm = ALGO_AES;
+
 	memset(m_pMasterKey, 0, 32);
 
 	_AllocGroups(PWM_NUM_INITIAL_GROUPS);
@@ -156,6 +158,19 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 	}
 
 	return FALSE;
+}
+
+BOOL CPwManager::SetAlgorithm(int nAlgorithm)
+{
+	ASSERT((nAlgorithm == ALGO_AES) || (nAlgorithm == ALGO_TWOFISH));
+	if((nAlgorithm != ALGO_AES) && (nAlgorithm != ALGO_TWOFISH)) return FALSE;
+	m_nAlgorithm = nAlgorithm;
+	return TRUE;
+}
+
+int CPwManager::GetAlgorithm()
+{
+	return m_nAlgorithm;
 }
 
 void CPwManager::_AllocEntries(unsigned long uEntries)
@@ -609,7 +624,6 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 	unsigned long uFileSize, uAllocated, uEncryptedPartSize;
 	unsigned long i, j, pos;
 	PW_DBHEADER hdr;
-	Rijndael aes;
 	sha256_ctx sha32;
 	RD_UINT8 uFinalKey[32];
 	DWORD dw, dw2;
@@ -659,23 +673,47 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 	if((hdr.dwVersion & 0xFFFFFF00) != (PWM_DBVER_DW & 0xFFFFFF00))
 		{ _OPENDB_FAIL; }
 
+	if(hdr.dwFlags & PWM_FLAG_RIJNDAEL) m_nAlgorithm = ALGO_AES;
+	else if(hdr.dwFlags & PWM_FLAG_TWOFISH) m_nAlgorithm = ALGO_TWOFISH;
+	else { ASSERT(FALSE); _OPENDB_FAIL; }
+
 	// Hash the master password with the salt in the file
 	sha256_begin(&sha32);
 	sha256_hash(hdr.aMasterSeed, 16, &sha32);
 	sha256_hash(m_pMasterKey, 32, &sha32);
 	sha256_end((unsigned char *)uFinalKey, &sha32);
 
-	// Initialize Rijndael algorithm
-	if(aes.init(Rijndael::CBC, Rijndael::Decrypt, uFinalKey,
-		Rijndael::Key32Bytes, hdr.aEncryptionIV) != RIJNDAEL_SUCCESS)
-		{ _OPENDB_FAIL; }
+	if(m_nAlgorithm == ALGO_AES)
+	{
+		Rijndael aes;
 
-	// Decrypt! The first 48 bytes aren't encrypted (that's the header)
-	uEncryptedPartSize = aes.padDecrypt((RD_UINT8 *)pVirtualFile + 48, uFileSize - 48,
-		(RD_UINT8 *)pVirtualFile + 48);
+		// Initialize Rijndael algorithm
+		if(aes.init(Rijndael::CBC, Rijndael::Decrypt, uFinalKey,
+			Rijndael::Key32Bytes, hdr.aEncryptionIV) != RIJNDAEL_SUCCESS)
+			{ _OPENDB_FAIL; }
+
+		// Decrypt! The first 48 bytes aren't encrypted (that's the header)
+		uEncryptedPartSize = (unsigned long)aes.padDecrypt((RD_UINT8 *)pVirtualFile + 48,
+			uFileSize - 48, (RD_UINT8 *)pVirtualFile + 48);
+	}
+	else if(m_nAlgorithm == ALGO_TWOFISH)
+	{
+		CTwofish twofish;
+
+		if(twofish.init(uFinalKey, 32, hdr.aEncryptionIV) != true)
+			{ _OPENDB_FAIL };
+
+		uEncryptedPartSize = (unsigned long)twofish.padDecrypt(
+			(RD_UINT8 *)pVirtualFile + 48,
+			uFileSize - 48, (RD_UINT8 *)pVirtualFile + 48);
+	}
+	else
+	{
+		ASSERT(FALSE); _OPENDB_FAIL;
+	}
 
 	// Check for success
-	if((uEncryptedPartSize > 2147483646) || (uEncryptedPartSize == 0))
+	if((uEncryptedPartSize > 2147483446) || (uEncryptedPartSize == 0))
 		{ _OPENDB_FAIL; }
 
 	// Update header information, it was partially encrypted
@@ -693,7 +731,7 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 		pos += j + 1;
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 
-		dw = *(DWORD *)&pVirtualFile[pos];
+		memcpy(&dw, &pVirtualFile[pos], sizeof(DWORD));
 		pos += 4;
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 
@@ -736,11 +774,11 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 		pos += j + 1;
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 
-		dw = *(DWORD *)&pVirtualFile[pos];
+		memcpy(&dw, &pVirtualFile[pos], sizeof(DWORD));
 		pos += 4;
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 
-		dw2 = *(DWORD *)&pVirtualFile[pos];
+		memcpy(&dw2, &pVirtualFile[pos], sizeof(DWORD));
 		pos += 4;
 		if(pos > uFileSize) { _OPENDB_FAIL; }
 
@@ -771,7 +809,6 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	unsigned long i, pos;
 	PW_DBHEADER hdr;
 	RD_UINT8 uFinalKey[32];
-	Rijndael aes;
 	sha256_ctx sha32;
 
 	ASSERT(pszFile != NULL);
@@ -813,7 +850,13 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	// Build header structure
 	hdr.dwSignature1 = PWM_DBSIG_1;
 	hdr.dwSignature2 = PWM_DBSIG_2;
-	hdr.dwFlags = PWM_FLAG_SHA2 | PWM_FLAG_RIJNDAEL;
+
+	hdr.dwFlags = PWM_FLAG_SHA2;
+
+	if(m_nAlgorithm == ALGO_AES) hdr.dwFlags |= PWM_FLAG_RIJNDAEL;
+	else if(m_nAlgorithm == ALGO_TWOFISH) hdr.dwFlags |= PWM_FLAG_TWOFISH;
+	else { fclose(fp); ASSERT(FALSE); return FALSE; }
+
 	hdr.dwVersion = PWM_DBVER_DW;
 	hdr.dwGroups = m_dwNumGroups;
 	hdr.dwEntries = m_dwNumEntries;
@@ -909,23 +952,46 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	sha256_hash(m_pMasterKey, 32, &sha32);
 	sha256_end((unsigned char *)uFinalKey, &sha32);
 
-	// Initialize Rijndael/AES
-	if(aes.init(Rijndael::CBC, Rijndael::Encrypt, uFinalKey,
-		Rijndael::Key32Bytes, hdr.aEncryptionIV) != RIJNDAEL_SUCCESS)
+	if(m_nAlgorithm == ALGO_AES)
 	{
-		fclose(fp); fp = NULL; SAFE_DELETE_ARRAY(pVirtualFile);
-		return FALSE;
-	}
+		Rijndael aes;
 
-	// Encrypt! The first 48 bytes remain unencrypted, that's the header
-	uEncryptedPartSize = aes.padEncrypt((RD_UINT8 *)pVirtualFile + 48, pos - 48,
-		(RD_UINT8 *)pVirtualFile + 48);
+		// Initialize Rijndael/AES
+		if(aes.init(Rijndael::CBC, Rijndael::Encrypt, uFinalKey,
+			Rijndael::Key32Bytes, hdr.aEncryptionIV) != RIJNDAEL_SUCCESS)
+		{
+			fclose(fp); fp = NULL; SAFE_DELETE_ARRAY(pVirtualFile);
+			return FALSE;
+		}
+
+		// Encrypt! The first 48 bytes remain unencrypted, that's the header
+		uEncryptedPartSize = (unsigned long)aes.padEncrypt((RD_UINT8 *)pVirtualFile + 48,
+			pos - 48, (RD_UINT8 *)pVirtualFile + 48);
+	}
+	else if(m_nAlgorithm == ALGO_TWOFISH)
+	{
+		CTwofish twofish;
+
+		if(twofish.init(uFinalKey, 32, hdr.aEncryptionIV) == false)
+		{
+			fclose(fp); fp = NULL; SAFE_DELETE_ARRAY(pVirtualFile);
+			return FALSE;
+		}
+
+		uEncryptedPartSize = (unsigned long)twofish.padEncrypt(
+			(RD_UINT8 *)pVirtualFile + 48,
+			pos - 48, (RD_UINT8 *)pVirtualFile + 48);
+	}
+	else
+	{
+		ASSERT(FALSE); _OPENDB_FAIL;
+	}
 
 	// Check if all went correct
 	ASSERT((uEncryptedPartSize % 16) == 0);
-	if((uEncryptedPartSize > 2147483646) || (uEncryptedPartSize == 0))
+	if((uEncryptedPartSize > 2147483446) || (uEncryptedPartSize == 0))
 	{
-		fclose(fp); fp = NULL; SAFE_DELETE_ARRAY(pVirtualFile);
+		ASSERT(FALSE); fclose(fp); fp = NULL; SAFE_DELETE_ARRAY(pVirtualFile);
 		return FALSE;
 	}
 
@@ -965,7 +1031,6 @@ int CPwManager::Find(const TCHAR *pszFindString, BOOL bCaseSensitive, int fieldF
 
 			if(strEntry.Find(strFind) != -1) return i;
 		}
-
 		if(fieldFlags & PWMF_USER)
 		{
 			strEntry = m_pEntries[i].pszUserName;
@@ -973,7 +1038,6 @@ int CPwManager::Find(const TCHAR *pszFindString, BOOL bCaseSensitive, int fieldF
 
 			if(strEntry.Find(strFind) != -1) return i;
 		}
-
 		if(fieldFlags & PWMF_URL)
 		{
 			strEntry = m_pEntries[i].pszURL;
@@ -997,6 +1061,13 @@ int CPwManager::Find(const TCHAR *pszFindString, BOOL bCaseSensitive, int fieldF
 
 			if(strEntry.Find(strFind) != -1) return i;
 		}
+		if(fieldFlags & PWMF_GROUPNAME)
+		{
+			strEntry = GetGroup(m_pEntries[i].uGroupId)->pszGroupName;
+			if(bCaseSensitive == FALSE) strEntry.MakeLower();
+
+			if(strEntry.Find(strFind) != -1) return i;
+		}
 	}
 
 	return -1;
@@ -1012,6 +1083,7 @@ void CPwManager::MoveInternal(int nFrom, int nTo)
 	if((nFrom < 0) || (nFrom >= (int)m_dwNumEntries)) return;
 	if((nTo < 0) || (nTo >= (int)m_dwNumEntries)) return;
 
+	// Set moving direction
 	if(nFrom < nTo) dir = 1;
 	else dir = -1;
 
@@ -1039,6 +1111,7 @@ BOOL CPwManager::MoveGroup(int nFrom, int nTo)
 	if((nFrom < 0) || (nFrom >= (int)m_dwNumGroups)) return FALSE;
 	if((nTo < 0) || (nTo >= (int)m_dwNumGroups)) return FALSE;
 
+	// Set moving direction
 	if(nFrom < nTo) dir = 1;
 	else dir = -1;
 
@@ -1080,6 +1153,32 @@ void CPwManager::MoveInGroup(int nGroup, int nFrom, int nTo)
 	if((nFromEx == -1) || (nToEx == -1)) return;
 
 	MoveInternal(nFromEx, nToEx);
+}
+
+void CPwManager::SortGroupList()
+{
+	DWORD i;
+	BOOL bSwapped = TRUE;
+	PPW_GROUP p, q;
+
+	if(m_dwNumGroups <= 1) return; // Nothing to sort
+
+	while(bSwapped == TRUE) // Stable bubble-sort on the group list
+	{
+		bSwapped = FALSE;
+
+		for(i = 0; i < (m_dwNumGroups - 1); i++)
+		{
+			p = GetGroup(i);
+			q = GetGroup(i+1);
+
+			if(_tcsicmp(p->pszGroupName, q->pszGroupName) > 0)
+			{
+				MoveGroup((int)i, (int)i+1);
+				bSwapped = TRUE;
+			}
+		}
+	}
 }
 
 void CPwManager::SortGroup(int nGroup, DWORD dwSortByField)
@@ -1184,14 +1283,26 @@ TCHAR *CPwManager::_ToUnicode(const char *pszString)
 	if(pszString == NULL) { ASSERT(FALSE); return NULL; }
 
 #ifdef _UNICODE
-	_nChars = strlen(pszString) + 1;
-	p = new TCHAR[_nChars];
+	// Determine the correct buffer size by calling the function itself with 0 as buffer size (see docs)
+	_nChars = MultiByteToWideChar(CP_ACP, 0, pszString, -1, NULL, 0);
+
+	p = new TCHAR[_nChars + 1];
 	p[0] = 0;
-	VERIFY(MultiByteToWideChar(CP_ACP, 0, pszString, -1, p, _nChars) !=
-		ERROR_INSUFFICIENT_BUFFER);
+
+	// Jan 9th 2004: DonAngel { 
+	// This was ASSERTing for string. All debugging did not given good results, so I decided to remove
+	// the verification. This could be a bug in MultiByteToWideChar, because thou it was returning
+	// ERROR_INSUFFICIENT_BUFFER, the convertion was OK!?
+	// The problem should be investigated later, but for now - I prefer to remove the ASSERT
+	// VERIFY(MultiByteToWideChar(CP_ACP, 0, pszString, -1, p, _nChars) !=
+	//	ERROR_INSUFFICIENT_BUFFER);
+	// Jan 9th 2004: DonAngel }
+
+	MultiByteToWideChar(CP_ACP, 0, pszString, -1, p, _nChars);
 #else
-	// Currently no _ToUnicode call is allowed when building non-Unicode project
-	ASSERT(FALSE);
+	// Non-unicode - return the same!
+	p = new char[strlen(pszString) + 1];
+	strcpy(p, pszString);
 #endif
 
 	return p;

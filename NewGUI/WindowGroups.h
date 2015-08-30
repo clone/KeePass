@@ -27,30 +27,23 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ___PW_IMPORT_H___
-#define ___PW_IMPORT_H___
+#include "NewGUICommon.h"
 
-#include "PwManager.h"
+#define WG_OFFSET_TOP  105
+#define WG_OFFSET_LEFT  35
+#define WG_Y_STEP       20
 
-#define DEF_CW_CATEGORY _T("----------------------------------------")
-
-class CPwImport
+class CWindowGroups
 {
 public:
-	CPwImport();
-	virtual ~CPwImport();
+	CWindowGroups();
+	virtual ~CWindowGroups();
 
-	BOOL ImportCsvToDb(const char *pszFile, CPwManager *pMgr, DWORD dwGroupId);
-	BOOL ImportCWalletToDb(const char *pszFile, CPwManager *pMgr);
-	BOOL ImportPwSafeToDb(const char *pszFile, CPwManager *pMgr);
+	BOOL AddWindow(CObject *pWindow, DWORD dwGroupID);
+	BOOL ArrangeWindows(CWnd *pParentWindow);
+	BOOL HideAllExcept(DWORD dwGroupID);
 
 private:
-	void _AddStringStreamToDb(const char *pStream, unsigned long uStreamSize);
-	char *_FileToMemory(const char *pszFile, unsigned long *pFileSize);
-	unsigned long _GetPreferredIcon(const char *pszGroup);
-
-	CPwManager *m_pLastMgr;
-	DWORD m_dwLastGroupId;
+	CObArray m_aWindows;
+	CDWordArray m_aGroupIDs;
 };
-
-#endif

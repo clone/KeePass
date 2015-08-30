@@ -65,6 +65,10 @@
 #define CDDS_SUBITEM           0x00020000
 #endif
 
+#ifndef TCM_HIGHLIGHTITEM
+#define TCM_HIGHLIGHTITEM (TCM_FIRST + 51)
+#endif
+
 typedef struct tagNMLVCUSTOMDRAWX
 {
     NMCUSTOMDRAW nmcd;

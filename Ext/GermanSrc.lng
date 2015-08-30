@@ -237,6 +237,7 @@
 |- Rijndael encryption|        |- Rijndael-Verschlüsselung|
 |- Rijndael decryption|        |- Rijndael-Entschlüsselung|
 |- Arcfour crypto routine|     |- Arcfour-Cryptoroutine|
+|- Twofish algorithm|          |- Twofish-Algorithmus|
 
 |The program will exit now.|   |Das Programm wird jetzt beendet.|
 |Self-Test(s) Failed|          |Selbsttest(s) fehlgeschlagen|
@@ -284,8 +285,7 @@
 |Newline sequence:|            |Neue-Zeile-Sequenz:|
 |Windows newline sequence (\r\n)|              |Windows Neue-Zeile-Sequenz (\r\n)|
 |Unix newline sequence (\n)|   |Unix Neue-Zeile-Sequenz (\n)|
-|Clipboard auto-clear time:|   |Zw.ablage autom. löschen:|
-|sec|                          |sec|
+|Clipboard auto-clear time (seconds):|   |Zwischenablage automatisch löschen (Sekunden):|
 |Settings|                     |Einstellungen|
 |Here you can configure KeePass.|              |Hier können Sie KeePass konfigurieren.|
 |Automatically open last used database on startup|
@@ -327,6 +327,7 @@
     |Es ist ein Fehler während des Importierens aufgetreten. Datei kann nicht importiert werden.|
 |&Import From CSV|             |CSV-Datei &importieren|
 |Import From Code&Wallet|      |Code&Wallet-Textdatei importieren|
+|Import From &PwSafe v2 TXT|   |&PwSafe v2 TXT-Datei importieren|
 |Select &Font|                 |&Font wählen|
 |Select a new font for the list controls.|     |Neue Schriftart für Listen auswählen.|
 
@@ -338,3 +339,34 @@
 |Import To Database|           |In Datenbank importieren|
 
 |&Get more languages...|       |Mehr &Sprachen herunterladen...|
+|Start and Exit|               |Start und Beenden|
+|Interface (GUI)|              |Interface (GUI)|
+|Files|                        |Dateien|
+|Memory|                       |Speicher|
+|Lock workspace when minimizing the main window|
+    |Arbeitsfläche sperren wenn das Hauptfenster minimiert wird|
+|Minimize to tray instead of taskbar|
+    |Nach Tray anstatt nach Taskbar minimieren|
+
+|Encryption algorithm to use (for this database):| |Zu benutzender Verschlüsselungsalgorithmus (für diese Datenbank):|
+|Advanced Encryption Standard (AES) (128-bit block cipher)|
+    |Advanced Encryption Standard (AES) (128-bit Block-Cipher)|
+|Twofish (128-bit block cipher)|               |Twofish (128-bit Block-Cipher)|
+|Security|                     |Sicherheit|
+|KeePass is OSI Certified Open Source Software.|
+    |KeePass ist OSI Certified Open Source Software.|
+|KeePass usage:|               |KeePass Kommandozeilen-Aufruf:|
+|db = Path to database you wish to open on KeePass startup|
+    |db = Pfad zu einer Datenbank, die KeePass beim Starten öffnen soll|
+|Automatically lock workspace after the following number of seconds:|
+    |Arbeitsfläche automatisch nach Anzahl Sekunden sperren:|
+|&Group Name|                  |&Gruppenname|
+|First close the open file before opening another one!|
+    |Die offene Datei muss zuerst geschlossen werden bevor eine andere geöffnet werden kann!|
+|Every second row has a different background color. Use this color:|
+    |Jede zweite Zeile hat eine andere Hintergrundfarbe. Diese Farbe benutzen:|
+|Start:|                       |Start:|
+|Exit:|                        |Beenden:|
+|Default|                      |Standard|
+|More Colors...|               |Mehr Farben...|
+|Search results|               |Suchergebnisse|

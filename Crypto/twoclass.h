@@ -27,30 +27,26 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ___PW_IMPORT_H___
-#define ___PW_IMPORT_H___
+#ifndef ___TWOFISH_CLASS_H___
+#define ___TWOFISH_CLASS_H___
 
-#include "PwManager.h"
+#include "twofish.h"
+#include "rijndael.h"
 
-#define DEF_CW_CATEGORY _T("----------------------------------------")
-
-class CPwImport
+class CTwofish
 {
 public:
-	CPwImport();
-	virtual ~CPwImport();
+	CTwofish();
+	virtual ~CTwofish();
 
-	BOOL ImportCsvToDb(const char *pszFile, CPwManager *pMgr, DWORD dwGroupId);
-	BOOL ImportCWalletToDb(const char *pszFile, CPwManager *pMgr);
-	BOOL ImportPwSafeToDb(const char *pszFile, CPwManager *pMgr);
+	bool init(RD_UINT8 *pKey, unsigned long uKeyLen, RD_UINT8 *initVector = NULL);
+
+	int padEncrypt(RD_UINT8 *pInput, int nInputOctets, RD_UINT8 *pOutBuffer);
+	int padDecrypt(RD_UINT8 *pInput, int nInputOctets, RD_UINT8 *pOutBuffer);
 
 private:
-	void _AddStringStreamToDb(const char *pStream, unsigned long uStreamSize);
-	char *_FileToMemory(const char *pszFile, unsigned long *pFileSize);
-	unsigned long _GetPreferredIcon(const char *pszGroup);
-
-	CPwManager *m_pLastMgr;
-	DWORD m_dwLastGroupId;
+	Twofish_key m_key;
+	RD_UINT8 m_pInitVector[16];
 };
 
 #endif

@@ -272,6 +272,91 @@ BOOL CPwImport::ImportCWalletToDb(const char *pszFile, CPwManager *pMgr)
 	return TRUE;
 }
 
+BOOL CPwImport::ImportPwSafeToDb(const char *pszFile, CPwManager *pMgr)
+{
+	char *pData;
+	unsigned long uFileSize, i;
+	int nField, j;
+	CString strGroup, strTitle, strUserName, strPassword, strNotes;
+	int nGroupId;
+	BOOL bInNotes = FALSE;
+
+	ASSERT(pszFile != NULL); if(pszFile == NULL) return FALSE;
+	ASSERT(pMgr != NULL); if(pMgr == NULL) return FALSE;
+
+	pData = _FileToMemory(pszFile, &uFileSize);
+	if(pData == NULL) return FALSE;
+
+	nField = 0;
+	i = 0; j = 0;
+	while(1)
+	{
+		if(pData[i] == '\t')
+		{
+			nField++;
+
+			if(nField == 1)
+			{
+				j = strGroup.ReverseFind('.');
+				if(j != -1)
+				{
+					strTitle = strGroup.Right(strGroup.GetLength() - j - 1);
+					strGroup = strGroup.Left(j);
+				}
+				else strTitle.Empty();
+			}
+		}
+		else if((pData[i] == '\"') && (bInNotes == FALSE) && (nField == 3))
+		{
+			bInNotes = TRUE;
+		}
+		else if((pData[i] == '\"') && (bInNotes == TRUE) && (nField == 3))
+		{
+			bInNotes = FALSE;
+
+			if(strNotes.GetAt(0) == '\"') strNotes = strNotes.Right(strNotes.GetLength() - 1);
+			if(strNotes.Right(1) == "\"") strNotes = strNotes.Left(strNotes.GetLength() - 1);
+		}
+		else if((pData[i] == '\r') && (bInNotes == FALSE))
+		{
+			// Ignore all \r
+		}
+		else if((pData[i] == '\n') && (bInNotes == FALSE))
+		{
+			nGroupId = pMgr->GetGroupId(strGroup);
+			if(nGroupId == -1)
+			{
+				pMgr->AddGroup(_GetPreferredIcon(strGroup), strGroup);
+				nGroupId = pMgr->GetGroupId(strGroup);
+			}
+			ASSERT(nGroupId != -1);
+
+			pMgr->AddEntry((DWORD)nGroupId, _GetPreferredIcon(strTitle),
+				strTitle, _T(""), strUserName, strPassword, strNotes);
+
+			strGroup.Empty(); strTitle.Empty(); strUserName.Empty();
+			strPassword.Empty(); strNotes.Empty();
+			nField = 0;
+		}
+		else
+		{
+			if(nField == 0) strGroup += pData[i];
+			else if(nField == 1) strUserName += pData[i];
+			else if(nField == 2) strPassword += pData[i];
+			else if(nField == 3) strNotes += pData[i];
+		}
+
+		i++;
+		if(i >= uFileSize) break;
+	}
+
+	EraseCString(&strGroup); EraseCString(&strTitle); EraseCString(&strUserName);
+	EraseCString(&strPassword); EraseCString(&strNotes);
+
+	SAFE_DELETE_ARRAY(pData);
+	return TRUE;
+}
+
 void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamSize)
 {
 	unsigned long s;
@@ -309,8 +394,8 @@ void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamS
 		p += s + 1;
 
 		if((strcmp(pTitle, "Account") != 0) && (strcmp(pPassword, "Password") != 0))
-			m_pLastMgr->AddEntry(m_dwLastGroupId, 0, pTitle, pURL, pUserName,
-				pPassword, pNotes);
+			m_pLastMgr->AddEntry(m_dwLastGroupId, _GetPreferredIcon(pTitle), pTitle,
+				pURL, pUserName, pPassword, pNotes);
 	}
 }
 

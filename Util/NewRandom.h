@@ -33,7 +33,7 @@
 #include <windows.h>
 #include "../Crypto/sha2.h"
 
-#define INTRAND_SIZE 60
+#define INTRAND_SIZE 260
 
 class CNewRandom
 {
@@ -46,6 +46,7 @@ public:
 
 	void GetRandomBuffer(BYTE *pBuf, DWORD dwSize);
 
+private:
 	BYTE m_pPseudoRandom[INTRAND_SIZE];
 	DWORD m_dwCounter;
 };
@@ -57,7 +58,6 @@ public:
 
 	virtual BOOL GenerateRandomSequence(unsigned long uRandomSeqSize, unsigned char *pBuffer) const = 0;
 };
-
 
 unsigned long randXorShift();
 

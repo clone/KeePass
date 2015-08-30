@@ -49,6 +49,8 @@ CCustomListCtrlEx::CCustomListCtrlEx()
 
 	if(nBitsPerPixel > 8) m_bColorize = TRUE;
 	else m_bColorize = FALSE;
+
+	m_rgbColor = RGB(238,238,255);
 }
 
 CCustomListCtrlEx::~CCustomListCtrlEx()
@@ -89,7 +91,7 @@ void CCustomListCtrlEx::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 			if(pLVCD->nmcd.dwItemSpec & 1)
 			{
 				crText = RGB(0,0,0);
-				crBkgnd = RGB(238,238,255);
+				crBkgnd = m_rgbColor;
 			}
 			else
 			{
@@ -116,4 +118,14 @@ BOOL CCustomListCtrlEx::PreCreateWindow(CREATESTRUCT& cs)
 	cs.style |= LVS_REPORT | LVS_OWNERDRAWFIXED;
 
 	return CListCtrl::PreCreateWindow(cs);
+}
+
+COLORREF CCustomListCtrlEx::GetColorEx()
+{
+	return m_rgbColor;
+}
+
+void CCustomListCtrlEx::SetColorEx(COLORREF rgbColor)
+{
+	m_rgbColor = rgbColor;
 }

@@ -225,6 +225,10 @@ SOURCE=.\res\document.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\hand.cur
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\iconpic.ico
 # End Source File
 # Begin Source File
@@ -242,6 +246,10 @@ SOURCE=.\res\key_smal.bmp
 # Begin Source File
 
 SOURCE=.\res\language.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\locked.ico
 # End Source File
 # Begin Source File
 
@@ -379,6 +387,22 @@ SOURCE=.\Crypto\testimpl.cpp
 
 SOURCE=.\Crypto\testimpl.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\Crypto\twoclass.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Crypto\twoclass.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Crypto\twofish.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Crypto\twofish.h
+# End Source File
 # End Group
 # Begin Group "NewGUI"
 
@@ -409,6 +433,14 @@ SOURCE=.\NewGUI\CeXDib.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\NewGUI\ColourPickerXP.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\ColourPickerXP.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\NewGUI\CustomListCtrlEx.cpp
 # ADD CPP /I ".."
 # End Source File
@@ -436,6 +468,10 @@ SOURCE=.\NewGUI\KCSideBannerWnd.h
 # Begin Source File
 
 SOURCE=.\NewGUI\KCWndUtil.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\MemDC.h
 # End Source File
 # Begin Source File
 
@@ -476,6 +512,14 @@ SOURCE=.\NewGUI\TranslateEx.cpp
 # Begin Source File
 
 SOURCE=.\NewGUI\TranslateEx.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\WindowGroups.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\WindowGroups.h
 # End Source File
 # Begin Source File
 

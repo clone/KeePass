@@ -40,6 +40,9 @@ class CCustomListCtrlEx : public CListCtrl
 public:
 	CCustomListCtrlEx();
 
+	COLORREF GetColorEx();
+	void SetColorEx(COLORREF rgbColor);
+
 	//{{AFX_VIRTUAL(CCustomListCtrlEx)
 	protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
@@ -49,6 +52,7 @@ public:
 	virtual ~CCustomListCtrlEx();
 
 private:
+	COLORREF m_rgbColor;
 	BOOL m_bColorize;
 
 protected:

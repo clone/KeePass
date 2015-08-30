@@ -32,15 +32,16 @@
 
 #include "../Util/NewRandom.h"
 #include "../Crypto/rijndael.h"
+#include "../Crypto/twoclass.h"
 
 // General product information
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
-#define PWM_VERSION_STR  _T("0.86")
+#define PWM_VERSION_STR  _T("0.87")
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
 #define PWM_DBSIG_2      0xB54BFB65
-#define PWM_DBVER_DW     0x00010001
+#define PWM_DBVER_DW     0x00010002
 
 #define PWM_HOMEPAGE     _T("http://keepass.sourceforge.net")
 #define PWM_URL_TRL      _T("http://keepass.sourceforge.net/translations.php")
@@ -76,6 +77,10 @@
 #define PWMKEY_COLWIDTH2 _T("KeeColumnWidth2")
 #define PWMKEY_COLWIDTH3 _T("KeeColumnWidth3")
 #define PWMKEY_COLWIDTH4 _T("KeeColumnWidth4")
+#define PWMKEY_LOCKMIN   _T("KeeLockOnMinimize")
+#define PWMKEY_MINTRAY   _T("KeeMinimizeToTray")
+#define PWMKEY_LOCKTIMER _T("KeeLockAfterTime")
+#define PWMKEY_ROWCOLOR  _T("KeeRowColor")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -84,6 +89,7 @@
 #define PWM_FLAG_SHA2           1
 #define PWM_FLAG_RIJNDAEL       2
 #define PWM_FLAG_ARCFOUR        4
+#define PWM_FLAG_TWOFISH        8
 
 #define PWM_SESSION_KEY_SIZE    12
 
@@ -93,6 +99,10 @@
 #define PWMF_URL         4
 #define PWMF_PASSWORD    8
 #define PWMF_ADDITIONAL 16
+#define PWMF_GROUPNAME  32
+
+#define ALGO_AES         0
+#define ALGO_TWOFISH     1
 
 #pragma pack(1)
 typedef struct _PW_ENTRY
@@ -184,8 +194,12 @@ public:
 	void MoveInGroup(int nGroup, int nFrom, int nTo);
 	BOOL MoveGroup(int nFrom, int nTo);
 	void SortGroup(int nGroup, DWORD dwSortByField);
+	void SortGroupList();
 
 	int Find(const TCHAR *pszFindString, BOOL bCaseSensitive, int fieldFlags, int nStart);
+
+	BOOL SetAlgorithm(int nAlgorithm);
+	int GetAlgorithm();
 
 	// Unicode/Ascii conversion helpers
 	char *_ToAscii(const TCHAR *lptString);
@@ -209,6 +223,7 @@ private:
 
 	BYTE m_pSessionKey[PWM_SESSION_KEY_SIZE];
 	BYTE m_pMasterKey[32];
+	int m_nAlgorithm;
 };
 
 #endif

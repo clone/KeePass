@@ -51,6 +51,11 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	m_bImgButtons = FALSE;
 	m_bEntryGrid = FALSE;
 	m_bAutoSave = FALSE;
+	m_bLockOnMinimize = FALSE;
+	m_bMinimizeToTray = FALSE;
+	m_nAlgorithm = -1;
+	m_bLockAfterTime = FALSE;
+	m_nLockAfter = 0;
 	//}}AFX_DATA_INIT
 }
 
@@ -58,6 +63,9 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COptionsDlg)
+	DDX_Control(pDX, IDC_BTN_ROWHIGHLIGHTSEL, m_btnColorRowHighlight);
+	DDX_Control(pDX, IDC_TAB_MENU, m_tabMenu);
+	DDX_Control(pDX, IDC_COMBO_ENCALGO, m_cEncAlgos);
 	DDX_Control(pDX, IDC_BTN_SELFONT, m_btSelFont);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
 	DDX_Control(pDX, IDOK, m_btOK);
@@ -67,12 +75,18 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_IMGBUTTONS, m_bImgButtons);
 	DDX_Check(pDX, IDC_CHECK_ENTRYGRID, m_bEntryGrid);
 	DDX_Check(pDX, IDC_CHECK_AUTOSAVE, m_bAutoSave);
+	DDX_Check(pDX, IDC_CHECK_LOCKMIN, m_bLockOnMinimize);
+	DDX_Check(pDX, IDC_CHECK_MINTRAY, m_bMinimizeToTray);
+	DDX_CBIndex(pDX, IDC_COMBO_ENCALGO, m_nAlgorithm);
+	DDX_Check(pDX, IDC_CHECK_LOCKAFTERTIME, m_bLockAfterTime);
+	DDX_Text(pDX, IDC_EDIT_LOCKSECONDS, m_nLockAfter);
 	//}}AFX_DATA_MAP
 }
 
 BEGIN_MESSAGE_MAP(COptionsDlg, CDialog)
 	//{{AFX_MSG_MAP(COptionsDlg)
 	ON_BN_CLICKED(IDC_BTN_SELFONT, OnBtnSelFont)
+	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_MENU, OnSelChangeTabMenu)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -98,6 +112,71 @@ BOOL COptionsDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_NEWLINETEXT), OPTGRP_FILES);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_NEWLINE_0), OPTGRP_FILES);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_NEWLINE_1), OPTGRP_FILES);
+
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CLIPCLEARTXT), OPTGRP_MEMORY);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_CLIPBOARDTIME), OPTGRP_MEMORY);
+
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_START), OPTGRP_STARTEXIT);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_AUTOOPENLASTDB), OPTGRP_STARTEXIT);
+	m_wndgrp.AddWindow(NULL, OPTGRP_STARTEXIT);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_EXIT), OPTGRP_STARTEXIT);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_AUTOSAVE), OPTGRP_STARTEXIT);
+
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_IMGBUTTONS), OPTGRP_GUI);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_ENTRYGRID), OPTGRP_GUI);
+	m_wndgrp.AddWindow(NULL, OPTGRP_GUI);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_MINTRAY), OPTGRP_GUI);
+	m_wndgrp.AddWindow(NULL, OPTGRP_GUI);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_SELFONTTXT), OPTGRP_GUI);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_SELFONT), OPTGRP_GUI);
+	m_wndgrp.AddWindow(NULL, OPTGRP_GUI);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_SELROWHIGHLIGHT), OPTGRP_GUI);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_ROWHIGHLIGHTSEL), OPTGRP_GUI);
+	
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CIPHERTEXT), OPTGRP_SECURITY);
+	m_wndgrp.AddWindow(&m_cEncAlgos, OPTGRP_SECURITY);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_LOCKMIN), OPTGRP_SECURITY);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_LOCKAFTERTIME), OPTGRP_SECURITY);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_LOCKSECONDS), OPTGRP_SECURITY);
+
+	m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
+	m_wndgrp.ArrangeWindows(this);
+
+	m_ilIcons.Create(IDR_CLIENTICONS, 16, 1, RGB(255,0,255));
+	m_tabMenu.SetImageList(&m_ilIcons);
+
+	TCITEM tci;
+	ZeroMemory(&tci, sizeof(TCITEM));
+	tci.mask = TCIF_TEXT | TCIF_IMAGE;
+
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_SECURITY)); tci.pszText = (char *)TRL(OPTSZ_SECURITY);
+	tci.iImage = 29; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_STARTEXIT)); tci.pszText = (char *)TRL(OPTSZ_STARTEXIT);
+	tci.iImage = 34; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_GUI)); tci.pszText = (char *)TRL(OPTSZ_GUI);
+	tci.iImage = 6; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_FILES)); tci.pszText = (char *)TRL(OPTSZ_FILES);
+	tci.iImage = 26; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_MEMORY)); tci.pszText = (char *)TRL(OPTSZ_MEMORY);
+	tci.iImage = 42; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
+
+	m_cEncAlgos.AddString(TRL("Advanced Encryption Standard (AES) (128-bit block cipher)"));
+	m_cEncAlgos.AddString(TRL("Twofish (128-bit block cipher)"));
+	m_cEncAlgos.SetCurSel(m_nAlgorithm);
+
+	m_tabMenu.SetCurSel(0);
+
+	m_btnColorRowHighlight.SetDefaultColor(RGB(238,238,255));
+	m_btnColorRowHighlight.SetColor(m_rgbRowHighlight);
+
+	m_btnColorRowHighlight.SetCustomText(TRL("More Colors..."));
+	m_btnColorRowHighlight.SetDefaultText(TRL("Default"));
+
 	UpdateData(FALSE);
 
 	return TRUE;
@@ -106,11 +185,14 @@ BOOL COptionsDlg::OnInitDialog()
 void COptionsDlg::OnOK() 
 {
 	UpdateData(TRUE);
+	m_rgbRowHighlight = m_btnColorRowHighlight.GetColor();
+	m_ilIcons.DeleteImageList();
 	CDialog::OnOK();
 }
 
 void COptionsDlg::OnCancel() 
 {
+	m_ilIcons.DeleteImageList();
 	CDialog::OnCancel();
 }
 
@@ -159,4 +241,31 @@ void COptionsDlg::OnBtnSelFont()
 		m_strFontSpec += (dlg.IsUnderline() == TRUE) ? '1' : '0';
 		m_strFontSpec += (dlg.IsStrikeOut() == TRUE) ? '1' : '0';
 	}
+}
+
+void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult) 
+{
+	int n = m_tabMenu.GetCurSel();
+
+	switch(n)
+	{
+	case OPTGRP_STARTEXIT:
+		m_wndgrp.HideAllExcept(OPTGRP_STARTEXIT);
+		break;
+	case OPTGRP_GUI:
+		m_wndgrp.HideAllExcept(OPTGRP_GUI);
+		break;
+	case OPTGRP_FILES:
+		m_wndgrp.HideAllExcept(OPTGRP_FILES);
+		break;
+	case OPTGRP_MEMORY:
+		m_wndgrp.HideAllExcept(OPTGRP_MEMORY);
+		break;
+	case OPTGRP_SECURITY:
+		m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
+	default:
+		break;
+	}
+
+	*pResult = 0;
 }

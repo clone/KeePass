@@ -30,8 +30,6 @@
 #ifndef ___BASE64_H___
 #define ___BASE64_H___
 
-#if 0
-
 #include <windows.h>
 
 class CBase64Codec
@@ -43,7 +41,5 @@ public:
 	bool Encode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen);
 	bool Decode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen);
 };
-
-#endif // #if 0
 
 #endif // ___BASE64_H___

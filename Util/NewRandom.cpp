@@ -56,28 +56,29 @@ void CNewRandom::Initialize()
 	LARGE_INTEGER li;
 	SYSTEMTIME st;
 	POINT pt;
+	MEMORYSTATUS ms;
+	SYSTEM_INFO si;
+	STARTUPINFO sui;
 
 	Reset();
 
 	inx = 0;
 
 	dw = GetTickCount();
-	memcpy(&m_pPseudoRandom[inx], (BYTE *)&dw, 4); inx += 4;
-
-	QueryPerformanceCounter(&li);
-	memcpy(&m_pPseudoRandom[inx], &li, 8); inx += 8;
-
-	GetLocalTime(&st);
-	memcpy(&m_pPseudoRandom[inx], &st, 16); inx += 16;
-
-	GetCursorPos(&pt);
-	memcpy(&m_pPseudoRandom[inx], &pt, 8); inx += 8;
-
-#ifndef _WIN32_WCE
-	SystemParametersInfo(SPI_GETSCREENSAVETIMEOUT, 0, &dw, 0);
-#endif
 	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
 
+	QueryPerformanceCounter(&li);
+	memcpy(&m_pPseudoRandom[inx], &li, sizeof(LARGE_INTEGER));
+	inx += sizeof(LARGE_INTEGER);
+
+	GetLocalTime(&st);
+	memcpy(&m_pPseudoRandom[inx], &st, sizeof(SYSTEMTIME));
+	inx += sizeof(SYSTEMTIME);
+
+	GetCursorPos(&pt);
+	memcpy(&m_pPseudoRandom[inx], &pt, sizeof(POINT));
+	inx += sizeof(POINT);
+
 	ww = (WORD)(rand());
 	memcpy(&m_pPseudoRandom[inx], &ww, 2); inx += 2;
 	ww = (WORD)(rand());
@@ -85,7 +86,95 @@ void CNewRandom::Initialize()
 	ww = (WORD)(rand());
 	memcpy(&m_pPseudoRandom[inx], &ww, 2); inx += 2;
 
-	// You can add some random sources here
+	GetCaretPos(&pt);
+	memcpy(&m_pPseudoRandom[inx], &pt, sizeof(POINT));
+	inx += sizeof(POINT);
+
+	GlobalMemoryStatus(&ms);
+	memcpy(&m_pPseudoRandom[inx], &ms, sizeof(MEMORYSTATUS));
+	inx += sizeof(MEMORYSTATUS);
+
+	dw = (DWORD)GetActiveWindow();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+	dw = (DWORD)GetCapture();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+	dw = (DWORD)GetClipboardOwner();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+#ifndef _WIN32_WCE
+	// No support under Windows CE
+	dw = (DWORD)GetClipboardViewer();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); 
+#else
+	// Leave the stack data - random :)
+#endif
+	inx += 4;
+
+	dw = GetCurrentProcessId();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+	dw = (DWORD)GetCurrentProcess();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+	dw = (DWORD)GetActiveWindow();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+	dw = GetCurrentThreadId();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+	dw = (DWORD)GetCurrentThread();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+	dw = (DWORD)GetDesktopWindow();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+	dw = (DWORD)GetFocus();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+	dw = (DWORD)GetForegroundWindow();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+#ifndef _WIN32_WCE
+	dw = (DWORD)GetInputState();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); 
+#else
+	// Leave the stack data - random :)
+#endif
+	inx += 4;
+
+	dw = GetMessagePos();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+#ifndef _WIN32_WCE
+	dw = (DWORD)GetMessageTime();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4);
+#else
+	// Leave the stack data - random :)
+#endif
+	inx += 4;
+
+	dw = (DWORD)GetOpenClipboardWindow();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+	dw = (DWORD)GetProcessHeap();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+	GetSystemInfo(&si);
+	memcpy(&m_pPseudoRandom[inx], &si, sizeof(SYSTEM_INFO));
+	inx += sizeof(SYSTEM_INFO);
+
+	dw = (DWORD)randXorShift();
+	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+
+#ifndef _WIN32_WCE
+	GetStartupInfo(&sui);
+	memcpy(&m_pPseudoRandom[inx], &sui, sizeof(STARTUPINFO));
+#else
+	// Leave the stack data - random :)
+#endif
+	inx += sizeof(STARTUPINFO);
 
 	ASSERT(inx <= INTRAND_SIZE);
 }

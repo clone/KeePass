@@ -34,6 +34,7 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
+#define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 
 #include <afxwin.h>

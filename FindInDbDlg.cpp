@@ -52,6 +52,7 @@ CFindInDbDlg::CFindInDbDlg(CWnd* pParent /*=NULL*/)
 	m_bUserName = TRUE;
 	m_strFind = _T("");
 	m_bCaseSensitive = FALSE;
+	m_bGroupName = FALSE;
 	//}}AFX_DATA_INIT
 }
 
@@ -68,6 +69,7 @@ void CFindInDbDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_USERNAME, m_bUserName);
 	DDX_Text(pDX, IDC_EDIT_FINDTEXT, m_strFind);
 	DDX_Check(pDX, IDC_CHECK_CASESENSITIVE, m_bCaseSensitive);
+	DDX_Check(pDX, IDC_CHECK_GROUPNAME, m_bGroupName);
 	//}}AFX_DATA_MAP
 }
 

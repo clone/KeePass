@@ -32,6 +32,7 @@
 
 #include "sha2.h"
 #include "rijndael.h"
+#include "twoclass.h"
 #include "arcfour.h"
 
 static const char g_szVectABCX[] =
@@ -88,6 +89,25 @@ static const unsigned char g_uVectRijndaelZeroDec[16] =
 	0x0f, 0x8f, 0xbb, 0xb3, 0x66, 0xb5, 0x31, 0xb4
 };
 
+static const unsigned char g_uVectTwofishKey[32] =
+{
+	0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
+	0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10,
+	0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+	0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF
+};
+
+static const unsigned char g_uVectTwofishPlain[16] =
+{
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+static const unsigned char g_uVectTwofishCipher[16] =
+{
+	0x37, 0x52, 0x7B, 0xE0, 0x05, 0x23, 0x34, 0xB8,
+	0x9F, 0x0C, 0xFC, 0xCA, 0xE8, 0x7C, 0xFA, 0x20
+};
+
 unsigned long testCryptoImpl()
 {
 	unsigned long uTestMask;
@@ -100,6 +120,7 @@ unsigned long testCryptoImpl()
 	RD_UINT8 aTemp2[128];
 	Rijndael rdcrypt;
 	Rijndael rddummy;
+	CTwofish twofish;
 	int i, j;
 
 	uTestMask = 0;
@@ -203,6 +224,25 @@ unsigned long testCryptoImpl()
 		rdcrypt.blockDecrypt(aHash, 128, aTemp);
 		if(memcmp(aTemp, g_uVectRijndaelZeroDec, 16) != 0)
 			uTestMask |= TI_ERR_RIJNDAEL_DECRYPT;
+	}
+
+	twofish.init((RD_UINT8 *)g_uVectTwofishKey, 32, NULL);
+	if(twofish.padEncrypt((RD_UINT8 *)g_uVectTwofishPlain, 16, aTemp) <= 0)
+	{
+		uTestMask |= TI_ERR_TWOFISH;
+	}
+	else
+	{
+		if(memcmp(aTemp, g_uVectTwofishCipher, 16) != 0)
+			uTestMask |= TI_ERR_TWOFISH;
+
+		if(twofish.padDecrypt(aTemp, 32, aHash) <= 0)
+			uTestMask |= TI_ERR_TWOFISH;
+		else
+		{
+			if(memcmp(aHash, g_uVectTwofishPlain, 16) != 0)
+				uTestMask |= TI_ERR_TWOFISH;
+		}
 	}
 
 	memset(aHash, 0, 32);

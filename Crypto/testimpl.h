@@ -37,6 +37,7 @@
 #define TI_ERR_RIJNDAEL_ENCRYPT 16
 #define TI_ERR_RIJNDAEL_DECRYPT 32
 #define TI_ERR_ARCFOUR_CRYPT    64
+#define TI_ERR_TWOFISH         128
 
 unsigned long testCryptoImpl();
 
