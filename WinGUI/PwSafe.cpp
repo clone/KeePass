@@ -179,12 +179,18 @@ BOOL CPwSafeApp::InitInstance()
 			const FullPathName& database = CmdArgs::instance().getDatabase();
 			if(database.getState() == FullPathName::PATH_AND_FILENAME)			
 			{
-				std_string string(database.getFullPathName());
+				std_string strData(database.getFullPathName());
 				DWORD dwData = 0;
 				if(!CmdArgs::instance().getPassword().empty())
 				{
 					dwData |= ((DWORD)CmdArgs::instance().getPassword().length() << 16);
-					string = CmdArgs::instance().getPassword() + string;
+					strData = CmdArgs::instance().getPassword() + strData;
+				}
+				else if(CmdArgs::instance().pwStdInIsInEffect())
+				{
+					std_string strPw = WU_StdInReadPassword();
+					dwData |= ((DWORD)strPw.length() << 16);
+					strData = strPw + strData;
 				}
 
 				const FullPathName& keyfile = CmdArgs::instance().getKeyfile();
@@ -192,10 +198,10 @@ BOOL CPwSafeApp::InitInstance()
 				if(keyfile.getState() & PATH_EXISTS && !CmdArgs::instance().preselectIsInEffect())                
 				{
 					dwData |= (DWORD)keyfile.getFullPathName().length();
-					string = keyfile.getFullPathName() + string;
+					strData = keyfile.getFullPathName() + strData;
 				}
 
-				dlg.m_instanceChecker.ActivatePreviousInstance(string.c_str(), dwData);
+				dlg.m_instanceChecker.ActivatePreviousInstance(strData.c_str(), dwData);
 			}
 			else dlg.m_instanceChecker.ActivatePreviousInstance(_T(""), 0xF0FFFFF0);
 

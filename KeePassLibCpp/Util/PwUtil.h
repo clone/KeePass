@@ -89,6 +89,16 @@ public:
 	static void PwTimeToTime(_In_ const PW_TIME *pPwTime,
 		_Out_bytecap_c_(5) BYTE *pCompressedTime);
 
+	// static void PwEntryStlToKpEntry(const PW_ENTRY_STL* pIn, KP_ENTRY* pOut,
+	//	const PW_ENTRY* pOriginalEntry, const CPwManager* pMgr);
+	// static void ClearPwEntryStl(PW_ENTRY_STL* p);
+
+	static void FreeKpEntry(KP_ENTRY* p);
+
+	// static bool EqualsPwEntryStl(const PW_ENTRY_STL* p1, const PW_ENTRY_STL* p2);
+
+	static void HashKpEntry(const KP_ENTRY* pEntry, BYTE* pHash32);
+
 	static BOOL AttachFileAsBinaryData(_Inout_ PW_ENTRY *pEntry,
 		const TCHAR *lpFile);
 	static BOOL SaveBinaryData(_In_ const PW_ENTRY *pEntry,
@@ -133,6 +143,8 @@ private:
 		DWORD dwIndex, DWORD& dwAllocCount);
 	static void FlattenGroupTreeInternal(PW_GROUP* pStorage, PG_TREENODE* pRoot,
 		DWORD& dwIndex, DWORD dwStorageCount, USHORT usLevel);
+
+	static void HashStringWithTerm(LPCTSTR lp, sha256_ctx& sha32);
 };
 
 /* class CPwErrorInfo

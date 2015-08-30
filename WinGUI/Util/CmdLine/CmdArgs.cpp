@@ -31,6 +31,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 // DR 2008-09-10: Added 'lock' command line option
 // DR 2008-11-25: Added 'set-urloverride' command line option
+// DR 2009-06-05: Added 'minimize' command line option
+// DR 2012-08-14: Added 'pw-stdin' command line option
 
 #include "StdAfx.h"
 #include "CmdArgs.h"
@@ -45,13 +47,14 @@ const CmdArgs& CmdArgs::instance() {
 }
 
 CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false), m_isLock(false),
-    m_isMin(false) {
+    m_isMin(false), m_isPwStdIn(false) {
 
     // Command line options:
     const CommandLineOption keyfile    (_T("keyfile:"));
     const CommandLineOption preselect  (_T("preselect:"));
     const CommandLineOption readonly   (_T("readonly"));
     const CommandLineOption pw         (_T("pw:"));
+    const CommandLineOption pwStdIn    (_T("pw-stdin"));
     const CommandLineOption lockcw     (_T("lock"));
     const CommandLineOption mincw      (_T("minimize"));
     const CommandLineOption urloverride(_T("set-urloverride:"));
@@ -102,6 +105,10 @@ CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false), m_isLock(false),
                 if(password.empty()) CommandLineTokens::displayIgnoredMessage(argument, TRL("Password is empty"));
                 else m_Password = password;
                 }
+            }
+
+		else if(pwStdIn.isOption(argument)) {
+            m_isPwStdIn = true;
             }
 
         // readonly option:

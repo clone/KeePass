@@ -1,3 +1,27 @@
+12/09/01 - 1.24
+- Header data in KDB files is now authenticated (to prevent
+  silent data removal attacks; thanks to P. Gasti and K. B.
+  Rasmussen)
+- The content part of a KDB file now contains 32 random bytes
+  (generated each time the file is saved, by a
+  cryptographically secure pseudo-random number generator using
+  system entropy) to prevent content guessing attacks using the
+  content hash
+- When closing the entry editing dialog by closing the window
+  (using [X], Esc, ...) and there are unsaved changes, KeePass
+  now asks whether to save or discard the changes; only when
+  explicitly clicking the 'Cancel' button, KeePass doesn't
+  prompt
+- Added '-pw-stdin' command line option to make KeePass read
+  the master password from the StdIn stream
+
+- Improved update check
+- Upgraded and improved installer (now uses Unicode, LZMA2
+  compression, ...)
+- Upgraded to Boost libraries version 1.51.0
+- Various code optimizations
+- Minor other improvements
+
 12/07/01 - 1.23
 - When trying to delete entries, the confirmation dialog now
   shows a short summary of the entries that will be deleted

@@ -299,6 +299,9 @@ CString CPwUtil::FormatError(int nErrorCode, DWORD dwFlags)
 		str += CPwUtil::FormatSystemMessage(GetLastError()).c_str();
 		str = str.TrimRight(_T(".!\r\n"));
 		break;
+	case PWE_DB_EMPTY:
+		str += TRL("The database is empty");
+		break;
 	default:
 		ASSERT(FALSE);
 		str += TRL("Unknown error");
@@ -399,6 +402,118 @@ void CPwUtil::PwTimeToTime(_In_ const PW_TIME *pPwTime,
 	_PackTimeToStruct(pCompressedTime, (DWORD)pPwTime->shYear, (DWORD)pPwTime->btMonth,
 		(DWORD)pPwTime->btDay, (DWORD)pPwTime->btHour, (DWORD)pPwTime->btMinute,
 		(DWORD)pPwTime->btSecond);
+}
+
+/* void CPwUtil::PwEntryStlToKpEntry(const PW_ENTRY_STL* pIn, KP_ENTRY* pOut,
+	const PW_ENTRY* pOriginalEntry, const CPwManager* pMgr)
+{
+	if((pIn == NULL) || (pOut == NULL)) { ASSERT(FALSE); return; }
+	// pOriginalEntry may be NULL
+	if(pMgr == NULL) { ASSERT(FALSE); return; }
+
+	ZeroMemory(pOut, sizeof(KP_ENTRY));
+
+	pOut->pOriginalEntry = pOriginalEntry;
+
+	memcpy(pOut->uuid, pIn->uuid, 16);
+	pOut->uGroupIndex = pMgr->GetGroupByIdN(pIn->uGroupId);
+	pOut->uImageId = pIn->uImageId;
+	pOut->lpTitle = _TcsSafeDupAlloc(pIn->strTitle.c_str());
+	pOut->lpURL = _TcsSafeDupAlloc(pIn->strURL.c_str());
+	pOut->lpUserName = _TcsSafeDupAlloc(pIn->strUserName.c_str());
+	pOut->lpPassword = _TcsSafeDupAlloc(pIn->strPassword.c_str());
+	pOut->lpAdditional = _TcsSafeDupAlloc(pIn->strAdditional.c_str());
+}
+
+void CPwUtil::ClearPwEntryStl(PW_ENTRY_STL* p)
+{
+	if(p == NULL) { ASSERT(FALSE); return; }
+
+	ZeroMemory(p->uuid, 16);
+	p->uGroupId = 0;
+	p->uImageId = 0;
+	p->strTitle.clear();
+	p->strURL.clear();
+	p->strUserName.clear();
+	p->strPassword.clear();
+	p->strAdditional.clear();
+	CPwManager::GetNeverExpireTime(&p->tCreation);
+	CPwManager::GetNeverExpireTime(&p->tLastMod);
+	CPwManager::GetNeverExpireTime(&p->tLastAccess);
+	CPwManager::GetNeverExpireTime(&p->tExpire);
+	p->strBinaryDesc.clear();
+	p->vBinaryData.clear();
+} */
+
+void CPwUtil::FreeKpEntry(KP_ENTRY* p)
+{
+	if(p == NULL) { ASSERT(FALSE); return; }
+
+	SAFE_DELETE_ARRAY(p->lpTitle);
+	SAFE_DELETE_ARRAY(p->lpURL);
+	SAFE_DELETE_ARRAY(p->lpUserName);
+	SAFE_DELETE_ARRAY(p->lpAdditional);
+
+	if(p->lpPassword != NULL)
+		mem_erase((unsigned char *)p->lpPassword, _tcslen(p->lpPassword) * sizeof(TCHAR));
+	SAFE_DELETE_ARRAY(p->lpPassword);
+}
+
+/* bool CPwUtil::EqualsPwEntryStl(const PW_ENTRY_STL* p1, const PW_ENTRY_STL* p2)
+{
+	if((p1 == NULL) || (p2 == NULL)) { ASSERT(FALSE); return false; }
+
+	if(memcmp(p1->uuid, p2->uuid, 16) != 0) return false;
+	if(p1->uGroupId != p2->uGroupId) return false;
+	if(p1->uImageId != p2->uImageId) return false;
+	if(p1->strTitle != p2->strTitle) return false;
+	if(p1->strURL != p2->strURL) return false;
+	if(p1->strUserName != p2->strUserName) return false;
+	if(p1->strPassword != p2->strPassword) return false;
+	if(p1->strAdditional != p2->strAdditional) return false;
+
+	// Do not compare times
+
+	if(p1->strBinaryDesc != p2->strBinaryDesc) return false;
+	if(p1->vBinaryData.size() != p2->vBinaryData.size()) return false;
+	if(p1->vBinaryData.size() > 0)
+	{
+		if(memcmp(&p1->vBinaryData[0], &p2->vBinaryData[0],
+			p1->vBinaryData.size()) != 0) return false;
+	}
+
+	return true;
+} */
+
+void CPwUtil::HashKpEntry(const KP_ENTRY* pEntry, BYTE* pHash32)
+{
+	if((pEntry == NULL) || (pHash32 == NULL)) { ASSERT(FALSE); return; }
+
+	sha256_ctx sha32;
+	sha256_begin(&sha32);
+
+	sha256_hash(pEntry->uuid, 16, &sha32);
+	sha256_hash((const BYTE*)&pEntry->uGroupIndex, sizeof(DWORD), &sha32);
+	sha256_hash((const BYTE*)&pEntry->uImageId, sizeof(DWORD), &sha32);
+	HashStringWithTerm(pEntry->lpTitle, sha32);
+	HashStringWithTerm(pEntry->lpURL, sha32);
+	HashStringWithTerm(pEntry->lpUserName, sha32);
+	HashStringWithTerm(pEntry->lpPassword, sha32);
+	HashStringWithTerm(pEntry->lpAdditional, sha32);
+
+	sha256_end(pHash32, &sha32);
+}
+
+void CPwUtil::HashStringWithTerm(LPCTSTR lp, sha256_ctx& sha32)
+{
+	if(lp != NULL)
+		sha256_hash((BYTE*)lp, static_cast<unsigned long>((_tcslen(lp) + 1) *
+			sizeof(TCHAR)), &sha32);
+	else // lp == NULL
+	{
+		const TCHAR tch0 = 0;
+		sha256_hash((const BYTE*)&tch0, sizeof(TCHAR), &sha32);
+	}
 }
 
 BOOL CPwUtil::AttachFileAsBinaryData(_Inout_ PW_ENTRY *pEntry,

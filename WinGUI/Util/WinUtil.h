@@ -141,4 +141,10 @@ BOOL WU_RunElevated(LPCTSTR lpExe, LPCTSTR lpArgs, HWND hParent);
 
 // std::basic_string<TCHAR> WU_CreateBackupFile(LPCTSTR lpBaseFile);
 
+bool WU_StdInReadLine(std::basic_string<TCHAR>& strOut);
+
+// Read a password from StdIn. The password is read only once
+// and then cached.
+std::basic_string<TCHAR> WU_StdInReadPassword();
+
 #endif

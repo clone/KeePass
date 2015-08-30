@@ -11,8 +11,8 @@
 #define MyAppUrlName "KeePass.url"
 #define MyAppHelpName "KeePass.chm"
 
-#define KeeVersionStr "1.23"
-#define KeeVersionWin "1.23.0.0"
+#define KeeVersionStr "1.24"
+#define KeeVersionWin "1.24.0.0"
 
 #define KeeDevPeriod "2003-2012"
 
@@ -32,7 +32,7 @@ AllowNoIcons=yes
 LicenseFile=..\Docs\License_Install.txt
 OutputDir=..\Build\WinGUI_Distrib
 OutputBaseFilename={#MyAppName}-{#KeeVersionStr}-Setup
-Compression=lzma/ultra
+Compression=lzma2/ultra
 SolidCompression=yes
 InternalCompressLevel=ultra
 UninstallDisplayIcon={app}\{#MyAppExeName}
@@ -65,7 +65,7 @@ Name: norwegian; MessagesFile: compiler:Languages\Norwegian.isl
 Name: polish; MessagesFile: compiler:Languages\Polish.isl
 Name: portuguese; MessagesFile: compiler:Languages\Portuguese.isl
 Name: russian; MessagesFile: compiler:Languages\Russian.isl
-Name: slovak; MessagesFile: compiler:Languages\Slovak.isl
+; Name: slovak; MessagesFile: compiler:Languages\Slovak.isl
 Name: slovenian; MessagesFile: compiler:Languages\Slovenian.isl
 Name: spanish; MessagesFile: compiler:Languages\Spanish.isl
 

@@ -47,7 +47,9 @@ private:
 	void PerformMiniModeAdjustments();
 
 	KP_ENTRY _CurrentDataToEntry(bool bUpdateData);
-	void _ClearStringsCache();
+	// void _ClearStringsCache();
+
+	void _GetExpireTime(PW_TIME& t);
 
 	void SelectFileAsUrl(LPCTSTR lpFilter);
 	void InsertIntoUrl(LPCTSTR lpText);
@@ -55,12 +57,19 @@ private:
 
 	void UrlToCombo(bool bGuiToInternals);
 
+	void _TryCloseForm();
+
 	CFont m_fStyle;
 	CFont m_fSymbol;
 	CKCSideBannerWnd m_banner;
 	CToolTipCtrl m_tipSecClear;
+	UINT m_uTryingToClose;
 
-	std::vector<LPTSTR> m_vStringsCache;
+	BYTE m_vInitialHash[32];
+	PW_TIME m_tInitialExpire;
+	CString m_strInitialBinaryDesc;
+
+	// std::vector<LPTSTR> m_vStringsCache;
 	std::vector<AV_APP_INFO> m_vApps;
 
 public:
@@ -125,6 +134,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	virtual void OnCancel();
+	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnCheckHidePw();
 	afx_msg void OnPickIconBtn();
 	afx_msg void OnRandomPwBtn();

@@ -169,6 +169,8 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *p
 		else { ASSERT(FALSE); _OPENDB_FAIL; }
 	}
 
+	if(hdr.dwGroups == 0) { _OPENDB_FAIL_LIGHT; return PWE_DB_EMPTY; }
+
 	// Select algorithm
 	if((hdr.dwFlags & PWM_FLAG_RIJNDAEL) != 0) m_nAlgorithm = ALGO_AES;
 	else if((hdr.dwFlags & PWM_FLAG_TWOFISH) != 0) m_nAlgorithm = ALGO_TWOFISH;
@@ -280,6 +282,9 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *p
 
 	NewDatabase(); // Create a new database and initialize internal structures
 
+	ASSERT(memcmp(&hdr, pVirtualFile, sizeof(PW_DBHEADER)) == 0);
+	HashHeaderWithoutContentHash((BYTE*)pVirtualFile, m_vHeaderHash);
+
 	// Add groups from the memory file to the internal structures
 	pos = sizeof(PW_DBHEADER);
 	// char *pStart = &pVirtualFile[pos];
@@ -303,7 +308,7 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *p
 		PWMOD_CHECK_AVAIL(dwFieldSize);
 		// if(pRepair != NULL) { if(IsBadReadPtr(p, dwFieldSize) != FALSE) { _OPENDB_FAIL; } }
 		if(!ReadGroupField(usFieldType, dwFieldSize, (BYTE *)p,
-			&pwGroupTemplate)) { _OPENDB_FAIL; }
+			&pwGroupTemplate, pRepair)) { _OPENDB_FAIL; }
 		if(usFieldType == 0xFFFF)
 			++uCurGroup; // Now and ONLY now the counter gets increased
 
@@ -335,7 +340,7 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, _Out_opt_ PWDB_REPAIR_INFO *p
 		PWMOD_CHECK_AVAIL(dwFieldSize);
 		// if(pRepair != NULL) { if(IsBadReadPtr(p, dwFieldSize) != FALSE) { _OPENDB_FAIL; } }
 		if(!ReadEntryField(usFieldType, dwFieldSize, (BYTE *)p,
-			&pwEntryTemplate)) { _OPENDB_FAIL; }
+			&pwEntryTemplate, pRepair)) { _OPENDB_FAIL; }
 		if(usFieldType == 0xFFFF)
 			++uCurEntry; // Now and ONLY now the counter gets increased
 
@@ -380,10 +385,18 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 	ASSERT(pszFile[0] != 0);
 	if(pszFile[0] == 0) return PWE_INVALID_PARAM;
 
+	if(m_dwNumGroups == 0) return PWE_DB_EMPTY;
+
 	_AddAllMetaStreams();
 
 	DWORD uFileSize = sizeof(PW_DBHEADER);
 	BYTE *pbt;
+
+	// Create a dummy ext data structure for computing its size
+	m_vHeaderHash.resize(32);
+	CKpMemoryStream msExtDataSize(true);
+	WriteExtData(msExtDataSize);
+	uFileSize += 2 + 4 + static_cast<DWORD>(msExtDataSize.GetSize());
 
 	// Get the size of all groups
 	for(i = 0; i < m_dwNumGroups; ++i)
@@ -462,14 +475,28 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 	m_random.GetRandomBuffer((BYTE *)hdr.aEncryptionIV, 16);
 	m_random.GetRandomBuffer(hdr.aMasterSeed2, 32);
 
+	// We have everything except the contents hash
+	HashHeaderWithoutContentHash((BYTE*)&hdr, m_vHeaderHash);
+	CKpMemoryStream msExtData(true);
+	WriteExtData(msExtData);
+	ASSERT(msExtData.GetSize() == msExtDataSize.GetSize());
+
 	// Skip the header, it will be written later
 	pos = sizeof(PW_DBHEADER);
 
 	BYTE *pb;
 
 	// Store all groups to memory file
-	for(i = 0; i < m_dwNumGroups; i++)
+	for(i = 0; i < m_dwNumGroups; ++i)
 	{
+		if(i == 0)
+		{
+			usFieldType = 0x0000; dwFieldSize = static_cast<DWORD>(msExtData.GetSize());
+			memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
+			memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
+			memcpy(&pVirtualFile[pos], msExtData.GetBuffer(), dwFieldSize); pos += dwFieldSize;
+		}
+
 		usFieldType = 0x0001; dwFieldSize = 4;
 		memcpy(&pVirtualFile[pos], &usFieldType, 2); pos += 2;
 		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
@@ -528,7 +555,7 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 	}
 
 	// Store all entries to memory file
-	for(i = 0; i < m_dwNumEntries; i++)
+	for(i = 0; i < m_dwNumEntries; ++i)
 	{
 		UnlockEntryPassword(&m_pEntries[i]);
 
@@ -645,7 +672,7 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 	sha256_hash((unsigned char *)pVirtualFile + sizeof(PW_DBHEADER), pos - sizeof(PW_DBHEADER), &sha32);
 	sha256_end((unsigned char *)hdr.aContentsHash, &sha32);
 
-	// Now we have everything required to build up the header
+	// Copy the completed header
 	memcpy(pVirtualFile, &hdr, sizeof(PW_DBHEADER));
 
 	// Generate m_pTransformedMasterKey from m_pMasterKey
@@ -756,14 +783,14 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 	ASSERT(FALSE); return false; } else { ASSERT(dwFieldSize == static_cast<DWORD>(w_Cnt_q)); } }
 
 bool CPwManager::ReadGroupField(USHORT usFieldType, DWORD dwFieldSize,
-	const BYTE *pData, PW_GROUP *pGroup)
+	const BYTE *pData, PW_GROUP *pGroup, PWDB_REPAIR_INFO *pRepair)
 {
 	BYTE aCompressedTime[5];
 
 	switch(usFieldType)
 	{
 	case 0x0000:
-		// Ignore field
+		if(!ReadExtData(pData, dwFieldSize, pGroup, NULL, pRepair)) return false;
 		break;
 	case 0x0001:
 		PWMRF_CHECK_AVAIL(4);
@@ -820,14 +847,14 @@ bool CPwManager::ReadGroupField(USHORT usFieldType, DWORD dwFieldSize,
 }
 
 bool CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize,
-	const BYTE *pData, PW_ENTRY *pEntry)
+	const BYTE *pData, PW_ENTRY *pEntry, PWDB_REPAIR_INFO *pRepair)
 {
 	BYTE aCompressedTime[5];
 
 	switch(usFieldType)
 	{
 	case 0x0000:
-		// Ignore field
+		if(!ReadExtData(pData, dwFieldSize, NULL, pEntry, pRepair)) return false;
 		break;
 	case 0x0001:
 		PWMRF_CHECK_AVAIL(16);
@@ -922,4 +949,85 @@ bool CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize,
 	}
 
 	return true;
+}
+
+bool CPwManager::ReadExtData(const BYTE* pData, DWORD dwDataSize, PW_GROUP* pg,
+	PW_ENTRY* pe, PWDB_REPAIR_INFO* pRepair)
+{
+	// No group- or entry-specific ext data yet
+	UNREFERENCED_PARAMETER(pg);
+	UNREFERENCED_PARAMETER(pe);
+
+	if(dwDataSize == 0) return true;
+
+	CKpMemoryStream ms(pData, dwDataSize);
+	std::vector<BYTE> vFieldData;
+
+	bool bEos = false, bResult = true;
+	while(!bEos)
+	{
+		USHORT usFieldType;
+		DWORD dwFieldSize;
+
+		if(FAILED(ms.Read((BYTE*)&usFieldType, 2))) { bResult = false; break; }
+		if(FAILED(ms.Read((BYTE*)&dwFieldSize, 4))) { bResult = false; break; }
+
+		if(dwFieldSize > 0)
+		{
+			if(vFieldData.size() < dwFieldSize) vFieldData.resize(dwFieldSize);
+
+			if(FAILED(ms.Read(&vFieldData[0], dwFieldSize))) { bResult = false; break; }
+		}
+
+		switch(usFieldType)
+		{
+		case 0x0000:
+			// Ignore field
+			break;
+		case 0x0001:
+			if((m_vHeaderHash.size() == dwFieldSize) && (pRepair == NULL))
+			{
+				if(memcmp(&m_vHeaderHash[0], &vFieldData[0], dwFieldSize) != 0)
+					bResult = false;
+			}
+			break;
+		case 0x0002:
+			// Ignore random data
+			break;
+		case 0xFFFF:
+			bEos = true;
+			break;
+		default:
+			ASSERT(FALSE);
+			break;
+		}
+
+		if(!bResult) break;
+	}
+
+	return bResult;
+}
+
+void CPwManager::WriteExtData(CKpMemoryStream& ms)
+{
+	WriteExtDataField(ms, 0x0001, &m_vHeaderHash[0], static_cast<DWORD>(
+		m_vHeaderHash.size()));
+
+	// Store random data to prevent guessing attacks that use the content hash
+	BYTE vRandom[32];
+	m_random.GetRandomBuffer(&vRandom[0], 32);
+	WriteExtDataField(ms, 0x0002, &vRandom[0], 32);
+
+	WriteExtDataField(ms, 0xFFFF, NULL, 0);
+}
+
+void CPwManager::WriteExtDataField(CKpMemoryStream& ms, USHORT usFieldType,
+	const BYTE* pData, DWORD dwFieldSize)
+{
+	// pData may be NULL
+
+	ms.Write((BYTE*)&usFieldType, 2);
+	ms.Write((BYTE*)&dwFieldSize, 4);
+
+	if(dwFieldSize > 0) ms.Write(pData, dwFieldSize);
 }

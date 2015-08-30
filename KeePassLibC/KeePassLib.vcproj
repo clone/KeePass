@@ -81,7 +81,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib wininet.lib"
 				OutputFile="$(OutDir)\KeePassLibC32.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -181,7 +181,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib wininet.lib"
 				OutputFile="$(OutDir)\KeePassLibC64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -280,7 +280,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib wininet.lib"
 				OutputFile="$(OutDir)\KeePassLibC32.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -380,7 +380,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib wininet.lib"
 				OutputFile="$(OutDir)\KeePassLibC64.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -481,7 +481,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib wininet.lib"
 				OutputFile="$(OutDir)\KeePassLibC32.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -581,7 +581,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib wininet.lib"
 				OutputFile="$(OutDir)\KeePassLibC64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -1175,6 +1175,34 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="IO"
+				>
+				<File
+					RelativePath="..\KeePassLibCpp\IO\KpInternetStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\IO\KpInternetStream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\IO\KpMemoryStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\IO\KpMemoryStream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\IO\KpStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\IO\KpStream.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

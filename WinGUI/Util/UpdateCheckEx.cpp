@@ -23,6 +23,7 @@
 #include "../../KeePassLibCpp/Util/StrUtil.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
 #include "../../KeePassLibCpp/PwManager.h"
+#include "../../KeePassLibCpp/IO/KpInternetStream.h"
 #include "../Plugins/PluginMgr.h"
 #include "../Plugins/KpApiImpl.h"
 
@@ -90,7 +91,7 @@ void CUpdateCheckEx::_RunCheck()
 	BYTE* pb = NULL;
 	std_string strError;
 	HRESULT hRes = CUpdateCheckEx::DownloadInfoFile(&pb, strError);
-	if(hRes != S_OK)
+	if(FAILED(hRes))
 	{
 		SAFE_DELETE_ARRAY(pb);
 
@@ -101,7 +102,7 @@ void CUpdateCheckEx::_RunCheck()
 	UC_COMPONENTS_LIST vAvailable;
 	hRes = CUpdateCheckEx::ParseInfoFile(pb, vAvailable);
 	SAFE_DELETE_ARRAY(pb);
-	if(hRes != S_OK)
+	if(FAILED(hRes))
 	{
 		_FinalReport(vInstalled, TRL("Loading error"), true, 0);
 		return;
@@ -140,7 +141,7 @@ HRESULT CUpdateCheckEx::DownloadInfoFile(BYTE** ppbData, std_string& strError)
 	if(ppbData == NULL) { ASSERT(FALSE); return E_POINTER; }
 	*ppbData = NULL;
 
-	TCHAR tszFile[MAX_PATH + 34];
+	/* TCHAR tszFile[MAX_PATH + 34];
 	ZeroMemory(tszFile, sizeof(TCHAR) * (MAX_PATH + 34));
 
 	URLDownloadToCacheFile(NULL, PWM_URL_VERSION, tszFile, URLOSTRM_GETNEWESTVERSION,
@@ -185,7 +186,21 @@ HRESULT CUpdateCheckEx::DownloadInfoFile(BYTE** ppbData, std_string& strError)
 	{
 		strError = TRL("Connect failed, cannot check for updates.");
 		return E_ACCESSDENIED;
+	} */
+
+	std::vector<BYTE> vData;
+	CKpInternetStream s(PWM_URL_VERSION, false);
+	HRESULT r = s.ReadToEnd(vData);
+	if(FAILED(r) || (vData.size() == 0))
+	{
+		strError = TRL("Connect failed, cannot check for updates.");
+		return r;
 	}
+
+	*ppbData = new BYTE[vData.size() + 2];
+	(*ppbData)[vData.size()] = 0;
+	(*ppbData)[vData.size() + 1] = 0;
+	memcpy(*ppbData, &vData[0], vData.size());
 
 	strError.clear();
 	return S_OK;

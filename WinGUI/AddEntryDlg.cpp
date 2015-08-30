@@ -69,6 +69,7 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 	m_dwDefaultExpire = 0;
 	m_pOriginalEntry = NULL;
 	m_pfNotes = NULL;
+	m_uTryingToClose = 0;
 }
 
 void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
@@ -106,6 +107,7 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	//{{AFX_MSG_MAP(CAddEntryDlg)
+	ON_WM_SYSCOMMAND()
 	ON_COMMAND(ID_POPUP_AUTOTYPE, OnHelpAutoType)
 	ON_COMMAND(ID_POPUP_URLFIELDFEATURES, OnHelpURLFieldFeatures)
 	ON_BN_CLICKED(IDC_CHECK_HIDEPW, OnCheckHidePw)
@@ -478,6 +480,12 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	if(CPwSafeDlg::m_bMiniMode == TRUE) this->UrlToCombo(false);
 
+	KP_ENTRY kpInitial = _CurrentDataToEntry(true);
+	CPwUtil::HashKpEntry(&kpInitial, m_vInitialHash);
+	CPwUtil::FreeKpEntry(&kpInitial);
+	_GetExpireTime(m_tInitialExpire);
+	m_strInitialBinaryDesc = m_strAttachment;
+
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
 
@@ -487,6 +495,20 @@ void CAddEntryDlg::CleanUp()
 	m_cbGroups.ResetContent();
 	m_fStyle.DeleteObject();
 	m_fSymbol.DeleteObject();
+}
+
+void CAddEntryDlg::_GetExpireTime(PW_TIME& t)
+{
+	if(m_bExpires == TRUE)
+	{
+		t.shYear = (USHORT)m_editDate.GetYear();
+		t.btMonth = (BYTE)m_editDate.GetMonth();
+		t.btDay = (BYTE)m_editDate.GetDay();
+		t.btHour = (BYTE)m_editTime.GetHour();
+		t.btMinute = (BYTE)m_editTime.GetMinute();
+		t.btSecond = (BYTE)m_editTime.GetSecond();
+	}
+	else m_pMgr->GetNeverExpireTime(&t);
 }
 
 void CAddEntryDlg::OnOK() 
@@ -511,16 +533,7 @@ void CAddEntryDlg::OnOK()
 		return;
 	}
 
-	if(m_bExpires == TRUE)
-	{
-		m_tExpire.shYear = (USHORT)m_editDate.GetYear();
-		m_tExpire.btMonth = (BYTE)m_editDate.GetMonth();
-		m_tExpire.btDay = (BYTE)m_editDate.GetDay();
-		m_tExpire.btHour = (BYTE)m_editTime.GetHour();
-		m_tExpire.btMinute = (BYTE)m_editTime.GetMinute();
-		m_tExpire.btSecond = (BYTE)m_editTime.GetSecond();
-	}
-	else m_pMgr->GetNeverExpireTime(&m_tExpire);
+	_GetExpireTime(m_tExpire);
 
 	m_reNotes.GetWindowText(m_strNotes);
 
@@ -538,7 +551,8 @@ void CAddEntryDlg::OnOK()
 	KP_ENTRY kpCur = _CurrentDataToEntry(false);
 	LPTSTR lpValMsg = NULL;
 	_CallPlugins(KPM_VALIDATE_ENTRY, (LPARAM)&kpCur, (LPARAM)&lpValMsg);
-	_ClearStringsCache();
+	// _ClearStringsCache();
+	CPwUtil::FreeKpEntry(&kpCur);
 	if((lpValMsg != NULL) && (lpValMsg[0] != 0))
 	{
 		MessageBox(lpValMsg, PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
@@ -556,8 +570,25 @@ void CAddEntryDlg::OnOK()
 
 void CAddEntryDlg::OnCancel() 
 {
+	if((m_uTryingToClose == 0) && ((GetKeyState(VK_ESCAPE) & 0x8000) != 0))
+	{
+		_TryCloseForm();
+		return;
+	}
+
 	CleanUp();
 	CDialog::OnCancel();
+}
+
+void CAddEntryDlg::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	if(nID == SC_CLOSE)
+	{
+		_TryCloseForm();
+		return;
+	}
+
+	CDialog::OnSysCommand(nID, lParam);
 }
 
 void CAddEntryDlg::OnCheckHidePw() 
@@ -1032,38 +1063,37 @@ KP_ENTRY CAddEntryDlg::_CurrentDataToEntry(bool bUpdateData)
 	e.uImageId = static_cast<DWORD>(m_nIconId);
 
 	e.lpTitle = _TcsSafeDupAlloc(m_strTitle);
-	m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpTitle));
+	// m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpTitle));
 
 	e.lpURL = _TcsSafeDupAlloc(m_strURL);
-	m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpURL));
+	// m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpURL));
 
 	e.lpUserName = _TcsSafeDupAlloc(m_strUserName);
-	m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpUserName));
+	// m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpUserName));
 
 	LPTSTR lpPw = m_pEditPw.GetPassword();
 	e.lpPassword = _TcsSafeDupAlloc(lpPw);
 	CSecureEditEx::DeletePassword(lpPw);
-	m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpPassword));
+	// m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpPassword));
 
 	CString strNotes;
 	m_reNotes.GetWindowText(strNotes);
 	e.lpAdditional = _TcsSafeDupAlloc(strNotes);
-	m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpAdditional));
+	// m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpAdditional));
 
 	return e;
 }
 
-void CAddEntryDlg::_ClearStringsCache()
-{
-	for(size_t i = 0; i < m_vStringsCache.size(); ++i)
-	{
-		LPTSTR lp = m_vStringsCache[i];
-		mem_erase((unsigned char *)lp, _tcslen(lp) * sizeof(TCHAR));
-		SAFE_DELETE_ARRAY(lp);
-	}
-
-	m_vStringsCache.clear();
-}
+// void CAddEntryDlg::_ClearStringsCache()
+// {
+//	for(size_t i = 0; i < m_vStringsCache.size(); ++i)
+//	{
+//		LPTSTR lp = m_vStringsCache[i];
+//		mem_erase((unsigned char *)lp, _tcslen(lp) * sizeof(TCHAR));
+//		SAFE_DELETE_ARRAY(lp);
+//	}
+//	m_vStringsCache.clear();
+// }
 
 void CAddEntryDlg::OnBnClickedEntryToolsBtn()
 {
@@ -1346,6 +1376,35 @@ void CAddEntryDlg::OnInsertFieldReferenceInNotesField()
 {
 	CString strNew = GetEntryFieldRef();
 	NewGUI_AppendToRichEditCtrl(&m_reNotes, strNew, true);
+}
+
+void CAddEntryDlg::_TryCloseForm()
+{
+	++m_uTryingToClose;
+
+	KP_ENTRY kpCur = _CurrentDataToEntry(true);
+	BYTE vHash[32];
+	CPwUtil::HashKpEntry(&kpCur, vHash);
+	CPwUtil::FreeKpEntry(&kpCur);
+
+	PW_TIME tExpire;
+	_GetExpireTime(tExpire);
+
+	bool bModified = false;
+	bModified |= (memcmp(vHash, m_vInitialHash, 32) != 0);
+	bModified |= (_pwtimecmp(&tExpire, &m_tInitialExpire) != 0);
+	bModified |= (m_strAttachment != m_strInitialBinaryDesc);
+
+	if(!bModified) OnCancel();
+	else
+	{
+		const int r = MessageBox(TRL("Do you want to save the changes before closing?"),
+			PWM_PRODUCT_NAME_SHORT, MB_YESNOCANCEL | MB_ICONQUESTION);
+		if(r == IDNO) OnCancel();
+		else if((r == IDYES) || (r == IDOK)) OnOK();
+	}
+
+	--m_uTryingToClose;
 }
 
 #pragma warning(pop)

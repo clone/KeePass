@@ -1604,13 +1604,16 @@ BOOL CPwSafeDlg::_ParseCommandLine()
 
 	m_bInitialCmdLineFile = TRUE;
 
-	const std_string& strPassword = CmdArgs::instance().getPassword();
+	std_string strPassword = CmdArgs::instance().getPassword();
 	const FullPathName& fpnKeyFile = CmdArgs::instance().getKeyfile();
 	enum { PATH_EXISTS = FullPathName::PATH_ONLY | FullPathName::PATH_AND_FILENAME };
 	const TCHAR* const lpKeyFile = ((fpnKeyFile.getState() & PATH_EXISTS) ?
 		fpnKeyFile.getFullPathName().c_str() : NULL);
 	const bool bPreSelectIsInEffect = CmdArgs::instance().preselectIsInEffect();
 	const BOOL bLocked = (CmdArgs::instance().lockIsInEffect() ? TRUE : FALSE);
+
+	if(strPassword.empty() && CmdArgs::instance().pwStdInIsInEffect())
+		strPassword = WU_StdInReadPassword();
 
 	_OpenDatabase(NULL, lpFileName, strPassword.empty() ? NULL : strPassword.c_str(),
 		(!bPreSelectIsInEffect) ? lpKeyFile : NULL, bLocked,
@@ -5434,7 +5437,7 @@ void CPwSafeDlg::RestartApplication()
 {
 	// TCHAR szFile[1024];
 	// GetModuleFileName(NULL, szFile, 1024);
-	std_string strFile = Executable::instance().getFullPathName();
+	const std_string strFile = Executable::instance().getFullPathName();
 
 	if(TWinExec(strFile.c_str(), 0) <= 31)
 	{
@@ -5540,7 +5543,8 @@ void CPwSafeDlg::OnFileChangeMasterPw()
 
 void CPwSafeDlg::OnUpdateFileSave(CCmdUI* pCmdUI)
 {
-	if((m_bFileOpen == TRUE) && (m_bFileReadOnly == FALSE))
+	if((m_bFileOpen == TRUE) && (m_bFileReadOnly == FALSE) &&
+		(m_mgr.GetNumberOfGroups() > 0))
 	{
 		if(m_bAllowSaveIfModifiedOnly == FALSE) pCmdUI->Enable(TRUE);
 		else pCmdUI->Enable(m_bModified);
@@ -5550,7 +5554,8 @@ void CPwSafeDlg::OnUpdateFileSave(CCmdUI* pCmdUI)
 
 void CPwSafeDlg::OnUpdateFileSaveAs(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_bFileOpen);
+	if(m_mgr.GetNumberOfGroups() == 0) pCmdUI->Enable(FALSE);
+	else pCmdUI->Enable(m_bFileOpen);
 }
 
 void CPwSafeDlg::OnUpdateFileChangeMasterPw(CCmdUI* pCmdUI)
@@ -7596,7 +7601,7 @@ void CPwSafeDlg::_UpdateToolBar(BOOL bForceUpdate)
 		UTB_ENSURE_ENABLED_STATE(&m_btnTbAddEntry, (m_mgr.GetNumberOfGroups() != 0) ? TRUE : FALSE);
 		UTB_ENSURE_ENABLED_STATE(&m_cQuickFind, TRUE);
 
-		if(m_bFileReadOnly == FALSE)
+		if((m_bFileReadOnly == FALSE) && (dwNumberOfGroups > 0))
 		{
 			if(m_bAllowSaveIfModifiedOnly == FALSE) UTB_ENSURE_ENABLED_STATE(&m_btnTbSave, TRUE)
 			else

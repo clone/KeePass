@@ -31,6 +31,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 // DR 2008-09-10: Added 'lock' command line option
 // DR 2008-11-25: Added 'set-urloverride' command line option
+// DR 2009-06-05: Added 'minimize' command line option
+// DR 2012-08-14: Added 'pw-stdin' command line option
 
 #pragma once
 #include "FullPathName.h"
@@ -57,6 +59,7 @@ public:
     bool         preselectIsInEffect() const {return m_isPreselect;}
     bool          readonlyIsInEffect() const {return m_isReadOnly;}
     const std_string&    getPassword() const {return m_Password;}
+	bool           pwStdInIsInEffect() const {return m_isPwStdIn;}
     bool              lockIsInEffect() const {return m_isLock;}
     bool            minimizeInEffect() const {return m_isMin;}
     const std_string& getUrlOverride() const {return m_urlOverride;}
@@ -69,6 +72,7 @@ private:
     bool         m_isPreselect;
     bool         m_isReadOnly;
     std_string   m_Password;  // empty() <==> not set
+    bool         m_isPwStdIn;
     bool         m_isLock;
     bool         m_isMin;
     std_string   m_urlOverride;

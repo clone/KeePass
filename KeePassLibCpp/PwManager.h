@@ -29,6 +29,7 @@
 
 #include "Util/NewRandom.h"
 #include "Crypto/Rijndael.h"
+#include "IO/KpMemoryStream.h"
 #include "PwStructs.h"
 
 // General product information
@@ -37,17 +38,17 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.23")
+#define PWM_VERSION_STR  _T("1.24")
 #else
-#define PWM_VERSION_STR  _T("1.23 Unicode")
+#define PWM_VERSION_STR  _T("1.24 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01170000
-#define PWM_VERSION_QW   0x0001001700000000ULL
+#define PWM_VERSION_DW   0x01180000
+#define PWM_VERSION_QW   0x0001001800000000ULL
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
 #define PWM_DBSIG_2      0xB54BFB65
-#define PWM_DBVER_DW     0x00030003
+#define PWM_DBVER_DW     0x00030004
 
 // KeePass 2.x database file signatures (pre-release and release)
 #define PWM_DBSIG_1_KDBX_P 0x9AA2D903
@@ -298,6 +299,7 @@
 #define PWE_FILEERROR_VERIFY       17
 #define PWE_UNSUPPORTED_KDBX       18
 #define PWE_GETLASTERROR           19
+#define PWE_DB_EMPTY               20
 
 // Format flags
 #define PWFF_NO_INTRO               1
@@ -512,9 +514,14 @@ private:
 	void _DeleteGroupList(BOOL bFreeStrings);
 
 	bool ReadGroupField(USHORT usFieldType, DWORD dwFieldSize,
-		const BYTE *pData, PW_GROUP *pGroup);
+		const BYTE *pData, PW_GROUP *pGroup, PWDB_REPAIR_INFO *pRepair);
 	bool ReadEntryField(USHORT usFieldType, DWORD dwFieldSize,
-		const BYTE *pData, PW_ENTRY *pEntry);
+		const BYTE *pData, PW_ENTRY *pEntry, PWDB_REPAIR_INFO *pRepair);
+	bool ReadExtData(const BYTE* pData, DWORD dwDataSize, PW_GROUP* pg,
+		PW_ENTRY* pe, PWDB_REPAIR_INFO* pRepair);
+	void WriteExtData(CKpMemoryStream& ms);
+	static void WriteExtDataField(CKpMemoryStream& ms, USHORT usFieldType,
+		const BYTE* pData, DWORD dwFieldSize);
 
 	BOOL _AddAllMetaStreams();
 	DWORD _LoadAndRemoveAllMetaStreams(bool bAcceptUnknown);
@@ -525,6 +532,9 @@ private:
 
 	// Encrypt the master key a few times to make brute-force key-search harder
 	BOOL _TransformMasterKey(const BYTE *pKeySeed);
+
+	static void HashHeaderWithoutContentHash(const BYTE* pbHeader,
+		std::vector<BYTE>& vHash);
 
 	DWORD DeleteLostEntries();
 
@@ -546,6 +556,7 @@ private:
 
 	PW_DBHEADER m_dbLastHeader;
 	PW_ENTRY *m_pLastEditedEntry; // Last modified entry, use GetLastEditedEntry() to get it
+	std::vector<BYTE> m_vHeaderHash;
 
 	CNewRandom m_random; // Pseudo-random number generator
 

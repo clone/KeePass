@@ -43,6 +43,7 @@
 #include "../../KeePassLibCpp/PwStructsEx.h"
 
 #include <boost/scoped_array.hpp>
+#include <iostream>
 
 using boost::scoped_array;
 
@@ -52,6 +53,9 @@ static unsigned char g_shaLastString[32];
 static UINT g_uCfIgnoreID = 0; // ID of CFN_CLIPBOARD_VIEWER_IGNORE
 
 static int g_nAppHelpSource = APPHS_LOCAL;
+
+static bool g_bStdInPw = false;
+static std::basic_string<TCHAR> g_strStdInPw;
 
 #ifndef _WIN32_WCE
 
@@ -1414,3 +1418,44 @@ BOOL WU_RunElevated(LPCTSTR lpExe, LPCTSTR lpArgs, HWND hParent)
 	}
 	return strResult;
 } */
+
+#ifdef _UNICODE
+#define WU_CIN std::wcin
+#else
+#define WU_CIN std::cin
+#endif
+
+bool WU_StdInReadLine(std::basic_string<TCHAR>& strOut)
+{
+	strOut.clear();
+
+	try
+	{
+		if(!WU_CIN) return false;
+
+		std::basic_string<TCHAR> str;
+		WU_CIN >> std::noskipws;
+		std::getline(WU_CIN, str);
+
+		CString cs = str.c_str();
+		cs = cs.Trim();
+
+		strOut = (LPCTSTR)cs;
+	}
+	catch(...) { return false; }
+
+	return true;
+}
+
+// Read a password from StdIn. The password is read only once
+// and then cached.
+std::basic_string<TCHAR> WU_StdInReadPassword()
+{
+	if(!g_bStdInPw)
+	{
+		WU_StdInReadLine(g_strStdInPw);
+		g_bStdInPw = true;
+	}
+
+	return g_strStdInPw;
+}

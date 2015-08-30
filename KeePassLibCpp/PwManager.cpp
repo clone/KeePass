@@ -2089,3 +2089,20 @@ void CPwManager::SetColor(COLORREF clr)
 {
 	m_clr = clr;
 }
+
+void CPwManager::HashHeaderWithoutContentHash(const BYTE* pbHeader,
+	std::vector<BYTE>& vHash)
+{
+	if(pbHeader == NULL) { ASSERT(FALSE); return; }
+
+	vHash.resize(32);
+
+	const size_t uEndCount = 32 + 4;
+	const size_t uStartCount = sizeof(PW_DBHEADER) - uEndCount - 32;
+
+	sha256_ctx sha32;
+	sha256_begin(&sha32);
+	sha256_hash(pbHeader, uStartCount, &sha32);
+	sha256_hash(&pbHeader[sizeof(PW_DBHEADER) - uEndCount], uEndCount, &sha32);
+	sha256_end(&vHash[0], &sha32);
+}

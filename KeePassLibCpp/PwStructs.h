@@ -33,6 +33,8 @@
 #pragma once
 
 #include "SysDefEx.h"
+// #include <string>
+// #include <vector>
 
 #pragma pack(1)
 
@@ -176,8 +178,31 @@ typedef struct
 
 	DWORD_PTR dwReserved; ///< Reserved for future use, must be 0.
 } KP_ENTRY, *PKP_ENTRY;
+// CPwUtil::FreeKpEntry
 
 #pragma pack()
+
+/* /// Entry structure, containing information about one entry.
+typedef struct _PW_ENTRY_STL
+{
+	BYTE uuid[16]; ///< Unique GUID identifying this entry (not only in this database).
+	DWORD uGroupId; ///< ID of the group that contains this entry.
+	DWORD uImageId; ///< Index of the icon in the image list to use for this entry.
+
+	std::basic_string<TCHAR> strTitle; ///< Title.
+	std::basic_string<TCHAR> strURL; ///< URL.
+	std::basic_string<TCHAR> strUserName; ///< User name.
+	std::basic_string<TCHAR> strPassword; ///< Password.
+	std::basic_string<TCHAR> strAdditional; ///< Notes.
+
+	PW_TIME tCreation; ///< Time when the entry was created.
+	PW_TIME tLastMod; ///< Time when the entry was last modified.
+	PW_TIME tLastAccess; ///< Time when the entry was last accessed.
+	PW_TIME tExpire; ///< Time when the entry will expire.
+
+	std::basic_string<TCHAR> strBinaryDesc; ///< A string describing the contents of vBinaryData.
+	std::vector<BYTE> vBinaryData; ///< Attachment data.
+} PW_ENTRY_STL, *PPW_ENTRY_STL; */
 
 /////////////////////////////////////////////////////////////////////////////
 // Key provider structures

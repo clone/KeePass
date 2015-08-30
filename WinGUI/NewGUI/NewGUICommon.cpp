@@ -743,6 +743,8 @@ COLORREF NewGUI_ColorToGrayscale(COLORREF clr)
 
 void NewGUI_EnableWindowPeekPreview(HWND hWnd, bool bEnable)
 {
+	// if(!bEnable) InvalidateRect(hWnd, NULL, TRUE);
+
 	HMODULE hDwm = LoadLibrary(DWMAPI_LIB_NAME);
 	if(hDwm == NULL) return;
 

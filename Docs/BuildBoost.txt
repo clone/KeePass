@@ -14,9 +14,9 @@ In order to explicitly use Visual Studio 2008, use msvc-9.0 instead of msvc.
 
 
 b2 --toolset=msvc-9.0 --with-date_time --build-type=complete stage
-b2 --toolset=msvc-9.0 --with-regex --build-type=complete stage
 b2 --toolset=msvc-9.0 --with-thread --build-type=complete stage
+b2 --toolset=msvc-9.0 --with-regex --build-type=complete stage
 
 b2 --toolset=msvc-9.0 --with-date_time --build-type=complete address-model=64 stage
-b2 --toolset=msvc-9.0 --with-regex --build-type=complete address-model=64 stage
 b2 --toolset=msvc-9.0 --with-thread --build-type=complete address-model=64 stage
+b2 --toolset=msvc-9.0 --with-regex --build-type=complete address-model=64 stage
