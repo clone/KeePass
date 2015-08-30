@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "MemUtil.h"
 #include "StrUtil.h"
 #include "TranslateEx.h"
+#include "PopularPasswords.h"
 #include "../Crypto/ARCFour.h"
 
 #define CHARSPACE_ESCAPE      60
@@ -60,7 +61,7 @@ DWORD CPwUtil::EstimatePasswordBits(LPCTSTR lpPassword)
 	{
 		const TCHAR tch = lpPassword[i];
 
-		if(tch < _T(' ')) bChEscape = TRUE;
+		if((tch > 0) && (tch < _T(' '))) bChEscape = TRUE;
 		if((tch >= _T('A')) && (tch <= _T('Z'))) bChUpper = TRUE;
 		if((tch >= _T('a')) && (tch <= _T('z'))) bChLower = TRUE;
 		if((tch >= _T('0')) && (tch <= _T('9'))) bChNumber = TRUE;
@@ -68,7 +69,7 @@ DWORD CPwUtil::EstimatePasswordBits(LPCTSTR lpPassword)
 		if((tch >= _T(':')) && (tch <= _T('@'))) bChExtSpecial = TRUE;
 		if((tch >= _T('[')) && (tch <= _T('`'))) bChExtSpecial = TRUE;
 		if((tch >= _T('{')) && (tch <= _T('~'))) bChExtSpecial = TRUE;
-		if(tch > _T('~')) bChHigh = TRUE;
+		if((tch <= 0) || (tch > _T('~'))) bChHigh = TRUE;
 
 		double dblDiffFactor = 1.0;
 		if(i >= 1)
@@ -108,7 +109,11 @@ DWORD CPwUtil::EstimatePasswordBits(LPCTSTR lpPassword)
 	ASSERT(dwCharSpace != 0); if(dwCharSpace == 0) return 0;
 
 	const double dblBitsPerChar = log((double)dwCharSpace) / log(2.00);
-	const DWORD dwBits = static_cast<DWORD>(ceil(dblBitsPerChar * dblEffectiveLength));
+	double dblRating = dblBitsPerChar * dblEffectiveLength;
+
+	if(IsPopularPassword(lpPassword)) dblRating /= 8.0;
+
+	const DWORD dwBits = static_cast<DWORD>(ceil(dblRating));
 
 	ASSERT(dwBits != 0);
 	return dwBits;

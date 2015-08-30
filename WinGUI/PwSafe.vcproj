@@ -4580,6 +4580,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\KeePassLibCpp\Util\PopularPasswords.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\PopularPasswords.h"
+					>
+				</File>
+				<File
 					RelativePath="..\KeePassLibCpp\Util\PwUtil.cpp"
 					>
 				</File>

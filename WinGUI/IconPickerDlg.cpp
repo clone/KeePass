@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -73,15 +73,14 @@ BOOL CIconPickerDlg::OnInitDialog()
 	m_cList.SetImageList(m_pImageList, LVSIL_SMALL);
 
 	ASSERT(LVM_SETEXTENDEDLISTVIEWSTYLE == (0x1000 + 54));
-	m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_SI_REPORT |
-		LVS_EX_ONECLICKACTIVATE | LVS_EX_UNDERLINEHOT);
+	// m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_SI_REPORT |
+	//	LVS_EX_ONECLICKACTIVATE | LVS_EX_UNDERLINEHOT);
 
-	unsigned long i;
-	CString str;
-	for(i = 0; i < m_uNumIcons; i++)
+	for(UINT i = 0; i < m_uNumIcons; ++i)
 	{
+		CString str;
 		str.Format(_T("%u"), i);
-		m_cList.InsertItem(LVIF_IMAGE | LVIF_TEXT, i, str, 0, 0, i, 0);
+		m_cList.InsertItem(LVIF_IMAGE | LVIF_TEXT, static_cast<int>(i), str, 0, 0, i, 0);
 	}
 
 	if((m_nSelectedIcon >= 0) && (m_nSelectedIcon < m_cList.GetItemCount()))

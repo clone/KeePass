@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,6 +29,37 @@
 // #include <objbase.h>
 // #include <atlconv.h>
 // #endif // _WIN32_WCE
+
+static bool g_bAuInitialized = false;
+
+void AU_EnsureInitialized()
+{
+	if(g_bAuInitialized) return;
+
+	HMODULE hKernel = ::LoadLibrary(_T("Kernel32.dll")); // Native, not AU
+	if(hKernel != NULL)
+	{
+		// Do not load libraries from the current working directory
+		LPSETDLLDIRECTORY lpSetDllDirectory = (LPSETDLLDIRECTORY)
+			::GetProcAddress(hKernel, SETDLLDIRECTORY_FNNAME);
+		if(lpSetDllDirectory != NULL) lpSetDllDirectory(_T(""));
+
+		// Enable data execution prevention (DEP)
+		LPSETPROCESSDEPPOLICY lpSetProcessDEPPolicy = (LPSETPROCESSDEPPOLICY)
+			::GetProcAddress(hKernel, SETPROCESSDEPPOLICY_FNNAME);
+		if(lpSetProcessDEPPolicy != NULL) lpSetProcessDEPPolicy(PROCESS_DEP_ENABLE);
+
+		::FreeLibrary(hKernel);
+	}
+	else { ASSERT(FALSE); }
+
+	g_bAuInitialized = true;
+}
+
+HMODULE AU_LoadLibrary(LPCTSTR lpFileName)
+{
+	return ::LoadLibrary(lpFileName);
+}
 
 BOOL AU_GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpecial, BOOL bMakeURL)
 {

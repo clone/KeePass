@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ void EraseCString(CString *pString)
 
 void EraseWCharVector(std::vector<WCHAR>& vBuffer)
 {
-	const DWORD dwBufSize = vBuffer.size();
+	const DWORD dwBufSize = static_cast<DWORD>(vBuffer.size());
 	for(DWORD i = 0; i < dwBufSize; ++i) vBuffer[i] = 0;
 
 	vBuffer.clear();
@@ -54,7 +54,7 @@ void EraseWCharVector(std::vector<WCHAR>& vBuffer)
 
 void EraseTCharVector(std::vector<TCHAR>& vBuffer)
 {
-	const DWORD dwBufSize = vBuffer.size();
+	const DWORD dwBufSize = static_cast<DWORD>(vBuffer.size());
 	for(DWORD i = 0; i < dwBufSize; ++i) vBuffer[i] = 0;
 
 	vBuffer.clear();

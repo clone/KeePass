@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "../SysDefEx.h"
 #include <mmsystem.h>
 #include "KeyTransform_BCrypt.h"
+#include "../Util/AppUtil.h"
 
 BOOL CKeyTransformBCrypt::m_bEnableBCrypt = TRUE;
 
@@ -28,7 +29,10 @@ CKeyTransformBCrypt::CKeyTransformBCrypt()
 {
 	if(m_bEnableBCrypt == FALSE) { m_hLib = NULL; return; }
 
-	m_hLib = LoadLibrary(BCRYPT_DLLNAME);
+	// BCrypt.dll is only supported on >= Vista
+	if(AU_IsAtLeastWinVistaSystem() == FALSE) { m_hLib = NULL; return; }
+
+	m_hLib = AU_LoadLibrary(BCRYPT_DLLNAME);
 	if(m_hLib == NULL) return;
 
 	m_lpBCryptOpenAlgorithmProvider = (LPBCRYPTOPENALGORITHMPROVIDER)

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -114,7 +114,12 @@ void AppLocator::FindOpera()
 
 void AppLocator::FindChrome()
 {
-	LPCTSTR lpPath = _T("Applications\\chrome.exe\\shell\\open\\command");
+	LPCTSTR lpPath = _T("ChromeHTML\\shell\\open\\command");
+	m_strChromePath = AppLocator::Fix(GetRegStrEx(HKEY_CLASSES_ROOT,
+		lpPath, _T(""), 0));
+	if(m_strChromePath.size() > 0) return;
+
+	lpPath = _T("Applications\\chrome.exe\\shell\\open\\command");
 	m_strChromePath = AppLocator::Fix(GetRegStrEx(HKEY_CLASSES_ROOT,
 		lpPath, _T(""), 0));
 }

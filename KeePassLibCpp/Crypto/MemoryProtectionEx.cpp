@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -73,7 +73,8 @@ void CMemoryProtectionEx::LoadCryptLib()
 	if(m_bEnabledAtStart == FALSE) return; // DPAPI disabled
 	if(AU_IsAtLeastWinVistaSystem() == FALSE) return; // Requires Windows Vista or higher
 
-	m_hCryptLib = ::LoadLibrary(MPU_CRYPTLIB_NAME);
+	// Crypt32.dll is available on all Windows operating systems >= 98
+	m_hCryptLib = AU_LoadLibrary(MPU_CRYPTLIB_NAME);
 	if(m_hCryptLib != NULL)
 	{
 		m_lpCryptProtectMemory = (LPFNCRYPTPROTECTMEMORY)::GetProcAddress(

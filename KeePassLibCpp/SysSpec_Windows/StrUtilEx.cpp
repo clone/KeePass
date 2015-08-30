@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "StdAfx.h"
 #include "../Util/MemUtil.h"
 #include "../Util/StrUtil.h"
+#include "../Util/AppUtil.h"
 
 char *_StringToAnsi(const WCHAR *lptString)
 {
@@ -354,7 +355,8 @@ void NSCAPI_Initialize()
 {
 	NSCAPI_Exit(); // Free any previously loaded library
 
-	m_hShlWApi = LoadLibrary(_T("ShlWApi.dll"));
+	// ShlWApi.dll is available on all Windows operating systems >= 98
+	m_hShlWApi = AU_LoadLibrary(_T("ShlWApi.dll"));
 	if(m_hShlWApi == NULL) return;
 
 	m_lpCmpNatural = (LPCWSTRCMPEX)GetProcAddress(m_hShlWApi, "StrCmpLogicalW");

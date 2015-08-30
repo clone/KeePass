@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,6 +19,9 @@
 
 #include "StdAfx.h"
 #include "EntryUtil.h"
+// #include "StrUtil.h"
+// #include "Base64.h"
+// #include "../SDK/Details/KpDefs.h"
 
 /*
 // The entry must be unlocked already!
@@ -201,4 +204,159 @@ int _CompareEntriesEx(void *pContext, const void *pEntryX, const void *pEntryY)
 
 	return iResult;
 }
+*/
+
+/*
+#ifdef _MFC_VER
+void ArStorePwTime(CArchive& ar, const PW_TIME& rTime)
+{
+	ar << rTime.shYear;
+	ar << rTime.btMonth;
+	ar << rTime.btDay;
+	ar << rTime.btHour;
+	ar << rTime.btMinute;
+	ar << rTime.btSecond;
+}
+
+void ArLoadPwTime(CArchive& ar, PW_TIME& rTime)
+{
+	ar >> rTime.shYear;
+	ar >> rTime.btMonth;
+	ar >> rTime.btDay;
+	ar >> rTime.btHour;
+	ar >> rTime.btMinute;
+	ar >> rTime.btSecond;
+}
+
+CString PwEntryToString(PW_ENTRY *lpEntry, CPwManager* lpContext)
+{
+	if(lpEntry == NULL) { ASSERT(FALSE); return CString(); }
+	if(lpContext == NULL) { ASSERT(FALSE); return CString(); }
+
+	CMemFile memFile;
+	CArchive ar(&memFile, CArchive::store);
+
+	CString strUuid;
+	_UuidToString(lpEntry->uuid, &strUuid);
+	ar << strUuid;
+
+	ar << lpEntry->uGroupId;
+	ar << lpEntry->uImageId;
+	
+	ar << lpEntry->pszTitle;
+	ar << lpEntry->pszURL;
+	ar << lpEntry->pszUserName;
+
+	lpContext->UnlockEntryPassword(lpEntry);
+	ar << lpEntry->pszPassword;
+	lpContext->LockEntryPassword(lpEntry);
+
+	ar << lpEntry->pszAdditional;
+
+	ArStorePwTime(ar, lpEntry->tCreation);
+	ArStorePwTime(ar, lpEntry->tLastMod);
+	ArStorePwTime(ar, lpEntry->tLastAccess);
+	ArStorePwTime(ar, lpEntry->tExpire);
+
+	if((lpEntry->pszBinaryDesc == NULL) || (lpEntry->pBinaryData == NULL))
+	{
+		ar << _T("");
+		ar << static_cast<DWORD>(0);
+	}
+	else // Store attachment
+	{
+		ar << lpEntry->pszBinaryDesc;
+		ar << lpEntry->uBinaryDataLen;
+		ar.Write(lpEntry->pBinaryData, lpEntry->uBinaryDataLen);
+	}
+
+	ar.Close();
+
+	const ULONGLONG uMemLen = memFile.GetLength();
+	const BYTE *pbMem = memFile.Detach();
+
+	DWORD dwBase64Len = static_cast<DWORD>(uMemLen * 3 + 12);
+	BYTE *pbBase64 = new BYTE[dwBase64Len];
+	CBase64Codec::Encode(pbMem, static_cast<DWORD>(uMemLen), pbBase64, &dwBase64Len);
+
+#ifdef _UNICODE
+	TCHAR *lpFinal = _StringToUnicode((char *)pbBase64);
+#else
+	TCHAR *lpFinal = (TCHAR *)pbBase64;
+#endif
+
+	CString strFinal = _T(CB64_PROTOCOL);
+	strFinal += lpFinal;
+
+	SAFE_DELETE_ARRAY(pbBase64);
+#ifdef _UNICODE
+	SAFE_DELETE_ARRAY(lpFinal);
+#endif
+
+	memFile.Close();
+	return strFinal;
+}
+
+bool StringToPwEntry(PW_ENTRY *lpEntry, LPCTSTR lpEntryString)
+{
+	if(lpEntry == NULL) { ASSERT(FALSE); return false; }
+	if(lpEntryString == NULL) { ASSERT(FALSE); return false; }
+
+	std::vector<BYTE> vData;
+	if(!CBase64Codec::DecodeUrlT(lpEntryString, vData)) { ASSERT(FALSE); return false; }
+
+	CMemFile memFile(&vData[0], vData.size());
+	CArchive ar(&memFile, CArchive::load);
+
+	CString strUuid;
+	ar >> strUuid;
+	_StringToUuid(strUuid, lpEntry->uuid);
+
+	ar >> lpEntry->uGroupId;
+	ar >> lpEntry->uImageId;
+
+	CString str;
+	ar >> str;
+	lpEntry->pszTitle = _TcsSafeDupAlloc((LPCTSTR)str);
+
+	ar >> str;
+	lpEntry->pszURL = _TcsSafeDupAlloc((LPCTSTR)str);
+
+	ar >> str;
+	lpEntry->pszUserName = _TcsSafeDupAlloc((LPCTSTR)str);
+
+	ar >> str;
+	lpEntry->pszPassword = _TcsCryptDupAlloc((LPCTSTR)str);
+
+	ar >> str;
+	lpEntry->pszAdditional = _TcsSafeDupAlloc((LPCTSTR)str);
+
+	ArLoadPwTime(ar, lpEntry->tCreation);
+	ArLoadPwTime(ar, lpEntry->tLastMod);
+	ArLoadPwTime(ar, lpEntry->tLastAccess);
+	ArLoadPwTime(ar, lpEntry->tExpire);	
+
+	ar >> str;
+	DWORD dwBinLen;
+	ar >> dwBinLen;
+
+	if(dwBinLen > 0)
+	{
+		lpEntry->pszBinaryDesc = _TcsSafeDupAlloc((LPCTSTR)str);
+		lpEntry->uBinaryDataLen = dwBinLen;
+		lpEntry->pBinaryData = new BYTE[dwBinLen];
+		ar.Read(lpEntry->pBinaryData, dwBinLen);
+	}
+	else
+	{
+		lpEntry->pszBinaryDesc = _TcsSafeDupAlloc(NULL);
+		lpEntry->uBinaryDataLen = 0;
+		lpEntry->pBinaryData = NULL;
+	}
+
+	ar.Close();
+	memFile.Close();
+	return true;
+}
+#endif // _MFC_VER
 */

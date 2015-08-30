@@ -11,10 +11,10 @@
 #define MyAppUrlName "KeePass.url"
 #define MyAppHelpName "KeePass.chm"
 
-#define KeeVersionStr "1.17"
-#define KeeVersionWin "1.1.7.0"
+#define KeeVersionStr "1.18"
+#define KeeVersionWin "1.1.8.0"
 
-#define KeeDevPeriod "2003-2009"
+#define KeeDevPeriod "2003-2010"
 
 [Setup]
 AppName={#MyAppFullName}
@@ -45,7 +45,9 @@ VersionInfoCopyright=Copyright (c) {#KeeDevPeriod} {#MyAppPublisher}
 WizardImageFile=compiler:WizModernImage-IS.bmp
 WizardSmallImageFile=compiler:WizModernSmallImage-IS.bmp
 DisableDirPage=auto
+AlwaysShowDirOnReadyPage=yes
 DisableProgramGroupPage=auto
+AlwaysShowGroupOnReadyPage=yes
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl

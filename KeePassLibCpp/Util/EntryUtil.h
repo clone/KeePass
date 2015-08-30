@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,7 +20,10 @@
 #ifndef ___ENTRY_UTIL_H___
 #define ___ENTRY_UTIL_H___
 
+#pragma once
+
 // #include "StrUtil.h"
+// #include "../PwManager.h"
 
 // LPTSTR PwEntryToString(const PW_ENTRY *lpEntry);
 // BOOL StringToPwEntry(PW_ENTRY *pEntry, LPCTSTR lpEntryString);
@@ -36,5 +39,10 @@
 // } CEE_CONTEXT;
 
 // int _CompareEntriesEx(void *pContext, const void *pEntryX, const void *pEntryY);
+
+// #ifdef _MFC_VER
+// CString PwEntryToString(PW_ENTRY *lpEntry, CPwManager* lpContext);
+// bool StringToPwEntry(PW_ENTRY *lpEntry, LPCTSTR lpEntryString);
+// #endif // _MFC_VER
 
 #endif // ___ENTRY_UTIL_H___

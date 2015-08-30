@@ -17,32 +17,13 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___FILE_TRANSACTION_EX_H___
-#define ___FILE_TRANSACTION_EX_H___
+#ifndef ___POPULAR_PASSWORDS_H___
+#define ___POPULAR_PASSWORDS_H___
 
 #pragma once
 
-#include <string>
-#include <tchar.h>
+#include "../SysDefEx.h"
 
-typedef std::basic_string<TCHAR> std_string;
+bool IsPopularPassword(LPCTSTR lpPassword);
 
-class CFileTransactionEx
-{
-public:
-	CFileTransactionEx(LPCTSTR lpBaseFile, bool bTransacted);
-
-	bool OpenWrite(std_string& strOutBufferFile);
-	bool CommitWrite();
-
-private:
-	bool CommitWriteTransaction();
-
-	bool m_bTransacted;
-	std_string m_strBaseFile;
-	std_string m_strTempFile;
-
-	bool m_bMadeUnhidden;
-};
-
-#endif // ___FILE_TRANSACTION_EX_H___
+#endif // ___POPULAR_PASSWORDS_H___

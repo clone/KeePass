@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -908,21 +908,21 @@ BOOL CPwSafeDlg::OnInitDialog()
 	// Translate the menu
 	BCMenu *pSubMenu = &m_menu;
 	const TCHAR *pSuffix = _T("");
-	CString strItem, strNew;
+	CString strItem;
 	int nItem = 0, nSub = 0;
 	UINT nID;
-	while(1)
+	while(true)
 	{
 		if(pSubMenu->GetMenuString((UINT)nItem, strItem, MF_BYPOSITION) == FALSE) break;
 		pSuffix = _GetCmdAccelExt(strItem);
-		strNew = TRL_VAR(strItem);
+		CString strNew = TRL_VAR(strItem);
 		if(_tcslen(pSuffix) != 0) { strNew += _T("\t"); strNew += pSuffix; }
 		nID = pSubMenu->GetMenuItemID(nItem);
 		if(pSubMenu->ModifyMenu(nItem, MF_BYPOSITION | MF_STRING, nID, strNew) == FALSE) { ASSERT(FALSE); }
 		++nItem;
 	}
 	pSubMenu = NewGUI_GetBCMenu(m_menu.GetSubMenu(nSub));
-	while(1)
+	while(true)
 	{
 		_TranslateMenu(pSubMenu, TRUE, &m_bCopyURLs);
 
@@ -3301,9 +3301,6 @@ void CPwSafeDlg::OnPwlistDelete()
 {
 	NotifyUserActivity();
 
-	PW_ENTRY *p;
-	BOOL b, bNeedGroupUpdate = FALSE;
-
 	if(m_bFileOpen == FALSE) return;
 	// if(m_dwLastNumSelectedItems == 0) return;
 
@@ -3312,17 +3309,30 @@ void CPwSafeDlg::OnPwlistDelete()
 	if(_CallPlugins(KPM_DELETE_ENTRY_PRE, 0, 0) == FALSE)
 		{ m_bDisplayDialog = FALSE; return; }
 
-	CString str;
-	str = TRL("This will remove all selected entries unrecoverably!");
-	str += _T("\r\n\r\n");
-	str += TRL("Are you sure you want to delete all selected entries?");
-	int nRes = MessageBox(str, TRL("Delete Entries Confirmation"), MB_ICONQUESTION | MB_YESNO);
-	if(nRes == IDNO) { m_bDisplayDialog = FALSE; return; }
+	CVistaTaskDialog dlgTask(this->m_hWnd, AfxGetInstanceHandle(), false);
+	dlgTask.SetContent(TRL("This will remove all selected entries unrecoverably!"));
+	dlgTask.SetMainInstruction(TRL("Are you sure you want to delete all selected entries?"));
+	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME);
+	dlgTask.SetIcon(V_MTDI_QUESTION);
+	dlgTask.AddButton(TRL("&Delete"), NULL, IDOK);
+	dlgTask.AddButton(TRL("Do&n't delete"), NULL, IDCANCEL);
+	int nMsg = dlgTask.ShowDialog();
+
+	if(nMsg < 0) // No task dialog support?
+	{
+		CString str;
+		str = TRL("This will remove all selected entries unrecoverably!");
+		str += _T("\r\n\r\n");
+		str += TRL("Are you sure you want to delete all selected entries?");
+		nMsg = MessageBox(str, TRL("Delete Entries Confirmation"), MB_ICONQUESTION | MB_YESNO);
+	}
+	if((nMsg == IDCANCEL) || (nMsg == IDNO)) { m_bDisplayDialog = FALSE; return; }
 
 	const DWORD dwInvGroup1 = m_mgr.GetGroupId(PWS_BACKUPGROUP);
 	const DWORD dwInvGroup2 = m_mgr.GetGroupId(PWS_BACKUPGROUP_SRC);
 
-	while(1)
+	BOOL bNeedGroupUpdate = FALSE;
+	while(true)
 	{
 		const DWORD dwSel = GetSelectedEntry();
 		if(dwSel == DWORD_MAX) break;
@@ -3332,13 +3342,13 @@ void CPwSafeDlg::OnPwlistDelete()
 
 		if(m_bBackupEntries != FALSE)
 		{
-			p = m_mgr.GetEntry(dwIndex);
+			PW_ENTRY *p = m_mgr.GetEntry(dwIndex);
 			ASSERT(p != NULL); if(p == NULL) break;
 
 			if((p->uGroupId != dwInvGroup1) && (p->uGroupId != dwInvGroup2))
 			{
 				m_mgr.UnlockEntryPassword(p);
-				b = FALSE;
+				BOOL b = FALSE;
 				m_mgr.BackupEntry(p, &b);
 				bNeedGroupUpdate |= b;
 				m_mgr.LockEntryPassword(p);
@@ -5144,7 +5154,11 @@ void CPwSafeDlg::OnSafeOptions()
 		}
 
 		if(dlg.m_bDefaultExpire == FALSE) m_dwDefaultExpire = 0;
-		else m_dwDefaultExpire = dlg.m_dwDefaultExpire;
+		else
+		{
+			m_dwDefaultExpire = dlg.m_dwDefaultExpire;
+			if(m_dwDefaultExpire > 2920) m_dwDefaultExpire = 2920;
+		}
 
 		if(dlg.m_bStartWithWindows != bStartWithWindows)
 		{
@@ -5250,7 +5264,7 @@ void CPwSafeDlg::OnSafeRemoveGroup()
 	ASSERT(p != NULL); if(p == NULL) { m_bDisplayDialog = FALSE; return; }
 	const USHORT usTopLevel = p->usLevel;
 
-	while(1)
+	while(true)
 	{
 		aGroupIds.Add(dwGroupId);
 
@@ -5265,14 +5279,25 @@ void CPwSafeDlg::OnSafeRemoveGroup()
 		dwGroupId = p->uGroupId;
 	}
 
-	CString str;
-	str = TRL("Deleting a group will delete all items and subgroups in that group, too.");
-	str += _T("\r\n\r\n");
-	str += TRL("Are you sure you want to delete this group?");
-	const int nRes = MessageBox(str, TRL("Delete Group Confirmation"),
-		MB_ICONQUESTION | MB_YESNO);
+	CVistaTaskDialog dlgTask(this->m_hWnd, AfxGetInstanceHandle(), false);
+	dlgTask.SetContent(TRL("Deleting a group will delete all items and subgroups in that group, too."));
+	dlgTask.SetMainInstruction(TRL("Are you sure you want to delete this group?"));
+	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME);
+	dlgTask.SetIcon(V_MTDI_QUESTION);
+	dlgTask.AddButton(TRL("&Delete"), NULL, IDOK);
+	dlgTask.AddButton(TRL("Do&n't delete"), NULL, IDCANCEL);
+	int nMsg = dlgTask.ShowDialog();
 
-	if(nRes == IDYES)
+	if(nMsg < 0) // No task dialog support?
+	{
+		CString str;
+		str = TRL("Deleting a group will delete all items and subgroups in that group, too.");
+		str += _T("\r\n\r\n");
+		str += TRL("Are you sure you want to delete this group?");
+		nMsg = MessageBox(str, TRL("Delete Group Confirmation"), MB_ICONQUESTION | MB_YESNO);
+	}
+
+	if((nMsg == IDOK) || (nMsg == IDYES))
 	{
 		const INT_PTR nCount = aGroupIds.GetSize();
 		for(INT_PTR i = 0; i < nCount; ++i)

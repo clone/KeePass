@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,6 +28,23 @@
 #define SDF_BUF_SIZE 4096
 
 #define AU_MAX_WRITE_BLOCK 65535
+
+#ifdef _UNICODE
+#define SETDLLDIRECTORY_FNNAME "SetDllDirectoryW"
+#else
+#define SETDLLDIRECTORY_FNNAME "SetDllDirectoryA"
+#endif
+typedef BOOL(WINAPI *LPSETDLLDIRECTORY)(LPCTSTR lpPathName);
+
+#ifndef PROCESS_DEP_ENABLE
+#define PROCESS_DEP_ENABLE 0x00000001
+#endif
+#define SETPROCESSDEPPOLICY_FNNAME "SetProcessDEPPolicy"
+typedef BOOL(WINAPI *LPSETPROCESSDEPPOLICY)(DWORD dwFlags);
+
+void AU_EnsureInitialized();
+
+HMODULE AU_LoadLibrary(LPCTSTR lpFileName);
 
 // Get the application's directory; without \\ at the end
 BOOL AU_GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpecial, BOOL bMakeURL);

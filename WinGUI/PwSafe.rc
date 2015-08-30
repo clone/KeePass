@@ -111,7 +111,7 @@ CAPTION "About KeePass..."
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,203,111,58,14,WS_GROUP
-    LTEXT           "Copyright © 2003-2009 Dominik Reichl.",IDC_STATIC,7,7,254,8
+    LTEXT           "Copyright © 2003-2010 Dominik Reichl.",IDC_STATIC,7,7,254,8
     LTEXT           "KeePass is OSI Certified Open Source Software.",IDC_STATIC,7,20,254,8
     LTEXT           "The program is distributed under the terms of the GNU General Public License v2 or later.",IDC_STATIC,7,33,254,17
     LTEXT           "<>",IDC_HLINK_HOMEPAGE,7,65,254,8
@@ -540,7 +540,8 @@ BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,150,125,58,14
     PUSHBUTTON      "&Cancel",IDCANCEL,211,125,58,14
     GROUPBOX        "Advanced",IDC_STATIC,7,7,262,76
-    CONTROL         "No repeating characters",IDC_CHECK_NO_REPEAT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,19,248,10
+    CONTROL         "Each character must occur at most once",IDC_CHECK_NO_REPEAT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,19,248,10
     CONTROL         "Exclude look-alike characters",IDC_CHECK_EXCLUDE_LOOKALIKE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,32,248,10
     LTEXT           "Exclude the following characters:",IDC_STATIC_EXCLUDECHARS,14,49,246,8
@@ -837,8 +838,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,7,0
- PRODUCTVERSION 1,1,7,0
+ FILEVERSION 1,1,8,0
+ PRODUCTVERSION 1,1,8,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -855,13 +856,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.17"
-            VALUE "FileVersion", "1.1.7.0"
+            VALUE "FileDescription", "KeePass Password Safe 1.18"
+            VALUE "FileVersion", "1.1.8.0"
             VALUE "InternalName", "PwSafe"
-            VALUE "LegalCopyright", "Copyright (c) 2003-2009 Dominik Reichl"
+            VALUE "LegalCopyright", "Copyright (c) 2003-2010 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.17"
-            VALUE "ProductVersion", "1.1.7.0"
+            VALUE "ProductName", "KeePass Password Safe 1.18"
+            VALUE "ProductVersion", "1.1.8.0"
         END
     END
     BLOCK "VarFileInfo"

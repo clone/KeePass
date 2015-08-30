@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -79,8 +79,7 @@ BOOL CLanguagesDlg::OnInitDialog()
 
 	RECT rcList;
 	m_listLang.GetWindowRect(&rcList);
-	int nColSize = rcList.right - rcList.left - GetSystemMetrics(SM_CXVSCROLL) - 8;
-	nColSize /= 4;
+	const int nColSize = (rcList.right - rcList.left - GetSystemMetrics(SM_CXVSCROLL) - 8) / 4;
 	m_listLang.InsertColumn(0, TRL("Available Languages"), LVCFMT_LEFT, nColSize, 0);
 	m_listLang.InsertColumn(1, TRL("Language File Version"), LVCFMT_LEFT, nColSize, 1);
 	m_listLang.InsertColumn(2, TRL("Author"), LVCFMT_LEFT, nColSize, 2);
@@ -184,25 +183,20 @@ void CLanguagesDlg::OnCancel()
 
 void CLanguagesDlg::OnClickLanguagesList(NMHDR* pNMHDR, LRESULT* pResult) 
 {
-	CPoint mousePoint;
-	UINT nFlags = 0;
-	int nHitItem = 0;
-	TCHAR tszItem[MAX_PATH];
-
 	UNREFERENCED_PARAMETER(pNMHDR);
 
+	CPoint mousePoint;
 	GetCursorPos(&mousePoint);
-
 	m_listLang.ScreenToClient(&mousePoint);
 
-	nHitItem = m_listLang.HitTest(mousePoint, &nFlags);
+	UINT nFlags = 0;
+	const int nHitItem = m_listLang.HitTest(mousePoint, &nFlags);
 
+	TCHAR tszItem[MAX_PATH];
+	ZeroMemory(tszItem, MAX_PATH * sizeof(TCHAR));
 	m_listLang.GetItemText(nHitItem, 0, tszItem, 254);
 
-	if(nFlags & LVHT_ONITEM)
-	{
-		_LoadLanguage(tszItem);
-	}
+	if((nFlags & LVHT_ONITEM) != 0) _LoadLanguage(tszItem);
 
 	*pResult = 0;
 }

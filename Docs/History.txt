@@ -1,3 +1,28 @@
+10/09/02 - 1.18
+- Password quality estimation algorithm: added check for about
+  1500 most common passwords (these are rated down to 1/8th of
+  their statistical rating; Bloom filter-based implementation)
+- {GOOGLECHROME} placeholder: updated detection code to also
+  support the latest versions of Chrome
+- KeePass now enables data execution prevention (DEP)
+- Improved lock overlay icon (higher resolution)
+
+- Improved character classification in password quality
+  estimation algorithm
+- Improved group and entries deletion confirmation dialogs
+  (only Windows Vista and higher)
+- Items in the update checking, plugin and icon picker dialogs
+  aren't underlined anymore when hovering over them
+- The default expiry interval for new entries is now limited to
+  a maximum of 8 years
+- Renamed character repetition option in the password generator
+  for improved clarity
+- Added code to prevent loading libraries from the current
+  working directory (to avoid binary planting attacks)
+- Installer: various minor improvements
+- Various code optimizations
+- Minor other improvements
+
 09/12/05 - 1.17
 - Added option to use file transactions when writing databases
   (enabled by default; writing to a temporary file and

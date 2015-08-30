@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -80,6 +80,8 @@ BOOL CPwSafeApp::InitInstance()
 	Enable3dControlsStatic();
 #endif
 #endif
+
+	AU_EnsureInitialized();
 
 	if(ProcessControlCommands() == TRUE)
 	{
@@ -421,7 +423,7 @@ BOOL CPwSafeApp::UnregisterShellAssociation()
 
 void CPwSafeApp::NotifyAssocChanged()
 {
-	HINSTANCE hShell32 = LoadLibrary(_T("Shell32.dll"));
+	HINSTANCE hShell32 = AU_LoadLibrary(_T("Shell32.dll"));
 	if(hShell32 != NULL)
 	{
 		LPSHCHANGENOTIFY lpSHChangeNotify = (LPSHCHANGENOTIFY)GetProcAddress(
@@ -681,7 +683,7 @@ BOOL CPwSafeApp::ProcessControlCommands()
 		strContent += tszUrlOverride;
 		strContent += _T("\r\n");
 		VERIFY(AU_WriteBigFile(strOutFile.c_str(), (const BYTE*)strContent.c_str(),
-			strContent.size() * sizeof(TCHAR), FALSE) == PWE_SUCCESS);
+			static_cast<DWORD>(strContent.size() * sizeof(TCHAR)), FALSE) == PWE_SUCCESS);
 		return TRUE;
 	}
 
@@ -710,7 +712,7 @@ HANDLE CPwSafeApp::CreateGlobalMutex()
 	std::basic_string<TCHAR> strName = _T("Global\\");
 	strName += MTXNAME_GLOBAL;
 
-	HMODULE hInst = ::LoadLibrary(_T("AdvApi32"));
+	HMODULE hInst = AU_LoadLibrary(_T("AdvApi32.dll"));
 	if(hInst == NULL) { ASSERT(FALSE); return NULL; }
 
 	LPINITIALIZESECURITYDESCRIPTOR lpInit = (LPINITIALIZESECURITYDESCRIPTOR)
