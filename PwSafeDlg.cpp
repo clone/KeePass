@@ -382,6 +382,17 @@ BEGIN_MESSAGE_MAP(CPwSafeDlg, CDialog)
 	ON_UPDATE_COMMAND_UI(ID_SAFE_EXPORTGROUP_TXT, OnUpdateSafeExportGroupTxt)
 	ON_COMMAND(ID_PWLIST_SELECTALL, OnPwlistSelectAll)
 	ON_UPDATE_COMMAND_UI(ID_PWLIST_SELECTALL, OnUpdatePwlistSelectAll)
+	ON_COMMAND(ID_VIEW_AUTOSORT_CREATION, OnViewAutosortCreation)
+	ON_COMMAND(ID_VIEW_AUTOSORT_EXPIRE, OnViewAutosortExpire)
+	ON_COMMAND(ID_VIEW_AUTOSORT_LASTACCESS, OnViewAutosortLastaccess)
+	ON_COMMAND(ID_VIEW_AUTOSORT_LASTMODIFY, OnViewAutosortLastmodify)
+	ON_COMMAND(ID_VIEW_AUTOSORT_NOSORT, OnViewAutosortNosort)
+	ON_COMMAND(ID_VIEW_AUTOSORT_NOTES, OnViewAutosortNotes)
+	ON_COMMAND(ID_VIEW_AUTOSORT_PASSWORD, OnViewAutosortPassword)
+	ON_COMMAND(ID_VIEW_AUTOSORT_TITLE, OnViewAutosortTitle)
+	ON_COMMAND(ID_VIEW_AUTOSORT_URL, OnViewAutosortUrl)
+	ON_COMMAND(ID_VIEW_AUTOSORT_USER, OnViewAutosortUser)
+	ON_UPDATE_COMMAND_UI(ID_SAFE_OPTIONS, OnUpdateSafeOptions)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -457,6 +468,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_dwOldListParameters = 0;
 	m_bMinimized = FALSE;
 	m_bMaximized = FALSE;
+	m_bWasMaximized = FALSE;
 	m_bCachedToolBarUpdate = FALSE;
 	m_bCachedPwlistUpdate = FALSE;
 	m_bDragging = FALSE;
@@ -464,6 +476,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_hDraggingGroup = NULL;
 	// m_bDraggingEntry = FALSE;
 	m_bMenuExit = FALSE;
+	m_bBlockPwListUpdate = FALSE;
 
 	m_bHashValid = FALSE;
 	ZeroMemory(m_aHashOfFile, 32);
@@ -589,6 +602,13 @@ BOOL CPwSafeDlg::OnInitDialog()
 	}
 	else m_bDisableUnsafe = FALSE;
 	m_bDisableUnsafeAtStart = m_bDisableUnsafe;
+
+	cConfig.Get(PWMKEY_AUTOSORT, szTemp);
+	if(_tcslen(szTemp) != 0)
+	{
+		m_nAutoSort = _ttoi(szTemp);
+	}
+	else m_nAutoSort = 0;
 
 	cConfig.Get(PWMKEY_USEPUTTYFORURLS, szTemp);
 	if(_tcslen(szTemp) != 0)
@@ -1117,16 +1137,29 @@ BOOL CPwSafeDlg::OnInitDialog()
 			{
 				TCHAR tszTemp[SI_REGSIZE];
 				int i;
+
 				GetModuleFileName(NULL, tszTemp, SI_REGSIZE - 2);
-				for(i = _tcslen(tszTemp) - 1; i > 1; i--)
+
+				if((szTemp[1] == _T(':')) && (szTemp[2] == _T('\\')))
 				{
-					if((tszTemp[i] == _T('\\')) || (tszTemp[i] == _T('/')))
-					{
-						tszTemp[i + 1] = 0;
-						break;
-					}
+					_tcscpy(tszTemp, szTemp);
 				}
-				_tcscat(tszTemp, szTemp);
+				else if((szTemp[0] == _T('\\')) && (szTemp[1] == _T('\\')))
+				{
+					_tcscpy(tszTemp, szTemp);
+				}
+				else
+				{
+					for(i = _tcslen(tszTemp) - 1; i > 1; i--)
+					{
+						if((tszTemp[i] == _T('\\')) || (tszTemp[i] == _T('/')))
+						{
+							tszTemp[i + 1] = 0;
+							break;
+						}
+					}
+					_tcscat(tszTemp, szTemp);
+				}
 
 				if(_FileAccessible(tszTemp) == TRUE)
 					_OpenDatabase(tszTemp);
@@ -1134,10 +1167,16 @@ BOOL CPwSafeDlg::OnInitDialog()
 		}
 	}
 
+	m_bWasMaximized = FALSE;
 	cConfig.Get(PWMKEY_WINSTATE_MAX, szTemp);
 	if(_tcslen(szTemp) != 0)
-		if(_tcscmp(szTemp, _T("True")) == 0) ShowWindow(SW_SHOWMAXIMIZED);
+		if(_tcscmp(szTemp, _T("True")) == 0)
+		{
+			ShowWindow(SW_SHOWMAXIMIZED);
+			m_bWasMaximized = TRUE;
+		}
 
+	UpdateAutoSortMenuItems();
 	_UpdateToolBar();
 	ProcessResize();
 
@@ -1163,7 +1202,8 @@ void CPwSafeDlg::_TranslateMenu(BCMenu *pBCMenu)
 		pSuffix = _GetCmdAccelExt((LPCTSTR)strItem);
 
 		if((strItem == _T("Export To")) || (strItem == _T("Import From")) ||
-			(strItem == _T("Show &Columns")) || (strItem == _T("&Rearrange")))
+			(strItem == _T("Show &Columns")) || (strItem == _T("&Rearrange")) ||
+			(strItem == _T("Auto-&Sort Password List")))
 		{
 			pNext = pBCMenu->GetSubBCMenu((TCHAR *)(LPCTSTR)strItem);
 			if(pNext != NULL) _TranslateMenu(pNext);
@@ -1359,6 +1399,10 @@ void CPwSafeDlg::OnSysCommand(UINT nID, LPARAM lParam)
 		SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, 0);
 		return;
 	}
+
+	if(nID == SC_MAXIMIZE) m_bWasMaximized = TRUE;
+	else if((nID == SC_RESTORE) && (m_bMaximized == TRUE)) m_bWasMaximized = FALSE;
+	else if((nID == SC_RESTORE) && (m_bMinimized == FALSE)) m_bWasMaximized = FALSE;
 
 	if((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
@@ -1746,6 +1790,9 @@ void CPwSafeDlg::CleanUp()
 	else _tcscpy(szTemp, _T("False"));
 	pcfg.Set(PWMKEY_USEPUTTYFORURLS, szTemp);
 
+	_itot(m_nAutoSort, szTemp, 10);
+	pcfg.Set(PWMKEY_AUTOSORT, szTemp);
+
 	if(m_bSaveOnLATMod == TRUE) _tcscpy(szTemp, _T("True"));
 	else _tcscpy(szTemp, _T("False"));
 	pcfg.Set(PWMKEY_SAVEONLATMOD, szTemp);
@@ -1764,8 +1811,8 @@ void CPwSafeDlg::CleanUp()
 
 	if(m_bRememberLast == TRUE)
 	{
-		TCHAR tszTemp[MAX_PATH * 2];
-		GetModuleFileName(NULL, tszTemp, (MAX_PATH * 2) - 2);
+		TCHAR tszTemp[SI_REGSIZE];
+		GetModuleFileName(NULL, tszTemp, SI_REGSIZE - 2);
 		pcfg.Set(PWMKEY_LASTDB, (LPCTSTR)MakeRelativePathEx(tszTemp, (LPCTSTR)m_strLastDb));
 	}
 	else pcfg.Set(PWMKEY_LASTDB, _T(""));
@@ -2221,6 +2268,11 @@ void CPwSafeDlg::UpdatePasswordList()
 	dwGroupId = GetSelectedGroupId();
 	if(dwGroupId == DWORD_MAX) return;
 
+	if(m_bBlockPwListUpdate == TRUE) return;
+	m_bBlockPwListUpdate = TRUE;
+	_SortListIfAutoSort();
+	m_bBlockPwListUpdate = FALSE;
+
 	m_cList.SetRedraw(FALSE);
 
 	m_cList.DeleteAllItems();
@@ -2411,6 +2463,8 @@ void CPwSafeDlg::RefreshPasswordList()
 
 	_GetCurrentPwTime(&tNow);
 
+	m_cList.SetRedraw(FALSE);
+
 	for(i = 0; i < (DWORD)m_cList.GetItemCount(); i++)
 	{
 		ZeroMemory(&lvi, sizeof(LV_ITEM));
@@ -2432,6 +2486,10 @@ void CPwSafeDlg::RefreshPasswordList()
 			j++;
 		}
 	}
+
+	_SortListIfAutoSort();
+	m_cList.SetRedraw(TRUE);
+	m_cList.Invalidate();
 }
 
 void CPwSafeDlg::OnPwlistAdd() 
@@ -2441,6 +2499,7 @@ void CPwSafeDlg::OnPwlistAdd()
 	PW_ENTRY pwTemplate;
 	PW_TIME tNow;
 	DWORD dwInitialGroup; // ID
+	BYTE aUuid[16];
 
 	if(m_bFileOpen == FALSE) return;
 	if(uGroupId == DWORD_MAX) return; // No group selected or other error
@@ -2483,6 +2542,7 @@ void CPwSafeDlg::OnPwlistAdd()
 
 		int nAttachLen = dlg.m_strAttachment.GetLength();
 		int nEscapeLen = (int)_tcslen(PWS_NEW_ATTACHMENT);
+		memcpy(aUuid, pNew->uuid, 16);
 
 		if(nAttachLen > nEscapeLen)
 		{
@@ -2495,7 +2555,21 @@ void CPwSafeDlg::OnPwlistAdd()
 		if(pNew->uGroupId == dwInitialGroup) // dwInitialGroup is an ID
 		{
 			_List_SetEntry(DWORD_MAX, pNew, TRUE, &tNow); // No unlock needed
-			m_cList.EnsureVisible(m_cList.GetItemCount() - 1, FALSE);
+			_SortListIfAutoSort();
+			if(m_nAutoSort == 0) // TODO FIXME
+			{
+				m_cList.EnsureVisible(m_cList.GetItemCount() - 1, FALSE);
+				m_cList.SetItemState(m_cList.GetItemCount() - 1, LVIS_SELECTED, LVIS_SELECTED);
+			}
+			else
+			{
+				DWORD dw = _EntryUuidToListPos(aUuid);
+				if(dw != DWORD_MAX)
+				{
+					m_cList.EnsureVisible((int)dw, FALSE);
+					m_cList.SetItemState((int)dw, LVIS_SELECTED, LVIS_SELECTED);
+				}
+			}
 		}
 
 		m_bModified = TRUE; // Haven't we? :)
@@ -2554,6 +2628,7 @@ void CPwSafeDlg::OnPwlistEdit()
 	DWORD dwNewGroupId;
 	BOOL bNeedFullUpdate = FALSE;
 	DWORD dwSelectedEntry = GetSelectedEntry();
+	BYTE aUuid[16];
 
 	if(m_bFileOpen == FALSE) return;
 
@@ -2628,6 +2703,9 @@ void CPwSafeDlg::OnPwlistEdit()
 					dlg.m_strAttachment.Right(dlg.m_strAttachment.GetLength() - (int)_tcslen(PWS_NEW_ATTACHMENT)));
 		}
 
+		PW_ENTRY *pBase = m_mgr.GetEntry(dwEntryIndex); ASSERT_ENTRY(pBase);
+		memcpy(aUuid, pBase->uuid, 16);
+
 		if(bNeedFullUpdate == TRUE) // Full list update(!) needed
 		{
 			_List_SaveView();
@@ -2638,6 +2716,14 @@ void CPwSafeDlg::OnPwlistEdit()
 		{
 			PW_ENTRY *pUpdated = m_mgr.GetEntry(dwEntryIndex); ASSERT(pUpdated != NULL);
 			_List_SetEntry(dwSelectedEntry, pUpdated, FALSE, &tNow);
+		}
+
+		_SortListIfAutoSort();
+		DWORD dwListEntry = _EntryUuidToListPos(aUuid);
+		if(dwListEntry != DWORD_MAX)
+		{
+			m_cList.EnsureVisible((int)dwListEntry, FALSE);
+			m_cList.SetItemState((int)dwListEntry, LVIS_SELECTED, LVIS_SELECTED);
 		}
 
 		m_bModified = TRUE;
@@ -2764,6 +2850,7 @@ void CPwSafeDlg::OnPwlistCopyPw()
 	if(_tcscmp(p->pszTitle, PWS_TAN_ENTRY) == 0) // If it is a TAN entry, expire it
 	{
 		_GetCurrentPwTime(&p->tExpire);
+		m_bModified = TRUE;
 	}
 
 	_TouchEntry(GetSelectedEntry(), FALSE);
@@ -3941,6 +4028,7 @@ void CPwSafeDlg::OnExtrasGenPw()
 {
 	CPwGeneratorDlg dlg;
 	DWORD dwGroupId = GetSelectedGroupId();
+	BYTE aUuid[16];
 
 	m_bDisplayDialog = TRUE;
 
@@ -3976,14 +4064,24 @@ void CPwSafeDlg::OnExtrasGenPw()
 
 			if(m_mgr.AddEntry(&pwTemplate) == TRUE)
 			{
-				UpdatePasswordList();
-				m_cList.EnsureVisible(m_cList.GetItemCount() - 1, FALSE);
+				PW_ENTRY *pNew = m_mgr.GetLastEditedEntry(); ASSERT_ENTRY(pNew);
+				DWORD dwListIndex;
+				memcpy(aUuid, pNew->uuid, 16);
+
+				_SortListIfAutoSort();
+				if(m_nAutoSort == 0) UpdatePasswordList();
+
+				dwListIndex = _EntryUuidToListPos(aUuid);
+
+				m_cList.EnsureVisible((int)dwListIndex, FALSE);
+				m_cList.SetItemState((int)dwListIndex, LVIS_SELECTED, LVIS_SELECTED);
 			}
 
 			EraseCString(&dlg.m_strPassword);
 		}
 	}
 
+	_UpdateToolBar();
 	m_bDisplayDialog = FALSE;
 }
 
@@ -4195,6 +4293,7 @@ void CPwSafeDlg::OnPwlistDuplicate()
 	int i;
 	DWORD dwEntryIndex;
 	UINT uState;
+	BYTE aUuid[16];
 
 	_GetCurrentPwTime(&tNow);
 
@@ -4220,11 +4319,21 @@ void CPwSafeDlg::OnPwlistDuplicate()
 			m_mgr.UnlockEntryPassword(&pwTemplate);
 			VERIFY(m_mgr.AddEntry(&pwTemplate));
 			m_mgr.LockEntryPassword(&pwTemplate);
+
+			PW_ENTRY *pNew = m_mgr.GetLastEditedEntry(); ASSERT_ENTRY(pNew);
+			memcpy(aUuid, pNew->uuid, 16);
 		}
 	}
 
-	UpdatePasswordList();
-	m_cList.EnsureVisible(m_cList.GetItemCount() - 1, FALSE);
+	_SortListIfAutoSort();
+	if(m_nAutoSort == 0) UpdatePasswordList();
+
+	DWORD dwListItem = _EntryUuidToListPos(aUuid);
+	if(dwListItem != DWORD_MAX)
+	{
+		m_cList.EnsureVisible((int)dwListItem, FALSE);
+		m_cList.SetItemState((int)dwListItem, LVIS_SELECTED, LVIS_SELECTED);
+	}
 
 	_UpdateToolBar();
 }
@@ -4339,6 +4448,12 @@ void CPwSafeDlg::OnPwlistMoveUp()
 
 	_TouchEntry(GetSelectedEntry(), FALSE);
 
+	if(m_nAutoSort != 0)
+	{
+		MessageBox(TRL("Auto-sorting of the password list is enabled, you cannot move entries manually."), TRL("Stop"), MB_OK | MB_ICONWARNING);
+		return;
+	}
+
 	p = m_mgr.GetEntry(dwEntryIndex);
 	m_mgr.MoveInGroup(p->uGroupId, dwRelativeEntry, dwRelativeEntry - 1);
 
@@ -4367,6 +4482,12 @@ void CPwSafeDlg::OnPwlistMoveTop()
 	if(dwRelativeEntry == 0) return;
 
 	_TouchEntry(GetSelectedEntry(), FALSE);
+
+	if(m_nAutoSort != 0)
+	{
+		MessageBox(TRL("Auto-sorting of the password list is enabled, you cannot move entries manually."), TRL("Stop"), MB_OK | MB_ICONWARNING);
+		return;
+	}
 
 	p = m_mgr.GetEntry(dwEntryIndex);
 	m_mgr.MoveInGroup(p->uGroupId, dwRelativeEntry, 0);
@@ -4398,6 +4519,12 @@ void CPwSafeDlg::OnPwlistMoveDown()
 
 	_TouchEntry(GetSelectedEntry(), FALSE);
 
+	if(m_nAutoSort != 0)
+	{
+		MessageBox(TRL("Auto-sorting of the password list is enabled, you cannot move entries manually."), TRL("Stop"), MB_OK | MB_ICONWARNING);
+		return;
+	}
+
 	p = m_mgr.GetEntry(dwEntryIndex);
 	m_mgr.MoveInGroup(p->uGroupId, dwRelativeEntry, dwRelativeEntry + 1);
 
@@ -4428,6 +4555,12 @@ void CPwSafeDlg::OnPwlistMoveBottom()
 	if(dwRelativeEntry == (dwItemCount - 1)) return;
 
 	_TouchEntry(GetSelectedEntry(), FALSE);
+
+	if(m_nAutoSort != 0)
+	{
+		MessageBox(TRL("Auto-sorting of the password list is enabled, you cannot move entries manually."), TRL("Stop"), MB_OK | MB_ICONWARNING);
+		return;
+	}
 
 	p = m_mgr.GetEntry(dwEntryIndex);
 	m_mgr.MoveInGroup(p->uGroupId, dwRelativeEntry, dwItemCount - 1);
@@ -4776,7 +4909,8 @@ void CPwSafeDlg::OnFileLock()
 		m_cList.EnsureVisible(m_cList.GetItemCount() - 1, FALSE);
 		m_cList.EnsureVisible(m_nLockedViewParams[2], FALSE);
 
-		m_cList.SetItemState((int)m_nLockedViewParams[1], LVIS_SELECTED, LVIS_SELECTED);
+		if(m_nLockedViewParams[1] != DWORD_MAX)
+			m_cList.SetItemState((int)m_nLockedViewParams[1], LVIS_SELECTED, LVIS_SELECTED);
 
 		SetStatusTextEx(TRL("Ready."));
 
@@ -4910,34 +5044,38 @@ void CPwSafeDlg::OnViewHide()
 {
 	if(m_bMinimized == TRUE)
 	{
+		BOOL bWasMaximized = m_bWasMaximized;
+
 		// m_systray.MaximiseFromTray(this);
 		// OnSysCommand(SC_RESTORE, 0);
 		SendMessage(WM_SYSCOMMAND, SC_RESTORE, 0);
+
+		if(bWasMaximized == TRUE) ShowWindow(SW_MAXIMIZE);
 
 		return;
 	}
 
 	if(m_bShowWindow == TRUE)
 	{
-		if(m_bMinimizeToTray == FALSE)
-			m_systray.MinimiseToTray(this);
-
 		m_bShowWindow = FALSE;
 
-		if(m_bMinimizeToTray == TRUE)
+		if(m_bMinimizeToTray == FALSE)
+			m_systray.MinimiseToTray(this);
+		else
 			OnSysCommand(SC_MINIMIZE, 0);
 
 		if((m_bLockOnMinimize == TRUE) && (m_bLocked == FALSE)) OnFileLock();
 	}
 	else
 	{
-		if(m_bMinimizeToTray == FALSE)
-			m_systray.MaximiseFromTray(this);
-
 		m_bShowWindow = TRUE;
 
-		if(m_bMinimizeToTray == TRUE)
+		if(m_bMinimizeToTray == FALSE)
+			m_systray.MaximiseFromTray(this);
+		else
 			OnSysCommand(SC_RESTORE, 0);
+
+		if(m_bWasMaximized == TRUE) ShowWindow(SW_MAXIMIZE);
 
 		if(m_bLocked == TRUE)
 		{
@@ -4978,7 +5116,8 @@ void CPwSafeDlg::OnImportCsv()
 
 		if(pvi.ImportCsvToDb((LPCTSTR)strFile, &m_mgr, dwGroupId) == TRUE)
 		{
-			UpdatePasswordList();
+			_SortListIfAutoSort();
+			if(m_nAutoSort == 0) UpdatePasswordList();
 			m_bModified = TRUE;
 		}
 		else
@@ -5007,7 +5146,7 @@ void CPwSafeDlg::OnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 	_UpdateToolBar();
 }
 
-void CPwSafeDlg::_SortList(DWORD dwByField)
+void CPwSafeDlg::_SortList(DWORD dwByField, BOOL bAutoSortCall)
 {
 	DWORD dwGroupId = GetSelectedGroupId();
 
@@ -5022,7 +5161,7 @@ void CPwSafeDlg::_SortList(DWORD dwByField)
 	int nTop = m_cList.GetTopIndex();
 
 	m_mgr.SortGroup(dwGroupId, (DWORD)dwByField);
-	m_bModified = TRUE;
+	if(bAutoSortCall == FALSE) m_bModified = TRUE;
 	UpdatePasswordList();
 	_UpdateToolBar();
 
@@ -5067,7 +5206,8 @@ void CPwSafeDlg::OnImportCWallet()
 		{
 			UpdateGroupList();
 			m_cGroups.EnsureVisible(_GetLastVisibleItem(&m_cGroups));
-			UpdatePasswordList();
+			_SortListIfAutoSort();
+			if(m_nAutoSort == 0) UpdatePasswordList();
 			m_bModified = TRUE;
 		}
 		else
@@ -5163,7 +5303,8 @@ void CPwSafeDlg::OnImportPwSafe()
 		if(pvi.ImportPwSafeToDb((LPCTSTR)strFile, &m_mgr) == TRUE)
 		{
 			_Groups_SaveView(); UpdateGroupList(); _Groups_RestoreView();
-			UpdatePasswordList();
+			_SortListIfAutoSort();
+			if(m_nAutoSort == 0) UpdatePasswordList();
 			m_bModified = TRUE;
 		}
 		else
@@ -5532,12 +5673,14 @@ void CPwSafeDlg::OnPwlistMassModify()
 		if(dlg.m_bModGroup == TRUE) // We need a full update
 		{
 			_List_SaveView();
-			UpdatePasswordList();
+			_SortListIfAutoSort();
+			if(m_nAutoSort == 0) UpdatePasswordList();
 			_List_RestoreView();
 		}
 		else // Refresh is enough, no entries have been moved
 		{
-			RefreshPasswordList();
+			_SortListIfAutoSort();
+			if(m_nAutoSort == 0) RefreshPasswordList();
 		}
 
 		m_bModified = TRUE;
@@ -6043,7 +6186,8 @@ void CPwSafeDlg::OnExtrasTanWizard()
 			}
 		}
 
-		UpdatePasswordList();
+		_SortListIfAutoSort();
+		if(m_nAutoSort == 0) UpdatePasswordList();
 		m_bModified = TRUE;
 	}
 
@@ -6783,7 +6927,8 @@ void CPwSafeDlg::OnImportPvault()
 		if(pvi.ImportPVaultToDb((LPCTSTR)strFile, &m_mgr) == TRUE)
 		{
 			_Groups_SaveView(); UpdateGroupList(); _Groups_RestoreView();
-			UpdatePasswordList();
+			_SortListIfAutoSort();
+			if(m_nAutoSort == 0) UpdatePasswordList();
 			m_bModified = TRUE;
 		}
 		else
@@ -6997,4 +7142,140 @@ void CPwSafeDlg::OnPwlistSelectAll()
 void CPwSafeDlg::OnUpdatePwlistSelectAll(CCmdUI* pCmdUI) 
 {
 	pCmdUI->Enable(m_bFileOpen);
+}
+
+void CPwSafeDlg::UpdateAutoSortMenuItems()
+{
+	int i;
+	UINT uCmdID;
+
+	for(i = 0; i < 10; i++)
+	{
+		switch(i)
+		{
+			case 0: uCmdID = ID_VIEW_AUTOSORT_NOSORT; break;
+			case 1: uCmdID = ID_VIEW_AUTOSORT_TITLE; break;
+			case 2: uCmdID = ID_VIEW_AUTOSORT_USER; break;
+			case 3: uCmdID = ID_VIEW_AUTOSORT_URL; break;
+			case 4: uCmdID = ID_VIEW_AUTOSORT_PASSWORD; break;
+			case 5: uCmdID = ID_VIEW_AUTOSORT_NOTES; break;
+			case 6: uCmdID = ID_VIEW_AUTOSORT_CREATION; break;
+			case 7: uCmdID = ID_VIEW_AUTOSORT_LASTMODIFY; break;
+			case 8: uCmdID = ID_VIEW_AUTOSORT_LASTACCESS; break;
+			case 9: uCmdID = ID_VIEW_AUTOSORT_EXPIRE; break;
+			default: ASSERT(FALSE); break;
+		}
+
+		if(i == m_nAutoSort)
+			m_menu.CheckMenuItem(uCmdID, MF_BYCOMMAND | MF_CHECKED);
+		else
+			m_menu.CheckMenuItem(uCmdID, MF_BYCOMMAND | MF_UNCHECKED);
+	}
+}
+
+void CPwSafeDlg::_SortListIfAutoSort()
+{
+	if(m_nAutoSort == 0) return;
+	_SortList((DWORD)(m_nAutoSort - 1), TRUE);
+}
+
+void CPwSafeDlg::OnViewAutosortCreation() 
+{
+	m_nAutoSort = 6;
+	UpdateAutoSortMenuItems();
+	_SortListIfAutoSort();
+}
+
+void CPwSafeDlg::OnViewAutosortExpire() 
+{
+	m_nAutoSort = 9;
+	UpdateAutoSortMenuItems();
+	_SortListIfAutoSort();
+}
+
+void CPwSafeDlg::OnViewAutosortLastaccess() 
+{
+	m_nAutoSort = 8;
+	UpdateAutoSortMenuItems();
+	_SortListIfAutoSort();
+}
+
+void CPwSafeDlg::OnViewAutosortLastmodify() 
+{
+	m_nAutoSort = 7;
+	UpdateAutoSortMenuItems();
+	_SortListIfAutoSort();
+}
+
+void CPwSafeDlg::OnViewAutosortNosort() 
+{
+	m_nAutoSort = 0;
+	UpdateAutoSortMenuItems();
+	_SortListIfAutoSort();
+}
+
+void CPwSafeDlg::OnViewAutosortNotes() 
+{
+	m_nAutoSort = 5;
+	UpdateAutoSortMenuItems();
+	_SortListIfAutoSort();
+}
+
+void CPwSafeDlg::OnViewAutosortPassword() 
+{
+	m_nAutoSort = 4;
+	UpdateAutoSortMenuItems();
+	_SortListIfAutoSort();
+}
+
+void CPwSafeDlg::OnViewAutosortTitle() 
+{
+	m_nAutoSort = 1;
+	UpdateAutoSortMenuItems();
+	_SortListIfAutoSort();
+}
+
+void CPwSafeDlg::OnViewAutosortUrl() 
+{
+	m_nAutoSort = 3;
+	UpdateAutoSortMenuItems();
+	_SortListIfAutoSort();
+}
+
+void CPwSafeDlg::OnViewAutosortUser() 
+{
+	m_nAutoSort = 2;
+	UpdateAutoSortMenuItems();
+	_SortListIfAutoSort();
+}
+
+DWORD CPwSafeDlg::_EntryUuidToListPos(BYTE *pUuid)
+{
+	int i;
+	LV_ITEM lvi;
+	char szTemp[66];
+	BYTE aUuid[16];
+
+	ZeroMemory(&lvi, sizeof(LV_ITEM));
+	lvi.iSubItem = 9;
+	lvi.cchTextMax = 65;
+	lvi.pszText = szTemp;
+	lvi.mask = LVIF_TEXT;
+
+	for(i = 0; i < m_cList.GetItemCount(); i++)
+	{
+		lvi.iItem = i;
+		lvi.pszText = szTemp;
+		m_cList.GetItem(&lvi);
+
+		_StringToUuid(lvi.pszText, aUuid);
+		if(memcmp(aUuid, pUuid, 16) == 0) return (DWORD)i;
+	}
+
+	return DWORD_MAX;
+}
+
+void CPwSafeDlg::OnUpdateSafeOptions(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(((m_bLocked == FALSE) ? TRUE : FALSE));
 }

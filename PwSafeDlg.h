@@ -82,6 +82,7 @@ public:
 	void CleanUp();
 	void SetStatusTextEx(LPCTSTR lpStatusText, int nPane = -1);
 	void NotifyUserActivity();
+	void UpdateAutoSortMenuItems();
 
 	void UpdateGroupList();
 	void UpdatePasswordList();
@@ -106,6 +107,7 @@ public:
 	void _ProcessListKey(UINT nChar);
 
 	void _OnPwlistColumnWidthChange(int icolumn = -1, int isize = -1);
+	void _SortListIfAutoSort();
 
 	void _HandleEntryDrop(DWORD dwDropType, HTREEITEM hTreeItem);
 
@@ -123,6 +125,7 @@ public:
 	BOOL m_bLocked;
 	long m_nLockedViewParams[3];
 	BOOL m_bShowWindow;
+	BOOL m_bWasMaximized;
 
 	CPwManager m_mgr;
 
@@ -155,6 +158,7 @@ public:
 	BOOL m_bCloseMinimizes;
 	BOOL m_bEntryView;
 	BOOL m_bColAutoSize;
+	int m_nAutoSort;
 
 	HICON m_hTrayIconNormal;
 	HICON m_hTrayIconLocked;
@@ -293,6 +297,7 @@ protected:
 	void _SelChangeView(UINT uID);
 	void _List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEntry, PW_TIME *ptNow);
 	DWORD _ListSelToEntryIndex(DWORD dwSelected = DWORD_MAX);
+	DWORD _EntryUuidToListPos(BYTE *pUuid);
 
 	void _DeleteTemporaryFiles();
 	BOOL _ParseCommandLine();
@@ -309,7 +314,7 @@ protected:
 
 	void _FinishDragging(BOOL bDraggingImageList);
 
-	void _SortList(DWORD dwByField);
+	void _SortList(DWORD dwByField, BOOL bAutoSortCall = FALSE);
 
 	HTREEITEM _FindSelectInTree(CTreeCtrl *pTree, HTREEITEM hRoot, DWORD dwGroupId);
 
@@ -327,6 +332,7 @@ protected:
 
 	BOOL m_bCachedToolBarUpdate;
 	BOOL m_bCachedPwlistUpdate;
+	BOOL m_bBlockPwListUpdate;
 
 	BOOL m_bDragging;
 	BOOL m_bDraggingHoriz;
@@ -535,6 +541,17 @@ protected:
 	afx_msg void OnUpdateSafeExportGroupTxt(CCmdUI* pCmdUI);
 	afx_msg void OnPwlistSelectAll();
 	afx_msg void OnUpdatePwlistSelectAll(CCmdUI* pCmdUI);
+	afx_msg void OnViewAutosortCreation();
+	afx_msg void OnViewAutosortExpire();
+	afx_msg void OnViewAutosortLastaccess();
+	afx_msg void OnViewAutosortLastmodify();
+	afx_msg void OnViewAutosortNosort();
+	afx_msg void OnViewAutosortNotes();
+	afx_msg void OnViewAutosortPassword();
+	afx_msg void OnViewAutosortTitle();
+	afx_msg void OnViewAutosortUrl();
+	afx_msg void OnViewAutosortUser();
+	afx_msg void OnUpdateSafeOptions(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

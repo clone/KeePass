@@ -659,6 +659,17 @@ CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile)
 	CString str;
 	BOOL bMod;
 
+	if((lpBaseFile[1] == _T(':')) && (lpTargetFile[1] == _T(':')) &&
+		(lpBaseFile[2] == _T('\\')) && (lpTargetFile[2] == _T('\\')) &&
+		(lpBaseFile[0] != lpTargetFile[0]))
+	{
+		return CString(lpTargetFile);
+	}
+	else if((lpTargetFile[0] == _T('\\')) && (lpTargetFile[1] == _T('\\')))
+	{
+		return CString(lpTargetFile);
+	}
+
 	hShl = LoadLibrary(_T("ShlWApi.dll"));
 	if(hShl == NULL) return CString(lpTargetFile);
 
@@ -719,29 +730,26 @@ BOOL OpenUrlInNewBrowser(LPCTSTR lpURL)
 
 	ASSERT(lpURL != NULL); if(lpURL == NULL) return FALSE;
 
-	if(GetRegKeyEx(HKEY_CLASSES_ROOT, _T(".htm"), tszKey) == TRUE)
+	_tcscpy(tszKey, _T("http\\shell\\open\\command"));
+
+	if(GetRegKeyEx(HKEY_CLASSES_ROOT, tszKey, tszKey) == TRUE)
 	{
-		_tcscat(tszKey, _T("\\shell\\open\\command"));
-
-		if(GetRegKeyEx(HKEY_CLASSES_ROOT, tszKey, tszKey) == TRUE)
+		TCHAR *pos;
+		pos = _tcsstr(tszKey, _T("\"%1\""));
+		if(pos == NULL) // No quotes found
 		{
-			TCHAR *pos;
-			pos = _tcsstr(tszKey, _T("\"%1\""));
-			if(pos == NULL) // No quotes found
-			{
-				pos = _tcsstr(tszKey, _T("%1")); // Check for %1, without quotes 
-				if(pos == NULL) // No parameter at all...
-					pos = tszKey + _tcslen(tszKey) - 1;
-				else
-					*pos = '\0'; // Remove the parameter
-			}
-			else *pos = '\0'; // Remove the parameter
-
-			_tcscat(pos, _T(" "));
-			_tcscat(pos, lpURL);
-
-			uResult = WinExec(tszKey, SW_SHOW);
+			pos = _tcsstr(tszKey, _T("%1")); // Check for %1, without quotes 
+			if(pos == NULL) // No parameter at all...
+				pos = tszKey + _tcslen(tszKey) - 1;
+			else
+				*pos = '\0'; // Remove the parameter
 		}
+		else *pos = '\0'; // Remove the parameter
+
+		_tcscat(pos, _T(" "));
+		_tcscat(pos, lpURL);
+
+		uResult = WinExec(tszKey, SW_SHOW);
 	}
 
 	return uResult > 31 ? TRUE : FALSE;
@@ -822,9 +830,17 @@ void OpenUrlEx(LPCTSTR lpURL)
 
 	if(_tcslen(lpURL) == 0) return;
 	if(_tcsncmp(lpURL, _T("http://"), 7) == 0)
-		OpenUrlInNewBrowser(lpURL);
+	{
+		if(OpenUrlInNewBrowser(lpURL) == FALSE)
+			ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
+	}
 	else if(_tcsncmp(lpURL, _T("https://"), 8) == 0)
-		OpenUrlInNewBrowser(lpURL);
+	{
+		if(OpenUrlInNewBrowser(lpURL) == FALSE)
+			ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
+	}
 	else
+	{
 		ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
+	}
 }

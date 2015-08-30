@@ -37,7 +37,7 @@
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
 
 // When making a Windows build, don't forget to update the verinfo resource
-#define PWM_VERSION_STR  _T("0.97b")
+#define PWM_VERSION_STR  _T("0.97c")
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -110,6 +110,7 @@
 #define PWMKEY_USEPUTTYFORURLS  _T("KeeUsePutty")
 #define PWMKEY_SAVEONLATMOD     _T("KeeSaveOnLATMod")
 #define PWMKEY_WINSTATE_MAX     _T("KeeWindowMaximized")
+#define PWMKEY_AUTOSORT         _T("KeeAutoSortPwList")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32

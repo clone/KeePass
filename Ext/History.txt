@@ -1,3 +1,18 @@
+04/10/09 - 0.97c
+- Fixed some problems in the relative paths handling
+- Added auto-sort password list feature, KeePass can sort the
+  password list automatically now, see 'View - Auto-Sort'
+- The database is now marked as modified when copying a TAN
+  number to the clipboard
+- Improved item selection handling after entry additions,
+  duplications and edits
+- Password list refreshing should be a bit faster now
+- After minimizing to taskbar and restoring to tray, the
+  window's maximized state is correctly restored now
+- The associated browser with 'http' is used now, instead of
+  the one associated with '.htm' files
+- Some minor GUI improvements
+
 04/09/19 - 0.97b
 - Improved in-memory passwords protection (for both master
   password and all stored passwords)
@@ -8,9 +23,9 @@
 - Improved font handling in the main dialog, Japanese should be
   displayed correctly now
 - The window state (maximized, etc.) and original size (size
-  when not maximized) is remembered correctly now
-- Fixed a bug in the edit-entry dialog (password sometimes
-  didn't match the repeated password)
+  when not maximized) are remembered correctly now
+- Fixed a bug in the edit-entry dialog (the password sometimes
+  was just empty and didn't match the repeated password)
 - Fixed orders of translation calls in some dialogs, which
   could have caused problems
 - Updated ReadMe file (added Japanese translator to credits)

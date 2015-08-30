@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |0.97a|
+|~LANGUAGEVERSION|             |0.97c|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -169,7 +169,7 @@
 
 |&Lock/Unlock Workspace|       |&Arbeitsfläche sperren/entsperren|
 
-|&Options|                     |&Einstellungen|
+|&Options...|                  |&Einstellungen...|
 |&Add Password Group...|       |&Neue Passwort-Gruppe...|
 |Add Password &Subgroup...|    |&Neue Passwort-Untergruppe erstellen...|
 |&Modify Password Group...|    |Passwort-Gruppe &bearbeiten...|
@@ -532,3 +532,7 @@
 |Mark database as modified on last-access time change|
     |Datenbank bei Änderung einer Letzten-Zugriffs-Zeit als geändert markieren|
 |Se&lect All|                             |A&lles markieren|
+|Auto-&Sort Password List|                |Passwort-Liste automatisch sortieren|
+|&No Auto-Sort|                           |&Nicht automatisch sortieren|
+|Auto-sorting of the password list is enabled, you cannot move entries manually.|
+    |Das automatische Sortieren der Passwort-Liste ist aktiviert, Sie können die Einträge nicht manuell bewegen.|

@@ -217,6 +217,7 @@ void COptionsDlg::OnOK()
 	UpdateData(TRUE);
 	m_rgbRowHighlight = m_btnColorRowHighlight.GetColor();
 	m_ilIcons.DeleteImageList();
+	if((m_bLockAfterTime == TRUE) && (m_nLockAfter < 5)) m_nLockAfter = 5;
 	CDialog::OnOK();
 }
 

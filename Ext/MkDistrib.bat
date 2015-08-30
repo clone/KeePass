@@ -19,6 +19,9 @@ Util\CprLang.exe BulgarianSrc.lng Bulgarian.lng
 DEL Czech.lng
 Util\CprLang.exe CzechSrc.lng Czech.lng
 
+DEL Danish.lng
+Util\CprLang.exe DanishSrc.lng Danish.lng
+
 DEL Dutch.lng
 Util\CprLang.exe DutchSrc.lng Dutch.lng
 
@@ -103,6 +106,8 @@ DEL ..\Debug\Italian.lng
 COPY /B Italian.lng /B ..\Debug\Italian.lng > NUL
 DEL ..\Debug\Japanese.lng
 COPY /B Japanese.lng /B ..\Debug\Japanese.lng > NUL
+DEL ..\Debug\Danish.lng
+COPY /B Danish.lng /B ..\Debug\Danish.lng > NUL
 
 REM Copy latest language files into Release directory
 
@@ -140,6 +145,8 @@ DEL ..\Release\Italian.lng
 COPY /B Italian.lng /B ..\Release\Italian.lng > NUL
 DEL ..\Release\Japanese.lng
 COPY /B Japanese.lng /B ..\Release\Japanese.lng > NUL
+DEL ..\Release\Danish.lng
+COPY /B Danish.lng /B ..\Release\Danish.lng > NUL
 
 REM Copy language reference file
 

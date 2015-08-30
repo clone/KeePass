@@ -321,13 +321,23 @@
 #define ID_IMPORT_PVAULT                32938
 #define ID_SAFE_EXPORTGROUP_TXT         32939
 #define ID_PWLIST_SELECTALL             32940
+#define ID_VIEW_AUTOSORT_TITLE          32941
+#define ID_VIEW_AUTOSORT_USER           32942
+#define ID_VIEW_AUTOSORT_URL            32943
+#define ID_VIEW_AUTOSORT_PASSWORD       32944
+#define ID_VIEW_AUTOSORT_NOTES          32945
+#define ID_VIEW_AUTOSORT_CREATION       32946
+#define ID_VIEW_AUTOSORT_LASTMODIFY     32947
+#define ID_VIEW_AUTOSORT_LASTACCESS     32948
+#define ID_VIEW_AUTOSORT_EXPIRE         32949
+#define ID_VIEW_AUTOSORT_NOSORT         32950
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        204
-#define _APS_NEXT_COMMAND_VALUE         32941
+#define _APS_NEXT_COMMAND_VALUE         32951
 #define _APS_NEXT_CONTROL_VALUE         1157
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
