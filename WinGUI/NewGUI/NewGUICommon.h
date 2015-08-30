@@ -257,4 +257,7 @@ COLORREF NewGUI_ColorToGrayscale(COLORREF clr);
 
 void NewGUI_EnableWindowPeekPreview(HWND hWnd, bool bEnable);
 
+void NewGUI_InitGDIPlus();
+void NewGUI_TerminateGDIPlus();
+
 #endif // ___NEW_GUI_COMMON___

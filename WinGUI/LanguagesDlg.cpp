@@ -25,6 +25,7 @@
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "Util/PrivateConfigEx.h"
 #include "NewGUI/NewGUICommon.h"
+#include "NewGUI/TaskDialog/VistaTaskDialog.h"
 #include "Util/CmdLine/Executable.h"
 
 #ifdef _DEBUG
@@ -244,12 +245,11 @@ void CLanguagesDlg::_LoadLanguage(LPCTSTR szLang)
 	str += _T("\r\n\r\n");
 	str += TRL("Do you wish to restart KeePass now?");
 
-	const int i = MessageBox(str, TRL("Restart KeePass?"), MB_YESNO |
-		MB_ICONQUESTION);
-	if(i == IDYES)
-	{
-		CDialog::OnOK();
-	}
+	int iResult = CVistaTaskDialog::ShowMessageBox(this->m_hWnd, TRL("Restart KeePass?"),
+		str, V_MTDI_QUESTION, TRL("&Yes"), IDOK, TRL("&No"), IDCANCEL);
+	if(iResult < 0)
+		iResult = MessageBox(str, TRL("Restart KeePass?"), MB_YESNO | MB_ICONQUESTION);
+	if((iResult == IDOK) || (iResult == IDYES)) CDialog::OnOK();
 }
 
 void CLanguagesDlg::OnBtnGetLanguage() 

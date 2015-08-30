@@ -37,7 +37,7 @@
 #include "../KeePassLibCpp/Util/StrUtil.h"
 #include "../KeePassLibCpp/Util/AppUtil.h"
 #include "Util/WinUtil.h"
-#include "Util/SendKeys.h"
+#include "Util/SendKeysEx.h"
 #include "Util/FileLock.h"
 #include "Util/CmdLine/CmdArgs.h"
 #include "Util/CmdLine/Executable.h"
@@ -54,6 +54,7 @@
 #include "NewGUI/TaskbarListEx/TaskbarListEx.h"
 // #include "NewGUI/VistaMenu/VistaMenu.h"
 #include "NewGUI/NewDialogsEx.h"
+#include "NewGUI/NewColorizerEx.h"
 #include "Plugins/KpApiImpl.h"
 #include "Plugins/KpDatabaseImpl.h"
 #include "Plugins/KpUtilitiesImpl.h"
@@ -248,6 +249,13 @@ CPwSafeDlg::CPwSafeDlg(CWnd* pParent /*=NULL*/)
 
 	m_lNormalWndPosX = m_lNormalWndPosY = 0;
 	m_lNormalWndSizeW = m_lNormalWndSizeH = -1;
+
+	m_clrIcoStoreMain = DWORD_MAX;
+	m_hIcoStoreMain = NULL;
+	m_clrIcoStoreTrayNormal = DWORD_MAX;
+	m_hIcoStoreTrayNormal = NULL;
+	// m_clrIcoStoreTrayLocked = DWORD_MAX;
+	// m_hIcoStoreTrayLocked = NULL;
 
 	m_mgr.InitPrimaryInstance();
 }
@@ -3339,7 +3347,7 @@ void CPwSafeDlg::OnPwlistDelete()
 	CVistaTaskDialog dlgTask(this->m_hWnd, AfxGetInstanceHandle(), false);
 	dlgTask.SetContent(TRL("This will remove all selected entries unrecoverably!"));
 	dlgTask.SetMainInstruction(TRL("Are you sure you want to delete all selected entries?"));
-	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME);
+	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
 	dlgTask.SetIcon(V_MTDI_QUESTION);
 	dlgTask.AddButton(TRL("&Delete"), NULL, IDOK);
 	dlgTask.AddButton(TRL("Do&n't delete"), NULL, IDCANCEL);
@@ -4256,7 +4264,7 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 			strTX += dlg.m_lpKey;
 			dlgTask.SetContent(strTX);
 			dlgTask.SetMainInstruction(TRL("Overwrite existing key file?"));
-			dlgTask.SetWindowTitle(PWM_PRODUCT_NAME);
+			dlgTask.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
 			dlgTask.SetIcon(MAKEINTRESOURCEW(IDI_KEY));
 			dlgTask.AddButton(TRL("Overwrite"), TRL("Generate a new key and overwrite the existing key file. The key currently stored in the existing key file will be lost."), IDYES);
 			dlgTask.AddButton(TRL("Reuse"), TRL("Load the existing key file and use it as key for the current database. The key file will not be modified."), IDNO);
@@ -4567,7 +4575,7 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
 							CVistaTaskDialog vtd(this->m_hWnd, AfxGetInstanceHandle(), true);
 							vtd.SetContent(strMessage);
 							vtd.SetMainInstruction(TRL("Open the file in read-only mode?"));
-							vtd.SetWindowTitle(PWM_PRODUCT_NAME);
+							vtd.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
 							vtd.SetIcon(V_MTDI_QUESTION);
 
 							vtd.AddButton(TRL("Read-only"), TRL("Open the file in read-only mode. Changes to the database can be saved to a different file."), IDYES);
@@ -4991,7 +4999,7 @@ void CPwSafeDlg::OnFileClose()
 			if(m_bIsLocking == TRUE) strMain = TRL("Save database changes before locking the workspace?");
 
 			CVistaTaskDialog dlgTask(this->m_hWnd, AfxGetInstanceHandle(), true);
-			dlgTask.SetWindowTitle(PWM_PRODUCT_NAME);
+			dlgTask.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
 			dlgTask.SetContent(strContent);
 			dlgTask.SetMainInstruction(strMain);
 			dlgTask.SetIcon(V_MTDI_QUESTION);
@@ -5350,7 +5358,7 @@ void CPwSafeDlg::OnSafeRemoveGroup()
 	CVistaTaskDialog dlgTask(this->m_hWnd, AfxGetInstanceHandle(), false);
 	dlgTask.SetContent(TRL("Deleting a group will delete all items and subgroups in that group, too."));
 	dlgTask.SetMainInstruction(TRL("Are you sure you want to delete this group?"));
-	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME);
+	dlgTask.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
 	dlgTask.SetIcon(V_MTDI_QUESTION);
 	dlgTask.AddButton(TRL("&Delete"), NULL, IDOK);
 	dlgTask.AddButton(TRL("Do&n't delete"), NULL, IDCANCEL);
@@ -5999,7 +6007,7 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 
 		while(true)
 		{
-			const DWORD dw = m_mgr.Find(dlg.m_strFind, dlg.m_bCaseSensitive, dwFlags, cnt);
+			const DWORD dw = m_mgr.FindEx(dlg.m_strFind, dlg.m_bCaseSensitive, dwFlags, cnt);
 
 			if(dw == DWORD_MAX) break;
 			else
@@ -9113,6 +9121,9 @@ void CPwSafeDlg::OnFileShowDbInfo()
 	CString strName = m_mgr.GetPropertyString(PWP_DEFAULT_USER_NAME).c_str();
 	dlg.m_strDefaultUserName = strName; // Copy
 
+	const COLORREF clrOld = m_mgr.GetColor();
+	dlg.m_clr = clrOld;
+
 	if(_CallPlugins(KPM_FILE_DBSETTINGS_PRE, 0, 0) == FALSE)
 		{ m_bDisplayDialog = FALSE; return; }
 
@@ -9129,6 +9140,13 @@ void CPwSafeDlg::OnFileShowDbInfo()
 			VERIFY(m_mgr.SetPropertyString(PWP_DEFAULT_USER_NAME,
 				(LPCTSTR)dlg.m_strDefaultUserName));
 			m_bModified = TRUE;
+		}
+
+		m_mgr.SetColor(dlg.m_clr);
+		if(clrOld != dlg.m_clr)
+		{
+			m_bModified = TRUE;
+			_UpdateTrayIcon();
 		}
 	}
 
@@ -9447,7 +9465,7 @@ void CPwSafeDlg::_DoQuickFind(LPCTSTR lpText)
 	DWORD cnt = 0;
 	while(true)
 	{
-		const DWORD dw = m_mgr.Find(lpSearch, FALSE, dwFlags, cnt);
+		const DWORD dw = m_mgr.FindEx(lpSearch, FALSE, dwFlags, cnt);
 
 		if(dw == DWORD_MAX) break;
 		else
@@ -9728,7 +9746,6 @@ void CPwSafeDlg::_AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSe
 	if(m_bDisableAutoType == TRUE) return;
 
 	const BOOL bNoBlockInput = AU_IsWin9xSystem();
-
 	if(bNoBlockInput == FALSE) ::BlockInput(TRUE);
 
 	CString strLookup;
@@ -9795,7 +9812,7 @@ void CPwSafeDlg::_AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSe
 
 	Sleep(50);
 
-	CSendKeys sk;
+	CSendKeysEx sk;
 	BOOL bToggleCapsLock = FALSE;
 	sk.SetDelay(10);
 
@@ -9818,6 +9835,8 @@ void CPwSafeDlg::_AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSe
 	sk.SendKeys(str, true);
 
 	if(bToggleCapsLock == TRUE) sk.SendKeys(_T("({CAPSLOCK})"), true);
+
+	sk.Release();
 
 	if(bNoBlockInput == FALSE) ::BlockInput(FALSE);
 
@@ -10925,14 +10944,33 @@ void CPwSafeDlg::_UpdateTrayIcon()
 {
 	USES_CONVERSION;
 
+	HICON hAssign = NULL, hDestroy = NULL;
+	NewGUI_UpdateColorizedIcon(AfxGetApp()->LoadIcon(IDR_MAINFRAME), NULL, m_mgr.GetColor(),
+		0, &m_hIcoStoreMain, &m_clrIcoStoreMain, &hAssign, &hDestroy);
+	SetIcon(hAssign, FALSE);
+	SetIcon(hAssign, TRUE);
+	if(hDestroy != NULL) { VERIFY(DestroyIcon(hDestroy)); }
+
 	if(m_bLocked == FALSE)
 	{
-		m_systray.SetIcon(m_hTrayIconNormal);
+		NewGUI_UpdateColorizedIcon(m_hTrayIconNormal, NULL, m_mgr.GetColor(), 16,
+			&m_hIcoStoreTrayNormal, &m_clrIcoStoreTrayNormal, &hAssign, &hDestroy);
+
+		m_systray.SetIcon(hAssign);
+		if(hDestroy != NULL) { VERIFY(DestroyIcon(hDestroy)); }
+
 		CTaskbarListEx::SetOverlayIcon(this->m_hWnd, NULL, L"");
 	}
 	else
 	{
+		// NewGUI_UpdateColorizedIcon(m_hTrayIconNormal, m_hLockOverlayIcon, m_mgr.GetColor(),
+		//	16, &m_hIcoStoreTrayLocked, &m_clrIcoStoreTrayLocked, &hAssign, &hDestroy);
+
+		// m_systray.SetIcon(hAssign);
+		// if(hDestroy != NULL) { VERIFY(DestroyIcon(hDestroy)); }
+
 		m_systray.SetIcon(m_hTrayIconLocked);
+
 		CTaskbarListEx::SetOverlayIcon(this->m_hWnd, m_hLockOverlayIcon,
 			T2CW(TRL("Locked")));
 	}

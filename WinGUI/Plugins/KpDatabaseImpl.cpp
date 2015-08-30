@@ -269,7 +269,7 @@ STDMETHODIMP CKpDatabaseImpl::SortGroupList()
 STDMETHODIMP_(DWORD) CKpDatabaseImpl::Find(LPCTSTR lpFindString, BOOL bCaseSensitive,
 	DWORD dwSearchFlags, DWORD dwStart)
 {
-	return m_pMgr->Find(lpFindString, bCaseSensitive, dwSearchFlags, dwStart);
+	return m_pMgr->Find(lpFindString, bCaseSensitive, dwSearchFlags, dwStart, DWORD_MAX);
 }
 
 // Get and set the algorithm used to encrypt the database

@@ -28,11 +28,15 @@
 #include "XPStyleButtonST.h"
 #include "../Util/WinUtil.h"
 #include <algorithm>
+#include <gdiplus.h>
 
 #include "../../KeePassLibCpp/Util/PwUtil.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
 #include "../../KeePassLibCpp/Util/MemUtil.h"
 #include "../../KeePassLibCpp/Util/AppUtil.h"
+
+static bool g_gdiplusInitialized = false;
+static ULONG_PTR g_gdiplusToken = 0;
 
 static BOOL g_bImgButtons = 0;
 static CThemeHelperST* g_pThemeHelper = NULL;
@@ -736,4 +740,20 @@ void NewGUI_EnableWindowPeekPreview(HWND hWnd, bool bEnable)
 	}
 
 	VERIFY(FreeLibrary(hDwm));
+}
+
+void NewGUI_InitGDIPlus()
+{
+	Gdiplus::GdiplusStartupInput si;
+	if(Gdiplus::GdiplusStartup(&g_gdiplusToken, &si, NULL) == Gdiplus::Ok)
+		g_gdiplusInitialized = true;
+}
+
+void NewGUI_TerminateGDIPlus()
+{
+	if(g_gdiplusInitialized)
+	{
+		Gdiplus::GdiplusShutdown(g_gdiplusToken);
+		g_gdiplusInitialized = false;
+	}
 }

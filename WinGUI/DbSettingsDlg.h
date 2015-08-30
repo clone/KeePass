@@ -22,7 +22,9 @@
 
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
+#include "NewGUI/ColorStaticEx.h"
 #include <afxwin.h>
+#include <afxcmn.h>
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -32,6 +34,10 @@ public:
 	CDbSettingsDlg(CWnd* pParent = NULL);
 
 	CKCSideBannerWnd m_banner;
+
+	COLORREF m_clr;
+
+	void EnableControlsEx();
 
 	//{{AFX_DATA(CDbSettingsDlg)
 	enum { IDD = IDD_DBSETTINGS_DLG };
@@ -43,6 +49,7 @@ public:
 	int		m_nAlgorithm;
 	DWORD	m_dwNumKeyEnc;
 	CString m_strDefaultUserName;
+	CColorStaticEx m_stcColor;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CDbSettingsDlg)
@@ -60,6 +67,12 @@ protected:
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()
+public:
+	CSliderCtrl m_sldColor;
+	afx_msg void OnSliderColorChanged(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	BOOL m_bCustomColor;
+	afx_msg void OnCheckCustomColor();
 };
 
 //{{AFX_INSERT_LOCATION}}

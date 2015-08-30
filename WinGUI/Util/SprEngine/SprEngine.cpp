@@ -203,7 +203,7 @@ void SprFillRefPlaceholders(CString& str, CPwManager* pDataSource,
 		else if(tchScan == _T('I')) dwFlags |= PWMF_UUID;
 		else SPRFRP_CONTINUE_WITH_OFFSET;
 
-		const DWORD dwIndex = pDataSource->Find(strID, FALSE, dwFlags, 0);
+		const DWORD dwIndex = pDataSource->FindEx(strID, FALSE, dwFlags, 0);
 		if(dwIndex != DWORD_MAX)
 		{
 			PW_ENTRY* pFound = pDataSource->GetEntry(dwIndex);

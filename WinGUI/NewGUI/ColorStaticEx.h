@@ -17,20 +17,25 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___KEEPASS_LIBRARY_API_H___
-#define ___KEEPASS_LIBRARY_API_H___
+#ifndef ___COLOR_STATIC_EX_H___
+#define ___COLOR_STATIC_EX_H___
 
-#include "APIDefEx.h"
+#pragma once
 
-// Library build number (independent of underlying KeePass version)
-#define KEEPASS_LIBRARY_BUILD 0x000000D4
+class CColorStaticEx : public CStatic
+{
+	DECLARE_DYNAMIC(CColorStaticEx)
 
-KP_SHARE DWORD GetKeePassVersion();
-KP_SHARE LPCTSTR GetKeePassVersionString();
+public:
+	CColorStaticEx();
+	virtual ~CColorStaticEx();
 
-KP_SHARE DWORD GetLibraryBuild();
+	COLORREF m_clr;
 
-KP_SHARE BOOL TransformKey256(UINT8* pBuffer256, const UINT8* pKeySeed256, UINT64 qwRounds);
-KP_SHARE UINT64 TransformKeyBenchmark256(DWORD dwTimeMs);
+protected:
+	afx_msg void OnPaint();
 
-#endif
+	DECLARE_MESSAGE_MAP()
+};
+
+#endif // ___COLOR_STATIC_EX_H___

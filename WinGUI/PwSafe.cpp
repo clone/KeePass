@@ -125,6 +125,8 @@ BOOL CPwSafeApp::InitInstance()
 		(osvi.dwMinorVersion == 0))) // Restore old banner style if running on < XP
 		NewGUI_SetWin32Banner();
 
+	NewGUI_InitGDIPlus();
+
 	CPwSafeDlg dlg;
 	m_pMainWnd = &dlg;
 
@@ -220,6 +222,7 @@ BOOL CPwSafeApp::InitInstance()
 
 void CPwSafeApp::_App_CleanUp()
 {
+	NewGUI_TerminateGDIPlus();
 	NewGUI_CleanUp();
 	CGradientUtil::Release();
 	CKpCommandLineImpl::ClearStatic();

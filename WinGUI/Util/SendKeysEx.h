@@ -17,20 +17,49 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___KEEPASS_LIBRARY_API_H___
-#define ___KEEPASS_LIBRARY_API_H___
+#ifndef ___SEND_KEYS_EX_H___
+#define ___SEND_KEYS_EX_H___
 
-#include "APIDefEx.h"
+#pragma once
 
-// Library build number (independent of underlying KeePass version)
-#define KEEPASS_LIBRARY_BUILD 0x000000D4
+#include "../../KeePassLibCpp/SysDefEx.h"
+#include "SendKeys.h"
 
-KP_SHARE DWORD GetKeePassVersion();
-KP_SHARE LPCTSTR GetKeePassVersionString();
+typedef struct _SKSTATEEX
+{
+	HWND hWndTarget;
+	DWORD dwTargetProcessID;
+	DWORD dwTargetThreadID;
 
-KP_SHARE DWORD GetLibraryBuild();
+	DWORD dwThisThreadID;
 
-KP_SHARE BOOL TransformKey256(UINT8* pBuffer256, const UINT8* pKeySeed256, UINT64 qwRounds);
-KP_SHARE UINT64 TransformKeyBenchmark256(DWORD dwTimeMs);
+	HKL hklOriginal;
+	HKL hklCurrent;
+} SKSTATEEX;
 
-#endif
+class CSendKeysEx
+{
+public:
+	CSendKeysEx();
+	~CSendKeysEx();
+
+	void Release();
+
+	void SendKeyUp(BYTE vKey);
+	bool SendKeys(LPCTSTR lpKeysString, bool bWait);
+
+	void SetDelay(DWORD dwDelay);
+
+private:
+	void _EnsureInitialized();
+
+	void _EnsureSameKeyboardLayout();
+	void _RestoreKeyboardLayout();
+
+	CSendKeys* m_p;
+	bool m_bReleasedOnce;
+
+	SKSTATEEX m_s;
+};
+
+#endif // ___SEND_KEYS_EX_H___

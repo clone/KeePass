@@ -17,20 +17,20 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___KEEPASS_LIBRARY_API_H___
-#define ___KEEPASS_LIBRARY_API_H___
+#ifndef ___NEW_COLORIZER_EX_H___
+#define ___NEW_COLORIZER_EX_H___
 
-#include "APIDefEx.h"
+#include <windows.h>
+#include <gdiplus.h>
 
-// Library build number (independent of underlying KeePass version)
-#define KEEPASS_LIBRARY_BUILD 0x000000D4
+float NewGUI_GetHue(COLORREF clr);
+void NewGUI_ColorToHsv(COLORREF clr, float* pfHue, float* pfSaturation,
+	float* pfValue);
+COLORREF NewGUI_ColorFromHsv(float fHue, float fSaturation, float fValue);
 
-KP_SHARE DWORD GetKeePassVersion();
-KP_SHARE LPCTSTR GetKeePassVersionString();
+HICON NewGUI_CreateColorizedIcon(HICON hBase, HICON hOverlay, COLORREF clr, int qSize);
 
-KP_SHARE DWORD GetLibraryBuild();
+void NewGUI_UpdateColorizedIcon(HICON hDefault, HICON hOverlay, COLORREF clr, int qSize,
+	HICON* phStore, COLORREF* pcStore, HICON* phAssignable, HICON* phDestructible);
 
-KP_SHARE BOOL TransformKey256(UINT8* pBuffer256, const UINT8* pKeySeed256, UINT64 qwRounds);
-KP_SHARE UINT64 TransformKeyBenchmark256(DWORD dwTimeMs);
-
-#endif
+#endif // ___NEW_COLORIZER_EX_H___

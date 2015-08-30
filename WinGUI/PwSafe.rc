@@ -405,13 +405,13 @@ BEGIN
     LTEXT           "Click on an entry to jump to it.",IDC_STATIC_LISTTEXT,7,7,399,8
 END
 
-IDD_DBSETTINGS_DLG DIALOGEX 0, 0, 377, 182
+IDD_DBSETTINGS_DLG DIALOGEX 0, 0, 377, 196
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Database Settings"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,252,161,58,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,312,161,58,14
+    DEFPUSHBUTTON   "&OK",IDOK,252,175,58,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,312,175,58,14
     LTEXT           "Encryption algorithm to use (for this database):",IDC_STATIC,13,18,350,8
     COMBOBOX        IDC_COMBO_ENCALGOS,13,29,351,135,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Security",IDC_STATIC,7,7,363,110
@@ -421,10 +421,13 @@ BEGIN
     LTEXT           "The higher this number, the harder are dictionary attacks. But also the higher this number, the slower the database loading and saving.",IDC_STATIC,13,95,350,16
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,13,49,351,1
     PUSHBUTTON      "Calculate rounds for a 1-second delay on this computer",IDC_BTN_CALCROUNDS,344,77,20,14
-    GROUPBOX        "General",IDC_STATIC,7,120,363,31
+    GROUPBOX        "General",IDC_STATIC,7,120,363,48
     LTEXT           "Default user name for new entries:",IDC_STATIC,13,133,177,8
     EDITTEXT        IDC_EDIT_DEFAULTUSER,193,130,170,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "&Help",IDC_BTN_SECHELP,7,161,58,14
+    CONTROL         "Custom database color:",IDC_CHECK_CUSTOMCOLOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,150,176,10
+    LTEXT           "",IDC_STATIC_COLORVIEW,193,148,17,14,SS_SUNKEN
+    CONTROL         "",IDC_SLIDER_COLOR,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,212,147,156,15
+    PUSHBUTTON      "&Help",IDC_BTN_SECHELP,7,175,58,14
 END
 
 IDD_PLUGINS_DLG DIALOGEX 0, 0, 414, 199
@@ -746,7 +749,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 370
         TOPMARGIN, 7
-        BOTTOMMARGIN, 175
+        BOTTOMMARGIN, 189
     END
 
     IDD_PLUGINS_DLG, DIALOG
@@ -838,8 +841,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,9,1
- PRODUCTVERSION 1,1,9,1
+ FILEVERSION 1,2,0,0
+ PRODUCTVERSION 1,2,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -856,13 +859,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.19b"
-            VALUE "FileVersion", "1.1.9.1"
+            VALUE "FileDescription", "KeePass Password Safe 1.20"
+            VALUE "FileVersion", "1.2.0.0"
             VALUE "InternalName", "PwSafe"
             VALUE "LegalCopyright", "Copyright (c) 2003-2011 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.19b"
-            VALUE "ProductVersion", "1.1.9.1"
+            VALUE "ProductName", "KeePass Password Safe 1.20"
+            VALUE "ProductVersion", "1.2.0.0"
         END
     END
     BLOCK "VarFileInfo"

@@ -193,7 +193,7 @@ CString CUpdateInfoDlg::FormatVersion(UINT64 qwVersion, LPCTSTR lpName)
 	{
 		str.Format(_T("%u.%u%u"), dwHi >> 16, dwHi & 0xFFFF, dwLo >> 16);
 		if((dwLo & 0xFFFF) != 0)
-			str += static_cast<TCHAR>(_T('a') + static_cast<TCHAR>((dwLo - 1) & 0xFFFF));
+			str += static_cast<TCHAR>(_T('a') + static_cast<TCHAR>(dwLo & 0xFFFF));
 		return str;
 	}
 

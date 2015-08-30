@@ -119,6 +119,8 @@ CString RemoveAcceleratorTipEx(LPCTSTR lpString);
 bool StrMatchText(LPCTSTR lpEntryData, LPCTSTR lpSearch,
 	BOOL bCaseSensitive, const boost::basic_regex<TCHAR>* pUseRegex);
 
+std::vector<std::basic_string<TCHAR> > SU_SplitSearchTerms(LPCTSTR lpSearch);
+
 std::basic_string<TCHAR> SU_GetQuotedPath(const std::basic_string<TCHAR>& strPath);
 
 CString SU_ConvertNewLines(LPCTSTR lpText, LPCTSTR lpNewLineSeq);
@@ -159,8 +161,12 @@ class CStringBuilderEx : boost::noncopyable
 public:
 	CStringBuilderEx();
 
+	void Clear() { m_vBuf.clear(); }
+
 	void Append(TCHAR tch);
 	void Append(LPCTSTR lpString);
+
+	size_t GetLength() const { return m_vBuf.size(); }
 
 	std::basic_string<TCHAR> ToString() const;
 

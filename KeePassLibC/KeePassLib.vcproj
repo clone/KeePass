@@ -382,6 +382,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib"
 				OutputFile="$(OutDir)\KeePassLibC64.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -584,6 +585,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib"
 				OutputFile="$(OutDir)\KeePassLibC64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -1112,6 +1114,10 @@
 				</File>
 				<File
 					RelativePath="..\KeePassLibCpp\Details\PwFileImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Details\PwFindImpl.cpp"
 					>
 				</File>
 			</Filter>

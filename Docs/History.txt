@@ -1,3 +1,24 @@
+11/06/28 - 1.20
+- Added option to specify a database color; by specifying a
+  color, the main window icon and the tray icon are recolored
+- When searching for a string containing a whitespace
+  character, KeePass now splits the terms and reports all
+  entries containing all of the terms (e.g. when you search for
+  "Forum KeePass" without the quotes, all entries containing
+  both "Forum" and "KeePass" are reported); the order of the
+  terms is arbitrary; if you want to search for a term
+  containing whitespace, enclose the term in quotes
+- Added support for sending keystrokes (auto-type) to windows
+  that are using different keyboard layouts
+
+- Improved version formatting in update dialog
+- On Windows Vista and higher, the restart dialog after
+  changing the language is now shown as modern task dialog
+- KeePassLibC can now be compiled in debug x64 and release
+  Unicode x64 mode
+- Various code optimizations
+- Minor other improvements
+
 11/04/07 - 1.19b
 - Command line options provided by plugins work correctly again
 

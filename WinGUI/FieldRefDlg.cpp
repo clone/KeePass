@@ -260,11 +260,11 @@ BOOL CFieldRefDlg::_IdMatchesMultipleTimes(LPCTSTR lpText, TCHAR tchScan)
 	else if(tchScan == _T('I')) dwFlags |= PWMF_UUID;
 	else return FALSE;
 
-	const DWORD dwIndex = m_pMgr->Find(lpText, FALSE, dwFlags, 0);
+	const DWORD dwIndex = m_pMgr->FindEx(lpText, FALSE, dwFlags, 0);
 	if(dwIndex == DWORD_MAX) { ASSERT(FALSE); return FALSE; }
 	if((dwIndex + 1) == m_pMgr->GetNumberOfEntries()) return FALSE;
 
-	const DWORD dwMulti = m_pMgr->Find(lpText, FALSE, dwFlags, dwIndex + 1);
+	const DWORD dwMulti = m_pMgr->FindEx(lpText, FALSE, dwFlags, dwIndex + 1);
 	if(dwMulti != DWORD_MAX) return TRUE;
 
 	return FALSE;

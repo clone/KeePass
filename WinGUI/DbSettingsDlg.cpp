@@ -25,6 +25,7 @@
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "Util/WinUtil.h"
 #include "NewGUI/NewGUICommon.h"
+#include "NewGUI/NewColorizerEx.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -37,11 +38,14 @@ static char THIS_FILE[] = __FILE__;
 CDbSettingsDlg::CDbSettingsDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CDbSettingsDlg::IDD, pParent),
 	m_strDefaultUserName(_T(""))
+	, m_bCustomColor(FALSE)
 {
 	//{{AFX_DATA_INIT(CDbSettingsDlg)
 	m_nAlgorithm = -1;
 	m_dwNumKeyEnc = 0;
 	//}}AFX_DATA_INIT
+
+	m_clr = DWORD_MAX;
 }
 
 void CDbSettingsDlg::DoDataExchange(CDataExchange* pDX)
@@ -56,6 +60,9 @@ void CDbSettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_KEYENC, m_dwNumKeyEnc);
 	DDX_Text(pDX, IDC_EDIT_DEFAULTUSER, m_strDefaultUserName);
 	DDX_Control(pDX, IDC_BTN_SECHELP, m_btHelp);
+	DDX_Control(pDX, IDC_STATIC_COLORVIEW, m_stcColor);
+	DDX_Control(pDX, IDC_SLIDER_COLOR, m_sldColor);
+	DDX_Check(pDX, IDC_CHECK_CUSTOMCOLOR, m_bCustomColor);
 	//}}AFX_DATA_MAP
 }
 
@@ -63,6 +70,9 @@ BEGIN_MESSAGE_MAP(CDbSettingsDlg, CDialog)
 	//{{AFX_MSG_MAP(CDbSettingsDlg)
 	ON_BN_CLICKED(IDC_BTN_CALCROUNDS, OnBtnCalcRounds)
 	ON_BN_CLICKED(IDC_BTN_SECHELP, &CDbSettingsDlg::OnBtnClickedHelp)
+	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_COLOR, &CDbSettingsDlg::OnSliderColorChanged)
+	ON_WM_HSCROLL()
+	ON_BN_CLICKED(IDC_CHECK_CUSTOMCOLOR, &CDbSettingsDlg::OnCheckCustomColor)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -96,9 +106,31 @@ BOOL CDbSettingsDlg::OnInitDialog()
 	m_cEncAlgos.AddString(TRL("Twofish (128-bit block cipher using 256-bit key)"));
 	m_cEncAlgos.SetCurSel(m_nAlgorithm);
 
+	if(m_clr == DWORD_MAX)
+	{
+		m_bCustomColor = FALSE;
+		m_stcColor.m_clr = RGB(0, 0, 255);
+	}
+	else
+	{
+		m_bCustomColor = TRUE;
+		m_stcColor.m_clr = m_clr;
+	}
+
+	float fHue = NewGUI_GetHue(m_stcColor.m_clr);
+	m_sldColor.SetRange(0, 360);
+	m_sldColor.SetPos((int)fHue);
+
 	UpdateData(FALSE);
+	EnableControlsEx();
 
 	return TRUE; // Return TRUE unless you set the focus to a control
+}
+
+void CDbSettingsDlg::EnableControlsEx()
+{
+	UpdateData(TRUE);
+	GetDlgItem(IDC_SLIDER_COLOR)->EnableWindow(m_bCustomColor);
 }
 
 void CDbSettingsDlg::OnOK() 
@@ -114,6 +146,9 @@ void CDbSettingsDlg::OnOK()
 	{
 		if(str.GetAt(0) >= _T('4')) m_dwNumKeyEnc = 0xFFFFFFFE; // Set to max
 	}
+
+	if(m_bCustomColor == FALSE) m_clr = DWORD_MAX;
+	else m_clr = m_stcColor.m_clr;
 
 	UpdateData(FALSE);
 
@@ -140,4 +175,27 @@ void CDbSettingsDlg::OnBtnCalcRounds()
 void CDbSettingsDlg::OnBtnClickedHelp()
 {
 	WU_OpenAppHelp(PWM_HELP_SECURITY);
+}
+
+void CDbSettingsDlg::OnSliderColorChanged(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	UNREFERENCED_PARAMETER(pNMHDR);
+	if(pResult != NULL) *pResult = 0;
+
+	float fHue = (float)m_sldColor.GetPos();
+	m_stcColor.m_clr = NewGUI_ColorFromHsv(fHue, 1.0f, 1.0f);
+	m_stcColor.RedrawWindow();
+}
+
+void CDbSettingsDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	if(pScrollBar->GetDlgCtrlID() == IDC_SLIDER_COLOR)
+		OnSliderColorChanged(NULL, NULL);
+
+	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
+}
+
+void CDbSettingsDlg::OnCheckCustomColor()
+{
+	EnableControlsEx();
 }

@@ -164,6 +164,10 @@ public:
 
 	int ShowDialog(BOOL* pVerificationResult = NULL);
 
+	static int ShowMessageBox(HWND hParent, LPCTSTR lpMainInstruction,
+		LPCTSTR lpContent, MY_TASKDIALOG_ICON tdIcon, LPCTSTR lpButton1, int nResult1,
+		LPCTSTR lpButton2, int nResult2);
+
 private:
 	void Clear();
 	inline static std::vector<V_TASKDIALOG_BUTTON> MyButtonsToVStruct(const

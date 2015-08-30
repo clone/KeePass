@@ -322,7 +322,7 @@ KP_SHARE DWORD Find(void *pMgr, const TCHAR *pszFindString,
 	BOOL bCaseSensitive, DWORD fieldFlags, DWORD nStart)
 {
 	DECL_MGR_N(pMgr);
-	return p->Find(pszFindString, bCaseSensitive, fieldFlags, nStart);
+	return p->Find(pszFindString, bCaseSensitive, fieldFlags, nStart, DWORD_MAX);
 }
 
 // Get and set the algorithm used to encrypt the database

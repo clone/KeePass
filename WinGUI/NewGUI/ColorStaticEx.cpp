@@ -17,20 +17,29 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___KEEPASS_LIBRARY_API_H___
-#define ___KEEPASS_LIBRARY_API_H___
+#include "StdAfx.h"
+#include "ColorStaticEx.h"
 
-#include "APIDefEx.h"
+IMPLEMENT_DYNAMIC(CColorStaticEx, CStatic)
 
-// Library build number (independent of underlying KeePass version)
-#define KEEPASS_LIBRARY_BUILD 0x000000D4
+CColorStaticEx::CColorStaticEx()
+{
+	m_clr = RGB(192, 192, 192);
+}
 
-KP_SHARE DWORD GetKeePassVersion();
-KP_SHARE LPCTSTR GetKeePassVersionString();
+CColorStaticEx::~CColorStaticEx()
+{
+}
 
-KP_SHARE DWORD GetLibraryBuild();
+BEGIN_MESSAGE_MAP(CColorStaticEx, CStatic)
+	ON_WM_PAINT()
+END_MESSAGE_MAP()
 
-KP_SHARE BOOL TransformKey256(UINT8* pBuffer256, const UINT8* pKeySeed256, UINT64 qwRounds);
-KP_SHARE UINT64 TransformKeyBenchmark256(DWORD dwTimeMs);
+void CColorStaticEx::OnPaint() 
+{
+	CPaintDC dc(this);
 
-#endif
+	RECT rect;
+	this->GetClientRect(&rect);
+	dc.FillSolidRect(&rect, m_clr);
+}

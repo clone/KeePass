@@ -37,16 +37,16 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.19b")
+#define PWM_VERSION_STR  _T("1.20")
 #else
-#define PWM_VERSION_STR  _T("1.19b Unicode")
+#define PWM_VERSION_STR  _T("1.20 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01010901
+#define PWM_VERSION_DW   0x01020000
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
 #define PWM_DBSIG_2      0xB54BFB65
-#define PWM_DBVER_DW     0x00030002
+#define PWM_DBVER_DW     0x00030003
 
 // KeePass 2.x database file signatures (pre-release and release)
 #define PWM_DBSIG_1_KDBX_P 0x9AA2D903
@@ -315,6 +315,7 @@
 #define PMS_STREAM_DEFAULTUSER       _T("Default User Name")
 #define PMS_STREAM_SEARCHHISTORYITEM _T("Search History Item")
 #define PMS_STREAM_CUSTOMKVP         _T("Custom KVP")
+#define PMS_STREAM_DBCOLOR           _T("Database Color")
 #define PMS_STREAM_KPXICON2          _T("KPX_CUSTOM_ICONS_2")
 
 #define PMD_HREL_ID     PWM_PRODUCT_NAME
@@ -359,6 +360,7 @@ typedef struct _PWDB_META_STREAM
 
 #pragma pack()
 
+typedef std::basic_string<TCHAR> std_string;
 typedef std::pair<std::basic_string<TCHAR>, std::basic_string<TCHAR> > CustomKvp;
 
 #ifdef _DEBUG
@@ -446,7 +448,11 @@ public:
 		BOOL bCompareTimes);
 
 	// Find an item
+	// DWORD Find(const TCHAR *pszFindString, BOOL bCaseSensitive,
+	//	DWORD searchFlags, DWORD nStart);
 	DWORD Find(const TCHAR *pszFindString, BOOL bCaseSensitive,
+		DWORD searchFlags, DWORD nStart, DWORD nEndExcl);
+	DWORD FindEx(const TCHAR *pszFindString, BOOL bCaseSensitive,
 		DWORD searchFlags, DWORD nStart);
 
 	// Get and set the algorithm used to encrypt the database
@@ -480,6 +486,9 @@ public:
 	LPCTSTR GetCustomKvp(LPCTSTR lpKey) const;
 
 	void SetTransactedFileWrites(BOOL bTransacted) { m_bUseTransactedFileWrites = bTransacted; }
+
+	COLORREF GetColor() const;
+	void SetColor(COLORREF clr);
 
 	DWORD m_dwLastSelectedGroupId;
 	DWORD m_dwLastTopVisibleGroupId;
@@ -548,6 +557,8 @@ private:
 	std::vector<PWDB_META_STREAM> m_vUnknownMetaStreams;
 
 	BOOL m_bUseTransactedFileWrites;
+
+	COLORREF m_clr;
 };
 
 #endif // ___KEEPASS_PASSWORD_MANAGER_H___

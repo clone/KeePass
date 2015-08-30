@@ -467,6 +467,13 @@ private:
 
 	CString m_strWindowTitleSuffix;
 
+	COLORREF m_clrIcoStoreMain;
+	HICON m_hIcoStoreMain;
+	COLORREF m_clrIcoStoreTrayNormal;
+	HICON m_hIcoStoreTrayNormal;
+	// COLORREF m_clrIcoStoreTrayLocked;
+	// HICON m_hIcoStoreTrayLocked;
+
 	static BOOL m_bUnintrusiveMiniMode;
 
 	static DWORD m_dwCachedBackupGroupID;

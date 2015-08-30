@@ -20,6 +20,7 @@
 #include "StdAfx.h"
 #include "VistaTaskDialog.h"
 #include "../../../KeePassLibCpp/Util/MemUtil.h"
+#include "../../../KeePassLibCpp/PwManager.h"
 
 CVistaTaskDialog::CVistaTaskDialog(HWND hParent, HINSTANCE hInstance,
 	bool bUseCommandLinks) :
@@ -210,4 +211,19 @@ inline std::vector<V_TASKDIALOG_BUTTON> CVistaTaskDialog::MyButtonsToVStruct(
 	}
 
 	return v;
+}
+
+int CVistaTaskDialog::ShowMessageBox(HWND hParent, LPCTSTR lpMainInstruction,
+	LPCTSTR lpContent, MY_TASKDIALOG_ICON tdIcon, LPCTSTR lpButton1, int nResult1,
+	LPCTSTR lpButton2, int nResult2)
+{
+	CVistaTaskDialog dlg(hParent, AfxGetInstanceHandle(), false);
+	dlg.AddButton(lpButton1, NULL, nResult1);
+	dlg.AddButton(lpButton2, NULL, nResult2);
+	dlg.SetContent(lpContent);
+	dlg.SetIcon(tdIcon);
+	dlg.SetMainInstruction(lpMainInstruction);
+	dlg.SetWindowTitle(PWM_PRODUCT_NAME_SHORT);
+
+	return dlg.ShowDialog(NULL);
 }

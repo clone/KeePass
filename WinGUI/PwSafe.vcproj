@@ -79,7 +79,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib gdiplus.lib"
 				OutputFile="$(OutDir)\KeePass.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -280,7 +280,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib gdiplus.lib"
 				OutputFile="$(OutDir)\KeePass.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -483,7 +483,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib gdiplus.lib"
 				OutputFile="$(OutDir)\KeePass.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -683,7 +683,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
+				AdditionalDependencies="winmm.lib gdiplus.lib"
 				OutputFile="$(OutDir)\KeePass.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -2733,6 +2733,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Util\SendKeysEx.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\SendKeysEx.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Util\SessionNotify.cpp"
 				>
 			</File>
@@ -3265,6 +3273,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NewGUI\ColorStaticEx.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\ColorStaticEx.h"
+				>
+			</File>
+			<File
 				RelativePath="NewGUI\ColourPickerXP.cpp"
 				>
 				<FileConfiguration
@@ -3585,6 +3601,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NewGUI\ImageUtilEx.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\ImageUtilEx.h"
+				>
+			</File>
+			<File
 				RelativePath="NewGUI\KCSideBannerWnd.cpp"
 				>
 				<FileConfiguration
@@ -3670,6 +3694,14 @@
 			</File>
 			<File
 				RelativePath=".\NewGUI\MsgRelayWnd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\NewColorizerEx.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\NewColorizerEx.h"
 				>
 			</File>
 			<File
@@ -4669,6 +4701,10 @@
 				</File>
 				<File
 					RelativePath="..\KeePassLibCpp\Details\PwFileImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Details\PwFindImpl.cpp"
 					>
 				</File>
 			</Filter>

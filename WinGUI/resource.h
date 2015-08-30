@@ -323,6 +323,9 @@
 #define IDC_STATIC_HELPSOURCE_INTRO     1299
 #define IDC_LIST_COMPS                  1300
 #define IDC_STATIC_SUMMARY              1301
+#define IDC_STATIC_COLORVIEW            1302
+#define IDC_SLIDER_COLOR                1304
+#define IDC_CHECK_CUSTOMCOLOR           1305
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -547,7 +550,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        247
 #define _APS_NEXT_COMMAND_VALUE         33040
-#define _APS_NEXT_CONTROL_VALUE         1302
+#define _APS_NEXT_CONTROL_VALUE         1306
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

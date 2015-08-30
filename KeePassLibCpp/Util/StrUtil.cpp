@@ -391,7 +391,7 @@ void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 		else if(tchScan == _T('I')) dwFlags |= PWMF_UUID;
 		else break;
 
-		const DWORD dwIndex = pDataSource->Find(strID, FALSE, dwFlags, 0);
+		const DWORD dwIndex = pDataSource->FindEx(strID, FALSE, dwFlags, 0);
 		if(dwIndex != DWORD_MAX)
 		{
 			PW_ENTRY *pFound = pDataSource->GetEntry(dwIndex);
@@ -745,6 +745,34 @@ bool StrMatchText(LPCTSTR lpEntryData, LPCTSTR lpSearch,
 	}
 
 	return (_tcsstr(lpEntryData, lpSearch) != NULL);
+}
+
+std::vector<std::basic_string<TCHAR> > SU_SplitSearchTerms(LPCTSTR lpSearch)
+{
+	std::vector<std::basic_string<TCHAR> > v;
+	if((lpSearch == NULL) || (lpSearch[0] == 0)) return v;
+
+	CStringBuilderEx sbTerm;
+	bool bQuoted = false;
+
+	const size_t uLen = _tcslen(lpSearch);
+	for(size_t i = 0; i < uLen; ++i)
+	{
+		TCHAR ch = lpSearch[i];
+
+		if(((ch == _T(' ')) || (ch == _T('\t')) || (ch == _T('\r')) ||
+			(ch == _T('\n'))) && !bQuoted)
+		{
+			if(sbTerm.GetLength() > 0) v.push_back(sbTerm.ToString());
+
+			sbTerm.Clear();
+		}
+		else if(ch == _T('\"')) bQuoted = !bQuoted;
+		else sbTerm.Append(ch);
+	}
+	if(sbTerm.GetLength() > 0) v.push_back(sbTerm.ToString());
+
+	return v;
 }
 
 #ifndef _WIN32_WCE

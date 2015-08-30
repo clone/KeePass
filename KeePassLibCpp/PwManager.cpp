@@ -31,8 +31,6 @@
 
 #include <boost/static_assert.hpp>
 
-using boost::scoped_ptr;
-
 static PW_TIME g_pwTimeNever = { 2999, 12, 28, 23, 59, 59 };
 static char g_pNullString[4] = { 0, 0, 0, 0 };
 
@@ -59,6 +57,8 @@ CPwManager::CPwManager()
 	m_strKeySource.clear();
 
 	m_bUseTransactedFileWrites = FALSE;
+
+	m_clr = DWORD_MAX;
 
 	_DetMetaInfo();
 
@@ -101,6 +101,8 @@ void CPwManager::CleanUp()
 	m_strKeySource.clear();
 
 	m_bUseTransactedFileWrites = FALSE;
+
+	m_clr = DWORD_MAX;
 
 	m_strDefaultUserName.clear();
 	m_vSearchHistory.clear();
@@ -454,6 +456,8 @@ void CPwManager::NewDatabase()
 	m_strDefaultUserName.clear();
 	m_vSearchHistory.clear();
 	m_vCustomKVPs.clear();
+
+	m_clr = DWORD_MAX;
 }
 
 int CPwManager::GetAlgorithm() const
@@ -1034,105 +1038,6 @@ void CPwManager::_DetMetaInfo()
 	LPCTSTR lp = CPwUtil::GetUniCvtPtr(NULL, FALSE);
 	const DWORD dwRel = CPwUtil::GetUniCPT(lp);
 	g_bMetaInfoCvt = (dwRel != PWU_SPN_CONST);
-}
-
-DWORD CPwManager::Find(const TCHAR *pszFindString, BOOL bCaseSensitive,
-	DWORD searchFlags, DWORD nStart)
-{
-	if(nStart >= m_dwNumEntries) return DWORD_MAX;
-	ASSERT(pszFindString != NULL); if(pszFindString == NULL) return DWORD_MAX;
-
-	CString strFind = pszFindString;
-	if((strFind.GetLength() == 0) || (strFind == _T("*"))) return nStart;
-
-	scoped_ptr<boost::basic_regex<TCHAR> > spRegex;
-#ifndef _WIN64
-	if((searchFlags & PWMS_REGEX) != 0)
-	{
-		try
-		{
-			if(bCaseSensitive == FALSE)
-				spRegex.reset(new boost::basic_regex<TCHAR>((LPCTSTR)strFind,
-					boost::regex_constants::icase));
-			else
-				spRegex.reset(new boost::basic_regex<TCHAR>((LPCTSTR)strFind));
-		}
-		catch(...) { return DWORD_MAX; }
-	}
-#else
-#pragma message("No regular expression support in x64 library.")
-#endif
-
-	LPCTSTR lpSearch = strFind;
-	if(bCaseSensitive == FALSE)
-	{
-		strFind = strFind.MakeLower();
-		lpSearch = strFind;
-	}
-
-	for(DWORD i = nStart; i < m_dwNumEntries; ++i)
-	{
-		if((searchFlags & PWMF_TITLE) != 0)
-		{
-			if(StrMatchText(m_pEntries[i].pszTitle, lpSearch, bCaseSensitive, spRegex.get()))
-				return i;
-		}
-
-		if((searchFlags & PWMF_USER) != 0)
-		{
-			if(StrMatchText(m_pEntries[i].pszUserName, lpSearch, bCaseSensitive, spRegex.get()))
-				return i;
-		}
-
-		if((searchFlags & PWMF_URL) != 0)
-		{
-			if(StrMatchText(m_pEntries[i].pszURL, lpSearch, bCaseSensitive, spRegex.get()))
-				return i;
-		}
-
-		if((searchFlags & PWMF_PASSWORD) != 0)
-		{
-			UnlockEntryPassword(&m_pEntries[i]);
-			CString strPassword = m_pEntries[i].pszPassword;
-			LockEntryPassword(&m_pEntries[i]);
-
-			if(StrMatchText(strPassword, lpSearch, bCaseSensitive, spRegex.get()))
-			{
-				EraseCString(&strPassword);
-				return i;
-			}
-
-			EraseCString(&strPassword);
-		}
-
-		if((searchFlags & PWMF_ADDITIONAL) != 0)
-		{
-			if(StrMatchText(m_pEntries[i].pszAdditional, lpSearch, bCaseSensitive, spRegex.get()))
-				return i;
-		}
-
-		if((searchFlags & PWMF_GROUPNAME) != 0)
-		{
-			const DWORD dwGroupIndex = GetGroupByIdN(m_pEntries[i].uGroupId);
-			ASSERT(dwGroupIndex != DWORD_MAX);
-			if(dwGroupIndex == DWORD_MAX) continue;
-
-			if(StrMatchText(GetGroup(dwGroupIndex)->pszGroupName, lpSearch,
-				bCaseSensitive, spRegex.get()))
-				return i;
-		}
-
-		if((searchFlags & PWMF_UUID) != 0)
-		{
-			CString strUuid;
-			_UuidToString(m_pEntries[i].uuid, &strUuid);
-
-			if(StrMatchText(strUuid, lpSearch, bCaseSensitive, spRegex.get()))
-				return i;
-		}
-	}
-
-	return DWORD_MAX;
 }
 
 void CPwManager::MoveInternal(DWORD dwFrom, DWORD dwTo)
@@ -1762,6 +1667,8 @@ BOOL CPwManager::_AddAllMetaStreams()
 	b &= _AddMetaStream(PMS_STREAM_DEFAULTUSER, pName, szlen((const char *)pName) + 1);
 	SAFE_DELETE_ARRAY(pName);
 
+	b &= _AddMetaStream(PMS_STREAM_DBCOLOR, (BYTE *)&m_clr, sizeof(COLORREF));
+
 	for(size_t uHItem = 0; uHItem < m_vSearchHistory.size(); ++uHItem)
 	{
 		const size_t uHIndex = m_vSearchHistory.size() - uHItem - 1;
@@ -1827,6 +1734,11 @@ void CPwManager::_ParseMetaStream(PW_ENTRY *p, bool bAcceptUnknown)
 		LPTSTR lpName = _UTF8ToString(p->pBinaryData);
 		m_strDefaultUserName = (LPCTSTR)lpName;
 		SAFE_DELETE_ARRAY(lpName);
+	}
+	else if(_tcscmp(p->pszAdditional, PMS_STREAM_DBCOLOR) == 0)
+	{
+		if(p->uBinaryDataLen >= sizeof(COLORREF))
+			memcpy(&m_clr, p->pBinaryData, sizeof(COLORREF));
 	}
 	else if(_tcscmp(p->pszAdditional, PMS_STREAM_SEARCHHISTORYITEM) == 0)
 	{
@@ -2166,4 +2078,14 @@ LPCTSTR CPwManager::GetCustomKvp(LPCTSTR lpKey) const
 	}
 
 	return NULL;
+}
+
+COLORREF CPwManager::GetColor() const
+{
+	return m_clr;
+}
+
+void CPwManager::SetColor(COLORREF clr)
+{
+	m_clr = clr;
 }
