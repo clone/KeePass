@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -121,7 +121,7 @@ public:
 	void _SaveWindowPositionAndSize(CPrivateConfigEx* pcfg);
 
 	void SetStatusTextEx(LPCTSTR lpStatusText, int nPane = -1);
-	inline void NotifyUserActivity();
+	void NotifyUserActivity();
 	void UpdateAutoSortMenuItems();
 	void BuildPluginMenu();
 	BOOL RegisterGlobalHotKey(int nHotKeyID, DWORD dwHotKey, BOOL bReleasePrevious, BOOL bMessageBoxOnFail);
@@ -313,8 +313,6 @@ private:
 	BOOL m_bImgButtons;
 	BOOL m_bEntryGrid;
 	BOOL m_bAutoSaveDb;
-	long m_nLockTimeDef;
-	long m_nLockCountdown;
 	BOOL m_bAutoShowExpired;
 	BOOL m_bAutoShowExpiredSoon;
 	BOOL m_bBackupEntries;
@@ -325,6 +323,10 @@ private:
 	BOOL m_bLockOnWinLock;
 	BOOL m_bClearClipOnDbClose;
 	BOOL m_bUseTransactedFileWrites;
+
+	long m_nLockTimeDef;
+	// long m_nLockCountdown;
+	UINT64 m_uLockAt;
 
 	BOOL m_bExiting;
 	BOOL m_bIsLocking;
@@ -486,6 +488,9 @@ private:
 
 	void _PostUseTANEntry(DWORD dwListIndex, DWORD dwEntryIndex);
 	void _PreDatabaseWrite();
+
+	inline void _SetAutoLockTimeout(long lSeconds);
+	inline UINT64 _GetCurrentTimeUtc();
 
 	LONG m_lNormalWndPosX;
 	LONG m_lNormalWndPosY;

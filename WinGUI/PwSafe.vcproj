@@ -2549,6 +2549,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Util\KeySourcesPool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\KeySourcesPool.h"
+				>
+			</File>
+			<File
 				RelativePath="Util\PrivateConfig.cpp"
 				>
 				<FileConfiguration

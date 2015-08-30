@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ STDMETHODIMP CKpDatabaseImpl::InitPrimaryInstance()
 STDMETHODIMP_(INT) CKpDatabaseImpl::SetMasterKey(LPCTSTR lpMasterKey, BOOL bDiskDrive,
 	LPCTSTR lpSecondKey)
 {
-	return m_pMgr->SetMasterKey(lpMasterKey, bDiskDrive, lpSecondKey, NULL, FALSE);
+	return m_pMgr->SetMasterKey(lpMasterKey, bDiskDrive, lpSecondKey, NULL, FALSE, NULL);
 }
 
 STDMETHODIMP_(DWORD) CKpDatabaseImpl::GetEntryCount()

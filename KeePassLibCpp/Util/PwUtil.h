@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -38,6 +38,13 @@ typedef struct _PG_TREENODE
 	PW_GROUP g;
 	std::vector<boost::shared_ptr<_PG_TREENODE> > vChildNodes;
 } PG_TREENODE;
+
+#ifdef _UNICODE
+#define ENCRYPTFILE_FNNAME "EncryptFileW"
+#else
+#define ENCRYPTFILE_FNNAME "EncryptFileA"
+#endif
+typedef BOOL(WINAPI *LPENCRYPTFILE)(LPCTSTR lpFileName);
 
 template<typename T>
 class CNullableEx : boost::noncopyable
@@ -115,6 +122,8 @@ public:
 
 	static CNullableEx<FILETIME> GetFileCreationTime(LPCTSTR lpFile);
 	static bool SetFileCreationTime(LPCTSTR lpFile, const FILETIME* pTime);
+
+	static bool EfsEncryptFile(LPCTSTR lpFile);
 
 private:
 	inline static BOOL ConvertStrToHex(char ch1, char ch2, BYTE& bt);

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -719,4 +719,21 @@ COLORREF NewGUI_ColorToGrayscale(COLORREF clr)
 	else if(l >= 256) l = 255;
 
 	return RGB(l, l, l);
+}
+
+void NewGUI_EnableWindowPeekPreview(HWND hWnd, bool bEnable)
+{
+	HMODULE hDwm = LoadLibrary(DWMAPI_LIB_NAME);
+	if(hDwm == NULL) return;
+
+	LPDWMSETWINDOWATTRIBUTE lpDwmSetWindowAttribute = (LPDWMSETWINDOWATTRIBUTE)
+		GetProcAddress(hDwm, DWMAPI_SETWINDOWATTRIBUTE);
+	if(lpDwmSetWindowAttribute != NULL)
+	{
+		BOOL bDisallow = (bEnable ? FALSE : TRUE);
+		BOOST_STATIC_ASSERT(sizeof(BOOL) == 4);
+		lpDwmSetWindowAttribute(hWnd, DWMWA_DISALLOW_PEEK, &bDisallow, sizeof(BOOL));
+	}
+
+	VERIFY(FreeLibrary(hDwm));
 }

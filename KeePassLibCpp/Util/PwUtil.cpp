@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -821,4 +821,20 @@ bool CPwUtil::SetFileCreationTime(LPCTSTR lpFile, const FILETIME* pTime)
 	VERIFY(SetFileTime(h, pTime, NULL, NULL));
 	VERIFY(CloseHandle(h));
 	return true;
+}
+
+bool CPwUtil::EfsEncryptFile(LPCTSTR lpFile)
+{
+	if(lpFile == NULL) { ASSERT(FALSE); return false; }
+
+	HMODULE hLib = ::LoadLibrary(_T("AdvApi32.dll"));
+	if(hLib == NULL) { ASSERT(FALSE); return false; }
+
+	bool bResult = false;
+	LPENCRYPTFILE lpEncryptFile = (LPENCRYPTFILE)::GetProcAddress(hLib, ENCRYPTFILE_FNNAME);
+	if(lpEncryptFile != NULL) { bResult = (lpEncryptFile(lpFile) != FALSE); }
+	else { ASSERT(FALSE); }
+
+	::FreeLibrary(hLib);
+	return bResult;
 }

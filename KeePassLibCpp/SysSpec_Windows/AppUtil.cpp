@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,6 +31,10 @@
 // #endif // _WIN32_WCE
 
 static bool g_bAuInitialized = false;
+
+static bool g_bOSInitialized = false;
+static bool g_bIsWin9xSystem = false;
+static bool g_bIsAtLeastWinVistaSystem = false;
 
 void AU_EnsureInitialized()
 {
@@ -201,24 +205,31 @@ int AU_WriteBigFile(LPCTSTR lpFilePath, const BYTE* pData, DWORD dwDataSize,
 	return nResult;
 }
 
-BOOL AU_IsWin9xSystem()
+void Priv_AU_EnsureOSInitialized()
 {
+	if(g_bOSInitialized) return;
+
 	OSVERSIONINFO osvi;
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osvi);
 
-	return ((osvi.dwMajorVersion <= 4) ? TRUE : FALSE);
+	g_bIsWin9xSystem = (osvi.dwMajorVersion <= 4);
+	g_bIsAtLeastWinVistaSystem = (osvi.dwMajorVersion >= 6);
+
+	g_bOSInitialized = true;
+}
+
+BOOL AU_IsWin9xSystem()
+{
+	Priv_AU_EnsureOSInitialized();
+	return (g_bIsWin9xSystem ? TRUE : FALSE);
 }
 
 BOOL AU_IsAtLeastWinVistaSystem()
 {
-	OSVERSIONINFO osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-
-	return ((osvi.dwMajorVersion >= 6) ? TRUE : FALSE);
+	Priv_AU_EnsureOSInitialized();
+	return (g_bIsAtLeastWinVistaSystem ? TRUE : FALSE);
 }
 
 /*

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@
 #include "Util/CmdLine/Executable.h"
 #include "Util/UpdateCheckEx.h"
 #include "Util/RestartManagerEx.h"
+#include "Util/KeySourcesPool.h"
 #include "Util/SprEngine/SprEngine.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "NewGUI/XHyperLink.h"
@@ -229,6 +230,8 @@ CPwSafeDlg::CPwSafeDlg(CWnd* pParent /*=NULL*/)
 	m_bCheckForInstance = FALSE;
 	m_bRestoreHotKeyRegistered = FALSE;
 	m_bInitialCmdLineFile = FALSE;
+
+	m_uLockAt = UINT64_MAX;
 
 	m_hLastSelectedGroup = NULL;
 	m_dwLastNumSelectedItems = 0;
@@ -548,7 +551,7 @@ BOOL CAboutDlg::OnInitDialog()
 
 	// NewGUI_MakeHyperLink(&m_hlHomepage);
 	// m_hlHomepage.SetURL(CString(PWM_HOMEPAGE));
-	str = TRL("Visit KeePass Homepage");
+	str = TRL("KeePass Website");
 	m_hlHomepage.SetWindowText(str);
 	NewGUI_MakeHyperLink(&m_hlHomepage);
 	m_hlHomepage.EnableTooltip(FALSE);
@@ -758,8 +761,17 @@ BOOL CPwSafeDlg::OnInitDialog()
 	}
 	else CPwGeneratorDlg::SetOptions(CString(_T("11100000001")), CString(_T("")), 16); */
 
+	// Ensure that relative paths on the command line are evaluated relatively to
+	// the initial working directory instead of the last used directory that
+	// KeePass remembers; for this, we ensure the CmdArgs singleton is constructed
+	// before restoring the remembered last directory; FR 3059831
+	CmdArgs::instance().getDatabase();
+
 	cConfig.Get(PWMKEY_LASTDIR, szTemp);
-	if(szTemp[0] != 0) SetCurrentDirectory(szTemp);
+	if(szTemp[0] != 0) WU_SetCurrentDirectory(szTemp);
+
+	CKeySourcesPool::SetEnabled(cConfig.GetBool(PWMKEY_REMEMBERKEYSOURCES, TRUE));
+	CKeySourcesPool::Load(&cConfig);
 
 	cConfig.Get(PWMKEY_CLIPBOARDMETHOD, szTemp);
 	if(szTemp[0] != 0) m_nClipboardMethod = _ttoi(szTemp);
@@ -884,7 +896,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_nLockTimeDef = -1;
 	cConfig.Get(PWMKEY_LOCKTIMER, szTemp);
 	if(szTemp[0] != 0) m_nLockTimeDef = _ttol(szTemp);
-	m_nLockCountdown = m_nLockTimeDef;
+	// m_nLockCountdown = m_nLockTimeDef; // NotifyUserActivity at the end of OnInitDialog
 
 	m_bAutoShowExpired = cConfig.GetBool(PWMKEY_AUTOSHOWEXPIRED, FALSE);
 	m_bAutoShowExpiredSoon = cConfig.GetBool(PWMKEY_AUTOSHOWEXPIREDS, FALSE);
@@ -1419,6 +1431,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 		}
 	}
 
+	NotifyUserActivity(); // Initialize the locking timeout
 	return FALSE; // We set the focus ourselves
 }
 
@@ -2153,13 +2166,14 @@ void CPwSafeDlg::SaveOptions()
 
 	if(m_bRememberLast == TRUE)
 	{
-		ASSERT(1024 <= SI_REGSIZE);
-		GetCurrentDirectory(1024, szTemp);
-		if(szTemp[0] != 0) pcfg.Set(PWMKEY_LASTDIR, szTemp);
+		// GetCurrentDirectory(1024, szTemp);
+		// if(szTemp[0] != 0) pcfg.Set(PWMKEY_LASTDIR, szTemp);
+		const std_string strCurDir = WU_GetCurrentDirectory();
+		if(strCurDir.size() > 0) pcfg.Set(PWMKEY_LASTDIR, strCurDir.c_str());
 
 		// TCHAR tszTemp[SI_REGSIZE];
 		// GetModuleFileName(NULL, tszTemp, SI_REGSIZE - 2);
-		std_string strTemp = Executable::instance().getFullPathName();
+		const std_string strTemp = Executable::instance().getFullPathName();
 		pcfg.Set(PWMKEY_LASTDB, MakeRelativePathEx(strTemp.c_str(), m_strLastDb));
 	}
 	else
@@ -2167,6 +2181,9 @@ void CPwSafeDlg::SaveOptions()
 		pcfg.Set(PWMKEY_LASTDIR, _T(""));
 		pcfg.Set(PWMKEY_LASTDB, _T(""));
 	}
+
+	pcfg.SetBool(PWMKEY_REMEMBERKEYSOURCES, CKeySourcesPool::GetEnabled());
+	CKeySourcesPool::Save(&pcfg);
 
 	pcfg.SetBool(PWMKEY_STARTMINIMIZED, m_bStartMinimized);
 	pcfg.SetBool(PWMKEY_DISABLEUNSAFE, m_bDisableUnsafe);
@@ -3607,10 +3624,19 @@ void CPwSafeDlg::OnTimer(WPARAM nIDEvent)
 		{
 			if(m_nLockTimeDef != -1)
 			{
-				if(m_nLockCountdown != 0)
+				// if(m_nLockCountdown != 0)
+				// {
+
+				// TryEnterCriticalSection apparently is available on Windows 98,
+				// but it doesn't do anything
+				const bool b9x = (AU_IsWin9xSystem() != FALSE);
+				if(b9x || (TryEnterCriticalSection(CPwSafeApp::GetLockTimerCS()) != FALSE))
 				{
-					--m_nLockCountdown;
-					if(m_nLockCountdown == 0)
+					// --m_nLockCountdown;
+					// if(m_nLockCountdown == 0)
+
+					const UINT64 uCurTimeUtc = _GetCurrentTimeUtc();
+					if(uCurTimeUtc >= m_uLockAt)
 					{
 						if(m_bExitInsteadOfLockAT == FALSE)
 						{
@@ -3624,7 +3650,11 @@ void CPwSafeDlg::OnTimer(WPARAM nIDEvent)
 						}
 						else OnFileExit();
 					}
+
+					if(!b9x) LeaveCriticalSection(CPwSafeApp::GetLockTimerCS());
 				}
+				
+				// }
 			}
 		}
 
@@ -4197,11 +4227,13 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 	int nErrCode, nErrCode2;
 
 	if(dlg.m_bKeyMethod == PWM_KEYMETHOD_OR)
-		nErrCode = pMgr->SetMasterKey(dlg.m_lpKey, dlg.m_bKeyFile, NULL, &ri, FALSE);
+		nErrCode = pMgr->SetMasterKey(dlg.m_lpKey, dlg.m_bKeyFile, NULL, &ri, FALSE,
+			dlg.m_strSelectedKeyProv);
 	else
 	{
 		ASSERT(dlg.m_bKeyFile == TRUE);
-		nErrCode = pMgr->SetMasterKey(dlg.m_lpKey, dlg.m_bKeyFile, dlg.m_lpKey2, &ri, FALSE);
+		nErrCode = pMgr->SetMasterKey(dlg.m_lpKey, dlg.m_bKeyFile, dlg.m_lpKey2, &ri,
+			FALSE, dlg.m_strSelectedKeyProv);
 	}
 
 	if(nErrCode != PWE_SUCCESS)
@@ -4235,9 +4267,11 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 			if(nMsg == IDYES)
 			{
 				if(dlg.m_bKeyMethod == PWM_KEYMETHOD_OR)
-					nErrCode2 = pMgr->SetMasterKey(dlg.m_lpKey, dlg.m_bKeyFile, NULL, &ri, TRUE);
+					nErrCode2 = pMgr->SetMasterKey(dlg.m_lpKey, dlg.m_bKeyFile, NULL,
+						&ri, TRUE, dlg.m_strSelectedKeyProv);
 				else
-					nErrCode2 = pMgr->SetMasterKey(dlg.m_lpKey, dlg.m_bKeyFile, dlg.m_lpKey2, &ri, TRUE);
+					nErrCode2 = pMgr->SetMasterKey(dlg.m_lpKey, dlg.m_bKeyFile,
+						dlg.m_lpKey2, &ri, TRUE, dlg.m_strSelectedKeyProv);
 
 				if(nErrCode2 != PWE_SUCCESS)
 				{
@@ -4249,9 +4283,11 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 			else if(nMsg == IDNO)
 			{
 				if(dlg.m_bKeyMethod == PWM_KEYMETHOD_OR)
-					nErrCode2 = pMgr->SetMasterKey(dlg.m_lpKey, dlg.m_bKeyFile, NULL, NULL, FALSE);
+					nErrCode2 = pMgr->SetMasterKey(dlg.m_lpKey, dlg.m_bKeyFile,
+						NULL, NULL, FALSE, dlg.m_strSelectedKeyProv);
 				else
-					nErrCode2 = pMgr->SetMasterKey(dlg.m_lpKey, dlg.m_bKeyFile, dlg.m_lpKey2, NULL, FALSE);
+					nErrCode2 = pMgr->SetMasterKey(dlg.m_lpKey, dlg.m_bKeyFile,
+						dlg.m_lpKey2, NULL, FALSE, dlg.m_strSelectedKeyProv);
 
 				if(nErrCode2 != PWE_SUCCESS)
 				{
@@ -4271,6 +4307,7 @@ BOOL CPwSafeDlg::_ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew)
 	}
 
 	if(pDbMgr == NULL) m_bModified = TRUE;
+
 	dlg.FreePasswords();
 
 	if(bCreateNew == FALSE)
@@ -4384,8 +4421,16 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
 				pDlgPass->m_hWindowIcon = m_hIcon;
 				pDlgPass->m_lpPreSelectPath = lpPreSelectPath;
 
-				if(pszFile == NULL) pDlgPass->m_strDescriptiveName = dlg.GetFileName();
-				else pDlgPass->m_strDescriptiveName = CsFileOnly(&strFile);
+				if(pszFile == NULL)
+				{
+					pDlgPass->m_strDatabasePath = dlg.GetPathName();
+					pDlgPass->m_strDescriptiveName = dlg.GetFileName();
+				}
+				else
+				{
+					pDlgPass->m_strDatabasePath = strFile;
+					pDlgPass->m_strDescriptiveName = CsFileOnly(&strFile);
+				}
 
 				if((pszPassword == NULL) && (pszKeyFile == NULL))
 				{
@@ -4425,10 +4470,16 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
 					}
 				}
 
+				CString strKeyFilePath;
+				if((pDlgPass->m_bKeyFile != FALSE) && (pDlgPass->m_lpKey != NULL))
+					strKeyFilePath = pDlgPass->m_lpKey;
+
 				if(pDlgPass->m_bKeyMethod == PWM_KEYMETHOD_OR)
-					nErr = pMgr->SetMasterKey(pDlgPass->m_lpKey, pDlgPass->m_bKeyFile, NULL, NULL, FALSE);
+					nErr = pMgr->SetMasterKey(pDlgPass->m_lpKey, pDlgPass->m_bKeyFile,
+						NULL, NULL, FALSE, pDlgPass->m_strSelectedKeyProv);
 				else
-					nErr = pMgr->SetMasterKey(pDlgPass->m_lpKey, pDlgPass->m_bKeyFile, pDlgPass->m_lpKey2, NULL, FALSE);
+					nErr = pMgr->SetMasterKey(pDlgPass->m_lpKey, pDlgPass->m_bKeyFile,
+						pDlgPass->m_lpKey2, NULL, FALSE, pDlgPass->m_strSelectedKeyProv);
 
 				pDlgPass->FreePasswords(); delete pDlgPass; pDlgPass = NULL;
 
@@ -4446,6 +4497,9 @@ void CPwSafeDlg::_OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile,
 					nErr = pMgr->OpenDatabase(strFile, NULL);
 
 				CTaskbarListEx::SetProgressState(this->m_hWnd, TBPF_NOPROGRESS);
+
+				if(nErr == PWE_SUCCESS) // Set or clear key source
+					CKeySourcesPool::Set(GetShortestAbsolutePath(strFile), strKeyFilePath);
 
 				if(bIgnoreCorrupted == TRUE)
 				{
@@ -4773,6 +4827,7 @@ void CPwSafeDlg::OnFileSave()
 
 	m_strLastDb = m_strFile;
 	m_bModified = FALSE;
+	CKeySourcesPool::Set(GetShortestAbsolutePath(m_strFile), m_mgr.GetKeySource()); // Set or clear
 
 	_UpdateToolBar(); // Updates titlebar, too
 	m_bDisplayDialog = FALSE;
@@ -4861,6 +4916,7 @@ void CPwSafeDlg::OnFileSaveAs()
 
 			m_bModified = FALSE;
 			m_strLastDb = strFile;
+			CKeySourcesPool::Set(m_strFileAbsolute, m_mgr.GetKeySource()); // Set or clear
 
 			m_bFileReadOnly = FALSE;
 
@@ -5092,6 +5148,7 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_bSortAutoTypeSelItems = m_bSortAutoTypeSelItems;
 	dlg.m_bDeleteTANsAfterUse = m_bDeleteTANsAfterUse;
 	dlg.m_bUseTransactedFileWrites = m_bUseTransactedFileWrites;
+	dlg.m_bRememberKeySources = CKeySourcesPool::GetEnabled();
 
 	if(_CallPlugins(KPM_OPTIONS_PRE, 0, 0) == FALSE)
 		{ m_bDisplayDialog = FALSE; return; }
@@ -5138,6 +5195,7 @@ void CPwSafeDlg::OnSafeOptions()
 		m_bSortAutoTypeSelItems = dlg.m_bSortAutoTypeSelItems;
 		m_bDeleteTANsAfterUse = dlg.m_bDeleteTANsAfterUse;
 		m_bUseTransactedFileWrites = dlg.m_bUseTransactedFileWrites;
+		CKeySourcesPool::SetEnabled(dlg.m_bRememberKeySources);
 
 		m_remoteControl.SetAlwaysAllowFullAccess(dlg.m_bAlwaysAllowIpc);
 		m_remoteControl.EnableRemoteControl(dlg.m_bEnableRemoteCtrl);
@@ -6688,7 +6746,7 @@ void CPwSafeDlg::OnFileLock()
 	strExtended += _T("\t");
 	strExtended += pSuffix;
 
-	if((strMenuItem == TRL("&Lock Workspace")) || (strMenuItem == strExtended))
+	if((strMenuItem == TRL("&Lock Workspace")) || (strMenuItem == strExtended)) // Lock
 	{
 		_DeleteTemporaryFiles();
 
@@ -6728,12 +6786,13 @@ void CPwSafeDlg::OnFileLock()
 		// _UpdateTitleBar(); // Updated by _UpdateToolBar()
 
 		ShowEntryDetails(NULL);
+		NewGUI_EnableWindowPeekPreview(this->m_hWnd, false);
 
 		if(m_bEntryView == TRUE) m_reEntryView.SetFocus();
 		else if(m_bShowToolBar == TRUE) m_cQuickFind.SetFocus();
 		else m_cList.SetFocus();
 	}
-	else
+	else // Unlock
 	{
 		_OpenDatabase(NULL, m_strLastDb, NULL, NULL, FALSE, NULL, FALSE);
 
@@ -6786,6 +6845,8 @@ void CPwSafeDlg::OnFileLock()
 			PW_ENTRY *p = m_mgr.GetEntryByUuid(m_pPreLockItemUuid);
 			ShowEntryDetails(p); // NULL is allowed
 		}
+
+		NewGUI_EnableWindowPeekPreview(this->m_hWnd, true);
 
 		m_cList.SetFocus();
 	}
@@ -7172,7 +7233,7 @@ BOOL CPwSafeDlg::PreTranslateMessage(MSG* pMsg)
 		((pMsg->wParam == PBT_APMQUERYSUSPEND) ||
 		(pMsg->wParam == PBT_APMSUSPEND)))
 	{
-		if(m_bLockOnWinLock == TRUE) _ChangeLockState(TRUE);
+		if(m_bLockOnWinLock != FALSE) _ChangeLockState(TRUE);
 	}
 
 	m_tip.RelayEvent(pMsg);
@@ -9446,9 +9507,27 @@ void CPwSafeDlg::_DoQuickFind(LPCTSTR lpText)
 		m_cList.SetFocus();
 }
 
-inline void CPwSafeDlg::NotifyUserActivity()
+void CPwSafeDlg::NotifyUserActivity()
 {
-	m_nLockCountdown = m_nLockTimeDef;
+	// m_nLockCountdown = m_nLockTimeDef;
+
+	if(m_nLockTimeDef < 0) m_uLockAt = UINT64_MAX;
+	else _SetAutoLockTimeout(m_nLockTimeDef);
+}
+
+inline void CPwSafeDlg::_SetAutoLockTimeout(long lSeconds)
+{
+	m_uLockAt = (_GetCurrentTimeUtc() + (static_cast<UINT64>(lSeconds) *
+		0x989680ui64)); // 10000000
+}
+
+inline UINT64 CPwSafeDlg::_GetCurrentTimeUtc()
+{
+	FILETIME ft;
+	GetSystemTimeAsFileTime(&ft);
+
+	return ((static_cast<UINT64>(ft.dwHighDateTime) << 32) |
+		static_cast<UINT64>(ft.dwLowDateTime));
 }
 
 void CPwSafeDlg::OnSafeExportGroupTxt()
@@ -10552,7 +10631,7 @@ void CPwSafeDlg::OnImportKeePass()
 {
 	NotifyUserActivity();
 
-	std::basic_string<TCHAR> strDir = WU_GetCurrentDirectory();
+	const std::basic_string<TCHAR> strDir = WU_GetCurrentDirectory();
 
 	CPwManager mgrImport;
 	_OpenDatabase(&mgrImport, NULL, NULL, NULL, FALSE, NULL, FALSE);

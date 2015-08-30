@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -55,6 +55,8 @@ BOOL AU_SecureDeleteFile(LPCTSTR pszFilePath);
 
 int AU_WriteBigFile(LPCTSTR lpFilePath, const BYTE* pData, DWORD dwDataSize,
 	BOOL bTransacted);
+
+void Priv_AU_EnsureOSInitialized();
 
 BOOL AU_IsWin9xSystem();
 BOOL AU_IsAtLeastWinVistaSystem();

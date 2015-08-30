@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -36,10 +36,11 @@
 #define MTXNAME_LOCAL  _T("KeePassApplicationMutex")
 #define MTXNAME_GLOBAL _T("KeePassAppMutexExI")
 
-#define KPCLOPT_FILEEXT_UNREG     _T("/unregisterfileext")
-#define KPCLOPT_FILEEXT_UNREG_ALT _T("-unregisterfileext")
-#define KPCLOPT_FILEEXT_REG       _T("/registerfileext")
-#define KPCLOPT_FILEEXT_REG_ALT   _T("-registerfileext")
+// User-friendly Pascal-case (shown in UAC dialog)
+#define KPCLOPT_FILEEXT_UNREG     _T("/UnregisterFileExt")
+#define KPCLOPT_FILEEXT_UNREG_ALT _T("-UnregisterFileExt")
+#define KPCLOPT_FILEEXT_REG       _T("/RegisterFileExt")
+#define KPCLOPT_FILEEXT_REG_ALT   _T("-RegisterFileExt")
 
 typedef BOOL(WINAPI *LPINITIALIZESECURITYDESCRIPTOR)(
 	PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD dwRevision);
@@ -68,6 +69,8 @@ public:
 	static LPCTSTR GetPasswordFont();
 
 	static void LoadTranslationEx(CPrivateConfigEx* pConfig);
+
+	static LPCRITICAL_SECTION GetLockTimerCS();
 
 private:
 	static void ChangeKdbShellAssociation(BOOL bRegister, HWND hParent);

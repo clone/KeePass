@@ -111,7 +111,7 @@ CAPTION "About KeePass..."
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,203,111,58,14,WS_GROUP
-    LTEXT           "Copyright © 2003-2010 Dominik Reichl.",IDC_STATIC,7,7,254,8
+    LTEXT           "Copyright © 2003-2011 Dominik Reichl.",IDC_STATIC,7,7,254,8
     LTEXT           "KeePass is OSI Certified Open Source Software.",IDC_STATIC,7,20,254,8
     LTEXT           "The program is distributed under the terms of the GNU General Public License v2 or later.",IDC_STATIC,7,33,254,17
     LTEXT           "<>",IDC_HLINK_HOMEPAGE,7,65,254,8
@@ -617,7 +617,7 @@ BEGIN
     DEFPUSHBUTTON   "&Close",IDOK,332,183,58,14
     LTEXT           "<>",IDC_STATIC_SUMMARY,7,7,383,8
     CONTROL         "",IDC_LIST_COMPS,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,20,383,157
-    LTEXT           "Visit &KeePass Homepage",IDC_HLINK_HOMEPAGE,7,187,319,8
+    LTEXT           "KeePass &Website",IDC_HLINK_HOMEPAGE,7,187,319,8
 END
 
 
@@ -838,8 +838,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,8,0
- PRODUCTVERSION 1,1,8,0
+ FILEVERSION 1,1,9,0
+ PRODUCTVERSION 1,1,9,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -856,13 +856,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.18"
-            VALUE "FileVersion", "1.1.8.0"
+            VALUE "FileDescription", "KeePass Password Safe 1.19"
+            VALUE "FileVersion", "1.1.9.0"
             VALUE "InternalName", "PwSafe"
-            VALUE "LegalCopyright", "Copyright (c) 2003-2010 Dominik Reichl"
+            VALUE "LegalCopyright", "Copyright (c) 2003-2011 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.18"
-            VALUE "ProductVersion", "1.1.8.0"
+            VALUE "ProductName", "KeePass Password Safe 1.19"
+            VALUE "ProductVersion", "1.1.9.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -989,7 +989,7 @@ BEGIN
         MENUITEM "&Help Contents",              ID_INFO_README
         MENUITEM "Help &Source...",             ID_INFO_HELP_SELECTHELPSOURCE
         MENUITEM SEPARATOR
-        MENUITEM "Visit &KeePass Homepage",     ID_INFO_HOMEPAGE
+        MENUITEM "KeePass &Website",            ID_INFO_HOMEPAGE
         MENUITEM "&Donate...",                  ID_INFO_DONATE
         MENUITEM SEPARATOR
         MENUITEM "Check for Updates",           ID_INFO_CHKFORUPD

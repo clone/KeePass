@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -62,7 +62,8 @@ bool CFileTransactionEx::CommitWriteTransaction()
 {
 	const bool bMadeUnhidden = CPwUtil::UnhideFile(m_strBaseFile.c_str());
 
-	if(GetFileAttributes(m_strBaseFile.c_str()) != INVALID_FILE_ATTRIBUTES)
+	const DWORD dwBaseAttrib = GetFileAttributes(m_strBaseFile.c_str());
+	if(dwBaseAttrib != INVALID_FILE_ATTRIBUTES) // File exists
 	{
 		CNullableEx<FILETIME> tCreation = CPwUtil::GetFileCreationTime(m_strBaseFile.c_str());
 		if(tCreation.HasValue())
@@ -74,7 +75,11 @@ bool CFileTransactionEx::CommitWriteTransaction()
 	if(MoveFile(m_strTempFile.c_str(), m_strBaseFile.c_str()) == FALSE)
 		return false;
 
-	if(bMadeUnhidden) CPwUtil::HideFile(m_strBaseFile.c_str(), true);
+	if((dwBaseAttrib != INVALID_FILE_ATTRIBUTES) &&
+		((dwBaseAttrib & FILE_ATTRIBUTE_ENCRYPTED) != 0))
+		CPwUtil::EfsEncryptFile(m_strBaseFile.c_str());
+	if(bMadeUnhidden)
+		CPwUtil::HideFile(m_strBaseFile.c_str(), true);
 
 	return true;
 }

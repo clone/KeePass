@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "Util/WinUtil.h"
 #include "Util/PrivateConfigEx.h"
+#include "Util/KeySourcesPool.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -55,6 +56,7 @@ CPasswordDlg::CPasswordDlg(CWnd* pParent /*=NULL*/)
 	m_bLoadMode = TRUE;
 	m_bConfirm = FALSE;
 	m_bChanging = FALSE;
+	m_strDatabasePath = _T("");
 	m_strDescriptiveName = _T("");
 	m_bOnce = FALSE;
 	m_hWindowIcon = NULL;
@@ -349,18 +351,27 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), _T(""));
 
-	if(m_lpPreSelectPath != NULL)
+	LPCTSTR lpSelect = m_lpPreSelectPath;
+	std_string strSugg; // Data buffer, don't move inside 'if'
+	if((lpSelect == NULL) && (m_strDatabasePath.GetLength() > 0))
 	{
-		const int nSpecLen = static_cast<int>(_tcslen(m_lpPreSelectPath));
-		CString strCBI;
+		CString strPathAbs = GetShortestAbsolutePath(m_strDatabasePath);
+		strSugg = CKeySourcesPool::Get(strPathAbs);
+		if(strSugg.size() > 0) lpSelect = strSugg.c_str();
+	}
+
+	if(lpSelect != NULL)
+	{
+		const int nSpecLen = static_cast<int>(_tcslen(lpSelect));
 		BOOL bFound = FALSE;
 
 		for(i = 0; i < m_cbDiskList.GetCount(); ++i)
 		{
+			CString strCBI;
 			m_cbDiskList.GetLBText(i, strCBI);
 			if(strCBI.GetLength() < nSpecLen) continue;
 
-			if(_tcsnicmp((LPCTSTR)strCBI, m_lpPreSelectPath, nSpecLen) == 0)
+			if(_tcsnicmp((LPCTSTR)strCBI, lpSelect, nSpecLen) == 0)
 			{
 				m_cbDiskList.SetCurSel(i);
 				OnSelChangeComboDiskList();
@@ -371,21 +382,20 @@ BOOL CPasswordDlg::OnInitDialog()
 
 		if(bFound == FALSE)
 		{
-			COMBOBOXEXITEM cbi;
 			ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
 			cbi.mask = (CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE);
 			cbi.iItem = m_cbDiskList.GetCount();
-			cbi.pszText = const_cast<LPTSTR>(m_lpPreSelectPath);
+			cbi.pszText = const_cast<LPTSTR>(lpSelect);
 			cbi.cchTextMax = (int)_tcslen(cbi.pszText);
 			cbi.iImage = cbi.iSelectedImage = 28;
 			cbi.iIndent = 0;
-			int nx = m_cbDiskList.InsertItem(&cbi);
+			const int nxInserted = m_cbDiskList.InsertItem(&cbi);
 
-			m_cbDiskList.SetCurSel(nx);
+			m_cbDiskList.SetCurSel(nxInserted);
 			OnSelChangeComboDiskList();
 		}
 
-		m_bKeyMethod = TRUE;
+		m_bKeyMethod = PWM_KEYMETHOD_AND;
 		UpdateData(FALSE);
 	}
 
@@ -532,6 +542,7 @@ void CPasswordDlg::OnOK()
 	{
 		CString strTemp;
 		m_cbDiskList.GetLBText(m_cbDiskList.GetCurSel(), strTemp);
+		CString strLBText = strTemp;
 
 		const BOOL bKeyProv = IsKeyProvider(strTemp);
 
@@ -607,6 +618,8 @@ void CPasswordDlg::OnOK()
 				FreePasswords();
 				return;
 			}
+
+			m_strSelectedKeyProv = strLBText;
 		}
 
 		m_bKeyFile = TRUE;
@@ -755,7 +768,7 @@ void CPasswordDlg::OnBnClickedBrowseKeyFile()
 	else
 		dwFlags |= OFN_HIDEREADONLY;
 
-	std::basic_string<TCHAR> strDir = WU_GetCurrentDirectory();
+	const std::basic_string<TCHAR> strDir = WU_GetCurrentDirectory();
 
 	CFileDialog dlg(m_bLoadMode, NULL, NULL, dwFlags, strFilter, this);
 	if(dlg.DoModal() == IDOK)

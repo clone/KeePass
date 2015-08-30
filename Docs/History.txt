@@ -1,3 +1,27 @@
+11/04/03 - 1.19
+- Added option to remember key sources (key file paths,
+  provider names, ...); it's enabled by default
+- New locking timer (using a timeout instead of a countdown)
+- Lock files are now hidden
+- On Windows 7 and higher, the main window peek preview is now
+  disabled when the KeePass workspace is locked
+- File transactions: the NTFS/EFS encryption flag is now also
+  preserved when the containing directory isn't encrypted
+- {FIREFOX} placeholder: added support for registry-redirected
+  32-bit Firefox installations on 64-bit Windows systems
+- Relative database paths on the command line are now evaluated
+  relatively to the initial working directory (specified by the
+  parent process) instead of the last used directory
+- Improved user-friendliness in UAC dialogs
+- Improved help (moved placeholders to separate page, ...)
+- Installer: the KeePass start menu shortcut is now created
+  directly in the programs folder; the other shortcuts have
+  been removed (use the Control Panel for uninstalling and the
+  'Help' menu in KeePass to access the help)
+- Upgraded installer
+- Various code optimizations
+- Minor other improvements
+
 10/09/02 - 1.18
 - Password quality estimation algorithm: added check for about
   1500 most common passwords (these are rated down to 1/8th of

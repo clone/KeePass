@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -52,7 +52,8 @@ KP_SHARE INT SetMasterKey(void *pMgr, LPCTSTR pszMasterKey, BOOL bDiskDrive,
 	LPCTSTR pszSecondKey, const CNewRandomInterface *pARI, BOOL bOverwrite)
 {
 	DECL_MGR_N(pMgr);
-	return p->SetMasterKey(pszMasterKey, bDiskDrive, pszSecondKey, pARI, bOverwrite);
+	return p->SetMasterKey(pszMasterKey, bDiskDrive, pszSecondKey, pARI,
+		bOverwrite, NULL);
 }
 
 // Returns number of entries in database

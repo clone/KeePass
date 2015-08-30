@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -45,6 +45,8 @@ static UINT g_uThreadACP = 0;
 static BOOL g_bForceSimpleAsterisks = FALSE;
 static TCHAR g_pFontNameNormal[12];
 static TCHAR g_pFontNameSymbol[8];
+
+static CRITICAL_SECTION g_csLockTimer;
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -200,6 +202,7 @@ BOOL CPwSafeApp::InitInstance()
 		}
 	}
 
+	InitializeCriticalSection(&g_csLockTimer);
 	NSCAPI_Initialize(); // Initialize natural string comparison API
 	CTaskbarListEx::Initialize();
 
@@ -209,6 +212,7 @@ BOOL CPwSafeApp::InitInstance()
 
 	CTaskbarListEx::Release(false);
 	NSCAPI_Exit(); // Clean up natural string comparison API
+	DeleteCriticalSection(&g_csLockTimer);
 
 	this->_App_CleanUp();
 	return FALSE;
@@ -645,15 +649,15 @@ BOOL CPwSafeApp::ProcessControlCommands()
 		return TRUE;
 	}
 
-	if((strCmdLine.Right(18) == KPCLOPT_FILEEXT_UNREG) ||
-		(strCmdLine.Right(18) == KPCLOPT_FILEEXT_UNREG_ALT))
+	if((strCmdLine.Right(18).CompareNoCase(KPCLOPT_FILEEXT_UNREG) == 0) ||
+		(strCmdLine.Right(18).CompareNoCase(KPCLOPT_FILEEXT_UNREG_ALT) == 0))
 	{
 		ChangeKdbShellAssociation(FALSE, NULL);
 		return TRUE;
 	}
 
-	if((strCmdLine.Right(16) == KPCLOPT_FILEEXT_REG) ||
-		(strCmdLine.Right(16) == KPCLOPT_FILEEXT_REG_ALT))
+	if((strCmdLine.Right(16).CompareNoCase(KPCLOPT_FILEEXT_REG) == 0) ||
+		(strCmdLine.Right(16).CompareNoCase(KPCLOPT_FILEEXT_REG_ALT) == 0))
 	{
 		ChangeKdbShellAssociation(TRUE, NULL);
 		return TRUE;
@@ -752,4 +756,9 @@ void CPwSafeApp::LoadTranslationEx(CPrivateConfigEx* pConfig)
 	VERIFY(LoadTranslationTable(szTemp));
 
 	if(bAlloc) { delete pCfg; pCfg = NULL; }
+}
+
+LPCRITICAL_SECTION CPwSafeApp::GetLockTimerCS()
+{
+	return &g_csLockTimer;
 }

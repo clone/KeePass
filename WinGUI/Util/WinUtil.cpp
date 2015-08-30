@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -767,7 +767,7 @@ std::vector<std::basic_string<TCHAR> > WU_GetFileNames(BOOL bOpenMode,
 {
 	std::vector<std::basic_string<TCHAR> > v;
 
-	std::basic_string<TCHAR> strDir = WU_GetCurrentDirectory();
+	const std::basic_string<TCHAR> strDir = WU_GetCurrentDirectory();
 
 	std::basic_string<TCHAR> strInitial = _T("*.");
 	strInitial += ((lpSuffix != NULL) ? lpSuffix : _T("*"));
@@ -1155,7 +1155,7 @@ BOOL WU_FlushStorageBuffers(TCHAR tchDriveLetter, BOOL bOnlyIfRemovable)
 		OPEN_EXISTING, 0, NULL);
 	if(hDevice == INVALID_HANDLE_VALUE) { ASSERT(FALSE); return FALSE; }
 
-	std::basic_string<TCHAR> strDir = WU_FreeDriveIfCurrent(tchDriveLetter);
+	const std::basic_string<TCHAR> strDir = WU_FreeDriveIfCurrent(tchDriveLetter);
 
 	BOOL bResult = TRUE;
 	DWORD dwDummy = 0;
@@ -1188,7 +1188,10 @@ BOOL WU_FlushStorageBuffersEx(LPCTSTR lpFileOnStorage, BOOL bOnlyIfRemovable)
 
 std::basic_string<TCHAR> WU_GetCurrentDirectory()
 {
+	BOOST_STATIC_ASSERT(SI_REGSIZE >= MAX_PATH);
+
 	TCHAR tszDir[SI_REGSIZE];
+	tszDir[0] = 0;
 	if(GetCurrentDirectory(SI_REGSIZE - 1, tszDir) == 0)
 	{
 		ASSERT(FALSE);

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -37,11 +37,11 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.18")
+#define PWM_VERSION_STR  _T("1.19")
 #else
-#define PWM_VERSION_STR  _T("1.18 Unicode")
+#define PWM_VERSION_STR  _T("1.19 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01010800
+#define PWM_VERSION_DW   0x01010900
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
@@ -199,6 +199,9 @@
 #define PWMKEY_DELETETANSAFTERUSE   _T("KeeDeleteTANsAfterUse")
 #define PWMKEY_SOONTOEXPIREDAYS     _T("KeeSoonToExpireDays")
 #define PWMKEY_TRANSACTEDFILEWRITE  _T("KeeUseTransactedFileWrites")
+#define PWMKEY_REMEMBERKEYSOURCES   _T("KeeRememberKeySources")
+#define PWMKEY_KEYSOURCE_ID         _T("KeeKeySourceID")
+#define PWMKEY_KEYSOURCE_VALUE      _T("KeeKeySourceValue")
 
 #define PWMKEY_GENPROFILE       _T("KeeGenProfile")
 #define PWMKEY_GENPROFILEAUTO   _T("KeeGenProfileAuto")
@@ -378,7 +381,7 @@ public:
 
 	// Set the master key for the database
 	int SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const TCHAR *pszSecondKey,
-		const CNewRandomInterface *pARI, BOOL bOverwrite);
+		const CNewRandomInterface *pARI, BOOL bOverwrite, const TCHAR *pszProviderName);
 
 	DWORD GetNumberOfEntries() const; // Returns number of entries in database
 	DWORD GetNumberOfGroups() const; // Returns number of groups in database
@@ -466,6 +469,8 @@ public:
 	void SetRawMasterKey(__in_ecount(32) const BYTE *pNewKey);
 	void ClearMasterKey(BOOL bClearKey, BOOL bClearTransformedKey);
 
+	LPCTSTR GetKeySource() const;
+
 	std::basic_string<TCHAR> GetPropertyString(DWORD dwPropertyId) const;
 	BOOL SetPropertyString(DWORD dwPropertyId, LPCTSTR lpValue);
 
@@ -534,6 +539,7 @@ private:
 	BYTE m_pTransformedMasterKey[32]; // Master key encrypted several times
 	int m_nAlgorithm; // Algorithm used to encrypt the database
 	DWORD m_dwKeyEncRounds;
+	std::basic_string<TCHAR> m_strKeySource;
 
 	std::basic_string<TCHAR> m_strDefaultUserName;
 	std::vector<std::basic_string<TCHAR> > m_vSearchHistory;

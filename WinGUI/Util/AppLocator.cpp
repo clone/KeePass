@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -91,12 +91,20 @@ void AppLocator::FindInternetExplorer()
 void AppLocator::FindFirefox()
 {
 	LPCTSTR lpVer = _T("SOFTWARE\\Mozilla\\Mozilla Firefox");
+	LPCTSTR lpVer32 = _T("SOFTWARE\\Wow6432Node\\Mozilla\\Mozilla Firefox");
+	LPCTSTR lpRel = lpVer;
+
 	std::basic_string<TCHAR> strVer = GetRegStrEx(HKEY_LOCAL_MACHINE,
 		lpVer, _T("CurrentVersion"), 0);
+	if(strVer.size() == 0)
+	{
+		strVer = GetRegStrEx(HKEY_LOCAL_MACHINE, lpVer32, _T("CurrentVersion"), 0);
+		lpRel = lpVer32;
 
-	if(strVer.size() == 0) return;
+		if(strVer.size() == 0) return;
+	}
 
-	std::basic_string<TCHAR> strCur = lpVer;
+	std::basic_string<TCHAR> strCur = lpRel;
 	strCur += _T("\\");
 	strCur += strVer;
 	strCur += _T("\\Main");

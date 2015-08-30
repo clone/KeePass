@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -100,6 +100,7 @@ public:
 	BOOL m_bClearClipOnDbClose;
 	BOOL m_bDeleteTANsAfterUse;
 	BOOL m_bUseTransactedFileWrites;
+	BOOL m_bRememberKeySources;
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };

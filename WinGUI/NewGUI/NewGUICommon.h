@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -175,6 +175,14 @@ typedef struct _MY_GRADIENT_RECT
 #define BCM_SETSHIELD 0x160C
 #endif
 
+#define DWMAPI_LIB_NAME _T("DwmApi.dll")
+#define DWMAPI_SETWINDOWATTRIBUTE "DwmSetWindowAttribute"
+typedef HRESULT(WINAPI* LPDWMSETWINDOWATTRIBUTE)(HWND hwnd, DWORD dwAttribute,
+	LPCVOID pvAttribute, DWORD cbAttribute);
+#ifndef DWMWA_DISALLOW_PEEK
+#define DWMWA_DISALLOW_PEEK 11
+#endif
+
 void NewGUI_CleanUp();
 
 COLORREF NewGUI_GetBgColor();
@@ -246,5 +254,7 @@ int NewGUI_Scale(int nPixels, CWnd* pParentWindow);
 CSize NewGUI_Scale(const CSize& rSize, CWnd* pParentWindow);
 
 COLORREF NewGUI_ColorToGrayscale(COLORREF clr);
+
+void NewGUI_EnableWindowPeekPreview(HWND hWnd, bool bEnable);
 
 #endif // ___NEW_GUI_COMMON___

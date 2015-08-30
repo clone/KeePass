@@ -11,10 +11,10 @@
 #define MyAppUrlName "KeePass.url"
 #define MyAppHelpName "KeePass.chm"
 
-#define KeeVersionStr "1.18"
-#define KeeVersionWin "1.1.8.0"
+#define KeeVersionStr "1.19"
+#define KeeVersionWin "1.1.9.0"
 
-#define KeeDevPeriod "2003-2010"
+#define KeeDevPeriod "2003-2011"
 
 [Setup]
 AppName={#MyAppFullName}
@@ -46,8 +46,8 @@ WizardImageFile=compiler:WizModernImage-IS.bmp
 WizardSmallImageFile=compiler:WizModernSmallImage-IS.bmp
 DisableDirPage=auto
 AlwaysShowDirOnReadyPage=yes
-DisableProgramGroupPage=auto
-AlwaysShowGroupOnReadyPage=yes
+DisableProgramGroupPage=yes
+AlwaysShowGroupOnReadyPage=no
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
@@ -92,14 +92,15 @@ Root: HKCR; Subkey: kdbfile\DefaultIcon; ValueType: string; ValueData: """{app}\
 Root: HKCR; Subkey: kdbfile\shell\open; ValueType: string; ValueData: &Open with {#MyAppName}; Flags: uninsdeletekey; Tasks: fileassoc
 Root: HKCR; Subkey: kdbfile\shell\open\command; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Flags: uninsdeletekey; Tasks: fileassoc
 
-[INI]
-Filename: {app}\{#MyAppUrlName}; Section: InternetShortcut; Key: URL; String: {#MyAppURL}
+; [INI]
+; Filename: {app}\{#MyAppUrlName}; Section: InternetShortcut; Key: URL; String: {#MyAppURL}
 
 [Icons]
-Name: {group}\{#MyAppName}; Filename: {app}\{#MyAppExeName}
-Name: {group}\{cm:ProgramOnTheWeb,{#MyAppName}}; Filename: {app}\{#MyAppUrlName}
-Name: {group}\Help; Filename: {app}\{#MyAppHelpName}
-Name: {group}\{cm:UninstallProgram,{#MyAppName}}; Filename: {uninstallexe}
+; Name: {group}\{#MyAppName}; Filename: {app}\{#MyAppExeName}
+; Name: {group}\{cm:ProgramOnTheWeb,{#MyAppName}}; Filename: {app}\{#MyAppUrlName}
+; Name: {group}\Help; Filename: {app}\{#MyAppHelpName}
+; Name: {group}\{cm:UninstallProgram,{#MyAppName}}; Filename: {uninstallexe}
+Name: {commonprograms}\{#MyAppName}; Filename: {app}\{#MyAppExeName}
 Name: {userdesktop}\{#MyAppName}; Filename: {app}\{#MyAppExeName}; Tasks: desktopicon
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filename: {app}\{#MyAppExeName}; Tasks: quicklaunchicon
 
@@ -107,5 +108,14 @@ Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filen
 Filename: {app}\{#MyAppExeName}; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: postinstall nowait skipifsilent unchecked
 Filename: http://keepass.info/plugins.html; Description: Visit &plugins web page (browser integration, ...); Flags: postinstall shellexec skipifsilent
 
-[UninstallDelete]
-Type: files; Name: {app}\{#MyAppUrlName}
+; Delete old files when upgrading
+[InstallDelete]
+Name: {app}\{#MyAppUrlName}; Type: files
+Name: {group}\{#MyAppName}.lnk; Type: files
+Name: {group}\{cm:ProgramOnTheWeb,{#MyAppName}}.lnk; Type: files
+Name: {group}\Help.lnk; Type: files
+Name: {group}\{cm:UninstallProgram,{#MyAppName}}.lnk; Type: files
+Name: {group}; Type: dirifempty
+
+; [UninstallDelete]
+; Type: files; Name: {app}\{#MyAppUrlName}

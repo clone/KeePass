@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@ CPwManager::CPwManager()
 
 	mem_erase(m_pMasterKey, 32);
 	mem_erase(m_pTransformedMasterKey, 32);
+	m_strKeySource.clear();
 
 	m_bUseTransactedFileWrites = FALSE;
 
@@ -97,6 +98,7 @@ void CPwManager::CleanUp()
 
 	mem_erase(m_pMasterKey, 32);
 	mem_erase(m_pTransformedMasterKey, 32);
+	m_strKeySource.clear();
 
 	m_bUseTransactedFileWrites = FALSE;
 
@@ -106,7 +108,8 @@ void CPwManager::CleanUp()
 }
 
 int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive,
-	const TCHAR *pszSecondKey, const CNewRandomInterface *pARI, BOOL bOverwrite)
+	const TCHAR *pszSecondKey, const CNewRandomInterface *pARI, BOOL bOverwrite,
+	const TCHAR *pszProviderName)
 {
 	size_t uKeyLen2 = 0, uFileSize, uRead;
 	TCHAR szFile[2048];
@@ -156,6 +159,8 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive,
 	ASSERT(uKeyLen != 0);
 	if(uKeyLen == 0) { SAFE_DELETE_ARRAY(paKey); return PWE_INVALID_KEY; }
 
+	std::basic_string<TCHAR> strKeySourceCand;
+
 	if(bDiskDrive == FALSE)
 	{
 		sha256_begin(&sha32);
@@ -163,6 +168,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive,
 			&sha32);
 		sha256_end((unsigned char *)m_pMasterKey, &sha32);
 		ProtectMasterKey(true);
+		m_strKeySource.clear();
 
 		mem_erase((unsigned char *)paKey, uKeyLen);
 		SAFE_DELETE_ARRAY(paKey);
@@ -182,6 +188,9 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive,
 		}
 		else return PWE_KEYPROV_INVALID_KEY;
 		mem_erase(&vExtKey[0], vExtKey.size());
+
+		if(pszProviderName != NULL) m_strKeySource = pszProviderName;
+		else { ASSERT(FALSE); m_strKeySource.clear(); }
 
 		if(pszSecondKey == NULL) // External source only
 		{
@@ -221,6 +230,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive,
 			_tcscpy_s(szFile, _countof(szFile), pszMasterKey);
 			if(szFile[_tcslen(szFile) - 1] == _T('\\'))
 				_tcscat_s(szFile, _countof(szFile), PWS_DEFAULT_KEY_FILENAME);
+			strKeySourceCand = szFile;
 
 			if(pARI == NULL) // If pARI is NULL: load key from disk
 			{
@@ -270,6 +280,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive,
 					ProtectMasterKey(true);
 				}
 
+				m_strKeySource = strKeySourceCand;
 				fclose(fp); fp = NULL;
 				return PWE_SUCCESS;
 			}
@@ -279,7 +290,11 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive,
 				unsigned char aRandomBytes[32];
 
 				_tfopen_s(&fp, szFile, _T("rb")); // Does the file exist already?
-				if((fp != NULL) && (bOverwrite == FALSE)) { fclose(fp); fp = NULL; return PWE_NOFILEACCESS_READ_KEY; }
+				if((fp != NULL) && (bOverwrite == FALSE))
+				{
+					fclose(fp); fp = NULL;
+					return PWE_NOFILEACCESS_READ_KEY;
+				}
 				if(fp != NULL) { fclose(fp); fp = NULL; } // We must close it before opening for write
 
 				if(pARI->GenerateRandomSequence(32, aRandomBytes) == FALSE) return PWE_INVALID_RANDOMSOURCE;
@@ -287,11 +302,16 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive,
 				fp = NULL;
 				_tfopen_s(&fp, szFile, _T("wb"));
 				if(fp == NULL) return PWE_NOFILEACCESS_WRITE;
-				if(CPwUtil::SaveHexKey32(fp, aRandomBytes) == FALSE) { fclose(fp); fp = NULL; return PWE_FILEERROR_WRITE; }
+				if(CPwUtil::SaveHexKey32(fp, aRandomBytes) == FALSE)
+				{
+					fclose(fp); fp = NULL;
+					return PWE_FILEERROR_WRITE;
+				}
 				fclose(fp); fp = NULL;
 
 				memcpy(m_pMasterKey, aRandomBytes, 32);
 				ProtectMasterKey(true);
+				m_strKeySource = strKeySourceCand;
 				return PWE_SUCCESS;
 			}
 		}
@@ -300,6 +320,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive,
 			_tcscpy_s(szFile, _countof(szFile), pszMasterKey);
 			if(szFile[_tcslen(szFile) - 1] == _T('\\'))
 				_tcscat_s(szFile, _countof(szFile), PWS_DEFAULT_KEY_FILENAME);
+			strKeySourceCand = szFile;
 
 			if(pARI == NULL) // If pARI is NULL: load key from disk
 			{
@@ -361,6 +382,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive,
 
 				mem_erase((unsigned char *)aPasswordKey, 32);
 				mem_erase((unsigned char *)aFileKey, 32);
+				m_strKeySource = strKeySourceCand;
 				return PWE_SUCCESS;
 			}
 			else // pARI is not NULL: save key to disk
@@ -369,14 +391,22 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive,
 				unsigned char aRandomBytes[32];
 
 				_tfopen_s(&fp, szFile, _T("rb")); // Does the file exist already?
-				if((fp != NULL) && (bOverwrite == FALSE)) { fclose(fp); fp = NULL; return PWE_NOFILEACCESS_READ_KEY; }
+				if((fp != NULL) && (bOverwrite == FALSE))
+				{
+					fclose(fp); fp = NULL;
+					return PWE_NOFILEACCESS_READ_KEY;
+				}
 				if(fp != NULL) { fclose(fp); fp = NULL; } // We must close it before opening for write
 
 				if(pARI->GenerateRandomSequence(32, aRandomBytes) == FALSE) return PWE_INVALID_RANDOMSOURCE;
 
 				_tfopen_s(&fp, szFile, _T("wb"));
 				if(fp == NULL) return PWE_NOFILEACCESS_WRITE;
-				if(CPwUtil::SaveHexKey32(fp, aRandomBytes) == FALSE) { fclose(fp); fp = NULL; return PWE_FILEERROR_WRITE; }
+				if(CPwUtil::SaveHexKey32(fp, aRandomBytes) == FALSE)
+				{
+					fclose(fp); fp = NULL;
+					return PWE_FILEERROR_WRITE;
+				}
 				fclose(fp); fp = NULL;
 
 				ASSERT(uKeyLen2 != 0);
@@ -396,6 +426,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive,
 
 				mem_erase((unsigned char *)aPasswordKey, 32);
 				mem_erase((unsigned char *)aFileKey, 32);
+				m_strKeySource = strKeySourceCand;
 				return PWE_SUCCESS;
 			}
 		}
@@ -2017,6 +2048,11 @@ void CPwManager::ClearMasterKey(BOOL bClearKey, BOOL bClearTransformedKey)
 {
 	if(bClearKey == TRUE) mem_erase(m_pMasterKey, 32);
 	if(bClearTransformedKey == TRUE) mem_erase(m_pTransformedMasterKey, 32);
+}
+
+LPCTSTR CPwManager::GetKeySource() const
+{
+	return m_strKeySource.c_str();
 }
 
 std::basic_string<TCHAR> CPwManager::GetPropertyString(DWORD dwPropertyId) const

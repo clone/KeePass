@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2010 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2011 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "../../KeePassLibCpp/DataExchange/PwImport.h"
 #include "../../KeePassLibCpp/Util/MemUtil.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
+#include "../../KeePassLibCpp/Util/PwUtil.h"
 
 #include "WinUtil.h"
 
@@ -44,21 +45,29 @@ BOOL FileLock_Lock(LPCTSTR lpFile, BOOL bLock)
 		_GetCurrentPwTime(&t);
 		_pwtimeadd(&t, &tAdd);
 
+		CPwUtil::UnhideFile(str);
+
 		FILE *fp = NULL;
 		_tfopen_s(&fp, str, _T("wb"));
 		if(fp == NULL) return FALSE;
 
 		VERIFY(fwrite(&t, sizeof(PW_TIME), 1, fp) == 1);
 
-		std::basic_string<TCHAR> tszUser = WU_GetUserName();
-		BYTE *pbUTF8 = _StringToUTF8(tszUser.c_str());
+		const std::basic_string<TCHAR> strUser = WU_GetUserName();
+		BYTE *pbUTF8 = _StringToUTF8(strUser.c_str());
 		fwrite(pbUTF8, 1, szlen((char *)pbUTF8) + 1, fp);
 
 		fclose(fp); fp = NULL;
 
+		CPwUtil::HideFile(str, true);
+
 		SAFE_DELETE_ARRAY(pbUTF8);
 	}
-	else DeleteFile(str);
+	else
+	{
+		CPwUtil::UnhideFile(str);
+		DeleteFile(str);
+	}
 
 	return TRUE;
 }
