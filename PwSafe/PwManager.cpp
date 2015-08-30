@@ -583,6 +583,9 @@ BOOL CPwManager::OpenDatabase(const char *pszFile)
 
 	ASSERT(sizeof(char) == 1);
 
+	if(pszFile == NULL) return FALSE;
+	if(strlen(pszFile) == 0) return FALSE;
+
 	fp = fopen(pszFile, "rb");
 	if(fp == NULL) return FALSE;
 

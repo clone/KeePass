@@ -48,6 +48,8 @@ public:
 	CShadeButtonST	m_btOK;
 	int		m_nNewlineSequence;
 	UINT	m_uClipboardSeconds;
+	BOOL	m_bOpenLastDb;
+	BOOL	m_bImgButtons;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(COptionsDlg)

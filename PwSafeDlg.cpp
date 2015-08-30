@@ -223,6 +223,8 @@ BEGIN_MESSAGE_MAP(CPwSafeDlg, CDialog)
 	ON_COMMAND(ID_VIEW_URL, OnViewUrl)
 	ON_COMMAND(ID_VIEW_PASSWORD, OnViewPassword)
 	ON_COMMAND(ID_VIEW_NOTES, OnViewNotes)
+	ON_COMMAND(ID_FILE_LOCK, OnFileLock)
+	ON_UPDATE_COMMAND_UI(ID_FILE_LOCK, OnUpdateFileLock)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -300,6 +302,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bShowURL = TRUE;
 	m_bShowPassword = TRUE;
 	m_bShowNotes = TRUE;
+	m_bLocked = FALSE;
 
 	m_menu.LoadMenu(IDR_MAINMENU);
 
@@ -347,6 +350,10 @@ BOOL CPwSafeDlg::OnInitDialog()
 	cConfig.Get(PWMKEY_LANG, szTemp);
 	LoadTranslationTable(szTemp);
 
+	cConfig.Get(PWMKEY_LASTDIR, szTemp);
+	if(strlen(szTemp) != 0)
+		SetCurrentDirectory(szTemp);
+
 	szTemp[0] = 0; szTemp[1] = 0;
 	cConfig.Get(PWMKEY_CLIPSECS, szTemp);
 	if(strlen(szTemp) > 0)
@@ -361,6 +368,15 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bWindowsNewLine = TRUE; // Assume Windows
 	cConfig.Get(PWMKEY_NEWLINE, szTemp);
 	if(stricmp(szTemp, "Unix") == 0) m_bWindowsNewLine = FALSE;
+
+	cConfig.Get(PWMKEY_IMGBTNS, szTemp);
+	if(strlen(szTemp) != 0)
+	{
+		if(strcmp(szTemp, "False") == 0) m_bImgButtons = FALSE;
+		else m_bImgButtons = TRUE;
+	}
+	else m_bImgButtons = TRUE;
+	NewGUI_SetImgButtons(m_bImgButtons);
 
 	// Translate the menu
 	BCMenu *pSubMenu = &m_menu;
@@ -495,6 +511,22 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_nClipboardCountdown = -1;
 	SetTimer(APPWND_TIMER_ID, 1000, NULL);
 
+	m_strLastDb.Empty();
+	cConfig.Get(PWMKEY_OPENLASTB, szTemp);
+	m_bOpenLastDb = FALSE;
+	if(stricmp(szTemp, "True") == 0) m_bOpenLastDb = TRUE;
+
+	if(m_bOpenLastDb == TRUE)
+	{
+		cConfig.Get(PWMKEY_LASTDB, szTemp);
+		if(strlen(szTemp) != 0)
+		{
+			_OpenDatabase(szTemp);
+		}
+	}
+
+	_ParseCommandLine();
+
 	return TRUE;
 }
 
@@ -510,6 +542,38 @@ void CPwSafeDlg::_TranslateMenu(BCMenu *pBCMenu)
 		if(pBCMenu->SetMenuText(nItem, strNew, MF_BYPOSITION) == FALSE) { ASSERT(FALSE); }
 		nItem++;
 	}
+}
+
+void CPwSafeDlg::_ParseCommandLine()
+{
+	CString strOrg = GetCommandLine();
+	CString str = strOrg;
+	long i;
+	long len = str.GetLength();
+
+	str.MakeLower();
+
+	if(len < 12) return;
+
+	i = str.Find(PWM_EXECUTABLE);
+	if(i == -1) return;
+
+	str = strOrg.Right(len - i - strlen(PWM_EXECUTABLE));
+	if(str.Left(1) == "\"") str = str.Right(str.GetLength() - 1);
+	if(str.GetLength() == 0) return;
+	str.TrimLeft(); str.TrimRight();
+	if(str.GetLength() == 0) return;
+	if(str.Left(1) == "\"") str = str.Right(str.GetLength() - 1);
+	if(str.GetLength() == 0) return;
+	str.TrimLeft(); str.TrimRight();
+	if(str.GetLength() == 0) return;
+	if(str.Right(1) == "\"") str = str.Left(str.GetLength() - 1);
+	if(str.GetLength() == 0) return;
+	str.TrimLeft(); str.TrimRight();
+	if(str.GetLength() == 0) return;
+
+	if(m_bOpenLastDb == FALSE)
+		_OpenDatabase((LPCTSTR)str);
 }
 
 void CPwSafeDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -752,7 +816,7 @@ void CPwSafeDlg::ProcessResize()
 void CPwSafeDlg::CleanUp()
 {
 	CPrivateConfig pcfg;
-	char szTemp[128];
+	char szTemp[1024];
 
 	if(m_bTimer == TRUE)
 	{
@@ -781,10 +845,26 @@ void CPwSafeDlg::CleanUp()
 	ultoa(m_dwClipboardSecs, szTemp, 10);
 	pcfg.Set(PWMKEY_CLIPSECS, szTemp);
 
+	GetCurrentDirectory(1024, szTemp);
+	if(strlen(szTemp) != 0)
+	{
+		pcfg.Set(PWMKEY_LASTDIR, szTemp);
+	}
+
 	// Save newline sequence
 	if(m_bWindowsNewLine == TRUE) strcpy(szTemp, "Windows");
 	else strcpy(szTemp, "Unix");
 	pcfg.Set(PWMKEY_NEWLINE, szTemp);
+
+	if(m_bOpenLastDb == TRUE) strcpy(szTemp, "True");
+	else strcpy(szTemp, "False");
+	pcfg.Set(PWMKEY_OPENLASTB, szTemp);
+
+	pcfg.Set(PWMKEY_LASTDB, (LPCTSTR)m_strLastDb);
+
+	if(m_bImgButtons == FALSE) strcpy(szTemp, "False");
+	else strcpy(szTemp, "True");
+	pcfg.Set(PWMKEY_IMGBTNS, szTemp);
 
 	HICON hReleaser; // Load/get all icons and release them safely
 	hReleaser = AfxGetApp()->LoadIcon(MAKEINTRESOURCE(IDI_ICONPIC));
@@ -1340,7 +1420,7 @@ void CPwSafeDlg::OnFileNew()
 	m_bFileOpen = TRUE;
 	m_cList.EnableWindow(TRUE);
 	m_cGroups.EnableWindow(TRUE);
-	m_bModified = FALSE;
+	m_bModified = TRUE;
 
 	EraseCString(&dlg.m_strRealKey);
 
@@ -1356,8 +1436,8 @@ void CPwSafeDlg::OnFileNew()
 		CString str;
 		str.Format("%d group", ix);
 		m_mgr.AddGroup(ix % 20, (LPCTSTR)str);
-	} */
-	/* for(int iy = 0; iy < (512+256+3); iy++)
+	}
+	for(int iy = 0; iy < (512+256+3); iy++)
 	{
 		CString str;
 		str.Format("Sample #%d", iy);
@@ -1368,11 +1448,12 @@ void CPwSafeDlg::OnFileNew()
 	UpdatePasswordList();
 }
 
-void CPwSafeDlg::OnFileOpen() 
+void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 {
 	CString strFile;
 	DWORD dwFlags;
 	CString strFilter;
+	int nRet;
 
 	strFilter = TRL("All files");
 	strFilter += " (*.*)|*.*||";
@@ -1383,9 +1464,12 @@ void CPwSafeDlg::OnFileOpen()
 	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 	CFileDialog dlg(TRUE, "pwd", "*.*", dwFlags, strFilter, this);
 
-	if(dlg.DoModal() == IDOK)
+	if(pszFile == NULL) nRet = dlg.DoModal();
+	else strFile = pszFile;
+
+	if((pszFile != NULL) || (nRet == IDOK))
 	{
-		strFile = dlg.GetPathName();
+		if(pszFile == NULL) strFile = dlg.GetPathName();
 
 		CPasswordDlg dlgPass;
 		dlgPass.m_bLoadMode = TRUE;
@@ -1412,16 +1496,27 @@ void CPwSafeDlg::OnFileOpen()
 			m_cList.EnableWindow(TRUE);
 			m_cGroups.EnableWindow(TRUE);
 
+			m_bLocked = FALSE;
+			m_menu.SetMenuText(ID_FILE_LOCK, TRL("&Lock Workspace"), MF_BYCOMMAND);
+
 			UpdateGroupList();
 			UpdatePasswordList();
+
+			m_strLastDb = strFile;
 		}
 	}
+}
+
+void CPwSafeDlg::OnFileOpen() 
+{
+	_OpenDatabase(NULL);
 }
 
 void CPwSafeDlg::OnFileSave() 
 {
 	if(m_strFile.IsEmpty()) { OnFileSaveAs(); return; }
 
+	m_strLastDb = m_strFile;
 	m_mgr.SaveDatabase((LPCTSTR)m_strFile);
 	m_bModified = FALSE;
 }
@@ -1456,6 +1551,7 @@ void CPwSafeDlg::OnFileSaveAs()
 		{
 			m_strFile = strFile;
 			m_bModified = FALSE;
+			m_strLastDb = strFile;
 		}
 	}
 }
@@ -1500,11 +1596,17 @@ void CPwSafeDlg::OnSafeOptions()
 	else dlg.m_nNewlineSequence = 1;
 
 	dlg.m_uClipboardSeconds = m_dwClipboardSecs - 1;
+	dlg.m_bOpenLastDb = m_bOpenLastDb;
+	dlg.m_bImgButtons = m_bImgButtons;
 
 	if(dlg.DoModal() == IDOK)
 	{
 		m_bWindowsNewLine = (dlg.m_nNewlineSequence == 0) ? TRUE : FALSE;
 		m_dwClipboardSecs = dlg.m_uClipboardSeconds + 1;
+		m_bOpenLastDb = dlg.m_bOpenLastDb;
+		m_bImgButtons = dlg.m_bImgButtons;
+
+		NewGUI_SetImgButtons(m_bImgButtons);
 	}
 }
 
@@ -2307,4 +2409,63 @@ void CPwSafeDlg::OnViewNotes()
 	m_menu.CheckMenuItem(ID_VIEW_NOTES, MF_BYCOMMAND | uState);
 	m_bShowColumn[4] = m_bShowNotes;
 	ProcessResize();
+}
+
+void CPwSafeDlg::OnFileLock() 
+{
+	CString strMenuItem;
+
+	m_menu.GetMenuText(ID_FILE_LOCK, strMenuItem, MF_BYCOMMAND);
+
+	if(strMenuItem == TRL("&Lock Workspace"))
+	{
+		m_nLockedViewParams[0] = m_cGroups.GetTopIndex();
+		m_nLockedViewParams[1] = GetSelectedGroup();
+		ASSERT(m_nLockedViewParams[1] != -1);
+		if(m_nLockedViewParams[1] == -1) m_nLockedViewParams[1] = 0;
+		m_nLockedViewParams[2] = m_cList.GetTopIndex();
+
+		OnFileClose();
+
+		if(m_bFileOpen == TRUE)
+		{
+			MessageBox(TRL("You must save the database before you can lock the workspace!"), TRL("Password Safe"),
+				MB_ICONINFORMATION | MB_OK);
+			return;
+		}
+
+		m_bLocked = TRUE;
+		m_menu.SetMenuText(ID_FILE_LOCK, TRL("&Unlock Workspace"), MF_BYCOMMAND);
+		m_sbStatus.SetText(TRL("Workspace locked"), 255, 0);
+	}
+	else
+	{
+		_OpenDatabase((LPCTSTR)m_strLastDb);
+
+		if(m_bFileOpen == FALSE)
+		{
+			MessageBox(TRL("Workspace cannot be unlocked!"), TRL("Password Safe"), MB_ICONINFORMATION | MB_OK);
+			return;
+		}
+
+		m_bLocked = FALSE;
+		m_menu.SetMenuText(ID_FILE_LOCK, TRL("&Lock Workspace"), MF_BYCOMMAND);
+
+		UpdateGroupList();
+		m_cGroups.SetItemState(m_nLockedViewParams[1],
+			LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
+		UpdatePasswordList();
+
+		m_cGroups.EnsureVisible(m_cGroups.GetItemCount() - 1, FALSE);
+		m_cGroups.EnsureVisible(m_nLockedViewParams[0], FALSE);
+		m_cList.EnsureVisible(m_cList.GetItemCount() - 1, FALSE);
+		m_cList.EnsureVisible(m_nLockedViewParams[2], FALSE);
+
+		m_sbStatus.SetText(TRL("Ready."), 255, 0);
+	}
+}
+
+void CPwSafeDlg::OnUpdateFileLock(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(m_bFileOpen || m_bLocked);
 }

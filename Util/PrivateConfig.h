@@ -37,7 +37,7 @@
 
 #define SI_REGSIZE 1024
 
-#define PCFG_IN
+#define PCFG_IN const
 #define PCFG_OUT
 
 #define OLF_OPEN 0

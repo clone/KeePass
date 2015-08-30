@@ -33,6 +33,8 @@
 #include "ShadeButtonST.h"
 #include "TranslateEx.h"
 
+static BOOL g_bImgButtons = 0;
+
 COLORREF NewGUI_GetBgColor()
 {
 	HDC hDC = NULL;
@@ -56,6 +58,12 @@ COLORREF NewGUI_GetBtnColor()
 	return clr + 10;
 }
 
+void NewGUI_SetImgButtons(BOOL bImageButtons)
+{
+	ASSERT((bImageButtons == TRUE) || (bImageButtons == FALSE));
+	g_bImgButtons = bImageButtons;
+}
+
 void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut)
 {
 	CShadeButtonST *p = (CShadeButtonST *)pButton;
@@ -64,11 +72,12 @@ void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut)
 	p->SetShade(CShadeButtonST::SHS_SOFTBUMP);
 	p->SetColor(CButtonST::BTNST_COLOR_FG_OUT, RGB(0, 0, 0), TRUE);
 	p->SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
+	p->DrawFlatFocus(TRUE);
+
+	if(g_bImgButtons == FALSE) return;
 
 	if((nBitmapIn != -1) && (nBitmapOut != -1))
 		p->SetBitmaps(nBitmapIn, RGB(255, 0, 255), nBitmapOut, RGB(255, 0, 255));
-
-	p->DrawFlatFocus(TRUE);
 }
 
 void NewGUI_TranslateCWnd(CWnd *pWnd)

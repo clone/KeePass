@@ -35,7 +35,7 @@
 
 // General product information
 #define PWM_PRODUCT_NAME "KeePass Password Safe"
-#define PWM_VERSION_STR  "0.81"
+#define PWM_VERSION_STR  "0.82"
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -44,6 +44,8 @@
 
 #define PWM_HOMEPAGE     "http://keepass.sourceforge.net"
 
+// The executable name must be lowercase!
+#define PWM_EXECUTABLE   "keepass.exe"
 #define PWM_README_FILE  "KeePass.html"
 #define PWM_LICENSE_FILE "License.html"
 
@@ -51,6 +53,10 @@
 #define PWMKEY_LANG      "KeeLanguage"
 #define PWMKEY_CLIPSECS  "KeeClipboardSeconds"
 #define PWMKEY_NEWLINE   "KeeNewLine"
+#define PWMKEY_LASTDIR   "KeeLastDir"
+#define PWMKEY_OPENLASTB "KeeAutoOpen"
+#define PWMKEY_LASTDB    "KeeLastDb"
+#define PWMKEY_IMGBTNS   "KeeImgButtons"
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32

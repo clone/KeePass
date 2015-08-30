@@ -47,6 +47,8 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	//{{AFX_DATA_INIT(COptionsDlg)
 	m_nNewlineSequence = -1;
 	m_uClipboardSeconds = 0;
+	m_bOpenLastDb = FALSE;
+	m_bImgButtons = FALSE;
 	//}}AFX_DATA_INIT
 }
 
@@ -58,6 +60,8 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_Radio(pDX, IDC_RADIO_NEWLINE_0, m_nNewlineSequence);
 	DDX_Text(pDX, IDC_EDIT_CLIPBOARDTIME, m_uClipboardSeconds);
+	DDX_Check(pDX, IDC_CHECK_AUTOOPENLASTDB, m_bOpenLastDb);
+	DDX_Check(pDX, IDC_CHECK_IMGBUTTONS, m_bImgButtons);
 	//}}AFX_DATA_MAP
 }
 

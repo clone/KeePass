@@ -52,7 +52,7 @@
 |Enter the master key for the new database.|
     |Geben Sie den Hauptschluessel fuer die neue Datenbank ein.|
 |Select the password disk drive to load the key from:|
-    |Wählen Sie das Laufwerk, in dem sich die Schlüsseldiskette befindet, aus:|
+    |Wählen Sie das Laufwerk der Schlüsseldiskette aus:|
 |Open database - Enter master key|
     |Passwort-Datenbank öffnen - Hauptschlüssel eingeben|
 |Enter master key|             |Hauptschlüssel eingeben|
@@ -152,7 +152,8 @@
 |Change &Master Key For This Database...|      |&Hauptschlüssel für diese Datenbank ändern...|
 |&Print Complete Password List|                |Komplette Passwortliste &drucken|
 |Export Complete Database|     |Komplette Datenbank exportieren|
-|Change &Language...|          |&Sprache ändern...|
+|&Lock Workspace|              |&Arbeitsfläche sperren|
+|&Unlock Workspace|            |&Arbeitsfläche entsperren|
 |&Exit|                        |&Beenden|
 
 |&Options|                     |&Einstellungen|
@@ -177,6 +178,7 @@
 |Mo&ve Entry One Down|         |Eintrag eine Zeile nach unten|
 |Move Entry To &Bottom|        |Eintrag ans Ende|
 
+|Change &Language...|          |&Sprache ändern...|
 |Show &Title Column|           |Spalte '&Titel' anzeigen|
 |Show User&Name Column|        |Spalte 'Benutzer&name' anzeigen|
 |Show &URL Column|             |Spalte '&URL' anzeigen|
@@ -269,3 +271,13 @@
 |sec|                          |sec|
 |Settings|                     |Einstellungen|
 |Here you can configure KeePass.|              |Hier koennen Sie KeePass konfigurieren.|
+|Automatically open last used database on startup|
+    |Beim Start zuletzt benutzte Datenbank öffnen|
+|GUI: Display images on buttons|
+    |GUI: Icons auf Buttons anzeigen|
+|You must save the database before you can lock the workspace!|
+    |Die Datenbank muss gespeichert werden bevor die Arbeitsfläche gesperrt werden kann!|
+|Workspace cannot be unlocked!|
+    |Arbeitsfläche kann nicht entsperrt werden!|
+|Workspace locked|
+    |Arbeitsfläche gesperrt|

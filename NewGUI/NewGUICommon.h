@@ -78,8 +78,6 @@ typedef USHORT COLOR16;
 #endif
 
 #ifndef TRIVERTEX
-#ifndef GRADIENT_RECT
-
 typedef struct _TRIVERTEX
 {
     LONG    x;
@@ -89,7 +87,9 @@ typedef struct _TRIVERTEX
     COLOR16 Blue;
     COLOR16 Alpha;
 }TRIVERTEX,*PTRIVERTEX,*LPTRIVERTEX;
+#endif
 
+#ifndef GRADIENT_RECT
 typedef struct _GRADIENT_TRIANGLE
 {
     ULONG Vertex1;
@@ -102,9 +102,7 @@ typedef struct _GRADIENT_RECT
     ULONG UpperLeft;
     ULONG LowerRight;
 }GRADIENT_RECT,*PGRADIENT_RECT,*LPGRADIENT_RECT;
-
-#endif // GRADIENT_RECT
-#endif // TRIVERTEX
+#endif
 
 #ifndef GRADIENT_FILL_RECT_H
 #define GRADIENT_FILL_RECT_H    0x00000000
@@ -125,6 +123,7 @@ typedef struct _GRADIENT_RECT
 COLORREF NewGUI_GetBgColor();
 COLORREF NewGUI_GetBtnColor();
 
+void NewGUI_SetImgButtons(BOOL bImageButtons);
 void NewGUI_Button(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1);
 
 void NewGUI_TranslateCWnd(CWnd *pWnd);

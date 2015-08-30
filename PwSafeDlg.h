@@ -69,6 +69,7 @@ public:
 	void ProcessResize();
 	void CleanUp();
 	void _DeleteTemporaryFiles();
+	void _ParseCommandLine();
 
 	void UpdateGroupList();
 	void UpdatePasswordList();
@@ -80,11 +81,18 @@ public:
 	CString GetExportFile(int nFormat);
 	void ExportSelectedGroup(int nFormat);
 
+	void _OpenDatabase(const TCHAR *pszFile);
 	void _PrintGroup(int nGroup);
 	void _Find(int nGroupIdX);
 
 	BOOL m_bTimer;
 	int m_nClipboardCountdown;
+	BOOL m_bOpenLastDb;
+	CString m_strLastDb;
+	BOOL m_bImgButtons;
+
+	BOOL m_bLocked;
+	long m_nLockedViewParams[3];
 
 	CPwManager m_mgr;
 
@@ -261,6 +269,8 @@ protected:
 	afx_msg void OnViewUrl();
 	afx_msg void OnViewPassword();
 	afx_msg void OnViewNotes();
+	afx_msg void OnFileLock();
+	afx_msg void OnUpdateFileLock(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

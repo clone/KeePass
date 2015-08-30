@@ -1,5 +1,28 @@
-03/11/19 - 0.81
-- Minor changes in the password manager class
+03/11/22 - 0.82
+- Usability fix: OK and Cancel buttons have been swapped
+- KeePass remembers the directory of the last saved or loaded
+  database
+- A database is loaded automatically if its path is supplied
+  in the command line on startup
+- KeePass can optionally open the last used database (see
+  settings dialog)
+- Usability option: the small icons on the buttons can
+  optionally be disabled
+- Fixed a string visibility bug when using German translation
+  in the 'open database' dialog
+- Workspace can be locked (so you don't have to close and open
+  your database when you quickly want to go away from the
+  computer)
+
+03/11/21 - 0.81
+- Minor changes in the password manager class (added additional
+  checks for function parameters)
+- String visibility bug in the option dialog fixed (the German
+  string was invisible because it exceeded the window rectangle
+  in the dialog)
+- Now not only passwords can be drag-n-dropped to other windows
+  but all fields (thanks to M. Widmann for this
+  suggestion). Just point on the field you want to drag-n-drop.
 
 03/11/17 - 0.8
-- First release on sourceforge.net
+- First release to the public
