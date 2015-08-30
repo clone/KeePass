@@ -24,12 +24,12 @@
 
 class CBase64Codec
 {
-public:
+private:
 	CBase64Codec();
-	~CBase64Codec();
 
-	bool Encode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen) const;
-	bool Decode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen) const;
+public:
+	static bool Encode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen);
+	static bool Decode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen);
 };
 
 #endif // ___BASE64_H___

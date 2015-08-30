@@ -19,7 +19,6 @@
 #define IDD_ADDGROUP_DLG                140
 #define IDD_GETRANDOM_DLG               142
 #define IDB_RANDOM_BMP                  143
-#define IDD_PW_GENERATOR_DLG            144
 #define IDD_FIND_DLG                    145
 #define IDI_SEARCH                      146
 #define IDI_ICONPIC                     147
@@ -71,13 +70,13 @@
 #define IDB_CLIENTICONS_EX              223
 #define IDB_OPTIONICONS_EX              224
 #define IDI_ENTRY_EDIT                  225
-#define IDB_TB_SAVE1                    225
-#define IDB_TB_SAVE_DISABLED            225
-#define IDD_IMPORT_OPTIONS_DLG          226
+#define IDB_TB_SAVE_DISABLED            226
+#define IDD_IMPORT_OPTIONS_DLG          227
 #define IDD_PERMISSION_DLG              229
 #define IDB_HELP_SMALL                  230
 #define IDR_ENTRYHELP_MENU              231
 #define IDB_HELP_SMALL_POPUP            232
+#define IDD_PW_GENERATOR_EX_DLG         233
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -107,10 +106,7 @@
 #define IDC_GENERATE_BTN                1033
 #define IDC_EDIT_PW                     1039
 #define IDC_LIST_OPTIONS                1040
-#define IDC_EDIT_NUMCHARACTERS          1041
 #define IDC_RANDOMPW_BTN                1042
-#define IDC_CHECK_CHARSPEC              1043
-#define IDC_EDIT_ONLYCHARSPEC           1044
 #define IDC_EDIT_FINDTEXT               1045
 #define IDC_CHECK_TITLE                 1046
 #define IDC_CHECK_USERNAME              1047
@@ -180,8 +176,6 @@
 #define IDC_SAVEATTACH_BTN              1129
 #define IDC_REMOVEATTACH_BTN            1130
 #define IDC_CHECK_CLOSEMIN              1131
-#define IDC_CHECK_GETENTROPY            1132
-#define IDC_SPIN_NUMCHARS               1133
 #define IDC_BTN_CREATEASSOC             1134
 #define IDC_BTN_DELETEASSOC             1135
 #define IDC_STATIC_ASSOC                1136
@@ -200,7 +194,8 @@
 #define IDC_STATIC_TB_GRADIENT          1160
 #define IDC_PLUGINS_LIST                1161
 #define IDC_STATIC_HL_GETPLUGINS        1162
-#define IDC_BUTTON_HELP                 1164
+#define IDC_BUTTON_HELP                 1163
+#define IDC_BTN_PROFILE_DELETE          1164
 #define IDC_STATIC_AUTOTYPEHK           1165
 #define IDC_HOTKEY_AUTOTYPE             1166
 #define IDC_RADIO_KEYMETHOD             1167
@@ -239,6 +234,35 @@
 #define IDC_STC_APP                     1214
 #define IDC_ENTRYHELP_BTN               1215
 #define IDC_TANHELP_BTN                 1216
+#define IDC_EDIT_GENCOUNT               1217
+#define IDC_SPIN_GENCOUNT               1218
+#define IDC_RADIO_PATTERN_BASED         1221
+#define IDC_EDIT_PATTERN                1222
+#define IDC_EDIT_LENGTH                 1223
+#define IDC_SPIN_LENGTH                 1224
+#define IDC_RADIO_CHARSET_BASED         1225
+#define IDC_COMBO_PROFILES              1227
+#define IDC_BTN_PROFILE_CREATE          1228
+#define IDC_CHECK_COLLECT_ENTROPY       1230
+#define IDC_CHECK_CS_UPPERCASE          1231
+#define IDC_CHECK_CS_LOWERCASE          1232
+#define IDC_CHECK_CS_NUMERIC            1233
+#define IDC_CHECK_CS_MINUS              1234
+#define IDC_CHECK_CS_SPACE              1235
+#define IDC_CHECK_CS_SPECIAL            1236
+#define IDC_CHECK_CS_BRACKETS           1237
+#define IDC_CHECK_CS_HIGHANSI           1238
+#define IDC_CHECK_CS_UNDERLINE          1240
+#define IDC_CHECK_NOREPEAT              1241
+#define IDC_CHECK_NOCONFUSING           1242
+#define IDC_COMBO_CUSTOMCHARSET         1243
+#define IDC_BTN_HELP                    1246
+#define IDC_STATIC_CUSTOMCHARSET        1247
+#define IDC_STATIC_PWLENGTH             1249
+#define IDC_BUTTON1                     1250
+#define IDC_BTN_BROWSE_KEYFILE          1251
+#define IDC_EDIT1                       1252
+#define IDC_EDIT_CUSTOMCHARSET          1253
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -436,13 +460,13 @@
 #define ID_POPUP_OPENHELPFILE           33004
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        233
+#define _APS_NEXT_RESOURCE_VALUE        234
 #define _APS_NEXT_COMMAND_VALUE         33005
-#define _APS_NEXT_CONTROL_VALUE         1217
+#define _APS_NEXT_CONTROL_VALUE         1254
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

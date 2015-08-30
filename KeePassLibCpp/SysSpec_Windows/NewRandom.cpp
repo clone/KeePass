@@ -34,30 +34,20 @@ static unsigned long g_xorZ = 0;
 CNewRandom::CNewRandom()
 {
 	ASSERT(m_vPseudoRandom.size() == 0);
-	Reset();
+
+	m_dwCounter = 0;
 }
 
 CNewRandom::~CNewRandom()
 {
-	Reset();
-}
-
-void CNewRandom::Reset()
-{
-	if(m_vPseudoRandom.size() > 0)
-	{
-		mem_erase(&m_vPseudoRandom[0], m_vPseudoRandom.size());
-		m_vPseudoRandom.clear();
-	}
-
-	m_dwCounter = 0;
+	m_vPseudoRandom.clear();
+	
+	this->ClearUserEntropyPool();
 }
 
 void CNewRandom::Initialize()
 {
 	g_dwNewRandomInstanceCounter++;
-
-	Reset();
 
 	DWORD dw;
 	dw = GetTickCount();
@@ -176,6 +166,19 @@ void CNewRandom::AddRandomObject(__in_bcount(uSize) const void *pObj, size_t uSi
 	}
 }
 
+void CNewRandom::AddToUserEntropyPool(const BYTE *pData, DWORD dwSize)
+{
+	ASSERT(pData != NULL); if(pData == NULL) return;
+
+	for(DWORD i = 0; i < dwSize; ++i)
+		m_vUserRandom.push_back(pData[i]);
+}
+
+void CNewRandom::ClearUserEntropyPool()
+{
+	m_vUserRandom.clear();
+}
+
 void CNewRandom::GetRandomBuffer(__out_bcount(dwSize) BYTE *pBuf, DWORD dwSize)
 {
 	sha256_ctx hashctx;
@@ -184,15 +187,19 @@ void CNewRandom::GetRandomBuffer(__out_bcount(dwSize) BYTE *pBuf, DWORD dwSize)
 
 	ASSERT(pBuf != NULL); if(pBuf == NULL) return;
 
+	if(m_vPseudoRandom.size() == 0) this->Initialize();
+
 	while(dwSize != 0)
 	{
 		m_dwCounter++;
 		sha256_begin(&hashctx);
 
 		if(m_vPseudoRandom.size() > 0)
-			sha256_hash(&m_vPseudoRandom[0],
-				static_cast<unsigned long>(m_vPseudoRandom.size()), &hashctx);
+			sha256_hash(&m_vPseudoRandom[0], m_vPseudoRandom.size(), &hashctx);
 		else { ASSERT(FALSE); }
+
+		if(m_vUserRandom.size() > 0)
+			sha256_hash(&m_vUserRandom[0], m_vUserRandom.size(), &hashctx);
 
 		sha256_hash((BYTE *)&m_dwCounter, 4, &hashctx);
 		sha256_end(aTemp, &hashctx);
@@ -241,7 +248,6 @@ unsigned long randXorShift()
 
 CPP_FN_SHARE void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource)
 {
-	SYSTEMTIME st;
 	BYTE *p = pUUID16;
 	DWORD *pdw1 = (DWORD *)pUUID16, *pdw2 = (DWORD *)&pUUID16[4],
 		*pdw3 = (DWORD *)&pUUID16[8], *pdw4 = (DWORD *)&pUUID16[12];
@@ -252,13 +258,14 @@ CPP_FN_SHARE void randCreateUUID(BYTE *pUUID16, CNewRandom *pRandomSource)
 	ASSERT((sizeof(DWORD) == 4) && (sizeof(USHORT) == 2) && (pUUID16 != NULL));
 	if(pUUID16 == NULL) return;
 
+	SYSTEMTIME st;
 	ZeroMemory(&st, sizeof(SYSTEMTIME));
 	GetSystemTime(&st);
 
 	_PackTimeToStruct(p, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
 	p += 5; // +5 => 5 bytes filled
 	*p = (BYTE)((st.wMilliseconds >> 2) & 0xFF); // Store milliseconds
-	p++; // +1 => 6 bytes filled
+	++p; // +1 => 6 bytes filled
 
 	// Use the xorshift random number generator as pseudo-counter
 	DWORD dwPseudoCounter = randXorShift();

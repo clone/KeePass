@@ -124,17 +124,7 @@ C_FN_SHARE BOOL LoadHexKey32(FILE *fp, BYTE *pBuf)
 		ch1 = buf[i * 2];
 		ch2 = buf[i * 2 + 1];
 
-		if((ch1 >= '0') && (ch1 <= '9')) bt = (BYTE)(ch1 - '0');
-		else if((ch1 >= 'a') && (ch1 <= 'f')) bt = (BYTE)(ch1 - 'a' + 10);
-		else if((ch1 >= 'A') && (ch1 <= 'F')) bt = (BYTE)(ch1 - 'A' + 10);
-		else return FALSE;
-
-		bt <<= 4;
-
-		if((ch2 >= '0') && (ch2 <= '9')) bt |= (BYTE)(ch2 - '0');
-		else if((ch2 >= 'a') && (ch2 <= 'f')) bt |= (BYTE)(ch2 - 'a' + 10);
-		else if((ch2 >= 'A') && (ch2 <= 'F')) bt |= (BYTE)(ch2 - 'A' + 10);
-		else return FALSE;
+		if(ConvertStrToHexEx(ch1, ch2, bt) == FALSE) return FALSE;
 
 		pBuf[i] = bt;
 	}
@@ -145,7 +135,7 @@ C_FN_SHARE BOOL LoadHexKey32(FILE *fp, BYTE *pBuf)
 
 C_FN_SHARE BOOL SaveHexKey32(FILE *fp, BYTE *pBuf)
 {
-	char buf[65], ch1, ch2, chq;
+	char buf[65], ch1, ch2;
 	int i;
 	BYTE bt;
 
@@ -158,13 +148,7 @@ C_FN_SHARE BOOL SaveHexKey32(FILE *fp, BYTE *pBuf)
 	{
 		bt = pBuf[i];
 
-		chq = (char)(bt >> 4);
-		if(chq < 10) ch1 = (char)(chq + '0');
-		else ch1 = (char)(chq - 10 + 'a');
-
-		chq = (char)(bt & 0x0F);
-		if(chq < 10) ch2 = (char)(chq + '0');
-		else ch2 = (char)(chq - 10 + 'a');
+		ConvertHexToStrEx(bt, ch1, ch2);
 
 		buf[i * 2] = ch1;
 		buf[i * 2 + 1] = ch2;
@@ -174,6 +158,34 @@ C_FN_SHARE BOOL SaveHexKey32(FILE *fp, BYTE *pBuf)
 
 	mem_erase((BYTE *)buf, 64);
 	return TRUE;
+}
+
+BOOL ConvertStrToHexEx(char ch1, char ch2, BYTE& bt)
+{
+	if((ch1 >= '0') && (ch1 <= '9')) bt = (BYTE)(ch1 - '0');
+	else if((ch1 >= 'a') && (ch1 <= 'f')) bt = (BYTE)(ch1 - 'a' + 10);
+	else if((ch1 >= 'A') && (ch1 <= 'F')) bt = (BYTE)(ch1 - 'A' + 10);
+	else return FALSE;
+
+	bt <<= 4;
+
+	if((ch2 >= '0') && (ch2 <= '9')) bt |= (BYTE)(ch2 - '0');
+	else if((ch2 >= 'a') && (ch2 <= 'f')) bt |= (BYTE)(ch2 - 'a' + 10);
+	else if((ch2 >= 'A') && (ch2 <= 'F')) bt |= (BYTE)(ch2 - 'A' + 10);
+	else return FALSE;
+
+	return TRUE;
+}
+
+void ConvertHexToStrEx(BYTE bt, char& ch1, char& ch2)
+{
+	char chq = (char)(bt >> 4);
+	if(chq < 10) ch1 = (char)(chq + '0');
+	else ch1 = (char)(chq - 10 + 'a');
+
+	chq = (char)(bt & 0x0F);
+	if(chq < 10) ch2 = (char)(chq + '0');
+	else ch2 = (char)(chq - 10 + 'a');
 }
 
 CPP_FN_SHARE CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags)

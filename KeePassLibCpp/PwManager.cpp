@@ -50,13 +50,12 @@ CPwManager::CPwManager()
 	_AllocGroups(PWM_NUM_INITIAL_GROUPS);
 	_AllocEntries(PWM_NUM_INITIAL_ENTRIES);
 
-	m_random.Initialize();
 	m_random.GetRandomBuffer(m_pSessionKey, PWM_SESSION_KEY_SIZE);
 }
 
 CPwManager::~CPwManager()
 {
-	CleanUp();
+	this->CleanUp();
 }
 
 void CPwManager::InitPrimaryInstance()
@@ -73,19 +72,17 @@ void CPwManager::InitPrimaryInstance()
 
 void CPwManager::CleanUp()
 {
-	if(m_pEntries != NULL) _DeleteEntryList(TRUE);
+	_DeleteEntryList(TRUE);
 	m_dwNumEntries = 0;
 	m_dwMaxEntries = 0;
 
-	if(m_pGroups != NULL) _DeleteGroupList(TRUE);
+	_DeleteGroupList(TRUE);
 	m_dwNumGroups = 0;
 	m_dwMaxGroups = 0;
 
 	m_pLastEditedEntry = NULL;
 
 	mem_erase(m_pMasterKey, 32);
-
-	m_random.Reset();
 }
 
 int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const TCHAR *pszSecondKey, const CNewRandomInterface *pARI, BOOL bOverwrite)
@@ -129,7 +126,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 
 		ASSERT(paKey2 != NULL); if(paKey2 == NULL) return PWE_NO_MEM;
 
-		uKeyLen2 = strlen(paKey2);
+		uKeyLen2 = szlen(paKey2);
 		ASSERT(uKeyLen2 != 0);
 	}
 
@@ -904,6 +901,8 @@ void CPwManager::NewDatabase()
 {
 	_DeleteEntryList(TRUE); // Delete really everything, the strings too
 	_DeleteGroupList(TRUE);
+
+	m_pLastEditedEntry = NULL;
 
 	_AllocGroups(PWM_NUM_INITIAL_GROUPS); // Allocate some space for the new items
 	_AllocEntries(PWM_NUM_INITIAL_ENTRIES);

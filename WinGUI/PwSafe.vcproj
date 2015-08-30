@@ -162,7 +162,7 @@
 				ProgramDataBaseFileName="$(IntDir)\"
 				WarningLevel="4"
 				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="false"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -367,7 +367,7 @@
 				ProgramDataBaseFileName="$(IntDir)\"
 				WarningLevel="4"
 				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="false"
+				Detect64BitPortabilityProblems="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -569,7 +569,7 @@
 				ProgramDataBaseFileName="$(IntDir)\"
 				WarningLevel="4"
 				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="false"
+				Detect64BitPortabilityProblems="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -765,7 +765,7 @@
 				ProgramDataBaseFileName="$(IntDir)\"
 				WarningLevel="4"
 				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="false"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -1783,72 +1783,8 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="PwGeneratorDlg.cpp"
+				RelativePath=".\PwGeneratorExDlg.cpp"
 				>
-				<FileConfiguration
-					Name="Debug Unicode|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug Unicode|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Unicode|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Unicode|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="PwSafe.cpp"
@@ -2264,7 +2200,7 @@
 				>
 			</File>
 			<File
-				RelativePath="PwGeneratorDlg.h"
+				RelativePath=".\PwGeneratorExDlg.h"
 				>
 			</File>
 			<File
@@ -4425,6 +4361,42 @@
 				</File>
 				<File
 					RelativePath="..\KeePassLibCpp\Util\TranslateEx.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="PasswordGenerator"
+				>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\CharSetBasedGenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\CharSetBasedGenerator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\PasswordGenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\PasswordGenerator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\PatternBasedGenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\PatternBasedGenerator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\PwCharSet.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\PwCharSet.h"
 					>
 				</File>
 			</Filter>

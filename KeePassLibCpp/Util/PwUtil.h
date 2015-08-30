@@ -28,6 +28,9 @@ C_FN_SHARE DWORD EstimatePasswordBits(LPCTSTR pszPassword);
 C_FN_SHARE BOOL LoadHexKey32(FILE *fp, BYTE *pBuf);
 C_FN_SHARE BOOL SaveHexKey32(FILE *fp, BYTE *pBuf);
 
+BOOL ConvertStrToHexEx(char ch1, char ch2, BYTE& bt);
+void ConvertHexToStrEx(BYTE bt, char& ch1, char& ch2);
+
 CPP_FN_SHARE CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags);
 
 #endif // ___PW_UTIL_H___

@@ -31,6 +31,7 @@
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
 
 static unsigned char g_shaLastString[32];
+// static LPCTSTR g_lpChildWindowText = NULL;
 
 #ifndef _WIN32_WCE
 
@@ -73,10 +74,20 @@ C_FN_SHARE void CopyStringToClipboard(const TCHAR *lptString)
 	VERIFY(SetClipboardData(CF_TTEXTEX, globalHandle)); // Set clipboard data to our global memory block
 	VERIFY(CloseClipboard()); // Close clipboard, and done
 
+	RegisterOwnClipboardData((unsigned char *)lptString, uDataSize - sizeof(TCHAR));
+}
+
+void RegisterOwnClipboardData(unsigned char* pData, unsigned long dwDataSize)
+{
+	ASSERT(pData != NULL); if(pData == NULL) return;
+
 	sha256_ctx shactx;
+
 	sha256_begin(&shactx);
-	sha256_hash((unsigned char *)lptString, (unsigned long)(uDataSize -
-		sizeof(TCHAR)), &shactx);
+
+	if(dwDataSize > 0)
+		sha256_hash(pData, dwDataSize, &shactx);
+
 	sha256_end(g_shaLastString, &shactx);
 }
 
@@ -141,23 +152,22 @@ C_FN_SHARE BOOL MakeClipboardDelayRender(HWND hOwner, HWND *phNextCB)
 
 C_FN_SHARE void CopyDelayRenderedClipboardData(const TCHAR *lptString)
 {
-    HGLOBAL hglb;
-    LPTSTR lptstr;
-
 	ASSERT(lptString != NULL); if(lptString == NULL) return;
 
 	const size_t cch = _tcslen(lptString);
-	hglb = GlobalAlloc(GMEM_MOVEABLE, (cch + 1) * sizeof(TCHAR));
+	HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, (cch + 1) * sizeof(TCHAR));
     ASSERT(hglb != NULL); if(hglb == NULL) return;
 
     // Copy the text from pboxLocalClip
-	lptstr = (LPTSTR)GlobalLock(hglb);
+	LPTSTR lptstr = (LPTSTR)GlobalLock(hglb);
 	if(cch > 1) memcpy(lptstr, lptString, cch * sizeof(TCHAR));
     lptstr[cch] = (TCHAR)0;
     GlobalUnlock(hglb);
 
     // Put the delayed clipboard data in the clipboard.
     SetClipboardData(CF_TTEXTEX, hglb);
+
+	RegisterOwnClipboardData((unsigned char *)lptString, cch * sizeof(TCHAR));
 };
 #endif
 
@@ -257,12 +267,12 @@ C_FN_SHARE BOOL GetRegKeyEx(HKEY hkeyBase, LPCTSTR lpSubKey, LPTSTR lpRetData)
 
 	if(lRetVal == ERROR_SUCCESS)
 	{
-		LONG lDataSize = MAX_PATH;
-		TCHAR tszData[MAX_PATH];
+		LONG lDataSize = MAX_PATH * 4;
+		TCHAR tszData[MAX_PATH * 4];
 
 		lRetVal = RegQueryValue(hkey, NULL, tszData, &lDataSize);
 		_tcscpy(lpRetData, tszData);
-		RegCloseKey(hkey); hkey = (HKEY)NULL;
+		RegCloseKey(hkey); hkey = NULL;
 	}
 
 	return (lRetVal == ERROR_SUCCESS) ? TRUE : FALSE;
@@ -272,10 +282,10 @@ C_FN_SHARE BOOL GetRegKeyEx(HKEY hkeyBase, LPCTSTR lpSubKey, LPTSTR lpRetData)
 
 C_FN_SHARE BOOL OpenUrlInNewBrowser(LPCTSTR lpURL)
 {
-	TCHAR tszKey[MAX_PATH << 1];
-	UINT uResult = 0;
-
 	ASSERT(lpURL != NULL); if(lpURL == NULL) return FALSE;
+
+	TCHAR tszKey[MAX_PATH * 4];
+	UINT uResult = 0;
 
 	_tcscpy_s(tszKey, _countof(tszKey), _T("http\\shell\\open\\command"));
 
@@ -289,10 +299,12 @@ C_FN_SHARE BOOL OpenUrlInNewBrowser(LPCTSTR lpURL)
 		}
 		else *pos = _T('\0'); // Remove the parameter
 
-		if(pos == NULL) _tcscat_s(tszKey, _countof(tszKey), _T(" "));
-		_tcscat_s(tszKey, _countof(tszKey), lpURL);
+		std::basic_string<TCHAR> strExec = tszKey;
 
-		uResult = TWinExec(tszKey, KPSW_SHOWDEFAULT);
+		if(pos == NULL) strExec += _T(" ");
+		strExec += lpURL;
+
+		uResult = TWinExec(strExec.c_str(), KPSW_SHOWDEFAULT);
 	}
 
 	return (uResult > 31) ? TRUE : FALSE;
@@ -552,3 +564,45 @@ C_FN_SHARE BOOL WU_IsWin9xSystem()
 
 	return (osvi.dwMajorVersion <= 4) ? TRUE : FALSE;
 }
+
+/*
+// Warning: this function is NOT multithreading-safe!
+BOOL ContainsChildWindow(HWND hWndContainer, LPCTSTR lpChildWindowText)
+{
+	ASSERT(lpChildWindowText != NULL);
+	if(lpChildWindowText == NULL) return FALSE;
+	ASSERT(lpChildWindowText[0] != 0);
+	if(lpChildWindowText[0] == 0) return FALSE;
+
+	g_lpChildWindowText = lpChildWindowText;
+
+	BOOL bWindowFound = FALSE;
+	EnumChildWindows(hWndContainer, CcwEnumChildProc, (LPARAM)&bWindowFound);
+	return bWindowFound;
+}
+
+BOOL CALLBACK CcwEnumChildProc(HWND hWnd, LPARAM lParam)
+{
+	// int nLength = GetWindowTextLength(hWnd);
+	// if(nLength <= 0) return TRUE; // Continue enumeration
+
+	int nLength = _tcslen(g_lpChildWindowText);
+
+	int nAllocated = nLength + 4;
+	LPTSTR lpText = new TCHAR[nAllocated];
+	memset(lpText, 0, nAllocated * sizeof(TCHAR));
+
+	GetWindowText(hWnd, lpText, nAllocated - 2);
+
+	if(_tcsstr(lpText, g_lpChildWindowText) != NULL)
+	{
+		*((BOOL *)lParam) = TRUE;
+
+		SAFE_DELETE_ARRAY(lpText);
+		return FALSE; // Stop enumeration
+	}
+
+	SAFE_DELETE_ARRAY(lpText);
+	return TRUE; // Continue enumeration
+}
+*/

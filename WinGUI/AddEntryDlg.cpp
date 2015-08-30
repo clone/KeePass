@@ -23,13 +23,14 @@
 #include "AddEntryDlg.h"
 
 #include "IconPickerDlg.h"
-#include "PwGeneratorDlg.h"
+#include "PwGeneratorExDlg.h"
 #include "../KeePassLibCpp/Util/MemUtil.h"
 #include "../KeePassLibCpp/Util/StrUtil.h"
 #include "Util/WinUtil.h"
 #include "NewGUI/NewGUICommon.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "../KeePassLibCpp/Util/Base64.h"
+#include "../KeePassLibCpp/PasswordGenerator/PasswordGenerator.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -63,7 +64,6 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 	m_strNotes = _T("");
 	m_lpPassword = m_lpRepeatPw = NULL;
 	m_dwDefaultExpire = 0;
-	m_bAutoPwGen = TRUE;
 }
 
 void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
@@ -261,9 +261,16 @@ BOOL CAddEntryDlg::OnInitDialog()
 		}
 	}
 
-	// Configure banner control
-	NewGUI_ConfigSideBanner(&m_banner, this);
-	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_ENTRY_EDIT), KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
+	RECT rectWindow, rectWork; // Save space by removing the banner, if needed
+	this->GetWindowRect(&rectWindow);
+	BOOL bSpi = SystemParametersInfo(SPI_GETWORKAREA, 0, &rectWork, 0);
+	if(((rectWindow.bottom - rectWindow.top) <= (rectWork.bottom -
+		rectWork.top)) || (bSpi == FALSE))
+	{
+		// Configure banner control
+		NewGUI_ConfigSideBanner(&m_banner, this);
+		m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_ENTRY_EDIT), KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
+	}
 
 	if(m_bEditMode == FALSE)
 	{
@@ -321,8 +328,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 #endif
 
 	m_tipSecClear.Create(this, 0x40);
-	m_tipSecClear.AddTool(&m_pEditPw, CPwSafeDlg::_GetSecureEditTipText(_T("Enter password:")));
-	m_tipSecClear.AddTool(&m_pRepeatPw, CPwSafeDlg::_GetSecureEditTipText(_T("Enter password:")));
+	m_tipSecClear.AddTool(&m_pEditPw, CPwSafeDlg::_GetSecureEditTipText(_T("Enter Password:")));
+	m_tipSecClear.AddTool(&m_pRepeatPw, CPwSafeDlg::_GetSecureEditTipText(_T("Enter Password:")));
 	m_tipSecClear.SetMaxTipWidth(630);
 	m_tipSecClear.Activate(m_pEditPw.IsSecureModeEnabled());
 
@@ -333,36 +340,42 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	if(m_bEditMode == FALSE) // Generate a pseudo-random password
 	{
-		if(m_bAutoPwGen == TRUE)
+		/* CNewRandom *pRand = new CNewRandom();
+		DWORD dwSize = 32;
+		BYTE pbRandom[16], pbString[32];
+
+		pRand->GetRandomBuffer(pbRandom, 16);
+		VERIFY(CBase64Codec::Encode(pbRandom, 16, pbString, &dwSize));
+		SAFE_DELETE(pRand);
+		pbString[strlen((char *)pbString) - 3] = 0;
+
+		TCHAR *pbStringT = _UTF8ToString((UTF8_BYTE *)(pbString + 1));
+		m_pEditPw.SetPassword(pbStringT);
+		m_pRepeatPw.SetPassword(pbStringT);
+
+		mem_erase((BYTE *)pbStringT, _tcslen(pbStringT) * sizeof(TCHAR));
+		SAFE_DELETE_ARRAY(pbStringT);
+
+		mem_erase(pbRandom, 16); mem_erase(pbString, 32); */
+
+		m_pEditPw.SetPassword(_T(""));
+		m_pRepeatPw.SetPassword(_T(""));
+
+		std::vector<TCHAR> strPassword;
+		if(PwgGenerateEx(strPassword, &CPwSafeDlg::m_pgsAutoProfile,
+			NULL) == PWGE_SUCCESS)
 		{
-			CNewRandom *pRand = new CNewRandom();
-			CBase64Codec base64;
-			DWORD dwSize = 32;
-			BYTE pbRandom[16], pbString[32];
-
-			ASSERT(pRand != NULL);
-
-			pRand->Initialize(); // Get system entropy
-			pRand->GetRandomBuffer(pbRandom, 16);
-			VERIFY(base64.Encode(pbRandom, 16, pbString, &dwSize));
-			SAFE_DELETE(pRand);
-			pbString[strlen((char *)pbString) - 3] = 0;
-
-			TCHAR *pbStringT = _UTF8ToString((UTF8_BYTE *)(pbString + 1));
-			m_pEditPw.SetPassword(pbStringT);
-			m_pRepeatPw.SetPassword(pbStringT);
-
-			mem_erase((BYTE *)pbStringT, _tcslen(pbStringT) * sizeof(TCHAR));
-			SAFE_DELETE_ARRAY(pbStringT);
-
-			mem_erase(pbRandom, 16); mem_erase(pbString, 32);
-			UpdateData(FALSE);
+			if(strPassword.size() > 0)
+			{
+				m_pEditPw.SetPassword(&strPassword[0]);
+				m_pRepeatPw.SetPassword(&strPassword[0]);
+			}
 		}
-		else
-		{
-			m_pEditPw.SetPassword(_T(""));
-			m_pRepeatPw.SetPassword(_T(""));
-		}
+		else { ASSERT(FALSE); }
+
+		EraseTCharVector(strPassword);
+
+		UpdateData(FALSE);
 	}
 
 	UpdateControlsStatus();
@@ -559,24 +572,25 @@ void CAddEntryDlg::OnPickIconBtn()
 
 void CAddEntryDlg::OnRandomPwBtn() 
 {
-	CPwGeneratorDlg dlg;
+	CPwGeneratorExDlg dlg;
 
 	UpdateData(TRUE);
 
-	dlg.m_bCanAccept = TRUE;
-	dlg.m_bHidePw = m_bStars;
+	dlg.InitEx(1, m_bStars);
 
 	if(dlg.DoModal() == IDOK)
 	{
-		m_pEditPw.SetPassword((LPCTSTR)dlg.m_lpPassword);
-		m_pRepeatPw.SetPassword((LPCTSTR)dlg.m_lpPassword);
-		CSecureEditEx::DeletePassword(dlg.m_lpPassword); dlg.m_lpPassword = NULL;
+		LPTSTR lpPassword = dlg.GetGeneratedPassword();
+		m_pEditPw.SetPassword(lpPassword);
+		m_pRepeatPw.SetPassword(lpPassword);
+		CSecureEditEx::DeletePassword(lpPassword); lpPassword = NULL;
 
 		UpdateData(FALSE);
 
 		LPTSTR lp = m_pEditPw.GetPassword();
-		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lp);
-		m_pEditPw.DeletePassword(lp); lp = NULL;
+		NewGUI_ShowQualityMeter(&m_cPassQuality,
+			GetDlgItem(IDC_STATIC_PASSBITS), lp);
+		CSecureEditEx::DeletePassword(lp); lp = NULL;
 	}
 }
 

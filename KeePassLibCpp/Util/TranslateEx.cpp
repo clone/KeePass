@@ -209,6 +209,7 @@ C_FN_SHARE void _SortTrlTable()
 C_FN_SHARE LPCTSTR _TRL(LPCTSTR pszDefString)
 {
 	if(m_dwNumTrlStrings == 0) return pszDefString;
+
 	ASSERT(pszDefString != NULL); if(pszDefString == NULL) return _T("");
 
 	// Fast binary search on the sorted list of translation strings:

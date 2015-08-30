@@ -5,12 +5,12 @@
 #define MyAppName "KeePass"
 #define MyAppFullName "KeePass Password Safe"
 #define MyAppPublisher "Dominik Reichl"
-#define MyAppURL "http://keepass.sourceforge.net/"
+#define MyAppURL "http://keepass.info/"
 #define MyAppExeName "KeePass.exe"
 #define MyAppUrlName "KeePass.url"
 
-#define KeeVersionStr "1.07"
-#define KeeVersionWin "1.0.7.1"
+#define KeeVersionStr "1.08"
+#define KeeVersionWin "1.0.8.1"
 
 #define KeeDevPeriod "2003-2007"
 
@@ -57,6 +57,7 @@ Name: portuguese; MessagesFile: compiler:Languages\Portuguese.isl
 Name: russian; MessagesFile: compiler:Languages\Russian.isl
 Name: slovak; MessagesFile: compiler:Languages\Slovak.isl
 Name: slovenian; MessagesFile: compiler:Languages\Slovenian.isl
+Name: spanish; MessagesFile: compiler:Languages\Spanish.isl
 
 [Tasks]
 Name: desktopicon; Description: {cm:CreateDesktopIcon}; GroupDescription: {cm:AdditionalIcons}; Flags: unchecked
@@ -80,7 +81,7 @@ Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filen
 
 [Run]
 Filename: {app}\{#MyAppExeName}; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent unchecked
-Filename: http://keepass.sourceforge.net/plugins.php; Flags: postinstall shellexec nowait; Tasks: ; Description: Visit Plugins Website (Browser Integration, ...)
+Filename: http://keepass.info/plugins.html; Flags: postinstall skipifsilent shellexec nowait; Tasks: ; Description: Visit Plugins Website (Browser Integration, ...)
 
 ; Unregister .KDB association
 [Registry]

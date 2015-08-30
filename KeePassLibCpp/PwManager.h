@@ -32,11 +32,11 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.07")
+#define PWM_VERSION_STR  _T("1.08")
 #else
-#define PWM_VERSION_STR  _T("1.07 Unicode")
+#define PWM_VERSION_STR  _T("1.08 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01000701
+#define PWM_VERSION_DW   0x01000801
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
@@ -47,6 +47,7 @@
 #define PWM_URL_TRL      _T("http://keepass.info/translations.html")
 #define PWM_URL_PLUGINS  _T("http://keepass.info/plugins.html")
 #define PWM_URL_VERSION  _T("http://keepass.info/update/version1.txt")
+#define PWM_URL_DONATE   _T("http://keepass.info/donate.html")
 
 #define PWM_EXENAME       _T("KeePass")
 
@@ -60,6 +61,7 @@
 #define PWM_HELP_PLUGINS  _T("help/v1/plugins.html")
 #define PWM_HELP_KEYS     _T("help/base/keys.html")
 #define PWM_HELP_TANS     _T("help/base/tans.html")
+#define PWM_HELP_PWGEN    _T("help/base/pwgenerator.html")
 
 #define PWMKEY_LANG       _T("KeeLanguage")
 #define PWMKEY_CLIPSECS   _T("KeeClipboardSeconds")
@@ -110,9 +112,9 @@
 #define PWMKEY_SHOWUUID         _T("KeeShowUUID")
 #define PWMKEY_SHOWTOOLBAR      _T("KeeShowToolBar")
 #define PWMKEY_COLAUTOSIZE      _T("KeeColAutoSize")
-#define PWMKEY_PWGEN_OPTIONS    _T("KeePwGenOptions")
-#define PWMKEY_PWGEN_CHARS      _T("KeePwGenChars")
-#define PWMKEY_PWGEN_NUMCHARS   _T("KeePwGenNumChars")
+// #define PWMKEY_PWGEN_OPTIONS    _T("KeePwGenOptions")
+// #define PWMKEY_PWGEN_CHARS      _T("KeePwGenChars")
+// #define PWMKEY_PWGEN_NUMCHARS   _T("KeePwGenNumChars")
 #define PWMKEY_DISABLEUNSAFE    _T("KeeDisableUnsafe")
 #define PWMKEY_REMEMBERLAST     _T("KeeRememberLast")
 #define PWMKEY_HEADERORDER      _T("KeeHeaderItemOrder")
@@ -146,6 +148,11 @@
 #define PWMKEY_LOCKONWINLOCK    _T("KeeLockOnWinLock")
 #define PWMKEY_ENABLEREMOTECTRL _T("KeeEnableRemoteCtrl")
 #define PWMKEY_DEFAULTATSEQ     _T("KeeDefaultAutoTypeSequence")
+#define PWMKEY_USELOCALTIMEFMT  _T("KeeUseLocalTimeFormat")
+
+#define PWMKEY_GENPROFILE       _T("KeeGenProfile")
+#define PWMKEY_GENPROFILEAUTO   _T("KeeGenProfileAuto")
+#define PWMKEY_GENPROFILELAST   _T("KeeGenProfileLastName")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -169,6 +176,11 @@
 #define PWM_SESSION_KEY_SIZE     12
 
 #define PWM_STD_KEYENCROUNDS     6000
+
+#define PWM_STD_ICON_GROUP       48
+#define PWM_STD_ICON_GROUP_OPEN  49
+#define PWM_STD_ICON_GROUP_EMAIL 50
+#define PWM_STD_ICON_GROUP_PKG 25
 
 // Field flags (for example in Find function)
 #define PWMF_TITLE              1
@@ -369,7 +381,6 @@ public:
 	virtual ~CPwManager();
 
 	void InitPrimaryInstance();
-	void CleanUp(); // Delete everything and release all allocated memory
 
 	// Set the master key for the database.
 	int SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const TCHAR *pszSecondKey, const CNewRandomInterface *pARI, BOOL bOverwrite);
@@ -486,6 +497,8 @@ protected:
 	virtual BOOL ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, const BYTE *pData, PW_ENTRY *pEntry);
 
 private:
+	void CleanUp(); // Delete everything and release all allocated memory
+
 	void _AllocEntries(DWORD uEntries);
 	void _DeleteEntryList(BOOL bFreeStrings);
 	void _AllocGroups(DWORD uGroups);

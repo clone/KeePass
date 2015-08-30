@@ -53,6 +53,8 @@ public:
 	static TCHAR GetPasswordCharacter();
 	static LPCTSTR GetPasswordFont();
 
+	static BOOL ProcessControlCommands();
+
 	CMutex *m_pAppMutex;
 
 	//{{AFX_VIRTUAL(CPwSafeApp)

@@ -39,6 +39,22 @@ CPP_FN_SHARE void EraseCString(CString *pString)
 	pString->ReleaseBuffer();
 }
 
+void EraseWCharVector(std::vector<WCHAR>& vBuffer)
+{
+	for(DWORD i = 0; i < vBuffer.size(); ++i)
+		vBuffer[i] = 0;
+
+	vBuffer.clear();
+}
+
+void EraseTCharVector(std::vector<TCHAR>& vBuffer)
+{
+	for(DWORD i = 0; i < vBuffer.size(); ++i)
+		vBuffer[i] = 0;
+
+	vBuffer.clear();
+}
+
 CPP_FN_SHARE void FixURL(CString *pstrURL)
 {
 	CString strTemp;
@@ -84,10 +100,54 @@ CPP_FN_SHARE void FixURL(CString *pstrURL)
 
 CPP_FN_SHARE void _PwTimeToString(PW_TIME t, CString *pstrDest)
 {
-	ASSERT(pstrDest != NULL);
-	pstrDest->Empty();
-	pstrDest->Format(_T("%04u-%02u-%02u %02u:%02u:%02u"), t.shYear, t.btMonth,
-		t.btDay, t.btHour, t.btMinute, t.btSecond);
+	CString strFormatted;
+	_PwTimeToStringEx(t, strFormatted, FALSE);
+	*pstrDest = strFormatted;
+}
+
+void _PwTimeToStringEx(const PW_TIME& t, CString& strDest, BOOL bUseLocalFormat)
+{
+	strDest.Empty();
+
+	BOOL bUseIso = FALSE;
+
+	if(bUseLocalFormat == TRUE)
+	{
+		SYSTEMTIME st;
+		st.wYear = t.shYear;
+		st.wMonth = t.btMonth;
+		st.wDay = t.btDay;
+		st.wDayOfWeek = 0;
+		st.wHour = t.btHour;
+		st.wMinute = t.btMinute;
+		st.wSecond = t.btSecond;
+
+		TCHAR tszBuf[32];
+
+		tszBuf[0] = 0; tszBuf[1] = 0;
+		if(GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, NULL,
+			tszBuf, 31) == 0)
+		{
+			bUseIso = TRUE; ASSERT(FALSE);
+		}
+		else strDest += tszBuf;
+
+		strDest += _T(" ");
+
+		tszBuf[0] = 0; tszBuf[1] = 0;
+		if(GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, NULL, tszBuf, 31) == 0)
+		{
+			bUseIso = TRUE; ASSERT(FALSE);
+		}
+		else strDest += tszBuf;
+	}
+	else bUseIso = TRUE;
+
+	if(bUseIso == TRUE)
+	{
+		strDest.Format(_T("%04u-%02u-%02u %02u:%02u:%02u"), t.shYear,
+			t.btMonth, t.btDay, t.btHour, t.btMinute, t.btSecond);
+	}
 }
 
 CPP_FN_SHARE void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest)
@@ -368,11 +428,13 @@ C_FN_SHARE TCHAR *MakeSafeXmlString(const TCHAR *ptString)
 	TCHAR *pFinal;
 
 	TCHAR aChar[LOCAL_NUMXMLCONV] = {
-		_T('<'), _T('>'), _T('&'), _T('\"'), _T('\'')
+		_T('<'), _T('>'), _T('&'), _T('\"'), _T('\''),
+		_T('\r'), _T('\n')
 	};
 
 	TCHAR *pTrans[LOCAL_NUMXMLCONV] = {
-		_T("&lt;"), _T("&gt;"), _T("&amp;"), _T("&quot;"), _T("&#39;")
+		_T("&lt;"), _T("&gt;"), _T("&amp;"), _T("&quot;"), _T("&#39;"),
+		_T("&#xD;"), _T("&#xA;")
 	};
 
 	ASSERT(ptString != NULL); if(ptString == NULL) return NULL;
@@ -450,12 +512,11 @@ CPP_FN_SHARE CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart, 
 	TCHAR *lp;
 	TCHAR tch;
 	CString str = _T("");
-	CString strSource;
 	int nPos = -1, nSearchFrom = 0;
 
 	ASSERT(lpstr != NULL); if(lpstr == NULL) return str; // _T("")
 
-	strSource = lpstr;
+	CString strSource = lpstr;
 	strSource.MakeLower();
 	lp = (TCHAR *)lpstr;
 
@@ -508,8 +569,13 @@ CPP_FN_SHARE CString TagSimString(LPCTSTR lpString)
 		{
 			case _T('+'): str += _T("{PLUS}"); break;
 			case _T('@'): str += _T("{AT}"); break;
+			// case _T('~'): str += _T("{TILDE}"); break;
+			case _T('~'): str += _T("(%{NUMPAD0}{NUMPAD1}{NUMPAD2}{NUMPAD6})"); break;
 			case _T('^'): str += _T("(%{NUMPAD0}{NUMPAD9}{NUMPAD4})"); break;
-			case _T('~'): str += _T("{TILDE}"); break;
+			case _T('\''): str += _T("(%{NUMPAD0}{NUMPAD3}{NUMPAD9})"); break;
+			case _T('"'): str += _T("(%{NUMPAD0}{NUMPAD3}{NUMPAD4})"); break;
+			case _T('´'): str += _T("(%{NUMPAD0}{NUMPAD1}{NUMPAD8}{NUMPAD0})"); break;
+			case _T('`'): str += _T("(%{NUMPAD0}{NUMPAD9}{NUMPAD6})"); break;
 			case _T('%'): str += _T("{PERCENT}"); break;
 			case _T('{'): str += _T("{LEFTBRACE}"); break;
 			case _T('}'): str += _T("{RIGHTBRACE}"); break;
@@ -583,4 +649,22 @@ CPP_FN_SHARE void RemoveAcceleratorTip(CString *pString)
 
 	pString->TrimLeft();
 	pString->TrimRight();
+}
+
+WCharStream::WCharStream(LPCWSTR lpData)
+{
+	ASSERT(lpData != NULL); if(lpData == NULL) return;
+
+	m_lpData = lpData;
+	m_dwPosition = 0;
+}
+
+WCHAR WCharStream::ReadChar()
+{
+	WCHAR tValue = m_lpData[m_dwPosition];
+
+	if(tValue == 0) return 0;
+
+	++m_dwPosition;
+	return tValue;
 }

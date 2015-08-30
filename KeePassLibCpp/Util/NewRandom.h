@@ -30,15 +30,17 @@ public:
 	CNewRandom();
 	virtual ~CNewRandom();
 
-	void Reset();
-	void Initialize();
-
 	void GetRandomBuffer(__out_bcount(dwSize) BYTE *pBuf, DWORD dwSize);
 
+	void AddToUserEntropyPool(const BYTE *pData, DWORD dwSize);
+	void ClearUserEntropyPool();
+
 private:
+	void Initialize();
 	void AddRandomObject(__in_bcount(uSize) const void *pObj, size_t uSize);
 
 	std::vector<BYTE> m_vPseudoRandom;
+	std::vector<BYTE> m_vUserRandom;
 	DWORD m_dwCounter;
 };
 
@@ -50,7 +52,7 @@ public:
 	virtual BOOL GenerateRandomSequence(unsigned long uRandomSeqSize, unsigned char *pBuffer) const = 0;
 };
 
-// Seed is 128 bits = 4 32-bit DWORDS
+// Seed is 128 bits = 4 32-bit DWORDs
 void srandXorShift(unsigned long *pSeed128);
 unsigned long randXorShift();
 

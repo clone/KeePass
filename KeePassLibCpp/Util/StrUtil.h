@@ -35,6 +35,8 @@
 typedef BOOL(WINAPI *LPPATHRELATIVEPATHTO)(LPTSTR pszPath, LPCTSTR pszFrom, DWORD dwAttrFrom, LPCTSTR pszTo, DWORD dwAttrTo);
 
 CPP_FN_SHARE void EraseCString(CString *pString);
+void EraseWCharVector(std::vector<WCHAR>& vBuffer);
+void EraseTCharVector(std::vector<TCHAR>& vBuffer);
 
 // Fix an URL if necessary (check protocol, form, etc.)
 CPP_FN_SHARE void FixURL(CString *pstrURL);
@@ -45,8 +47,8 @@ CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimStri
 CPP_FN_SHARE CString CsRemoveMeta(CString *psString);
 
 // String conversion functions
-C_FN_SHARE char *_StringToAnsi(const TCHAR *lptString);
-C_FN_SHARE TCHAR *_StringToUnicode(const char *pszString);
+C_FN_SHARE char *_StringToAnsi(const WCHAR *lptString);
+C_FN_SHARE WCHAR *_StringToUnicode(const char *pszString);
 
 // Convert UCS-2 to UTF-8 and the other way round
 C_FN_SHARE UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString);
@@ -61,6 +63,8 @@ C_FN_SHARE BOOL _IsUTF8String(const UTF8_BYTE *pUTF8String);
 
 // Convert PW_TIME structure to a CString
 CPP_FN_SHARE void _PwTimeToString(PW_TIME t, CString *pstrDest);
+void _PwTimeToStringEx(const PW_TIME& t, CString& strDest, BOOL bUseLocalFormat);
+
 CPP_FN_SHARE void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest);
 
 // Convert UUID to string and the other way round
@@ -86,5 +90,17 @@ CPP_FN_SHARE CString TagSimString(LPCTSTR lpString);
 CPP_FN_SHARE TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource);
 
 CPP_FN_SHARE void RemoveAcceleratorTip(CString *pString);
+
+class WCharStream
+{
+public:
+	WCharStream(LPCWSTR lpData);
+
+	WCHAR ReadChar();
+
+private:
+	LPCWSTR m_lpData;
+	DWORD m_dwPosition;
+};
 
 #endif

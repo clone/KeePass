@@ -222,11 +222,12 @@ BOOL COptionsDlg::OnInitDialog()
 
 	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Advanced"), 11);
-	m_olAdvanced.AddCheckItem(TRL("Automatically generate random passwords for new entries"), &m_bAutoPwGen, NULL, OL_LINK_NULL);
+	// m_olAdvanced.AddCheckItem(TRL("Automatically generate random passwords for new entries"), &m_bAutoPwGen, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Include backup entries in quick searches (toolbar)"), &m_bQuickFindIncBackup, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Exit program instead of locking the workspace after the specified time"), &m_bExitInsteadOfLockAT, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Show full path in the titlebar (instead of filename only)"), &m_bShowFullPath, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Disable 'Save' button if the database hasn't been modified"), &m_bAllowSaveIfModifiedOnly, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Use local date/time format instead of ISO notation"), &m_bUseLocalTimeFormat, NULL, OL_LINK_NULL);
 
 	AddTcItem(TRL(OPTSZ_SECURITY), 29);
 	AddTcItem(TRL(OPTSZ_GUI), 6);
@@ -432,13 +433,11 @@ void COptionsDlg::OnBtnDeleteAssoc()
 
 void COptionsDlg::NotifyAssocChanged()
 {
-	LPSHCHANGENOTIFY lpSHChangeNotify;
-	HINSTANCE hShell32;
-
-	hShell32 = LoadLibrary(_T("Shell32.dll"));
+	HINSTANCE hShell32 = LoadLibrary(_T("Shell32.dll"));
 	if(hShell32 != NULL)
 	{
-		lpSHChangeNotify = (LPSHCHANGENOTIFY)GetProcAddress(hShell32, "SHChangeNotify");
+		LPSHCHANGENOTIFY lpSHChangeNotify = (LPSHCHANGENOTIFY)GetProcAddress(
+			hShell32, "SHChangeNotify");
 
 		if(lpSHChangeNotify != NULL)
 		{
@@ -453,9 +452,9 @@ void COptionsDlg::NotifyAssocChanged()
 
 void COptionsDlg::OnRadioClipMethodSecure() 
 {
-	CString str = TRL("Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.");
+	CString str = TRL("Warning! It is possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing or clipboard backup tools.");
 	str += _T("\r\n\r\n");
-	str += TRL("If you notice any problems with this enhanced method, just switch back to the timed clipboard clearing method.");
+	str += TRL("If you notice any problems with the enhanced method, switch back to the timed clipboard clearing method.");
 	MessageBox((LPCTSTR)str, TRL("Password Safe"), MB_ICONINFORMATION | MB_OK);
 
 	UpdateData(TRUE);

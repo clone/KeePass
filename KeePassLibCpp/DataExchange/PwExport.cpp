@@ -134,7 +134,7 @@ void CPwExport::_ExpStr(LPCTSTR lpString)
 
 void CPwExport::_ExpXmlStr(LPCTSTR lpString)
 {
-	if(_tcslen(lpString) != 0)
+	if(_tcslen(lpString) > 0)
 	{
 		TCHAR *pXmlString = MakeSafeXmlString(lpString);
 		
@@ -249,41 +249,36 @@ BOOL CPwExport::ExportAll(const TCHAR *pszFile, const PWEXPORT_OPTIONS *pOptions
 
 CString CPwExport::MakeGroupTreeString(DWORD dwGroupId) const
 {
-	DWORD *pdwIndexes;
-	DWORD i;
-	USHORT usLevel;
 	PW_GROUP *pg;
-	CString str = _T(""), strTemp;
+	CString str;
 
 	pg = m_pMgr->GetGroupById(dwGroupId);
 	ASSERT(pg != NULL); if(pg == NULL) return str;
 
-	usLevel = pg->usLevel;
-	ASSERT(usLevel != 0xffff); if(usLevel == 0xffff) return str;
+	const USHORT usLevel = pg->usLevel;
+	ASSERT(usLevel != 0xFFFF); if(usLevel == 0xFFFF) return str;
 	if(usLevel == 0) return str;
-	pdwIndexes = new DWORD[usLevel + 2];
-	ASSERT(pdwIndexes != NULL); if(pdwIndexes == NULL) return str;
+	DWORD *pdwIndices = new DWORD[usLevel + 2];
+	ASSERT(pdwIndices != NULL); if(pdwIndices == NULL) return str;
 
-	if(m_pMgr->GetGroupTree(dwGroupId, pdwIndexes) == TRUE)
+	if(m_pMgr->GetGroupTree(dwGroupId, pdwIndices) == TRUE)
 	{
-		for(i = 0; i < (DWORD)usLevel; i++)
+		for(DWORD i = 0; i < (DWORD)usLevel; i++)
 		{
-			pg = m_pMgr->GetGroup(pdwIndexes[i]);
+			pg = m_pMgr->GetGroup(pdwIndices[i]);
 
 			if(pg != NULL)
 			{
-				if(i != 0) str += _T(".");
+				if(i > 0) str += _T("\\");
 
-				strTemp = pg->pszGroupName;
-				strTemp.Replace(_T("\\"), _T("\\\\"));
-				strTemp.Replace(_T("."), _T("\\."));
-
+				CString strTemp = pg->pszGroupName;
+				strTemp.Replace(_T("\\"), _T("/"));
 				str += strTemp;
 			}
 		}
 	}
 
-	SAFE_DELETE_ARRAY(pdwIndexes);
+	SAFE_DELETE_ARRAY(pdwIndices);
 	return str;
 }
 
@@ -297,7 +292,6 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 	CString str, strUUID, strImage, strCreationTime, strLastAccTime, strLastModTime;
 	CString strExpireTime, strGroupTree;
 	BYTE *pbEncodedAttachment = NULL;
-	CBase64Codec base64;
 	PW_TIME tNever;
 	std::vector<DWORD> aGroupIds;
 	USHORT usLevel = 0;
@@ -407,7 +401,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 	}
 	else if(m_nFormat == PWEXP_XML)
 	{
-		_ExpStr(_T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+		_ExpStr(_T("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>"));
 		_ExpStr(m_pszNewLine);
 		_ExpStr(_T("<pwlist>"));
 		_ExpStr(m_pszNewLine);
@@ -507,7 +501,8 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 				ASSERT(pbEncodedAttachment != NULL);
 				if(pbEncodedAttachment != NULL)
 				{
-					if(base64.Encode(p->pBinaryData, p->uBinaryDataLen, pbEncodedAttachment, &dwBufSize) == false)
+					if(CBase64Codec::Encode(p->pBinaryData, p->uBinaryDataLen,
+						pbEncodedAttachment, &dwBufSize) == false)
 					{
 						SAFE_DELETE_ARRAY(pbEncodedAttachment);
 					}

@@ -21,7 +21,7 @@
 #include "../Util/MemUtil.h"
 #include "../Util/StrUtil.h"
 
-C_FN_SHARE char *_StringToAnsi(const TCHAR *lptString)
+C_FN_SHARE char *_StringToAnsi(const WCHAR *lptString)
 {
 	char *p = NULL;
 	int _nChars = 0;
@@ -30,22 +30,22 @@ C_FN_SHARE char *_StringToAnsi(const TCHAR *lptString)
 
 #ifdef _UNICODE
 	_nChars = lstrlen(lptString) + 1;
-	p = new char[_nChars * 2 + 1];
-	p[0] = 0;
-	VERIFY(WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lptString, -1, p, _nChars, NULL, NULL) !=
-		ERROR_INSUFFICIENT_BUFFER);
+	p = new char[_nChars * 2 + 2];
+	p[0] = 0; p[1] = 0;
+	VERIFY(WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lptString, -1, p,
+		_nChars, NULL, NULL) != ERROR_INSUFFICIENT_BUFFER);
 #else
-	_nChars = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, (LPCWSTR) lptString, -1, NULL, 0, NULL, NULL);
-	p = new char[_nChars * 2 + 1];
-	p[0] = 0;
-	VERIFY(WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, (LPCWSTR) lptString, -1, p, _nChars, NULL, NULL) !=
-		ERROR_INSUFFICIENT_BUFFER);
+	_nChars = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lptString, -1, NULL, 0, NULL, NULL);
+	p = new char[_nChars * 2 + 2];
+	p[0] = 0; p[1] = 0;
+	VERIFY(WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, lptString,
+		-1, p, _nChars, NULL, NULL) != ERROR_INSUFFICIENT_BUFFER);
 #endif
 
 	return p;
 }
 
-C_FN_SHARE TCHAR *_StringToUnicode(const char *pszString)
+C_FN_SHARE WCHAR *_StringToUnicode(const char *pszString)
 {
 	int _nChars = 0;
 
@@ -57,8 +57,8 @@ C_FN_SHARE TCHAR *_StringToUnicode(const char *pszString)
 	// Determine the correct buffer size by calling the function itself with 0 as buffer size (see docs)
 	_nChars = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, NULL, 0);
 
-	p = new WCHAR[_nChars + 1];
-	p[0] = 0;
+	p = new WCHAR[_nChars + 2];
+	p[0] = 0; p[1] = 0;
 
 	// Jan 9th 2004: DonAngel {
 	// This was ASSERTing for string. All debugging did not given good results, so I decided to remove
@@ -72,13 +72,13 @@ C_FN_SHARE TCHAR *_StringToUnicode(const char *pszString)
 	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, p, _nChars);
 #else
 	_nChars = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, NULL, 0);
-	p = new WCHAR[_nChars *2 + 1];
+	p = new WCHAR[_nChars * 2 + 2];
 	p[0] = 0; p[1] = 0;
 	VERIFY(MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszString, -1, (LPWSTR) p, _nChars) !=
 		ERROR_INSUFFICIENT_BUFFER);
 #endif
 
-	return (TCHAR *)p;
+	return p;
 }
 
 C_FN_SHARE UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)

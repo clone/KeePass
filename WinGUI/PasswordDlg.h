@@ -24,9 +24,9 @@
 #include "NewGUI/NewGUICommon.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/GradientProgressCtrl.h"
-#include "NewGUI/XHyperLink.h"
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/SecureEditEx.h"
+#include "afxwin.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -47,6 +47,7 @@ public:
 	CImageList m_ilIcons;
 	CFont m_fStyle;
 	CFont m_fSymbol;
+	CFont m_fBold;
 	CKCSideBannerWnd m_banner;
 	CToolTipCtrl m_tipSecClear;
 
@@ -61,7 +62,6 @@ public:
 	//{{AFX_DATA(CPasswordDlg)
 	enum { IDD = IDD_PASSWORD_DLG };
 	CComboBoxEx	m_cbDiskList;
-	CXHyperLink	m_hlSelFile;
 	CGradientProgressCtrl	m_cPassQuality;
 	CXPStyleButtonST	m_btStars;
 	CXPStyleButtonST	m_btOK;
@@ -70,6 +70,7 @@ public:
 	CSecureEditEx	m_pEditPw;
 	BOOL	m_bStars;
 	BOOL	m_bKeyMethod;
+	CXPStyleButtonST m_btBrowseKeyFile;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CPasswordDlg)
@@ -80,7 +81,6 @@ public:
 	//}}AFX_VIRTUAL
 
 private:
-	void RedrawHyperLink();
 	BOOL m_bOnce;
 
 protected:
@@ -93,10 +93,11 @@ protected:
 	afx_msg void OnChangeEditPassword();
 	afx_msg void OnSelChangeComboDiskList();
 	afx_msg void OnCheckKeymethodAnd();
+	afx_msg void OnBnClickedBrowseKeyFile();
 	//}}AFX_MSG
 
-	afx_msg LRESULT OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+public:
 };
 
 //{{AFX_INSERT_LOCATION}}

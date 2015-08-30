@@ -26,6 +26,7 @@
 
 #include "../KeePassLibCpp/PwManager.h"
 #include "../KeePassLibCpp/DataExchange/PwExport.h"
+#include "../KeePassLibCpp/PasswordGenerator/PasswordGenerator.h"
 
 #include "NewGUI/NewGUICommon.h"
 #include "NewGUI/KCWndUtil.h"
@@ -86,9 +87,10 @@
 #define ATM_DROPBACK       0
 #define ATM_MINIMIZE       1
 
-#define PWM_URL_DONATE     _T("http://keepass.sourceforge.net/donate.php")
-
 #define LVSX_CHANGING      DWORD_MAX
+
+#define KPCM_NULL          0
+#define KPCM_EXIT          1
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -105,6 +107,7 @@ public:
 	static CString _GetSecureEditTipText(const TCHAR *tszBase);
 	void RebuildContextMenus();
 	void DeleteContextMenus();
+	void _SetDefaultFocus();
 
 	void ProcessResize();
 	void CleanUp();
@@ -244,6 +247,8 @@ public:
 
 	void _FinishDragging(BOOL bDraggingImageList);
 
+	static UINT GetKeePassControlMessageID();
+
 	int m_nClipboardMethod;
 	BOOL m_bTimer;
 	int m_nClipboardCountdown;
@@ -266,6 +271,7 @@ public:
 	BOOL m_bDeleteBackupsOnSave;
 	BOOL m_bDisableAutoType;
 	BOOL m_bLockOnWinLock;
+	static BOOL m_bUseLocalTimeFormat;
 
 	BOOL m_bExiting;
 	BOOL m_bLocked;
@@ -313,7 +319,6 @@ public:
 	BOOL m_bEntryView;
 	BOOL m_bColAutoSize;
 	int m_nAutoSort;
-	BOOL m_bAutoPwGen;
 	int m_nAutoTypeMethod;
 	BOOL m_bShowFullPath;
 	BOOL m_bCopyURLs;
@@ -413,6 +418,8 @@ public:
 	CRemoteControl m_remoteControl;
 
 	CString m_strDefaultAutoTypeSequence;
+
+	static PW_GEN_SETTINGS_EX m_pgsAutoProfile;
 
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
@@ -679,6 +686,7 @@ protected:
 
 	afx_msg LRESULT OnTaskbarCreated(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnProcessMailslot(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnKeePassControlMessage(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnWTSSessionChange(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()

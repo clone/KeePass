@@ -995,6 +995,42 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="PasswordGenerator"
+				>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\CharSetBasedGenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\CharSetBasedGenerator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\PasswordGenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\PasswordGenerator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\PatternBasedGenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\PatternBasedGenerator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\PwCharSet.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\PasswordGenerator\PwCharSet.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="KeePassAPI"

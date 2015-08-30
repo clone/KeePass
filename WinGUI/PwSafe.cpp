@@ -71,6 +71,8 @@ BOOL CPwSafeApp::InitInstance()
 #endif
 #endif
 
+	if(ProcessControlCommands() == TRUE) return FALSE;
+
 	// Create application's mutex object to make our presence public
 	m_pAppMutex = new CMutex(FALSE, _T("KeePassApplicationMutex"), NULL);
 	if(m_pAppMutex == NULL) { ASSERT(FALSE); }
@@ -490,4 +492,24 @@ LPCTSTR CPwSafeApp::GetPasswordFont()
 	if((IsMBThreadACP() == TRUE) || (g_bForceSimpleAsterisks == TRUE))
 		return g_pFontNameNormal;
 	return (TCHAR *)g_pFontNameSymbol;
+}
+
+BOOL CPwSafeApp::ProcessControlCommands()
+{
+	CString strCmdLine = (LPCTSTR)GetCommandLine();
+	strCmdLine.Trim(_T("\"' \t\r\n\\$%"));
+	strCmdLine.MakeLower();
+
+	if(strCmdLine.GetLength() >= 6)
+	{
+		if((strCmdLine.Right(10) == _T("--exit-all")) ||
+			(strCmdLine.Right(9) == _T("/exit-all")))
+		{
+			::SendMessage(HWND_BROADCAST, CPwSafeDlg::GetKeePassControlMessageID(),
+				KPCM_EXIT, 0);
+			return TRUE;
+		}
+	}
+
+	return FALSE;
 }

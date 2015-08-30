@@ -53,11 +53,7 @@ CBase64Codec::CBase64Codec()
 {
 }
 
-CBase64Codec::~CBase64Codec()
-{
-}
-
-bool CBase64Codec::Encode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen) const
+bool CBase64Codec::Encode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen)
 {
 	DWORD i, len2, leven;
 	BYTE *p;
@@ -95,7 +91,7 @@ bool CBase64Codec::Encode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOut
 	return true;
 }
 
-bool CBase64Codec::Decode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen) const
+bool CBase64Codec::Decode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen)
 {
 	DWORD t, x, y, z;
 	BYTE c;

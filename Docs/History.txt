@@ -1,3 +1,54 @@
+07/09/01 - 1.08
+- Completely new password generator; it now supports saving
+  options as profiles, password generation based on patterns,
+  more options (excluding look-alike characters, ...)
+- Added ability to configure the settings of passwords that are
+  automatically generated for new entries (open password
+  generator, choose the correct profile, edit and save it)
+- Added option to use the local date/time format instead of ISO
+  notation (see 'Tools' -> 'Options' -> 'Advanced'); it's
+  enabled by default
+- Added '--exit-all' command line parameter; call KeePass.exe
+  with this parameter to close all other open KeePass instances
+  (if you do not wish to see the 'Save?' confirmation dialog,
+  enable the 'Automatically save database on exit' option)
+- Added support for silent installation
+- Improved 'Enter Password' dialog (more compact, replaced the
+  hyperlink by a button, improved texts and descriptions)
+- The database name is now shown in the title of the 'Enter
+  Password' window
+- KeePass now shows a warning if it cannot find a database that
+  has been specified using the command line
+- The XML import plugin now supports special characters
+- Newline characters are encoded now in XML exports
+- Pressing the 'Enter' key in the password list now opens the
+  currently selected entry for editing
+- Changing the database master key now requires unsafe
+  operations permission
+- Added support for auto-typing the following characters in US
+  International mode: ' " ´ ` ~
+- The banner of the 'Edit Entry' dialog is hidden now if the
+  screen resolution is very low (640x480 or lower)
+- New entries now by default get the icons of their container
+  groups, if the icons do not look like folders
+- Changed tab order in various places to the more obvious 'left
+  to right, then top to bottom' pattern
+- The clipboard is now also cleared on KeePass exit when the
+  enhanced clipboard protection option is enabled
+- The quick-find box now has the focus after opening a database
+- Added Spanish language for installer
+- Improved internal random number generation interface
+- Updated file format documentation (thanks to Naomaru Itoi)
+- Updated CHM documentation file
+- Auto-Type now selects the correct sequence when multiple
+  entries match the current window and multiple sequence/window
+  pairs are specified (thanks to ThierryP for the patch)
+- The expiration time column menu item in the columns context
+  menu is translated correctly now
+- Entry details view is now cleared after deleting entries
+- URL length is not limited any more
+- Various other minor improvements and bugfixes
+
 07/04/16 - 1.07
 - Auto-Type is now supported on Windows 9x systems
 - Added ability to use one auto-type sequence for multiple
@@ -11,7 +62,6 @@
   sequence of your choice (there's no option in the user
   interface for this yet); see the CHM documentation for more
 - WTS notifications are ignored if a dialog is open
-- KeePass is now x64-ready (thanks to Gabe Martin)
 - Improved attachments description column naming in exports
 - Top-level menu shortcuts now work after closing a database
 - Status bar is now updated when navigating in the group tree
@@ -43,6 +93,7 @@
 - Window position/size is now remembered when exiting from tray
 - Fixed a bug in the 'Start KeePass at Windows startup'
   registration method
+- x64 fixes (thanks to Gabe Martin)
 - Improved MFC string clearing routine
 - Various translation improvements
 - Made 'Icon' label wider

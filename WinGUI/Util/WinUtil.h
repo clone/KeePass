@@ -32,6 +32,8 @@
 C_FN_SHARE void CopyStringToClipboard(const TCHAR *lptString);
 C_FN_SHARE void ClearClipboardIfOwner();
 
+void RegisterOwnClipboardData(unsigned char* pData, unsigned long dwDataSize);
+
 // Thanks to Gabe Martin for the contribution of the following
 // two secure clipboard functions!
 // http://sourceforge.net/tracker/index.php?func=detail&aid=1102906&group_id=95013&atid=609910
@@ -60,5 +62,8 @@ C_FN_SHARE BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile);
 C_FN_SHARE UINT TWinExec(LPCTSTR lpCmdLine, WORD uCmdShow);
 
 C_FN_SHARE BOOL WU_IsWin9xSystem();
+
+// BOOL ContainsChildWindow(HWND hWndContainer, LPCTSTR lpChildWindowText);
+// BOOL CALLBACK CcwEnumChildProc(HWND hWnd, LPARAM lParam);
 
 #endif

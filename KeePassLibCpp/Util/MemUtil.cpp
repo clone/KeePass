@@ -137,7 +137,7 @@ C_FN_SHARE void _pwtimeadd(PW_TIME *pTime, const PW_TIME *pTimeAdd)
 #pragma warning(disable: 4996) // _itot and _tcscat deprecated
 
 // Packs an array of integers to a TCHAR string
-C_FN_SHARE void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount)
+void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount)
 {
 	INT i;
 	TCHAR tszTemp[20];
@@ -161,7 +161,7 @@ C_FN_SHARE void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount)
 #pragma warning(pop)
 
 // Unpacks a TCHAR string to an array of integers
-C_FN_SHARE void str2ar(TCHAR *tszString, INT *pArray, INT nItemCount)
+void str2ar(TCHAR *tszString, INT *pArray, INT nItemCount)
 {
 	INT i = 0;
 	TCHAR *p = tszString;
@@ -218,4 +218,10 @@ C_FN_SHARE BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash)
 
 	SAFE_DELETE_ARRAY(pBuf);
 	return TRUE;
+}
+
+C_FN_SHARE void DeleteArrayCtx(BYTE **p)
+{
+	if(p == NULL) return;
+	SAFE_DELETE_ARRAY(*p);
 }

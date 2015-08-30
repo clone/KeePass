@@ -17,17 +17,12 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___KEEPASS_LIBRARY_API_H___
-#define ___KEEPASS_LIBRARY_API_H___
+#ifndef ___CHARSET_BASED_GENERATOR_H___
+#define ___CHARSET_BASED_GENERATOR_H___
 
-#include "APIDefEx.h"
+#include "PasswordGenerator.h"
 
-// Library build number (independent of underlying KeePass version)
-#define KEEPASS_LIBRARY_BUILD 0x00000023
+PWG_ERROR CsbgGenerate(std::vector<WCHAR>& vOutBuffer,
+	const PW_GEN_SETTINGS_EX* pSettings, CNewRandom* pRandomSource);
 
-KP_SHARE DWORD GetKeePassVersion();
-KP_SHARE LPCTSTR GetKeePassVersionString();
-
-KP_SHARE DWORD GetLibraryBuild();
-
-#endif
+#endif // ___CHARSET_BASED_GENERATOR_H___

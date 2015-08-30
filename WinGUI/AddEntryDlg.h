@@ -53,7 +53,6 @@ public:
 	DWORD m_dwEntryIndex;
 	int m_nGroupId;
 	int m_nIconId;
-	BOOL m_bAutoPwGen;
 
 	CString m_strNotes;
 	PW_TIME m_tExpire;

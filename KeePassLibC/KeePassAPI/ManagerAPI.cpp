@@ -44,8 +44,6 @@ KP_SHARE void DeleteManager(void *pMgr)
 {
 	DECL_MGR_V(pMgr);
 
-	p->CleanUp();
-
 	delete p; p = NULL;
 }
 

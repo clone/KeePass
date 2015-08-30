@@ -25,7 +25,7 @@
 
 #include "../../KeePassLibCpp/SysDefEx.h"
 
-#define SI_REGSIZE 1024
+#define SI_REGSIZE 2048
 
 // A GUID used to detect non-existing keys in queries
 #define PCFG_NOTFOUND _T("2C3317110FC211DA94B900E08161165F")

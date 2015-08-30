@@ -19,6 +19,7 @@
 
 #include "StdAfx.h"
 #include "PwSafe.h"
+#include "PwSafeDlg.h"
 #include "EntryListDlg.h"
 
 #include "../KeePassLibCpp/Util/TranslateEx.h"
@@ -290,7 +291,7 @@ void CEntryListDlg::_AddEntryToList(PW_ENTRY *p, BOOL bExpiredIcon)
 	}
 
 	lvi.iSubItem = 4;
-	_PwTimeToString(pwe->tExpire, &strTemp);
+	_PwTimeToStringEx(pwe->tExpire, strTemp, CPwSafeDlg::m_bUseLocalTimeFormat);
 	lvi.pszText = (LPTSTR)(LPCTSTR)strTemp;
 	m_cList.SetItem(&lvi);
 

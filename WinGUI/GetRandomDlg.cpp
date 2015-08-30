@@ -86,7 +86,6 @@ BOOL CGetRandomDlg::OnInitDialog()
 	m_banner.SetCaption(TRL("Move the mouse and type some random text to generate random values."));
 
 	CNewRandom cRand;
-	cRand.Initialize();
 	cRand.GetRandomBuffer(m_pFinalRandom, 32);
 	cRand.GetRandomBuffer((BYTE *)m_points, sizeof(POINT) * 100);
 

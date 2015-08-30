@@ -79,7 +79,6 @@ public:
 	BOOL m_bBackupEntries;
 	BOOL m_bSingleInstance;
 	BOOL m_bSingleClickTrayIcon;
-	BOOL m_bAutoPwGen;
 	BOOL m_bQuickFindIncBackup;
 	BOOL m_bMinimizeBeforeAT;
 	BOOL m_bDeleteBackupsOnSave;
@@ -91,6 +90,7 @@ public:
 	BOOL m_bCheckForUpdate;
 	BOOL m_bLockOnWinLock;
 	BOOL m_bEnableRemoteCtrl;
+	BOOL m_bUseLocalTimeFormat;
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };
