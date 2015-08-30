@@ -112,6 +112,9 @@ BOOL COptionsDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	NewGUI_TranslateCWnd(this);
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
+
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_Button(&m_btSelFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
@@ -123,9 +126,6 @@ BOOL COptionsDlg::OnInitDialog()
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("Settings"));
 	m_banner.SetCaption(TRL("Here you can configure KeePass."));
-
-	NewGUI_TranslateCWnd(this);
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_NEWLINETEXT), OPTGRP_FILES);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_NEWLINE_0), OPTGRP_FILES);

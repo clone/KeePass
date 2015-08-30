@@ -1,3 +1,21 @@
+04/09/19 - 0.97b
+- Improved in-memory passwords protection (for both master
+  password and all stored passwords)
+- Fixed two bugs in the relative paths handling; one which
+  could have caused the auto-open function not to work any
+  more; another, which could have caused problems when always
+  opening the same database
+- Improved font handling in the main dialog, Japanese should be
+  displayed correctly now
+- The window state (maximized, etc.) and original size (size
+  when not maximized) is remembered correctly now
+- Fixed a bug in the edit-entry dialog (password sometimes
+  didn't match the repeated password)
+- Fixed orders of translation calls in some dialogs, which
+  could have caused problems
+- Updated ReadMe file (added Japanese translator to credits)
+- Some minor bugfixes and improvements
+
 04/09/12 - 0.97a
 - KeePass is using relative paths now to remember the last
   opened database; so this feature can be used now with
@@ -163,7 +181,7 @@
 - Fixed some bugs in the import functions
 - Some other minor improvements
 
-04/03/04 - 0.93a
+04/03/04 - 0.93
 - Replaced group list by a group tree, you can now create
   subgroups
 - Added file attachments, you can now "attach" files to
@@ -191,7 +209,7 @@
 - Various minor bugfixes and improvements
 - The Windows setup program now has multi-language support
   (thanks to Lubos Stanek)
-- b: Fixed various minor bugs
+- 0.93b: Fixed various minor bugs
 
 04/02/22 - 0.92a
 - Smaller Windows installer

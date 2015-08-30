@@ -84,6 +84,9 @@ BOOL CFindInDbDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	NewGUI_TranslateCWnd(this);
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
+
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 
@@ -92,9 +95,6 @@ BOOL CFindInDbDlg::OnInitDialog()
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("Find"));
 	m_banner.SetCaption(TRL("Find a string in the password list"));
-
-	NewGUI_TranslateCWnd(this);
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	GetDlgItem(IDC_EDIT_FINDTEXT)->SetFocus();
 	return FALSE; // Return TRUE unless you set the focus to a control

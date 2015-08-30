@@ -1,3 +1,8 @@
+|~LANGUAGEVERSION| |0.97a|
+|~LANGUAGEAUTHOR|     |Дончо Ангелов|
+|~LANGUAGEAUTHOREMAIL| |kppc@doncho.net|
+|~LANGUAGENAME|       |Български|
+
 |&OK|                          |&OK|
 |&Cancel|                      |&Отказ|
 |&Close|                       |&Затваря|
@@ -156,7 +161,6 @@
 |Save Database &As...|         |Запис на базата с данни &като...|
 |Change &Master Key For This Database...|      |&Смяна на главният ключ на базата с данни|
 |&Print Complete Password List|                |Отпечатване на целият списък с пароли|
-|Export Complete Database|     |Експортиране на цялата база с данни|
 |&Lock Workspace|              |Заключване на програмата|
 |&Unlock Workspace|            |Отключване на програмата|
 |&Exit|                        |&Изход|
@@ -173,7 +177,6 @@
 |Export Group To &CSV...|      |Експорт на фрупа в &CSV...|
 |Copy User&Name To Clipboard|  |Копиране на потр.име в клипбоардът|
 |Copy &Password To Clipboard|  |Копиране на паролата в клипбоардът|
-|Open &URL|                    |Отваряне на URLа|
 |&Find In Database...|         |&Търсене в базата данни...|
 |Find In This &Group...|       |Търсене в тази група...|
 |&Add Entry...|                |Прибавяне на &запис...|
@@ -242,8 +245,6 @@
 |Self-Test(s) Failed|          |Самотестването се провали|
 
 |Clipboard cleared.|           |Клипбордът беше изтрит.|
-|Password copied to clipboard. Clipboard will be cleared in %d seconds.|
-    |Паролате беше копирана в клипборда. Клипборда ще бъде изтрит след %d секунди.|
 
 |Failed to set the master key!|
     |Слагането на главният ключ не успя!|
@@ -326,18 +327,8 @@
     |Възникна грешка при импортиране на CSV файлът. Файлът не може да бъде импортиран.|
 |An error occured while importing the file. File cannot be imported.|
     |Възникна грешка при импортиране на файла. Файлът не може да бъде импортиран.|
-|&Import From CSV|             |Импорт на &CSV|
-|Import From Code&Wallet|      |Импорт на Code&Wallet|
-|Import From &PwSafe v2 TXT|   |Импорт на &PwSafe v2 TXT|
 |Select &Font|                 |Избор на &шрифт|
 |Select a new font for the list controls.|     |Избор на нов шрифт за интерфейса.|
-
-|Import From Code&Wallet|      |Импорт от Code&Wallet|
-|&TXT Format...|               |&TXT формат...|
-|&HTML Format...|              |&HTML формат...|
-|&XML Format...|               |&XML формат...|
-|&CSV Format...|               |&CSV формат...|
-|Import To Database|           |Импорт към база с пароли|
 
 |&Get more languages...|       |Вземане на още &езици...|
 |Start and Exit|               |Старт и изход|
@@ -359,8 +350,6 @@
 |Automatically lock workspace after the following number of seconds:|
     |Автоматично заключване на сесията след изминаване на брой секунди:|
 |&Group Name|                  |&Име на група|
-|First close the open file before opening another one!|
-    |Затворете отвореният файл преди да отворите друг!|
 |Every second row has a different background color. Use this color:|
     |Всеки втори ред има различен фонов цвят. Моля изберете цвета:|
 |Start:|                       |Старт:|
@@ -436,11 +425,6 @@
 
 |Show &Columns| |Показване на колони|
 
-|~LANGUAGEVERSION| |0.95b|
-|~LANGUAGEAUTHOR|     |Дончо Ангелов|
-|~LANGUAGEAUTHOREMAIL| |kppc@doncho.net|
-|~LANGUAGENAME|       |Български|
-
 |Show &Entry View|     |Показване на изгледът на записа|
 |Print Pre&view...|	|Преглед за печат...|
 
@@ -458,8 +442,6 @@
 |Copy &All| |Копиране на &всичко|
 |Cu&t| |И&зрязване|
 |Currently used language| |В момента се използва език|
-|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-numerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only numerical 'substrings' are added as TAN entries.|
-    |Просто вмъкнете от клипборда своите TAN в прозореца по-долу. Форматирането няма значение, всички не-цифрови символи ще бъдат игнорорани (напр. нови редове, табове, интервали и т.н) и само цифрите ще бъдат пробваени като TAN записи.|
 |Language file version| |Версия на превода|
 |TAN Wizard| |Помощник за TAN|
 |Translation author contact| |Контакт с преводача|
@@ -536,8 +518,99 @@
 |Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
     |Вашият ключ се криптира няколко пъти при създаването на ключът за базата данни. Това прибавя константно забавяне, но и прави атаката с груба сила много по-трудна.|
 
-|Import From Personal &Vault TXT|
-    |Импорт на Личен &Vault TXT|
 |bits|
     |бита|
+
+|%u of %u selected|
+    |Избрани %u от %u selected|
+|&CSV File...|
+    |&CSV файл...|
+    
+|&CSV File...|
+    |&CSV файл...|
+    
+|&HTML File...|
+    |&HTML файл...|
+    
+|&PwSafe v2 TXT File...|
+    |&PwSafe v2 TXT файл...|
+    
+|&TXT File...|
+    |&TXT файл...|
+    
+|&XML File...|
+    |&XML файл...|
+    
+|Are you sure you want to delete all selected entries?|
+    |Сигурни ли сте, че желаете изтриване на всички избрани записи?|
+    
+|Code&Wallet TXT File...|
+    |Code&Wallet TXT файл...|
+    
+|Delete Entries Confirmation|
+    |Потвърждение за изтриване на записите|
+    
+|Do you want to overwrite it?|
+    |Да се презапише ли?|
+    
+|Export Group To &TXT...|
+    |Изнасяне на групата като &TXT...|
+    
+|Export To|
+    |Изнасяне в|
+    
+|Field copied to clipboard. Clipboard will be cleared in %d seconds.|
+    |Полето е копирано в клипбоардa. Kлипбоардът ще бъде изчистен след %d секунди.|
+    
+|Import From|
+    |Внасяне от|
+    
+|Imported from Password Safe|
+    |Внасяне от Password Safe|
+    
+|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-alphanumerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only alphanumerical 'substrings' are added as TAN entries.|
+    |Просто сложете вашите TAN в текстовото поле долу. Форматирането няма значение, всички не-буквеноцифрови символи ще бъдат игнорирани (като нови редове, табове, интервали и т.н.) и само буквеноцифровите части от текста ще се прибавят като TAN записи.|
+    
+|Mark database as modified on last-access time change|
+    |Маркира базата като модифицирана при смяна на времето на последен достъп|
+    
+|Most probably someone has changed the file while you were editing it.|
+    |Най-вероятно някой е променил файла, докато го редактирахте.|
+    
+|Number of selected entries (number of entries in the list)|
+    |Брой на избрани записи (брой заиси в листа)|
+    
+|Open &URL(s)|
+    |Отвори &URL-ите|
+    
+|Personal &Vault TXT File...|
+    |Personal &Vault TXT файл|
+    
+|Remember last opened file|
+    |Запомня последния отворен файл|
+    
+|Se&lect All|
+    |Из&бира всичко|
+    
+|Status|
+    |Състояние|
+    
+|The database file has been modified!|
+    |Файлът с данние беше модифициран!|
+    
+|The group you selected cannot store entries. Please select an other group.|
+    |Избраната група не може да съдържа записи. Моля изберете друга група.|
+    
+|This will remove all selected entries unrecoverably!|
+    |Това ще унищожи завинаги всички записи!|
+    
+|Total number of groups / entries|
+    |Всичко брой групи / записи|
+    
+|Total: %u groups / %u entries|
+    |Всично: %u групи / %u записи|
+    
+|Use PuTTY for ssh: and telnet: URLs|
+    |Използване на PuTTY за ssh: и telnet: URL-и|
+    
 

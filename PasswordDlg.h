@@ -50,6 +50,7 @@ public:
 	CFont m_fStyle;
 	CKCSideBannerWnd m_banner;
 
+	CString m_strPassword;
 	CString m_strRealKey;
 	BOOL m_bKeyFile;
 
@@ -64,7 +65,6 @@ public:
 	CButtonST	m_btMakePw;
 	CEdit	m_pEditPw;
 	CWzComboBox	m_cbDiskList;
-	CString	m_strPassword;
 	BOOL	m_bStars;
 	//}}AFX_DATA
 

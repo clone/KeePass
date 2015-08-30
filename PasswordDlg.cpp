@@ -49,7 +49,6 @@ CPasswordDlg::CPasswordDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CPasswordDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CPasswordDlg)
-	m_strPassword = _T("");
 	m_bStars = TRUE;
 	//}}AFX_DATA_INIT
 
@@ -69,7 +68,6 @@ void CPasswordDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MAKEPASSWORD_BTN, m_btMakePw);
 	DDX_Control(pDX, IDC_EDIT_PASSWORD, m_pEditPw);
 	DDX_Control(pDX, IDC_COMBO_DISKLIST, m_cbDiskList);
-	DDX_Text(pDX, IDC_EDIT_PASSWORD, m_strPassword);
 	DDX_Check(pDX, IDC_CHECK_STARS, m_bStars);
 	//}}AFX_DATA_MAP
 }
@@ -87,6 +85,8 @@ END_MESSAGE_MAP()
 BOOL CPasswordDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
+
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
@@ -252,12 +252,11 @@ BOOL CPasswordDlg::OnInitDialog()
 	m_bStars = TRUE;
 	OnCheckStars();
 
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
-
 	UpdateData(FALSE);
 
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
 
+	m_pEditPw.SetWindowText((LPCTSTR)m_strPassword);
 	m_pEditPw.SetFocus();
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
@@ -279,6 +278,9 @@ void CPasswordDlg::OnOK()
 
 	UpdateData(TRUE);
 
+	EraseCString(&m_strPassword);
+	m_pEditPw.GetWindowText(m_strPassword);
+
 	// Either password _or_ key disk
 	if(((m_strPassword.GetLength() == 0) ^ (m_cbDiskList.GetCurSel() == 0)) == 0)
 	{
@@ -290,6 +292,7 @@ void CPasswordDlg::OnOK()
 	if(m_cbDiskList.GetCurSel() == 0)
 	{
 		m_bKeyFile = FALSE;
+		EraseCString(&m_strRealKey);
 		m_strRealKey = m_strPassword;
 	}
 	else
@@ -330,6 +333,7 @@ void CPasswordDlg::OnOK()
 		}
 
 		m_bKeyFile = TRUE;
+		EraseCString(&m_strRealKey);
 		m_strRealKey = strTemp;
 		ASSERT(m_strRealKey.GetLength() != 0);
 	}
@@ -367,6 +371,7 @@ void CPasswordDlg::OnMakePasswordBtn()
 	dlg.m_bCanAccept = TRUE;
 	if(dlg.DoModal() == IDOK)
 	{
+		EraseCString(&m_strPassword);
 		m_strPassword = dlg.m_strPassword;
 		EraseCString(&dlg.m_strPassword);
 
@@ -374,12 +379,15 @@ void CPasswordDlg::OnMakePasswordBtn()
 		UpdateData(FALSE);
 		OnCheckStars();
 
-		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
+		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
+		m_pEditPw.SetWindowText((LPCTSTR)m_strPassword);
 	}
 }
 
 void CPasswordDlg::OnChangeEditPassword() 
 {
 	UpdateData(TRUE);
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
+	EraseCString(&m_strPassword);
+	m_pEditPw.GetWindowText(m_strPassword);
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
 }

@@ -162,6 +162,7 @@ void NewGUI_ToolBarButton(void *pButton, int nBitmapIn, int nBitmapOut)
 void NewGUI_TranslateCWnd(CWnd *pWnd)
 {
 	CString str;
+	ASSERT(pWnd != NULL); if(pWnd == NULL) return;
 	pWnd->GetWindowText(str);
 	pWnd->SetWindowText(TRL((LPCTSTR)str));
 }
@@ -170,6 +171,7 @@ BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
 {
 	TCHAR sz[1024];
 	UNREFERENCED_PARAMETER(lParam);
+	ASSERT(hwnd != NULL);
 	GetWindowText(hwnd, sz, 1023);
 	if(_tcslen(sz) <= 1021) SetWindowText(hwnd, TRL(sz));
 	return TRUE;

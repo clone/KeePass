@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Türkçe <Turkish>|
-|~LANGUAGEVERSION|             |0.96a|
+|~LANGUAGEVERSION|             |0.97a|
 |~LANGUAGEAUTHOR|              |Erhan BURHAN|
 |~LANGUAGEAUTHOREMAIL|         |<texas@xposta.com> <http://www.eburhan.com.tr.tc/>|
 
@@ -178,9 +178,10 @@
 |Export Group To &HTML...|     |Grubu &HTML olarak dýþarýya ver...|
 |Export Group To &XML...|      |Grubu &XML olarak dýþarýya ver...|
 |Export Group To &CSV...|      |Grubu &CSV olarak dýþarýya ver...|
+|Export Group To &TXT...|      |Grubu &TXT olarak dýþarýya ver...|
 |Copy User&Name To Clipboard|  |&Kullanýcý adýný panoya kopyala|
 |Copy &Password To Clipboard|  |&Parolayý panoya kopyala|
-|Open &URL|                    |&Web adresini (URL) aç|
+|Open &URL(s)|                 |&Web adresini (URL) aç|
 |&Find In Database...|         |&Veritabaný içerisinde bul...|
 |Find In This &Group...|       |Bu &grup içerisinde bul...|
 |&Add Entry...|                |Giriþ &ekle...|
@@ -251,8 +252,8 @@
 |Self-Test(s) Failed|          |Öz sýnama(lar) baþarýsýz oldu|
 
 |Clipboard cleared.|           |Pano temizlendi.|
-|Password copied to clipboard. Clipboard will be cleared in %d seconds.|
-    |Parola panoya kopyalandý. Pano %d saniye içerisinde temizlenmiþ olacak|
+|Field copied to clipboard. Clipboard will be cleared in %d seconds.|
+    |alan panoya kopyalandý. Pano %d saniye içerisinde temizlenmiþ olacak.|
 
 |Failed to set the master key!|
     |Ana anahtarý belirle iþlemi baþarýsýz!|
@@ -369,8 +370,6 @@
 |Automatically lock workspace after the following number of seconds:|
     |Aþaðýdaki süre sonunda (saniye cinsinden) çalýþma alanýný otomatik olarak kilitle:|
 |&Group Name|                  |&Grup ismi|
-|First close the open file before opening another one!|
-    |Bir baþka dosyayý açmadan önce açýk olaný kapatmalýsýnýz!|
 |Every second row has a different background color. Use this color:|
     |Her iki satýrý farklý bir arkaplan rengiyle göster. Bu rengi kullan :|
 |Start:|                       |Baþlangýç :|
@@ -424,8 +423,8 @@
 |Using this wizard you can easily add TAN entries.|
     |Bu sihirbazý kullanarak kolayca TAN giriþleri ekleyebilirsiniz.|
 
-|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-numerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only numerical 'substrings' are added as TAN entries.|
-    |Aþaðýdaki düzenleme penceresine TAN giriþlerinizi yapýþtýrabilirsiniz. Biçimleme gerçekten de önemli, deðildir. Sayýsal olmayan tüm karakterler (mesela yeni satýrlar, sekmeler, boþluklar, vb ) yok sayýlýr. Sadece sayýsal 'alt çizgiler'  TAN giriþleri olarak eklenir.|
+|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-alphanumerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only alphanumerical 'substrings' are added as TAN entries.|
+    |Aþaðýdaki düzenleme penceresine TAN giriþlerinizi yapýþtýrabilirsiniz. Biçimleme gerçekten de önemli, deðildir.  Biçimleme gerçekten de önemli, deðildir. Sayýsal olmayan tüm karakterler (mesela yeni satýrlar, sekmeler, boþluklar, vb ) yok sayýlýr. Sadece sayýsal olmayan 'alt çizgiler' TAN giriþleri olarak eklenir.|
 
 |<TAN>|                        |<TAN>|
 |Print Pre&view...|            |Baský &önizleme...|
@@ -521,4 +520,15 @@
 |Status|                                  |Durum|
 |The database file has been modified!|    |Veritabaný dosyasý deðiþtirilmiþ!|
 |Most probably someone has changed the file while you were editing it.| |Büyük ihtimalle size dosyasyý düzenliyorken bir baþkasýný onu deðiþtirdi.|
-|Do you want to overwrite it?|            |ÜZerine yazmak istiyor musunuz?|
+|Do you want to overwrite it?|            |Üzerine yazmak istiyor musunuz?|
+|The group you selected cannot store entries. Please select an other group.|
+    |Seçtiðiniz gruba giriþler eklenemez. Lütfen baþka bir grup seçiniz.|
+|This will remove all selected entries unrecoverably!|
+    |Bu iþlem bütün giriþleri geri dönüþümsüz bir þekilde silecektir!|
+|Are you sure you want to delete all selected entries?|
+    |Seçili olan tüm giriþler gerçekten silinsin istiyor musunuz?|
+|Delete Entries Confirmation|             |Giriþleri Silmeyi Doðrula|
+|Use PuTTY for ssh: and telnet: URLs|     |ssh: ve telnet: adresleri için PuTTY kullan|
+|Mark database as modified on last-access time change|
+    |Son eriþim zamanýný, düzenleme zamaný olarak deðiþtir.|
+|Se&lect All|                             |&Hepsini Seç|

@@ -88,6 +88,9 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 	ASSERT(m_pMgr != NULL); // You must set the manager before using this class
 	ASSERT(m_pParentIcons != NULL); // You must set the image list first!
 
+	// Translate all windows
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
+
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_Button(&m_btSelectIcon, -1, -1);
@@ -160,9 +163,6 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 	m_bModExpire = FALSE;
 	m_editTime.EnableWindow(FALSE);
 	m_editDate.EnableWindow(FALSE);
-
-	// Translate all windows
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	UpdateData(FALSE);
 

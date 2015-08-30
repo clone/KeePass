@@ -393,6 +393,9 @@ BOOL CAboutDlg::OnInitDialog()
 
 	CString str;
 
+	NewGUI_TranslateCWnd(this);
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
+
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btReadMe, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
 	NewGUI_Button(&m_btLicense, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
@@ -400,9 +403,6 @@ BOOL CAboutDlg::OnInitDialog()
 	m_strDbVersion.Format(TRL("%u.%u.%u.%u, compatible with %u.%u.x.x"),
 		PWM_DBVER_DW >> 24, (PWM_DBVER_DW >> 16) & 0xFF, (PWM_DBVER_DW >> 8) & 0xFF,
 		PWM_DBVER_DW & 0xFF, PWM_DBVER_DW >> 24, (PWM_DBVER_DW >> 16) & 0xFF);
-
-	NewGUI_TranslateCWnd(this);
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDR_MAINFRAME),
@@ -1115,11 +1115,28 @@ BOOL CPwSafeDlg::OnInitDialog()
 			cConfig.Get(PWMKEY_LASTDB, szTemp);
 			if(_tcslen(szTemp) != 0)
 			{
-				if(_FileAccessible(szTemp) == TRUE)
-					_OpenDatabase(szTemp);
+				TCHAR tszTemp[SI_REGSIZE];
+				int i;
+				GetModuleFileName(NULL, tszTemp, SI_REGSIZE - 2);
+				for(i = _tcslen(tszTemp) - 1; i > 1; i--)
+				{
+					if((tszTemp[i] == _T('\\')) || (tszTemp[i] == _T('/')))
+					{
+						tszTemp[i + 1] = 0;
+						break;
+					}
+				}
+				_tcscat(tszTemp, szTemp);
+
+				if(_FileAccessible(tszTemp) == TRUE)
+					_OpenDatabase(tszTemp);
 			}
 		}
 	}
+
+	cConfig.Get(PWMKEY_WINSTATE_MAX, szTemp);
+	if(_tcslen(szTemp) != 0)
+		if(_tcscmp(szTemp, _T("True")) == 0) ShowWindow(SW_SHOWMAXIMIZED);
 
 	_UpdateToolBar();
 	ProcessResize();
@@ -1242,7 +1259,7 @@ void CPwSafeDlg::_ParseSpecAndSetFont(const TCHAR *pszSpec)
 		if(nSize < 0) nSize = -nSize;
 		if(strFace.GetLength() >= 32) strFace = strFace.Left(31);
 
-		lf.lfCharSet = ANSI_CHARSET; lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+		lf.lfCharSet = DEFAULT_CHARSET; lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
 		lf.lfEscapement = 0; lf.lfItalic = bItalic; lf.lfOrientation = 0;
 		lf.lfOutPrecision = OUT_DEFAULT_PRECIS; lf.lfQuality = DEFAULT_QUALITY;
 		lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
@@ -1373,7 +1390,7 @@ void CPwSafeDlg::OnSysCommand(UINT nID, LPARAM lParam)
 		if(nID == SC_MAXIMIZE)
 		{
 			m_bMinimized = FALSE;
-			m_bMaximized = TRUE;
+			// m_bMaximized = TRUE;
 		}
 		else if((nID == SC_MINIMIZE) || (nID == SC_RESTORE))
 		{
@@ -1389,8 +1406,13 @@ void CPwSafeDlg::OnSysCommand(UINT nID, LPARAM lParam)
 			}
 
 			m_bMinimized = (nID == SC_MINIMIZE) ? TRUE : FALSE;
-			m_bMaximized = FALSE;
+			// m_bMaximized = (nID == SC_RESTORE) ? FALSE : TRUE;
 		}
+
+		WINDOWPLACEMENT wp;
+		wp.length = sizeof(WINDOWPLACEMENT);
+		GetWindowPlacement(&wp);
+		m_bMaximized = (wp.showCmd == SW_SHOWMAXIMIZED) ? TRUE : FALSE;
 	}
 
 	_UpdateToolBar();
@@ -1743,7 +1765,7 @@ void CPwSafeDlg::CleanUp()
 	if(m_bRememberLast == TRUE)
 	{
 		TCHAR tszTemp[MAX_PATH * 2];
-		GetModuleFileName(NULL, tszTemp, MAX_PATH * 2 - 2);
+		GetModuleFileName(NULL, tszTemp, (MAX_PATH * 2) - 2);
 		pcfg.Set(PWMKEY_LASTDB, (LPCTSTR)MakeRelativePathEx(tszTemp, (LPCTSTR)m_strLastDb));
 	}
 	else pcfg.Set(PWMKEY_LASTDB, _T(""));
@@ -1887,6 +1909,10 @@ void CPwSafeDlg::CleanUp()
 		_ltot(m_lSplitterPosVert, szTemp, 10);
 		pcfg.Set(PWMKEY_SPLITTERY, szTemp);
 	}
+
+	if(m_bMaximized == TRUE) _tcscpy(szTemp, _T("True"));
+	else _tcscpy(szTemp, _T("False"));
+	pcfg.Set(PWMKEY_WINSTATE_MAX, szTemp);
 
 	_ltot((long)m_cList.GetColorEx(), szTemp, 10);
 	pcfg.Set(PWMKEY_ROWCOLOR, szTemp);
@@ -2696,7 +2722,6 @@ void CPwSafeDlg::OnRclickPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 	m_bDisplayDialog = FALSE;
 
 	*pResult = 0;
-
 	_UpdateToolBar();
 }
 
@@ -3210,8 +3235,9 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 			else dlgPass.m_strDescriptiveName = CsFileOnly(&strFile);
 
 			if(dlgPass.DoModal() == IDCANCEL) { LCL_OD_CLEANUP; return; }
-			if(m_mgr.SetMasterKey(dlgPass.m_strRealKey, dlgPass.m_bKeyFile, NULL) == FALSE)
+			if(m_mgr.SetMasterKey((LPCTSTR)dlgPass.m_strRealKey, dlgPass.m_bKeyFile, NULL) == FALSE)
 			{
+				EraseCString(&dlgPass.m_strRealKey);
 				MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"), MB_OK | MB_ICONWARNING);
 				continue;
 			}
@@ -6013,7 +6039,7 @@ void CPwSafeDlg::OnExtrasTanWizard()
 				VERIFY(m_mgr.AddEntry(&pwTemplate));
 
 				bValidSubString = FALSE;
-				strSubString.Empty();
+				EraseCString(&strSubString);
 			}
 		}
 

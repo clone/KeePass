@@ -82,6 +82,9 @@ BOOL CGetRandomDlg::OnInitDialog()
 	m_dwCurPoint = 0;
 	m_bMouseActive = FALSE;
 
+	NewGUI_TranslateCWnd(this);
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
+
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_Button(&m_btMouseInput, IDB_MOUSE_SMALL, IDB_MOUSE_SMALL);
@@ -96,9 +99,6 @@ BOOL CGetRandomDlg::OnInitDialog()
 	cRand.Initialize();
 	cRand.GetRandomBuffer(m_pFinalRandom, 32);
 	cRand.GetRandomBuffer((BYTE *)m_points, sizeof(POINT) * 100);
-
-	NewGUI_TranslateCWnd(this);
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	return TRUE;
 }

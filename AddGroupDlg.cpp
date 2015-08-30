@@ -80,6 +80,8 @@ BOOL CAddGroupDlg::OnInitDialog()
 	
 	ASSERT(m_pParentImageList != NULL);
 
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
+
 	NewGUI_Button(&m_btSetIcon, -1, -1);
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
@@ -101,8 +103,7 @@ BOOL CAddGroupDlg::OnInitDialog()
 		SetWindowText(TRL("Edit Group"));
 	}
 
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
-
+	UpdateData(FALSE);
 	GetDlgItem(IDC_EDIT_GROUPNAME)->SetFocus();
 	return FALSE; // Return TRUE unless you set the focus to a control
 }

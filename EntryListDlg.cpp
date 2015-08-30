@@ -81,6 +81,9 @@ BOOL CEntryListDlg::OnInitDialog()
 	ASSERT(m_nDisplayMode != ELDMODE_UNKNOWN);
 	ASSERT(m_pImgList != NULL);
 
+	// Translate all windows
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
+
 	NewGUI_Button(&m_btClose, IDB_CANCEL, IDB_CANCEL);
 
 	// Configure banner control
@@ -125,9 +128,6 @@ BOOL CEntryListDlg::OnInitDialog()
 			_AddEntryToList(p);
 		}
 	}
-
-	// Translate all windows
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	return TRUE; // return TRUE unless you set the focus to a control
 }

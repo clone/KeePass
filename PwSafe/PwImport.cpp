@@ -64,7 +64,7 @@ char *CPwImport::_FileToMemory(const TCHAR *pszFile, unsigned long *pFileSize)
 	pData[uFileSize] = 0; // Terminate buffer
 
 	fread(pData, 1, uFileSize, fp);
-	fclose(fp);
+	fclose(fp); fp = NULL;
 
 	if(pFileSize != NULL) *pFileSize = uFileSize; // Store file size
 	return pData;

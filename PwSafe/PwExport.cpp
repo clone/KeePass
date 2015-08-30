@@ -345,7 +345,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 		PWEXPSTR(m_pszNewLine);
 	}
 	else if(m_nFormat == PWEXP_CSV)
-	{ // Nothing to finalize CSV
+	{ // Nothing to do to finalize CSV
 	}
 	else { ASSERT(FALSE); } // Unknown format, should never happen
 

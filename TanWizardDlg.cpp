@@ -70,6 +70,9 @@ BOOL CTanWizardDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	NewGUI_TranslateCWnd(this);
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
+
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 
@@ -78,9 +81,6 @@ BOOL CTanWizardDlg::OnInitDialog()
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("TAN Wizard"));
 	m_banner.SetCaption(TRL("Using this wizard you can easily add TAN entries."));
-
-	NewGUI_TranslateCWnd(this);
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	return TRUE;
 }

@@ -34,19 +34,13 @@
 
 void mem_erase(unsigned char *p, unsigned long u)
 {
-	unsigned long i;
+	// unsigned long i;
 
-	ASSERT(p != NULL);
-	if(p == NULL) return;
-	ASSERT(u != 0);
-	if(u == 0) return;
+	ASSERT(p != NULL); if(p == NULL) return;
+	ASSERT(u != 0); if(u == 0) return;
 
-	for(i = 0; i < u; i++)
-		p[i] = (unsigned char)(rand() & 0xFF);
-	for(i = 0; i < u; i++)
-		p[i] = (unsigned char)(rand() & 0xFF);
-	for(i = 0; i < u; i++)
-		p[i] = (unsigned char)(rand() & 0xFF);
+	// for(i = 0; i < u; i++)
+	//	p[i] = (unsigned char)(rand() & 0xFF);
 
 	memset(p, 0, u);
 }

@@ -72,6 +72,9 @@ END_MESSAGE_MAP()
 BOOL CLanguagesDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
+
+	NewGUI_TranslateCWnd(this);
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 	
 	NewGUI_Button(&m_btClose, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_Button(&m_btGetLang, IDB_LANGUAGE, IDB_LANGUAGE);
@@ -81,9 +84,6 @@ BOOL CLanguagesDlg::OnInitDialog()
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("Load a language file"));
 	m_banner.SetCaption(TRL("Select one of the languages in the list below."));
-
-	NewGUI_TranslateCWnd(this);
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	RECT rcList;
 	m_listLang.GetWindowRect(&rcList);

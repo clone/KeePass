@@ -1213,6 +1213,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 		memcpy(&pVirtualFile[pos], &dwFieldSize, 4); pos += 4;
 		ASSERT((pb != NULL) && (szlen((char *)pb) == (dwFieldSize - 1)) && ((pos + dwFieldSize) <= uAllocated));
 		szcpy(&pVirtualFile[pos], (char *)pb); pos += dwFieldSize;
+		if(pb != NULL) mem_erase((unsigned char *)pb, szlen((char *)pb));
 		SAFE_DELETE_ARRAY(pb);
 
 		pb = _StringToUTF8(m_pEntries[i].pszAdditional);
@@ -1808,6 +1809,8 @@ BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pDa
 		break;
 	case 0x0007:
 		ASSERT(dwFieldSize != 0);
+		if(pEntry->pszPassword != NULL)
+			mem_erase((unsigned char *)pEntry->pszPassword, _tcslen(pEntry->pszPassword) * sizeof(TCHAR));
 		SAFE_DELETE_ARRAY(pEntry->pszPassword);
 		pEntry->pszPassword = _UTF8ToString((UTF8_BYTE *)pData);
 		break;
@@ -1856,6 +1859,8 @@ BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pDa
 		SAFE_DELETE_ARRAY(pEntry->pszTitle);
 		SAFE_DELETE_ARRAY(pEntry->pszURL);
 		SAFE_DELETE_ARRAY(pEntry->pszUserName);
+		if(pEntry->pszPassword != NULL)
+			mem_erase((unsigned char *)pEntry->pszPassword, _tcslen(pEntry->pszPassword) * sizeof(TCHAR));
 		SAFE_DELETE_ARRAY(pEntry->pszPassword);
 		SAFE_DELETE_ARRAY(pEntry->pszAdditional);
 		SAFE_DELETE_ARRAY(pEntry->pszBinaryDesc);

@@ -51,8 +51,8 @@ void EraseCString(CString *pString)
 		lpt[j] = (TCHAR)((rand() % tcMod) + tcPlus);
 	}
 
-	pString->FreeExtra();
 	pString->Empty();
+	pString->FreeExtra();
 }
 
 #ifndef _WIN32_WCE
@@ -286,7 +286,7 @@ void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 {
 	DWORD i, j = 0;
-	DWORD dwLength, dwBytesNeeded;
+	DWORD dwLength, dwBytesNeeded, dwUniBufferLength = 0;
 	BYTE *p = NULL;
 	WCHAR ut;
 	const WCHAR *pUni = NULL;
@@ -301,7 +301,8 @@ UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 #else
 	// This returns the new length plus the zero byte - i.e. the whole buffer!
 	dwLength = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszSourceString, -1, NULL, 0);
-	pUniBuffer = new WCHAR[dwLength + 2];
+	dwUniBufferLength = dwLength + 2;
+	pUniBuffer = new WCHAR[dwUniBufferLength];
 	pUniBuffer[0] = 0; pUniBuffer[1] = 0;
 	pUni = pUniBuffer;
 	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszSourceString, -1, pUniBuffer, dwLength);
@@ -322,8 +323,7 @@ UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 	}
 
 	p = new BYTE[dwBytesNeeded + 2];
-	ASSERT(p != NULL);
-	if(p == NULL) return NULL;
+	ASSERT(p != NULL); if(p == NULL) return NULL;
 
 	j = 0;
 	for(i = 0; i < dwLength; i++)
@@ -350,6 +350,7 @@ UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 	ASSERT(j == (dwBytesNeeded + 1));
 
 #ifndef _UNICODE
+	mem_erase((unsigned char *)pUniBuffer, dwUniBufferLength * sizeof(WCHAR));
 	SAFE_DELETE_ARRAY(pUniBuffer);
 #endif
 
@@ -415,12 +416,12 @@ DWORD _UTF8BytesNeeded(const TCHAR *pszString)
 TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 {
 	DWORD i, j;
-	DWORD dwNumChars, dwMoreBytes;
+	DWORD dwNumChars, dwMoreBytes, dwPBufLength = 0;
 	BYTE b0, b1, b2;
 	WCHAR *p, *pANSI;
 	WCHAR tch;
 
-	ASSERT(pUTF8String != NULL);
+	ASSERT(pUTF8String != NULL); if(pUTF8String == NULL) return NULL;
 
 	// Count needed Unicode chars (right counterpart to _StringToUTF8)
 	i = 0; dwNumChars = 0;
@@ -437,9 +438,9 @@ TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 	}
 	if(dwNumChars == 0) return NULL;
 
-	p = new WCHAR[dwNumChars + 2];
-	ASSERT(p != NULL);
-	if(p == NULL) return NULL;
+	dwPBufLength = dwNumChars + 2;
+	p = new WCHAR[dwPBufLength];
+	ASSERT(p != NULL); if(p == NULL) return NULL;
 
 	i = 0; j = 0;
 	while(1)
@@ -492,6 +493,7 @@ TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 	pANSI[0] = 0;
 	VERIFY(WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, p, -1, (LPSTR)pANSI, dwNumChars, NULL, NULL) !=
 		ERROR_INSUFFICIENT_BUFFER);
+	if(p != NULL) mem_erase((unsigned char *)p, dwPBufLength);
 	SAFE_DELETE_ARRAY(p);
 	return (TCHAR *)pANSI;
 #endif
@@ -511,28 +513,28 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry)
 	{
 		nPos = str.Find(_T("%TITLE%"));
 		if(nPos == -1) break;
-		str = str.Left(nPos) + CString(pEntry->pszTitle) + str.Right(str.GetLength() - nPos - 7);
+		str = str.Left(nPos) + pEntry->pszTitle + str.Right(str.GetLength() - nPos - 7);
 	}
 
 	while(1)
 	{
 		nPos = str.Find(_T("%USERNAME%"));
 		if(nPos == -1) break;
-		str = str.Left(nPos) + CString(pEntry->pszUserName) + str.Right(str.GetLength() - nPos - 10);
+		str = str.Left(nPos) + pEntry->pszUserName + str.Right(str.GetLength() - nPos - 10);
 	}
 
 	while(1)
 	{
 		nPos = str.Find(_T("%PASSWORD%"));
 		if(nPos == -1) break;
-		str = str.Left(nPos) + CString(pEntry->pszPassword) + str.Right(str.GetLength() - nPos - 10);
+		str = str.Left(nPos) + pEntry->pszPassword + str.Right(str.GetLength() - nPos - 10);
 	}
 
 	while(1)
 	{
 		nPos = str.Find(_T("%NOTES%"));
 		if(nPos == -1) break;
-		str = str.Left(nPos) + CString(pEntry->pszAdditional) + str.Right(str.GetLength() - nPos - 7);
+		str = str.Left(nPos) + pEntry->pszAdditional + str.Right(str.GetLength() - nPos - 7);
 	}
 
 	*pString = str;
@@ -654,6 +656,8 @@ CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile)
 	HINSTANCE hShl;
 	TCHAR tszPath[MAX_PATH * 2];
 	BOOL bResult;
+	CString str;
+	BOOL bMod;
 
 	hShl = LoadLibrary(_T("ShlWApi.dll"));
 	if(hShl == NULL) return CString(lpTargetFile);
@@ -664,9 +668,23 @@ CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile)
 		bResult = lpRel(tszPath, lpBaseFile, 0, lpTargetFile, 0);
 	}
 
-	FreeLibrary(hShl);
+	FreeLibrary(hShl); hShl = NULL;
 
-	if(bResult == TRUE) return CString(tszPath);
+	str = tszPath;
+	while(1) // Remove all .\\ from the left of the path
+	{
+		bMod = FALSE;
+
+		if(str.Left(2) == ".\\")
+		{
+			str = str.Right(str.GetLength() - 2);
+			bMod = TRUE;
+		}
+
+		if(bMod == FALSE) break;
+	}
+
+	if(bResult == TRUE) return str;
 	else return CString(lpTargetFile);
 }
 #else

@@ -63,6 +63,8 @@ public:
 	int m_nGroupId;
 	int m_nIconId;
 
+	CString m_strPassword;
+	CString m_strRepeatPw;
 	CString m_strNotes;
 	PW_TIME m_tExpire;
 
@@ -86,8 +88,6 @@ public:
 	CEdit	m_pEditPw;
 	CWzComboBox	m_pGroups;
 	BOOL	m_bStars;
-	CString	m_strPassword;
-	CString	m_strRepeatPw;
 	CString	m_strTitle;
 	CString	m_strURL;
 	CString	m_strUserName;

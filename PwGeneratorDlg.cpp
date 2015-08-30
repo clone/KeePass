@@ -101,6 +101,9 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	NewGUI_TranslateCWnd(this);
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
+
 	NewGUI_Button(&m_btnOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btnCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_Button(&m_btGenerate, IDB_KEY_SMALL, IDB_KEY_SMALL);
@@ -191,9 +194,6 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 		m_btnCancel.SetWindowText(_T("&Close"));
 	}
 	else m_btnOK.ShowWindow(SW_SHOW);
-
-	NewGUI_TranslateCWnd(this);
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
 

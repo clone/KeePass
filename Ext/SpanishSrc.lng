@@ -1,5 +1,5 @@
 |~LANGUAGENAME||Spanish (Español para España y Latinoamérica)|
-|~LANGUAGEVERSION||0.96b|
+|~LANGUAGEVERSION||0.97a|
 |~LANGUAGEAUTHOR||Marcel Trujillo|
 |~LANGUAGEAUTHOREMAIL||marcelito@gmail.com|
 |&OK||&OK|
@@ -70,7 +70,7 @@
 |Space ' '||Espacio ' '|
 |Special characters (!, §, $, %, &, ...)||Caracteres especiales (!, §, $, %, &, ...)|
 |Higher ANSI characters (Â, ©, É, µ, ½, ...)||Caracteres ANSI extendidos (Â, ©, É, µ, ½, ...)|
-|Special brackets ('{', '}', '[', ..)||Paréntesis, llaves y corchetes ('{', '}', '[', ...)|
+|Special brackets ('{', '}', '[', ...)||Paréntesis, llaves y corchetes ('{', '}', '[', ...)|
 |Group:||Grupo:|
 |Title:||Título:|
 |UserName:||Usuario:|
@@ -129,9 +129,10 @@
 |Export Group To &HTML...||Exportar Grupo en &HTML...|
 |Export Group To &XML...||Exportar Grupo en &XML...|
 |Export Group To &CSV...||Exportar Grupo en &CSV...|
+|Export Group To &TXT...||Exportar Grupo en &TXT...|
 |Copy User&Name To Clipboard||Copiar &Usuario en el portapapeles|
 |Copy &Password To Clipboard||Copiar &Contraseña en el portapapeles|
-|Open &URL||Abrir &URL |
+|Open &URL(s)||Abrir &URL(s)|
 |&Find In Database...||Encontrar en la &Base de Datos...|
 |Find In This &Group...||Encontrar en este &Grupo...|
 |&Add Entry...||&Añadir Entrada...|
@@ -180,7 +181,7 @@
 |The program will exit now.||El programa se cerrará ahora.|
 |Self-Test(s) Failed||Auto-Test(s) falló(aron)|
 |Clipboard cleared.||Portapapeles borrado.|
-|Password copied to clipboard. Clipboard will be cleared in %d seconds.||Contraseña copiada al portapapeles. El portapapeles será borrado en %d segundos.|
+|Field copied to clipboard. Clipboard will be cleared in %d seconds.||Campo copiado al portapapeles. El portapapeles será borrado en %d segundos.|
 |Failed to set the master key!||¡No pudo definirse una clave maestra!|
 |File cannot be opened!||¡El archivo no puede ser abierto!|
 |File cannot be saved!||¡El archivo no puede ser guardado!|
@@ -241,7 +242,6 @@
 |db = Path to database you wish to open on KeePass startup||db = Ruta de la base de datos que desea abrir al iniciar KeePass|
 |Automatically lock workspace after the following number of seconds:||Bloquear automáticamente el área de trabajo después de el siguiente número de segundos:|
 |&Group Name||Nombre del &Grupo|
-|First close the open file before opening another one!||¡Primero cierre el archivo antes de abrir otro!|
 |Every second row has a different background color. Use this color:||Cada segunda fila tiene un color de fondo diferente. Use este color:|
 |Start:||Inicio:|
 |Exit:||Salir:|
@@ -260,7 +260,7 @@
 |Show UU&ID Column||Mostrar columna &UUID |
 |Show &ToolBar||&Mostrar barra de herramientas|
 |Visit KeePass Homepage||Visitar KeePass Homepage|
-|Field copied to clipboard.||Campo copiado al Portapapeles.|
+|Field copied to clipboard.||Campo copiado al portapapeles.|
 |A key-file already exists on this drive. Do you want to overwrite it?||Un archivo de clave ya existe en esta unidad. ¿Desea usted sobreescribirlo?|
 |Overwrite?||¿Sobreescribir?|
 |Expires:||Expiración:|
@@ -284,7 +284,7 @@
 |&TAN Wizard||Asistente de &TAN|
 |TAN Wizard||Asistente de TAN|
 |Using this wizard you can easily add TAN entries.||Usando este asistente, usted puede fácilmente añadir entradas TAN.|
-|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-numerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only numerical 'substrings' are added as TAN entries.||Sólo pegue sus TANs en la ventana de edición de arriba. El formato realmente no importa, todos los caracteres no numéricos son ignorados (ex: nuevas líneas, tabs, espacios, etc...) y solamente secuencias numéricas son añadidas como entradas TAN.|
+|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-alphanumerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only alphanumerical 'substrings' are added as TAN entries.||Sólo pegue sus TANs en la ventana de edición siguiente. El formato no es relevante, todos los caracteres no alfanuméricos son ignorados (ej. nuevas líneas, tabulaciones, espacios, etc...) y únicamente secuencias alfanuméricas son añadidas como entradas TAN.|
 |<TAN>||<TAN>|
 |Print Pre&view...||&Pre&visualizar Impresión...|
 |About &Translation...||Acerca de la &Traducción...|
@@ -365,6 +365,12 @@
 |&XML File...||Archivo &XML...|
 |Code&Wallet TXT File...||Archivo TXT Code&Wallet...|
 |Do you want to overwrite it?||¿Desea sobreescribirlo?|
+|The group you selected cannot store entries. Please select an other group.||El grupo que seleccionó no pueda almacenar entradas. Por favor seleccione otro grupo.|
+|This will remove all selected entries unrecoverably!||¡Esto eliminará todas las entradas seleccionadas permanentemente!|
+|Are you sure you want to delete all selected entries?||¿Está seguro que desea eliminar todas las entradas seleccionadas?|
+|Delete Entries Confirmation||Confirmación de Borrado de Entradas|
+|Use PuTTY for ssh: and telnet: URLs||Usar PuTTY para ssh: y telnet: URLS|
+|Mark database as modified on last-access time change||Marcar la base de datos como modificada tras el cambio del último acceso|
 |Export To||Exportar a|
 |Import From||Importar desde|
 |Imported from Password Safe||Importado de Password Safe|
@@ -376,3 +382,4 @@
 |The database file has been modified!||¡El archivo de la base de datos fue modificado!|
 |Total number of groups / entries||Número total de grupos / entradas|
 |Total: %u groups / %u entries||Total: %u grupo(s) / %u entrada(s)|
+|Se&lect All||Se&leccionar Todo|

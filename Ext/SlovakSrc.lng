@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Slovenèina|
-|~LANGUAGEVERSION|             |0.96b|
+|~LANGUAGEVERSION|             |0.97a|
 |~LANGUAGEAUTHOR|              |Radoslav Bielik|
 |~LANGUAGEAUTHOREMAIL|         |rado@bielik.org, http://www.bielik.org|
 
@@ -137,9 +137,9 @@
 |So, the more the better. The different, the better.| \
     |Èím viac, a èím rozmanitejšie, tım lepšie.| \
 |The random the better.|       THIS ISN'T A ONE-TO-ONE TRANSLATION!
-    |Náhodnos je lepšia.| /
-|Get Random|                   |Zufallszahlen generieren|
-|Get random data for key generation|           |Zufallszahlen für Schlüsselerstellung|
+    |Èím náhodnejšie, tım lepšie.| /
+|Get Random|                   |Generovanie náhodnıch údajov|
+|Get random data for key generation|           |Generovanie náhodnıch údajov pre vytvorenie hesla|
 |Move the mouse and type some random text to generate random values.|
     |Pohybujte myšou a zadajte nejakı náhodnı text pre generovanie náhodnıch hodnôt.|
 
@@ -174,12 +174,13 @@
 |&Modify Password Group...|    |&Upravi skupinu hesiel...|
 |&Delete Password Group...|    |&Zmaza skupinu hesiel...|
 |&Print Group|                 |&Tlaèi skupinu...|
-|Export Group To &HTML...|     |Exportova skupinu do HTML...|
-|Export Group To &XML...|      |Exportova skupinu do XML...|
-|Export Group To &CSV...|      |Exportova skupinu do CSV...|
+|Export Group To &HTML...|     |Exportova skupinu do &HTML...|
+|Export Group To &XML...|      |Exportova skupinu do &XML...|
+|Export Group To &CSV...|      |Exportova skupinu do &CSV...|
+|Export Group To &TXT...|	   |Exportova skupinu do &TXT...|
 |Copy User&Name To Clipboard|  |Kopírova uívate¾ské &meno do schránky|
 |Copy &Password To Clipboard|  |Kopírova &heslo do schránky|
-|Open &URL|                    |Otvori U&RL|
+|Open &URL(s)|                 |Otvori U&RL|
 |&Find In Database...|         |Nájs v databáze...|
 |Find In This &Group...|       |Nájs v tejto skupine...|
 |&Add Entry...|                |Pr&ida záznam...|
@@ -248,8 +249,6 @@
 |Self-Test(s) Failed|          |Samotest(y) zlyhali|
 
 |Clipboard cleared.|           |Schránka bola vymazaná.|
-|Password copied to clipboard. Clipboard will be cleared in %d seconds.|
-    |Heslo bolo skopírované do schránky. Schránka bude vymazaná za %d sekúnd.|
 |Field copied to clipboard. Clipboard will be cleared in %d seconds.|
     |Poloka bola skopírovaná do schránky. Schránka bude vymazaná za %d sekúnd.|
 
@@ -371,8 +370,6 @@
 |Automatically lock workspace after the following number of seconds:|
     |Automaticky zamknú pracovnú plochu po nasledujúcom mnostve sekúnd:|
 |&Group Name|                  |Názov &skupiny|
-|First close the open file before opening another one!|
-    |Pred otvorením ïalšieho súboru musí by zatvorenı aktuálny súbor!|
 |Every second row has a different background color. Use this color:|
     |Kadı druhı riadok má inú farbu pozadia. Poui túto farbu:|
 |Start:|                       |Spustenie:|
@@ -401,7 +398,7 @@
     |Súbor k¾úèa u na tomto disku existuje. Prajete si ho prepísa?|
 |Overwrite?|                   |Prepísa?|
 |Expires:|                     |Platné do:|
-|&Delete Selected Entries|     |&Zmaza zvolené záznamy|
+|&Delete Selected Entries|     |&Zmaza oznaèené záznamy|
 |&Mass Modify (All Selected)...|               |Upravi v&šetky zvolené záznamy...|
 |Change group:|                |Zmeni skupinu:|
 |Change entry icon:|           |Zmeni ikonu záznamu:|
@@ -418,7 +415,7 @@
 |&Undo|                        |&Spä|
 |&Paste|                       |V&loi|
 |Cu&t|                         |Vyst&rihnú|
-|&Select All|                  |Zvoli všetko|
+|&Select All|                  |Oznaèi všetko|
 |&Delete|                      |&Zmaza|
 |&TAN Wizard|                  |Sprievodca &TAN|
 |TAN Wizard|                   |Sprievodca TAN|
@@ -426,8 +423,9 @@
 |Using this wizard you can easily add TAN entries.|
     |Tento sprievodca vám pomôe pri pridávaní záznamov TAN.|
 
-|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-numerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only numerical 'substrings' are added as TAN entries.|
-    |Vlote svoje TAN kódy do editaèného okna nišie. Na formátovaní nezáleí, všetky nenumerické znaky sú ignorované (napríklad znaky nového riadku, tabulátora, medzera, atï.) a len numerické podreazce sú pridané ako TAN záznamy.|
+|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-alphanumerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only alphanumerical 'substrings' are added as TAN entries.|
+    |Vlote svoje TAN kódy do editaèného okna nišie. Na formátovaní nezáleí, všetky nealfanumerické znaky sú ignorované (napríklad znaky nového riadku, tabulátora, medzera, atï.) a len alfanumerické podreazce sú pridané ako TAN záznamy.|
+
 
 |<TAN>|                        |<TAN>|
 |Print Pre&view...|            |Náh¾a&d tlaèe...|
@@ -438,7 +436,7 @@
 |Language file version|        |Verzia jazykového súboru|
 |Author|                       |Autor|
 |Translation author contact|   |Kontakt na autora prekladu|
-|&Rearrange|                   |&Reorganizova|
+|&Rearrange|                   |Reor&ganizova|
 |&Sort Group List|             |Zotriedi zoznam &skupín|
 |&Sort List By Title|          |Zotriedi zoznam pod¾a &názvu|
 |Sort List By User&Name|       |Zotriedi zoznam pod¾a uívate¾ského &mena|
@@ -527,15 +525,30 @@
 
 |bits|						|bitov|
 
-|%u of %u selected|				|Zvolenıch %u z %u|
+|%u of %u selected|				|Oznaèenıch %u z %u|
 |Do you want to overwrite it?|			|Prajete si ho prepísa?|
 |Imported from Password Safe|			|Importované z Password Safe|
 |Most probably someone has changed the file while you were editing it.|
 	|Niekto pravdepodobne upravil súbor kım ste s ním pracovali.|
 |Number of selected entries (number of entries in the list)|
-	|Poèet zvolenıch záznamov (poèet záznamov v zozname)|
+	|Poèet oznaèenıch záznamov (poèet záznamov v zozname)|
 |Remember last opened file|			|Zapamäta naposledy otvorenı súbor|
 |Status|					|Stav|
 |The database file has been modified!|		|Súbor databázy bol zmenenı!|
 |Total number of groups / entries|		|Celkové mnostvo skupín / záznamov|
 |Total: %u groups / %u entries|			|Celkom: %u skupín / %u záznamov|
+
+
+|Are you sure you want to delete all selected entries?|
+	|Skutoène si prajete zmaza všetky oznaèené záznamy?|
+|Delete Entries Confirmation|           |Potvrdenie vymazania záznamov|
+|Mark database as modified on last-access time change|
+	|Oznaèi databázu ako modifikovanú pri zmene èasu posledného prístupu|
+|Se&lect All|                           |Oznaèi všetky|	  
+|The group you selected cannot store entries. Please select an other group.|
+	|Do tejto skupiny nemôu by uloené záznamy. Prosím zvo¾te ïalšiu skupinu.|
+|This will remove all selected entries unrecoverably!|
+	|Všetky oznaèené záznamy budú nenávratne odstránené!|
+|Use PuTTY for ssh: and telnet: URLs|
+	|Pouíva PuTTY pre ssh: a telnet: URL adresy|
+

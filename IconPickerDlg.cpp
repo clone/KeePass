@@ -77,6 +77,9 @@ BOOL CIconPickerDlg::OnInitDialog()
 	ASSERT(m_pImageList != NULL);
 	ASSERT(m_uNumIcons != 0);
 
+	NewGUI_TranslateCWnd(this);
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
+
 	m_cList.SetImageList(m_pImageList, LVSIL_SMALL);
 
 	ASSERT(LVM_SETEXTENDEDLISTVIEWSTYLE == (0x1000 + 54));
@@ -99,9 +102,6 @@ BOOL CIconPickerDlg::OnInitDialog()
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("Pick an Icon"));
 	m_banner.SetCaption(TRL("Pick an icon from the list and click OK to set it."));
-
-	NewGUI_TranslateCWnd(this);
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	return TRUE; // Return TRUE unless you set the focus to a control
 }

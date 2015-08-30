@@ -54,8 +54,7 @@ BOOL LoadTranslationTable(const char *pszTableName)
 
 	if(m_bTableLoaded == TRUE) FreeCurrentTranslationTable();
 
-	ASSERT(pszTableName != NULL);
-	if(pszTableName == NULL) return FALSE;
+	ASSERT(pszTableName != NULL); if(pszTableName == NULL) return FALSE;
 	if(strlen(pszTableName) == 0) return TRUE;
 	if((strcmp(pszTableName, "Standard") == 0) || (strcmp(pszTableName, "English") == 0))
 	{
@@ -205,7 +204,7 @@ void _SortTrlTable()
 const TCHAR *_TRL(const char *pszDefString)
 {
 	if(m_dwNumTrlStrings == 0) return pszDefString;
-	if(pszDefString == NULL) return "";
+	ASSERT(pszDefString != NULL); if(pszDefString == NULL) return _T("");
 
 	// Fast binary search on the sorted list of translation strings:
 	static int l, r, x, c;

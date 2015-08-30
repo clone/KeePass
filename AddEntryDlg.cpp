@@ -53,8 +53,6 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 {
 	//{{AFX_DATA_INIT(CAddEntryDlg)
 	m_bStars = TRUE;
-	m_strPassword = _T("");
-	m_strRepeatPw = _T("");
 	m_strTitle = _T("");
 	m_strURL = _T(PWAE_STDURL_A);
 	m_strUserName = _T("");
@@ -67,6 +65,8 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 	m_bEditMode = FALSE;
 	m_pParentIcons = NULL;
 	m_strNotes = _T("");
+	m_strPassword = _T("");
+	m_strRepeatPw = _T("");
 }
 
 void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
@@ -89,8 +89,6 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_PASSWORD, m_pEditPw);
 	DDX_Control(pDX, IDC_COMBO_GROUPS, m_pGroups);
 	DDX_Check(pDX, IDC_CHECK_HIDEPW, m_bStars);
-	DDX_Text(pDX, IDC_EDIT_PASSWORD, m_strPassword);
-	DDX_Text(pDX, IDC_EDIT_REPEATPW, m_strRepeatPw);
 	DDX_Text(pDX, IDC_EDIT_TITLE, m_strTitle);
 	DDX_Text(pDX, IDC_EDIT_URL, m_strURL);
 	DDX_Text(pDX, IDC_EDIT_USERNAME, m_strUserName);
@@ -125,6 +123,9 @@ BOOL CAddEntryDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	ASSERT(m_pParentIcons != NULL); // Parent must set image list first!
+
+	// Translate all windows
+	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	// The password dots font
 	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
@@ -239,18 +240,14 @@ BOOL CAddEntryDlg::OnInitDialog()
 	m_editTime.SetTime((int)(unsigned int)m_tExpire.btHour,
 		(int)(unsigned int)m_tExpire.btMinute, (int)(unsigned int)m_tExpire.btSecond);
 
-	UpdateData(FALSE);
-
 	// m_reNotes.LimitText(0);
-
 	m_reNotes.SetEventMask(ENM_MOUSEEVENTS);
 	m_reNotes.SetRTF(m_strNotes, SF_TEXT);
 
+	UpdateData(FALSE);
+
 	// removed m_bStars = TRUE; -> Parent can decide to show the password or not
 	OnCheckHidePw(); // Update GUI based on m_bStars flag
-
-	// Translate all windows
-	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
 	if(m_bEditMode == FALSE) // Generate a pseudo-random password
 	{
@@ -264,12 +261,19 @@ BOOL CAddEntryDlg::OnInitDialog()
 		VERIFY(base64.Encode(pbRandom, 16, pbString, &dwSize));
 		SAFE_DELETE(pRand);
 		pbString[strlen((char *)pbString) - 3] = 0;
+		EraseCString(&m_strPassword);
 		m_strPassword = (char *)(pbString + 1);
+		EraseCString(&m_strRepeatPw);
 		m_strRepeatPw = (char *)(pbString + 1);
 		UpdateData(FALSE);
+		m_pEditPw.SetWindowText((LPCTSTR)m_strPassword);
+		m_pRepeatPw.SetWindowText((LPCTSTR)m_strRepeatPw);
 	}
 
 	UpdateControlsStatus();
+
+	m_pEditPw.SetWindowText((LPCTSTR)m_strRepeatPw);
+	m_pRepeatPw.SetWindowText((LPCTSTR)m_strRepeatPw);
 
 	if(m_strTitle == PWS_TAN_ENTRY)
 	{
@@ -297,6 +301,11 @@ void CAddEntryDlg::OnOK()
 {
 	UpdateData(TRUE);
 
+	EraseCString(&m_strPassword);
+	m_pEditPw.GetWindowText(m_strPassword);
+	EraseCString(&m_strRepeatPw);
+	m_pRepeatPw.GetWindowText(m_strRepeatPw);
+
 	CString strGroupTest;
 	m_pGroups.GetLBText(m_pGroups.GetCurSel(), strGroupTest);
 	if(CPwManager::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
@@ -312,6 +321,7 @@ void CAddEntryDlg::OnOK()
 	m_tExpire.btHour = (BYTE)m_editTime.GetHour();
 	m_tExpire.btMinute = (BYTE)m_editTime.GetMinute();
 	m_tExpire.btSecond = (BYTE)m_editTime.GetSecond();
+
 	m_reNotes.GetWindowText(m_strNotes);
 
 	m_nGroupId = m_pGroups.GetCurSel();
@@ -382,13 +392,17 @@ void CAddEntryDlg::OnRandomPwBtn()
 	dlg.m_bCanAccept = TRUE;
 	if(dlg.DoModal() == IDOK)
 	{
+		EraseCString(&m_strPassword);
 		m_strPassword = dlg.m_strPassword;
+		EraseCString(&m_strRepeatPw);
 		m_strRepeatPw = dlg.m_strPassword;
 
 		EraseCString(&dlg.m_strPassword);
 
 		UpdateData(FALSE);
 
+		m_pEditPw.SetWindowText((LPCTSTR)m_strPassword);
+		m_pRepeatPw.SetWindowText((LPCTSTR)m_strRepeatPw);
 		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
 	}
 }
@@ -575,5 +589,7 @@ void CAddEntryDlg::OnChangeEditPassword()
 {
 	UpdateData(TRUE);
 
+	EraseCString(&m_strPassword);
+	m_pEditPw.GetWindowText(m_strPassword);
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
 }
