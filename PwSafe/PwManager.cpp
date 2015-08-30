@@ -2619,10 +2619,17 @@ void CPwManager::_ParseMetaStream(PW_ENTRY *p)
 	{
 		pState = (PMS_SIMPLE_UI_STATE *)p->pBinaryData;
 
-		m_dwLastSelectedGroupId = pState->uLastSelectedGroupId;
-		m_dwLastTopVisibleGroupId = pState->uLastTopVisibleGroupId;
-		memcpy(m_aLastSelectedEntryUuid, pState->aLastSelectedEntryUuid, 16);
-		memcpy(m_aLastTopVisibleEntryUuid, pState->aLastTopVisibleEntryUuid, 16);
+		if(p->uBinaryDataLen >= 4) // Length checks for backwards compatibility
+			m_dwLastSelectedGroupId = pState->uLastSelectedGroupId;
+
+		if(p->uBinaryDataLen >= 8)
+			m_dwLastTopVisibleGroupId = pState->uLastTopVisibleGroupId;
+
+		if(p->uBinaryDataLen >= 24)
+			memcpy(m_aLastSelectedEntryUuid, pState->aLastSelectedEntryUuid, 16);
+
+		if(p->uBinaryDataLen >= 40)
+			memcpy(m_aLastTopVisibleEntryUuid, pState->aLastTopVisibleEntryUuid, 16);
 	}
 }
 
@@ -2749,6 +2756,8 @@ void CPwManager::MergeIn(VPA_MODIFY CPwManager *pDataSource, BOOL bCreateNewUUID
 		// Don't import meta streams
 		if(_IsMetaStream(peSource) == TRUE) continue;
 
+		pDataSource->UnlockEntryPassword(peSource);
+
 		if(bCreateNewUUIDs == TRUE)
 		{
 			memset(peSource->uuid, 0, 16);
@@ -2777,6 +2786,8 @@ void CPwManager::MergeIn(VPA_MODIFY CPwManager *pDataSource, BOOL bCreateNewUUID
 				}
 			}
 		}
+
+		pDataSource->LockEntryPassword(peSource);
 	}
 
 	VERIFY(DeleteLostEntries() == 0);

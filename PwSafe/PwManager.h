@@ -30,8 +30,8 @@
 #define PWM_PRODUCT_NAME_SHORT _T("KeePass")
 
 // When making a Windows build, don't forget to update the verinfo resource
-#define PWM_VERSION_STR  _T("1.02")
-#define PWM_VERSION_DW   0x01000201
+#define PWM_VERSION_STR  _T("1.03")
+#define PWM_VERSION_DW   0x01000301
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -125,6 +125,8 @@
 #define PWMKEY_AUTOTYPEMETHOD   _T("KeeAutoTypeMethod")
 #define PWMKEY_DELETEBKONSAVE   _T("KeeDeleteBackupsOnSave")
 #define PWMKEY_SHOWFULLPATH     _T("KeeShowFullPath")
+#define PWMKEY_DISABLEAUTOTYPE  _T("KeeDisableAutoType")
+#define PWMKEY_COPYURLS         _T("KeeCopyURLs")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32

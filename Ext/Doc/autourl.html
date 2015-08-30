@@ -77,8 +77,16 @@ The following substitutions are available:<br />
 <tr><td class="boxcontent" width="50%">URL field</td><td class="boxcontent" width="50%">{URL} or %URL%</td></tr>
 <tr><td class="boxcontent" width="50%">Password field</td><td class="boxcontent" width="50%">{PASSWORD} or %PASSWORD%</td></tr>
 <tr><td class="boxcontent" width="50%">Notes field</td><td class="boxcontent" width="50%">{NOTES} or %NOTES%</td></tr>
+<tr><td class="boxcontent" width="50%">Current application directory path</td><td class="boxcontent" width="50%">{APPDIR} or %APPDIR%</td></tr>
 </table></center>
-<br /><br />
+<br />
+The <code>{APPDIR}</code> and <code>%APPDIR%</code> substitution codes are replaced by the application
+directory path of the currently running KeePass instance. It's the full absolute path of the
+directory containing the KeePass executable, without a trailing backslash.
+If you would like to start a new KeePass instance, you could set the URL to:<br />
+<br />
+<b>cmd://{APPDIR}\KeePass.exe</b><br />
+<br />
 
 </body>
 </html>

@@ -398,25 +398,28 @@ void CPasswordDlg::OnOK()
 	m_lpKey = m_pEditPw.GetPassword();
 	lpPassword = m_lpKey;
 
-	// Validate input
-	if(m_bKeyMethod == PWM_KEYMETHOD_OR)
+	if(m_bConfirm == FALSE)
 	{
-		if(!((_tcslen(m_lpKey) == 0) ^ (m_cbDiskList.GetCurSel() == 0)))
+		// Validate input
+		if(m_bKeyMethod == PWM_KEYMETHOD_OR)
 		{
-			MessageBox(TRL("EITHER enter a password/passphrase OR select a key disk drive."),
-				TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
-			FreePasswords();
-			return;
+			if(!((_tcslen(m_lpKey) == 0) ^ (m_cbDiskList.GetCurSel() == 0)))
+			{
+				MessageBox(TRL("EITHER enter a password/passphrase OR select a key disk drive."),
+					TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+				FreePasswords();
+				return;
+			}
 		}
-	}
-	else // m_bKeyMethod == PWM_KEYMETHOD_AND
-	{
-		if((_tcslen(m_lpKey) == 0) || (m_cbDiskList.GetCurSel() == 0))
+		else // m_bKeyMethod == PWM_KEYMETHOD_AND
 		{
-			MessageBox(TRL("You've selected the AND key mode, so you must enter a password AND select a key-file."),
-				TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
-			FreePasswords();
-			return;
+			if((_tcslen(m_lpKey) == 0) || (m_cbDiskList.GetCurSel() == 0))
+			{
+				MessageBox(TRL("You've selected the AND key mode, so you must enter a password AND select a key-file."),
+					TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+				FreePasswords();
+				return;
+			}
 		}
 	}
 

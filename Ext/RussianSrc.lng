@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Russian|
-|~LANGUAGEVERSION|             |1.01|
+|~LANGUAGEVERSION|             |1.02|
 |~LANGUAGEAUTHOR|              |Varrey|
 |~LANGUAGEAUTHOREMAIL|         |varrey@hotmail.com|
 
@@ -38,7 +38,7 @@
 
 |Password Groups|              |Группы паролей|
 |Title|                        |Название|
-|UserName|                     |Имя|
+|User Name|                    |Имя|
 |URL|                          |Ссылка|
 |Password|                     |Пароль|
 |Notes|                        |Комментарии|
@@ -97,7 +97,7 @@
 
 |Group:|                       |Группа:|
 |Title:|                       |Название:|
-|UserName:|                    |Имя:|
+|User Name:|                   |Имя:|
 |URL:|                         |Ссылка:|
 |Icon:|                        |Значок:|
 |Password:|                    |Пароль:|
@@ -173,7 +173,7 @@
 |Export Group To &XML...|      |Экспортировать группу в &XML...|
 |Export Group To &CSV...|      |Экспортировать группу в &CSV...|
 |Export Group To &TXT...|      |Экспортировать группу в &TXT...|
-|Copy User&Name To Clipboard|  |Скопировать &имя пользователя в буфер обмена|
+|Copy User &Name To Clipboard| |Скопировать &имя пользователя в буфер обмена|
 |Copy &Password To Clipboard|  |Скопировать &пароль в буфер обмена|
 |Open &URL(s)|                 |Открыть &ссылку(и)|
 |&Find In Database...|         |П&оиск по базе паролей...|
@@ -194,7 +194,7 @@
 
 |Change &Language...|          |Изменить &язык...|
 |Show &Title Column|           |Показывать столбец &назавания|
-|Show User&Name Column|        |Показывать столбец &имени пользователя|
+|Show User &Name Column|       |Показывать столбец &имени пользователя|
 |Show &URL Column|             |Показывать столбец &ссылки|
 |Show &Password Column|        |Показывать столбец &пароля|
 |Show Note&s Column|           |Показывать столбец &комментариев|
@@ -262,8 +262,8 @@
 |Do you want to save the changes before closing?|
     |Хотите сохранить изменения перед закрытием?|
 
-|Deleting a group will delete all items in that group, too.|
-    |Удаление группы приведет к удалению всех записей в этой группе.|
+|Deleting a group will delete all items and subgroups in that group, too.|
+    |Удаление группы приведет к удалению всех записей и подгрупп в этой группе.|
 |Are you sure you want to delete this group?|
     |Вы уверены, что хотите удалить эту группу?|
 |Delete Group Confirmation|
@@ -422,7 +422,7 @@
 |&Rearrange|                   |Пор&ядок|
 |&Sort Group List|             |&Сортировать список групп|
 |Sort List By &Title|          |Сортировать по &названию|
-|Sort List By User&Name|       |Сортировать по &имени пользователя|
+|Sort List By User &Name|      |Сортировать по &имени пользователя|
 |Sort List By &URL|            |Сортировать по &ссылке|
 |Sort List By &Password|       |Сортировать по &паролю|
 |Sort List By Note&s|          |Сортировать по &комментариям|
@@ -433,7 +433,7 @@
 |Move Group One &Left|         |Переместить на уровень в&лево|
 |Move Group One &Right|        |Переместить на уровень в&право|
 
-|Hide &UserNames Behind Asterisks (***)|  |Показывать (***) вместо &имени пользователя|
+|Hide &User Names Behind Asterisks (***)|  |Показывать (***) вместо &имени пользователя|
 |Attachment:|                  |Файл:|
 |Attachment|                   |Файл|
 |Show &Attachment Column|      |Показывать столбец присоединенных &файлов|
@@ -656,3 +656,24 @@
 |Delete all backup entries before saving the database| |Удалять все резервные записи перед сохранением базы паролей|
 |Press Shift-Home or Shift-End to clear this edit control| |Нажмите Shift-Home или Shift-End для очистки этого поля|
 |Use alternative auto-type method (minimize window)| |Использовать альтернативный метод автонабора|
+
+|&KeePass Database...| |Базу паролей &KeePass...|
+|Acknowledgements| |Благодарности|
+|Please choose if KeePass should use the key of the currently opened database or ask you to define a new key to encrypt the exported file.|
+    |Выберите: должен ли KeePass использовать основной пароль открытой сейчас базы паролей или предложить установить новый основной пароль для экспортируемого файла.|
+|Click [Yes] to use the same key as the currently opened database.| |Нажмите [Да] чтобы использовать основной пароль открытой сейчас базы паролей.|
+|Click [No] to set a new key for the exported file.|                |Нажмите [Нет] чтобы установить новый основной пароль для экспортируемого файла.|
+|Reuse the current key/password?| |Использовать текущий основной пароль?|
+|Export Group To &KeePass Database...| |Экспортировать группу в базу паролей &KeePass...|
+|Show full path in the titlebar (instead of filename only)| |Показывать полный путь в заголовке (вместо только имени файла)|
+|The file format that you have selected to import supports group and/or entry IDs. Please choose an import behaviour.|
+    |Формат импортируемого файла поддерживает идентификаторы для групп и/или записей. Выберите режим импортирования.|
+|Create new IDs|     |Создавать новые идентификаторы|
+|If you select this option, KeePass will create new IDs for all groups and entries. Consequently no existing groups and entries of the currently opened database will be modified or overwritten.|
+    |Если вы выберите эту опцию, KeePass создаст новые идентификаторы для всех групп и записей. Поэтому все существующие группы и записи в открытой базе паролей будут оставлены без изменений.|
+|Overwrite|          |Переписывать|
+|KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.|
+    |KeePass заменит все существующие группы и записи на новые из импортируемого файла, если они имеют одинаковые идентификаторы.|
+|Overwrite if newer| |Переписывать новые|
+|KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.|
+    |KeePass сравнит время последнего изменения группы/записи и заменит существующие только если импортируемые более новые.|

@@ -164,6 +164,7 @@ CSendKeys::key_desc_t CSendKeys::KeyNames[CSendKeys::MaxSendKeysRecs] =
   {_T("SCROLL"), VK_SCROLL},
   {_T("SEPARATOR"), VK_SEPARATOR}, 
   {_T("SNAPSHOT"), VK_SNAPSHOT},
+  {_T("SPACE"), VK_SPACE},
   {_T("SUBTRACT"), VK_SUBTRACT}, 
   {_T("TAB"), VK_TAB},
   {_T("TILDE"), '~', true}, 

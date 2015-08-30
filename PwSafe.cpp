@@ -31,7 +31,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-static UINT g_uThreadACP;
+static UINT g_uThreadACP = 0;
 static TCHAR g_pFontNameNormal[12];
 static TCHAR g_pFontNameSymbol[8];
 
@@ -48,7 +48,6 @@ END_MESSAGE_MAP()
 
 CPwSafeApp::CPwSafeApp()
 {
-	g_uThreadACP = GetACP();
 	_tcscpy(g_pFontNameNormal, _T("MS Serif"));
 	_tcscpy(g_pFontNameSymbol, _T("Symbol"));
 }
@@ -81,6 +80,8 @@ BOOL CPwSafeApp::InitInstance()
 	// SetDialogBkColor(NewGUI_GetBgColor(), CR_FRONT); // Setup the "new" dialog look
 
 	ASSERT(TRUE == 1); ASSERT(FALSE == 0);
+
+	g_uThreadACP = GetACP();
 
 	CPwSafeDlg dlg;
 	m_pMainWnd = &dlg;
@@ -410,14 +411,20 @@ void CPwSafeApp::CreateHiColorImageList(CImageList *pImageList, WORD wResourceID
 	bmpImages.DeleteObject();
 }
 
+BOOL CPwSafeApp::IsMBThreadACP()
+{
+	if((g_uThreadACP == 932) || (g_uThreadACP == 936) || (g_uThreadACP == 950)) return TRUE;
+	return FALSE;
+}
+
 TCHAR CPwSafeApp::GetPasswordCharacter()
 {
-	if((g_uThreadACP == 932) || (g_uThreadACP == 936) || (g_uThreadACP == 950)) return _T('*');
+	if(IsMBThreadACP() == TRUE) return _T('*');
 	return (TCHAR)0xB7;
 }
 
 const TCHAR *CPwSafeApp::GetPasswordFont()
 {
-	if((g_uThreadACP == 932) || (g_uThreadACP == 936) || (g_uThreadACP == 950)) return g_pFontNameNormal;
-	return g_pFontNameSymbol;
+	if(IsMBThreadACP() == TRUE) return g_pFontNameNormal;
+	return (TCHAR *)g_pFontNameSymbol;
 }

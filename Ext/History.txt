@@ -1,3 +1,28 @@
+05/09/10 - 1.03
+- Added option to copy URLs to the clipboard instead of
+  launching them (exception: cmd:// protocol, these URLs will
+  be started as before)
+- Added option to disable all auto-type features (adv. options)
+- Added {SPACE} code for auto-type sequences
+- Auto-type and URL fields now support the {APPDIR}
+  substitution code, this will be replaced by the directory
+  path of the currently running KeePass instance
+- Fixed a bug in the KeePass database import routine (passwords
+  were imported incorrectly)
+- KeePass now prevents disabled columns from being resized
+- Status bar is now updated after pressing Ctrl-A to select all
+  entries
+- Fixed a bug which could occasionally crash KeePass when
+  loading old database formats (old UI state meta streams)
+- Removed a misleading message box that appeared when entering
+  an incorrect confirmation password in the master key dialog
+- Accelerator tips are now correctly removed from toolbar
+  button tips when using a language that uses special
+  accelerator combination hints in brackets
+- Fixed various translation bugs
+- Get() function of the CPrivateConfig configuration manager
+  class doesn't require 33-byte buffers any more
+
 05/09/05 - 1.02
 - KeePass databases can now be imported into the currently
   opened database, you can choose if you want to create new

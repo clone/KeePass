@@ -49,8 +49,9 @@ public:
 
 	static void CreateHiColorImageList(CImageList *pImageList, WORD wResourceID, int czSize);
 
-	static TCHAR CPwSafeApp::GetPasswordCharacter();
-	static const TCHAR *CPwSafeApp::GetPasswordFont();
+	static BOOL IsMBThreadACP();
+	static TCHAR GetPasswordCharacter();
+	static const TCHAR *GetPasswordFont();
 
 	CMutex *m_pAppMutex;
 

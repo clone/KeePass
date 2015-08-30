@@ -161,37 +161,36 @@ BOOL CPrivateConfig::Get(const TCHAR *pszField, PCFG_OUT TCHAR *pszValue)
 {
 	LPCTSTR lpExeName = PWM_EXENAME;
 	LPCTSTR lpNotFound = PCFG_NOTFOUND;
+	TCHAR tszTemp[SI_REGSIZE];
 
 	ASSERT(pszValue != NULL); if(pszValue == NULL) return FALSE;
 	pszValue[0] = 0; pszValue[1] = 0; // Reset string
+	tszTemp[0] = 0; tszTemp[1] = 0;
 
 	ASSERT(pszField != NULL); if(pszField == NULL) return FALSE;
 	ASSERT(pszField[0] != 0); if(pszField[0] == 0) return FALSE;
 
 #ifndef _WIN32_WCE
 	if(m_nUseDir == 0)
-		GetPrivateProfileString(lpExeName, pszField, lpNotFound, pszValue, SI_REGSIZE, m_szFileLocal);
+		GetPrivateProfileString(lpExeName, pszField, lpNotFound, tszTemp, SI_REGSIZE - 1, m_szFileLocal);
 
-	if((_tcscmp(pszValue, lpNotFound) == 0) || (m_nUseDir != 0))
+	if((_tcscmp(tszTemp, lpNotFound) == 0) || (m_nUseDir != 0))
 	{
-		pszValue[0] = 0; pszValue[1] = 0;
+		tszTemp[0] = 0; tszTemp[1] = 0;
 
 		if(m_nUseDir <= 1)
-			GetPrivateProfileString(lpExeName, pszField, lpNotFound, pszValue, SI_REGSIZE, m_szFileUser);
+			GetPrivateProfileString(lpExeName, pszField, lpNotFound, tszTemp, SI_REGSIZE - 1, m_szFileUser);
 
-		if((_tcscmp(pszValue, lpNotFound) == 0) || (m_nUseDir == 2))
+		if((_tcscmp(tszTemp, lpNotFound) == 0) || (m_nUseDir == 2))
 		{
-			pszValue[0] = 0; pszValue[1] = 0;
-			GetPrivateProfileString(lpExeName, pszField, lpNotFound, pszValue, SI_REGSIZE, m_szFileGeneric);
+			tszTemp[0] = 0; tszTemp[1] = 0;
+			GetPrivateProfileString(lpExeName, pszField, lpNotFound, tszTemp, SI_REGSIZE - 1, m_szFileGeneric);
 
-			if(_tcscmp(pszValue, lpNotFound) == 0)
-			{
-				pszValue[0] = 0; pszValue[1] = 0;
-				return FALSE;
-			}
+			if(_tcscmp(tszTemp, lpNotFound) == 0) return FALSE;
 		}
 	}
 
+	_tcscpy(pszValue, tszTemp);
 	return TRUE;
 #else
 	ASSERT(FALSE); // Implement before using on WinCE

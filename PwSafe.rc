@@ -123,7 +123,7 @@ STYLE DS_3DLOOK | DS_NOFAILCREATE | WS_MINIMIZEBOX | WS_MAXIMIZEBOX |
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "Password Safe"
 MENU IDR_MAINMENU
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "",IDC_MENULINE,"Static",SS_ETCHEDHORZ,0,0,69,1
     EDITTEXT        IDC_EDIT_QUICKFIND,213,2,88,13,ES_AUTOHSCROLL
@@ -148,7 +148,7 @@ BEGIN
     PUSHBUTTON      "&Delete Entry",IDC_TB_DELETEENTRY,87,2,15,14,NOT 
                     WS_TABSTOP
     CONTROL         "",IDC_STATIC_TBSEP1,"Static",SS_ETCHEDVERT,105,2,1,15
-    PUSHBUTTON      "Copy User&Name To Clipboard",IDC_TB_COPYUSER,109,2,15,
+    PUSHBUTTON      "Copy User &Name To Clipboard",IDC_TB_COPYUSER,109,2,15,
                     14,NOT WS_TABSTOP
     PUSHBUTTON      "Copy &Password To Clipboard",IDC_TB_COPYPW,125,2,15,14,
                     NOT WS_TABSTOP
@@ -777,8 +777,8 @@ IDI_PLUGINS             ICON    DISCARDABLE     "res\\plugins.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,2,1
- PRODUCTVERSION 1,0,2,1
+ FILEVERSION 1,0,3,1
+ PRODUCTVERSION 1,0,3,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -795,15 +795,15 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.sourceforge.net\0"
             VALUE "CompanyName", "Dominik Reichl\0"
-            VALUE "FileDescription", "KeePass Password Safe v1.02\0"
-            VALUE "FileVersion", "1, 0, 2, 1\0"
+            VALUE "FileDescription", "KeePass Password Safe v1.03\0"
+            VALUE "FileVersion", "1, 0, 3, 1\0"
             VALUE "InternalName", "PwSafe\0"
             VALUE "LegalCopyright", "Copyright (c) 2003-2005 Dominik Reichl\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "KeePass.exe\0"
             VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "KeePass Password Safe v1.02\0"
-            VALUE "ProductVersion", "1, 0, 2, 1\0"
+            VALUE "ProductName", "KeePass Password Safe v1.03\0"
+            VALUE "ProductVersion", "1, 0, 3, 1\0"
             VALUE "SpecialBuild", "\0"
         END
     END

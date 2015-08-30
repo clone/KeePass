@@ -45,6 +45,7 @@ CCustomListCtrlEx::CCustomListCtrlEx()
 	m_rgbColor = RGB(238,238,255);
 
 	m_pParentI = NULL;
+	m_pbShowColumns = NULL;
 }
 
 CCustomListCtrlEx::~CCustomListCtrlEx()
@@ -152,8 +153,9 @@ BOOL CCustomListCtrlEx::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	HD_NOTIFY *phdn = (HD_NOTIFY *)lParam;
 
 	// Parent must be initialized first
-	ASSERT(m_pParentI != NULL);
-	if(m_pParentI == NULL) return CListCtrl::OnNotify(wParam, lParam, pResult);
+	ASSERT((m_pParentI != NULL) && (m_pbShowColumns != NULL));
+	if((m_pParentI == NULL) || (m_pbShowColumns == NULL))
+		return CListCtrl::OnNotify(wParam, lParam, pResult);
 
 	if((phdn->hdr.code == HDN_ITEMCHANGEDW) || (phdn->hdr.code == HDN_ITEMCHANGEDA))
 	{
@@ -162,6 +164,19 @@ BOOL CCustomListCtrlEx::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		// Track only width changes
 		if (phdn->pitem->mask & HDI_WIDTH)
 			((CPwSafeDlg *)m_pParentI)->_OnPwlistColumnWidthChange(phdn->iItem, phdn->pitem->cxy);
+	}
+	else if((phdn->hdr.code == HDN_BEGINTRACKW) || (phdn->hdr.code == HDN_BEGINTRACKA))
+	{
+		int nItem = phdn->iItem;
+
+		if(nItem >= 0)
+		{
+			if(m_pbShowColumns[nItem] == FALSE)
+			{
+				*pResult = TRUE;
+				return TRUE;
+			}
+		}
 	}
 
 	return CListCtrl::OnNotify(wParam, lParam, pResult);

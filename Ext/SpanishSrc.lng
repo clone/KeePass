@@ -1,5 +1,5 @@
 |~LANGUAGENAME||Spanish (Español para España y Latinoamérica)|
-|~LANGUAGEVERSION||1.01|
+|~LANGUAGEVERSION||1.02|
 |~LANGUAGEAUTHOR||Marcel Trujillo|
 |~LANGUAGEAUTHOREMAIL||marcelito@gmail.com|
 |&OK||&OK|
@@ -31,7 +31,6 @@
 |About KeePass...||Acerca de KeePass...|
 |Password Groups||Grupos de Contraseña|
 |Title||Título|
-|UserName||Usuario|
 |URL||URL|
 |Password||Contraseña|
 |Notes||Comentarios|
@@ -68,7 +67,6 @@
 |Special brackets ('{', '}', '[', ...)||Paréntesis, llaves y corchetes ('{', '}', '[', ...)|
 |Group:||Grupo:|
 |Title:||Título:|
-|UserName:||Usuario:|
 |URL:||URL:|
 |Icon:||Icono:|
 |Password:||Contraseña:|
@@ -119,7 +117,6 @@
 |Export Group To &XML...||Exportar Grupo en &XML...|
 |Export Group To &CSV...||Exportar Grupo en &CSV...|
 |Export Group To &TXT...||Exportar Grupo en &TXT...|
-|Copy User&Name To Clipboard||Copiar &Usuario en el portapapeles|
 |Copy &Password To Clipboard||Copiar &Contraseña en el portapapeles|
 |Open &URL(s)||Abrir &URL(s)|
 |&Find In Database...||Encontrar en la &Base de Datos...|
@@ -137,7 +134,6 @@
 |Move Group To &Bottom||Mover Grupo hasta el &Fondo|
 |Change &Language...||Cambiar Idioma...|
 |Show &Title Column||Mostrar columna &Título|
-|Show User&Name Column||Mostrar columna Usuar&io|
 |Show &URL Column||Mostrar columna &URL|
 |Show &Password Column||Mostrar columna Contra&seña|
 |Password &Generator||&Generador de Contraseñas|
@@ -171,7 +167,6 @@
 |All files||Todos los archivos|
 |The current file has been modified.||Este archivo ha sido modificado.|
 |Do you want to save the changes before closing?||¿Desea guardar los cambios antes de salir?|
-|Deleting a group will delete all items in that group, too.||Suprimir un grupo eliminará además todos los items en ese grupo.|
 |Are you sure you want to delete this group?||¿Está seguro que desea eliminar este grupo?|
 |Delete Group Confirmation||Confirmación de Borrado de Grupo|
 |Cannot open temporary file for printing!||¡No puede abrirse el archivo temporal para impresión!|
@@ -284,7 +279,6 @@
 |Sort List By Last &Access Time||Ordenar lista por &Último Acceso|
 |Sort List By Last &Modify Time||Ordenar lista por Última &Modificación|
 |Sort List By Note&s||Ordenar lista por Come&ntarios|
-|Sort List By User&Name||Ordenar &lista por Nombre de Usuario|
 |There already is a file attached with this entry.||Ya hay un archivo adjuntado a esta entrada.|
 |There is no file attached with this entry.||No hay ningún archivo adjuntado a esta entrada.|
 |Twofish (128-bit block cipher using 256-bit key)||Twofish (bloque de cifrado de 128-bit usando clave de 256-bit)|
@@ -359,7 +353,6 @@
 |Enter the new master key for this database.||Introduzca la nueva clave maestra de esta base de datos.|
 |Find In T&his Group...||Buscar En Es&te Grupo...|
 |Hide &Passwords Behind Asterisks (***)||Ocultar &Contraseñas Detrás de Asteriscos (***)|
-|Hide &UserNames Behind Asterisks (***)||Ocultar Nombres de &Usuario Detrás de Asteriscos (***)|
 |Modif&y Password Group...||Modi&ficar Grupo de Contraseñas...|
 |N&o Auto-Sort||N&o Auto-Ordenar|
 |Open &Help File||Abrir Arc&hivo de Ayuda|
@@ -484,3 +477,25 @@
 |Delete all backup entries before saving the database||Eliminar todas las entradas de respaldo antes de guardar la base de datos|
 |Press Shift-Home or Shift-End to clear this edit control||Presione Shift-Inicio o Shift-Fin para borrar este control de edición|
 |Use alternative auto-type method (minimize window)||Usar método de auto-escritura alternativo (minimizar la ventana)|
+|&KeePass Database...||Base de datos de &KeePass...|
+|Acknowledgements||Reconocimientos|
+|Click [No] to set a new key for the exported file.||Haga click en [No] para establecer una nueva clave para el archivo exportado.|
+|Click [Yes] to use the same key as the currently opened database.||Haga click en [Sí] para usar la misma clave de la base de datos abierta actualmente.|
+|Copy User &Name To Clipboard||Copiar &Nombre de Usuario al Portapapeles|
+|Create new IDs||Crear nuevas IDs|
+|Deleting a group will delete all items and subgroups in that group, too.||Borrar un grupo borrará también todos los elementos y subgrupos presentes en el grupo.|
+|Export Group To &KeePass Database...||Exportar Grupo a la Base de Datos de &KeePass...|
+|Hide &User Names Behind Asterisks (***)||Ocultar Nombres de &Usuario Detrás de Asteriscos (***)|
+|If you select this option, KeePass will create new IDs for all groups and entries. Consequently no existing groups and entries of the currently opened database will be modified or overwritten.||Si usted selecciona esta opción, KeePass creará nuevas IDs para todos los grupos y entradas. En consecuencia, ningún grupo o entrada existente en la base de datos abierta actualmente será modificado o reescrito.|
+|KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.||KeePass comparará la última vez que fueron modificados(as) los grupos y entradas, y los reemplazará únicamente si los elementos a importar son más recientes.|
+|KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.||KeePass reemplazará todos los grupos y entradas existentes por aquellos(as) en el archivo a importar, en caso de tener la misma ID.|
+|Overwrite||Sobreescribir|
+|Overwrite if newer||Sobreescribir si es más reciente|
+|Please choose if KeePass should use the key of the currently opened database or ask you to define a new key to encrypt the exported file.||Por favor elija si KeePass debería utilizar la clave de la base de datos actualmente abierta o solicitarle que defina una nueva clave para cifrar el archivo exportado.|
+|Reuse the current key/password?||¿Reutilizar la clave/contraseña actual?|
+|Show User &Name Column||Mostrar la Colum&na Usuario|
+|Show full path in the titlebar (instead of filename only)||Mostrar la ruta completa en la barra del título (en vez del nombre del archivo exclusivamente)|
+|Sort List By User &Name||Ordenar la lista por &Nombre de Usuario|
+|The file format that you have selected to import supports group and/or entry IDs. Please choose an import behaviour.||El formato de archivo que usted ha seleccionado para importar soporta IDs para grupo y/o entrada. Por favor elija un comportamiento para llevar a cabo la importación.|
+|User Name||Nombre de Usuario|
+|User Name:||Nombre de Usuario:|

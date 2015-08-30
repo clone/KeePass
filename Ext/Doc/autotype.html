@@ -64,6 +64,7 @@ for special keys are supported:<br />
 <br />
 <center><table class="tablebox75">
 <tr><td class="smallboxtitle" width="50%">Special key</td><td class="smallboxtitle" width="50%">Code</td></tr>
+<tr><td class="boxcontent" width="50%">Space</td><td class="boxcontent" width="50%">{SPACE}</td></tr>
 <tr><td class="boxcontent" width="50%">Backspace</td><td class="boxcontent" width="50%">{BACKSPACE}, {BS} or {BKSP}</td></tr>
 <tr><td class="boxcontent" width="50%">Break</td><td class="boxcontent" width="50%">{BREAK}</td></tr>
 <tr><td class="boxcontent" width="50%">Caps Lock</td><td class="boxcontent" width="50%">{CAPSLOCK}</td></tr>
@@ -114,6 +115,7 @@ Additionally, some special commands are supported:
 <tr><td class="boxcontent" width="50%">{DELAY X}</td><td class="boxcontent" width="50%">Delays X milliseconds.</td></tr>
 <tr><td class="boxcontent" width="50%">{DELAY=X}</td><td class="boxcontent" width="50%">Sets the default delay to X milliseconds for all following keypresses.</td></tr>
 <tr><td class="boxcontent" width="50%">{APPACTIVATE WindowTitle}</td><td class="boxcontent" width="50%">Activates the window "WindowTitle".</td></tr>
+<tr><td class="boxcontent" width="50%">{APPDIR}</td><td class="boxcontent" width="50%">Will be replaced by the current application directory path.</td></tr>
 </table></center>
 <br /><br />
 Here are some examples:<br />
@@ -131,10 +133,11 @@ Presses the tab key, enters the password and presses return.<br />
 <br />
 <b>Toggling checkboxes</b><br />
 <br />
-Sometimes you find checkboxes on websites (&quot;Stay logged in on this computer&quot; for example).
-You can toggle these checkboxes by sending a space character (&quot; &quot;) when auto-typing.
+Sometimes you find checkboxes on websites (<i>&quot;Stay logged in on this computer&quot;</i> for example).
+You can toggle these checkboxes by sending a space character (<code>{SPACE}</code>)
+when auto-typing.
 An example:<br />
-<code>{USERNAME}{TAB}{PASSWORD}{TAB} {TAB}{ENTER}</code><br />
+<code>{USERNAME}{TAB}{PASSWORD}{TAB}{SPACE}{TAB}{ENTER}</code><br />
 If there is a webform with a username field, password field and a checkbox, this sequence would
 enter the username, the password and toggle the checkbox that follows the password control.<br />
 <br />

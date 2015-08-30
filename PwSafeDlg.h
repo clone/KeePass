@@ -94,7 +94,7 @@ public:
 
 	void OnUpdateFlush(CMenu *pMenu); // BCMenu function
 
-	static void _TranslateMenu(BCMenu *pBCMenu, BOOL bAppendSuffix = TRUE);
+	static void _TranslateMenu(BCMenu *pBCMenu, BOOL bAppendSuffix, BOOL *pFlags);
 	static const TCHAR *_GetCmdAccelExt(const TCHAR *psz);
 	void RestartApplication();
 	static CString _GetSecureEditTipText(const TCHAR *tszBase);
@@ -274,6 +274,7 @@ public:
 	BOOL m_bSingleClickTrayIcon;
 	DWORD m_dwDefaultExpire;
 	BOOL m_bDeleteBackupsOnSave;
+	BOOL m_bDisableAutoType;
 
 	BOOL m_bExiting;
 	BOOL m_bLocked;
@@ -323,6 +324,7 @@ public:
 	BOOL m_bAutoPwGen;
 	int m_nAutoTypeMethod;
 	BOOL m_bShowFullPath;
+	BOOL m_bCopyURLs;
 
 	HICON m_hTrayIconNormal;
 	HICON m_hTrayIconLocked;

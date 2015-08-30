@@ -20,6 +20,7 @@
 #include "StdAfx.h"
 #include "MemUtil.h"
 #include "StrUtil.h"
+#include "WinUtil.h"
 #include "../Crypto/sha2.h"
 
 CPP_FN_SHARE void EraseCString(CString *pString)
@@ -534,6 +535,21 @@ CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimStri
 		}
 	}
 
+	while(1)
+	{
+		nPos = str.Find(_T("%APPDIR%"));
+		if(nPos == -1) nPos = str.Find(_T("{APPDIR}"));
+		if(nPos == -1) break;
+
+		TCHAR tszBufP[512];
+		GetApplicationDirectory(tszBufP, 512 - 1, TRUE, FALSE);
+
+		if(bMakeSimString == FALSE)
+			str = str.Left(nPos) + tszBufP + str.Right(str.GetLength() - nPos - 8);
+		else
+			str = str.Left(nPos) + TagSimString(tszBufP) + str.Right(str.GetLength() - nPos - 8);
+	}
+
 	if(bMakeSimString == TRUE)
 	{
 		CString strSourceCopy = str;
@@ -813,4 +829,25 @@ CPP_FN_SHARE TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource)
 	}
 
 	return ptsz;
+}
+
+CPP_FN_SHARE void RemoveAcceleratorTip(CString *pString)
+{
+	ASSERT(pString != NULL); if(pString == NULL) return;
+
+	pString->Replace(_T("(&A)"), _T(""));
+	pString->Replace(_T("(&D)"), _T(""));
+	pString->Replace(_T("(&E)"), _T(""));
+	pString->Replace(_T("(&F)"), _T(""));
+	pString->Replace(_T("(&H)"), _T(""));
+	pString->Replace(_T("(&L)"), _T(""));
+	pString->Replace(_T("(&N)"), _T(""));
+	pString->Replace(_T("(&O)"), _T(""));
+	pString->Replace(_T("(&P)"), _T(""));
+	pString->Replace(_T("(&S)"), _T(""));
+
+	pString->Remove(_T('&'));
+
+	pString->TrimLeft();
+	pString->TrimRight();
 }

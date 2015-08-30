@@ -215,7 +215,7 @@ void CPluginsDlg::OnRClickPluginsList(NMHDR* pNMHDR, LRESULT* pResult)
 	psub->ModifyODMenu(NULL, (UINT)ID_PLUGIN_CONFIG, m_pImgList, 21);
 	psub->ModifyODMenu(NULL, (UINT)ID_PLUGIN_ABOUT, m_pImgList, 22);
 
-	CPwSafeDlg::_TranslateMenu(psub, FALSE);
+	CPwSafeDlg::_TranslateMenu(psub, FALSE, NULL);
 
 	if(p != NULL)
 	{

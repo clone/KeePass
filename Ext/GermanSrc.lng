@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |1.02|
+|~LANGUAGEVERSION|             |1.03|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -688,3 +688,7 @@
 |Export Group To &KeePass Database...|       |Gruppe nach KeePass-Datenbank exportieren...|
 |Show full path in the titlebar (instead of filename only)|
     |Kompletten Pfad in der Titelleiste anzeigen (anstatt nur den Dateinamen)|
+|Disable all auto-type features|             |Alle Auto-Type-Features deaktivieren|
+|Copy URLs to clipboard instead of launching them (exception: cmd:// URLs)|
+    |URLs in Zwischenablage kopieren anstatt sie zu starten (Ausnahme: cmd:// URLs)|
+|Copy &URL To Clipboard|                     |&URL in Zwischenablage kopieren|

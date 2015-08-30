@@ -86,4 +86,6 @@ C_FN_SHARE void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath);
 // Allocate enough memory and clone the parameter string
 CPP_FN_SHARE TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource);
 
+CPP_FN_SHARE void RemoveAcceleratorTip(CString *pString);
+
 #endif

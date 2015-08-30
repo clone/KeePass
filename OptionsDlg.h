@@ -78,6 +78,8 @@ public:
 	BOOL m_bMinimizeBeforeAT;
 	BOOL m_bDeleteBackupsOnSave;
 	BOOL m_bShowFullPath;
+	BOOL m_bDisableAutoType;
+	BOOL m_bCopyURLs;
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };

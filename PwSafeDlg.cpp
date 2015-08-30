@@ -460,14 +460,14 @@ BOOL CAboutDlg::OnInitDialog()
 	NewGUI_MakeHyperLink(&m_hlHomepage);
 	m_hlHomepage.SetURL(CString(PWM_HOMEPAGE));
 
-	str = TRL("Open &Help File"); str.Remove(_T('&'));
+	str = TRL("Open &Help File"); RemoveAcceleratorTip(&str);
 	m_hlHelp.SetWindowText(str);
 	NewGUI_MakeHyperLink(&m_hlHelp);
 	m_hlHelp.EnableTooltip(FALSE);
 	m_hlHelp.SetNotifyParent(TRUE);
 	m_hlHelp.EnableURL(FALSE);
 
-	str = TRL("Open &License File"); str.Remove(_T('&'));
+	str = TRL("Open &License File"); RemoveAcceleratorTip(&str);
 	m_hlLicense.SetWindowText(str);
 	NewGUI_MakeHyperLink(&m_hlLicense);
 	m_hlLicense.EnableTooltip(FALSE);
@@ -481,7 +481,7 @@ BOOL CAboutDlg::OnInitDialog()
 	m_hlCredits.SetNotifyParent(TRUE);
 	m_hlCredits.EnableURL(FALSE);
 
-	str = TRL("&Donate..."); str.Remove(_T('&')); str.Remove(_T('.'));
+	str = TRL("&Donate..."); RemoveAcceleratorTip(&str); str.Remove(_T('.'));
 	m_hlDonate.SetWindowText(str);
 	NewGUI_MakeHyperLink(&m_hlDonate);
 	m_hlDonate.EnableTooltip(FALSE);
@@ -546,6 +546,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	ZeroMemory(m_aHashOfFile, 32);
 
 	m_cList.m_pParentI = this;
+	m_cList.m_pbShowColumns = (BOOL *)m_bShowColumn;
 	m_cGroups.m_pParentI = this;
 
 	m_hArrowCursor = AfxGetApp()->LoadStandardCursor(IDC_ARROW);
@@ -717,6 +718,8 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bAutoPwGen = cConfig.GetBool(PWMKEY_AUTOPWGEN, TRUE);
 	m_bQuickFindIncBackup = cConfig.GetBool(PWMKEY_QUICKFINDINCBK, TRUE);
 	m_bDeleteBackupsOnSave = cConfig.GetBool(PWMKEY_DELETEBKONSAVE, FALSE);
+	m_bDisableAutoType = cConfig.GetBool(PWMKEY_DISABLEAUTOTYPE, FALSE);
+	m_bCopyURLs = cConfig.GetBool(PWMKEY_COPYURLS, FALSE);
 
 	m_bShowToolBar = cConfig.GetBool(PWMKEY_SHOWTOOLBAR, TRUE);
 	m_bShowFullPath = cConfig.GetBool(PWMKEY_SHOWFULLPATH, FALSE);
@@ -762,7 +765,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	pSubMenu = (BCMenu *)m_menu.GetSubMenu(nSub);
 	while(1)
 	{
-		_TranslateMenu(pSubMenu);
+		_TranslateMenu(pSubMenu, TRUE, &m_bCopyURLs);
 
 		pSubMenu = (BCMenu *)m_menu.GetSubMenu(nSub);
 		nSub++;
@@ -1181,15 +1184,18 @@ BOOL CPwSafeDlg::OnInitDialog()
 	return FALSE; // We set the focus ourselves
 }
 
-void CPwSafeDlg::_TranslateMenu(BCMenu *pBCMenu, BOOL bAppendSuffix)
+void CPwSafeDlg::_TranslateMenu(BCMenu *pBCMenu, BOOL bAppendSuffix, BOOL *pFlags)
 {
 	CString strItem, strNew;
 	UINT nItem = 0;
 	BCMenu *pNext;
 	const TCHAR *pSuffix = _T("");
+	BOOL bDefaultFlag = FALSE;
 
 	ASSERT(pBCMenu != NULL);
 	if(pBCMenu == NULL) return;
+
+	if(pFlags == NULL) pFlags = &bDefaultFlag;
 
 	while(1)
 	{
@@ -1201,8 +1207,13 @@ void CPwSafeDlg::_TranslateMenu(BCMenu *pBCMenu, BOOL bAppendSuffix)
 			(strItem == _T("Auto-&Sort Password List")))
 		{
 			pNext = pBCMenu->GetSubBCMenu((TCHAR *)(LPCTSTR)strItem);
-			if(pNext != NULL) _TranslateMenu(pNext);
+			if(pNext != NULL) _TranslateMenu(pNext, TRUE, pFlags);
 		}
+
+		// Replace URL menu item if required, pFlags[0] must be a pointer to m_bCopyURLs
+		if(*pFlags == TRUE)
+			if(strItem == _T("Open &URL(s)"))
+				strItem = _T("Copy &URL To Clipboard");
 
 		if(strItem.GetLength() != 0) strNew = TRL((LPCTSTR)strItem);
 		else strNew = _T("");
@@ -1830,6 +1841,8 @@ void CPwSafeDlg::SaveOptions()
 	pcfg.SetBool(PWMKEY_AUTOPWGEN, m_bAutoPwGen);
 	pcfg.SetBool(PWMKEY_QUICKFINDINCBK, m_bQuickFindIncBackup);
 	pcfg.SetBool(PWMKEY_DELETEBKONSAVE, m_bDeleteBackupsOnSave);
+	pcfg.SetBool(PWMKEY_DISABLEAUTOTYPE, m_bDisableAutoType);
+	pcfg.SetBool(PWMKEY_COPYURLS, m_bCopyURLs);
 
 	pcfg.SetBool(PWMKEY_SHOWTITLE, m_bShowTitle);
 	pcfg.SetBool(PWMKEY_SHOWUSER, m_bShowUserName);
@@ -2920,7 +2933,7 @@ void CPwSafeDlg::OnRclickPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 	if(_CALLPLUGINS(KPM_PWLIST_RCLICK, psub, 0) == FALSE)
 		{ *pResult = 0; m_popmenu.DestroyMenu(); m_bDisplayDialog = FALSE; return; }
 
-	_TranslateMenu(psub);
+	_TranslateMenu(psub, TRUE, &m_bCopyURLs);
 	psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y,
 		AfxGetMainWnd());
 	m_popmenu.DestroyMenu();
@@ -3184,7 +3197,7 @@ void CPwSafeDlg::OnRclickGroupList(NMHDR* pNMHDR, LRESULT* pResult)
 	m_popmenu.LoadToolbar(IDR_INFOICONS, IDB_INFOICONS_EX);
 
 	BCMenu *psub = (BCMenu *)m_popmenu.GetSubMenu(0);
-	_TranslateMenu(psub);
+	_TranslateMenu(psub, TRUE, NULL);
 	psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, AfxGetMainWnd());
 	m_popmenu.DestroyMenu();
 
@@ -3242,6 +3255,7 @@ void CPwSafeDlg::OnPwlistVisitUrl()
 	PW_ENTRY *p;
 	DWORD dwGroupId = GetSelectedGroupId();
 	CString strURL;
+	BOOL bLaunched = FALSE;
 
 	ASSERT(dwGroupId != DWORD_MAX); if(dwGroupId == DWORD_MAX) return;
 
@@ -3250,45 +3264,92 @@ void CPwSafeDlg::OnPwlistVisitUrl()
 		{ m_bDisplayDialog = FALSE; return; }
 	m_bDisplayDialog = FALSE;
 
-	for(i = 0; i < m_cList.GetItemCount(); i++)
+	if(m_bCopyURLs == FALSE)
 	{
-		uState = m_cList.GetItemState(i, LVIS_SELECTED);
-		if((uState & LVIS_SELECTED) > 0)
+		for(i = 0; i < m_cList.GetItemCount(); i++)
 		{
-			// p = m_mgr.GetEntryByGroup(dwGroupId, (DWORD)i);
-
-			DWORD dwIndex = _ListSelToEntryIndex((DWORD)i);
-			ASSERT(dwIndex != DWORD_MAX); if(dwIndex == DWORD_MAX) continue;
-
-			p = m_mgr.GetEntry(dwIndex);
-			ASSERT_ENTRY(p);
-
-			if(p != NULL)
+			uState = m_cList.GetItemState(i, LVIS_SELECTED);
+			if((uState & LVIS_SELECTED) > 0)
 			{
-				strURL = p->pszURL;
-				if(strURL.GetLength() != 0)
-				{
-					FixURL(&strURL);
-					m_mgr.UnlockEntryPassword(p);
-					ParseURL(&strURL, p, FALSE);
-					m_mgr.LockEntryPassword(p);
+				// p = m_mgr.GetEntryByGroup(dwGroupId, (DWORD)i);
 
+				DWORD dwIndex = _ListSelToEntryIndex((DWORD)i);
+				ASSERT(dwIndex != DWORD_MAX); if(dwIndex == DWORD_MAX) continue;
+
+				p = m_mgr.GetEntry(dwIndex);
+				ASSERT_ENTRY(p);
+
+				if(p != NULL)
+				{
+					strURL = p->pszURL;
 					if(strURL.GetLength() != 0)
 					{
-						if(m_bUsePuttyForURLs == TRUE)
-						{
-							if(OpenUrlUsingPutty((LPCTSTR)strURL, p->pszUserName) == FALSE)
-								OpenUrlEx((LPCTSTR)strURL);
-						}
-						else
-							OpenUrlEx((LPCTSTR)strURL);
-					}
+						FixURL(&strURL);
+						m_mgr.UnlockEntryPassword(p);
+						ParseURL(&strURL, p, FALSE);
+						m_mgr.LockEntryPassword(p);
 
-					_TouchEntry((DWORD)i, FALSE);
+						if(strURL.GetLength() != 0)
+						{
+							if(m_bUsePuttyForURLs == TRUE)
+							{
+								if(OpenUrlUsingPutty((LPCTSTR)strURL, p->pszUserName) == FALSE)
+									OpenUrlEx((LPCTSTR)strURL);
+							}
+							else OpenUrlEx((LPCTSTR)strURL);
+						}
+
+						_TouchEntry((DWORD)i, FALSE);
+					}
 				}
 			}
 		}
 	}
+	else // m_bCopyURLs == TRUE
+	{
+		DWORD dwSelectedEntry = GetSelectedEntry();
+		ASSERT(dwSelectedEntry != DWORD_MAX); if(dwSelectedEntry == DWORD_MAX) return;
+
+		DWORD dwEntryIndex = _ListSelToEntryIndex(dwSelectedEntry);
+		ASSERT(dwEntryIndex != DWORD_MAX); if(dwEntryIndex == DWORD_MAX) return;
+
+		p = m_mgr.GetEntry(dwEntryIndex);
+		ASSERT_ENTRY(p); if(p == NULL) return;
+
+		strURL = p->pszURL;
+		// FixURL(&strURL);
+		m_mgr.UnlockEntryPassword(p);
+		ParseURL(&strURL, p, FALSE);
+		m_mgr.LockEntryPassword(p);
+
+		if(strURL.GetLength() >= 6)
+		{
+			if(strURL.Left(6) == _T("cmd://"))
+			{
+				if(m_bUsePuttyForURLs == TRUE)
+				{
+					if(OpenUrlUsingPutty((LPCTSTR)strURL, p->pszUserName) == FALSE)
+						OpenUrlEx((LPCTSTR)strURL);
+				}
+				else OpenUrlEx((LPCTSTR)strURL);
+
+				bLaunched = TRUE;
+			}
+			else CopyStringToClipboard(strURL);
+		}
+		else CopyStringToClipboard(strURL);
+
+		EraseCString(&strURL);
+
+		_TouchEntry(dwSelectedEntry, FALSE);
+
+		if(bLaunched == FALSE)
+		{
+			m_nClipboardCountdown = (int)m_dwClipboardSecs;
+			SetStatusTextEx(TRL("Field copied to clipboard."));
+		}
+	}
+
 	_UpdateToolBar();
 }
 
@@ -4130,6 +4191,8 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_bMinimizeBeforeAT = (m_nAutoTypeMethod == ATM_MINIMIZE) ? TRUE : FALSE;
 	dlg.m_bDeleteBackupsOnSave = m_bDeleteBackupsOnSave;
 	dlg.m_bShowFullPath = m_bShowFullPath;
+	dlg.m_bDisableAutoType = m_bDisableAutoType;
+	dlg.m_bCopyURLs = m_bCopyURLs;
 
 	if(_CALLPLUGINS(KPM_OPTIONS_PRE, 0, 0) == FALSE)
 		{ m_bDisplayDialog = FALSE; return; }
@@ -4163,6 +4226,8 @@ void CPwSafeDlg::OnSafeOptions()
 		m_bQuickFindIncBackup = dlg.m_bQuickFindIncBackup;
 		m_bDeleteBackupsOnSave = dlg.m_bDeleteBackupsOnSave;
 		m_bShowFullPath = dlg.m_bShowFullPath;
+		m_bDisableAutoType = dlg.m_bDisableAutoType;
+		m_bCopyURLs = dlg.m_bCopyURLs;
 
 		m_nAutoTypeMethod = (dlg.m_bMinimizeBeforeAT == TRUE) ? ATM_MINIMIZE : ATM_DROPBACK;
 
@@ -4371,7 +4436,10 @@ void CPwSafeDlg::OnUpdatePwlistEdit(CCmdUI* pCmdUI)
 
 void CPwSafeDlg::OnUpdatePwlistVisitUrl(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems >= 1 ? TRUE : FALSE));
+	if(m_bCopyURLs == FALSE)
+		pCmdUI->Enable((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems >= 1 ? TRUE : FALSE));
+	else
+		pCmdUI->Enable((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems == 1 ? TRUE : FALSE));
 }
 
 void CPwSafeDlg::OnUpdateSafeRemoveGroup(CCmdUI* pCmdUI)
@@ -6936,7 +7004,7 @@ BOOL CPwSafeDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 			m_popmenu.LoadToolbar(IDR_INFOICONS, IDB_INFOICONS_EX);
 
 			BCMenu *psub = (BCMenu *)m_popmenu.GetSubMenu(0);
-			_TranslateMenu(psub);
+			_TranslateMenu(psub, TRUE, NULL);
 			psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, AfxGetMainWnd());
 			m_popmenu.DestroyMenu();
 		}
@@ -6976,7 +7044,7 @@ BOOL CPwSafeDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 				m_menuColView.LoadToolbar(IDR_INFOICONS, IDB_INFOICONS_EX);
 
 				BCMenu *psub = (BCMenu *)m_menuColView.GetSubMenu(0);
-				_TranslateMenu(psub);
+				_TranslateMenu(psub, TRUE, NULL);
 				_EnableViewMenuItems(psub);
 				psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, AfxGetMainWnd());
 				m_menuColView.DestroyMenu();
@@ -7775,6 +7843,8 @@ void CPwSafeDlg::_ProcessListKey(UINT nChar, BOOL bAlt)
 
 void CPwSafeDlg::_OnPwlistColumnWidthChange(int iColumn, int iSize)
 {
+	ASSERT((iColumn >= 0) && (iColumn < 11));
+
 	if((iColumn >= 0) && (iColumn < 11))
 	{
 		if(m_bShowColumn[iColumn] == TRUE)
@@ -8202,6 +8272,8 @@ void CPwSafeDlg::OnPwlistSelectAll()
 	m_cList.SetFocus();
 	for(i = 0; i < m_cList.GetItemCount(); i++)
 		m_cList.SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
+
+	_UpdateToolBar(TRUE);
 }
 
 void CPwSafeDlg::OnUpdatePwlistSelectAll(CCmdUI* pCmdUI)
@@ -8361,6 +8433,8 @@ void CPwSafeDlg::_AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus)
 
 	ASSERT(pEntry != NULL); if(pEntry == NULL) return;
 
+	if(m_bDisableAutoType == TRUE) return;
+
 	str = ExtractParameterFromString(pEntry->pszAdditional, _T("auto-type:"));
 
 	if(str.GetLength() == 0) str = _T("{USERNAME}{TAB}{PASSWORD}{ENTER}");
@@ -8473,6 +8547,8 @@ void CPwSafeDlg::OnPwlistAutoType()
 {
 	NotifyUserActivity();
 
+	if(m_bDisableAutoType == TRUE) return;
+
 	DWORD dwEntry = _ListSelToEntryIndex();
 	PW_ENTRY *p;
 
@@ -8486,7 +8562,8 @@ void CPwSafeDlg::OnPwlistAutoType()
 
 void CPwSafeDlg::OnUpdatePwlistAutoType(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable((((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems == 1)) ? TRUE : FALSE));
+	pCmdUI->Enable((((m_dwLastFirstSelectedItem != DWORD_MAX) && (m_dwLastNumSelectedItems == 1)) ? TRUE : FALSE)
+		&& (!m_bDisableAutoType));
 }
 
 void CPwSafeDlg::OnExtrasPluginMgr()
@@ -8656,6 +8733,8 @@ BOOL CPwSafeDlg::RegisterGlobalHotKey(int nHotKeyID, DWORD dwHotKey, BOOL bRelea
 LRESULT CPwSafeDlg::OnHotKey(WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
+
+	if(m_bDisableAutoType == TRUE) return 0;
 
 	ASSERT((wParam == HOTKEYID_AUTOTYPE) || (wParam == HOTKEYID_RESTORE));
 	if(wParam == HOTKEYID_AUTOTYPE)

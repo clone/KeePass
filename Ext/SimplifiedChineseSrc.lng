@@ -1,7 +1,7 @@
-05-8-22 14:41|~LANGUAGENAME|
+05-9-6 15:30|~LANGUAGENAME|
 |简体中文|
 |~LANGUAGEVERSION|
-|1.01|
+|1.02|
 |~LANGUAGEAUTHOR|
 |窦兴强 (Leo Dou)|
 |~LANGUAGEAUTHOREMAIL|
@@ -64,7 +64,7 @@
 |密码群组|
 |Title|
 |标题|
-|UserName|
+|User Name|
 |用户名|
 |URL|
 |网址|
@@ -146,7 +146,7 @@
 |群组：|
 |Title:|
 |标题：|
-|UserName:|
+|User Name:|
 |用户名：|
 |URL:|
 |网址：|
@@ -264,7 +264,7 @@
 |输出群组到CSV文件(&C)...|
 |Export Group To &TXT...|
 |输出群组到TXT文件(&T)...|
-|Copy User&Name To Clipboard|
+|Copy User &Name To Clipboard|
 |复制用户名(&N)|
 |Copy &Password To Clipboard|
 |复制密码(&P)|
@@ -302,7 +302,7 @@
 |选择语言(&L)...|
 |Show &Title Column|
 |标题(&T)|
-|Show User&Name Column|
+|Show User &Name Column|
 |用户名(&N)|
 |Show &URL Column|
 |网址(&U)|
@@ -384,8 +384,8 @@
 |关闭前保存更改吗？|
 |KeePass - Save Before Close/Lock?|
 |KeePass - 关闭/锁定前保存？|
-|Deleting a group will delete all items in that group, too.|
-|删除群组将删除其下所有记录。|
+|Deleting a group will delete all items and subgroups in that group, too.|
+|删除群组将删除其下所有记录及子群组。|
 |Are you sure you want to delete this group?|
 |你确定要删除这个群组吗？|
 |Delete Group Confirmation|
@@ -613,7 +613,7 @@
 |排序群组(&S)|
 |Sort List By &Title|
 |按标题(&T)|
-|Sort List By User&Name|
+|Sort List By User &Name|
 |按用户名(&N)|
 |Sort List By &URL|
 |按网址(&U)|
@@ -633,7 +633,7 @@
 |向左移动(&L)|
 |Move Group One &Right|
 |向左移动(&R)|
-|Hide &UserNames Behind Asterisks (***)|
+|Hide &User Names Behind Asterisks (***)|
 |隐藏用户名为***(&U)|
 |Attachment:|
 |附件：|
@@ -974,3 +974,33 @@
 |保存数据前删除所有备份记录|
 |&Repair KeePass Database File...|
 |修复KeePass数据库文件(&R)...|
+|&KeePass Database...|
+|&KeePass 数据库...|
+|Acknowledgements|
+|鸣谢|
+|Click [No] to set a new key for the exported file.|
+|点击 [否] 为导出的数据库文件设置新的密码/密匙。|
+|Click [Yes] to use the same key as the currently opened database.|
+|点击 [是] 使用当前打开数据库的密码/密匙。|
+|Create new IDs|
+|新建标识|
+|Export Group To &KeePass Database...|
+|导出群组为新的 &KeePass 数据库...|
+|If you select this option, KeePass will create new IDs for all groups and entries. Consequently no existing groups and entries of the currently opened database will be modified or overwritten.|
+|KeePass 将会为 导入的群组和记录 创建新的名称标识，因此不会修改或覆盖 当前打开数据库中的群组和记录 。|
+|KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.|
+|KeePass 将会对比 群组/记录 的最后修改时间，并且仅当导入项时间更新时，才替换当前项。|
+|KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.|
+|注意：KeePass 将会用 导入数据库中的群组和记录 替换 当前数据库中的 [同名] 群组和记录！（经试验，同名群组包括其下不同名的记录都将被覆盖。）|
+|Overwrite|
+|覆盖|
+|Overwrite if newer|
+|更新|
+|Please choose if KeePass should use the key of the currently opened database or ask you to define a new key to encrypt the exported file.|
+|请选择新数据库是否继续使用当前打开数据库的密码/密匙？或者是否需要为其建立新的密码/密匙？|
+|Reuse the current key/password?|
+|继续使用当前的密码/密匙？|
+|Show full path in the titlebar (instead of filename only)|
+|在标题栏显示完整的路径（而不是只显示文件名）|
+|The file format that you have selected to import supports group and/or entry IDs. Please choose an import behaviour.|
+|你所选择的导入文件格式支持群组 和/或 记录名称标识，请设置导入选项。|

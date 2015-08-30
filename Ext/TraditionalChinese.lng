@@ -1,7 +1,7 @@
 |~LANGUAGENAME|
 |繁體中文(臺灣)|
 |~LANGUAGEVERSION|
-|1.01 - 1|
+|1.02 - 1|
 |~LANGUAGEAUTHOR|
 |高祥元 (Kao Shiang-Yuan)|
 |~LANGUAGEAUTHOREMAIL|
@@ -13,9 +13,9 @@
 |&Close|
 |關閉(&C)|
 |Password Safe|
-|密碼保險櫃|
+|密碼資料庫|
 |&Generate Random Password|
-|產生隨機密碼(&G)|
+|密碼產生器(&G)|
 |&Pick One|
 |選擇(&P)|
 |&Gen|
@@ -23,11 +23,11 @@
 |General|
 |一般|
 |Windows|
-|視窗|
+|Windows|
 |Network|
 |網路|
 |Internet|
-|網際網路|
+|Internet|
 |eMail|
 |電子郵件|
 |Homebanking|
@@ -58,13 +58,11 @@
 |在密碼清單中找一個字串|
 |Find text in password list|
 |在密碼清單中找文字|
-|About KeePass...|
-|關於KeePass...|
 |Password Groups|
 |密碼群組|
 |Title|
 |標題|
-|UserName|
+|User Name|
 |使用者名稱|
 |URL|
 |網址|
@@ -77,23 +75,23 @@
 |Enter the passphrase and/or select the key-disk's drive.|
 |輸入密碼及/或選擇鑰匙碟片所在的磁碟機。|
 |Enter password:|
-|輸入密碼：|
+|密碼：|
 |Select the password disk drive where the key will be stored:|
-|選擇儲存鑰匙的密碼碟片：|
+|鑰匙碟片：|
 |Create a new password database - Enter master key|
-|建立新密碼資料庫 - 輸入主鑰匙|
+|建立新密碼資料庫 - 輸入主密碼及/或主鑰匙|
 |Set master key|
-|選擇主鑰匙|
+|設定主密碼及/或主鑰匙|
 |Enter the master key for the new database.|
-|為新的資料庫輸入主鑰匙。|
+|為新的資料庫設定主密碼及/或主鑰匙。|
 |Create a new password database - Repeat master key|
-|建立新資料庫 - 重複輸入主鑰匙：|
+|建立新資料庫 - 重複輸入主密碼|
 |Repeat master password|
-|重複主密碼|
+|重複輸入主密碼|
 |Repeat the master key for the new database.|
-|為新資料庫重複主鑰匙。|
+|重複輸入主密碼，以防錯誤|
 |Select the password disk drive to load the key from:|
-|選擇載入鑰匙的密碼碟片：|
+|鑰匙碟片：|
 |Open database - Enter master key|
 |開啟資料庫 - 輸入主鑰匙|
 |Enter master key|
@@ -113,13 +111,13 @@
 |Password Generation Options|
 |密碼產生選項|
 |&Only the following characters:|
-|只有這些字元(&O)|
-|Collect &entropy (recommended for strong passwords)|
-|收集輸入資料(若要產生高強度密碼，建議使用)(&E)|
+|只使用這些字元(&O)：|
 |Number of characters:|
 |字元數：|
+|Collect &entropy (recommended for strong passwords)|
+|人工輸入亂數(若要產生高強度密碼，建議勾選)(&E)|
 |Your new password:|
-|您的新密碼：|
+|新密碼：|
 |&Generate|
 |產生(&G)|
 |&Accept|
@@ -142,7 +140,7 @@
 |群組：|
 |Title:|
 |標題：|
-|UserName:|
+|User Name:|
 |使用者名稱：|
 |URL:|
 |網址：|
@@ -174,18 +172,24 @@
 |編輯群組|
 |Modify a password group|
 |變更一個密碼群組|
+|Get Random|
+|產生亂數|
+|Get random data for key generation|
+|取得利用滑鼠及/或鍵盤輸入資料，供程式產生亂數|
+|Move the mouse and type some random text to generate random values.|
+|提示：最好兩種輸入方式都使用|
 |Random mouse input|
-|用滑鼠作為隨機亂數資料來源|
+|滑鼠|
 |Click to begin:|
-|按一下開始：|
+|1. 按一下[開始]|
 |Use &Mouse As Random Source|
-|使用滑鼠當作隨機亂數資料來源(&M)|
+|開始(&M)|
 |Move the mouse in the field above until this is full:|
-|在上面的區域內移動滑鼠，直到填滿：|
+|2. 在上面的區域內移動滑鼠，直到填滿|
 |Hint: It is best to use both mouse and keyboard random sources.|
-|提示：最好使用滑鼠「與」鍵盤當作隨機亂數資料來源。|
+|提示：最好兩種輸入方式都使用|
 |Random keyboard input|
-|用鍵盤作為隨機亂數資料來源|
+|鍵盤|
 |Just hack some random keys into the edit box above.|
 |在上面的方塊內隨便亂打一些字。|
 |You don't have to remember the keys you type in. They are used to generate a random value.|
@@ -193,13 +197,7 @@
 |So, the more the better. The different, the better.|
 |所以，愈多，愈複雜愈好。|
 |The random the better.|
-|愈隨機，愈沒有規則愈好。|
-|Get Random|
-|取得隨機亂數資料|
-|Get random data for key generation|
-|為產生鑰匙取得隨機亂數資料|
-|Move the mouse and type some random text to generate random values.|
-|利用滑鼠移動與鍵盤輸入產生隨機亂數資料。|
+|愈沒有規則愈好。|
 |Pick an icon|
 |選擇一個圖示|
 |Pick an Icon|
@@ -217,7 +215,7 @@
 |&?|
 |說明(&?)|
 |&New Database...|
-|新資料庫(&N)...|
+|開新資料庫(&N)...|
 |&Open Database...|
 |開啟資料庫(&O)...|
 |&Close Database|
@@ -260,7 +258,7 @@
 |&CSV...|
 |Export Group To &TXT...|
 |純文字(&TXT)...|
-|Copy User&Name To Clipboard|
+|Copy User &Name To Clipboard|
 |複製使用者名稱到剪貼簿(&N)|
 |Copy &Password To Clipboard|
 |複製密碼到剪貼簿(&P)|
@@ -298,7 +296,7 @@
 |變更語言(&L)|
 |Show &Title Column|
 |標題(&T)|
-|Show User&Name Column|
+|Show User &Name Column|
 |使用者名稱(&N)|
 |Show &URL Column|
 |網址(&U)|
@@ -314,8 +312,6 @@
 |密碼產生器(&G)|
 |Visit &KeePass Homepage|
 |瀏覽&KeePass首頁|
-|&About KeePass...|
-|關於KeePass(&A)...|
 |&Database Settings...|
 |資料庫設定(&D)...|
 |&Tray/Untray|
@@ -374,14 +370,14 @@
 |密碼資料庫檔案|
 |All files|
 |所有檔案|
+|KeePass - Save Before Close/Lock?|
+|KeePass - 在關閉/鎖定前儲存？|
 |The current file has been modified.|
 |此檔案已變更。|
 |Do you want to save the changes before closing?|
-|您希望在關閉前儲存嗎？|
-|KeePass - Save Before Close/Lock?|
-|KeePass - 在關閉/鎖定前儲存？|
-|Deleting a group will delete all items in that group, too.|
-|刪除群組將失去該群組內的所有項目。|
+|是否儲存？|
+|Deleting a group will delete all items and subgroups in that group, too.|
+|刪除群組，也將刪除其中的所有項目與子群組。|
 |Are you sure you want to delete this group?|
 |您確定要刪除這個群組嗎？|
 |Delete Group Confirmation|
@@ -413,7 +409,7 @@
 |Settings|
 |設定|
 |Here you can configure KeePass.|
-|您可以在這裡設定KeePass。|
+|您可以在這裡設定KeePass|
 |Automatically open last used database on startup|
 |在啟動時自動開啟上次使用的資料庫|
 |Automatically save database on exit and workspace locking|
@@ -465,7 +461,7 @@
 |&Import From|
 |匯入自(&I)|
 |&Get more languages...|
-|取得更多語言(&G)...|
+|更多語言(&G)...|
 |Start and Exit|
 |開始與結束|
 |Interface (GUI)|
@@ -477,7 +473,7 @@
 |Lock workspace when minimizing the main window|
 |在最小化主視窗時鎖定|
 |Minimize to tray instead of taskbar|
-|最小化後不在工具列顯示(通知區域(系統工具列)不受影響)|
+|最小化後不在工具列顯示(通知區域(右下角系統工具列)不受影響)|
 |Encryption algorithm to use (for this database):|
 |使用加密的演算法(這個資料庫)：|
 |Advanced Encryption Standard (AES) (128-bit block cipher using 256-bit key)|
@@ -489,11 +485,11 @@
 |KeePass is OSI Certified Open Source Software.|
 |KeePass是OSI認證的開放原始碼軟體。|
 |Automatically lock workspace after the following number of seconds:|
-|在下列秒數後自動鎖定：|
+|在閒置一段時間後自動鎖定(單位：秒)：|
 |&Group Name|
 |群組名稱(&G)|
 |Every second row has a different background color. Use this color:|
-|在雙數列使用不同的背景顏色。選擇顏色：|
+|選擇雙數列背景顏色：|
 |Default|
 |預設|
 |More Colors...|
@@ -592,7 +588,7 @@
 |按名稱排序(&S)|
 |Sort List By &Title|
 |標題(&T)|
-|Sort List By User&Name|
+|Sort List By User &Name|
 |使用者名稱(&N)|
 |Sort List By &URL|
 |網址(&U)|
@@ -612,7 +608,7 @@
 |向左移動(&L)|
 |Move Group One &Right|
 |向右移動(&R)|
-|Hide &UserNames Behind Asterisks (***)|
+|Hide &User Names Behind Asterisks (***)|
 |用星號隱藏用者名稱(&U)|
 |Attachment:|
 |附件：|
@@ -653,7 +649,7 @@
 |&Remove Association|
 |移除關聯(&R)|
 |Setup|
-|組織|
+|環境整合|
 |Password List|
 |密碼清單|
 |Exit?|
@@ -673,7 +669,7 @@
 |Not enough free disk space!|
 |磁碟空間不足！|
 |Disable unsafe (security-critical) operations like exports, etc.|
-|關閉不安全的指令(嚴重影響安全的)，像是匯出。|
+|關閉不安全的指令(嚴重影響安全的，像是匯出)|
 |Unsafe operations are disabled.|
 |不安全的指令已經關閉。|
 |To execute this operation you must enable unsafe operations in the options dialog.|
@@ -751,9 +747,9 @@
 |Auto-sorting of the password list is enabled, you cannot sort the list manually now.|
 |密碼清單自動排序已啟動，您無法手動排序項目。|
 |Select key-file manually...|
-|手動選擇鑰匙檔案...|
+|選擇鑰匙檔案...|
 |Save key-file manually to...|
-|手動儲存鑰匙檔案到...|
+|選擇鑰匙檔案...|
 |Enter the new master key for this database.|
 |為這個資料庫輸入新的主鑰匙。|
 |Repeat master key|
@@ -831,15 +827,15 @@
 |Get more plugins...|
 |取得更多Plug-in...|
 |Global auto-type hot key combination:|
-|全域自動輸入快速鍵：|
+|全域自動輸入快速鍵(若要清除，按一下Ctrl)：|
 |Most probably another application has reserved this hot key already.|
 |很有可能是另一個應用程式接收了這個快速鍵。|
 |You can choose an other hot key combination in 'Edit - Options - Setup'.|
 |您可以在「	編輯」「選項」「組織」中選擇其它的快速鍵。|
 |and|
-|以及|
+|雙重認證|
 |You've selected the AND key mode, so you must enter a password AND select a key-file.|
-|您已經選擇密碼與鑰匙必須一起使用的模式，所以請輸入密碼「並」選擇鑰匙檔案。|
+|您選擇雙重認證，請輸入密碼「並」選擇鑰匙碟片/鑰匙檔案。|
 |Timed: copy data to the clipboard and clear it automatically after some seconds|
 |時間限制：複製資料到剪貼簿，並在一段時間後自動清除|
 |Enhanced: allow pasting only once and protect against clipboard spies|
@@ -909,7 +905,7 @@
 |Save backups of modified entries into the 'Backup' group|
 |為變更過的項目備份到「備份」群組|
 |Select a new font for the list controls:|
-|為清單項目選擇新字型(建議選擇支援中文的字型，例如新細明體，大小設定為9)：|
+|為清單項目選擇字型：(建議使用支援中文的字型，例如新細明體，大小設定為9)|
 |Show grid lines in password entry list|
 |在密碼項目清單上顯示格線|
 |Start KeePass at Windows startup (for current user)|
@@ -927,7 +923,7 @@
 |3 months|
 |3個月|
 |By default, new entries expire in the following number of days:|
-|依照預設值，新的項目將在幾天後逾期：|
+|預設新的項目逾期時間(單位：天)：|
 |Cannot register the global hot key.|
 |無法註冊全域快速鍵。|
 |Click to expire the entry in %u days|
@@ -943,7 +939,7 @@
 |Paste operation completed.|
 |完成貼上。|
 |Single left click instead of double-click for default tray icon action|
-|從通知區域(系統工具列)叫出KeePass時，只需點一次(原本需要連點兩次)|
+|從通知區域(右下角系統工具列)叫出KeePass時，只需點一次(原本需要連點兩次)|
 |Special characters|
 |特殊字元|
 |Calculate rounds for a 1-second delay on this computer|
@@ -972,3 +968,37 @@
 |按Shift+Home或Shift+End清除該編輯控制項內容|
 |Use alternative auto-type method (minimize window)|
 |使用替代的自動輸入方法(最小化視窗)|
+|&KeePass Database...|
+|KeePass資料庫(&K)...|
+|Acknowledgements|
+|致謝|
+|Click [No] to set a new key for the exported file.|
+|選擇[否]為輸出檔設定新的主密碼及/或主鑰匙。|
+|Click [Yes] to use the same key as the currently opened database.|
+|選擇[是]使用與目前資料庫一樣的主密碼/主鑰匙。|
+|Export Group To &KeePass Database...|
+|將群組輸出到KeePass資料庫(&K)...|
+|Create new IDs|
+|不覆蓋(建立新ID)|
+|If you select this option, KeePass will create new IDs for all groups and entries. Consequently no existing groups and entries of the currently opened database will be modified or overwritten.|
+|KeePass將為每個群組與項目建立新ID。現在開啟的資料庫中沒有任何群組與項目將被更改或覆蓋。|
+|Overwrite|
+|直接覆蓋|
+|KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.|
+|如果包含相同ID，KeePass將覆蓋現在開啟的資料庫中所有項目與群組。|
+|Overwrite if newer|
+|用新版覆蓋|
+|KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.|
+|KeePass將比對最後更改的時間，如果匯入的資料比較新，才覆蓋。|
+|Please choose if KeePass should use the key of the currently opened database or ask you to define a new key to encrypt the exported file.|
+|請問匯出的資料庫要用同樣一組主密碼/主鑰匙，或是您要使用新的主密碼及/或主鑰匙？|
+|Reuse the current key/password?|
+|重複使用現有的主密碼/主鑰匙？|
+|Show full path in the titlebar (instead of filename only)|
+|在標題列顯示完整位置(否則只顯示檔名)|
+|The file format that you have selected to import supports group and/or entry IDs. Please choose an import behaviour.|
+|您選擇的輸入檔案格式支援群組及/或項目ID。請選擇處理方式。|
+|About KeePass...|
+|關於KeePass...|
+|&About KeePass...|
+|關於KeePass(&A)...|

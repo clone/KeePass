@@ -480,7 +480,7 @@ BOOL CButtonST::OnClicked()
 #ifdef	BTNST_USE_BCMENU
 			BCMenu* psub = (BCMenu*)m_menuPopup.GetSubMenu(0);
 			if (m_csCallbacks.hWnd)	::SendMessage(m_csCallbacks.hWnd, m_csCallbacks.nMessage, (WPARAM)psub, m_csCallbacks.lParam);
-			CPwSafeDlg::_TranslateMenu(psub, FALSE);
+			CPwSafeDlg::_TranslateMenu(psub, FALSE, NULL);
 			DWORD dwRetValue = psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON | TPM_NONOTIFY | TPM_RETURNCMD, rWnd.left, rWnd.bottom, this, NULL);
 #else
 			HMENU hSubMenu = ::GetSubMenu(m_hMenu, 0);

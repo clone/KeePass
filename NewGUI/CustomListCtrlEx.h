@@ -38,6 +38,7 @@ public:
 	int GetItemCount();
 
 	CWnd *m_pParentI;
+	BOOL *m_pbShowColumns;
 
 	//{{AFX_VIRTUAL(CCustomListCtrlEx)
 	protected:

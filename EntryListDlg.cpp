@@ -89,7 +89,7 @@ BOOL CEntryListDlg::OnInitDialog()
 	int nColWidth = 160;
 	m_cList.InsertColumn(0, TRL("Password Groups"), LVCFMT_LEFT, nColWidth / 2 + 20, 0);
 	m_cList.InsertColumn(1, TRL("Title"), LVCFMT_LEFT, nColWidth - 8, 1);
-	m_cList.InsertColumn(2, TRL("UserName"), LVCFMT_LEFT, nColWidth - 8, 2);
+	m_cList.InsertColumn(2, TRL("User Name"), LVCFMT_LEFT, nColWidth - 8, 2);
 	m_cList.InsertColumn(3, TRL("Password"), LVCFMT_LEFT, nColWidth / 2, 3);
 	m_cList.InsertColumn(4, TRL("Expires"), LVCFMT_LEFT, nColWidth / 2, 4);
 	m_cList.InsertColumn(5, TRL("UUID"), LVCFMT_LEFT, 0, 5);

@@ -1,4 +1,4 @@
-|~LANGUAGEVERSION| |1.01|
+|~LANGUAGEVERSION| |1.02|
 |~LANGUAGEAUTHOR|     |DonAngel|
 |~LANGUAGEAUTHOREMAIL| |public@doncho.net|
 |~LANGUAGENAME|       |Български|
@@ -38,7 +38,6 @@
 
 |Password Groups|              |Групи пароли|
 |Title|                        |Заглавие|
-|UserName|                     |Потребителско име|
 |URL|                          |URL|
 |Password|                     |Парола|
 |Notes|                        |Коментар|
@@ -93,7 +92,6 @@
 
 |Group:|                       |Група:|
 |Title:|                       |Заглавие:|
-|UserName:|                    |Потр.име:|
 |URL:|                         |URL:|
 |Icon:|                        |Икона:|
 |Password:|                    |Парола:|
@@ -160,7 +158,6 @@
 |Export Group To &HTML...|     |Експорт на група в &HTML...|
 |Export Group To &XML...|      |Експорт на група в &XML...|
 |Export Group To &CSV...|      |Експорт на фрупа в &CSV...|
-|Copy User&Name To Clipboard|  |Копиране на потр.име в клипбоардът|
 |Copy &Password To Clipboard|  |Копиране на паролата в клипбоардът|
 |&Find In Database...|         |&Търсене в базата данни...|
 |&Add Entry...|                |Прибавяне на &запис...|
@@ -179,7 +176,6 @@
 
 |Change &Language...|          |&Смяна на езика...|
 |Show &Title Column|           |Показване на колона '&Заглавие'|
-|Show User&Name Column|        |Показване на колона '&Потребителско име'|
 |Show &URL Column|             |Показване на колона '&URL'|
 |Show &Password Column|        |Показване на колона 'П&арола'|
 
@@ -236,8 +232,6 @@
 |Do you want to save the changes before closing?|
     |Желаете ли да се запишат промените преди да завърши програмата?|
 
-|Deleting a group will delete all items in that group, too.|
-    |Изтриването на група ще изтрие също така всички записи в нея.|
 |Are you sure you want to delete this group?|
     |Сигурен ли сте, че желаете да изтриете тази група?|
 |Delete Group Confirmation|
@@ -345,7 +339,6 @@
 |Move Group One &Left|		|Местене на групата едно в&ляво|
 |Move Group One &Right|		|Местене не групата едно в&дясно|
 
-|Sort List By User&Name|	|Сортира листа по &Потребителско име|
 |Sort List By &URL|		|Сортира листа по &URL|
 |Sort List By &Password|	|Сортира листа по П&арола|
 |Sort List By Note&s|		|Сортира листа по &Забележка|
@@ -631,8 +624,6 @@
 	|Тук може да настроите всички инсталирани KeePass разширения.|
 |Hide &Passwords Behind Asterisks (***)|
 	|Скриване на &паролите със звездички (***)|
-|Hide &UserNames Behind Asterisks (***)|
-	|Скриване на п&отребителското име зад звездички (***)|
 |If you notice any problems with this enhanced method, just switch back to the timed clipboard clearing method.|
 	|Ако срещате затруднения при използването на този разширен метод, просто преминете обратно към временно копиране в клипбоардът.|
 |Internal error|
@@ -879,3 +870,52 @@
 |Use alternative auto-type method (minimize window)|
 	|Използване на алтернативния авто-пишещ метод (минимизира прозореца)|
 
+|&KeePass Database...|
+	|&KeePass база данни...|
+|Acknowledgements|
+	|Благодарности|
+|Click [No] to set a new key for the exported file.|
+	|Натиснете [Не] за да зададете нов ключ за експортирания файл.|
+|Click [Yes] to use the same key as the currently opened database.|
+	|Натиснете [Yes] за да се използва същия ключ като на сега отворения файл.|
+|Copy User &Name To Clipboard|
+	|Копира Потр.&име в клипбоарда|
+|Create new IDs|
+	|Създава нови IDта|
+|Deleting a group will delete all items and subgroups in that group, too.|
+	|Изтриването на група ще изтрие също така всички записи и подгрупи в нея.|
+|Export Group To &KeePass Database...|
+	|Изнася група в &KeePass база данни...|
+|Hide &User Names Behind Asterisks (***)|
+	|&Скрива потр.име зад звездички (***)|
+|If you select this option, KeePass will create new IDs for all groups and entries. Consequently no existing groups and entries of the currently opened database will be modified or overwritten.|
+	|Ако се избере тази опция, KeePass ще създаде нови IDта за всички групи и записи. Следователно нито съществуващи групи, нито записи от отворената база данни ще бъдат модифицирани или презаписани.|
+
+|KeePass will compare the last-modified times of the groups/entries and replace the existing
+ ones only if the ones to import are newer.|
+	|KeePass ще сравни времената на последна модификация на групите/записите и ще подмени съществуващите само ако импортираните са по-нови.|
+	
+|KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.|
+	|KeePass ще подмени всички съществуващи групи и записи с тези от импортирания файл, ако техните ИДта съответстват.|
+|Overwrite|
+	|Презаписване|
+|Overwrite if newer|
+	|Презаписване ако е по-нов|
+|Please choose if KeePass should use the key of the currently opened database or ask you to define a new key to encrypt the exported file.|
+	|Моля укажете на KeePass дали да използва ключа на текущо отворената база данни или да поиска указване на нов ключ за експортирания файл.|
+
+|Reuse the current key/password?|
+	|Преизпозване на текущия ключ/парола?|
+	
+|Show User &Name Column|
+	|Показва колона П&отр.име|
+|Show full path in the titlebar (instead of filename only)|
+	|Показва пълния път в заглавието на прозореца (вместо само името на файла)|
+|Sort List By User &Name|
+	|Сортира списъка по по&тр.име|
+|The file format that you have selected to import supports group and/or entry IDs. Please choose an import behaviour.|
+	|Файловия формат, който е указан за внясяне, поддържа ИДта на групи/записи. Моля укажете поведение при внасянето.|
+|User Name|
+	|Потр.име|
+|User Name:|
+	|Потр.име:|

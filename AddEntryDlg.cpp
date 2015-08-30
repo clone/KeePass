@@ -150,20 +150,27 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	if(m_bStars == FALSE)
 	{
-		GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fStyle, TRUE);
-		GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fStyle, TRUE);
+		// GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fStyle, TRUE);
+		m_pEditPw.SetFont(&m_fStyle, TRUE);
+		// GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fStyle, TRUE);
+		m_pRepeatPw.SetFont(&m_fStyle, TRUE);
+
 		m_pEditPw.EnableSecureMode(FALSE);
 		m_pRepeatPw.EnableSecureMode(FALSE);
 	}
 	else
 	{
-		GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fSymbol, TRUE);
-		GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fSymbol, TRUE);
+		// GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fSymbol, TRUE);
+		m_pEditPw.SetFont(&m_fSymbol, TRUE);
+		// GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fSymbol, TRUE);
+		m_pRepeatPw.SetFont(&m_fSymbol, TRUE);
+
 		m_pEditPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
 		m_pRepeatPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
 	}
 
-	GetDlgItem(IDC_CHECK_HIDEPW)->SetFont(&m_fSymbol, TRUE);
+	// GetDlgItem(IDC_CHECK_HIDEPW)->SetFont(&m_fSymbol, TRUE);
+	m_btHidePw.SetFont(&m_fSymbol, TRUE);
 
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
@@ -356,8 +363,10 @@ BOOL CAddEntryDlg::OnInitDialog()
 		GetDlgItem(IDC_EDIT_TITLE)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_USERNAME)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_URL)->EnableWindow(FALSE);
-		GetDlgItem(IDC_RANDOMPW_BTN)->EnableWindow(FALSE);
-		GetDlgItem(IDC_PICKICON_BTN)->EnableWindow(FALSE);
+		// GetDlgItem(IDC_RANDOMPW_BTN)->EnableWindow(FALSE);
+		m_btRandomPw.EnableWindow(FALSE);
+		// GetDlgItem(IDC_PICKICON_BTN)->EnableWindow(FALSE);
+		m_btPickIcon.EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_PASSWORD)->SetFocus();
 	}
 	else
@@ -373,6 +382,33 @@ BOOL CAddEntryDlg::OnInitDialog()
 	LPTSTR lpTemp = m_pEditPw.GetPassword();
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lpTemp);
 	m_pEditPw.DeletePassword(lpTemp); lpTemp = NULL;
+
+	CString strTest;
+	m_btRandomPw.GetWindowText(strTest);
+	if(strTest.Find(_T("(&G)"), 0) >= 0) // Extend buttons if using a language that has special accelerator tips
+	{
+		RECT rcMover;
+
+		m_pEditPw.GetWindowRect(&rcMover);
+		ScreenToClient(&rcMover);
+		rcMover.right -= 25;
+		m_pEditPw.MoveWindow(&rcMover);
+
+		m_pRepeatPw.GetWindowRect(&rcMover);
+		ScreenToClient(&rcMover);
+		rcMover.right -= 25;
+		m_pRepeatPw.MoveWindow(&rcMover);
+
+		m_btRandomPw.GetWindowRect(&rcMover);
+		ScreenToClient(&rcMover);
+		rcMover.left -= 25;
+		m_btRandomPw.MoveWindow(&rcMover);
+
+		m_btHidePw.GetWindowRect(&rcMover);
+		ScreenToClient(&rcMover);
+		rcMover.left -= 25;
+		m_btHidePw.MoveWindow(&rcMover);
+	}
 
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
@@ -581,7 +617,7 @@ BOOL CAddEntryDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		m_popmenu.LoadToolbar(IDR_INFOICONS, IDB_INFOICONS_EX);
 
 		BCMenu *psub = (BCMenu *)m_popmenu.GetSubMenu(0);
-		CPwSafeDlg::_TranslateMenu(psub);
+		CPwSafeDlg::_TranslateMenu(psub, TRUE, NULL);
 		psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, this);
 		m_popmenu.DestroyMenu();
 	}

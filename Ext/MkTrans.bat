@@ -39,6 +39,9 @@ Util\CprLang.exe JapaneseSrc.lng Japanese.lng
 DEL Korean.lng
 Util\CprLang.exe KoreanSrc.lng Korean.lng
 
+DEL Lithuanian.lng
+Util\CprLang.exe LithuanianSrc.lng Lithuanian.lng
+
 DEL Norwegian.lng
 Util\CprLang.exe NorwegianSrc.lng Norwegian.lng
 
@@ -130,6 +133,8 @@ DEL ..\Debug\SimplifiedChinese.lng
 COPY /B SimplifiedChinese.lng /B ..\Debug\SimplifiedChinese.lng > NUL
 DEL ..\Debug\Greek.lng
 COPY /B Greek.lng /B ..\Debug\Greek.lng > NUL
+DEL ..\Debug\Lithuanian.lng
+COPY /B Lithuanian.lng /B ..\Debug\Lithuanian.lng > NUL
 
 REM Copy latest language files into Release directory
 
@@ -183,6 +188,8 @@ DEL ..\Release\SimplifiedChinese.lng
 COPY /B SimplifiedChinese.lng /B ..\Release\SimplifiedChinese.lng > NUL
 DEL ..\Release\Greek.lng
 COPY /B Greek.lng /B ..\Release\Greek.lng > NUL
+DEL ..\Release\Lithuanian.lng
+COPY /B Lithuanian.lng /B ..\Release\Lithuanian.lng > NUL
 
 REM Copy language reference file
 

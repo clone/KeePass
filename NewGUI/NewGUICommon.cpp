@@ -28,6 +28,7 @@
 #include "XPStyleButtonST.h"
 
 #include "../PwSafe/PwUtil.h"
+#include "../Util/StrUtil.h"
 
 static BOOL g_bImgButtons = 0;
 static CThemeHelperST *g_pThemeHelper = NULL;
@@ -175,7 +176,10 @@ C_FN_SHARE void NewGUI_ToolBarButton(void *pButton, int nBitmapIn, int nBitmapOu
 
 	p->GetWindowText(strToolTip);
 	p->SetWindowText(_T(""));
-	p->SetTooltipText(TRL((LPCTSTR)strToolTip));
+
+	strToolTip = TRL(strToolTip);
+	RemoveAcceleratorTip(&strToolTip);
+	p->SetTooltipText(strToolTip);
 
 	if(g_pThemeHelper == NULL)
 	{

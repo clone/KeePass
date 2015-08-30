@@ -194,10 +194,9 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddGroupText(TRL("Integration"), 9);
 	m_olAdvanced.AddCheckItem(TRL("Start KeePass at Windows startup (for current user)"), &m_bStartWithWindows, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Single left click instead of double-click for default tray icon action"), &m_bSingleClickTrayIcon, NULL, OL_LINK_NULL);
-
-	CString strStrBuild = TRL("Use alternative auto-type method (minimize window)");
-	strStrBuild += _T(" (0.99c)");
-	m_olAdvanced.AddCheckItem(strStrBuild, &m_bMinimizeBeforeAT, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Use alternative auto-type method (minimize window)"), &m_bMinimizeBeforeAT, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Disable all auto-type features"), &m_bDisableAutoType, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Copy URLs to clipboard instead of launching them (exception: cmd:// URLs)"), &m_bCopyURLs, NULL, OL_LINK_NULL);
 
 	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Start and Exit"), 7);
@@ -376,6 +375,8 @@ void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case OPTGRP_SETUP:
 		m_wndgrp.HideAllExcept(OPTGRP_SETUP);
+		if(m_bDisableAutoType == TRUE)
+			m_hkAutoType.EnableWindow(FALSE);
 		break;
 	case OPTGRP_ADVANCED:
 		m_wndgrp.HideAllExcept(OPTGRP_ADVANCED);
