@@ -1,3 +1,21 @@
+03/12/03 - 0.84
+- Added French translation (thanks to Marc Tissot!)
+- Renamed some structures and variables, which could be defined
+  already, to avoid compiling problems
+- Added option to show/hide gridlines in the password entry
+  list
+- The edit box in the 'enter-password' dialog now has the focus
+- Changed the default focus in some dialogs
+- View options (columns to show, hide passwords behind stars,
+  always on top, etc.) are saved now
+- Fixed a bug in the find routines which caused KeePass to
+  crash when many items are found and a memory reallocation was
+  needed
+- KeePass now uses the system color for the dialog backgrounds
+- You can now "compile" one big list of all password entries by
+  opening the search dialog and clicking OK (so without
+  entering a search string)
+
 03/11/25 - 0.83
 - Groups are movable now (like the entries, see context menu)
 - GUI: Removed moving options from main menu (of course not

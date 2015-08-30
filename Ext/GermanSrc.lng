@@ -280,7 +280,27 @@
     |Beim Start zuletzt benutzte Datenbank öffnen|
 |GUI: Display images on buttons|
     |GUI: Icons auf Buttons anzeigen|
+|GUI: Show grid lines in password entry list|
+    |GUI: Gitternetzlinien in Passwortliste anzeigen|
 |Workspace cannot be unlocked!|
     |Arbeitsfläche kann nicht entsperrt werden!|
 |Workspace locked|
     |Arbeitsfläche gesperrt|
+
+|Loading error|                |Ladefehler|
+|Language file cannot be opened!|
+    |Sprachdatei kann nicht geöffnet werden!|
+|Language file cannot be registered!|
+    |Sprachdatei kann nicht registriert werden!|
+|The language file has been installed.|
+    |Die Sprachdatei wurde installiert.|
+|You must restart KeePass in order to load the new language.|
+    |KeePass muss neu gestartet werden, um die neue Sprache zu laden.|
+|Do you wish to restart KeePass now?|
+    |Möchten Sie KeePass jetzt neu starten?|
+|Restart KeePass?|
+    |KeePass neu starten?|
+|Application cannot be restarted automatically!|
+    |Anwendung kann nicht automatisch neu gestartet werden!|
+|Please restart KeePass manually.|
+    |Bitte starten Sie KeePass manuell neu.|

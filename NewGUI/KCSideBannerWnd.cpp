@@ -414,8 +414,8 @@ void CKCSideBannerWnd::DrawBackground(CDC* pDC, CRect rect)
 	// Gradient fill
 	else if ( m_uFillFlag & KCSB_FILL_GRADIENT )
 	{
-		TRIVERTEX			vert[2];
-		GRADIENT_RECT		gRect;
+		MY_TRIVERTEX			vert[2];
+		MY_GRADIENT_RECT		gRect;
 		ULONG				uGFlag;
 
 		if ( m_pGradFill )		// can we use the MSIMG32.DLL function?

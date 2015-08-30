@@ -489,14 +489,6 @@ BOOL CPwManager::SetEntry(DWORD dwIndex, DWORD uGroupId, DWORD uImageId,
 	else
 		m_pEntries[dwIndex].pszTitle[0] = 0;
 
-	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszURL);
-	slen = strlen(pszURL);
-	m_pEntries[dwIndex].pszURL = new char[slen + 1];
-	if(slen != 0)
-		strcpy(m_pEntries[dwIndex].pszURL, pszURL);
-	else
-		m_pEntries[dwIndex].pszURL[0] = 0;
-
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszUserName);
 	slen = strlen(pszUserName);
 	m_pEntries[dwIndex].pszUserName = new char[slen + 1];
@@ -504,6 +496,14 @@ BOOL CPwManager::SetEntry(DWORD dwIndex, DWORD uGroupId, DWORD uImageId,
 		strcpy(m_pEntries[dwIndex].pszUserName, pszUserName);
 	else
 		m_pEntries[dwIndex].pszUserName[0] = 0;
+
+	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszURL);
+	slen = strlen(pszURL);
+	m_pEntries[dwIndex].pszURL = new char[slen + 1];
+	if(slen != 0)
+		strcpy(m_pEntries[dwIndex].pszURL, pszURL);
+	else
+		m_pEntries[dwIndex].pszURL[0] = 0;
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszPassword);
 	slen = strlen(pszPassword);
@@ -524,14 +524,14 @@ BOOL CPwManager::SetEntry(DWORD dwIndex, DWORD uGroupId, DWORD uImageId,
 	m_pEntries[dwIndex].uPasswordLen = strlen(pszPassword);
 	LockEntryPassword(&m_pEntries[dwIndex]);
 
+	ASSERT_ENTRY((&m_pEntries[dwIndex]));
 	return TRUE;
 }
 
 void CPwManager::LockEntryPassword(PW_ENTRY *pEntry)
 {
-	ASSERT(pEntry != NULL);
+	ASSERT_ENTRY(pEntry);
 	if(pEntry == NULL) return;
-	ASSERT(pEntry->pszPassword != NULL);
 	if(pEntry->pszPassword == NULL) return;
 
 	if(pEntry->uPasswordLen != 0)
@@ -541,7 +541,7 @@ void CPwManager::LockEntryPassword(PW_ENTRY *pEntry)
 
 void CPwManager::UnlockEntryPassword(PW_ENTRY *pEntry)
 {
-	LockEntryPassword(pEntry); // OFB mode
+	LockEntryPassword(pEntry); // OFB encryption mode
 }
 
 void CPwManager::NewDatabase()
@@ -627,8 +627,8 @@ BOOL CPwManager::OpenDatabase(const char *pszFile)
 		{ OPENDB_FAIL; }
 
 	// Decrypt! The first 48 bytes aren't encrypted (that's the header)
-	uEncryptedPartSize = aes.padDecrypt((UINT8 *)pVirtualFile + 48, uFileSize - 48,
-		(UINT8 *)pVirtualFile + 48);
+	uEncryptedPartSize = aes.padDecrypt((RD_UINT8 *)pVirtualFile + 48, uFileSize - 48,
+		(RD_UINT8 *)pVirtualFile + 48);
 
 	// Check for success
 	if((uEncryptedPartSize > 2147483646) || (uEncryptedPartSize == 0))
@@ -814,8 +814,8 @@ BOOL CPwManager::SaveDatabase(const char *pszFile)
 	}
 
 	// Encrypt! The first 48 bytes remain unencrypted, that's the header
-	uEncryptedPartSize = aes.padEncrypt((UINT8 *)pVirtualFile + 48, pos - 48,
-		(UINT8 *)pVirtualFile + 48);
+	uEncryptedPartSize = aes.padEncrypt((RD_UINT8 *)pVirtualFile + 48, pos - 48,
+		(RD_UINT8 *)pVirtualFile + 48);
 
 	// Check if all went correct
 	ASSERT((uEncryptedPartSize % 16) == 0);
@@ -843,11 +843,13 @@ int CPwManager::Find(const char *pszFindString, BOOL bCaseSensitive, int fieldFl
 
 	ASSERT(nStart >= 0);
 	ASSERT(pszFindString != NULL);
-	if(strlen(pszFindString) == 0) return -1;
+	if(nStart < 0) return -1;
 	if(nStart >= (int)m_dwNumEntries) return -1;
 
 	strFind = pszFindString;
 	if(bCaseSensitive == FALSE) strFind.MakeLower();
+
+	if((strFind.GetLength() == 0) || (strFind == "*")) return nStart;
 
 	for(i = nStart; i < (int)m_dwNumEntries; i++)
 	{

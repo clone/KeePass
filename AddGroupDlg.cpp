@@ -107,7 +107,8 @@ BOOL CAddGroupDlg::OnInitDialog()
 
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	return TRUE; // Return TRUE unless you set the focus to a control
+	GetDlgItem(IDC_EDIT_GROUPNAME)->SetFocus();
+	return FALSE; // Return TRUE unless you set the focus to a control
 }
 
 void CAddGroupDlg::OnOK() 

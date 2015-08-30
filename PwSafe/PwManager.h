@@ -35,7 +35,7 @@
 
 // General product information
 #define PWM_PRODUCT_NAME "KeePass Password Safe"
-#define PWM_VERSION_STR  "0.83b"
+#define PWM_VERSION_STR  "0.84"
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -56,6 +56,14 @@
 #define PWMKEY_OPENLASTB "KeeAutoOpen"
 #define PWMKEY_LASTDB    "KeeLastDb"
 #define PWMKEY_IMGBTNS   "KeeImgButtons"
+#define PWMKEY_ENTRYGRID "KeeEntryGrid"
+#define PWMKEY_ALWAYSTOP "KeeAlwaysOnTop"
+#define PWMKEY_SHOWTITLE "KeeShowTitle"
+#define PWMKEY_SHOWUSER  "KeeShowUser"
+#define PWMKEY_SHOWURL   "KeeShowURL"
+#define PWMKEY_SHOWPASS  "KeeShowPassword"
+#define PWMKEY_SHOWNOTES "KeeShowNotes"
+#define PWMKEY_HIDESTARS "KeeHideStars"
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -110,6 +118,14 @@ typedef struct _PW_DBHEADER
 	DWORD dwEntries;
 } PW_DBHEADER;
 #pragma pack()
+
+#ifdef _DEBUG
+#define ASSERT_ENTRY(pp) ASSERT(pp != NULL); ASSERT(pp->pszTitle != NULL); \
+	ASSERT(pp->pszUserName != NULL); ASSERT(pp->pszURL != NULL); \
+	ASSERT(pp->pszPassword != NULL); ASSERT(pp->pszAdditional != NULL);
+#else
+#define ASSERT_ENTRY(pp)
+#endif
 
 class CPwManager
 {

@@ -190,14 +190,14 @@ void CLanguagesDlg::_LoadLanguage(char *szLang)
 		ASSERT(fp != NULL);
 		if(fp == NULL)
 		{
-			MessageBox("Language file cannot be opened!", "Loading error", MB_OK | MB_ICONWARNING);
+			MessageBox(TRL("Language file cannot be opened!"), TRL("Loading error"), MB_OK | MB_ICONWARNING);
 			return;
 		}
 		fclose(fp);
 
 		if(cConfig.Set(PWMKEY_LANG, szLang) == FALSE)
 		{
-			MessageBox("Language file cannot be registered!", "Loading error", MB_OK | MB_ICONWARNING);
+			MessageBox(TRL("Language file cannot be registered!"), TRL("Loading error"), MB_OK | MB_ICONWARNING);
 			return;
 		}
 	}
@@ -206,8 +206,14 @@ void CLanguagesDlg::_LoadLanguage(char *szLang)
 		cConfig.Set(PWMKEY_LANG, "Standard");
 	}
 
-	i = MessageBox("The language file has been installed.\r\n\r\nYou must restart KeePass in order to load the new language.\r\n\r\nDo you wish to restart KeePass now?",
-		"Restart KeePass?", MB_YESNO | MB_ICONQUESTION);
+	CString str;
+	str = TRL("The language file has been installed.");
+	str += "\r\n\r\n";
+	str += TRL("You must restart KeePass in order to load the new language.");
+	str += "\r\n\r\n";
+	str += TRL("Do you wish to restart KeePass now?");
+	i = MessageBox(str,
+		TRL("Restart KeePass?"), MB_YESNO | MB_ICONQUESTION);
 	if(i == IDYES)
 	{
 		CDialog::OnOK();

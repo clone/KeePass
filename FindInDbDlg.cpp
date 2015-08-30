@@ -97,7 +97,8 @@ BOOL CFindInDbDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	return TRUE; // Return TRUE unless you set the focus to a control
+	GetDlgItem(IDC_EDIT_FINDTEXT)->SetFocus();
+	return FALSE; // Return TRUE unless you set the focus to a control
 }
 
 void CFindInDbDlg::OnOK() 

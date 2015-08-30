@@ -120,7 +120,7 @@ BOOL CPasswordDlg::OnInitDialog()
 	int i; char c; UINT uStat; CString str; BYTE idxImage;
 	for(i = 0; i < 26; i++)
 	{
-		c = i + 'A';
+		c = (char)(i + 'A');
 		str = CString(c) + ":\\";
 		uStat = GetDriveType((LPCTSTR)str);
 		if(uStat != DRIVE_NO_ROOT_DIR)
@@ -186,7 +186,8 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	return TRUE; // Return TRUE unless you set the focus to a control
+	m_pEditPw.SetFocus();
+	return FALSE; // Return TRUE unless you set the focus to a control
 }
 
 void CPasswordDlg::CleanUp()

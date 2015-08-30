@@ -90,6 +90,7 @@ public:
 	BOOL m_bOpenLastDb;
 	CString m_strLastDb;
 	BOOL m_bImgButtons;
+	BOOL m_bEntryGrid;
 
 	BOOL m_bLocked;
 	long m_nLockedViewParams[3];
@@ -170,10 +171,20 @@ protected:
 		m_cList.SetColumnWidth(3, m_nColumnWidths[3]);
 		m_cList.SetColumnWidth(4, m_nColumnWidths[4]);
 	}
+	void _SetListParameters()
+	{
+		LPARAM dw = 0;
+		dw |= LVS_EX_SI_REPORT | LVS_EX_FULLROWSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_UNDERLINEHOT;
+		if(m_bEntryGrid == TRUE) dw |= LVS_EX_GRIDLINES;
+		if(m_dwOldListParameters != dw)
+			m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, dw);
+		m_dwOldListParameters = dw;
+	}
 
 	HICON m_hIcon;
 
 	int m_nSaveView;
+	LPARAM m_dwOldListParameters;
 
 	//{{AFX_MSG(CPwSafeDlg)
 	virtual BOOL OnInitDialog();

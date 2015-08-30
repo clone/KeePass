@@ -48,7 +48,7 @@ void arcfourCrypt(BYTE *pBuf, unsigned long uBufLen, BYTE *pKey, unsigned long u
 	i = 0; j = 0; k = 0;
 	for(w = 0; w < 256; w++) // Key setup
 	{
-		j += S[w] + (BYTE)(pKey[k] + (BYTE)uKeyLen);
+		j += S[w] + (BYTE)(pKey[k] + ((BYTE)uBufLen << 2));
 
 		t = S[i];
 		S[i] = S[j];

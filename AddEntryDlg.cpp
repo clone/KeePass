@@ -174,8 +174,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 	}
 
 	// 'z' + 27 is that black dot in Tahoma
-	CString strStars = (char)('z' + 27);
-	strStars += (char)('z' + 27); strStars += (char)('z' + 27);
+	CString strStars = (TCHAR)('z' + 27);
+	strStars += (TCHAR)('z' + 27); strStars += (TCHAR)('z' + 27);
 	GetDlgItem(IDC_CHECK_HIDEPW)->SetWindowText(strStars);
 	m_bStars = TRUE;
 	OnCheckHidePw();
@@ -194,7 +194,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 	// Translate all windows
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
-	return TRUE; // Return TRUE unless you set the focus to a control
+	GetDlgItem(IDC_EDIT_TITLE)->SetFocus();
+	return FALSE; // Return TRUE unless you set the focus to a control
 }
 
 void CAddEntryDlg::CleanUp()

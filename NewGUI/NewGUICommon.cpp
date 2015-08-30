@@ -37,25 +37,30 @@ static BOOL g_bImgButtons = 0;
 
 COLORREF NewGUI_GetBgColor()
 {
-	HDC hDC = NULL;
-	int nBitsPerPixel = 0;
+	// Future skinning support? :
 
-	hDC = GetDC(NULL);
-	nBitsPerPixel = GetDeviceCaps(hDC, BITSPIXEL);
-	ReleaseDC(NULL, hDC);
+	// HDC hDC = NULL;
+	// int nBitsPerPixel = 0;
 
-	if(nBitsPerPixel <= 8) return GetSysColor(COLOR_BTNFACE);
+	// hDC = GetDC(NULL);
+	// nBitsPerPixel = GetDeviceCaps(hDC, BITSPIXEL);
+	// ReleaseDC(NULL, hDC);
 
-	return(CR_BACK);
+	// if(nBitsPerPixel <= 8) return GetSysColor(COLOR_BTNFACE);
+
+	// return(CR_BACK);
+
+	return GetSysColor(COLOR_BTNFACE);
 }
 
 COLORREF NewGUI_GetBtnColor()
 {
-	COLORREF clr = 0;
+	COLORREF clr;
 
 	clr = GetSysColor(COLOR_BTNFACE);
 
-	return clr + 10;
+	// return clr + 10;
+	return clr;
 }
 
 void NewGUI_SetImgButtons(BOOL bImageButtons)
@@ -90,6 +95,7 @@ void NewGUI_TranslateCWnd(CWnd *pWnd)
 BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
 {
 	char sz[1024];
+	UNREFERENCED_PARAMETER(lParam);
 	GetWindowText(hwnd, sz, 1023);
 	SetWindowText(hwnd, TRL(sz));
 	return TRUE;

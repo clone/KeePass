@@ -76,11 +76,11 @@ void CNewRandom::Initialize()
 	SystemParametersInfo(SPI_GETSCREENSAVETIMEOUT, 0, &dw, 0);
 	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
 
-	ww = rand();
+	ww = (WORD)(rand());
 	memcpy(&m_pPseudoRandom[inx], &ww, 2); inx += 2;
-	ww = rand();
+	ww = (WORD)(rand());
 	memcpy(&m_pPseudoRandom[inx], &ww, 2); inx += 2;
-	ww = rand();
+	ww = (WORD)(rand());
 	memcpy(&m_pPseudoRandom[inx], &ww, 2); inx += 2;
 
 	// You can add some random sources here

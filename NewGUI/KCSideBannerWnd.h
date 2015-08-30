@@ -37,6 +37,10 @@
  *
  ****************************************************************************/
 
+// This is a modified version of the original KCSideBannerWnd control.
+// I (Dominik Reichl) changed some variable names to compile with the
+// project and with my compiler. Thank you very much Peter!
+
 #if !defined(_KCSIDEBANNERWND_H_)
 #define _KCSIDEBANNERWND_H_
 
@@ -71,7 +75,7 @@
 #define KCSB_FILL_GRADIENT		2
 #define	KCSB_FILL_TEXTURE		4
 
-typedef BOOL (CALLBACK*PFNGRADFILL)(HDC, PTRIVERTEX, ULONG, PVOID, ULONG, ULONG);
+typedef BOOL (CALLBACK*PFNGRADFILL)(HDC, MY_PTRIVERTEX, ULONG, PVOID, ULONG, ULONG);
 
 /////////////////////////////////////////////////////////////////////////////
 // CKCSideBannerWnd window

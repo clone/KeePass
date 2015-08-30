@@ -50,6 +50,7 @@ public:
 	UINT	m_uClipboardSeconds;
 	BOOL	m_bOpenLastDb;
 	BOOL	m_bImgButtons;
+	BOOL	m_bEntryGrid;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(COptionsDlg)

@@ -134,7 +134,9 @@ pre {
 <table class="quickjump">
 <tr>
     <td class="quickjumptd">
-	<a href="http://keepass.sourceforge.net">[Visit Homepage]</a>
+	&nbsp;Links:&nbsp;
+	<a href="http://keepass.sourceforge.net">[Visit KeePass homepage]</a>&nbsp;
+	<a href="http://www.codeproject.com/tools/KeePass.asp">[An article]</a>
     </td>
 </tr>
 </table>
@@ -144,7 +146,7 @@ pre {
 &nbsp;KeePass Password Safe</td></tr></table>
 
 <br>
-KeePass is copyright (c) 2003 Dominik Reichl.
+KeePass is Copyright (c) 2003 Dominik Reichl.
 For more information see the <a href="License.html" target="_blank">License</a> file.<br>
 
 <br>Index:<ul>
@@ -152,6 +154,10 @@ For more information see the <a href="License.html" target="_blank">License</a> 
 <li><a href="License.html" target="_self">License file</a></li>
 <li><a href="#inst">Installation / un-installation</a></li>
 <li><a href="#oscompat">Compatible operating systems</a></li>
+<li><a href="#intro">Introduction</a></li>
+<li><a href="#keyinfo">Master passwords and key-disks</a></li>
+<li><a href="#keesec">Security</a></li>
+<li><a href="#keeint">Internals</a></li>
 <li><a href="#thanks">Thanks / Acknowledgements</a></li>
 </ul><br>
 
@@ -170,7 +176,7 @@ KeePass is a free, open-source, light-weight and easy-to-use password safe for W
 <li>Print password list.</li>
 <li>Fast copy password or user name to the Windows clipboard.</li>
 <li>Searching in password database is possible.</li>
-<li>KeePass can be translated into other languages very easily. Currently German and English are available.</li>
+<li>KeePass can be translated into other languages very easily. Currently English, German and French are available.</li>
 <li>A strong random password generator (you can define the possible output characters)</li>
 <li>It's free and you have full access to its source code!</li>
 </ul>
@@ -178,11 +184,13 @@ KeePass is a free, open-source, light-weight and easy-to-use password safe for W
 <table class="tablebox"><tr><td class="boxtitle">
 &nbsp;<a name="inst"></a>Installation / un-installation</td></tr></table>
 <br>
-KeePass doesn't need to be installed. Just unpack the archive you downloaded and it's
-runnable.<br>
+KeePass doesn't need to be installed. Just unpack the archive you downloaded and it
+works.<br>
 <br>
-KeePass doesn't install anything, so no registry entries or initialization files
-are left on your computer when you delete the directory of KeePass.<br>
+KeePass doesn't install anything into the environment of your Windows.
+The program stores its settings in a file in the same directory of the executable.
+So no registry entries or initialization files in the Windows directory
+are left on your computer when you delete the folder of KeePass.<br>
 <br>
 <br>
 <table class="tablebox"><tr><td class="boxtitle">
@@ -197,11 +205,139 @@ KeePass runs on all Windows systems available on the market:
 <li>Windows 2003</li>
 </ul>
 <br>
+
+<table class="tablebox"><tr><td class="boxtitle">
+&nbsp;<a name="intro"></a>Introduction</td></tr></table>
+<br>
+Today you need to remember many passwords. You need a password for the Windows
+network logon, your e-mail account, your homepage's ftp password, online
+passwords (like CodeProject member account), etc. etc. etc. The list is
+endless. Also, you should use different passwords for each
+account. Because if you use only one password everywhere and someone gets this
+password you have a problem... A serious problem. He would have access to your
+e-mail account, homepage, etc. Unimaginable.<br><br>
+But who can remember all those passwords? Nobody, but KeePass can.
+KeePass is a free, open-source, light-weight and easy-to-use password safe for Windows.<br>
+<br>
+The program stores your passwords in a highly encrypted database.
+This database consists of only one file so it can be transferred from one computer
+to another easily.<br><br>
+KeePass supports password groups, so you can sort your passwords (for example into
+Windows, Internet, My Homepage, etc.).
+You can drag-n-drop passwords into other windows.
+The program can export the database to TXT, HTML, XML or CSV files.<br><br>
+For sure, you can also print the password list or current list view (see groups).
+Using the context menu of the password list you can quickly copy password or user name
+to the Windows clipboard.
+Searching in password database is possible.<br><br>
+KeePass can be translated into other languages very easily (currently English
+and German are available).
+The program has a strong random password generator (you can define the possible
+output characters).<br>
+<br>
+And the best: it's free and you have full access to its source code!<br>
+<br>
+KeePass is a Windows application. It has been developed using Microsoft Visual C++
+with MFC classes. No .NET framework is required, nor any other special DLLs. So
+it should run on all Windows operating systems.<br>
+<br>
+KeePass is distributed under a BSD-style license. To sum it up a bit:
+you can use it freely, modify the source code yourself if you log your changes
+and don't remove my original header. Because it's free, there is no warranty
+of any kind. See the file "License.html" in the downloadable KeePass zip package
+for details.
+<br><br>
+<br>
+
+<table class="tablebox"><tr><td class="boxtitle">
+&nbsp;<a name="keyinfo"></a>Master passwords and key-disks</td></tr></table>
+<br>
+KeePass stores your passwords securely in an encrypted database. This database
+is locked with a master password or key-disk.<br>
+<br>
+If you use a master password you only have to remember one password or passphrase
+(which should be good then!).<br>
+<br>
+If you lose this master password, all your other passwords in the database are lost too.
+The database is encrypted based on mathematics and there isn't any
+backdoor or a key which can open all databases. There is no way of recovering your
+passwords.<br>
+<br>
+But you don't even have to remember a long, complicated master passphrase.
+The database can alternatively be locked with a key-disk. A "key-disk" is just
+a normal disk which holds a file with the password bytes (KeePass can generate
+such disks for you).<br>
+<br>
+If you lose the key-disk and have no backup copy of the key-file your
+passwords in the database are lost too, just as when you lose the master passphrase.<br>
+<br>
+If you want to burn a master key CD-ROM select a writable drive (C: D: ?) and
+generate the master key-file. Burn the file "pwsafe.key" (i.e. C:\pwsafe.key or D:\pwsafe.key)
+into the root directory of your CD-ROM (i.e. E:\pwsafe.key).
+You can then insert the key CD-ROM and select the CD-ROM drive in KeePass to
+load the key from CD-ROM. For sure, you can do the steps above for any writable
+and readable media, not just CD-ROMs.<br>
+<br>
+So you must decide: either use a really good master password or a key-disk.
+<br><br>
+<br>
+
+<table class="tablebox"><tr><td class="boxtitle">
+&nbsp;<a name="keesec"></a>Security</td></tr></table>
+<br>
+In this section I will tell you how the databases are encrypted. If you
+aren't a cryptographer and don't know anything in the security field you won't
+understand that much. In this case just believe me it's secure ;-)<br>
+<br>
+All databases are encrypted. Currently they are encrypted using the Advanced
+Encryption Standard (AES/Rijndael), a 128-bit block cipher, using a 256-bit key.
+I've chosen the CBC block cipher mode. A 128-bit initialization vector (IV) is
+generated randomly each time you save the database.<br>
+<br>
+In order to generate the 256-bit key for AES the secure hash algorithm SHA-256
+(which belongs to the SHA-2 family) is used. The user key (the passphrase
+the user enters or the binary string in the key-file) plus a random salt
+is hashed using SHA-256. The random salt is generated randomly each time you
+save the database and saved in it.<br>
+<br>
+Each time you start KeePass, the program will perform a quick self-test where
+the AES/Rijndael cipher and the SHA-256 are tested against their correct test vectors.<br>
+<br><br>
+
+<table class="tablebox"><tr><td class="boxtitle">
+&nbsp;<a name="keeint"></a>Internals</td></tr></table>
+<br>
+There is a password manager class (<code>CPwManager</code>) which handles all the operations
+concerning the database. It exports functions for editing groups, edit password
+entries, move them, etc.<br>
+<br>
+The passwords are encrypted while running. So if Windows decides to cache
+the KeePass process to disk the passwords will be encrypted and a possible
+attacker couldn't read the passwords anyway.<br>
+<br>
+The class <code>CPwExport</code> handles all the export functions. It can export the complete
+database or just one group. I decided not to include an XML library which would
+blow up the KeePass application horribly.<br>
+<br>
+The file <code>"memutils.h"</code> contains some memory and buffer functions like securely
+erasing a buffer by overwriting it several times before setting it to zero,
+the same for CStrings, a routine for copying strings to the Windows clipboard
+and a routine for securely deleting files.<br>
+<br>
+The <code>CNewRandom</code> class is a new pseudo-random number generator. It's based on the
+SHA-256 hash which hashes random sources with a counter to generate secure
+random bytes. By standard the random sources are various pseudo-random sources
+like current mouse position, tick counter, time and date, etc. When more
+security is needed (for example when generating the key-disk file),
+the class accepts other random sources (see the dialog for getting random data
+using mouse movement and typing random characters).<br>
+<br><br>
+
 <table class="tablebox"><tr><td class="boxtitle">
 &nbsp;<a name="thanks"></a>Thanks / Acknowledgements</td></tr></table>
 <br>
 At this place I want to thank a few people very much for their help,
-source codes, classes and suggestions: (no particular order)
+source code, classes and suggestions: (no particular order)
 <ul>
 <li><i>Szymon Stefanek</i> - for his C++ implementation of the Rijndael cipher</li>
 <li><i>Dr Brian Gladman</i> - for his C implementation of the SHA-2 (256/384/512) hashing algorithms
@@ -211,6 +347,7 @@ source codes, classes and suggestions: (no particular order)
 <li><i>Peter Mares</i> - for his side banner window class</li>
 <li><i>Simon Wang</i> - for his combobox class</li>
 <li><i>Daniel Turini</i> - for suggesting "KeePass" as name for the password safe</li>
+<li><i>Marc Tissot</i> - for the French translation</li>
 </ul>
 
 </body>

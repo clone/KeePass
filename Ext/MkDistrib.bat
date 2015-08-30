@@ -3,12 +3,18 @@ Util\CprLang.exe GermanSrc.lng German.lng
 
 DEL ..\Debug\German.lng
 COPY /B German.lng /B ..\Debug\German.lng
+DEL ..\Debug\French.lng
+COPY /B French.lng /B ..\Debug\French.lng
 
 DEL ..\Release\German.lng
 COPY /B German.lng /B ..\Release\German.lng
+DEL ..\Release\French.lng
+COPY /B French.lng /B ..\Release\French.lng
 
 DEL ..\Distrib\German.lng
 COPY /B German.lng /B ..\Distrib\German.lng
+DEL ..\Distrib\French.lng
+COPY /B French.lng /B ..\Distrib\French.lng
 
 IF EXIST ..\Debug\KeePass.exe COPY /B ..\Debug\KeePass.exe /B ..\Distrib\KeePass.exe
 IF EXIST ..\Release\KeePass.exe COPY /B ..\Release\KeePass.exe /B ..\Distrib\KeePass.exe
