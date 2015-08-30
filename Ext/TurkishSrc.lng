@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Türkçe <Turkish>|
-|~LANGUAGEVERSION|             |1.01|
+|~LANGUAGEVERSION|             |1.03|
 |~LANGUAGEAUTHOR|              |Erhan BURHAN|
 |~LANGUAGEAUTHOREMAIL|         |<texas@xposta.com>|
 
@@ -38,7 +38,7 @@
 
 |Password Groups|              |Parola Grubu|
 |Title|                        |Baþlýk|
-|UserName|                     |Kullanýcý Adý|
+|User Name|                    |Kullanýcý adý|
 |URL|                          |URL|
 |Password|                     |Parola|
 |Notes|                        |Notlar|
@@ -102,7 +102,7 @@
 
 |Group:|                       |Grup:|
 |Title:|                       |Baþlýk:|
-|UserName:|                    |Kullanýcý Adý:|
+|User Name:|                   |Kullanýcý adý:|
 |URL:|                         |URL:|
 |Icon:|                        |Simge:|
 |Password:|                    |Parola:|
@@ -178,7 +178,7 @@
 |Export Group To &XML...|      |Grubu &XML olarak dýþarýya ver...|
 |Export Group To &CSV...|      |Grubu &CSV olarak dýþarýya ver...|
 |Export Group To &TXT...|      |Grubu &TXT olarak dýþarýya ver...|
-|Copy User&Name To Clipboard|  |&Kullanýcý adýný panoya kopyala|
+|Copy User &Name To Clipboard| |&Kullanýcý adýný panoya kopyala|
 |Copy &Password To Clipboard|  |&Parolayý panoya kopyala|
 |Open &URL(s)|                 |&Web adresini (URL) aç|
 |&Find In Database...|         |&Veritabaný içerisinde bul...|
@@ -199,7 +199,7 @@
 
 |Change &Language...|          |&Dili deðiþtir...|
 |Show &Title Column|           |&Baþlýk kolonunu göster|
-|Show User&Name Column|        |&Kullanýcý adý kolonunu göster|
+|Show User &Name Column|       |&Kullanýcý adý kolonunu göster|
 |Show &URL Column|             |&URL kolonunu göster|
 |Show &Password Column|        |&Parola kolonunu göster|
 |Show Note&s Column|           |&Notlar kolonunu göster|
@@ -267,8 +267,8 @@
     |Kapatmadan önce deðiþiklikleri kaydetmek ister misiniz?|
 |KeePass - Save Before Close/Lock?|   |KeePass - Kapatmadan/Kilitlemeden önce kaydedilsin mi?|
 
-|Deleting a group will delete all items in that group, too.|
-    |Bir gurubu sildiðinizde o grup içindeki tüm öðeler de silinecektir.|
+|Deleting a group will delete all items and subgroups in that group, too.|
+    |Bir grubu sildiðinizden o gruptaki bütün öðeler ve alt gruplar da silinir|
 |Are you sure you want to delete this group?|
     |Bu grubu silmek istediðinizden emin misiniz?|
 |Delete Group Confirmation|
@@ -436,7 +436,7 @@
 |&Rearrange|                   |Yeniden &düzenle|
 |&Sort Group List|             |Grup listesini &sýrala|
 |Sort List By &Title|          |&Baþlýða göre sýrala|
-|Sort List By User&Name|       |&Kullanýcý adýna göre sýrala|
+|Sort List By User &Name|      |&Kullanýcý adýna göre sýrala|
 |Sort List By &URL|            |&URL'ye göre sýrala|
 |Sort List By &Password|       |&Parolaya göre sýrala|
 |Sort List By Note&s|          |&Notlara göre sýrala|
@@ -447,7 +447,7 @@
 |Move Group One &Left|         |Grubu bir &sola taþý|
 |Move Group One &Right|        |Grubu bir &saða taþý|
 
-|Hide &UserNames Behind Asterisks (***)|  |Kullanýcý adlarýný yýldýz (***) iþaretleriyle gizle|
+|Hide &User Names Behind Asterisks (***)|  |&Kullanýcý adlarýný (***) yýldýz iþaretleriyle gizle|
 |Attachment:|                  |Ek dosya:|
 |Attachment|                   |Ek dosya|
 |Show &Attachment Column|      |&Ek dosya kolonunu göster|
@@ -669,4 +669,32 @@
 |&Donate...|                                 |&Baðýþ yap...|
 |Use alternative auto-type method (minimize window)|    |Alternatif otomatik yazma yöntemini kullan (pencere simge durumunda)|
 |Delete all backup entries before saving the database|  |Veritabanýný kaydetmeden önce 'Yedek' grubundaki tüm kayýtlarý sil|
-|&Repair KeePass Database File...|           |KeePass vertabaný dosyasýný &onar...|
+|&Repair KeePass Database File...|           |KeePass veritabaný dosyasýný &onar...|
+|Disable all auto-type features|             |Tüm otomatik yazma özelliklerini devre dýþý býrak|
+|The file format that you have selected to import supports group and/or entry IDs. Please choose an import behaviour.|
+    |Ýçeriye almak için seçtiðiniz dosya formatý grup ve/veya kayýt kimliklerini destekliyor. Lütfen bir içeriye alma davranýþý seçin.|
+|Create new IDs|                             |Yeni kimlik oluþtur|
+|If you select this option, KeePass will create new IDs for all groups and entries. Consequently no existing groups and entries of the currently opened database will be modified or overwritten.|
+    |Bu seçeneði seçerseniz, KeePass tüm gruplar ve kayýtlar için yeni kimlikler oluþturacak. Sonuçta þu anda açýk olan veritabanýnýn var olmayan gruplarý ve kayýtlarý deðiþmiþ veya üzerine yazýlmýþ olacak.|
+|Overwrite|                                  |Üzerine yaz|
+|KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.|
+    |KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.|
+|Overwrite if newer|                         |Daha yeniyse üzerine yaz|
+|KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.|
+    |KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.|
+|&KeePass Database...|                       |&KeePass Veritabaný...|
+|Acknowledgements|                           |Onaylar|
+|Please choose if KeePass should use the key of the currently opened database or ask you to define a new key to encrypt the exported file.|
+    |Please choose if KeePass should use the key of the currently opened database or ask you to define a new key to encrypt the exported file.|
+|Click [Yes] to use the same key as the currently opened database.|
+    |Açýk olan veritabaný için ayný anahtarý kullanmak için [Evet]'e týklayýn.|
+|Click [No] to set a new key for the exported file.|
+    |Dýþarýya verilen dosyaya yeni bir anahtar atamak için [Hayýr]'a týklayýn.|
+|Reuse the current key/password?|            |Geçerli anahtar/parola yeniden kullanýsýn mý?|
+|Export Group To &KeePass Database...|       |Grubu &KeePass veritabanýna çýkart...|
+|Show full path in the titlebar (instead of filename only)|
+    |Baþlýk çubuðunda tam yolu göster (sadece dosya ismi yerine)|
+|Disable all auto-type features|             |Tüm otomatik yazma özelliklerini devre dýþý býrak|
+|Copy URLs to clipboard instead of launching them (exception: cmd:// URLs)|
+    |Çalýþtýrmanýn yerine web adreslerini panoya kopyala (istisna: cmd:// adresleri)|
+|Copy &URL To Clipboard|                     |&Web adresini panoya kopyala|

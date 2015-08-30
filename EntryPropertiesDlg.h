@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class CEntryPropertiesDlg : public CDialog
 public:
 	CEntryPropertiesDlg(CWnd* pParent = NULL);
 
-	void SetExpireDays(DWORD dwDays);
+	void SetExpireDays(DWORD dwDays, BOOL bSetTime);
 
 	CKCSideBannerWnd m_banner;
 	CImageList *m_pParentIcons;
@@ -80,6 +80,7 @@ protected:
 	afx_msg void OnExpires3Months();
 	afx_msg void OnExpires6Months();
 	afx_msg void OnExpires12Months();
+	afx_msg void OnExpiresNow();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

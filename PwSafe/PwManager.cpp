@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 	paKey = _StringToAnsi(pszMasterKey);
 #else
 	ASSERT(sizeof(TCHAR) == 1);
-	paKey = new char[strlen(pszMasterKey) + 1];
+	paKey = new char[_tcslen(pszMasterKey) + 1];
 	ASSERT(paKey != NULL); if(paKey == NULL) return PWE_NO_MEM;
 	strcpy(paKey, pszMasterKey);
 #endif
@@ -120,7 +120,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 		paKey2 = _StringToAnsi(pszSecondKey);
 #else
 		ASSERT(sizeof(TCHAR) == 1);
-		paKey2 = new char[strlen(pszSecondKey) + 1];
+		paKey2 = new char[_tcslen(pszSecondKey) + 1];
 		ASSERT(paKey2 != NULL); if(paKey2 == NULL) return PWE_NO_MEM;
 		strcpy(paKey2, pszSecondKey);
 #endif
@@ -163,7 +163,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 				FILE *fp;
 
 				fp = _tfopen(szFile, _T("rb"));
-				if(fp == NULL) return PWE_NOFILEACCESS_READ;
+				if(fp == NULL) return PWE_NOFILEACCESS_READ_KEY;
 				fseek(fp, 0, SEEK_END);
 				uFileSize = (unsigned long)ftell(fp);
 				fseek(fp, 0, SEEK_SET);
@@ -211,7 +211,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 				unsigned char aRandomBytes[32];
 
 				fp = _tfopen(szFile, _T("rb")); // Does the file exist already?
-				if((fp != NULL) && (bOverwrite == FALSE)) { fclose(fp); fp = NULL; return PWE_NOFILEACCESS_READ; }
+				if((fp != NULL) && (bOverwrite == FALSE)) { fclose(fp); fp = NULL; return PWE_NOFILEACCESS_READ_KEY; }
 				if(fp != NULL) { fclose(fp); fp = NULL; } // We must close it before opening for write
 
 				if(pARI->GenerateRandomSequence(32, aRandomBytes) == FALSE) return PWE_INVALID_RANDOMSOURCE;
@@ -241,7 +241,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 				FILE *fp;
 
 				fp = _tfopen(szFile, _T("rb"));
-				if(fp == NULL) return PWE_NOFILEACCESS_READ;
+				if(fp == NULL) return PWE_NOFILEACCESS_READ_KEY;
 				fseek(fp, 0, SEEK_END);
 				uFileSize = (unsigned long)ftell(fp);
 				fseek(fp, 0, SEEK_SET);
@@ -304,7 +304,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 				unsigned char aRandomBytes[32];
 
 				fp = _tfopen(szFile, _T("rb")); // Does the file exist already?
-				if((fp != NULL) && (bOverwrite == FALSE)) { fclose(fp); fp = NULL; return PWE_NOFILEACCESS_READ; }
+				if((fp != NULL) && (bOverwrite == FALSE)) { fclose(fp); fp = NULL; return PWE_NOFILEACCESS_READ_KEY; }
 				if(fp != NULL) { fclose(fp); fp = NULL; } // We must close it before opening for write
 
 				if(pARI->GenerateRandomSequence(32, aRandomBytes) == FALSE) return PWE_INVALID_RANDOMSOURCE;
@@ -2436,82 +2436,6 @@ BOOL CPwManager::BackupEntry(const PW_ENTRY *pe, BOOL *pbGroupCreated)
 	return dwId;
 } */
 
-std::string CPwManager::FormatError(int nErrorCode, DWORD dwFlags)
-{
-	std::string str;
-	TCHAR tszTemp[24];
-
-	_stprintf(tszTemp, _T("%08X"), (unsigned int)nErrorCode);
-
-	if((dwFlags & PWFF_NO_INTRO) == 0)
-	{
-		str = TRL("An error occured"); str += _T("!\r\n");
-	}
-
-	str += TRL("Error code"); str += _T(": 0x");
-	str += tszTemp;
-
-	if((dwFlags & PWFF_NO_INTRO) == 0) str += _T("\r\n\r\n");
-	else str += _T("\r\n");
-
-	switch(nErrorCode)
-	{
-	case PWE_UNKNOWN:
-		str += TRL("Unknown error");
-		break;
-	case PWE_SUCCESS:
-		str += TRL("Success");
-		break;
-	case PWE_INVALID_PARAM:
-		str += TRL("Invalid parameter");
-		break;
-	case PWE_NO_MEM:
-		str += TRL("Too few memory (RAM) available");
-		break;
-	case PWE_INVALID_KEY:
-		str += TRL("Invalid/wrong key");
-		break;
-	case PWE_NOFILEACCESS_READ:
-		str += TRL("File access error: failed to open file in read mode");
-		break;
-	case PWE_NOFILEACCESS_WRITE:
-		str += TRL("File access error: failed to open file in write mode");
-		break;
-	case PWE_FILEERROR_READ:
-		str += TRL("File error: error while reading from the file");
-		break;
-	case PWE_FILEERROR_WRITE:
-		str += TRL("File error: error while writing to the file");
-		break;
-	case PWE_INVALID_RANDOMSOURCE:
-		str += TRL("Internal error"); str += _T(": ");
-		str += TRL("Invalid random source");
-		break;
-	case PWE_INVALID_FILESTRUCTURE:
-		str += TRL("Invalid/corrupted file structure");
-		break;
-	case PWE_CRYPT_ERROR:
-		str += TRL("Encryption/decryption error");
-		break;
-	case PWE_INVALID_FILESIZE:
-		str += TRL("Invalid/corrupted file structure");
-		break;
-	case PWE_INVALID_FILESIGNATURE:
-		str += TRL("Invalid/corrupted file structure");
-		break;
-	case PWE_INVALID_FILEHEADER:
-		str += TRL("Invalid/corrupted file structure");
-		break;
-	default:
-		ASSERT(FALSE);
-		str += TRL("Unknown error");
-		break;
-	}
-	str += _T(".");
-
-	return str;
-}
-
 BOOL CPwManager::_AddMetaStream(LPCTSTR lpMetaDataDesc, BYTE *pData, DWORD dwLength)
 {
 	PW_ENTRY pe;
@@ -2803,4 +2727,10 @@ void CPwManager::SetRawMasterKey(const BYTE *pNewKey)
 {
 	if(pNewKey != NULL) memcpy(m_pMasterKey, pNewKey, 32);
 	else memset(m_pMasterKey, 0, 32);
+}
+
+BOOL CPwManager::IsZeroUUID(const BYTE *pUUID)
+{
+	if(pUUID == NULL) return TRUE;
+	return (memcmp(pUUID, g_uuidZero, 16) == 0) ? TRUE : FALSE;
 }

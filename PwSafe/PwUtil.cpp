@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 
 #include "PwUtil.h"
 #include "../Util/MemUtil.h"
+#include "../NewGUI/TranslateEx.h"
 
 #define CHARSPACE_ESCAPE      60
 #define CHARSPACE_ALPHA       26
@@ -145,4 +146,83 @@ C_FN_SHARE BOOL SaveHexKey32(FILE *fp, BYTE *pBuf)
 
 	mem_erase((BYTE *)buf, 64);
 	return TRUE;
+}
+
+CPP_FN_SHARE CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags)
+{
+	CString str;
+	TCHAR tszTemp[24];
+
+	_stprintf(tszTemp, _T("%08X"), (unsigned int)nErrorCode);
+
+	if((dwFlags & PWFF_NO_INTRO) == 0)
+	{
+		str = TRL("An error occured"); str += _T("!\r\n");
+	}
+
+	str += TRL("Error code"); str += _T(": 0x");
+	str += tszTemp;
+
+	if((dwFlags & PWFF_NO_INTRO) == 0) str += _T("\r\n\r\n");
+	else str += _T("\r\n");
+
+	switch(nErrorCode)
+	{
+	case PWE_UNKNOWN:
+		str += TRL("Unknown error");
+		break;
+	case PWE_SUCCESS:
+		str += TRL("Success");
+		break;
+	case PWE_INVALID_PARAM:
+		str += TRL("Invalid parameter");
+		break;
+	case PWE_NO_MEM:
+		str += TRL("Too few memory (RAM) available");
+		break;
+	case PWE_INVALID_KEY:
+		str += TRL("Invalid/wrong key");
+		break;
+	case PWE_NOFILEACCESS_READ:
+		str += TRL("File access error: failed to open file in read mode");
+		break;
+	case PWE_NOFILEACCESS_WRITE:
+		str += TRL("File access error: failed to open file in write mode");
+		break;
+	case PWE_FILEERROR_READ:
+		str += TRL("File error: error while reading from the file");
+		break;
+	case PWE_FILEERROR_WRITE:
+		str += TRL("File error: error while writing to the file");
+		break;
+	case PWE_INVALID_RANDOMSOURCE:
+		str += TRL("Internal error"); str += _T(": ");
+		str += TRL("Invalid random source");
+		break;
+	case PWE_INVALID_FILESTRUCTURE:
+		str += TRL("Invalid/corrupted file structure");
+		break;
+	case PWE_CRYPT_ERROR:
+		str += TRL("Encryption/decryption error");
+		break;
+	case PWE_INVALID_FILESIZE:
+		str += TRL("Invalid/corrupted file structure");
+		break;
+	case PWE_INVALID_FILESIGNATURE:
+		str += TRL("Invalid/corrupted file structure");
+		break;
+	case PWE_INVALID_FILEHEADER:
+		str += TRL("Invalid/corrupted file structure");
+		break;
+	case PWE_NOFILEACCESS_READ_KEY:
+		str += TRL("File access error: failed to open file in read mode");
+		break;
+	default:
+		ASSERT(FALSE);
+		str += TRL("Unknown error");
+		break;
+	}
+	str += _T(".");
+
+	return str;
 }

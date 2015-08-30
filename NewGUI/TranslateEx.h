@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,19 +20,25 @@
 #ifndef ___TRANSLATE_EX_H___
 #define ___TRANSLATE_EX_H___
 
-#define MAX_TRANSLATION_STRINGS 508
+#define MAX_TRANSLATION_STRINGS 520
 
-// Translate string, sptr must be a char*, _not_ a TCHAR* !
+// Translate a string
+#ifndef _UNICODE
 #define TRL(sptr) _TRL(sptr)
+#else
+#define TRL(sptr) _TRL(_T(sptr))
+#endif
+
+#define TRL_VAR(stptr) _TRL(stptr)
 
 #define TRL_MODE_DEF FALSE
 #define TRL_MODE_TRL TRUE
 
-C_FN_SHARE BOOL LoadTranslationTable(const char *pszTableName);
+C_FN_SHARE BOOL LoadTranslationTable(LPCTSTR pszTableName);
 C_FN_SHARE BOOL FreeCurrentTranslationTable();
 
-C_FN_SHARE const char *_TRL(const char *pszDefString);
+C_FN_SHARE LPCTSTR _TRL(LPCTSTR pszDefString);
 
-C_FN_SHARE const TCHAR *GetCurrentTranslationTable();
+C_FN_SHARE LPCTSTR GetCurrentTranslationTable();
 
 #endif // ___TRANSLATE_EX_H___

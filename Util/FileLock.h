@@ -17,32 +17,14 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___WINDOW_GROUPS_H___
-#define ___WINDOW_GROUPS_H___
+#include <windows.h>
+#include "SysDefEx.h"
 
-#include "NewGUICommon.h"
-#include "../Util/SysDefEx.h"
+#define FL_LOCK_SUFFIX       _T(".lock")
 
-#define WG_OFFSET_TOP  105
-#define WG_OFFSET_LEFT  35
-#define WG_Y_STEP       20
+// Times in minutes
+#define FL_TIME_RELOCK_AFTER 9
+#define FL_TIME_LOCKING      12
 
-#define WGF_REPOSITION 1
-
-class CWindowGroups
-{
-public:
-	CWindowGroups();
-	virtual ~CWindowGroups();
-
-	BOOL AddWindow(CObject *pWindow, DWORD dwGroupID, BOOL bReposition);
-	BOOL ArrangeWindows(CWnd *pParentWindow);
-	BOOL HideAllExcept(DWORD dwGroupID);
-
-private:
-	CObArray m_aWindows;
-	CDWordArray m_aGroupIDs;
-	CByteArray m_aFlags;
-};
-
-#endif
+C_FN_SHARE BOOL FileLock_Lock(LPCTSTR lpFile, BOOL bLock);
+C_FN_SHARE BOOL FileLock_IsLocked(LPCTSTR lpFile);

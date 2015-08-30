@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,10 +25,13 @@
 #include "NewGUI/KCSideBannerWnd.h"
 #include "PwSafe/PwManager.h"
 
+#include <vector>
+
 #define ELDMODE_UNKNOWN    0
 #define ELDMODE_EXPIRED    1
 #define ELDMODE_SOONTOEXP  2
 #define ELDMODE_EXPSOONEXP 3
+#define ELDMODE_LIST       4
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -37,6 +40,8 @@ class CEntryListDlg : public CDialog
 // Konstruktion
 public:
 	CEntryListDlg(CWnd* pParent = NULL);
+
+	void SaveSelectedEntry();
 
 	CKCSideBannerWnd m_banner;
 
@@ -49,8 +54,14 @@ public:
 
 	BYTE m_aUuid[16];
 
+	CString m_strBannerTitle;
+	CString m_strBannerCaption;
+
+	std::vector<PW_UUID_STRUCT> m_vEntryList;
+
 	//{{AFX_DATA(CEntryListDlg)
 	enum { IDD = IDD_ENTRYLIST_DLG };
+	CStatic	m_stcProductName;
 	CXPStyleButtonST	m_btClose;
 	CListCtrl	m_cList;
 	//}}AFX_DATA
@@ -68,6 +79,7 @@ protected:
 	virtual void OnOK();
 	virtual void OnCancel();
 	afx_msg void OnClickEntryList(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnReturnEntryList(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

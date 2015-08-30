@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL CPwGeneratorDlg::OnInitDialog() 
+BOOL CPwGeneratorDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
@@ -254,7 +254,7 @@ void CPwGeneratorDlg::_SaveOptions()
 	g_nChars = m_nCharacters;
 }
 
-void CPwGeneratorDlg::OnOK() 
+void CPwGeneratorDlg::OnOK()
 {
 	UpdateData(TRUE);
 
@@ -270,7 +270,7 @@ void CPwGeneratorDlg::OnOK()
 	CDialog::OnOK();
 }
 
-void CPwGeneratorDlg::OnCancel() 
+void CPwGeneratorDlg::OnCancel()
 {
 	UpdateData(TRUE);
 
@@ -280,7 +280,7 @@ void CPwGeneratorDlg::OnCancel()
 	CDialog::OnCancel();
 }
 
-void CPwGeneratorDlg::OnGenerateBtn() 
+void CPwGeneratorDlg::OnGenerateBtn()
 {
 	CGetRandomDlg dlg;
 	CNewRandom newrand;
@@ -361,7 +361,7 @@ void CPwGeneratorDlg::OnGenerateBtn()
 			continue;
 		}
 
-		t = (TCHAR)(BYTE)aTemp[j];
+		t = (TCHAR)aTemp[j];
 
 		if(m_bCharSpec == FALSE)
 		{
@@ -423,7 +423,7 @@ void CPwGeneratorDlg::OnGenerateBtn()
 			bool bFound = false;
 			for(int ix = 0; ix < m_strCharSet.GetLength(); ix++)
 			{
-				if((BYTE)(TCHAR)m_strCharSet[ix] == (BYTE)t) bFound = true;
+				if(m_strCharSet[ix] == t) bFound = true;
 			}
 
 			if(bFound == true)
@@ -436,8 +436,9 @@ void CPwGeneratorDlg::OnGenerateBtn()
 		j++;
 	}
 
-	ASSERT(strPassword.GetLength() == m_nCharacters);
-	if(strPassword.GetLength() > m_nCharacters) strPassword = strPassword.Left(m_nCharacters);
+	ASSERT(strPassword.GetLength() == (int)m_nCharacters);
+	if(strPassword.GetLength() > (int)m_nCharacters)
+		strPassword = strPassword.Left((int)m_nCharacters);
 
 	UpdateData(FALSE);
 
@@ -479,7 +480,7 @@ BOOL CPwGeneratorDlg::_GetCheck(int inxItem)
 	return ((lvi.iImage == 57) ? FALSE : TRUE);
 }
 
-void CPwGeneratorDlg::OnCheckCharSpec() 
+void CPwGeneratorDlg::OnCheckCharSpec()
 {
 	UpdateData(TRUE);
 
@@ -495,7 +496,7 @@ void CPwGeneratorDlg::OnCheckCharSpec()
 	}
 }
 
-void CPwGeneratorDlg::OnClickListOptions(NMHDR* pNMHDR, LRESULT* pResult) 
+void CPwGeneratorDlg::OnClickListOptions(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	CPoint pointM;
 
@@ -516,7 +517,7 @@ void CPwGeneratorDlg::OnClickListOptions(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-void CPwGeneratorDlg::OnRclickListOptions(NMHDR* pNMHDR, LRESULT* pResult) 
+void CPwGeneratorDlg::OnRclickListOptions(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	UNREFERENCED_PARAMETER(pNMHDR);
 	*pResult = 0;
@@ -536,7 +537,7 @@ void CPwGeneratorDlg::GetOptions(CString *pstrOptions, CString *pstrCharSet, UIN
 	*pnCharacters = g_nChars;
 }
 
-void CPwGeneratorDlg::OnDeltaPosSpinNumChars(NMHDR* pNMHDR, LRESULT* pResult) 
+void CPwGeneratorDlg::OnDeltaPosSpinNumChars(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_UPDOWN* pNMUpDown = (NM_UPDOWN*)pNMHDR;
 	*pResult = 0;
@@ -553,7 +554,7 @@ void CPwGeneratorDlg::OnDeltaPosSpinNumChars(NMHDR* pNMHDR, LRESULT* pResult)
 	UpdateData(FALSE);
 }
 
-void CPwGeneratorDlg::OnChangeEditPw() 
+void CPwGeneratorDlg::OnChangeEditPw()
 {
 	UpdateData(TRUE);
 
@@ -569,7 +570,7 @@ void CPwGeneratorDlg::OnChangeEditPw()
 	}
 }
 
-void CPwGeneratorDlg::OnCheckHidePw() 
+void CPwGeneratorDlg::OnCheckHidePw()
 {
 	UpdateData(TRUE);
 
@@ -595,7 +596,7 @@ void CPwGeneratorDlg::OnCheckHidePw()
 	m_cEditPw.SetFocus();
 }
 
-BOOL CPwGeneratorDlg::PreTranslateMessage(MSG* pMsg) 
+BOOL CPwGeneratorDlg::PreTranslateMessage(MSG* pMsg)
 {
 	m_tipSecClear.RelayEvent(pMsg);
 

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -177,7 +177,7 @@ C_FN_SHARE void NewGUI_ToolBarButton(void *pButton, int nBitmapIn, int nBitmapOu
 	p->GetWindowText(strToolTip);
 	p->SetWindowText(_T(""));
 
-	strToolTip = TRL(strToolTip);
+	strToolTip = TRL_VAR(strToolTip);
 	RemoveAcceleratorTip(&strToolTip);
 	p->SetTooltipText(strToolTip);
 
@@ -202,7 +202,7 @@ CPP_FN_SHARE void NewGUI_TranslateCWnd(CWnd *pWnd)
 	CString str;
 	ASSERT(pWnd != NULL); if(pWnd == NULL) return;
 	pWnd->GetWindowText(str);
-	pWnd->SetWindowText(TRL((LPCTSTR)str));
+	pWnd->SetWindowText(TRL_VAR(str));
 }
 
 C_FN_SHARE BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
@@ -219,7 +219,7 @@ C_FN_SHARE BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
 	if(_tcsicmp(sz, _T("ComboBoxEx32")) == 0) return TRUE;
 
 	sz[0] = 0; sz[1] = 0;
-	if(GetWindowText(hwnd, sz, 511) != 0) SetWindowText(hwnd, TRL(sz));
+	if(GetWindowText(hwnd, sz, 511) != 0) SetWindowText(hwnd, TRL_VAR(sz));
 	return TRUE;
 }
 

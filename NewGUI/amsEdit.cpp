@@ -147,10 +147,10 @@ LONG CAMSEdit::OnCut(UINT, LONG)
 		SendMessage(WM_COPY);				// copy the selection and...
 		ReplaceSel(_T(""));					// delete it
 	}
-	
+
 	return 0;
 }
-	
+
 // Clears the current selection.
 LONG CAMSEdit::OnClear(UINT, LONG)
 {
@@ -159,7 +159,7 @@ LONG CAMSEdit::OnClear(UINT, LONG)
 
 	if (nStart < nEnd)
 		SendMessage(WM_KEYDOWN, VK_DELETE); // delete the selection
-	
+
 	return 0;
 }
 
@@ -182,7 +182,7 @@ LONG CAMSEdit::OnPaste(UINT, LONG)
 }
 
 // Handles drawing the text and background using the designated colors
-BOOL CAMSEdit::OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pLResult) 
+BOOL CAMSEdit::OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pLResult)
 {
 	if ((message == WM_CTLCOLOREDIT || message == WM_CTLCOLORSTATIC) && (m_brushBackground.GetSafeHandle() || m_uInternalFlags & TextColorHasBeenSet))
 	{
@@ -349,7 +349,7 @@ void CAMSEdit::Behavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 }
 
 // Handles the WM_KILLFOCUS message by passing it to the control.
-void CAMSEdit::Behavior::_OnKillFocus(CWnd* pNewWnd) 
+void CAMSEdit::Behavior::_OnKillFocus(CWnd* pNewWnd)
 {
 	m_pEdit->OnKillFocus(pNewWnd);
 }
@@ -459,7 +459,7 @@ void CAMSEdit::AlphanumericBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFla
 	}
 
 	TCHAR c = static_cast<TCHAR>(uChar);
-	
+
 	// If the number of characters is already at Max, overwrite
 	CString strText = m_pEdit->GetText();
 	if (strText.GetLength() == m_nMaxChars && m_nMaxChars && _istprint(c))
@@ -524,7 +524,7 @@ CString CAMSEdit::MaskedBehavior::GetNumericText() const
 			strResult += c;
 	}
 
-	return strResult;	
+	return strResult;
 }
 
 // Returns the control's value in a valid format.
@@ -532,13 +532,13 @@ CString CAMSEdit::MaskedBehavior::_GetValidText() const
 {
 	CString strText = m_pEdit->GetText();
 	int nMaskLen = m_strMask.GetLength();
-	
+
 	// If the mask is empty, allow anything
 	if (!nMaskLen)
 		return strText;
 
 	CString strNewText;
-	
+
 	// Accomodate the text to the mask as much as possible
 	for (int iPos = 0, iMaskPos = 0, nLen = strText.GetLength(); iPos < nLen; iPos++, iMaskPos++)
 	{
@@ -566,7 +566,7 @@ CString CAMSEdit::MaskedBehavior::_GetValidText() const
 				{
 					strNewText += symbol.Convert(c);
 					break;
-				} 
+				}
 				else
 				{
 					for (int iSymbol2 = 0; iSymbol2 < nSymbolCount; iSymbol2++)
@@ -649,7 +649,7 @@ void CAMSEdit::MaskedBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 			m_pEdit->SendMessage(WM_KEYDOWN, VK_LEFT); // move the cursor left
 			return;
 		}
-		
+
 		// Allow backspace only if the cursor is all the way to the right
 		if (_ShouldEnter(c))
 			Behavior::_OnChar(uChar, nRepCnt, nFlags);
@@ -697,10 +697,10 @@ void CAMSEdit::MaskedBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 		if (!symbol.Validate(c))
 			continue;
 
-		// Find the position of the next symbol 
+		// Find the position of the next symbol
 		CString strMaskPortion = m_strMask.Mid(nStart);
 		int nMaskPos = strMaskPortion.FindOneOf(strSymbols);
-			
+
 		// Enter the character if there isn't another symbol before it
 		if (nMaskPos >= 0 && strMaskPortion[nMaskPos] == symbol && _ShouldEnter(c))
 		{
@@ -714,7 +714,7 @@ void CAMSEdit::MaskedBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 }
 
 // Handles the WM_KEYDOWN message, which is called when the user enters a special character such as Delete or the arrow keys.
-void CAMSEdit::MaskedBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags) 
+void CAMSEdit::MaskedBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 {
 	switch (uChar)
 	{
@@ -758,7 +758,7 @@ CAMSEdit::MaskedBehavior::Symbol::Symbol() :
 	m_fnValidation(NULL),
 	m_fnConversion(NULL)
 {
-}	
+}
 
 // Constructs the object with the given character and set of functions
 CAMSEdit::MaskedBehavior::Symbol::Symbol(TCHAR cSymbol, ValidationFunction fnValidation, ConversionFunction fnConversion /*= NULL*/) :
@@ -766,7 +766,7 @@ CAMSEdit::MaskedBehavior::Symbol::Symbol(TCHAR cSymbol, ValidationFunction fnVal
 	m_fnValidation(fnValidation),
 	m_fnConversion(fnConversion)
 {
-}	
+}
 
 // Destroys the object (virtual).
 CAMSEdit::MaskedBehavior::Symbol::~Symbol()
@@ -826,7 +826,7 @@ CAMSEdit::NumericBehavior::NumericBehavior(CAMSEdit* pEdit, int nMaxWholeDigits 
 	m_cDecimalPoint('.'),
 	m_cGroupSeparator(','),
 	m_nDigitsInGroup(0),
-	m_dMin(AMS_MIN_NUMBER),	
+	m_dMin(AMS_MIN_NUMBER),
 	m_dMax(AMS_MAX_NUMBER),
 	m_bAdjustingSeparators(false)
 {
@@ -840,7 +840,7 @@ CAMSEdit::NumericBehavior::NumericBehavior(CAMSEdit* pEdit, int nMaxWholeDigits 
 	if (::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SNEGATIVESIGN, NULL, 0))
 		::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SNEGATIVESIGN, &m_cNegativeSign, sizeof(m_cNegativeSign));
 
-	// Get the system's decimal point	
+	// Get the system's decimal point
 	if (::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL, NULL, 0))
 		::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL, &m_cDecimalPoint, sizeof(m_cDecimalPoint));
 
@@ -863,7 +863,7 @@ void CAMSEdit::NumericBehavior::SetMaxWholeDigits(int nMaxWholeDigits)
 	bool bAllowNegative = (nMaxWholeDigits >= 0);
 	if (nMaxWholeDigits < 0)
 		nMaxWholeDigits = -nMaxWholeDigits;
-		
+
 	if (m_nMaxWholeDigits == nMaxWholeDigits && IsNegativeAllowed() == bAllowNegative)
 		return;
 
@@ -952,7 +952,7 @@ void CAMSEdit::NumericBehavior::GetSeparators(TCHAR* pcDecimal, TCHAR* pcGroup) 
 		*pcDecimal = m_cDecimalPoint;
 	if (pcGroup)
 		*pcGroup = m_cGroupSeparator;
-}	
+}
 
 // Sets the text to be automatically inserted in front of the number (such as a currency sign).
 void CAMSEdit::NumericBehavior::SetPrefix(const CString& strPrefix)
@@ -1114,7 +1114,7 @@ CString CAMSEdit::NumericBehavior::GetDoubleText(double dText, bool bTrimTrailin
 	CString strText;
 	strText.Format(_T("%lf"), dText);
 
-	if (m_cDecimalPoint != '.')		
+	if (m_cDecimalPoint != '.')
 		strText.Replace('.', m_cDecimalPoint);
 
 	if (bTrimTrailingZeros)
@@ -1176,7 +1176,7 @@ CString CAMSEdit::NumericBehavior::GetSeparatedText(const CString& strText) cons
 {
 	CString strNumericText = GetNumericText(strText);
 	CString strNewText = strNumericText;
-	
+
 	// Retrieve the number without the decimal point
 	int nDecimalPos = strNumericText.Find(m_cDecimalPoint);
 	if (nDecimalPos >= 0)
@@ -1257,7 +1257,7 @@ CString CAMSEdit::NumericBehavior::_GetValidText() const
 			nNewLen++;
 		}
 	}
-	
+
 	// Check if we need to pad the number with zeros after the decimal point
 	if (m_nMaxDecimalPlaces > 0 && nNewLen > 0 &&
 		((m_uFlags & PadWithZerosAfterDecimalWhenTextChanges) ||
@@ -1332,7 +1332,7 @@ void CAMSEdit::NumericBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 
 			NumericBehavior::_OnChar(uChar, nRepCnt, nFlags);
 		}
-		
+
 		return;
 	}
 
@@ -1408,7 +1408,7 @@ void CAMSEdit::NumericBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 		}
 
 		// We're on the left side of the decimal point
-		else 
+		else
 		{
 			bool bIsNegative = (!strNumericText.IsEmpty() && strNumericText[0] == m_cNegativeSign);
 
@@ -1451,7 +1451,7 @@ void CAMSEdit::NumericBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 	// Check if the character should be entered
 	if (!_ShouldEnter(c))
 		return;
-	
+
 	Behavior::_OnChar(uChar, nRepCnt, nFlags);
 
 	// If the decimal point was added/removed or a separator needs adding/removing, adjust the text
@@ -1460,7 +1460,7 @@ void CAMSEdit::NumericBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 }
 
 // Handles the WM_KEYDOWN message, which is called when the user enters a special character such as Delete or the arrow keys.
-void CAMSEdit::NumericBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags) 
+void CAMSEdit::NumericBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 {
 	switch (uChar)
 	{
@@ -1503,7 +1503,7 @@ void CAMSEdit::NumericBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags
 
 // Handles the WM_KILLFOCUS message, which is called when the user leaves the control.
 // It's used here to check if zeros need to be added to the value.
-void CAMSEdit::NumericBehavior::_OnKillFocus(CWnd* pNewWnd) 
+void CAMSEdit::NumericBehavior::_OnKillFocus(CWnd* pNewWnd)
 {
 	Behavior::_OnKillFocus(pNewWnd);
 
@@ -1560,7 +1560,7 @@ void CAMSEdit::NumericBehavior::_OnKillFocus(CWnd* pNewWnd)
 
 	if (strText != strOriginalText)
 	{
-		SelectionSaver selection = m_pEdit;	// remember the current selection 
+		SelectionSaver selection = m_pEdit;	// remember the current selection
 		m_pEdit->SetWindowText(strText);
 	}
 
@@ -1569,29 +1569,29 @@ void CAMSEdit::NumericBehavior::_OnKillFocus(CWnd* pNewWnd)
 	{
 		if (m_uFlags & OnKillFocus_Beep_IfEmpty)
 			MessageBeep(MB_ICONEXCLAMATION);
-			
+
 		if (m_uFlags & OnKillFocus_SetValid_IfEmpty)
 			AdjustWithinRange();
 
 		if ((m_uFlags & OnKillFocus_ShowMessage_IfEmpty) == OnKillFocus_ShowMessage_IfEmpty)
-			ShowErrorMessage();		
+			ShowErrorMessage();
 
 		if (m_uFlags & OnKillFocus_SetFocus_IfEmpty)
 			m_pEdit->SetFocus();
 
 		return;
 	}
-		
+
 	if (!IsValid())
 	{
 		if (m_uFlags & OnKillFocus_Beep_IfInvalid)
 			MessageBeep(MB_ICONEXCLAMATION);
-			
+
 		if (m_uFlags & OnKillFocus_SetValid_IfInvalid)
 			AdjustWithinRange();
-		
+
 		if ((m_uFlags & OnKillFocus_ShowMessage_IfInvalid) == OnKillFocus_ShowMessage_IfInvalid)
-			ShowErrorMessage();		
+			ShowErrorMessage();
 
 		if (m_uFlags & OnKillFocus_SetFocus_IfInvalid)
 			m_pEdit->SetFocus();
@@ -1618,7 +1618,7 @@ bool CAMSEdit::NumericBehavior::CheckIfValid(bool bShowErrorIfNotValid /*= true*
 		ShowErrorMessage();
 		m_pEdit->SetFocus();
 	}
-	
+
 	return bValid;
 }
 
@@ -1626,7 +1626,7 @@ bool CAMSEdit::NumericBehavior::CheckIfValid(bool bShowErrorIfNotValid /*= true*
 void CAMSEdit::NumericBehavior::ShowErrorMessage() const
 {
 	CString strMessage = _T("Please specify a valid numeric value.");
-	
+
 	if (m_dMin > AMS_MIN_NUMBER && m_dMax < AMS_MAX_NUMBER)
 		strMessage = _T("Please specify a numeric value between ") + GetDoubleText(m_dMin) + _T(" and ") + GetDoubleText(m_dMax) + _T(".");
 	else if (m_dMin > AMS_MIN_NUMBER)
@@ -1681,7 +1681,7 @@ CAMSEdit::DateBehavior::DateBehavior(CAMSEdit* pEdit) :
 	TCHAR szShortDate[MAX_PATH];
 	if (::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SSHORTDATE, NULL, 0))
 	{
-		::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SSHORTDATE, szShortDate, sizeof(szShortDate));
+		::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SSHORTDATE, szShortDate, sizeof(szShortDate)/sizeof(TCHAR));
 
 		for (int iPos = 0; szShortDate[iPos]; iPos++)
 		{
@@ -1698,7 +1698,7 @@ CAMSEdit::DateBehavior::DateBehavior(CAMSEdit* pEdit) :
 }
 
 // Handles the WM_CHAR message, which is called when the user enters a regular character or Backspace
-void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags) 
+void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 {
 	// Check to see if it's read only
 	if (m_pEdit->IsReadOnly())
@@ -1720,7 +1720,7 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 			m_pEdit->SendMessage(WM_KEYDOWN, VK_LEFT); // move the cursor left
 			return;
 		}
-		
+
 		// Allow backspace only if the cursor is all the way to the right
 		if (_ShouldEnter(c))
 			Behavior::_OnChar(uChar, nRepCnt, nFlags);
@@ -1758,7 +1758,7 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 				else if (nLen == nStart && GetMinDayDigit(0) == '0' && IsValidDayDigit(c, 1) && _ShouldEnter(c))
 				{
 					m_pEdit->SetSel(nStart, nStart + 2);
-					m_pEdit->ReplaceSel(CString('0') + c, TRUE);					
+					m_pEdit->ReplaceSel(CString('0') + c, TRUE);
 				}
 			}
 			else
@@ -1788,7 +1788,7 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 				else if (nLen == nStart && GetMinMonthDigit(0) == '0' && IsValidMonthDigit(c, 1) && _ShouldEnter(c))
 				{
 					m_pEdit->SetSel(nStart, nStart + 2);
-					m_pEdit->ReplaceSel(CString('0') + c, TRUE);					
+					m_pEdit->ReplaceSel(CString('0') + c, TRUE);
 				}
 			}
 			break;
@@ -1811,7 +1811,7 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 				else if (c == m_cSep && nLen == nStart && GetMinDayDigit(0) == '0' && IsValidDay(_ttoi(CString('0') + strText[0])) && _ShouldEnter(c))
 				{
 					m_pEdit->SetSel(0, nStart);
-					m_pEdit->ReplaceSel(CString('0') + strText[0] + c, TRUE);					
+					m_pEdit->ReplaceSel(CString('0') + strText[0] + c, TRUE);
 				}
 			}
 			else
@@ -1828,17 +1828,17 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 					}
 					else
 						Behavior::_OnChar(uChar, nRepCnt, nFlags);
-				}				
+				}
 				// Check if it's a slash and the first digit (preceded by a zero) is a valid month
 				else if (c == m_cSep && nLen == nStart && GetMinMonthDigit(0) == '0' && IsValidMonth(_ttoi(CString('0') + strText[0])) && _ShouldEnter(c))
 				{
 					m_pEdit->SetSel(0, nStart);
-					m_pEdit->ReplaceSel(CString('0') + strText[0] + c, TRUE);					
+					m_pEdit->ReplaceSel(CString('0') + strText[0] + c, TRUE);
 				}
 			}
 			break;
 		}
-		
+
 		case 2:		// FIRST SLASH
 		{
 			int nSlash = 0;
@@ -1895,7 +1895,7 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 				else if (nLen == nStart && GetMinMonthDigit(0) == '0' && IsValidMonthDigit(c, 1) && _ShouldEnter(c))
 				{
 					m_pEdit->SetSel(nStart, nStart + 2);
-					m_pEdit->ReplaceSel(CString('0') + c, TRUE);					
+					m_pEdit->ReplaceSel(CString('0') + c, TRUE);
 					AdjustMaxDay();
 				}
 			}
@@ -1925,10 +1925,10 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 				else if (nLen == nStart && GetMinDayDigit(0) == '0' && IsValidDayDigit(c, 1) && _ShouldEnter(c))
 				{
 					m_pEdit->SetSel(nStart, nStart + 2);
-					m_pEdit->ReplaceSel(CString('0') + c, TRUE);					
+					m_pEdit->ReplaceSel(CString('0') + c, TRUE);
 				}
 			}
-			break;			
+			break;
 		}
 
 		case 4:		// FOURTH DIGIT
@@ -1955,7 +1955,7 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 				else if (c == m_cSep && nLen == nStart && GetMinMonthDigit(0) == '0' && IsValidMonth(_ttoi(CString('0') + strText[3])) && _ShouldEnter(c))
 				{
 					m_pEdit->SetSel(3, nStart);
-					m_pEdit->ReplaceSel(CString('0') + strText[3] + c, TRUE);					
+					m_pEdit->ReplaceSel(CString('0') + strText[3] + c, TRUE);
 				}
 			}
 			else
@@ -1974,7 +1974,7 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 				else if (c == m_cSep && nLen == nStart && GetMinDayDigit(0) == '0' && IsValidDay(_ttoi(CString('0') + strText[3])) && _ShouldEnter(c))
 				{
 					m_pEdit->SetSel(3, nStart);
-					m_pEdit->ReplaceSel(CString('0') + strText[3] + c, TRUE);					
+					m_pEdit->ReplaceSel(CString('0') + strText[3] + c, TRUE);
 				}
 			}
 			break;
@@ -1998,7 +1998,7 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 			// If the slash is to be preceded by a valid digit, "type" it in.
 			if (nSlash == 2)
 				keybd_event((BYTE)c, 0, 0, 0);
-			break;			
+			break;
 		}
 
 		case 6:		// YEAR (all 4 digits)
@@ -2021,7 +2021,7 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 							CString strPortion;
 							for (int iPos = nStart + 1; iPos < nLen && iPos < 10; iPos++)
 								strPortion += GetMinYearDigit(iPos - GetYearStartPosition(), false);
-							
+
 							m_pEdit->ReplaceSel(strPortion, TRUE);
 							m_pEdit->SetSel(nStart + 1, 10, FALSE);
 							break;
@@ -2043,7 +2043,7 @@ void CAMSEdit::DateBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 }
 
 // Handles the WM_KEYDOWN message, which is called when the user enters a special character such as Delete or the arrow keys.
-void CAMSEdit::DateBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags) 
+void CAMSEdit::DateBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 {
 	// Check to see if it's read only
 	if (m_pEdit->IsReadOnly())
@@ -2098,7 +2098,7 @@ void CAMSEdit::DateBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 				if (nDay >= GetMinDay() && nDay < GetMaxDay())
 					SetDay(++nDay);
 			}
-			
+
 			return;
 		}
 
@@ -2129,7 +2129,7 @@ void CAMSEdit::DateBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 				if (nDay > GetMinDay())
 					SetDay(--nDay);
 			}
-			
+
 			return;
 		}
 	}
@@ -2139,7 +2139,7 @@ void CAMSEdit::DateBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 
 // Handles the WM_KILLFOCUS message, which is called when the user leaves the control.
 // It's used here to check if any action needs to be taken based on the control's value.
-void CAMSEdit::DateBehavior::_OnKillFocus(CWnd* pNewWnd) 
+void CAMSEdit::DateBehavior::_OnKillFocus(CWnd* pNewWnd)
 {
 	Behavior::_OnKillFocus(pNewWnd);
 
@@ -2154,29 +2154,29 @@ void CAMSEdit::DateBehavior::_OnKillFocus(CWnd* pNewWnd)
 	{
 		if (m_uFlags & OnKillFocus_Beep_IfEmpty)
 			MessageBeep(MB_ICONEXCLAMATION);
-			
+
 		if (m_uFlags & OnKillFocus_SetValid_IfEmpty)
 			m_pEdit->SetWindowText(_T(" "));
 
 		if ((m_uFlags & OnKillFocus_ShowMessage_IfEmpty) == OnKillFocus_ShowMessage_IfEmpty)
-			ShowErrorMessage();		
+			ShowErrorMessage();
 
 		if (m_uFlags & OnKillFocus_SetFocus_IfEmpty)
 			m_pEdit->SetFocus();
 
 		return;
 	}
-		
+
 	if (!IsValid())
 	{
 		if (m_uFlags & OnKillFocus_Beep_IfInvalid)
 			MessageBeep(MB_ICONEXCLAMATION);
-			
+
 		if (m_uFlags & OnKillFocus_SetValid_IfInvalid)
 			_Redraw();
-		
+
 		if ((m_uFlags & OnKillFocus_ShowMessage_IfInvalid) == OnKillFocus_ShowMessage_IfInvalid)
-			ShowErrorMessage();		
+			ShowErrorMessage();
 
 		if (m_uFlags & OnKillFocus_SetFocus_IfInvalid)
 			m_pEdit->SetFocus();
@@ -2307,7 +2307,7 @@ TCHAR CAMSEdit::DateBehavior::GetMaxMonthDigit(int nPos) const
 
 		// Assuming the logic for the first digit is correct, then it must be '0'
 		ASSERT(cFirstDigit == '0');
-		return '9';  
+		return '9';
 	}
 
 	// Use the first digit to determine the second digit's max
@@ -2347,7 +2347,7 @@ TCHAR CAMSEdit::DateBehavior::GetMinMonthDigit(int nPos) const
 		if (GetString(nMinMonth)[0] == cFirstDigit)
 			return GetString(nMinMonth)[1];
 
-		return '0';  
+		return '0';
 	}
 
 	// Use the first digit to determine the second digit's min
@@ -2397,9 +2397,9 @@ TCHAR CAMSEdit::DateBehavior::GetMaxDayDigit(int nPos) const
 	if (nYear == nMaxYear && nMonth == nMaxMonth && GetString(nMaxDay)[0] == cFirstDigit)
 		return GetString(nMaxDay)[1];
 
-	if (cFirstDigit == '0' || 
-		cFirstDigit == '1' || 
-		(cFirstDigit == '2' && nMonth != 2) || 
+	if (cFirstDigit == '0' ||
+		cFirstDigit == '1' ||
+		(cFirstDigit == '2' && nMonth != 2) ||
 		(nMonth == 2 && !IsValidYear(GetYear())))
 		return '9';
 	return GetString(GetMaxDayOfMonth(nMonth, nYear))[1];
@@ -2460,7 +2460,7 @@ bool CAMSEdit::DateBehavior::IsValidYear(int nYear) const
 // Adjusts the month (to the minimum) if not valid; otherwise adjusts the day (to the maximum) if not valid.
 bool CAMSEdit::DateBehavior::AdjustMaxMonthAndDay()
 {
-	int nMonth = GetMonth();	
+	int nMonth = GetMonth();
 	if (nMonth && !IsValidMonth(nMonth))
 	{
 		SetMonth(GetMinMonth());  // this adjusts the day automatically
@@ -2479,7 +2479,7 @@ bool CAMSEdit::DateBehavior::AdjustMaxDay()
 		SetDay(GetMaxDay());
 		return true;
 	}
-	
+
 	return false;	// nothing had to be adjusted
 }
 
@@ -2531,13 +2531,13 @@ int CAMSEdit::DateBehavior::GetMonth() const
 	return 0;
 }
 
-// Returns the current month as a valid value.  
-// If it is less than the minimum allowed, the minimum is returned; 
+// Returns the current month as a valid value.
+// If it is less than the minimum allowed, the minimum is returned;
 // if it is more than the maximum allowed, the maximum is returned.
 int CAMSEdit::DateBehavior::GetValidMonth() const
 {
 	int nMonth = GetMonth();
-	
+
 	// It it's outside the range, fix it
 	if (nMonth < GetMinMonth())
 		nMonth = GetMinMonth();
@@ -2558,8 +2558,8 @@ int CAMSEdit::DateBehavior::GetDay() const
 	return 0;
 }
 
-// Returns the current day as a valid value.  
-// If it is less than the minimum allowed, the minimum is returned; 
+// Returns the current day as a valid value.
+// If it is less than the minimum allowed, the minimum is returned;
 // if it is more than the maximum allowed, the maximum is returned.
 int CAMSEdit::DateBehavior::GetValidDay() const
 {
@@ -2585,8 +2585,8 @@ int CAMSEdit::DateBehavior::GetYear() const
 	return 0;
 }
 
-// Returns the current year as a valid value.  
-// If it is less than the minimum allowed, the minimum is returned; 
+// Returns the current year as a valid value.
+// If it is less than the minimum allowed, the minimum is returned;
 // if it is more than the maximum allowed, the maximum is returned.
 int CAMSEdit::DateBehavior::GetValidYear() const
 {
@@ -2607,7 +2607,7 @@ int CAMSEdit::DateBehavior::GetValidYear() const
 void CAMSEdit::DateBehavior::SetMonth(int nMonth)
 {
 	SelectionSaver selection = m_pEdit;	// remember the current selection
-	
+
 	if (GetMonth() > 0)		// see if there's already a month
 		m_pEdit->SetSel(GetMonthStartPosition(), GetMonthStartPosition() + 3);
 
@@ -2625,7 +2625,7 @@ void CAMSEdit::DateBehavior::SetDay(int nDay)
 	ASSERT(IsValidDay(nDay));
 
 	SelectionSaver selection = m_pEdit;	// remember the current selection
-	
+
 	if (GetDay() > 0)		// see if there's already a day
 		m_pEdit->SetSel(GetDayStartPosition(), GetDayStartPosition() + 3);
 
@@ -2648,7 +2648,7 @@ void CAMSEdit::DateBehavior::SetYear(int nYear)
 	CString strText;
 	strText.Format(_T("%4d"), nYear);
 	m_pEdit->ReplaceSel(strText, TRUE);	// set the year
-	
+
 	AdjustMaxMonthAndDay();	// adjust the month and/or day if they're out of range
 }
 
@@ -2667,7 +2667,7 @@ COleDateTime CAMSEdit::DateBehavior::GetOleDate() const
 // Sets the month, day, and year on the control to the given values, which must be valid.
 void CAMSEdit::DateBehavior::SetDate(int nYear, int nMonth, int nDay)
 {
-	ASSERT(IsWithinRange(COleDateTime(nYear, nMonth, nDay, 0, 0, 0))); 
+	ASSERT(IsWithinRange(COleDateTime(nYear, nMonth, nDay, 0, 0, 0)));
 	m_pEdit->SetWindowText(GetFormattedDate(nYear, nMonth, nDay));
 }
 
@@ -2692,7 +2692,7 @@ void CAMSEdit::DateBehavior::SetDateToToday()
 // Returns true if the given year is a leap year.
 bool CAMSEdit::DateBehavior::IsLeapYear(int nYear)
 {
-	return (nYear & 3) == 0 && (nYear % 100 != 0 || nYear % 400 == 0); 
+	return (nYear & 3) == 0 && (nYear % 100 != 0 || nYear % 400 == 0);
 }
 
 // Returns true if the control's date is valid and falls within the allowed range.
@@ -2714,7 +2714,7 @@ bool CAMSEdit::DateBehavior::CheckIfValid(bool bShowErrorIfNotValid /*= true*/)
 		ShowErrorMessage();
 		m_pEdit->SetFocus();
 	}
-	
+
 	return bValid;
 }
 
@@ -2835,7 +2835,7 @@ CString CAMSEdit::DateBehavior::_GetValidText() const
 // Formats the given year, month, and day values into a string based on the proper format.
 CString CAMSEdit::DateBehavior::GetFormattedDate(int nYear, int nMonth, int nDay) const
 {
-	CString strText;	
+	CString strText;
 	if (m_uFlags & DayBeforeMonth)
 		strText.Format(_T("%02d%c%02d%c%4d"), nDay, m_cSep, nMonth, m_cSep, nYear);
 	else
@@ -2873,7 +2873,7 @@ CAMSEdit::TimeBehavior::TimeBehavior(CAMSEdit* pEdit) :
 	TCHAR szBuffer[3];
 	if (::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_ITIME, NULL, 0))
 	{
-		::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_ITIME, szBuffer, sizeof(szBuffer));
+		::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_ITIME, szBuffer, sizeof(szBuffer)/sizeof(TCHAR));
 		if (_ttoi(szBuffer))
 			m_uFlags |= TwentyFourHourFormat;
 	}
@@ -2881,14 +2881,14 @@ CAMSEdit::TimeBehavior::TimeBehavior(CAMSEdit* pEdit) :
 	// Get the AM symbol
 	if (::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_S1159, NULL, 0))
 	{
-		::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_S1159, szBuffer, sizeof(szBuffer));
+		::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_S1159, szBuffer, sizeof(szBuffer)/sizeof(TCHAR));
 		m_strAM = szBuffer;
 	}
 
 	// Get the PM symbol
 	if (::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_S2359, NULL, 0))
 	{
-		::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_S2359, szBuffer, sizeof(szBuffer));
+		::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_S2359, szBuffer, sizeof(szBuffer)/sizeof(TCHAR));
 		m_strPM = szBuffer;
 	}
 
@@ -2904,20 +2904,20 @@ CAMSEdit::TimeBehavior::TimeBehavior(CAMSEdit* pEdit) :
 }
 
 // Handles the WM_CHAR message, which is called when the user enters a regular character or Backspace
-void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags) 
+void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 {
 	// Check to see if it's read only
 	if (m_pEdit->IsReadOnly())
 		return;
 
 	TCHAR c = static_cast<TCHAR>(uChar);
-	
+
 	int nStart, nEnd;
 	m_pEdit->GetSel(nStart, nEnd);
-	
+
 	CString strText = m_pEdit->GetText();
 	int nLen = strText.GetLength();
-	
+
 	// Check for a non-printable character (such as Ctrl+C)
 	if (!_istprint(c))
 	{
@@ -2926,13 +2926,13 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 			m_pEdit->SendMessage(WM_KEYDOWN, VK_LEFT); // move the cursor left
 			return;
 		}
-		
+
 		// Allow backspace only if the cursor is all the way to the right
 		if (_ShouldEnter(c))
 			Behavior::_OnChar(uChar, nRepCnt, nFlags);
 		return;
 	}
-	
+
 	// Add the digit depending on its location
 	if (nStart == m_nHourStart)		// FIRST DIGIT
 	{
@@ -2942,7 +2942,7 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 			{
 				m_pEdit->SetSel(nStart, nStart + 1);
 				m_pEdit->ReplaceSel(CString(c), TRUE);
-				
+
 				if (nLen > nStart + 1)
 				{
 					// If the second digit is no longer valid, correct and select it
@@ -2960,7 +2960,7 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 		else if (nLen == nStart && IsValidHourDigit(c, 1) && _ShouldEnter(c))
 		{
 			m_pEdit->SetSel(nStart, nStart + 2);
-			m_pEdit->ReplaceSel(CString('0') + c, TRUE);					
+			m_pEdit->ReplaceSel(CString('0') + c, TRUE);
 		}
 		else
 			ChangeAMPM(c);	// allow changing AM/PM (if it's being shown) by pressing A or P
@@ -2973,7 +2973,7 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 			if (nLen > nStart)
 			{
 				m_pEdit->SetSel(nStart, nStart + 1);
-				m_pEdit->ReplaceSel(CString(c), TRUE);					
+				m_pEdit->ReplaceSel(CString(c), TRUE);
 			}
 			else
 				Behavior::_OnChar(uChar, nRepCnt, nFlags);
@@ -2981,12 +2981,12 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 		else if (c == m_cSep && nLen == nStart && IsValidHour(_ttoi(CString('0') + strText[m_nHourStart])) && _ShouldEnter(c))
 		{
 			m_pEdit->SetSel(m_nHourStart, nStart);
-			m_pEdit->ReplaceSel(CString('0') + strText[m_nHourStart] + c, TRUE);					
+			m_pEdit->ReplaceSel(CString('0') + strText[m_nHourStart] + c, TRUE);
 		}
 		else
 			ChangeAMPM(c);	// allow changing AM/PM (if it's being shown) by pressing A or P
 	}
-	
+
 	else if (nStart == m_nHourStart + 2)	// FIRST COLON
 	{
 		int nColon = 0;
@@ -2994,21 +2994,21 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 			nColon = 1;
 		else
 			nColon = (IsValidMinuteDigit(c, 0) ? 2 : 0);
-		
+
 		// If we need the colon, enter it
 		if (nColon && _ShouldEnter(c))
 		{
 			m_pEdit->SetSel(nStart, nStart + 1, FALSE);
 			m_pEdit->ReplaceSel(CString(m_cSep), TRUE);
 		}
-		
+
 		// If the colon is to be preceded by a valid digit, "type" it in.
 		if (nColon == 2)
 			keybd_event((BYTE)c, 0, 0, 0);
 		else
 			ChangeAMPM(c);	// allow changing AM/PM (if it's being shown) by pressing A or P
 	}
-			
+
 	else if (nStart == m_nHourStart + 3)	// THIRD DIGIT
 	{
 		if (IsValidMinuteDigit(c, 0) && _ShouldEnter(c))
@@ -3017,7 +3017,7 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 			{
 				m_pEdit->SetSel(nStart, nStart + 1);
 				m_pEdit->ReplaceSel(CString(c), TRUE);
-				
+
 				if (nLen > nStart + 1)
 				{
 					if (!IsValidMinute(GetMinute()))
@@ -3034,7 +3034,7 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 		else
 			ChangeAMPM(c);	// allow changing AM/PM (if it's being shown) by pressing A or P
 	}
-	
+
 	else if (nStart == m_nHourStart + 4)	// FOURTH DIGIT
 	{
 		if (IsValidMinuteDigit(c, 1) && _ShouldEnter(c))
@@ -3046,15 +3046,15 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 			}
 			else
 				Behavior::_OnChar(uChar, nRepCnt, nFlags);
-			
+
 			// Show the AM/PM symbol if we're not showing seconds
 			if (!IsShowingSeconds())
 				ShowAMPM();
-		}				
+		}
 		else
 			ChangeAMPM(c);	// allow changing AM/PM (if it's being shown) by pressing A or P
 	}
-			
+
 	else if (nStart == m_nHourStart + 5)	// SECOND COLON	OR FIRST SPACE (seconds' first digit or AM/PM)
 	{
 		if (IsShowingSeconds())
@@ -3064,15 +3064,15 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 				nColon = 1;
 			else
 				nColon = (IsValidSecondDigit(c, 0) ? 2 : 0);
-			
+
 			// If we need the slash, enter it
 			if (nColon && _ShouldEnter(c))
-			{					
+			{
 				int nReplace = (nStart < nLen && strText[nStart] != ' ');
 				m_pEdit->SetSel(nStart, nStart + nReplace, FALSE);
 				m_pEdit->ReplaceSel(CString(m_cSep), TRUE);
 			}
-			
+
 			// If the colon is to be preceded by a valid digit, "type" it in.
 			if (nColon == 2)
 				keybd_event((BYTE)c, 0, 0, 0);
@@ -3106,7 +3106,7 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 					Behavior::_OnChar(uChar, nRepCnt, nFlags);
 			}
 		}
-		
+
 		ChangeAMPM(c);	// allow changing AM/PM (if it's being shown) by pressing A or P
 	}
 
@@ -3132,7 +3132,7 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 
 		ChangeAMPM(c);	// allow changing AM/PM (if it's being shown) by pressing A or P
 	}
-		
+
 	else if (nStart == m_nHourStart + 8)	// FIRST SPACE (with seconds showing)
 	{
 		if (IsShowingSeconds() && !IsShowing24HourFormat())
@@ -3143,7 +3143,7 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 				m_pEdit->ReplaceSel(CString(c), TRUE);
 				ShowAMPM();
 			}
-		} 
+		}
 
 		ChangeAMPM(c);	// allow changing AM/PM (if it's being shown) by pressing A or P
 	}
@@ -3153,7 +3153,7 @@ void CAMSEdit::TimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 }
 
 // Handles the WM_KEYDOWN message, which is called when the user enters a special character such as Delete or the arrow keys.
-void CAMSEdit::TimeBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags) 
+void CAMSEdit::TimeBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 {
 	// Check to see if it's read only
 	if (m_pEdit->IsReadOnly())
@@ -3165,13 +3165,13 @@ void CAMSEdit::TimeBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 		{
 			// If deleting make sure it's the last character or that
 			// the selection goes all the way to the end of the text
-			
+
 			int nStart, nEnd;
 			m_pEdit->GetSel(nStart, nEnd);
-			
+
 			CString strText = m_pEdit->GetText();
 			int nLen = strText.GetLength();
-			
+
 			if (nEnd != nLen)
 			{
 				if (!(nEnd == nStart && nEnd == nLen - 1))
@@ -3179,14 +3179,14 @@ void CAMSEdit::TimeBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 			}
 			break;
 		}
-			
+
 		case VK_UP:
 		{
 			// If pressing the UP arrow, increment the corresponding value.
-			
+
 			int nStart, nEnd;
 			m_pEdit->GetSel(nStart, nEnd);
-			
+
 			if (nStart >= GetHourStartPosition() && nStart <= GetHourStartPosition() + 2)
 			{
 				int nHour = GetHour();
@@ -3200,7 +3200,7 @@ void CAMSEdit::TimeBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 						{
 							if (strAMPM == m_strPM)  // stop at midnight
 								return;
-							SetAMPM(false); 
+							SetAMPM(false);
 						}
 						else if (nHour == 12)
 							nHour = 0;
@@ -3209,7 +3209,7 @@ void CAMSEdit::TimeBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 					if (nHour < GetMaxHour())
 						SetHour(++nHour);
 				}
-			}			
+			}
 			else if (nStart >= GetMinuteStartPosition() && nStart <= GetMinuteStartPosition() + 2)
 			{
 				int nMinute = GetMinute();
@@ -3230,14 +3230,14 @@ void CAMSEdit::TimeBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 
 			return;
 		}
-			
+
 		case VK_DOWN:
 		{
 			// If pressing the DOWN arrow, decrement the corresponding value.
-			
+
 			int nStart, nEnd;
 			m_pEdit->GetSel(nStart, nEnd);
-			
+
 			if (nStart >= GetHourStartPosition() && nStart <= GetHourStartPosition() + 2)
 			{
 				int nHour = GetHour();
@@ -3260,7 +3260,7 @@ void CAMSEdit::TimeBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 					if (nHour > GetMinHour())
 						SetHour(--nHour);
 				}
-			}			
+			}
 			else if (nStart >= GetMinuteStartPosition() && nStart <= GetMinuteStartPosition() + 2)
 			{
 				int nMinute = GetMinute();
@@ -3281,13 +3281,13 @@ void CAMSEdit::TimeBehavior::_OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 			return;
 		}
 	}
-	
+
 	Behavior::_OnKeyDown(uChar, nRepCnt, nFlags);
 }
 
 // Handles the WM_KILLFOCUS message, which is called when the user leaves the control.
 // It's used here to check if any action needs to be taken based on the control's value.
-void CAMSEdit::TimeBehavior::_OnKillFocus(CWnd* pNewWnd) 
+void CAMSEdit::TimeBehavior::_OnKillFocus(CWnd* pNewWnd)
 {
 	Behavior::_OnKillFocus(pNewWnd);
 
@@ -3302,29 +3302,29 @@ void CAMSEdit::TimeBehavior::_OnKillFocus(CWnd* pNewWnd)
 	{
 		if (m_uFlags & OnKillFocus_Beep_IfEmpty)
 			MessageBeep(MB_ICONEXCLAMATION);
-			
+
 		if (m_uFlags & OnKillFocus_SetValid_IfEmpty)
 			AdjustWithinRange();
 
 		if ((m_uFlags & OnKillFocus_ShowMessage_IfEmpty) == OnKillFocus_ShowMessage_IfEmpty)
-			ShowErrorMessage();		
+			ShowErrorMessage();
 
 		if (m_uFlags & OnKillFocus_SetFocus_IfEmpty)
 			m_pEdit->SetFocus();
 
 		return;
 	}
-		
+
 	if (!IsValid())
 	{
 		if (m_uFlags & OnKillFocus_Beep_IfInvalid)
 			MessageBeep(MB_ICONEXCLAMATION);
-			
+
 		if (m_uFlags & OnKillFocus_SetValid_IfInvalid)
 			AdjustWithinRange();
-		
+
 		if ((m_uFlags & OnKillFocus_ShowMessage_IfInvalid) == OnKillFocus_ShowMessage_IfInvalid)
-			ShowErrorMessage();		
+			ShowErrorMessage();
 
 		if (m_uFlags & OnKillFocus_SetFocus_IfInvalid)
 			m_pEdit->SetFocus();
@@ -3520,7 +3520,7 @@ void CAMSEdit::TimeBehavior::SetAMPM(bool bAM)
 
 	SelectionSaver selection = m_pEdit;	// remember the current selection
 	m_pEdit->SetSel(GetAMPMStartPosition() - 1, GetAMPMStartPosition() + m_nAMPMLength);
-	
+
 	CString strText;
 	strText.Format(_T(" %s"), bAM ? m_strAM : m_strPM);
 	m_pEdit->ReplaceSel(strText, TRUE);	// set the AM/PM
@@ -3611,7 +3611,7 @@ bool CAMSEdit::TimeBehavior::IsValidAMPM(const CString& strAMPM) const
 int CAMSEdit::TimeBehavior::GetHour() const
 {
 	CString strText = m_pEdit->GetText();
-	
+
 	int nStartPos = GetHourStartPosition();
 	if (strText.GetLength() >= nStartPos + 2)
 		return _ttoi(strText.Mid(nStartPos, 2));
@@ -3619,17 +3619,17 @@ int CAMSEdit::TimeBehavior::GetHour() const
 	return -1;
 }
 
-// Returns the current hour as a valid value.  
+// Returns the current hour as a valid value.
 int CAMSEdit::TimeBehavior::GetValidHour(bool b24HourFormat /*= false*/) const
 {
 	int nHour = GetHour();
-	
+
 	// It it's outside the range, fix it
 	if (nHour < GetMinHour(b24HourFormat))
 		nHour = GetMinHour(b24HourFormat);
 	else if (nHour > GetMaxHour(b24HourFormat))
 		nHour = GetMaxHour(b24HourFormat);
-	
+
 	return nHour;
 }
 
@@ -3637,25 +3637,25 @@ int CAMSEdit::TimeBehavior::GetValidHour(bool b24HourFormat /*= false*/) const
 int CAMSEdit::TimeBehavior::GetMinute() const
 {
 	CString strText = m_pEdit->GetText();
-	
+
 	int nStartPos = GetMinuteStartPosition();
 	if (strText.GetLength() >= nStartPos + 2)
 		return _ttoi(strText.Mid(nStartPos, 2));
-	
+
 	return -1;
 }
 
-// Returns the current minute as a valid value.  
+// Returns the current minute as a valid value.
 int CAMSEdit::TimeBehavior::GetValidMinute() const
 {
 	int nMinute = GetMinute();
-	
+
 	// It it's outside the range, fix it
 	if (nMinute < GetMinMinute())
 		nMinute = GetMinMinute();
 	else if (nMinute > GetMaxMinute())
 		nMinute = GetMaxMinute();
-	
+
 	return nMinute;
 }
 
@@ -3671,7 +3671,7 @@ int CAMSEdit::TimeBehavior::GetSecond() const
 	return -1;
 }
 
-// Returns the current second as a valid value.  
+// Returns the current second as a valid value.
 int CAMSEdit::TimeBehavior::GetValidSecond() const
 {
 	int nSecond = GetSecond();
@@ -3679,7 +3679,7 @@ int CAMSEdit::TimeBehavior::GetValidSecond() const
 		nSecond = GetMinSecond();
 	else if (nSecond > GetMaxSecond())
 		nSecond = GetMaxSecond();
-	
+
 	return nSecond;
 }
 
@@ -3698,8 +3698,8 @@ CString CAMSEdit::TimeBehavior::GetValidAMPM() const
 {
 	CString strAMPM = GetAMPM();
 	if (!IsValidAMPM(strAMPM))
-		return m_strAM;			
-	
+		return m_strAM;
+
 	return strAMPM;
 }
 
@@ -3707,12 +3707,12 @@ CString CAMSEdit::TimeBehavior::GetValidAMPM() const
 void CAMSEdit::TimeBehavior::SetHour(int nHour)
 {
 	ASSERT(IsValidHour(nHour, false));
-	
+
 	SelectionSaver selection = m_pEdit;	// remember the current selection
-	
+
 	if (GetHour() >= 0)		// see if there's already an hour
 		m_pEdit->SetSel(GetHourStartPosition(), GetHourStartPosition() + 3);
-	
+
 	// Convert it to AM/PM hour if necessary
 	CString strAMPM;
 	if (!IsShowing24HourFormat() && nHour > 12)
@@ -3731,17 +3731,17 @@ void CAMSEdit::TimeBehavior::SetHour(int nHour)
 void CAMSEdit::TimeBehavior::SetMinute(int nMinute)
 {
 	ASSERT(IsValidMinute(nMinute));
-	
+
 	SelectionSaver selection = m_pEdit;	// remember the current selection
-	
+
 	if (GetMinute() >= 0)		// see if there's already a minute
 		m_pEdit->SetSel(GetMinuteStartPosition(), GetMinuteStartPosition() + 2 + IsShowingSeconds());
-	
+
 	CString strText;
 	strText.Format(_T("%02d"), nMinute);
 	if (IsShowingSeconds())
 		strText += m_cSep;
-	
+
 	m_pEdit->ReplaceSel(strText, TRUE);	// set the minute
 
 	// Append the AM/PM if no seconds come after and it's not in 24-hour format
@@ -3753,15 +3753,15 @@ void CAMSEdit::TimeBehavior::SetMinute(int nMinute)
 void CAMSEdit::TimeBehavior::SetSecond(int nSecond)
 {
 	ASSERT(IsValidSecond(nSecond));
-	
+
 	if (!IsShowingSeconds())
 		return;
 
 	SelectionSaver selection = m_pEdit;	// remember the current selection
-	
+
 	if (GetSecond() >= 0)		// see if there's already a second
 		m_pEdit->SetSel(GetSecondStartPosition(), GetSecondStartPosition() + 2);
-	
+
 	CString strText;
 	strText.Format(_T("%02d"), nSecond);
 	m_pEdit->ReplaceSel(strText, TRUE);	// set the second
@@ -3780,7 +3780,7 @@ int CAMSEdit::TimeBehavior::ConvertTo24Hour(int nHour, const CString& strAMPM) c
 	return nHour;
 }
 
-// Returns the given hour (in 24-hour format) to 12-Hour format and sets the optional 
+// Returns the given hour (in 24-hour format) to 12-Hour format and sets the optional
 // string pointer to the resulting AM/PM symbol (if not NULL).
 int CAMSEdit::TimeBehavior::ConvertToAMPMHour(int nHour, CString* pStrAMPM /*= NULL*/) const
 {
@@ -3858,7 +3858,7 @@ bool CAMSEdit::TimeBehavior::IsValid(bool bCheckRangeAlso) const
     int nMinute = GetMinute();
 	if (nHour < 0 || nMinute < 0)
 		return false;
-    
+
 	// Check that the seconds are valid if being shown
 	int nSecond = GetSecond();
 	bool bShowingSeconds = IsShowingSeconds();
@@ -3898,14 +3898,14 @@ bool CAMSEdit::TimeBehavior::CheckIfValid(bool bShowErrorIfNotValid /*= true*/)
 {
 	if (!m_pEdit->IsWindowEnabled())
 		return true;
-	
+
 	bool bValid = IsValid();
 	if (!bValid && bShowErrorIfNotValid)
 	{
 		ShowErrorMessage();
 		m_pEdit->SetFocus();
 	}
-	
+
 	return bValid;
 }
 
@@ -3920,11 +3920,11 @@ void CAMSEdit::TimeBehavior::SetRange(const CTime& dateMin, const CTime& dateMax
 {
 	ASSERT(dateMin >= AMS_MIN_CTIME);
 	ASSERT(dateMax <= AMS_MAX_CTIME);
-	
+
 	m_timeMin.SetTime(dateMin.GetHour(), dateMin.GetMinute(), dateMin.GetSecond());
 	m_timeMax.SetTime(dateMax.GetHour(), dateMax.GetMinute(), dateMin.GetSecond());
 	ASSERT(m_timeMin <= m_timeMax);
-	
+
 	_Redraw();
 }
 
@@ -3933,7 +3933,7 @@ void CAMSEdit::TimeBehavior::SetRange(const COleDateTime& dateMin, const COleDat
 {
 	ASSERT(dateMin >= AMS_MIN_OLEDATETIME);
 	ASSERT(dateMax <= AMS_MAX_OLEDATETIME);
-	
+
 	m_timeMin.SetTime(dateMin.GetHour(), dateMin.GetMinute(), dateMin.GetSecond());
 	m_timeMax.SetTime(dateMax.GetHour(), dateMax.GetMinute(), dateMin.GetSecond());
 	ASSERT(m_timeMin <= m_timeMax);
@@ -3970,7 +3970,7 @@ void CAMSEdit::TimeBehavior::SetSeparator(TCHAR cSep)
 {
 	ASSERT(cSep);
 	ASSERT(!_istdigit(cSep));
-	
+
 	if (m_cSep != cSep)
 	{
 		m_cSep = cSep;
@@ -4040,7 +4040,7 @@ void CAMSEdit::TimeBehavior::GetAMPMSymbols(CString* pStrAM, CString* pStrPM) co
 CString CAMSEdit::TimeBehavior::_GetValidText() const
 {
 	CString strText = m_pEdit->GetText();
-	
+
 	// If it's empty or has a valid time, return it
 	if (strText.IsEmpty())
 		return strText;
@@ -4075,22 +4075,22 @@ CString CAMSEdit::TimeBehavior::GetFormattedTime(int nHour, int nMinute, int nSe
 			nHour = ConvertToAMPMHour(nHour, const_cast<CString*>(&strAMPM));
 	}
 
-	CString strText;	
+	CString strText;
     if (IsShowingSeconds())
 	{
         if (IsShowing24HourFormat())
             strText.Format(_T("%02d%c%02d%c%02d"), nHour, m_cSep, nMinute, m_cSep, nSecond);
-		else 
+		else
             strText.Format(_T("%02d%c%02d%c%02d %s"), nHour, m_cSep, nMinute, m_cSep, nSecond, strAMPM);
     }
-	else 
+	else
 	{
         if (IsShowing24HourFormat())
             strText.Format(_T("%02d%c%02d"), nHour, m_cSep, nMinute);
-		else 
+		else
             strText.Format(_T("%02d%c%02d %s"), nHour, m_cSep, nMinute, strAMPM);
     }
-	
+
 	return strText;
 }
 
@@ -4123,11 +4123,11 @@ void CAMSEdit::TimeBehavior::AdjustWithinRange()
 /////////////////////////////////////////////////////////////////////////////
 // CAMSEdit::DateTimeBehavior
 
-CAMSEdit::DateTimeBehavior::DateTimeBehavior(CAMSEdit* pEdit) : 
-	DateBehavior(pEdit), 
+CAMSEdit::DateTimeBehavior::DateTimeBehavior(CAMSEdit* pEdit) :
+	DateBehavior(pEdit),
 	TimeBehavior(pEdit),
 	Behavior(pEdit)
-{ 
+{
 	m_nHourStart = 11;
 }
 
@@ -4140,7 +4140,7 @@ void CAMSEdit::DateTimeBehavior::SetDateTime(int nYear, int nMonth, int nDay, in
 		SetTime(nHour, nMinute, nSecond);
 	else
 	{
-		ASSERT(IsWithinRange(COleDateTime(nYear, nMonth, nDay, nHour, nMinute, nSecond))); 
+		ASSERT(IsWithinRange(COleDateTime(nYear, nMonth, nDay, nHour, nMinute, nSecond)));
 		m_pEdit->SetWindowText(GetFormattedDate(nYear, nMonth, nDay) + ' ' + GetFormattedTime(nHour, nMinute, nSecond));
 	}
 }
@@ -4168,11 +4168,11 @@ CTime CAMSEdit::DateTimeBehavior::GetDateTime() const
 {
 	CTime date = GetDate();
 	CTime time = GetTime();
-	
+
 	if (m_uFlags & DateOnly)
 		return date;
 	if (m_uFlags & TimeOnly)
-		return time;	
+		return time;
 	return CTime(date.GetYear(), date.GetMonth(), date.GetDay(), time.GetHour(), time.GetMinute(), time.GetSecond());
 }
 
@@ -4181,11 +4181,11 @@ COleDateTime CAMSEdit::DateTimeBehavior::GetOleDateTime() const
 {
 	COleDateTime date = GetOleDate();
 	COleDateTime time = GetOleTime();
-	
+
 	if (m_uFlags & DateOnly)
 		return date;
 	if (m_uFlags & TimeOnly)
-		return time;	
+		return time;
 	return COleDateTime(date.GetYear(), date.GetMonth(), date.GetDay(), time.GetHour(), time.GetMinute(), time.GetSecond());
 }
 
@@ -4300,7 +4300,7 @@ void CAMSEdit::DateTimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 	}
 
 	TCHAR c = static_cast<TCHAR>(uChar);
-	
+
 	int nStart, nEnd;
 	DateBehavior::m_pEdit->GetSel(nStart, nEnd);
 
@@ -4321,14 +4321,14 @@ void CAMSEdit::DateTimeBehavior::_OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 			nSpace = 1;
 		else
 			nSpace = (IsValidHourDigit(c, 0) || (IsValidHourDigit(c, 1) && nLen <= 11) ? 2 : 0);
-		
+
 		// If we need the space, enter it
 		if (nSpace && _ShouldEnter(c))
 		{
 			DateBehavior::m_pEdit->SetSel(nStart, nStart + 1, FALSE);
 			DateBehavior::m_pEdit->ReplaceSel(CString(' '), TRUE);
 		}
-		
+
 		// If the space is to be preceded by a valid digit, "type" it in.
 		if (nSpace == 2)
 			keybd_event((BYTE)c, 0, 0, 0);
@@ -4371,11 +4371,11 @@ void CAMSEdit::DateTimeBehavior::ShowErrorMessage() const
 		TimeBehavior::ShowErrorMessage();
 	else
 	{
-		CString strMinDateTime = 
-			GetFormattedDate(m_dateMin.GetYear(), m_dateMin.GetMonth(), m_dateMin.GetDay()) + ' ' + 
+		CString strMinDateTime =
+			GetFormattedDate(m_dateMin.GetYear(), m_dateMin.GetMonth(), m_dateMin.GetDay()) + ' ' +
 			GetFormattedTime(m_timeMin.GetHour(), m_timeMin.GetMinute(), m_timeMin.GetSecond());
-		CString strMaxDateTime = 
-			GetFormattedDate(m_dateMax.GetYear(), m_dateMax.GetMonth(), m_dateMax.GetDay()) + ' ' + 
+		CString strMaxDateTime =
+			GetFormattedDate(m_dateMax.GetYear(), m_dateMax.GetMonth(), m_dateMax.GetDay()) + ' ' +
 			GetFormattedTime(m_timeMax.GetHour(), m_timeMax.GetMinute(), m_timeMax.GetSecond());
 		AfxMessageBox(_T("Please specify a date and time between ") + strMinDateTime + _T(" and ") + strMaxDateTime + '.', MB_ICONEXCLAMATION);
 	}
@@ -4502,13 +4502,13 @@ void CAMSNumericEdit::OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 }
 
 // Handles the WM_KEYDOWN message, which is called when the user enters a special character such as Delete or the arrow keys.
-void CAMSNumericEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags) 
+void CAMSNumericEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 {
 	_OnKeyDown(uChar, nRepCnt, nFlags);
 }
 
 // Handles the WM_KILLFOCUS message, which is called when the user leaves the control.
-void CAMSNumericEdit::OnKillFocus(CWnd* pNewWnd) 
+void CAMSNumericEdit::OnKillFocus(CWnd* pNewWnd)
 {
 	_OnKillFocus(pNewWnd);
 }
@@ -4553,11 +4553,11 @@ CAMSCurrencyEdit::CAMSCurrencyEdit()
 	m_nDigitsInGroup = 3;
 	m_nMaxDecimalPlaces = 2;
 	m_strPrefix = _T("$");
-	m_uFlags |= PadWithZerosAfterDecimalWhenTextIsSet | 
-				OnKillFocus_RemoveExtraLeadingZeros | 
-				OnKillFocus_PadWithZerosAfterDecimal | 
+	m_uFlags |= PadWithZerosAfterDecimalWhenTextIsSet |
+				OnKillFocus_RemoveExtraLeadingZeros |
+				OnKillFocus_PadWithZerosAfterDecimal |
 				OnKillFocus_DontPadWithZerosIfEmpty;
-	
+
 	// Get the system's current settings
 	TCHAR szValue[10];
 	if (::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SCURRENCY, szValue, 0))
@@ -4588,7 +4588,7 @@ CAMSCurrencyEdit::CAMSCurrencyEdit()
 			case 0:		// Prefix, no separation
 				break;
 			case 2:		// Prefix, one space separation
-				m_strPrefix += ' ';  
+				m_strPrefix += ' ';
 				break;
 			default:	// Suffix (no prefix)
 				m_strPrefix = _T("");
@@ -4601,7 +4601,7 @@ CAMSCurrencyEdit::CAMSCurrencyEdit()
 	if (::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SMONTHOUSANDSEP, &m_cGroupSeparator, 0))
 		::GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SMONTHOUSANDSEP, &m_cGroupSeparator, sizeof(m_cGroupSeparator));
 }
-	
+
 BEGIN_MESSAGE_MAP(CAMSCurrencyEdit, CEdit)
 	//{{AFX_MSG_MAP(CAMSCurrencyEdit)
 	ON_WM_CHAR()
@@ -4622,12 +4622,20 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CAMSDateEdit
 
+// VS 2005 = 1400
+#if (_MSC_VER >= 1400)
+CAMSDateEdit::CAMSDateEdit() :
+	DateBehavior(this),
+	CAMSEdit::Behavior(this) // required because DateBehavior derives virtually from Behavior
+{
+}
+#else
 CAMSDateEdit::CAMSDateEdit() :
 	DateBehavior(this),
 	Behavior(this) // required because DateBehavior derives virtually from Behavior
 {
 }
-
+#endif
 
 BEGIN_MESSAGE_MAP(CAMSDateEdit, CEdit)
 	//{{AFX_MSG_MAP(CAMSDateEdit)
@@ -4654,13 +4662,13 @@ void CAMSDateEdit::OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 }
 
 // Handles the WM_KEYDOWN message, which is called when the user enters a special character such as Delete or the arrow keys.
-void CAMSDateEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags) 
+void CAMSDateEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 {
 	_OnKeyDown(uChar, nRepCnt, nFlags);
 }
 
 // Handles the WM_KILLFOCUS message, which is called when the user leaves the control.
-void CAMSDateEdit::OnKillFocus(CWnd* pNewWnd) 
+void CAMSDateEdit::OnKillFocus(CWnd* pNewWnd)
 {
 	_OnKillFocus(pNewWnd);
 }
@@ -4679,12 +4687,19 @@ LONG CAMSDateEdit::OnPaste(UINT, LONG)
 /////////////////////////////////////////////////////////////////////////////
 // CAMSTimeEdit
 
+#if (_MSC_VER >= 1400)
+CAMSTimeEdit::CAMSTimeEdit() :
+	TimeBehavior(this),
+	CAMSEdit::Behavior(this)  // required because TimeBehavior derives virtually from Behavior
+{
+}
+#else
 CAMSTimeEdit::CAMSTimeEdit() :
 	TimeBehavior(this),
 	Behavior(this)  // required because TimeBehavior derives virtually from Behavior
 {
 }
-
+#endif
 
 BEGIN_MESSAGE_MAP(CAMSTimeEdit, CEdit)
 	//{{AFX_MSG_MAP(CAMSTimeEdit)
@@ -4711,13 +4726,13 @@ void CAMSTimeEdit::OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 }
 
 // Handles the WM_KEYDOWN message, which is called when the user enters a special character such as Delete or the arrow keys.
-void CAMSTimeEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags) 
+void CAMSTimeEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 {
 	_OnKeyDown(uChar, nRepCnt, nFlags);
 }
 
 // Handles the WM_KILLFOCUS message, which is called when the user leaves the control.
-void CAMSTimeEdit::OnKillFocus(CWnd* pNewWnd) 
+void CAMSTimeEdit::OnKillFocus(CWnd* pNewWnd)
 {
 	_OnKillFocus(pNewWnd);
 }
@@ -4736,12 +4751,19 @@ LONG CAMSTimeEdit::OnPaste(UINT, LONG)
 /////////////////////////////////////////////////////////////////////////////
 // CAMSDateTimeEdit
 
+#if (_MSC_VER >= 1400)
+CAMSDateTimeEdit::CAMSDateTimeEdit() :
+	DateTimeBehavior(this),
+	CAMSEdit::Behavior(this) // required because DateTimeBehavior derives virtually from Behavior
+{
+}
+#else
 CAMSDateTimeEdit::CAMSDateTimeEdit() :
 	DateTimeBehavior(this),
 	Behavior(this) // required because DateTimeBehavior derives virtually from Behavior
 {
 }
-
+#endif
 
 BEGIN_MESSAGE_MAP(CAMSDateTimeEdit, CEdit)
 	//{{AFX_MSG_MAP(CAMSDateTimeEdit)
@@ -4768,13 +4790,13 @@ void CAMSDateTimeEdit::OnChar(UINT uChar, UINT nRepCnt, UINT nFlags)
 }
 
 // Handles the WM_KEYDOWN message, which is called when the user enters a special character such as Delete or the arrow keys.
-void CAMSDateTimeEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags) 
+void CAMSDateTimeEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 {
 	_OnKeyDown(uChar, nRepCnt, nFlags);
 }
 
 // Handles the WM_KILLFOCUS message, which is called when the user leaves the control.
-void CAMSDateTimeEdit::OnKillFocus(CWnd* pNewWnd) 
+void CAMSDateTimeEdit::OnKillFocus(CWnd* pNewWnd)
 {
 	_OnKillFocus(pNewWnd);
 }
@@ -4926,7 +4948,7 @@ void CAMSMultiMaskedEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT)
 }
 
 // Handles the WM_KILLFOCUS message, which is called when the user leaves the control.
-void CAMSMultiMaskedEdit::OnKillFocus(CWnd* pNewWnd) 
+void CAMSMultiMaskedEdit::OnKillFocus(CWnd* pNewWnd)
 {
 	ASSERT(m_pCurrentBehavior);
 	m_pCurrentBehavior->_OnKillFocus(pNewWnd);

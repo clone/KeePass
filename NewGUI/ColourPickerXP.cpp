@@ -431,13 +431,13 @@ void CColourPickerXP::SetColoursName(UINT nFirstID)
 		{
 			if(!szTemp.LoadString(nFirstID + i))
 				szTemp = CColourPopupXP::m_strInitNames[i];
-			strcpy(CColourPopupXP::m_crColours[i].szName, szTemp);
+			_tcscpy(CColourPopupXP::m_crColours[i].szName, szTemp);
 		}
 	}
 	else
 	{
 		for(int i=0; i<(sizeof(CColourPopupXP::m_crColours)/sizeof(ColourTableEntry)); i++)
-			strcpy(CColourPopupXP::m_crColours[i].szName, CColourPopupXP::m_strInitNames[i]);
+			_tcscpy(CColourPopupXP::m_crColours[i].szName, CColourPopupXP::m_strInitNames[i]);
 	}
 }
 

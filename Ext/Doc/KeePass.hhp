@@ -4,6 +4,7 @@ Compiled file=KeePass.chm
 Contents file=indextoc.hhc
 Default topic=index.html
 Display compile progress=No
+Full-text search=Yes
 Language=0x409 Englisch (USA)
 
 
@@ -34,6 +35,7 @@ tips.html
 repair.html
 license_lgpl.html
 images\dragndrop.png
+version.html
 
 [INFOTYPES]
 

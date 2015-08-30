@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Russian|
-|~LANGUAGEVERSION|             |1.02|
+|~LANGUAGEVERSION|             |1.03|
 |~LANGUAGEAUTHOR|              |Varrey|
 |~LANGUAGEAUTHOREMAIL|         |varrey@hotmail.com|
 
@@ -677,3 +677,8 @@
 |Overwrite if newer| |Переписывать новые|
 |KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.|
     |KeePass сравнит время последнего изменения группы/записи и заменит существующие только если импортируемые более новые.|
+
+|Copy &URL To Clipboard| |Скопировать &ссылку в буфер обмена|
+|Copy URLs to clipboard instead of launching them (exception: cmd:// URLs)|
+    |Копировать ссылки в буфер обмена вместо их открытия (за исключением cmd://)|
+|Disable all auto-type features| |Запрещать все возможности автонабора|

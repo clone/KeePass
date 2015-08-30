@@ -15,6 +15,9 @@ Util\CprLang.exe DutchSrc.lng Dutch.lng
 DEL Estonian.lng
 Util\CprLang.exe EstonianSrc.lng Estonian.lng
 
+DEL Finnish.lng
+Util\CprLang.exe FinnishSrc.lng Finnish.lng
+
 DEL French.lng
 Util\CprLang.exe FrenchSrc.lng French.lng
 
@@ -135,6 +138,8 @@ DEL ..\Debug\Greek.lng
 COPY /B Greek.lng /B ..\Debug\Greek.lng > NUL
 DEL ..\Debug\Lithuanian.lng
 COPY /B Lithuanian.lng /B ..\Debug\Lithuanian.lng > NUL
+DEL ..\Debug\Finnish.lng
+COPY /B Finnish.lng /B ..\Debug\Finnish.lng > NUL
 
 REM Copy latest language files into Release directory
 
@@ -190,6 +195,8 @@ DEL ..\Release\Greek.lng
 COPY /B Greek.lng /B ..\Release\Greek.lng > NUL
 DEL ..\Release\Lithuanian.lng
 COPY /B Lithuanian.lng /B ..\Release\Lithuanian.lng > NUL
+DEL ..\Release\Finnish.lng
+COPY /B Finnish.lng /B ..\Release\Finnish.lng > NUL
 
 REM Copy language reference file
 

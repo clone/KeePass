@@ -313,7 +313,7 @@ LRESULT CButtonST::OnSetCheck(WPARAM wParam, LPARAM lParam)
 LRESULT CButtonST::OnGetCheck(WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(wParam); UNREFERENCED_PARAMETER(lParam);
-	ASSERT(m_bIsCheckBox);
+	// ASSERT(m_bIsCheckBox);
 	return GetCheck();
 } // End of OnGetCheck
 

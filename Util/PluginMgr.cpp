@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -170,13 +170,13 @@ BOOL CPluginManager::AddAllPlugins(LPCTSTR lpBaseSearchPath, LPCTSTR lpMask, BOO
 
 		if((AddPlugin(tszPath) == FALSE) && (bShowErrors == TRUE))
 		{
-			std::string str;
+			CString str;
 			str = TRL("Plugin");
-			str += " <";
+			str += _T(" <");
 			str += wfd.cFileName;
-			str += "> ";
+			str += _T("> ");
 			str += TRL("cannot be loaded!");
-			MessageBox(GetDesktopWindow(), str.c_str(), TRL("Plugin Manager"),
+			MessageBox(GetDesktopWindow(), str, TRL("Plugin Manager"),
 				MB_OK | MB_ICONWARNING);
 		}
 
@@ -218,32 +218,32 @@ BOOL CPluginManager::LoadAllPlugins()
 
 		if(p->info.dwForAppVer != m_kpAppInfo.dwAppVersion)
 		{
-			std::string str;
+			CString str;
 			TCHAR tszTemp[20];
 
-			str = TRL("Plugin"); str += ": <";
-			str += p->tszFile; str += ">\r\n\r\n";
+			str = TRL("Plugin"); str += _T(": <");
+			str += p->tszFile; str += _T(">\r\n\r\n");
 			str += TRL("This plugin has been designed for a different application version and may be incompatible with this one.");
-			str += "\r\n\r\n";
-			str += TRL("Application version:"); str += " ";
+			str += _T("\r\n\r\n");
+			str += TRL("Application version:"); str += _T(" ");
 			_stprintf(tszTemp, _T("%u.%u.%u.%u"), (m_kpAppInfo.dwAppVersion >> 24) & 0xFF,
 				(m_kpAppInfo.dwAppVersion >> 16) & 0xFF,
 				(m_kpAppInfo.dwAppVersion >> 8) & 0xFF,
 				m_kpAppInfo.dwAppVersion & 0xFF);
-			str += tszTemp; str += "\r\n";
-			str += TRL("Plugin has been designed for:"); str += " ";
+			str += tszTemp; str += _T("\r\n");
+			str += TRL("Plugin has been designed for:"); str += _T(" ");
 			_stprintf(tszTemp, _T("%u.%u.%u.%u"), (p->info.dwForAppVer >> 24) & 0xFF,
 				(p->info.dwForAppVer >> 16) & 0xFF,
 				(p->info.dwForAppVer >> 8) & 0xFF,
 				p->info.dwForAppVer & 0xFF);
-			str += tszTemp; str += "\r\n\r\n";
+			str += tszTemp; str += _T("\r\n\r\n");
 			str += TRL("It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.");
-			str += "\r\n";
-			str += TRL("Therefore save all data before you continue."); str += "\r\n\r\n";
+			str += _T("\r\n");
+			str += TRL("Therefore save all data before you continue."); str += _T("\r\n\r\n");
 			str += TRL("Do you want to load the plugin?");
 
 			int nRet;
-			nRet = MessageBox(GetDesktopWindow(), str.c_str(), TRL("Plugin Manager"), MB_YESNO | MB_ICONQUESTION);
+			nRet = MessageBox(GetDesktopWindow(), str, TRL("Plugin Manager"), MB_YESNO | MB_ICONQUESTION);
 
 			if(nRet == IDNO)
 			{

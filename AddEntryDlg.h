@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ public:
 	void CleanUp();
 
 	void UpdateControlsStatus();
-	void SetExpireDays(DWORD dwDays);
+	void SetExpireDays(DWORD dwDays, BOOL bSetTime);
 
 	CFont m_fStyle;
 	CFont m_fSymbol;
@@ -134,6 +134,8 @@ protected:
 	afx_msg void OnExpires3Months();
 	afx_msg void OnExpires6Months();
 	afx_msg void OnExpires12Months();
+	afx_msg void OnExpiresNow();
+	afx_msg void OnReNotesClickLink(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 
 	afx_msg LRESULT OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam);

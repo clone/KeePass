@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ CCustomListCtrlEx::CCustomListCtrlEx()
 	if(nBitsPerPixel > 8) m_bColorize = TRUE;
 	else m_bColorize = FALSE;
 
-	m_rgbColor = RGB(238,238,255);
+	m_rgbRowColor = RGB(238,238,255);
 
 	m_pParentI = NULL;
 	m_pbShowColumns = NULL;
@@ -73,7 +73,7 @@ void CCustomListCtrlEx::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 	// First thing - check the draw stage. If it's the control's prepaint
 	// stage, then tell Windows we want messages for every item.
-	if(CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage)
+	if(pLVCD->nmcd.dwDrawStage == CDDS_PREPAINT)
 	{
 		*pResult = CDRF_NOTIFYITEMDRAW;
 	}
@@ -86,12 +86,12 @@ void CCustomListCtrlEx::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 		if(m_bColorize == TRUE) // Colorize the list only if enough colors are available
 		{
-			if(pLVCD->nmcd.dwItemSpec & 1)
+			if(pLVCD->nmcd.dwItemSpec & 1) // Uneven item number
 			{
 				crText = RGB(0,0,0);
-				crBkgnd = m_rgbColor;
+				crBkgnd = m_rgbRowColor;
 			}
-			else
+			else // Even item number
 			{
 				crText = RGB(0,0,0);
 				crBkgnd = RGB(255,255,255);
@@ -118,14 +118,14 @@ BOOL CCustomListCtrlEx::PreCreateWindow(CREATESTRUCT& cs)
 	return CListCtrl::PreCreateWindow(cs);
 }
 
-COLORREF CCustomListCtrlEx::GetColorEx()
+COLORREF CCustomListCtrlEx::GetRowColorEx()
 {
-	return m_rgbColor;
+	return m_rgbRowColor;
 }
 
-void CCustomListCtrlEx::SetColorEx(COLORREF rgbColor)
+void CCustomListCtrlEx::SetRowColorEx(COLORREF rgbColor)
 {
-	m_rgbColor = rgbColor;
+	m_rgbRowColor = rgbColor;
 	RedrawItems(0, GetItemCount() - 1);
 	UpdateWindow();
 }
@@ -163,7 +163,7 @@ BOOL CCustomListCtrlEx::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 
 		// Track only width changes
 		if (phdn->pitem->mask & HDI_WIDTH)
-			((CPwSafeDlg *)m_pParentI)->_OnPwlistColumnWidthChange(phdn->iItem, phdn->pitem->cxy);
+			((CPwSafeDlg *)m_pParentI)->CB_OnPwlistColumnWidthChange(phdn->iItem, phdn->pitem->cxy);
 	}
 	else if((phdn->hdr.code == HDN_BEGINTRACKW) || (phdn->hdr.code == HDN_BEGINTRACKA))
 	{

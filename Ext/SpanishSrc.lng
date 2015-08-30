@@ -1,5 +1,5 @@
 |~LANGUAGENAME||Spanish (Español para España y Latinoamérica)|
-|~LANGUAGEVERSION||1.02|
+|~LANGUAGEVERSION||1.03|
 |~LANGUAGEAUTHOR||Marcel Trujillo|
 |~LANGUAGEAUTHOREMAIL||marcelito@gmail.com|
 |&OK||&OK|
@@ -499,3 +499,6 @@
 |The file format that you have selected to import supports group and/or entry IDs. Please choose an import behaviour.||El formato de archivo que usted ha seleccionado para importar soporta IDs para grupo y/o entrada. Por favor elija un comportamiento para llevar a cabo la importación.|
 |User Name||Nombre de Usuario|
 |User Name:||Nombre de Usuario:|
+|Copy &URL To Clipboard||Copias &URL al Portapapeles|
+|Copy URLs to clipboard instead of launching them (exception: cmd:// URLs)||Copiar URLs al Portapapeles en vez de ejecutarlas (excepción: URLs de la forma cmd://)|
+|Disable all auto-type features||Deshabilitar todas las características de auto-escritura|

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 static UINT g_uThreadACP = 0;
+static BOOL g_bForceSimpleAsterisks = FALSE;
 static TCHAR g_pFontNameNormal[12];
 static TCHAR g_pFontNameSymbol[8];
 
@@ -74,7 +75,13 @@ BOOL CPwSafeApp::InitInstance()
 
 	VERIFY(AfxOleInit());
 	AfxEnableControlContainer();
+
+#ifndef _UNICODE
 	AfxInitRichEdit();
+#else
+	AfxInitRichEditEx();
+#endif	
+
 	InitCommonControls();
 
 	// SetDialogBkColor(NewGUI_GetBgColor(), CR_FRONT); // Setup the "new" dialog look
@@ -82,6 +89,14 @@ BOOL CPwSafeApp::InitInstance()
 	ASSERT(TRUE == 1); ASSERT(FALSE == 0);
 
 	g_uThreadACP = GetACP();
+
+	OSVERSIONINFO osvi;
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+
+	if((osvi.dwMajorVersion == 5) && (osvi.dwMinorVersion == 0))
+		g_bForceSimpleAsterisks = TRUE;
 
 	CPwSafeDlg dlg;
 	m_pMainWnd = &dlg;
@@ -126,10 +141,7 @@ BOOL CPwSafeApp::InitInstance()
 
 				dlg.m_instanceChecker.ActivatePreviousInstance((LPCTSTR)strFile, dwData);
 			}
-			else
-			{
-				dlg.m_instanceChecker.ActivatePreviousInstance();
-			}
+			else dlg.m_instanceChecker.ActivatePreviousInstance(_T(""), 0xF0FFFFF0);
 
 			m_pMainWnd = NULL;
 			return FALSE;
@@ -144,7 +156,7 @@ BOOL CPwSafeApp::InitInstance()
 	return FALSE;
 }
 
-int CPwSafeApp::ExitInstance() 
+int CPwSafeApp::ExitInstance()
 {
 	// Release application's mutex object
 	if(m_pAppMutex != NULL)
@@ -357,28 +369,28 @@ BOOL CPwSafeApp::ParseCurrentCommandLine(CString *psFile, LPCTSTR *lpPassword, L
 
 	for(i = 1; i < (long)__argc; i++)
 	{
-		if((_tcsnicmp(__argv[i], _T("-pw:"), 4) == 0) && (_tcslen(__argv[i]) > 4))
-			*lpPassword = &__argv[i][4];
-		else if((_tcsnicmp(__argv[i], _T("/pw:"), 4) == 0) && (_tcslen(__argv[i]) > 4))
-			*lpPassword = &__argv[i][4];
-		else if((_tcsnicmp(__argv[i], _T("-keyfile:"), 9) == 0) && (_tcslen(__argv[i]) > 9))
-			*lpKeyFile = &__argv[i][9];
-		else if((_tcsnicmp(__argv[i], _T("/keyfile:"), 9) == 0) && (_tcslen(__argv[i]) > 9))
-			*lpKeyFile = &__argv[i][9];
-		else if((_tcsnicmp(__argv[i], _T("-preselect:"), 11) == 0) && (_tcslen(__argv[i]) > 11))
-			*lpPreSelectPath = &__argv[i][11];
-		else if((_tcsnicmp(__argv[i], _T("/preselect:"), 11) == 0) && (_tcslen(__argv[i]) > 11))
-			*lpPreSelectPath = &__argv[i][11];
-		else if((_tcsnicmp(__argv[i], _T("-ext:"), 5) == 0) && (_tcslen(__argv[i]) > 5))
+		if((_tcsnicmp(__targv[i], _T("-pw:"), 4) == 0) && (_tcslen(__targv[i]) > 4))
+			*lpPassword = &__targv[i][4];
+		else if((_tcsnicmp(__targv[i], _T("/pw:"), 4) == 0) && (_tcslen(__targv[i]) > 4))
+			*lpPassword = &__targv[i][4];
+		else if((_tcsnicmp(__targv[i], _T("-keyfile:"), 9) == 0) && (_tcslen(__targv[i]) > 9))
+			*lpKeyFile = &__targv[i][9];
+		else if((_tcsnicmp(__targv[i], _T("/keyfile:"), 9) == 0) && (_tcslen(__targv[i]) > 9))
+			*lpKeyFile = &__targv[i][9];
+		else if((_tcsnicmp(__targv[i], _T("-preselect:"), 11) == 0) && (_tcslen(__targv[i]) > 11))
+			*lpPreSelectPath = &__targv[i][11];
+		else if((_tcsnicmp(__targv[i], _T("/preselect:"), 11) == 0) && (_tcslen(__targv[i]) > 11))
+			*lpPreSelectPath = &__targv[i][11];
+		else if((_tcsnicmp(__targv[i], _T("-ext:"), 5) == 0) && (_tcslen(__targv[i]) > 5))
 		{ // Ignore this parameter
 		}
-		else if((_tcsnicmp(__argv[i], _T("/ext:"), 5) == 0) && (_tcslen(__argv[i]) > 5))
+		else if((_tcsnicmp(__targv[i], _T("/ext:"), 5) == 0) && (_tcslen(__targv[i]) > 5))
 		{ // Ignore this parameter
 		}
 		else
 		{
 			if(bFirst != TRUE) *psFile += _T(" ");
-			*psFile += __argv[i];
+			*psFile += __targv[i];
 			bFirst = FALSE;
 		}
 	}
@@ -419,12 +431,14 @@ BOOL CPwSafeApp::IsMBThreadACP()
 
 TCHAR CPwSafeApp::GetPasswordCharacter()
 {
-	if(IsMBThreadACP() == TRUE) return _T('*');
+	if((IsMBThreadACP() == TRUE) || (g_bForceSimpleAsterisks == TRUE))
+		return _T('*');
 	return (TCHAR)0xB7;
 }
 
-const TCHAR *CPwSafeApp::GetPasswordFont()
+LPCTSTR CPwSafeApp::GetPasswordFont()
 {
-	if(IsMBThreadACP() == TRUE) return g_pFontNameNormal;
+	if((IsMBThreadACP() == TRUE) || (g_bForceSimpleAsterisks == TRUE))
+		return g_pFontNameNormal;
 	return (TCHAR *)g_pFontNameSymbol;
 }

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ C_FN_SHARE void mem_erase(unsigned char *p, unsigned long u)
 }
 
 #ifndef _WIN32_WCE
-C_FN_SHARE BOOL SecureDeleteFile(LPCSTR pszFilePath)
+C_FN_SHARE BOOL SecureDeleteFile(LPCTSTR pszFilePath)
 {
 	HANDLE hFile;
 	DWORD i, m, dwSizeLo, dwTmp;
@@ -92,7 +92,7 @@ C_FN_SHARE BOOL SecureDeleteFile(LPCSTR pszFilePath)
 	SAFE_DELETE_ARRAY(pBuf);
 
 	if(DeleteFile(pszFilePath) == FALSE)
-		if(remove(pszFilePath) != 0)
+		if(_tremove(pszFilePath) != 0)
 			return FALSE;
 
 	return TRUE;
@@ -165,6 +165,29 @@ C_FN_SHARE int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2)
 	else if(pt1->btSecond > pt2->btSecond) return 1;
 
 	return 0; // They are exactly the same
+}
+
+// Fast arithmetic time addition, possibly incorrect calendar-day
+C_FN_SHARE void _pwtimeadd(PW_TIME *pTime, const PW_TIME *pTimeAdd)
+{
+	if((pTime == NULL) || (pTimeAdd == NULL)) return;
+
+	pTime->btSecond += pTimeAdd->btSecond;
+	if(pTime->btSecond > 59) { pTime->btSecond -= 60; pTime->btMinute++; }
+
+	pTime->btMinute += pTimeAdd->btMinute;
+	if(pTime->btMinute > 59) { pTime->btMinute -= 60; pTime->btHour++; }
+
+	pTime->btHour += pTimeAdd->btHour;
+	if(pTime->btHour > 23) { pTime->btHour -= 24; pTime->btDay++; }
+
+	pTime->btDay += pTimeAdd->btDay;
+	if(pTime->btDay > 31) { pTime->btDay -= 31; pTime->btMonth++; }
+
+	pTime->btMonth += pTimeAdd->btMonth;
+	if(pTime->btMonth > 12) { pTime->btMonth -= 12; pTime->shYear++; }
+
+	pTime->shYear += pTimeAdd->shYear;
 }
 
 // Packs an array of integers to a TCHAR string

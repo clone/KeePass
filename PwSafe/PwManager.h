@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #define ___PASSWORD_MANAGER_H___
 
 #include "../Util/SysDefEx.h"
-#include <string>
 #include "../Util/NewRandom.h"
 #include "../Crypto/rijndael.h"
 
@@ -30,8 +29,12 @@
 #define PWM_PRODUCT_NAME_SHORT _T("KeePass")
 
 // When making a Windows build, don't forget to update the verinfo resource
-#define PWM_VERSION_STR  _T("1.03")
-#define PWM_VERSION_DW   0x01000301
+#ifndef _UNICODE
+#define PWM_VERSION_STR  _T("1.04")
+#else
+#define PWM_VERSION_STR  _T("1.04 Unicode")
+#endif
+#define PWM_VERSION_DW   0x01000401
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -127,14 +130,18 @@
 #define PWMKEY_SHOWFULLPATH     _T("KeeShowFullPath")
 #define PWMKEY_DISABLEAUTOTYPE  _T("KeeDisableAutoType")
 #define PWMKEY_COPYURLS         _T("KeeCopyURLs")
+#define PWMKEY_EXITINSTEADLOCK  _T("KeeExitInsteadOfLockAT")
+#define PWMKEY_URLOVERRIDE      _T("KeeURLOverride")
+#define PWMKEY_SIMPLETANVIEW    _T("KeeSimpleTANView")
+#define PWMKEY_SHOWTANINDICES   _T("KeeShowTANIndices")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
 
 #define PWM_PASSWORD_STRING      _T("********")
 
-#define PWM_KEYMETHOD_OR        FALSE
-#define PWM_KEYMETHOD_AND       TRUE
+#define PWM_KEYMETHOD_OR         FALSE
+#define PWM_KEYMETHOD_AND        TRUE
 
 #define PWS_SEARCHGROUP          TRL("Search results")
 #define PWS_BACKUPGROUP_SRC      _T("Backup")
@@ -142,14 +149,14 @@
 #define PWS_DEFAULT_KEY_FILENAME _T("pwsafe.key")
 #define PWV_SOONTOEXPIRE_DAYS    7
 
-#define PWM_FLAG_SHA2           1
-#define PWM_FLAG_RIJNDAEL       2
-#define PWM_FLAG_ARCFOUR        4
-#define PWM_FLAG_TWOFISH        8
+#define PWM_FLAG_SHA2            1
+#define PWM_FLAG_RIJNDAEL        2
+#define PWM_FLAG_ARCFOUR         4
+#define PWM_FLAG_TWOFISH         8
 
-#define PWM_SESSION_KEY_SIZE    12
+#define PWM_SESSION_KEY_SIZE     12
 
-#define PWM_STD_KEYENCROUNDS    6000
+#define PWM_STD_KEYENCROUNDS     6000
 
 // Field flags (for example in Find function)
 #define PWMF_TITLE              1
@@ -185,6 +192,7 @@
 #define PWE_INVALID_FILESIZE      12
 #define PWE_INVALID_FILESIGNATURE 13
 #define PWE_INVALID_FILEHEADER    14
+#define PWE_NOFILEACCESS_READ_KEY 15
 
 // Format Flags
 #define PWFF_NO_INTRO   1
@@ -274,6 +282,11 @@ typedef struct _PW_ENTRY // Structure containing information about one entry
 	BYTE *pBinaryData;
 	DWORD uBinaryDataLen;
 } PW_ENTRY, *PPW_ENTRY;
+
+typedef struct _PW_UUID_STRUCT
+{
+	BYTE uuid[16];
+} PW_UUID_STRUCT;
 
 typedef struct _PMS_SIMPLE_UI_STATE
 {
@@ -406,7 +419,6 @@ public:
 	// Convert PW_TIME to 5-byte compressed structure and the other way round
 	static void _TimeToPwTime(const BYTE *pCompressedTime, PW_TIME *pPwTime);
 	static void _PwTimeToTime(const PW_TIME *pPwTime, BYTE *pCompressedTime);
-	static std::string FormatError(int nErrorCode, DWORD dwFlags);
 
 	// Get the never-expire time
 	static void _GetNeverExpireTime(PW_TIME *pPwTime);
@@ -425,6 +437,8 @@ public:
 
 	void GetRawMasterKey(BYTE *pStorage);
 	void SetRawMasterKey(const BYTE *pNewKey);
+
+	static BOOL IsZeroUUID(const BYTE *pUUID);
 
 	DWORD m_dwLastSelectedGroupId;
 	DWORD m_dwLastTopVisibleGroupId;

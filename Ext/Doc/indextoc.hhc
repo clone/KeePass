@@ -21,6 +21,10 @@
 			<param name="Local" value="install.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Compatibility / SxS">
+			<param name="Local" value="version.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="First Steps Tutorial">
 			<param name="Local" value="first.html">
 			</OBJECT>

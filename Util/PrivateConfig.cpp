@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -43,7 +43,13 @@ CPrivateConfig::CPrivateConfig(BOOL bRequireWriteAccess)
 	HINSTANCE hShell32 = LoadLibrary(_T("Shell32"));
 	if(hShell32 != NULL)
 	{
-		LPSHGETSPECIALFOLDERPATH lpGet = (LPSHGETSPECIALFOLDERPATH)GetProcAddress(hShell32, "SHGetSpecialFolderPathA");
+		LPSHGETSPECIALFOLDERPATH lpGet = (LPSHGETSPECIALFOLDERPATH)GetProcAddress(hShell32,
+#ifndef _UNICODE
+			"SHGetSpecialFolderPathA"
+#else
+			"SHGetSpecialFolderPathW"
+#endif
+			);
 
 		// WinNT 4.0 doesn't support this function, therefore check for NULL pointer without assertion
 		if(lpGet != NULL) lpGet(NULL, m_szFileUser, CSIDL_APPDATA, TRUE);

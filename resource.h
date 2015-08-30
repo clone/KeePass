@@ -225,6 +225,8 @@
 #define IDC_RADIO_OVERWRITE_TIMEBASED   1203
 #define IDC_HLINK_CREDITS               1204
 #define IDC_HLINK_DONATE                1205
+#define IDC_STATIC_LISTTEXT             1207
+#define IDC_STATIC_PRODUCTNAME          1208
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -411,15 +413,18 @@
 #define ID_IMPORT_KEEPASS               32987
 #define ID_SAFE_EXPORTGROUP_KEEPASS     32989
 #define ID_EXPORT_KEEPASS               32991
+#define ID_EXPIRES_NOW                  32992
+#define ID_VIEW_SIMPLETANVIEW           32993
+#define ID_VIEW_SHOWTANINDICES          32994
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        227
-#define _APS_NEXT_COMMAND_VALUE         32992
-#define _APS_NEXT_CONTROL_VALUE         1207
+#define _APS_NEXT_RESOURCE_VALUE        228
+#define _APS_NEXT_COMMAND_VALUE         32999
+#define _APS_NEXT_CONTROL_VALUE         1209
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

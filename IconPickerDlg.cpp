@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ BOOL CIconPickerDlg::OnInitDialog()
 	CString str;
 	for(i = 0; i < m_uNumIcons; i++)
 	{
-		str.Format("%u", i);
+		str.Format(_T("%u"), i);
 		m_cList.InsertItem(LVIF_IMAGE | LVIF_TEXT, i, str, 0, 0, i, 0);
 	}
 

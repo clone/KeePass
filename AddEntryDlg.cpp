@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -124,6 +124,8 @@ BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	ON_COMMAND(ID_EXPIRES_3MONTHS, OnExpires3Months)
 	ON_COMMAND(ID_EXPIRES_6MONTHS, OnExpires6Months)
 	ON_COMMAND(ID_EXPIRES_12MONTHS, OnExpires12Months)
+	ON_COMMAND(ID_EXPIRES_NOW, OnExpiresNow)
+	ON_NOTIFY(EN_LINK, IDC_RE_NOTES, OnReNotesClickLink)
 	//}}AFX_MSG_MAP
 
 	ON_REGISTERED_MESSAGE(WM_XHYPERLINK_CLICKED, OnXHyperLinkClicked)
@@ -302,8 +304,14 @@ BOOL CAddEntryDlg::OnInitDialog()
 	else m_bExpires = TRUE;
 
 	// m_reNotes.LimitText(0);
-	m_reNotes.SetEventMask(ENM_MOUSEEVENTS);
+	m_reNotes.SetEventMask(ENM_MOUSEEVENTS | ENM_LINK);
+	m_reNotes.SendMessage(EM_AUTOURLDETECT, TRUE, 0);
+
+#ifdef _UNICODE
+	m_reNotes.SetRTF(m_strNotes, SF_TEXT | SF_UNICODE);
+#else
 	m_reNotes.SetRTF(m_strNotes, SF_TEXT);
+#endif
 
 	m_tipSecClear.Create(this, 0x40);
 	m_tipSecClear.AddTool(&m_pEditPw, CPwSafeDlg::_GetSecureEditTipText(_T("Enter password:")));
@@ -322,16 +330,24 @@ BOOL CAddEntryDlg::OnInitDialog()
 		{
 			CNewRandom *pRand = new CNewRandom();
 			CBase64Codec base64;
-			ASSERT(pRand != NULL);
 			DWORD dwSize = 32;
 			BYTE pbRandom[16], pbString[32];
+
+			ASSERT(pRand != NULL);
+
 			pRand->Initialize(); // Get system entropy
 			pRand->GetRandomBuffer(pbRandom, 16);
 			VERIFY(base64.Encode(pbRandom, 16, pbString, &dwSize));
 			SAFE_DELETE(pRand);
 			pbString[strlen((char *)pbString) - 3] = 0;
-			m_pEditPw.SetPassword((char *)(pbString + 1));
-			m_pRepeatPw.SetPassword((char *)(pbString + 1));
+
+			TCHAR *pbStringT = _UTF8ToString((UTF8_BYTE *)(pbString + 1));
+			m_pEditPw.SetPassword(pbStringT);
+			m_pRepeatPw.SetPassword(pbStringT);
+
+			mem_erase((BYTE *)pbStringT, _tcslen(pbStringT) * sizeof(TCHAR));
+			SAFE_DELETE_ARRAY(pbStringT);
+
 			mem_erase(pbRandom, 16); mem_erase(pbString, 32);
 			UpdateData(FALSE);
 		}
@@ -777,7 +793,7 @@ LRESULT CAddEntryDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
 void CAddEntryDlg::OnSetDefaultExpireBtn() 
 {
 	if(m_dwDefaultExpire == 0) return;
-	SetExpireDays(m_dwDefaultExpire);
+	SetExpireDays(m_dwDefaultExpire, FALSE);
 }
 
 HBRUSH CAddEntryDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) 
@@ -791,7 +807,7 @@ HBRUSH CAddEntryDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	return hbr;
 }
 
-void CAddEntryDlg::SetExpireDays(DWORD dwDays)
+void CAddEntryDlg::SetExpireDays(DWORD dwDays, BOOL bSetTime)
 {
 	UpdateData(TRUE);
 
@@ -800,41 +816,46 @@ void CAddEntryDlg::SetExpireDays(DWORD dwDays)
 	CTime t = CTime::GetCurrentTime();
 	t += CTimeSpan((LONG)dwDays, 0, 0, 0);
 
-	m_editDate.SetDate(t);
-	// m_editTime.SetTime(t); // Daylight saving
+	m_editDate.SetDate(t); // Beware of daylight saving
+	if(bSetTime == TRUE) m_editTime.SetTime(t);
 
 	UpdateData(FALSE);
 	UpdateControlsStatus();
 }
 
+void CAddEntryDlg::OnExpiresNow() 
+{
+	SetExpireDays(0, TRUE);
+}
+
 void CAddEntryDlg::OnExpires1Week() 
 {
-	SetExpireDays(7);
+	SetExpireDays(7, FALSE);
 }
 
 void CAddEntryDlg::OnExpires2Weeks() 
 {
-	SetExpireDays(14);
+	SetExpireDays(14, FALSE);
 }
 
 void CAddEntryDlg::OnExpires1Month() 
 {
-	SetExpireDays(30);
+	SetExpireDays(30, FALSE);
 }
 
 void CAddEntryDlg::OnExpires3Months() 
 {
-	SetExpireDays(91);
+	SetExpireDays(91, FALSE);
 }
 
 void CAddEntryDlg::OnExpires6Months() 
 {
-	SetExpireDays(182);
+	SetExpireDays(182, FALSE);
 }
 
 void CAddEntryDlg::OnExpires12Months() 
 {
-	SetExpireDays(365);
+	SetExpireDays(365, FALSE);
 }
 
 BOOL CAddEntryDlg::PreTranslateMessage(MSG* pMsg) 
@@ -842,6 +863,27 @@ BOOL CAddEntryDlg::PreTranslateMessage(MSG* pMsg)
 	m_tipSecClear.RelayEvent(pMsg);
 
 	return CDialog::PreTranslateMessage(pMsg);
+}
+
+void CAddEntryDlg::OnReNotesClickLink(NMHDR* pNMHDR, LRESULT* pResult) 
+{
+	ENLINK *pEnLink = reinterpret_cast<ENLINK *>(pNMHDR);
+	if(pEnLink == NULL) return;
+
+	if((pEnLink->nmhdr.idFrom == IDC_RE_NOTES) && (pEnLink->msg == WM_LBUTTONDOWN))
+	{
+		CHARRANGE cr;
+		m_reNotes.GetSel(cr); // Push current user selection
+
+		m_reNotes.SetSel(pEnLink->chrg);
+		CString strSelectedURL = m_reNotes.GetSelText();
+
+		m_reNotes.SetSel(cr); // Pop current user selection
+
+		if(strSelectedURL.GetLength() != 0) OpenUrlEx(strSelectedURL);
+	}
+
+	*pResult = 0;
 }
 
 #pragma warning(pop)

@@ -1,5 +1,10 @@
 // This is a modified version of Brent Corkums BCMenu class.
-// Editor: Dominik Reichl (removed bitmap fading, etc...)
+// It has been optimized for the menus in KeePass; the class doesn't
+// have all the functionality of the original class any more!
+// I recommend getting the original version of the menu if you want
+// to use it in your project.
+
+// Editor: Dominik Reichl
 // For the original version, see the authors site below.
 
 //*************************************************************************
@@ -268,8 +273,8 @@ protected:
 	void ColorBitmap(CDC* pDC, CBitmap& bmp,CSize bitmap_size,CSize icon_size,COLORREF fill,COLORREF border,int hatchstyle=-1);
 	void RemoveTopLevelOwnerDraw(void);
 	int GetMenuStart(void);
-	void GetFadedBitmap(CBitmap &bmp);
-	void GetTransparentBitmap(CBitmap &bmp);
+	// void GetFadedBitmap(CBitmap &bmp);
+	// void GetTransparentBitmap(CBitmap &bmp);
 	void GetDisabledBitmap(CBitmap &bmp,COLORREF background=0);
 	void GetShadowBitmap(CBitmap &bmp);
 	int AddToGlobalImageList(CImageList *il,int xoffset,int nID);

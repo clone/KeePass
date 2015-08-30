@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -136,6 +136,8 @@ typedef struct
 
 #define KPM_SAVEDB_POST 49
 
+#define KPM_CHANGE_MASTER_KEY_PRE 50
+
 // File menu commands
 
 #define KPM_FILE_NEW_PRE 23
@@ -194,6 +196,6 @@ typedef struct
 #define KPM_GROUP_PRINT_PRE 41
 
 // The following is unused. It's always the last command ID + 1
-#define KPM_NEXT 50
+#define KPM_NEXT 51
 
 #endif

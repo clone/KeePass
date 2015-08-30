@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Slovenèina|
-|~LANGUAGEVERSION|             |1.0|
+|~LANGUAGEVERSION|             |1.03|
 |~LANGUAGEAUTHOR|              |Radoslav Bielik|
 |~LANGUAGEAUTHOREMAIL|         |rado@bielik.org, http://www.bielik.org|
 
@@ -38,7 +38,7 @@
 
 |Password Groups|              |Skupiny hesiel|
 |Title|                        |Názov|
-|UserName|                     |Uívate¾ské meno|
+|User Name|                     |Uívate¾ské meno|
 |URL|                          |URL|
 |Password|                     |Heslo|
 |Notes|                        |Poznámky|
@@ -92,8 +92,6 @@
     |Mínus '-'|
 |Space ' '|
     |Medzera ' '|
-|Unable to register a global hot key.|
-	|Nebolo moné zaregistrova globálnu klávesovú skratku.|
 |Special characters|
     |Špeciálne znaky|
 |Higher ANSI characters|
@@ -103,7 +101,7 @@
 
 |Group:|                       |Skupina:|
 |Title:|                       |Názov:|
-|UserName:|                    |Uív. meno:|
+|User Name:|                    |Uív. meno:|
 |URL:|                         |URL:|
 |Icon:|                        |Ikona:|
 |Password:|                    |Heslo:|
@@ -178,8 +176,11 @@
 |Export Group To &XML...|      |Exportova skupinu do &XML...|
 |Export Group To &CSV...|      |Exportova skupinu do &CSV...|
 |Export Group To &TXT...|	   |Exportova skupinu do &TXT...|
-|Copy User&Name To Clipboard|  |Kopírova uívate¾ské &meno do schránky|
+|Export Group To &KeePass Database...|
+	|Exportova skupiny do &KeePass databázy...|
+|Copy User &Name To Clipboard| |Kopírova uívate¾ské &meno do schránky|
 |Copy &Password To Clipboard|  |Kopírova &heslo do schránky|
+|Copy &URL To Clipboard|       |Kopírova &URL do schránky|
 |Open &URL(s)|                 |Otvori U&RL|
 |&Find In Database...|         |Nájs v databáze...|
 |Find In T&his Group...|       |Nájs v tejto skupine...|
@@ -199,7 +200,7 @@
 
 |Change &Language...|          |Zmeni &jazyk...|
 |Show &Title Column|           |Zobrazi ståpec '&Názov'|
-|Show User&Name Column|        |Zobrazi ståpec 'Uívate¾ské &meno'|
+|Show User &Name Column|       |Zobrazi ståpec 'Uívate¾ské &meno'|
 |Show &URL Column|             |Zobrazi ståpec '&URL'|
 |Show &Password Column|        |Zobrazi ståpec '&Heslo'|
 |Show Note&s Column|           |Zobrazi ståpec '&Poznámky'|
@@ -261,8 +262,8 @@
 |Do you want to save the changes before closing?|
     |Prajete si uloi zmeny pred zatvorením súboru?|
 
-|Deleting a group will delete all items in that group, too.|
-    |Zmazanie skupiny zmae tie všetky záznamy v tejto skupine.|
+|Deleting a group will delete all items and subgroups in that group, too.|
+    |Zmazanie skupiny zmae tie všetky záznamy a podskupiny v tejto skupine.|
 |Are you sure you want to delete this group?|
     |Skutoène si prajete zmaza túto skupinu?|
 |Delete Group Confirmation|
@@ -289,8 +290,6 @@
 |Here you can configure KeePass.|              |Tu môete meni nastavenia programu KeePass.|
 |Automatically open last used database on startup|
     |Automaticky otvori poslednú pouitú databázu pri spustení|
-|Automatically save database on exit|
-    |Automaticky uloi databázu pri ukonèení|
 |Workspace cannot be unlocked!|
     |Pracovnú plochu nie je moné odomknú!|
 |Workspace locked|
@@ -329,6 +328,7 @@
 |&HTML File...|			|&HTML súboru...|
 |&XML File...|			|&XML súboru...|
 |&CSV File...|			|&CSV súboru...|
+|&KeePass Database...|	|&KeePass databázy...|
 |&PwSafe v2 TXT File...|	|Súboru &PwSafe v2 TXT...|
 |Code&Wallet TXT File...|	|Súboru Code&Wallet TXT...|
 |Personal &Vault TXT File...|	|Súboru Personal &Vault TXT...|
@@ -418,7 +418,7 @@
 |&Rearrange|                   |Reor&ganizova|
 |&Sort Group List|             |Zoradi zoznam &skupín|
 |Sort List By &Title|          |Zoradi zoznam pod¾a &názvu|
-|Sort List By User&Name|       |Zoradi zoznam pod¾a uívate¾ského &mena|
+|Sort List By User &Name|      |Zoradi zoznam pod¾a uívate¾ského &mena|
 |Sort List By &URL|            |Zoradi zoznam pod¾a &URL|
 |Sort List By &Password|       |Zoradi zoznam pod¾a &hesla|
 |Sort List By Note&s|          |Zoradi zoznam pod¾a &poznámky|
@@ -429,7 +429,7 @@
 |Move Group One &Left|         |Presunú skupinu o úroveò do&¾ava|
 |Move Group One &Right|        |Presunú skupinu o úroveò dop&rava|
 
-|Hide &UserNames Behind Asterisks (***)|  |Skry &uívate¾ské mená za hviezdièky (***)|
+|Hide &User Names Behind Asterisks (***)|	|Skry &uívate¾ské mená za hviezdièky (***)|
 |Attachment:|                  |Príloha:|
 |Attachment|                   |Príloha|
 |Show &Attachment Column|      |Zobrazi ståpec 'Príloha'|
@@ -488,8 +488,8 @@
 |Quality:|					|Kvalita:|
 |Show All &Expired Entries...|			|Zobrazi záznamy &po vypršaní platnosti...|
 |The file couldn't be saved.|			|Nebolo moné uloi súbor.|
-|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
-	|Èím je toto èíslo vyššie, tım ašie sú uskutoènite¾né brute-force útoky, ale zároveò je o to pomalšie naèítanie a ukladanie databázy.|
+|The higher this number, the harder are dictionary attacks. But also the higher this number, the slower the database loading and saving.|
+	|Èím je toto èíslo vyššie, tım ašie sú uskutoènite¾né slovníkové útoky, ale zároveò je o to pomalšie naèítanie a ukladanie databázy.|
 |This is a list of all expired entries|	
 	|Toto je zoznam všetkıch záznamov po vypršaní platnosti|
 |To execute this operation you must enable unsafe operations in the options dialog.|
@@ -566,6 +566,8 @@
 	|Iná aplikácia u pravdepodobne vyuíva túto klávesovú skratku.|
 |You can choose an other hot key combination in 'Edit - Options - Setup'.|
 	|Môete zvoli inú klávesovú skratkuv menu 'Upravi - Monosti - Inštalácia'.|
+|Use alternative auto-type method (minimize window)|
+	|Poui alternatívny spôsob automatického zadania (minimalizácia okna)|	
 
 |Error code|					|Kód chyby|
 |Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations.|
@@ -741,3 +743,50 @@
 	|Jediné kliknutie namiesto dvojitého kliknutia pre hlavnú akciu ikony notifikaènej oblasti|
 |The program is distributed under the terms of the GNU General Public License v2 or later.|
 	|Tento program je vo¾ne šírite¾nı v súlade s podmienkami licencie GNU General Public License verzie 2 alebo novšej.|
+
+
+|&Repair KeePass Database File...|  |&Opravi databázovı súbor KeePass...|
+|Automatically save database on exit and workspace locking|
+    |Automaticky uloi databázu pri ukonèení alebo uzamknutí pracovnej plochy|
+
+
+	
+|Copy URLs to clipboard instead of launching them (exception: cmd:// URLs)|
+	|Kopírova URL adresy do schránky namiesto ich otvárania v prehliadaèi (vınimka: cmd:// adresy)|
+
+|Overwrite|						|Prepísa|
+|Overwrite if newer|			|Prepísa ak novší|
+
+|Delete all backup entries before saving the database|
+	|Zmaza všetky zálohované záznamy pred uloením databázy|
+
+|Disable all auto-type features|	|Úplne vypnú funkcie automatického zadania|
+
+|Create new IDs|				|Vytvori nové identifikátory|
+|If you select this option, KeePass will create new IDs for all groups and entries. Consequently no existing groups and entries of the currently opened database will be modified or overwritten.|
+	|Ak zvolíte túto monos, KeePass vytvorí nové identifikátory pre všetky skupiny a záznamy. Následne nebudú iadne z existujúcich skupín a záznamov v práve otvorenej databáze modifikované alebo prepísané.|
+|The file format that you have selected to import supports group and/or entry IDs. Please choose an import behaviour.|
+	|Súborovı formát zvolenı pre import podporuje identifikátory (ID) pre skupiny a/alebo záznamy. Prosím zvo¾te spôsob importu.|
+|KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.|
+	|Program KeePass nahradí všetky existujúce skupiny a záznamy tımi, ktoré sa nachádzajú v importovanom súbore, v prípade e majú rovnaké ID.|
+|KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.|
+	|KeePass porovná èas poslednej modifikácie skupín/záznamov, a nahradí existujúce záznamy len vtedy, ak importované záznamy sú novšie.|
+
+|Please choose if KeePass should use the key of the currently opened database or ask you to define a new key to encrypt the exported file.|
+	|Zvo¾te èi má KeePass poui k¾úè/heslo aktuálne otvorenej databázy, alebo chcete zada novı k¾úè/heslo pre zakódovanie exportovaného súboru.|
+|Click [No] to set a new key for the exported file.|
+	|Kliknite [Nie] pre nastavenie nového k¾úèa/hesla pre exportovanı súbor.|
+|Click [Yes] to use the same key as the currently opened database.|
+	|Kliknite [Áno] pre pouitie rovnakého k¾úèa/hesla akı má práve otvorená databáza.|
+|Reuse the current key/password?|
+	|Poui súèasnı k¾úè/heslo?|	
+	
+|Press Shift-Home or Shift-End to clear this edit control|
+	|Stlaète klávesy Shift a Home alebo Shift a End pre zmazanie obsahu tohoto políèka|
+
+|Show full path in the titlebar (instead of filename only)|
+	|Zobrazi celú cestu v záhlaví okna (nie len názov súboru)|
+
+
+|Acknowledgements|				|Poïakovania|
+

@@ -27,6 +27,7 @@
 #include "stdafx.h"
 #include "XHyperLink.h"
 #include "atlconv.h"		// for Unicode conversion
+#include "../Util/WinUtil.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -101,7 +102,7 @@ CXHyperLink::~CXHyperLink()
 
 ///////////////////////////////////////////////////////////////////////////////
 // DestroyWindow
-BOOL CXHyperLink::DestroyWindow() 
+BOOL CXHyperLink::DestroyWindow()
 {
 	KillTimer(m_nTimerID);
 	return CStatic::DestroyWindow();
@@ -109,7 +110,7 @@ BOOL CXHyperLink::DestroyWindow()
 
 ///////////////////////////////////////////////////////////////////////////////
 // PreTranslateMessage
-BOOL CXHyperLink::PreTranslateMessage(MSG* pMsg) 
+BOOL CXHyperLink::PreTranslateMessage(MSG* pMsg)
 {
 	m_ToolTip.RelayEvent(pMsg);
 	return CStatic::PreTranslateMessage(pMsg);
@@ -117,12 +118,12 @@ BOOL CXHyperLink::PreTranslateMessage(MSG* pMsg)
 
 ///////////////////////////////////////////////////////////////////////////////
 // PreSubclassWindow
-void CXHyperLink::PreSubclassWindow() 
+void CXHyperLink::PreSubclassWindow()
 {
 	// We want to get mouse clicks via STN_CLICKED
 	DWORD dwStyle = GetStyle();
 	::SetWindowLong(GetSafeHwnd(), GWL_STYLE, dwStyle | SS_NOTIFY);
-	
+
 	// Set the URL as the window text
 	if (m_strURL.IsEmpty())
 		GetWindowText(m_strURL);
@@ -130,7 +131,7 @@ void CXHyperLink::PreSubclassWindow()
 	// Check that the window text isn't empty. If it is, set it as the URL.
 	CString strWndText;
 	GetWindowText(strWndText);
-	if (strWndText.IsEmpty()) 
+	if (strWndText.IsEmpty())
 	{
 		ASSERT(!m_strURL.IsEmpty());	// Window and URL both NULL. DUH!
 		SetWindowText(m_strURL);
@@ -161,7 +162,7 @@ void CXHyperLink::PreSubclassWindow()
 	// Create the tooltip
 	if (m_bToolTip)
 	{
-		CRect rect; 
+		CRect rect;
 		GetClientRect(rect);
 		m_ToolTip.Create(this);
 		m_ToolTip.AddTool(this, m_strURL, rect, TOOLTIP_ID);
@@ -187,7 +188,7 @@ void CXHyperLink::OnClicked()
 		MessageBeep(MB_ICONEXCLAMATION);	 // Unable to follow link
 		ReportError(result);
 	}
-	else 
+	else
 		SetVisited();						// Repaint to show visited colour
 
 	NotifyParent();
@@ -196,9 +197,9 @@ void CXHyperLink::OnClicked()
 ///////////////////////////////////////////////////////////////////////////////
 // CtlColor
 #ifdef _DEBUG
-HBRUSH CXHyperLink::CtlColor(CDC* pDC, UINT nCtlColor) 
+HBRUSH CXHyperLink::CtlColor(CDC* pDC, UINT nCtlColor)
 #else
-HBRUSH CXHyperLink::CtlColor(CDC* pDC, UINT /*nCtlColor*/) 
+HBRUSH CXHyperLink::CtlColor(CDC* pDC, UINT /*nCtlColor*/)
 #endif
 {
 	ASSERT(nCtlColor == CTLCOLOR_STATIC);
@@ -226,7 +227,7 @@ HBRUSH CXHyperLink::CtlColor(CDC* pDC, UINT /*nCtlColor*/)
 
 ///////////////////////////////////////////////////////////////////////////////
 // OnMouseMove
-void CXHyperLink::OnMouseMove(UINT nFlags, CPoint point) 
+void CXHyperLink::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (!m_bOverControl)		// Cursor has just moved over control
 	{
@@ -243,7 +244,7 @@ void CXHyperLink::OnMouseMove(UINT nFlags, CPoint point)
 
 ///////////////////////////////////////////////////////////////////////////////
 // OnTimer
-void CXHyperLink::OnTimer(UINT nIDEvent) 
+void CXHyperLink::OnTimer(UINT nIDEvent)
 {
 	CPoint p(GetMessagePos());
 	ScreenToClient(&p);
@@ -260,13 +261,13 @@ void CXHyperLink::OnTimer(UINT nIDEvent)
 		rect.bottom+=10;
 		InvalidateRect(rect);
 	}
-	
+
 	CStatic::OnTimer(nIDEvent);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // OnSetCursor
-BOOL CXHyperLink::OnSetCursor(CWnd* /*pWnd*/, UINT /*nHitTest*/, UINT /*message*/) 
+BOOL CXHyperLink::OnSetCursor(CWnd* /*pWnd*/, UINT /*nHitTest*/, UINT /*message*/)
 {
 	if (m_hLinkCursor)
 	{
@@ -278,7 +279,7 @@ BOOL CXHyperLink::OnSetCursor(CWnd* /*pWnd*/, UINT /*nHitTest*/, UINT /*message*
 
 ///////////////////////////////////////////////////////////////////////////////
 // OnEraseBkgnd
-BOOL CXHyperLink::OnEraseBkgnd(CDC* pDC) 
+BOOL CXHyperLink::OnEraseBkgnd(CDC* pDC)
 {
 	CRect rect;
 	GetClientRect(rect);
@@ -299,7 +300,7 @@ void CXHyperLink::SetURL(CString strURL)
 {
 	m_strURL = strURL;
 
-	if (::IsWindow(GetSafeHwnd())) 
+	if (::IsWindow(GetSafeHwnd()))
 	{
 		PositionWindow();
 		m_ToolTip.UpdateTipText(strURL, this, TOOLTIP_ID);
@@ -308,11 +309,11 @@ void CXHyperLink::SetURL(CString strURL)
 
 ///////////////////////////////////////////////////////////////////////////////
 // SetColours
-void CXHyperLink::SetColours(COLORREF crLinkColour, 
-							 COLORREF crVisitedColour,	
-							 COLORREF crHoverColour /* = -1 */) 
-{ 
-	m_crLinkColour	= crLinkColour; 
+void CXHyperLink::SetColours(COLORREF crLinkColour,
+							 COLORREF crVisitedColour,
+							 COLORREF crHoverColour /* = -1 */)
+{
+	m_crLinkColour	= crLinkColour;
 	m_crVisitedColour = crVisitedColour;
 
 	if (crHoverColour == -1)
@@ -321,7 +322,7 @@ void CXHyperLink::SetColours(COLORREF crLinkColour,
 		m_crHoverColour = crHoverColour;
 
 	if (::IsWindow(m_hWnd))
-		Invalidate(); 
+		Invalidate();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -336,18 +337,18 @@ void CXHyperLink::SetBackgroundColour(COLORREF crBackground)
 
 ///////////////////////////////////////////////////////////////////////////////
 // SetVisited
-void CXHyperLink::SetVisited(BOOL bVisited /* = TRUE */) 
-{ 
-	m_bVisited = bVisited; 
+void CXHyperLink::SetVisited(BOOL bVisited /* = TRUE */)
+{
+	m_bVisited = bVisited;
 
 	if (::IsWindow(GetSafeHwnd()))
-		Invalidate(); 
+		Invalidate();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // SetLinkCursor
 void CXHyperLink::SetLinkCursor(HCURSOR hCursor)
-{ 
+{
 	m_hLinkCursor = hCursor;
 	if (m_hLinkCursor == NULL)
 		SetDefaultCursor();
@@ -367,7 +368,7 @@ void CXHyperLink::SetUnderline(int nUnderline /*=ulHover*/)
 		else
 			SetFont(&m_StdFont);
 
-		Invalidate(); 
+		Invalidate();
 	}
 
 	m_nUnderline = nUnderline;
@@ -405,11 +406,11 @@ void CXHyperLink::SetWindowText(LPCTSTR lpszString)
 // then the window is merely shrunk, but if it is centred or right
 // justified then the window will have to be moved as well.
 //
-// Suggested by Pål K. Tønder 
+// Suggested by Pål K. Tønder
 //
 void CXHyperLink::PositionWindow()
 {
-	if (!::IsWindow(GetSafeHwnd()) || !m_bAdjustToFit) 
+	if (!::IsWindow(GetSafeHwnd()) || !m_bAdjustToFit)
 		return;
 
 	// Get the current window position
@@ -437,8 +438,8 @@ void CXHyperLink::PositionWindow()
 	ReleaseDC(pDC);
 
 	// Adjust for window borders
-	Extent.cx += WndRect.Width() - ClientRect.Width(); 
-	Extent.cy += WndRect.Height() - ClientRect.Height(); 
+	Extent.cx += WndRect.Width() - ClientRect.Width();
+	Extent.cy += WndRect.Height() - ClientRect.Height();
 
 	// Get the text justification via the window style
 	DWORD dwStyle = GetStyle();
@@ -449,17 +450,17 @@ void CXHyperLink::PositionWindow()
 	else
 		WndRect.bottom = WndRect.top + Extent.cy;
 
-	if (dwStyle & SS_CENTER) 
+	if (dwStyle & SS_CENTER)
 		WndRect.DeflateRect((WndRect.Width() - Extent.cx)/2, 0);
-	else if (dwStyle & SS_RIGHT) 
+	else if (dwStyle & SS_RIGHT)
 		WndRect.left = WndRect.right - Extent.cx;
-	else // SS_LEFT = 0, so we can't test for it explicitly 
+	else // SS_LEFT = 0, so we can't test for it explicitly
 		WndRect.right = WndRect.left + Extent.cx;
 
 	// Move the window
-	SetWindowPos(NULL, 
-				 WndRect.left, WndRect.top, 
-				 WndRect.Width(), WndRect.Height(), 
+	SetWindowPos(NULL,
+				 WndRect.left, WndRect.top,
+				 WndRect.Width(), WndRect.Height(),
 				 SWP_NOZORDER);
 }
 
@@ -477,7 +478,7 @@ void CXHyperLink::SetDefaultCursor()
 		TRACE(_T("loading from IDC_HAND\n"));
 		m_hLinkCursor = AfxGetApp()->LoadStandardCursor(IDC_HAND);
 
-		if (m_hLinkCursor == NULL)			// Still no cursor handle - 
+		if (m_hLinkCursor == NULL)			// Still no cursor handle -
 											// load the WinHelp hand cursor
 		{
 			// The following appeared in Paul DiLascia's Jan 1998 MSJ articles.
@@ -494,7 +495,7 @@ void CXHyperLink::SetDefaultCursor()
 
 			// This retrieves cursor #106 from winhlp32.exe, which is a hand pointer
 			HMODULE hModule = LoadLibrary(strWndDir);
-			if (hModule) 
+			if (hModule)
 			{
 				HCURSOR hHandCursor = ::LoadCursor(hModule, MAKEINTRESOURCE(106));
 				if (hHandCursor)
@@ -512,7 +513,7 @@ LONG CXHyperLink::GetRegKey(HKEY key, LPCTSTR subkey, LPTSTR retdata)
 	HKEY hkey;
 	LONG retval = RegOpenKeyEx(key, subkey, 0, KEY_QUERY_VALUE, &hkey);
 
-	if (retval == ERROR_SUCCESS) 
+	if (retval == ERROR_SUCCESS)
 	{
 		long datasize = MAX_PATH;
 		TCHAR data[MAX_PATH];
@@ -531,7 +532,7 @@ void CXHyperLink::ReportError(int nError)
 #ifdef XHYPERLINK_REPORT_ERROR
 
 	CString str;
-	switch (nError) 
+	switch (nError)
 	{
 		case 0:							str = "The operating system is out\nof memory or resources."; break;
 		case SE_ERR_PNF:				str = "The specified path was not found."; break;
@@ -590,19 +591,19 @@ HINSTANCE CXHyperLink::GotoURL(LPCTSTR url, int showcmd, BOOL bAlwaysOpenNew /*=
 	HINSTANCE result = ShellExecute(NULL, verb, url, NULL,NULL, showcmd);
 
 	// If it failed, get the .htm regkey and lookup the program
-	if ((UINT)result <= HINSTANCE_ERROR) 
+	if ((UINT)result <= HINSTANCE_ERROR)
 	{
-		if (GetRegKey(HKEY_CLASSES_ROOT, _T(".htm"), key) == ERROR_SUCCESS) 
+		if (GetRegKey(HKEY_CLASSES_ROOT, _T(".htm"), key) == ERROR_SUCCESS)
 		{
 			_tcscat(key, _T("\\shell\\open\\command"));
 
-			if (GetRegKey(HKEY_CLASSES_ROOT,key,key) == ERROR_SUCCESS) 
+			if (GetRegKey(HKEY_CLASSES_ROOT,key,key) == ERROR_SUCCESS)
 			{
 				TCHAR *pos;
 				pos = _tcsstr(key, _T("\"%1\""));
-				if (pos == NULL) 
+				if (pos == NULL)
 				{					// No quotes found
-					pos = _tcsstr(key, _T("%1"));	// Check for %1, without quotes 
+					pos = _tcsstr(key, _T("%1"));	// Check for %1, without quotes
 					if (pos == NULL)				// No parameter at all...
 						pos = key + _tcslen(key)-1;
 					else
@@ -616,8 +617,7 @@ HINSTANCE CXHyperLink::GotoURL(LPCTSTR url, int showcmd, BOOL bAlwaysOpenNew /*=
 				_tcscat(pos, _T(" "));
 				_tcscat(pos, url);
 
-				USES_CONVERSION;
-				result = (HINSTANCE) WinExec(T2A(key),showcmd);
+				result = (HINSTANCE) TWinExec(key, (WORD)showcmd);
 			}
 		}
 	}

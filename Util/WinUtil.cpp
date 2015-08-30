@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,6 +18,11 @@
 */
 
 #include "StdAfx.h"
+
+#ifdef _UNICODE
+#include <atlbase.h>
+#endif
+
 #include "WinUtil.h"
 #include "MemUtil.h"
 #include "StrUtil.h"
@@ -26,6 +31,13 @@
 static unsigned char g_shaLastString[32];
 
 #ifndef _WIN32_WCE
+
+#ifdef _UNICODE
+#define CF_TTEXTEX CF_UNICODETEXT
+#else
+#define CF_TTEXTEX CF_TEXT
+#endif
+
 C_FN_SHARE void CopyStringToClipboard(const TCHAR *lptString)
 {
 	unsigned long uDataSize;
@@ -57,7 +69,7 @@ C_FN_SHARE void CopyStringToClipboard(const TCHAR *lptString)
 	_tcscpy((TCHAR *)globalData, lptString); // Copy string plus NULL-byte to global memory
 	GlobalUnlock(globalHandle); // Unlock before SetClipboardData!
 
-	VERIFY(SetClipboardData(CF_TEXT, globalHandle)); // Set clipboard data to our global memory block
+	VERIFY(SetClipboardData(CF_TTEXTEX, globalHandle)); // Set clipboard data to our global memory block
 	VERIFY(CloseClipboard()); // Close clipboard, and done
 
 	sha256_ctx shactx;
@@ -77,7 +89,7 @@ C_FN_SHARE void ClearClipboardIfOwner()
 		return;
 	}
 
-	HANDLE hClipboardData = GetClipboardData(CF_TEXT);
+	HANDLE hClipboardData = GetClipboardData(CF_TTEXTEX);
 	if(hClipboardData == NULL) { CloseClipboard(); return; }
 
 	TCHAR *lpString = (TCHAR *)GlobalLock(hClipboardData);
@@ -117,7 +129,7 @@ C_FN_SHARE BOOL MakeClipboardDelayRender(HWND hOwner, HWND *phNextCB)
 				*phNextCB = SetClipboardViewer(hOwner);
 
 		EmptyClipboard();
-		SetClipboardData(CF_TEXT, NULL);
+		SetClipboardData(CF_TTEXTEX, NULL);
 		CloseClipboard();
 	}
 
@@ -138,12 +150,12 @@ C_FN_SHARE void CopyDelayRenderedClipboardData(const TCHAR *lptString)
 
     // Copy the text from pboxLocalClip
 	lptstr = (LPTSTR)GlobalLock(hglb);
-	if(cch > 1) memcpy(lptstr, lptString, cch * sizeof(TCHAR)); 
+	if(cch > 1) memcpy(lptstr, lptString, cch * sizeof(TCHAR));
     lptstr[cch] = (TCHAR)0;
     GlobalUnlock(hglb);
 
-    // Put the delayed clipboard data in the clipboard. 
-    SetClipboardData(CF_TEXT, hglb); 
+    // Put the delayed clipboard data in the clipboard.
+    SetClipboardData(CF_TTEXTEX, hglb);
 };
 #endif
 
@@ -177,7 +189,7 @@ CPP_FN_SHARE CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile
 	hShl = LoadLibrary(_T("ShlWApi.dll"));
 	if(hShl == NULL) return CString(lpTargetFile);
 
-	lpRel = (LPPATHRELATIVEPATHTO)GetProcAddress(hShl, _T(PRPT_API_NAME));
+	lpRel = (LPPATHRELATIVEPATHTO)GetProcAddress(hShl, PRPT_API_NAME);
 	if(lpRel != NULL)
 	{
 		bResult = lpRel(tszPath, lpBaseFile, 0, lpTargetFile, 0);
@@ -266,7 +278,7 @@ C_FN_SHARE BOOL OpenUrlInNewBrowser(LPCTSTR lpURL)
 		pos = _tcsstr(tszKey, _T("\"%1\""));
 		if(pos == NULL) // No quotes found
 		{
-			pos = _tcsstr(tszKey, _T("%1")); // Check for %1, without quotes 
+			pos = _tcsstr(tszKey, _T("%1")); // Check for %1, without quotes
 			if(pos == NULL) // No parameter at all...
 				pos = tszKey + _tcslen(tszKey) - 1;
 			else
@@ -277,7 +289,7 @@ C_FN_SHARE BOOL OpenUrlInNewBrowser(LPCTSTR lpURL)
 		_tcscat(pos, _T(" "));
 		_tcscat(pos, lpURL);
 
-		uResult = WinExec(tszKey, KPSW_SHOWDEFAULT);
+		uResult = TWinExec(tszKey, KPSW_SHOWDEFAULT);
 	}
 
 	return uResult > 31 ? TRUE : FALSE;
@@ -322,7 +334,7 @@ C_FN_SHARE BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 		_tcscat(tszKey, (LPCTSTR)strURL);
 
 		// Execute the ssh client
-		bResult = WinExec(tszKey, KPSW_SHOWDEFAULT) > 31 ? TRUE : FALSE;
+		bResult = (TWinExec(tszKey, KPSW_SHOWDEFAULT) > 31) ? TRUE : FALSE;
 	}
 	else if(strURL.Find(_T("telnet:")) >= 0)
 	{
@@ -346,7 +358,7 @@ C_FN_SHARE BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 		_tcscat(tszKey, strURL.GetBuffer(0));
 
 		// Execute the ssh client
-		bResult = WinExec(tszKey, KPSW_SHOWDEFAULT) > 31 ? TRUE : FALSE;
+		bResult = (TWinExec(tszKey, KPSW_SHOWDEFAULT) > 31) ? TRUE : FALSE;
 	}
 
 	return bResult;
@@ -355,7 +367,6 @@ C_FN_SHARE BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 C_FN_SHARE void OpenUrlEx(LPCTSTR lpURL)
 {
 	ASSERT(lpURL != NULL); if(lpURL == NULL) return;
-
 	if(_tcslen(lpURL) == 0) return;
 
 	if(_tcsncmp(lpURL, _T("http://"), 7) == 0)
@@ -370,8 +381,10 @@ C_FN_SHARE void OpenUrlEx(LPCTSTR lpURL)
 	}
 	else if(_tcsncmp(lpURL, _T("cmd://"), 6) == 0)
 	{
-		if(_tcslen(lpURL) != 6)
-			WinExec(((LPCSTR)lpURL) + (6 * sizeof(TCHAR)), KPSW_SHOWDEFAULT);
+		if(_tcslen(lpURL) > 6)
+		{
+			TWinExec(&lpURL[6], KPSW_SHOWDEFAULT);
+		}
 	}
 	else ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, KPSW_SHOWDEFAULT);
 }
@@ -534,18 +547,38 @@ C_FN_SHARE BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
 	str += _T("::/");
 	str += lpTopicFile;
 
-	WinExec((LPCTSTR)str, KPSW_SHOWDEFAULT);
-
-	// STARTUPINFO sui;
-	// PROCESS_INFORMATION pi;
-	// ZeroMemory(&sui, sizeof(STARTUPINFO)); sui.cb = sizeof(STARTUPINFO);
-	// ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
-	// // Required: full path to executable + short executable as argv[0] in command-line
-	// CreateProcess("C:\\Windows\\hh.exe", (LPTSTR)(LPCTSTR)str, NULL, NULL, FALSE, 0, NULL, NULL, &sui, &pi);
-	// LPVOID lpMsgBuf;
-	// FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL);
-	// MessageBox( NULL, (LPCTSTR)lpMsgBuf, "Error", MB_OK | MB_ICONINFORMATION );
-	// LocalFree( lpMsgBuf );
+	TWinExec(str, KPSW_SHOWDEFAULT);
 
 	return TRUE;
+}
+
+C_FN_SHARE UINT TWinExec(LPCTSTR lpCmdLine, WORD wCmdShow)
+{
+    STARTUPINFO sui;
+	PROCESS_INFORMATION pi;
+	BOOL bResult;
+
+	ASSERT(lpCmdLine != NULL);
+	if(lpCmdLine == NULL) return ERROR_PATH_NOT_FOUND;
+
+	ZeroMemory(&sui, sizeof(STARTUPINFO));
+	sui.cb = sizeof(STARTUPINFO);
+	sui.wShowWindow = wCmdShow;
+	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
+
+	DWORD dwCmdLen = _tcslen(lpCmdLine);
+	LPTSTR lp = new TCHAR[dwCmdLen + 2];
+	_tcscpy(lp, lpCmdLine);
+
+	bResult = CreateProcess(NULL, lp, NULL, NULL, FALSE, 0, NULL, NULL, &sui, &pi);
+
+	// LPVOID lpMsgBuf;
+	// FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL);
+	// MessageBox(NULL, (LPCTSTR)lpMsgBuf, _T("Error"), MB_OK | MB_ICONINFORMATION);
+	// LocalFree(lpMsgBuf);
+
+	CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+
+	return (bResult != FALSE) ? 32 : ERROR_FILE_NOT_FOUND;
 }

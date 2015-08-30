@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ C_FN_SHARE TCHAR *MakeSafeXmlString(const TCHAR *ptString);
 C_FN_SHARE size_t szlen(const char *pszString);
 C_FN_SHARE char *szcpy(char *szDestination, const char *szSource);
 
-CPP_FN_SHARE CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart);
+CPP_FN_SHARE CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart, DWORD dwInstance);
 CPP_FN_SHARE CString TagSimString(LPCTSTR lpString);
 
 C_FN_SHARE void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath);

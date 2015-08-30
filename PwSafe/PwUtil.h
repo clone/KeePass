@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,5 +27,7 @@ C_FN_SHARE DWORD EstimatePasswordBits(const TCHAR *pszPassword);
 
 C_FN_SHARE BOOL LoadHexKey32(FILE *fp, BYTE *pBuf);
 C_FN_SHARE BOOL SaveHexKey32(FILE *fp, BYTE *pBuf);
+
+CPP_FN_SHARE CString PWM_FormatStaticError(int nErrorCode, DWORD dwFlags);
 
 #endif // ___PW_UTIL_H___

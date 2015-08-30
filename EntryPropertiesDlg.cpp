@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -77,6 +77,7 @@ BEGIN_MESSAGE_MAP(CEntryPropertiesDlg, CDialog)
 	ON_COMMAND(ID_EXPIRES_3MONTHS, OnExpires3Months)
 	ON_COMMAND(ID_EXPIRES_6MONTHS, OnExpires6Months)
 	ON_COMMAND(ID_EXPIRES_12MONTHS, OnExpires12Months)
+	ON_COMMAND(ID_EXPIRES_NOW, OnExpiresNow)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -255,10 +256,10 @@ void CEntryPropertiesDlg::OnCheckModIcon()
 void CEntryPropertiesDlg::OnSetDefaultExpireBtn() 
 {
 	if(m_dwDefaultExpire == 0) return;
-	SetExpireDays(m_dwDefaultExpire);
+	SetExpireDays(m_dwDefaultExpire, FALSE);
 }
 
-void CEntryPropertiesDlg::SetExpireDays(DWORD dwDays)
+void CEntryPropertiesDlg::SetExpireDays(DWORD dwDays, BOOL bSetTime)
 {
 	UpdateData(TRUE);
 
@@ -267,39 +268,44 @@ void CEntryPropertiesDlg::SetExpireDays(DWORD dwDays)
 	CTime t = CTime::GetCurrentTime();
 	t += CTimeSpan((LONG)dwDays, 0, 0, 0);
 
-	m_editDate.SetDate(t);
-	// m_editTime.SetTime(t); // Daylight saving
+	m_editDate.SetDate(t); // Beware of daylight saving
+	if(bSetTime == TRUE) m_editTime.SetTime(t);
 
 	UpdateData(FALSE);
 	OnCheckModExpire();
 }
 
+void CEntryPropertiesDlg::OnExpiresNow() 
+{
+	SetExpireDays(0, TRUE);
+}
+
 void CEntryPropertiesDlg::OnExpires1Week() 
 {
-	SetExpireDays(7);
+	SetExpireDays(7, FALSE);
 }
 
 void CEntryPropertiesDlg::OnExpires2Weeks() 
 {
-	SetExpireDays(14);
+	SetExpireDays(14, FALSE);
 }
 
 void CEntryPropertiesDlg::OnExpires1Month() 
 {
-	SetExpireDays(30);
+	SetExpireDays(30, FALSE);
 }
 
 void CEntryPropertiesDlg::OnExpires3Months() 
 {
-	SetExpireDays(91);
+	SetExpireDays(91, FALSE);
 }
 
 void CEntryPropertiesDlg::OnExpires6Months() 
 {
-	SetExpireDays(182);
+	SetExpireDays(182, FALSE);
 }
 
 void CEntryPropertiesDlg::OnExpires12Months() 
 {
-	SetExpireDays(365);
+	SetExpireDays(365, FALSE);
 }

@@ -1,3 +1,53 @@
+06/01/02 - 1.04
+- Added dialog that lets you select an entry if multiple
+  entries match the current window when pressing the global
+  auto-type hotkey (previously KeePass always just used the
+  first entry that matched, now you can select the right entry)
+- An entry now can have multiple Auto-Type-Window strings
+- User input is now blocked while KeePass is auto-typing
+- URLs in note fields are clickable now (including entry
+  preview window)
+- KeePass now supports all protocols in URLs that delimit the
+  protocol prefix and the address using '://'
+- Default auto-type sequence for TAN entries now is {PASSWORD}
+- Added option to show TANs in a more simple list view
+- Added option to show TAN indices in entry titles
+- TANs are marked as used/expired when auto-typing them
+- Fixed a bug that prevented several auto-type codes from
+  working
+- New auto-type code: {CLEARFIELD} clears the contents of the
+  edit control that currently has the focus
+- On Windows 2000 simple asterisks are displayed now instead
+  of black dots as on Windows XP
+- Added option to exit the program instead of locking the
+  workspace after the specified time
+- Added option to open a database in read-only mode
+- Added error code for 'key-file not accessible'
+- Context menus in the main window now popup lightning fast
+- Added filename filters for single group exports
+- CHM documentation file now supports full-text search
+- Added version compatibility page to the CHM documentation
+- Replaced duplicate 'user' icon by a 'wireless' icon
+- For plugin developers: parameters of _OpenDatabase and
+  _ChangeMasterKey are now passed to the plugin (pointer array)
+- Tray icon is recreated after Windows Explorer crashes (thanks
+  to Kenneth Ballard for the patch)
+- Renamed '?' menu to 'Help'
+- Renamed 'Extras' menu to 'Tools'
+- Removed 'Print Group' command from 'Edit' in the main menu
+  (use the context menu of a group to print it)
+- Changed menu accelerator key to close the database to Ctrl-W
+- Removed 'Open License' and 'Print License' from 'Help' menu
+- Moved program options from 'Edit' menu into 'Tools' menu
+- Improved main menu (fixed dots, item positions, ...)
+- Added option to override entry URLs (URL-Override:)
+- Code fixes (KeePass should compile cleanly now with VC 2005)
+- Improved Unicode support (thanks to Norbert Schulze)
+- Changed font from MS Sans Serif to MS Shell Dlg
+- Translation files must now be UTF-8 encoded
+- Some dialog/lock timing improvements
+- Minor other improvements
+
 05/09/10 - 1.03
 - Added option to copy URLs to the clipboard instead of
   launching them (exception: cmd:// protocol, these URLs will

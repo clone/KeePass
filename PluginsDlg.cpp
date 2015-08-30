@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL CPluginsDlg::OnInitDialog() 
+BOOL CPluginsDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
@@ -126,12 +126,12 @@ BOOL CPluginsDlg::OnInitDialog()
 	return TRUE;
 }
 
-void CPluginsDlg::OnOK() 
+void CPluginsDlg::OnOK()
 {
 	CDialog::OnOK();
 }
 
-void CPluginsDlg::OnCancel() 
+void CPluginsDlg::OnCancel()
 {
 	CDialog::OnCancel();
 }
@@ -167,13 +167,13 @@ void CPluginsDlg::UpdateGUI()
 		lvi.mask = LVIF_TEXT;
 
 		if((p->hinstDLL != NULL) && (p->bEnabled == FALSE))
-			lvi.pszText = (TCHAR *)TRL("This plugin will be disabled after you restart KeePass.");
+			lvi.pszText = (LPTSTR)TRL("This plugin will be disabled after you restart KeePass.");
 		else if((p->hinstDLL != NULL) && (p->bEnabled == TRUE))
-			lvi.pszText = (TCHAR *)TRL("Enabled, loaded");
+			lvi.pszText = (LPTSTR)TRL("Enabled, loaded");
 		else if((p->hinstDLL == NULL) && (p->bEnabled == FALSE))
-			lvi.pszText = (TCHAR *)TRL("Disabled, not loaded");
+			lvi.pszText = (LPTSTR)TRL("Disabled, not loaded");
 		else if((p->hinstDLL == NULL) && (p->bEnabled == TRUE))
-			lvi.pszText = (TCHAR *)TRL("This plugin will be enabled after you restart KeePass.");
+			lvi.pszText = (LPTSTR)TRL("This plugin will be enabled after you restart KeePass.");
 		else { ASSERT(FALSE); lvi.pszText = _T(""); }
 
 		lvi.iSubItem = 1;
@@ -181,12 +181,12 @@ void CPluginsDlg::UpdateGUI()
 
 		lvi.iSubItem = 2;
 		strT.Format(_T("%u"), p->dwPluginID);
-		lvi.pszText = (TCHAR *)(LPCTSTR)strT;
+		lvi.pszText = (LPTSTR)(LPCTSTR)strT;
 		m_cList.SetItem(&lvi);
 	}
 }
 
-void CPluginsDlg::OnRClickPluginsList(NMHDR* pNMHDR, LRESULT* pResult) 
+void CPluginsDlg::OnRClickPluginsList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	DWORD dwID = GetSelectedPluginID();
 	KP_PLUGIN_INSTANCE *p = m_pPiMgr->GetPluginByID(dwID);
@@ -263,6 +263,7 @@ DWORD CPluginsDlg::GetSelectedPluginID()
 	LV_ITEM lvi;
 	TCHAR tszBuf[13];
 
+	tszBuf[12] = 0;
 	ZeroMemory(&lvi, sizeof(LV_ITEM));
 
 	for(i = 0; i < (DWORD)m_cList.GetItemCount(); i++)
@@ -284,7 +285,7 @@ DWORD CPluginsDlg::GetSelectedPluginID()
 	return DWORD_MAX;
 }
 
-void CPluginsDlg::OnPluginEnable() 
+void CPluginsDlg::OnPluginEnable()
 {
 	DWORD dwID = GetSelectedPluginID();
 	if(dwID == DWORD_MAX) return;
@@ -294,7 +295,7 @@ void CPluginsDlg::OnPluginEnable()
 	UpdateGUI();
 }
 
-void CPluginsDlg::OnPluginDisable() 
+void CPluginsDlg::OnPluginDisable()
 {
 	DWORD dwID = GetSelectedPluginID();
 	if(dwID == DWORD_MAX) return;
@@ -304,14 +305,14 @@ void CPluginsDlg::OnPluginDisable()
 	UpdateGUI();
 }
 
-void CPluginsDlg::OnPluginConfig() 
+void CPluginsDlg::OnPluginConfig()
 {
 	DWORD dwID = GetSelectedPluginID();
 	ASSERT(dwID != DWORD_MAX); if(dwID == DWORD_MAX) return;
 	m_pPiMgr->CallSinglePlugin(dwID, KPM_DIRECT_CONFIG, 0, 0);
 }
 
-void CPluginsDlg::OnPluginAbout() 
+void CPluginsDlg::OnPluginAbout()
 {
 	DWORD dwID = GetSelectedPluginID();
 	ASSERT(dwID != DWORD_MAX); if(dwID == DWORD_MAX) return;

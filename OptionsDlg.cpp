@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -221,22 +221,23 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Automatically generate random passwords for new entries"), &m_bAutoPwGen, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Include backup entries in quick searches (toolbar)"), &m_bQuickFindIncBackup, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Show full path in the titlebar (instead of filename only)"), &m_bShowFullPath, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Exit program instead of locking the workspace after the specified time"), &m_bExitInsteadOfLockAT, NULL, OL_LINK_NULL);
 
 	TCITEM tci;
 	ZeroMemory(&tci, sizeof(TCITEM));
 	tci.mask = TCIF_TEXT | TCIF_IMAGE;
 
-	tci.cchTextMax = _tcslen(TRL(OPTSZ_SECURITY)); tci.pszText = (char *)TRL(OPTSZ_SECURITY);
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_SECURITY)); tci.pszText = (LPTSTR)TRL(OPTSZ_SECURITY);
 	tci.iImage = 29; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
-	tci.cchTextMax = _tcslen(TRL(OPTSZ_GUI)); tci.pszText = (char *)TRL(OPTSZ_GUI);
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_GUI)); tci.pszText = (LPTSTR)TRL(OPTSZ_GUI);
 	tci.iImage = 6; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
-	tci.cchTextMax = _tcslen(TRL(OPTSZ_FILES)); tci.pszText = (char *)TRL(OPTSZ_FILES);
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_FILES)); tci.pszText = (LPTSTR)TRL(OPTSZ_FILES);
 	tci.iImage = 26; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
-	tci.cchTextMax = _tcslen(TRL(OPTSZ_MEMORY)); tci.pszText = (char *)TRL(OPTSZ_MEMORY);
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_MEMORY)); tci.pszText = (LPTSTR)TRL(OPTSZ_MEMORY);
 	tci.iImage = 42; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
-	tci.cchTextMax = _tcslen(TRL(OPTSZ_SETUP)); tci.pszText = (char *)TRL(OPTSZ_SETUP);
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_SETUP)); tci.pszText = (LPTSTR)TRL(OPTSZ_SETUP);
 	tci.iImage = 30; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
-	tci.cchTextMax = _tcslen(TRL(OPTSZ_ADVANCED)); tci.pszText = (char *)TRL(OPTSZ_ADVANCED);
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_ADVANCED)); tci.pszText = (LPTSTR)TRL(OPTSZ_ADVANCED);
 	tci.iImage = 21; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
 
 	m_tabMenu.SetCurSel(0);
@@ -304,7 +305,7 @@ void COptionsDlg::OnBtnSelFont()
 	strFace = strFontSpec.Left(nChars);
 	strSize = strFontSpec.Mid(nChars + 1, nSizeEnd - nChars - 1);
 	strFlags = strFontSpec.Right(4);
-	int nSize = atoi((LPCTSTR)strSize);
+	int nSize = _ttoi((LPCTSTR)strSize);
 	int nWeight = FW_NORMAL;
 	if(strFlags.GetAt(0) == _T('1')) nWeight = FW_BOLD;
 	BYTE bItalic = (BYTE)((strFlags.GetAt(1) == _T('1')) ? TRUE : FALSE);
@@ -317,14 +318,14 @@ void COptionsDlg::OnBtnSelFont()
 	ASSERT(hDC != NULL);
 	if(hDC != NULL) lf.lfHeight = -MulDiv(nSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
 	else { ASSERT(FALSE); lf.lfHeight = -nSize; }
-	ReleaseDC(pDC);
+	ReleaseDC(pDC); pDC = NULL;
 
 	lf.lfWidth = 0; lf.lfEscapement = 0; lf.lfOrientation = 0;
 	lf.lfWeight = nWeight; lf.lfItalic = bItalic; lf.lfUnderline = bUnderlined;
 	lf.lfStrikeOut = bStrikeOut; lf.lfCharSet = DEFAULT_CHARSET;
 	lf.lfOutPrecision = OUT_DEFAULT_PRECIS; lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
 	lf.lfQuality = DEFAULT_QUALITY; lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-	strcpy(lf.lfFaceName, (LPCTSTR)strFace);
+	_tcscpy(lf.lfFaceName, strFace);
 
 	CFontDialog dlg(&lf);
 	CString strTemp;
@@ -429,7 +430,7 @@ void COptionsDlg::NotifyAssocChanged()
 	hShell32 = LoadLibrary(_T("Shell32.dll"));
 	if(hShell32 != NULL)
 	{
-		lpSHChangeNotify = (LPSHCHANGENOTIFY)GetProcAddress(hShell32, _T("SHChangeNotify"));
+		lpSHChangeNotify = (LPSHCHANGENOTIFY)GetProcAddress(hShell32, "SHChangeNotify");
 
 		if(lpSHChangeNotify != NULL)
 		{

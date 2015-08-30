@@ -1,4 +1,4 @@
-|~LANGUAGEVERSION| |1.02|
+|~LANGUAGEVERSION| |1.03|
 |~LANGUAGEAUTHOR|     |DonAngel|
 |~LANGUAGEAUTHOREMAIL| |public@doncho.net|
 |~LANGUAGENAME|       |Български|
@@ -891,10 +891,6 @@
 |If you select this option, KeePass will create new IDs for all groups and entries. Consequently no existing groups and entries of the currently opened database will be modified or overwritten.|
 	|Ако се избере тази опция, KeePass ще създаде нови IDта за всички групи и записи. Следователно нито съществуващи групи, нито записи от отворената база данни ще бъдат модифицирани или презаписани.|
 
-|KeePass will compare the last-modified times of the groups/entries and replace the existing
- ones only if the ones to import are newer.|
-	|KeePass ще сравни времената на последна модификация на групите/записите и ще подмени съществуващите само ако импортираните са по-нови.|
-	
 |KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.|
 	|KeePass ще подмени всички съществуващи групи и записи с тези от импортирания файл, ако техните ИДта съответстват.|
 |Overwrite|
@@ -919,3 +915,13 @@
 	|Потр.име|
 |User Name:|
 	|Потр.име:|
+
+|Copy &URL To Clipboard|
+	|Копиране на &URL-а в клипбоарда|
+|Copy URLs to clipboard instead of launching them (exception: cmd:// URLs)|
+	|Копира URL-ите в клипборда вместо да ги стартира (освен: cmd:// URL-ите)|
+|Disable all auto-type features|
+	|Забрана на всички авто-попълващи услуги|
+|KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.|
+	|KeePass ще сравнява времената на последна модификация на групите/записите и ще замества съществуващи само ако внасяните са по-нови.|
+

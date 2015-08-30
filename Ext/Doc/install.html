@@ -9,45 +9,71 @@
 
 <table class="tablebox"><tr><td class="boxtitle">
 <img src="images/movepaper.gif" width="31px" height="21px" class="singleimg">
-Installation, Uninstallation and Portability</td></tr></table>
+Installation, Uninstallation, Portability and Updates</td></tr></table>
 <br />
+<h3>Installation / Uninstallation / Portability</h3>
+
 When downloading KeePass, you have the choice between 3 different packages:
 
 <ul>
-<li><b>KeePass-<i>X.XXx</i>.zip:</b> The binary ZIP package.</li>
+<li><b>KeePass-<i>X.XXx</i>.zip:</b> The binary ZIP package (portable version).</li>
 <li><b>KeePass-<i>X.XXx</i>-Setup.exe:</b> A Windows installer package.</li>
 <li><b>KeePass-<i>X.XXx</i>-Src.zip:</b> The full source code.</li>
 </ul>
 
 KeePass does not need to be installed. Just download the binary ZIP package, unpack
 it with your favorite packer and KeePass is ready to be used. Copy it to
-a location of your choice (for example onto your portable USB stick), no
+a location of your choice (for example onto your USB stick), no
 additional configuration or installation is needed.<br />
 <br />
 The KeePass development team also provides you an installer, which automates
-creating links in the startmenu etc. Apart from those integration options, there's
+creating links in the start menu etc. Apart from those integration options, there's
 nothing different from the binary ZIP package.<br />
 <br />
 In contrast to many other applications, KeePass does not use any functions that require
 the latest Windows operating system, such like theming on XP or like a .NET application that
-requires the .NET framework.<br />
+requires the .NET framework. It runs perfectly on older systems without any
+feature limitations.<br />
 <br />
 The source code package contains everything you need to compile KeePass. It includes
 all C++ source code and header files, resource files, source files of the documentation,
 all the latest language/translation files, sources for building the installer, etc.<br />
 <br />
 KeePass doesn't store anything on your system. The program doesn't create any new
-registry keys and it doesn't create any initialization files (ini) in your Windows directory.
+registry keys and it doesn't create any initialization files (INI) in your Windows directory.
 Deleting the KeePass directory (in case you downloaded the binary zip package) or using the
 uninstaller (in case you downloaded the installer package) leaves no trace of KeePass on your
 system.<br />
 <br />
-When using the portable version, make sure that KeePass has write access to
+When using the portable version (the files in the binary ZIP package), make sure
+that KeePass has write access to
 its application directory. Otherwise, if it doesn't have, it'll attempt
 to store the configuration options (nothing security-relevant though) into the
 application configuration directory of the currently logged on user.
 For more about that, see this page:
-<a href="faq.html#nooptsave" target="_self">Option Saving</a>.
+<a href="faq.html#nooptsave" target="_self">Option Saving</a>.<br />
+<br />
+<br />
+
+<h3>Updating KeePass</h3>
+
+When a new KeePass version has been released, you can update your existing KeePass
+installation without losing any configuration settings.<br />
+<br />
+If you were using the <b>binary ZIP package</b>, download the latest one, unpack it
+and copy all new files over the old ones. Your configuration settings won't be lost (they
+are stored in the <i>KeePass.ini</i> file, which won't be overwritten because binary ZIPs don't
+include a <i>KeePass.ini</i> file).<br />
+<br />
+If you were using the <b>Windows installer package</b>, first backup the <i>KeePass.ini</i> file
+in the KeePass directory, then uninstall the old version. Download the latest Windows installer
+package of KeePass and install it. Copy the old <i>KeePass.ini</i> (which you backed up) into
+the directory to which you installed the new version.<br />
+<br />
+
+Translations should also be updated when you install a new KeePass version. You can find the
+latest translation files here:
+<a href="http://keepass.sourceforge.net/translations.php" target="_blank">KeePass translations</a>.
 
 </body>
 </html>

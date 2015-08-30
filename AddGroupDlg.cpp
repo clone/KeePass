@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -106,15 +106,14 @@ BOOL CAddGroupDlg::OnInitDialog()
 
 void CAddGroupDlg::OnOK() 
 {
-	CString strRef = TRL(PWS_SEARCHGROUP), strTest;
+	CString strRef = PWS_SEARCHGROUP, strTest; // PWS_SEARCHGROUP is translated
 	strRef.MakeLower();
 
 	UpdateData(TRUE);
 
 	if(m_strGroupName.GetLength() == 0)
 	{
-		MessageBox(TRL("Enter a group name!"),
-			TRL("Stop"), MB_ICONINFORMATION);
+		MessageBox(TRL("Enter a group name!"), TRL("Stop"), MB_ICONINFORMATION);
 		return;
 	}
 	strTest = m_strGroupName;

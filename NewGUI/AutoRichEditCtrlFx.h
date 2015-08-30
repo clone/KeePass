@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,6 +25,19 @@
 #endif // _MSC_VER > 1000
 
 #include "../Util/SysDefEx.h"
+
+#ifdef _UNICODE	
+class _AFX_RICHEDITEX_STATE
+{
+public:
+	_AFX_RICHEDITEX_STATE();
+	virtual ~_AFX_RICHEDITEX_STATE();
+
+	HINSTANCE m_hInstRichEdit20;
+};
+
+BOOL PASCAL AfxInitRichEditEx();
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CAutoRichEditCtrl window
@@ -53,6 +66,10 @@ protected:
 private:
 	static DWORD CALLBACK CBStreamIn(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb);
 	static DWORD CALLBACK CBStreamOut(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb);
+
+#ifdef _UNICODE	
+	static DWORD CALLBACK CBStreamInRTF(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb);
+#endif	
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -81,6 +81,24 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\PwSafe.ico"
+IDI_KEY                 ICON    DISCARDABLE     "res\\key.ico"
+IDI_SEARCH              ICON    DISCARDABLE     "res\\search.ico"
+IDI_ICONPIC             ICON    DISCARDABLE     "res\\iconpic.ico"
+IDI_WORLD               ICON    DISCARDABLE     "res\\world.ico"
+IDI_OPTIONS             ICON    DISCARDABLE     "res\\options.ico"
+IDI_LOCKED              ICON    DISCARDABLE     "res\\locked.ico"
+IDI_UNLOCKED            ICON    DISCARDABLE     "res\\unlocked.ico"
+IDI_KEYHOLE             ICON    DISCARDABLE     "res\\keyhole.ico"
+IDI_PLUGINS             ICON    DISCARDABLE     "res\\plugins.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // Dialog
 //
 
@@ -88,7 +106,7 @@ IDD_CHECKOPTIONS_DLG DIALOG DISCARDABLE  0, 0, 273, 210
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_CAPTION>"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,138,189,62,14
     PUSHBUTTON      "&Cancel",IDCANCEL,204,189,62,14
@@ -101,9 +119,9 @@ IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 268, 132
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "About KeePass..."
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "Copyright © 2003-2005 Dominik Reichl.",IDC_STATIC,7,7,
+    LTEXT           "Copyright © 2003-2006 Dominik Reichl.",IDC_STATIC,7,7,
                     254,8
     DEFPUSHBUTTON   "&OK",IDOK,199,111,62,14,WS_GROUP
     LTEXT           "KeePass is OSI Certified Open Source Software.",
@@ -123,7 +141,7 @@ STYLE DS_3DLOOK | DS_NOFAILCREATE | WS_MINIMIZEBOX | WS_MAXIMIZEBOX |
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "Password Safe"
 MENU IDR_MAINMENU
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_MENULINE,"Static",SS_ETCHEDHORZ,0,0,69,1
     EDITTEXT        IDC_EDIT_QUICKFIND,213,2,88,13,ES_AUTOHSCROLL
@@ -131,8 +149,8 @@ BEGIN
                     TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | 
                     WS_BORDER | WS_TABSTOP,7,45,114,127
     CONTROL         "List1",IDC_PWLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | WS_BORDER | 
-                    WS_TABSTOP,135,27,144,129
+                    LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | 
+                    LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,135,27,144,129
     CONTROL         "",IDC_RE_ENTRYVIEW,"RICHEDIT",ES_MULTILINE | 
                     ES_AUTOVSCROLL | ES_READONLY | ES_WANTRETURN | WS_BORDER | 
                     WS_VSCROLL | WS_TABSTOP,136,162,248,52
@@ -167,7 +185,7 @@ IDD_PASSWORD_DLG DIALOGEX 0, 0, 352, 140
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_TITLE>"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     LTEXT           "Enter password:",IDC_STATIC_ENTERPW,13,40,94,8
     EDITTEXT        IDC_EDIT_PASSWORD,109,38,209,14,ES_PASSWORD | 
@@ -197,7 +215,7 @@ IDD_ADDENTRY_DLG DIALOGEX 0, 0, 315, 279
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_TITLE>"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,189,258,58,14
     PUSHBUTTON      "&Cancel",IDCANCEL,250,258,58,14
@@ -251,7 +269,7 @@ IDD_ICONPICKER_DLG DIALOG DISCARDABLE  0, 0, 320, 210
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Pick an icon"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,194,189,58,14
     PUSHBUTTON      "&Cancel",IDCANCEL,255,189,58,14
@@ -266,7 +284,7 @@ IDD_ADDGROUP_DLG DIALOG DISCARDABLE  0, 0, 262, 71
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_TITLE>"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,137,50,57,14
     PUSHBUTTON      "&Cancel",IDCANCEL,198,50,57,14
@@ -281,7 +299,7 @@ IDD_GETRANDOM_DLG DIALOGEX 0, 0, 402, 215
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Get Random"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,277,194,57,14
     PUSHBUTTON      "&Cancel",IDCANCEL,338,194,57,14
@@ -313,7 +331,7 @@ IDD_PW_GENERATOR_DLG DIALOGEX 0, 0, 316, 274
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Password Generator"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Accept",IDOK,189,253,58,14
     PUSHBUTTON      "&Cancel",IDCANCEL,251,253,58,14
@@ -348,7 +366,7 @@ IDD_FIND_DLG DIALOG DISCARDABLE  0, 0, 231, 148
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Find text in password list"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Find",IDOK,105,127,58,14
     PUSHBUTTON      "&Cancel",IDCANCEL,166,127,58,14
@@ -379,13 +397,13 @@ IDD_LANGUAGES_DLG DIALOG DISCARDABLE  0, 0, 460, 212
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Load language file"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Close",IDCANCEL,397,191,56,14
     CONTROL         "List1",IDC_LANGUAGES_LIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SORTASCENDING | LVS_SHAREIMAGELISTS | 
                     LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,446,179
-    PUSHBUTTON      "&Get more languages...",IDC_BTN_GETLANGUAGE,7,191,149,
+    PUSHBUTTON      "&Get more languages...",IDC_BTN_GETLANGUAGE,7,191,125,
                     14
 END
 
@@ -393,7 +411,7 @@ IDD_OPTIONS_DLG DIALOG DISCARDABLE  0, 0, 394, 225
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Options"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,269,204,56,14
     PUSHBUTTON      "&Cancel",IDCANCEL,331,204,56,14
@@ -477,7 +495,7 @@ IDD_ENTRYPROPERTIES_DLG DIALOG DISCARDABLE  0, 0, 351, 114
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_TITLE>"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,217,93,61,14
     PUSHBUTTON      "&Cancel",IDCANCEL,283,93,61,14
@@ -501,7 +519,7 @@ IDD_TANWIZARD_DLG DIALOG DISCARDABLE  0, 0, 378, 258
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "TAN Wizard"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,239,237,64,14
     PUSHBUTTON      "&Cancel",IDCANCEL,307,237,64,14
@@ -522,20 +540,22 @@ IDD_ENTRYLIST_DLG DIALOG DISCARDABLE  0, 0, 413, 255
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_TITLE>"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
-    DEFPUSHBUTTON   "&Close",IDOK,348,234,58,14
+    PUSHBUTTON      "&Close",IDCANCEL,348,234,58,14
     CONTROL         "List1",IDC_ENTRYLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHAREIMAGELISTS | WS_BORDER | 
-                    WS_TABSTOP,7,20,399,210
-    LTEXT           "Click on an entry to jump to it.",IDC_STATIC,7,7,399,8
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | 
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,20,399,210
+    LTEXT           "Click on an entry to jump to it.",IDC_STATIC_LISTTEXT,7,
+                    7,399,8
+    LTEXT           "<>",IDC_STATIC_PRODUCTNAME,7,239,143,8,WS_DISABLED
 END
 
 IDD_DBSETTINGS_DLG DIALOG DISCARDABLE  0, 0, 377, 146
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Database Settings"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,247,125,59,14
     PUSHBUTTON      "&Cancel",IDCANCEL,311,125,59,14
@@ -561,7 +581,7 @@ IDD_PLUGINS_DLG DIALOG DISCARDABLE  0, 0, 414, 199
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Plugin Manager"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Close",IDOK,347,178,60,14
     CONTROL         "List1",IDC_PLUGINS_LIST,"SysListView32",LVS_REPORT | 
@@ -576,7 +596,7 @@ IDD_IMPORT_OPTIONS_DLG DIALOG DISCARDABLE  0, 0, 318, 177
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Options"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,191,156,58,14
     PUSHBUTTON      "&Cancel",IDCANCEL,253,156,58,14
@@ -752,24 +772,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDR_MAINFRAME           ICON    DISCARDABLE     "res\\PwSafe.ico"
-IDI_KEY                 ICON    DISCARDABLE     "res\\key.ico"
-IDI_SEARCH              ICON    DISCARDABLE     "res\\search.ico"
-IDI_ICONPIC             ICON    DISCARDABLE     "res\\iconpic.ico"
-IDI_WORLD               ICON    DISCARDABLE     "res\\world.ico"
-IDI_OPTIONS             ICON    DISCARDABLE     "res\\options.ico"
-IDI_LOCKED              ICON    DISCARDABLE     "res\\locked.ico"
-IDI_UNLOCKED            ICON    DISCARDABLE     "res\\unlocked.ico"
-IDI_KEYHOLE             ICON    DISCARDABLE     "res\\keyhole.ico"
-IDI_PLUGINS             ICON    DISCARDABLE     "res\\plugins.ico"
-
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -777,8 +779,8 @@ IDI_PLUGINS             ICON    DISCARDABLE     "res\\plugins.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,3,1
- PRODUCTVERSION 1,0,3,1
+ FILEVERSION 1,0,4,1
+ PRODUCTVERSION 1,0,4,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -795,15 +797,15 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.sourceforge.net\0"
             VALUE "CompanyName", "Dominik Reichl\0"
-            VALUE "FileDescription", "KeePass Password Safe v1.03\0"
-            VALUE "FileVersion", "1, 0, 3, 1\0"
+            VALUE "FileDescription", "KeePass Password Safe v1.04\0"
+            VALUE "FileVersion", "1, 0, 4, 1\0"
             VALUE "InternalName", "PwSafe\0"
-            VALUE "LegalCopyright", "Copyright (c) 2003-2005 Dominik Reichl\0"
+            VALUE "LegalCopyright", "Copyright (c) 2003-2006 Dominik Reichl\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "KeePass.exe\0"
             VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "KeePass Password Safe v1.03\0"
-            VALUE "ProductVersion", "1, 0, 3, 1\0"
+            VALUE "ProductName", "KeePass Password Safe v1.04\0"
+            VALUE "ProductVersion", "1, 0, 4, 1\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -865,13 +867,13 @@ BEGIN
     END
     POPUP "&Edit"
     BEGIN
-        MENUITEM "&Options...",                 ID_SAFE_OPTIONS
+        MENUITEM SEPARATOR
     END
     POPUP "&View"
     BEGIN
         MENUITEM "Change &Language...",         ID_FILE_CHANGELANGUAGE
         MENUITEM SEPARATOR
-        MENUITEM "Show &ToolBar",               ID_VIEW_SHOWTOOLBAR, CHECKED
+        MENUITEM "Show &Toolbar",               ID_VIEW_SHOWTOOLBAR, CHECKED
         MENUITEM "Show &Entry View",            ID_VIEW_ENTRYVIEW, CHECKED
         MENUITEM SEPARATOR
         MENUITEM "&Always On Top",              ID_VIEW_ALWAYSONTOP, CHECKED
@@ -881,6 +883,13 @@ BEGIN
         MENUITEM "Hide &Passwords Behind Asterisks (***)", ID_VIEW_HIDESTARS
         , CHECKED
         MENUITEM SEPARATOR
+        POPUP "TAN View &Options"
+        BEGIN
+            MENUITEM "Use &Simple List View For TAN-Only Groups", 
+                                                    ID_VIEW_SIMPLETANVIEW
+            MENUITEM "Show TAN &Indices In Entry Titles", 
+                                                    ID_VIEW_SHOWTANINDICES
+        END
         POPUP "Auto-&Sort Password List"
         BEGIN
             MENUITEM "N&o Auto-Sort",               ID_VIEW_AUTOSORT_NOSORT
@@ -926,25 +935,24 @@ BEGIN
             MENUITEM "Show &Attachment Column",     ID_VIEW_ATTACH, CHECKED
         END
     END
-    POPUP "E&xtras"
+    POPUP "&Tools"
     BEGIN
-        MENUITEM "Password &Generator",         ID_EXTRAS_GENPW
-        MENUITEM "&TAN Wizard",                 ID_EXTRAS_TANWIZARD
+        MENUITEM "Password &Generator...",      ID_EXTRAS_GENPW
+        MENUITEM "&TAN Wizard...",              ID_EXTRAS_TANWIZARD
         MENUITEM SEPARATOR
         MENUITEM "&Repair KeePass Database File...", ID_EXTRAS_REPAIRDB
         MENUITEM SEPARATOR
-        MENUITEM "Show All &Expired Entries...", ID_EXTRAS_SHOWEXPIRED
+        MENUITEM "Show All &Expired Entries",   ID_EXTRAS_SHOWEXPIRED
         MENUITEM SEPARATOR
-        MENUITEM "&Plugin Manager",             ID_EXTRAS_PLUGINMGR
+        MENUITEM "&Options...",                 ID_SAFE_OPTIONS
+        MENUITEM "&Plugin Manager...",          ID_EXTRAS_PLUGINMGR
     END
-    POPUP "&?"
+    POPUP "&Help"
     BEGIN
         MENUITEM "Visit &KeePass Homepage",     ID_INFO_HOMEPAGE
         MENUITEM "&Donate...",                  ID_INFO_DONATE
         MENUITEM SEPARATOR
-        MENUITEM "Open &Help File",             ID_INFO_README
-        MENUITEM "Open &License File",          ID_INFO_LICENSE
-        MENUITEM "&Print License File",         ID_INFO_PRINTLICENSE
+        MENUITEM "&Help Contents...",           ID_INFO_README
         MENUITEM SEPARATOR
         MENUITEM "About &Translation...",       ID_INFO_TRANSLATION
         MENUITEM "&About KeePass...",           ID_INFO_ABOUT
@@ -1044,7 +1052,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Add Entry...",               ID_PWLIST_ADD
         MENUITEM SEPARATOR
-        MENUITEM "Password &Generator",         ID_EXTRAS_GENPW
+        MENUITEM "Password &Generator...",      ID_EXTRAS_GENPW
         MENUITEM SEPARATOR
         MENUITEM "&Options...",                 ID_SAFE_OPTIONS
         MENUITEM "&About KeePass...",           ID_INFO_ABOUT
@@ -1109,14 +1117,16 @@ IDR_EXPIRESMENU MENU DISCARDABLE
 BEGIN
     POPUP "Popup"
     BEGIN
-        MENUITEM "1 week",                      ID_EXPIRES_1WEEK
-        MENUITEM "2 weeks",                     ID_EXPIRES_2WEEKS
+        MENUITEM "Now",                         ID_EXPIRES_NOW
         MENUITEM SEPARATOR
-        MENUITEM "1 month",                     ID_EXPIRES_1MONTH
-        MENUITEM "3 months",                    ID_EXPIRES_3MONTHS
-        MENUITEM "6 months",                    ID_EXPIRES_6MONTHS
+        MENUITEM "1 Week",                      ID_EXPIRES_1WEEK
+        MENUITEM "2 Weeks",                     ID_EXPIRES_2WEEKS
         MENUITEM SEPARATOR
-        MENUITEM "1 year",                      ID_EXPIRES_12MONTHS
+        MENUITEM "1 Month",                     ID_EXPIRES_1MONTH
+        MENUITEM "3 Months",                    ID_EXPIRES_3MONTHS
+        MENUITEM "6 Months",                    ID_EXPIRES_6MONTHS
+        MENUITEM SEPARATOR
+        MENUITEM "1 Year",                      ID_EXPIRES_12MONTHS
     END
 END
 
@@ -1279,12 +1289,12 @@ BEGIN
     "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
     "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL, NOINVERT
-    "Q",            ID_FILE_CLOSE,          VIRTKEY, CONTROL, NOINVERT
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
     "U",            ID_PWLIST_VISITURL,     VIRTKEY, CONTROL, NOINVERT
     "V",            ID_PWLIST_AUTOTYPE,     VIRTKEY, CONTROL, NOINVERT
     VK_F1,          ID_INFO_README,         VIRTKEY, NOINVERT
     VK_F1,          ID_INFO_README,         VIRTKEY, ALT, NOINVERT
+    "W",            ID_FILE_CLOSE,          VIRTKEY, CONTROL, NOINVERT
     "X",            ID_FILE_EXIT,           VIRTKEY, CONTROL, NOINVERT
     "Y",            ID_PWLIST_ADD,          VIRTKEY, CONTROL, NOINVERT
     "Z",            ID_EXTRAS_GENPW,        VIRTKEY, CONTROL, NOINVERT

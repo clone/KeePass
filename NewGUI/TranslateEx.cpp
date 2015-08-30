@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,23 +20,24 @@
 #include "StdAfx.h"
 #include "../Util/MemUtil.h"
 #include "TranslateEx.h"
+#include "../Util/StrUtil.h"
 
 static BOOL m_bTableLoaded = FALSE;
-static char *m_pTranslationStrings = NULL;
+static LPTSTR m_pTranslationStrings = NULL;
 
 static DWORD m_dwNumTrlStrings = 0;
 
-static char *m_pDefString[MAX_TRANSLATION_STRINGS];
-static char *m_pTrlString[MAX_TRANSLATION_STRINGS];
+static LPTSTR m_pDefString[MAX_TRANSLATION_STRINGS];
+static LPTSTR m_pTrlString[MAX_TRANSLATION_STRINGS];
 
 C_FN_SHARE void _SortTrlTable();
 
-static char m_szCurrentTranslationTable[2 * MAX_PATH];
+static TCHAR m_szCurrentTranslationTable[2 * MAX_PATH];
 
-C_FN_SHARE BOOL LoadTranslationTable(const char *pszTableName)
+C_FN_SHARE BOOL LoadTranslationTable(LPCTSTR pszTableName)
 {
 	FILE *fp = NULL;
-	char szPath[2 * MAX_PATH];
+	TCHAR szPath[2 * MAX_PATH];
 	DWORD i = 0;
 	DWORD dwLength = 0;
 	BOOL bMode = FALSE;
@@ -45,8 +46,8 @@ C_FN_SHARE BOOL LoadTranslationTable(const char *pszTableName)
 	if(m_bTableLoaded == TRUE) FreeCurrentTranslationTable();
 
 	ASSERT(pszTableName != NULL); if(pszTableName == NULL) return FALSE;
-	if(strlen(pszTableName) == 0) return TRUE;
-	if((strcmp(pszTableName, "Standard") == 0) || (strcmp(pszTableName, "English") == 0))
+	if(_tcslen(pszTableName) == 0) return TRUE;
+	if((_tcscmp(pszTableName, _T("Standard")) == 0) || (_tcscmp(pszTableName, _T("English")) == 0))
 	{
 		_tcscpy(m_szCurrentTranslationTable, pszTableName);
 		return TRUE;
@@ -54,10 +55,10 @@ C_FN_SHARE BOOL LoadTranslationTable(const char *pszTableName)
 
 	GetModuleFileName(NULL, szPath, 2 * MAX_PATH);
 
-	i = strlen(szPath) - 1;
+	i = _tcslen(szPath) - 1;
 	while(1)
 	{
-		if((szPath[i] == '\\') || (szPath[i] == '/'))
+		if((szPath[i] == _T('\\')) || (szPath[i] == _T('/')))
 		{
 			szPath[i+1] = 0;
 			break;
@@ -65,32 +66,45 @@ C_FN_SHARE BOOL LoadTranslationTable(const char *pszTableName)
 		i--;
 		if(i == 0) break;
 	}
-	strcat(szPath, pszTableName);
-	strcat(szPath, ".lng");
+	_tcscat(szPath, pszTableName);
+	_tcscat(szPath, _T(".lng"));
 
-	fp = fopen(szPath, "rb");
+	fp = _tfopen(szPath, _T("rb"));
 	if(fp == NULL) return FALSE;
 
 	fseek(fp, 0, SEEK_END);
 	dwLength = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	m_pTranslationStrings = new char[dwLength+1];
-	if(m_pTranslationStrings == NULL) { fclose(fp); return FALSE; }
-	m_pTranslationStrings[dwLength] = 0;
+	UTF8_BYTE *pTranslationStrings8 = new UTF8_BYTE[dwLength + 1];
+	if(pTranslationStrings8 == NULL) { fclose(fp); fp = NULL; return FALSE; }
+	pTranslationStrings8[dwLength] = 0;
 
-	fread(m_pTranslationStrings, 1, dwLength, fp);
+	fread(pTranslationStrings8, 1, dwLength, fp);
+	fclose(fp); fp = NULL;
 
-	fclose(fp);
-	fp = NULL;
+	m_pTranslationStrings = _UTF8ToString(pTranslationStrings8);
+	SAFE_DELETE_ARRAY(pTranslationStrings8);
+
+	if(m_pTranslationStrings == NULL) return FALSE;
+	dwLength = _tcslen(m_pTranslationStrings);
 
 	m_dwNumTrlStrings = 0;
 
 	bMode = TRL_MODE_DEF;
 	bScanning = FALSE;
-	for(i = 0; i < dwLength; i++)
+
+	i = 0;
+	if(dwLength > 3)
+		if((m_pTranslationStrings[0] == 0xEF) && (m_pTranslationStrings[1] == 0xBB) &&
+			(m_pTranslationStrings[2] == 0xBF))
+		{
+			i += 3; // Skip UTF-8 initialization characters
+		}
+
+	for( ; i < dwLength; i++)
 	{
-		if(m_pTranslationStrings[i] == '|')
+		if(m_pTranslationStrings[i] == _T('|'))
 		{
 			if((bMode == TRL_MODE_DEF) && (bScanning == FALSE))
 			{
@@ -100,7 +114,7 @@ C_FN_SHARE BOOL LoadTranslationTable(const char *pszTableName)
 
 				continue;
 			}
-			
+
 			if((bMode == TRL_MODE_DEF) && (bScanning == TRUE))
 			{
 				m_pTranslationStrings[i] = 0;
@@ -140,7 +154,7 @@ C_FN_SHARE BOOL LoadTranslationTable(const char *pszTableName)
 
 	for(i = 0; i < m_dwNumTrlStrings; i++)
 	{
-		if(strlen(m_pTrlString[i]) == 0)
+		if(_tcslen(m_pTrlString[i]) == 0)
 		{
 			m_pTrlString[i] = m_pDefString[i];
 		}
@@ -168,7 +182,7 @@ C_FN_SHARE BOOL FreeCurrentTranslationTable()
 C_FN_SHARE void _SortTrlTable()
 {
 	unsigned long i, j = 0, min;
-	char *v;
+	TCHAR *v;
 
 	if(m_dwNumTrlStrings <= 1) return;
 
@@ -191,7 +205,7 @@ C_FN_SHARE void _SortTrlTable()
 	}
 }
 
-C_FN_SHARE const TCHAR *_TRL(const char *pszDefString)
+C_FN_SHARE LPCTSTR _TRL(LPCTSTR pszDefString)
 {
 	if(m_dwNumTrlStrings == 0) return pszDefString;
 	ASSERT(pszDefString != NULL); if(pszDefString == NULL) return _T("");
@@ -220,7 +234,7 @@ C_FN_SHARE const TCHAR *_TRL(const char *pszDefString)
 	return pszDefString; */
 }
 
-C_FN_SHARE const TCHAR *GetCurrentTranslationTable()
+C_FN_SHARE LPCTSTR GetCurrentTranslationTable()
 {
 	return m_szCurrentTranslationTable;
 }

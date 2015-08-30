@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,12 +26,15 @@
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/XPStyleButtonST.h"
 
+#define PWMX_ENGLISH_AUTHOR  _T("Dominik Reichl")
+#define PWMX_ENGLISH_CONTACT _T("dominik.reichl@t-online.de, http://www.dominik-reichl.de/")
+
 class CLanguagesDlg : public CDialog
 {
 public:
 	CLanguagesDlg(CWnd* pParent = NULL);
 
-	void _LoadLanguage(char *szLang);
+	void _LoadLanguage(LPCTSTR szLang);
 
 	CKCSideBannerWnd m_banner;
 	CImageList m_ilIcons;

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "../Util/StrUtil.h"
 #include "../NewGUI/TranslateEx.h"
 
-static char g_pNullString[4] = { 0, 0, 0, 0 };
+static TCHAR g_pNullString[4] = { 0, 0, 0, 0 };
 
 CPwImport::CPwImport()
 {
@@ -743,7 +743,7 @@ void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamS
 	}
 }
 
-unsigned long CPwImport::_GetPreferredIcon(const char *pszGroup)
+unsigned long CPwImport::_GetPreferredIcon(LPCTSTR pszGroup)
 {
 	CString str = pszGroup;
 

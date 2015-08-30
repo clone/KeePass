@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #define ___WIN_UTIL_EX_H___
 
 #include "../StdAfx.h"
-#include "../PwSafe/PwManager.h"
+#include "../Util/SysDefEx.h"
 
 #define OLF_OPEN 0
 #define OLF_PRINT 1
@@ -60,5 +60,7 @@ C_FN_SHARE BOOL GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL 
 C_FN_SHARE BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD dwBufLen);
 
 C_FN_SHARE BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile);
+
+C_FN_SHARE UINT TWinExec(LPCTSTR lpCmdLine, WORD uCmdShow);
 
 #endif

@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Magyar|
-|~LANGUAGEVERSION|             |1.01|
+|~LANGUAGEVERSION|             |1.03|
 |~LANGUAGEAUTHOR|              |documan|
 |~LANGUAGEAUTHOREMAIL|         |documan at mailbox dot hu|
 
@@ -38,7 +38,6 @@
 
 |Password Groups|              |Jelszó csoportok|
 |Title|                        |Cím|
-|UserName|                     |Felhasználónév|
 |URL|                          |URL|
 |Password|                     |Jelszó|
 |Notes|                        |Megjegyzés|
@@ -95,7 +94,6 @@
 
 |Group:|                       |Csoport:|
 |Title:|                       |Cím:|
-|UserName:|                    |Felhasználónév:|
 |URL:|                         |URL:|
 |Icon:|                        |Ikon:|
 |Password:|                    |Jelszó:|
@@ -169,7 +167,6 @@
 |Export Group To &XML...|      |Csoport exportálása &XML-ként...|
 |Export Group To &CSV...|      |Csoport exportálása &CSV-ként...|
 |Export Group To &TXT...|      |Csoport exportálása &TXT-ként...|
-|Copy User&Name To Clipboard|  |&Felhasználónév másolása a vágólapra|
 |Copy &Password To Clipboard|  |&Jelszó másolása a vágólapra|
 |Open &URL(s)|                 |&URL(ek) megnyitása|
 |&Find In Database...|         |&Keresés az adatbázisban...|
@@ -190,7 +187,6 @@
 
 |Change &Language...|          |&Nyelv váltása...|
 |Show &Title Column|           |&Cím oszlop mutatása|
-|Show User&Name Column|        |&Felhasználónév oszlop mutatása|
 |Show &URL Column|             |&URL oszlop mutatása|
 |Show &Password Column|        |&Jelszó oszlop mutatása|
 |Show Note&s Column|           |Megjegyzés oszlop mutatása|
@@ -254,8 +250,6 @@
 |Do you want to save the changes before closing?|
     |Szeretnéd kilépés elõtt menteni a változtatásokat?|
 
-|Deleting a group will delete all items in that group, too.|
-    |A csoport törlésekor a csoport minden eleme is törlõdik.|
 |Are you sure you want to delete this group?|
     |Biztosan szeretnéd törölni ezt a csoportot?|
 |Delete Group Confirmation|
@@ -403,7 +397,6 @@
 |&Rearrange|                   |&Újrarendez|
 |&Sort Group List|             |Csoport lista &rendezése|
 |Sort List By &Title|          |Rendezés &Cím szerint|
-|Sort List By User&Name|       |Rendezés &Felhasználónév szerint|
 |Sort List By &URL|            |Rendezés &URL szerint|
 |Sort List By &Password|       |Rendezés &Jelszó szerint|
 |Sort List By Note&s|          |Rendezés &Megjegyzés szerint|
@@ -414,7 +407,6 @@
 |Move Group One &Left|         |Csoport mozgatása eggyel &balra|
 |Move Group One &Right|        |Csoport mozgatása eggyel &jobbra|
 
-|Hide &UserNames Behind Asterisks (***)|  |Felhasználónevek rejtése csillagok (***) mögé|
 |Attachment:|                  |Melléklet:|
 |Attachment|                   |Melléklet|
 |Show &Attachment Column|      |&Melléklet oszlop mutatása|
@@ -627,3 +619,29 @@
 |Press Shift-Home or Shift-End to clear this edit control| |Nyomd meg a Shift-Home vagy a Shift-End billentyûket ennek a szerkesztõelemnek a törléséhez|
 |The higher this number, the harder are dictionary attacks. But also the higher this number, the slower the database loading and saving.| |Minél nagyobb ez a szám, annál nehezebb a támadók dolga. Ugyanakkor minél nagyobb a szám, annál lassabb az adatbázis mentése és betöltése is.|
 |Use alternative auto-type method (minimize window)| |Alternatív auto-gépelési módszer használata (az ablak kicsinyítésével)|
+
+|&KeePass Database...| |&KeePass adatbázis...|
+|Acknowledgements| |Köszönetnyilvánítás|
+|Click [No] to set a new key for the exported file.| |Új kulcs létrehozásához az exportált fájlhoz klikk a [Nem]-re.|
+|Click [Yes] to use the same key as the currently opened database.| |A jelenleg megnyitott adatbázis kulcsának használatához klikk az [Igen]-re.|
+|Copy &URL To Clipboard| |&URL másolása a Vágólapra|
+|Copy URLs to clipboard instead of launching them (exception: cmd:// URLs)| |Az URL-ek vágólapra másolása azok betöltése helyett (kivétel: cmd:// típusú URL-ek)|
+|Copy User &Name To Clipboard| |Felhasználónév másolása a Vágólapra|
+|Create new IDs| |Új ID-k létrehozása|
+|Deleting a group will delete all items and subgroups in that group, too.| |A csoport törlése a csoport minden alcsoportjának és elemének törlését is magában foglalja.|
+|Disable all auto-type features| |Minden auto-gépelés funkció kikapcsolása|
+|Export Group To &KeePass Database...| |Csoport exportálása &KeePass adatbázisba...|
+|Hide &User Names Behind Asterisks (***)| |Felhasználónevek rejtése csillagok (***) mögé|
+|If you select this option, KeePass will create new IDs for all groups and entries. Consequently no existing groups and entries of the currently opened database will be modified or overwritten.| |Ha ezt az opciót választod, a KeePass minden csoportnak és bejegyzésnek új ID-t (azonosítót) generál. Ez természetesen nem jelenti azt, hogy a jelenleg megnyitott adatbázis bármilyen eleme megváltozna, vagy felülírásra kerülne.|
+|KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.| |A KeePass megvizsgálja a csoportok/bejegyzések utolsó-módosítási idejét, és csak abban az cseréli le azokat, amennyiben az importálandó megfelelõjük újabb.|
+|KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.| |A KeePass minden jelenlegi csoportot és bejegyzést le fog cserélni az importálandó fájlban találhatóakkal, amennyiben ugyanaz az ID-jük (azonosítójuk).|
+|Overwrite| |Felülírás|
+|Overwrite if newer| |Felülírás, ha újabb|
+|Please choose if KeePass should use the key of the currently opened database or ask you to define a new key to encrypt the exported file.| |Válaszd ki, hogy a KeePass a jelenleg megnyitott adatbázis kulcsát használja, vagy kérjen tõled egy új kulcsot az exportálandó fájl titkosításához.|
+|Reuse the current key/password?| |Használja a jelenlegi kulcsot/jelszót?|
+|Show User &Name Column| |&Felhasználónév oszlop mutatása|
+|Show full path in the titlebar (instead of filename only)| |Teljes útvonal megjelenítése a címsorban (kizárólag a fájlnév helyett)|
+|Sort List By User &Name| |Rendezés &Felhasználónév alapján|
+|The file format that you have selected to import supports group and/or entry IDs. Please choose an import behaviour.| |Az általad importáláshoz választott fájl formátuma támogatja a csoportok és/vagy bejegyzések ID-jét (azonosítóját). Kérlek válaszd ki az importálás típusát.|
+|User Name| |Felhasználónév|
+|User Name:| |Felhasználónév:|

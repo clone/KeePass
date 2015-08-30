@@ -942,7 +942,7 @@ void CSystemTray::InstallIconPending()
     // If it's STILL hidden, then have another go next time...
     m_bShowIconPending = m_bHidden;
 
-    ASSERT(m_bHidden == FALSE);
+    // ASSERT(m_bHidden == FALSE);
 }
 
 /////////////////////////////////////////////////////////////////////////////

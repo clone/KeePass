@@ -1,5 +1,6 @@
 // This is a modified version of the CSendKeys class.
 // See .cpp file for more information.
+
 #ifndef __SENDKEYS_04192004__INC__
 #define __SENDKEYS_04192004__INC__
 

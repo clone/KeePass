@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ public:
 	CCustomListCtrlEx();
 	virtual ~CCustomListCtrlEx();
 
-	COLORREF GetColorEx();
-	void SetColorEx(COLORREF rgbColor);
+	COLORREF GetRowColorEx();
+	void SetRowColorEx(COLORREF rgbColor);
 
 	BOOL EnsureVisible(int nItem, BOOL bPartialOK);
 	int GetItemCount();
@@ -47,7 +47,7 @@ public:
 	//}}AFX_VIRTUAL
 
 private:
-	COLORREF m_rgbColor;
+	COLORREF m_rgbRowColor;
 	BOOL m_bColorize;
 
 protected:

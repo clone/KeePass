@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -183,7 +183,7 @@ BOOL CPwManager::_OpenDatabaseV1(const TCHAR *pszFile)
 
 		pwTG.uGroupId = i + 1; pwTG.uImageId = dw;
 #ifdef _UNICODE
-		lpptr = _StringToUnicode(ptrTemp);
+		LPTSTR lpptr = _StringToUnicode(ptrTemp);
 		pwTG.pszGroupName = lpptr;
 		pwTG.usLevel = 0;
 		AddGroup(&pwTG);
@@ -237,9 +237,11 @@ BOOL CPwManager::_OpenDatabaseV1(const TCHAR *pszFile)
 		ZeroMemory(pwTE.uuid, 16); // 0 = create new UUID
 
 #ifdef _UNICODE
-		lptTitle = _StringToUnicode(ptrTitle); lptURL = _StringToUnicode(ptrURL);
-		lptUserName = _StringToUnicode(ptrUserName); lptPassword = _StringToUnicode(ptrPassword);
-		lptAdditional = _StringToUnicode(ptrAdditional);
+		LPTSTR lptTitle = _StringToUnicode(ptrTitle);
+		LPTSTR lptURL = _StringToUnicode(ptrURL);
+		LPTSTR lptUserName = _StringToUnicode(ptrUserName);
+		LPTSTR lptPassword = _StringToUnicode(ptrPassword);
+		LPTSTR lptAdditional = _StringToUnicode(ptrAdditional);
 		pwTE.pszAdditional = lptAdditional; pwTE.pszPassword = lptPassword;
 		pwTE.pszTitle = lptTitle; pwTE.pszURL = lptURL;
 		pwTE.pszUserName = lptUserName; pwTE.uGroupId = dw; pwTE.uImageId = dw2;

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 C_FN_SHARE void mem_erase(unsigned char *p, unsigned long u);
 
 #ifndef _WIN32_WCE
-C_FN_SHARE BOOL SecureDeleteFile(LPCSTR pszFilePath);
+C_FN_SHARE BOOL SecureDeleteFile(LPCTSTR pszFilePath);
 #endif
 
 // Time conversion functions
@@ -50,6 +50,9 @@ C_FN_SHARE void _GetCurrentPwTime(PW_TIME *p);
 // Compare two PW_TIME structures, returns -1 if pt1<pt2, returns 1 if pt1>pt2,
 // returns 0 if pt1=pt2
 C_FN_SHARE int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2);
+
+// Fast arithmetic time addition, possibly incorrect calendar-day
+C_FN_SHARE void _pwtimeadd(PW_TIME *pTime, const PW_TIME *pTimeAdd);
 
 // Packs an array of integers to a TCHAR string
 C_FN_SHARE void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount);

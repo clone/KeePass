@@ -23,11 +23,13 @@ Auto-Type feature</td></tr></table>
 KeePass features an "auto-type" functionality. This feature allows you to define
 a sequence of keypresses, which KeePass can automatically perform for you.<br />
 <br />
-The default auto-type sequence is:<br />
+For normal entries the default auto-type sequence is:<br />
 <br />
 <b>{USERNAME}{TAB}{PASSWORD}{ENTER}</b><br />
 <br />
-If you don't define your own auto-type sequence, this sequence is sent. {USERNAME}
+For TANs the default is: <b>{PASSWORD}</b> (i.e. it just types the TAN).<br />
+<br />
+If you don't define your own auto-type sequence, these sequences are sent. {USERNAME}
 is replaced by the username field contents of the currently selected entry.
 {TAB} simulates a TAB keypress, {PASSWORD} enters the password of the entry and
 {ENTER} finally simulates an ENTER keypress.<br />
@@ -116,6 +118,7 @@ Additionally, some special commands are supported:
 <tr><td class="boxcontent" width="50%">{DELAY=X}</td><td class="boxcontent" width="50%">Sets the default delay to X milliseconds for all following keypresses.</td></tr>
 <tr><td class="boxcontent" width="50%">{APPACTIVATE WindowTitle}</td><td class="boxcontent" width="50%">Activates the window "WindowTitle".</td></tr>
 <tr><td class="boxcontent" width="50%">{APPDIR}</td><td class="boxcontent" width="50%">Will be replaced by the current application directory path.</td></tr>
+<tr><td class="boxcontent" width="50%">{CLEARFIELD}</td><td class="boxcontent" width="50%">Clears the contents of the edit control that currently has the focus.</td></tr>
 </table></center>
 <br /><br />
 Here are some examples:<br />
@@ -169,6 +172,11 @@ Here you can continue with your notes if you wish...</pre>
 If you now have a window open that starts with &quot;PayPal - Welcome&quot; and press the global
 auto-type hotkey combination, KeePass performs the auto-type sequence above.<br />
 <br />
+You can define as many <code>Auto-Type-Window</code> strings per entry as you wish; an entry can have multiple
+window targets.<br />
+<br />
+If multiple entries match a window, KeePass will display a selection dialog.<br />
+<br />
 The default Auto-Type-Window string is <b>*{TITLE}*</b>. So, if you don't define your
 own <code>Auto-Type-Window</code> string, KeePass will compare the titles of your entries with
 the actual window title and if an entry title is a substring of the window title,
@@ -177,7 +185,7 @@ that entry is auto-typed.<br />
 As you can see in the example above, you can use simple wildcards:<br />
 <br />
 <center><table class="tablebox75">
-<tr><td class="smallboxtitle" width="25%">String with wildcard</td><td class="smallboxtitle" width="75%">Meaning</td></tr>
+<tr><td class="smallboxtitle" width="25%" nowrap="nowrap">String with wildcard</td><td class="smallboxtitle" width="75%">Meaning</td></tr>
 <tr><td class="boxcontent" width="25%">STRING</td><td class="boxcontent" width="75%">Matches all window titles that are named exactly &quot;STRING&quot;.</td></tr>
 <tr><td class="boxcontent" width="25%">STRING*</td><td class="boxcontent" width="75%">Matches all window titles that start with &quot;STRING&quot;.</td></tr>
 <tr><td class="boxcontent" width="25%">*STRING</td><td class="boxcontent" width="75%">Matches all window titles that end with &quot;STRING&quot;.</td></tr>

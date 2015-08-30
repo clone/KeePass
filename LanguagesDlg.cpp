@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -95,23 +95,23 @@ BOOL CLanguagesDlg::OnInitDialog()
 
 	m_listLang.DeleteAllItems();
 	lvi.iItem = m_listLang.InsertItem(LVIF_TEXT | LVIF_IMAGE, m_listLang.GetItemCount(),
-		"English", 0, 0, 1, NULL);
+		_T("English"), 0, 0, 1, NULL);
 
 	CString strTemp;
 	
 	strTemp = PWM_VERSION_STR;
 	lvi.iSubItem = 1; lvi.mask = LVIF_TEXT;
-	lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+	lvi.pszText = (LPTSTR)(LPCTSTR)strTemp;
 	m_listLang.SetItem(&lvi);
 
-	strTemp = _T("Dominik Reichl");
+	strTemp = PWMX_ENGLISH_AUTHOR;
 	lvi.iSubItem = 2; lvi.mask = LVIF_TEXT;
-	lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+	lvi.pszText = (LPTSTR)(LPCTSTR)strTemp;
 	m_listLang.SetItem(&lvi);
 
-	strTemp = _T("dominik.reichl@t-online.de, http://www.dominik-reichl.de/");
+	strTemp = PWMX_ENGLISH_CONTACT;
 	lvi.iSubItem = 3; lvi.mask = LVIF_TEXT;
-	lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+	lvi.pszText = (LPTSTR)(LPCTSTR)strTemp;
 	m_listLang.SetItem(&lvi);
 
 	CFileFind ff;
@@ -151,19 +151,19 @@ BOOL CLanguagesDlg::OnInitDialog()
 			strTemp = TRL("~LANGUAGEVERSION");
 			if(strTemp == _T("~LANGUAGEVERSION")) strTemp.Empty();
 			lvi.iSubItem = 1; lvi.mask = LVIF_TEXT;
-			lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+			lvi.pszText = (LPTSTR)(LPCTSTR)strTemp;
 			m_listLang.SetItem(&lvi);
 
 			strTemp = TRL("~LANGUAGEAUTHOR");
 			if(strTemp == _T("~LANGUAGEAUTHOR")) strTemp.Empty();
 			lvi.iSubItem = 2; lvi.mask = LVIF_TEXT;
-			lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+			lvi.pszText = (LPTSTR)(LPCTSTR)strTemp;
 			m_listLang.SetItem(&lvi);
 
 			strTemp = TRL("~LANGUAGEAUTHOREMAIL");
 			if(strTemp == _T("~LANGUAGEAUTHOREMAIL")) strTemp.Empty();
 			lvi.iSubItem = 3; lvi.mask = LVIF_TEXT;
-			lvi.pszText = (LPSTR)(LPCTSTR)strTemp;
+			lvi.pszText = (LPTSTR)(LPCTSTR)strTemp;
 			m_listLang.SetItem(&lvi);
 		}
 	}
@@ -210,7 +210,7 @@ void CLanguagesDlg::OnClickLanguagesList(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-void CLanguagesDlg::_LoadLanguage(char *szLang)
+void CLanguagesDlg::_LoadLanguage(LPCTSTR szLang)
 {
 	FILE *fp = NULL;
 	TCHAR szFile[MAX_PATH * 2];

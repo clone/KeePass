@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL CImportOptionsDlg::OnInitDialog() 
+BOOL CImportOptionsDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
@@ -74,7 +74,7 @@ BOOL CImportOptionsDlg::OnInitDialog()
 
 	m_fBold.CreateFont(-10, 0, 0, 0, FW_BOLD, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, "MS Sans Serif");
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("MS Shell Dlg"));
 
 	GetDlgItem(IDC_RADIO_CREATENEW)->SetFont(&m_fBold);
 	GetDlgItem(IDC_RADIO_OVERWRITE_ALWAYS)->SetFont(&m_fBold);
@@ -83,7 +83,7 @@ BOOL CImportOptionsDlg::OnInitDialog()
 	return TRUE;
 }
 
-void CImportOptionsDlg::OnOK() 
+void CImportOptionsDlg::OnOK()
 {
 	UpdateData(TRUE);
 
@@ -91,7 +91,7 @@ void CImportOptionsDlg::OnOK()
 	CDialog::OnOK();
 }
 
-void CImportOptionsDlg::OnCancel() 
+void CImportOptionsDlg::OnCancel()
 {
 	UpdateData(TRUE);
 

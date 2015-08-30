@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -68,8 +68,8 @@
 #define WM_PLUGINS_FIRST   (0x9FFF)
 #define WM_PLUGINS_LAST    (0xAFFF)
 
-#define HOTKEYID_AUTOTYPE 33
-#define HOTKEYID_RESTORE  34
+#define HOTKEYID_AUTOTYPE  33
+#define HOTKEYID_RESTORE   34
 
 #define CM_TIMED 0
 #define CM_ENHSECURE 1
@@ -85,6 +85,8 @@
 
 #define PWM_URL_DONATE     _T("http://keepass.sourceforge.net/donate.php")
 
+#define LVSX_CHANGING      DWORD_MAX
+
 /////////////////////////////////////////////////////////////////////////////
 
 class CPP_CLASS_SHARE CPwSafeDlg : public CDialog
@@ -98,6 +100,8 @@ public:
 	static const TCHAR *_GetCmdAccelExt(const TCHAR *psz);
 	void RestartApplication();
 	static CString _GetSecureEditTipText(const TCHAR *tszBase);
+	void RebuildContextMenus();
+	void DeleteContextMenus();
 
 	void ProcessResize();
 	void CleanUp();
@@ -107,6 +111,10 @@ public:
 	void UpdateAutoSortMenuItems();
 	void BuildPluginMenu();
 	BOOL RegisterGlobalHotKey(int nHotKeyID, DWORD dwHotKey, BOOL bReleasePrevious, BOOL bMessageBoxOnFail);
+	void AdjustPwListMode();
+	void AdjustColumnWidths();
+
+	void ParseAndOpenURLWithEntryInfo(LPCTSTR lpURL, PW_ENTRY *pEntry);
 	void _AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus);
 
 	void UpdateGroupList();
@@ -118,7 +126,7 @@ public:
 	DWORD GetSelectedGroupId();
 
 	BOOL GetExportOptions(PWEXPORT_OPTIONS *pOptions, CPwExport *pPwExport);
-	CString GetExportFile(int nFormat, LPCTSTR lpFileName = NULL);
+	CString GetExportFile(int nFormat, LPCTSTR lpBaseFileName, BOOL bFixFileName);
 	void ExportSelectedGroup(int nFormat);
 	void ExportGroupToKeePass(DWORD dwGroupId);
 
@@ -133,7 +141,7 @@ public:
 	void _ProcessGroupKey(UINT nChar, UINT nFlags);
 	void _ProcessListKey(UINT nChar, BOOL bAlt);
 
-	void _OnPwlistColumnWidthChange(int icolumn = -1, int isize = -1);
+	void CB_OnPwlistColumnWidthChange(int iColumn, int iSize);
 	void _SortListIfAutoSort();
 	void ViewHideHandler();
 
@@ -180,36 +188,10 @@ public:
 			if(h != NULL) m_cGroups.SelectItem(h);
 		}
 	}
-	void _CalcColumnSizes()
-	{
-		RECT rect;
-		int nColumnWidth, nColumns = 0, i;
-		for(i = 0; i < 11; i++)
-		{
-			if(m_bShowColumn[i] == TRUE) nColumns++;
-			m_nColumnWidths[i] = 0;
-		}
-		if(nColumns == 0) return;
-		m_cList.GetClientRect(&rect);
-		nColumnWidth = ((rect.right - 9) / nColumns) - (GetSystemMetrics(SM_CXVSCROLL) / nColumns);
-		for(i = 0; i < 11; i++)
-			if(m_bShowColumn[i] == TRUE)
-				m_nColumnWidths[i] = nColumnWidth;
-	}
-	void _SetColumnWidths()
-	{
-		for(int i = 0; i < 11; i++) m_cList.SetColumnWidth(i, m_nColumnWidths[i]);
-	}
-	void _SetListParameters()
-	{
-		LPARAM dw;
-		dw = LVS_EX_SI_REPORT | LVS_EX_FULLROWSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_UNDERLINEHOT;
-		dw |= LVS_EX_HEADERDRAGDROP | LVS_EX_INFOTIP;
-		if(m_bEntryGrid == TRUE) dw |= LVS_EX_GRIDLINES;
-		if(m_dwOldListParameters != dw)
-			m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, dw);
-		m_dwOldListParameters = dw;
-	}
+
+	void _CalcColumnSizes();
+	void _SetColumnWidths();
+	void _SetListParameters();
 
 	BOOL _RemoveSearchGroup();
 	void _DeleteBackupEntries();
@@ -259,6 +241,7 @@ public:
 	BOOL m_bTimer;
 	int m_nClipboardCountdown;
 	int m_nClipboardState;
+	int m_nFileRelockCountdown;
 	HWND m_hwndNextViewer;
 	BOOL m_bOpenLastDb;
 	CString m_strLastDb;
@@ -325,6 +308,8 @@ public:
 	int m_nAutoTypeMethod;
 	BOOL m_bShowFullPath;
 	BOOL m_bCopyURLs;
+	BOOL m_bExitInsteadOfLockAT;
+	CString m_strURLOverride;
 
 	HICON m_hTrayIconNormal;
 	HICON m_hTrayIconLocked;
@@ -332,6 +317,12 @@ public:
 
 	BCMenu m_menu; // Our XP-style menu
 	BOOL m_bMenu; // Menu created?
+	BCMenu *m_pPwListMenu;
+	BCMenu *m_pGroupListMenu;
+	BCMenu *m_pEntryViewMenu;
+	BCMenu *m_pPwListTrackableMenu;
+	BCMenu *m_pGroupListTrackableMenu;
+	BCMenu *m_pEntryViewTrackableMenu;
 	BOOL m_bRestoreHotKeyRegistered;
 
 	BCMenu m_popmenu;
@@ -347,6 +338,7 @@ public:
 	CString m_strFileAbsolute;
 	BOOL m_bFileOpen;
 	BOOL m_bModified;
+	BOOL m_bFileReadOnly;
 	BOOL m_bMinimized;
 	BOOL m_bMaximized;
 
@@ -402,6 +394,11 @@ public:
 	INT m_aHeaderOrder[11];
 
 	BOOL m_bMenuExit;
+
+	BOOL m_bSimpleTANView;
+	BOOL m_bShowTANIndices;
+	BOOL m_bTANsOnly;
+	DWORD m_dwPwListMode;
 
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
@@ -520,8 +517,6 @@ protected:
 	afx_msg void OnBeginDragPwlist(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnFileChangeLanguage();
 	afx_msg void OnInfoReadme();
-	afx_msg void OnInfoLicense();
-	afx_msg void OnInfoPrintLicense();
 	afx_msg void OnViewTitle();
 	afx_msg void OnViewUsername();
 	afx_msg void OnViewUrl();
@@ -649,6 +644,8 @@ protected:
 	afx_msg void OnUpdateSafeExportGroupKeePass(CCmdUI* pCmdUI);
 	afx_msg void OnExportKeePass();
 	afx_msg void OnUpdateExportKeePass(CCmdUI* pCmdUI);
+	afx_msg void OnViewSimpleTANView();
+	afx_msg void OnViewShowTANIndices();
 	//}}AFX_MSG
 
 	afx_msg void OnPluginMessage(UINT nID);
@@ -658,8 +655,11 @@ protected:
 	afx_msg void OnChangeCbChain(HWND hWndRemove, HWND hWndAfter);
 	afx_msg void OnDrawClipboard();
 
+	afx_msg BOOL OnQueryEndSession();
 	afx_msg void OnEndSession(BOOL bEnding);
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
+
+	afx_msg LRESULT OnTaskbarCreated(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()
 };

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@ CPP_FN_SHARE void EraseCString(CString *pString)
 {
 	int j, len;
 	LPTSTR lpt;
-	const TCHAR tcPlus = ' ';
-	const TCHAR tcMod = '}' - tcPlus;
+	const TCHAR tcPlus = _T(' ');
+	const TCHAR tcMod = _T('}') - tcPlus;
 
 	ASSERT(pString != NULL); if(pString == NULL) return;
 
@@ -54,23 +54,31 @@ CPP_FN_SHARE void FixURL(CString *pstrURL)
 	strTemp.MakeLower();
 
 	// If the string begins with one of the following prefixes it is an URL
-	if(strTemp.Left(5) == "file:") bPre = TRUE;
-	if(strTemp.Left(4) == "ftp:") bPre = TRUE;
-	if(strTemp.Left(7) == "gopher:") bPre = TRUE;
-	if(strTemp.Left(5) == "http:") bPre = TRUE;
-	if(strTemp.Left(6) == "https:") bPre = TRUE;
-	if(strTemp.Left(7) == "mailto:") bPre = TRUE;
-	if(strTemp.Left(5) == "news:") bPre = TRUE;
-	if(strTemp.Left(5) == "nntp:") bPre = TRUE;
-	if(strTemp.Left(9) == "prospero:") bPre = TRUE;
-	if(strTemp.Left(7) == "telnet:") bPre = TRUE;
-	if(strTemp.Left(5) == "wais:") bPre = TRUE;
-	if(strTemp.Left(4) == "cmd:") bPre = TRUE;
+	if(strTemp.Left(5) == _T("http:")) bPre = TRUE;
+	else if(strTemp.Left(6) == _T("https:")) bPre = TRUE;
+	else if(strTemp.Left(4) == _T("cmd:")) bPre = TRUE;
+	else if(strTemp.Left(4) == _T("ftp:")) bPre = TRUE;
+	else if(strTemp.Left(5) == _T("file:")) bPre = TRUE;
+	else if(strTemp.Left(7) == _T("gopher:")) bPre = TRUE;
+	else if(strTemp.Left(7) == _T("mailto:")) bPre = TRUE;
+	else if(strTemp.Left(5) == _T("news:")) bPre = TRUE;
+	else if(strTemp.Left(5) == _T("nntp:")) bPre = TRUE;
+	else if(strTemp.Left(9) == _T("prospero:")) bPre = TRUE;
+	else if(strTemp.Left(7) == _T("telnet:")) bPre = TRUE;
+	else if(strTemp.Left(5) == _T("wais:")) bPre = TRUE;
+	else if(strTemp.Left(4) == _T("irc:")) bPre = TRUE;
+	else
+	{
+		int nIndex = strTemp.Find(_T("://"));
+		int nNoIndex = strTemp.FindOneOf(_T("/@;: \t\\"));
+
+		if((nIndex != -1) && ((nNoIndex == -1) || (nNoIndex >= nIndex))) bPre = TRUE;
+	}
 
 	if(bPre == FALSE) // The string isn't a valid URL, so assume it's a HTTP
 	{
-		strTemp = "http:";
-		if(pstrURL->Left(1) != "/") strTemp += "//";
+		strTemp = _T("http:");
+		if(pstrURL->Left(1) != _T("/")) strTemp += _T("//");
 		strTemp += *pstrURL;
 
 		*pstrURL = strTemp;
@@ -203,11 +211,15 @@ C_FN_SHARE void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 C_FN_SHARE UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 {
 	DWORD i, j = 0;
-	DWORD dwLength, dwBytesNeeded, dwUniBufferLength = 0;
+	DWORD dwLength, dwBytesNeeded;
 	BYTE *p = NULL;
 	WCHAR ut;
 	const WCHAR *pUni = NULL;
+
+#ifndef _UNICODE
 	WCHAR *pUniBuffer = NULL;
+	DWORD dwUniBufferLength = 0;
+#endif
 
 	ASSERT(pszSourceString != NULL); if(pszSourceString == NULL) return NULL;
 
@@ -245,6 +257,8 @@ C_FN_SHARE UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 	for(i = 0; i < dwLength; i++)
 	{
 		ut = pUni[i];
+
+		// if(ut == 0) break;
 
 		if(ut < 0x80) // 7-bit character, store as it is
 		{
@@ -334,8 +348,12 @@ C_FN_SHARE TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 	DWORD i, j;
 	DWORD dwNumChars, dwMoreBytes, dwPBufLength;
 	BYTE b0, b1, b2;
-	WCHAR *p, *pANSI;
+	WCHAR *p;
 	WCHAR tch;
+
+#ifndef _UNICODE
+	WCHAR *pANSI;
+#endif
 
 	ASSERT(pUTF8String != NULL); if(pUTF8String == NULL) return NULL;
 
@@ -540,10 +558,8 @@ CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimStri
 		nPos = str.Find(_T("%APPDIR%"));
 		if(nPos == -1) nPos = str.Find(_T("{APPDIR}"));
 		if(nPos == -1) break;
-
 		TCHAR tszBufP[512];
 		GetApplicationDirectory(tszBufP, 512 - 1, TRUE, FALSE);
-
 		if(bMakeSimString == FALSE)
 			str = str.Left(nPos) + tszBufP + str.Right(str.GetLength() - nPos - 8);
 		else
@@ -565,7 +581,7 @@ CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimStri
 			if(uch > 0x7E)
 			{
 				str += _T("(%{NUMPAD0}");
-				strTemp.Format("%u", uch);
+				strTemp.Format(_T("%u"), uch);
 				ASSERT(strTemp.GetLength() == 3);
 
 				for(i = 0; i < strTemp.GetLength(); i++)
@@ -582,6 +598,8 @@ CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimStri
 
 		EraseCString(&strTemp);
 	}
+
+	str.Replace(_T("{CLEARFIELD}"), _T("{HOME}(+{END}){DEL}"));
 
 	*pString = str;
 	EraseCString(&str);
@@ -728,21 +746,31 @@ C_FN_SHARE char *szcpy(char *szDestination, const char *szSource)
 
 // Extracts a substring from the lpstr string
 // Example: to extract the auto-type command, pass "auto-type:" in lpStart
-CPP_FN_SHARE CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart)
+CPP_FN_SHARE CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart, DWORD dwInstance)
 {
 	TCHAR *lp;
 	TCHAR tch;
 	CString str = _T("");
 	CString strSource;
-	int nPos;
+	int nPos = -1, nSearchFrom = 0;
 
-	ASSERT(lpstr != NULL); if(lpstr == NULL) return CString("");
+	ASSERT(lpstr != NULL); if(lpstr == NULL) return str; // _T("")
 
 	strSource = lpstr;
 	strSource.MakeLower();
 	lp = (TCHAR *)lpstr;
 
-	nPos = strSource.Find(lpStart, 0);
+	// nPos = strSource.Find(lpStart, 0);
+	while(dwInstance != DWORD_MAX)
+	{
+		nPos = strSource.Find(lpStart, nSearchFrom);
+
+		if(nPos != -1) nSearchFrom = nPos + 1;
+		else return str; // _T("")
+
+		dwInstance--;
+	}
+
 	if(nPos != -1)
 	{
 		lp += _tcslen(lpStart);
