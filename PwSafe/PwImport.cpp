@@ -439,6 +439,7 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 	CString strGroup, strTitle, strUserName, strPassword, strNotes;
 	DWORD dwGroupId;
 	BOOL bInNotes = FALSE;
+	CString str3, str4, str5, str6;
 
 	ASSERT(pszFile != NULL); if(pszFile == NULL) return FALSE;
 	ASSERT(pMgr != NULL); if(pMgr == NULL) return FALSE;
@@ -451,19 +452,87 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 	strGroup.Empty(); strTitle.Empty(); strUserName.Empty(); strPassword.Empty(); strNotes.Empty();
 	while(1)
 	{
-		if(pData[i] == '\t')
+		if((pData[i] == '\t') && (bInNotes == FALSE))
 		{
 			nField++;
 
 			if(nField == 1)
 			{
-				j = strGroup.ReverseFind('.');
+				j = strGroup.ReverseFind(_T('.'));
+
+				// Thanks to Andrew D. Bond for the following improvement
+				// Slightly enhanced by D. Reichl to detect some more URLs
+
+				// -- Andrew D. Bond
+				// Introduction: The Password Safe export format is rather flawed,
+				// since it uses the '.' character as the group / title separator.
+				// However, '.' is not likely to appear in the context of titles
+				// that include 'com', 'org', 'edu', etc, (domain names) or even
+				// 'zip' (password protected zip files)
+
+				// Slightly-smarter import: if the '.' we just found is followed
+				// by 'com', 'org', 'edu', etc, (domain names) or even
+				// 'zip' (password protected zip files) then figure this is part
+				// of the title and try the group / title splitting again.
+				// Example:
+				//  strGroup = "websites.someSite.com" // j == 17 // <- INCORRECT
+				//
+				// Overall, these fixes do make things much better.
+				// However, they will still not be able to handle entries where
+				// the title has _other_ "."'s in it.
+				// For example, when the title is:
+				//  subdomain.domain.com
+				//  mySoftware version 8.5
+				//	domain.tv (replace .tv with any domain suffix not included below)
+
+				if((strGroup.GetLength() >= 4) && (j != -1))
+					str3 = strGroup.Right(3);
+				else
+					str3 = _T("   ");
+				if((strGroup.GetLength() >= 5) && (j != -1))
+					str4 = strGroup.Right(4);
+				else
+					str4 = _T("    ");
+				if((strGroup.GetLength() >= 6) && (j != -1))
+					str5 = strGroup.Right(5);
+				else
+					str5 = _T("     ");
+				if((strGroup.GetLength() >= 7) && (j != -1))
+					str6 = strGroup.Right(6);
+				else
+					str6 = _T("      ");
+
+				str3.MakeLower(); str4.MakeLower(); str5.MakeLower(); str6.MakeLower();
+
+				if((str4 == _T(".com")) || (str4 == _T(".org")) || (str4 == _T(".edu"))
+					|| (str4 == _T(".net")) || (str4 == _T(".zip"))
+					|| (str3 == _T(".uk")) || (str3 == _T(".de")) || (str3 == _T(".ch"))
+					|| (str3 == _T(".at")) || (str3 == _T(".it")))
+				{
+					// Fix for double-point URLs like .co.uk
+					if(str6 == _T(".co.uk")) j -= 3;
+
+					strTitle = strGroup.Right(strGroup.GetLength() - j);
+					strGroup = strGroup.Left(j);
+					j = strGroup.ReverseFind(_T('.'));
+				}
+
 				if(j != -1)
 				{
-					strTitle = strGroup.Right(strGroup.GetLength() - j - 1);
+					strTitle = strGroup.Right(strGroup.GetLength() - j - 1) + strTitle;
 					strGroup = strGroup.Left(j);
 				}
-				else strTitle.Empty();
+				else
+				{
+					// No '.' was found, or it is part of a ".com" in the title.
+					// Since Password Safe
+					// **requires** a title but not a group name, this means
+					// that a group name was not specified (a common
+					// occurrence). We should assign a logical group name
+					// and store the title we just identified. 
+					strTitle = strGroup + strTitle;
+					strGroup = TRL("Imported from Password Safe");
+				}
 			}
 		}
 		else if((pData[i] == '\"') && (bInNotes == FALSE) && (nField == 3))
@@ -476,8 +545,8 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 
 			if(strNotes.GetLength() != 0)
 			{
-				if(strNotes.GetAt(0) == '\"') strNotes = strNotes.Right(strNotes.GetLength() - 1);
-				if(strNotes.Right(1) == "\"") strNotes = strNotes.Left(strNotes.GetLength() - 1);
+				if(strNotes.GetAt(0) == _T('\"')) strNotes = strNotes.Right(strNotes.GetLength() - 1);
+				if(strNotes.Right(1) == _T("\"")) strNotes = strNotes.Left(strNotes.GetLength() - 1);
 			}
 		}
 		else if((pData[i] == '\r') && (bInNotes == FALSE))

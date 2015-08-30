@@ -436,7 +436,7 @@
 
 |Show &Columns| |Показване на колони|
 
-|~LANGUAGEVERSION| |0.95a|
+|~LANGUAGEVERSION| |0.95b|
 |~LANGUAGEAUTHOR|     |Дончо Ангелов|
 |~LANGUAGEAUTHOREMAIL| |kppc@doncho.net|
 |~LANGUAGENAME|       |Български|
@@ -535,4 +535,9 @@
     |Сменена е настройка, която изисква рестартиране на KeePass, за да стане активна.|
 |Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
     |Вашият ключ се криптира няколко пъти при създаването на ключът за базата данни. Това прибавя константно забавяне, но и прави атаката с груба сила много по-трудна.|
+
+|Import From Personal &Vault TXT|
+    |Импорт на Личен &Vault TXT|
+|bits|
+    |бита|
 

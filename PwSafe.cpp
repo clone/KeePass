@@ -73,7 +73,7 @@ BOOL CPwSafeApp::InitInstance()
 	m_pAppMutex = new CMutex(FALSE, _T("KeePassApplicationMutex"), NULL);
 	if(m_pAppMutex == NULL) { ASSERT(FALSE); }
 
-	AfxOleInit();
+	VERIFY(AfxOleInit());
 	AfxEnableControlContainer();
 	AfxInitRichEdit();
 

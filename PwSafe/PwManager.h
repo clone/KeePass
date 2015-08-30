@@ -35,7 +35,7 @@
 
 // General product information
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
-#define PWM_VERSION_STR  _T("0.95b")
+#define PWM_VERSION_STR  _T("0.96a")
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -103,6 +103,8 @@
 #define PWMKEY_PWGEN_CHARS      _T("KeePwGenChars")
 #define PWMKEY_PWGEN_NUMCHARS   _T("KeePwGenNumChars")
 #define PWMKEY_DISABLEUNSAFE    _T("KeeDisableUnsafe")
+#define PWMKEY_REMEMBERLAST     _T("KeeRememberLast")
+#define PWMKEY_HEADERORDER      _T("KeeHeaderItemOrder")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -269,6 +271,7 @@ public:
 
 	BOOL SetGroup(DWORD dwIndex, PW_GROUP *pTemplate);
 	BOOL SetEntry(DWORD dwIndex, PW_ENTRY *pTemplate);
+	// DWORD MakeGroupTree(LPCTSTR lpTreeString, TCHAR tchSeparator);
 
 	// Use these functions to make passwords in PW_ENTRY structures readable
 	void LockEntryPassword(PW_ENTRY *pEntry); // Lock password, encrypt it
@@ -306,6 +309,7 @@ public:
 
 	// Checks and corrects the group tree (level order, etc.)
 	void FixGroupTree();
+	void DeleteLostEntries();
 
 	void SubstEntryGroupIds(DWORD dwExistingId, DWORD dwNewId);
 

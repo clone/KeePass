@@ -155,15 +155,18 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId)
 	}
 	else { ASSERT(FALSE); }
 
-	for(i = 0; i < m_pMgr->GetNumberOfEntries(); i++)
+	unsigned long uNumEntries = (unsigned long)m_pMgr->GetNumberOfEntries();
+
+	for(i = 0; i < uNumEntries; i++)
 	{
 		p = m_pMgr->GetEntry(i);
 		ASSERT_ENTRY(p);
 
+		// Are we exporting this group?
 		if((dwGroupId != DWORD_MAX) && (p->uGroupId != dwGroupId)) continue;
 
-		pg = m_pMgr->GetGroup(m_pMgr->GetGroupByIdN(p->uGroupId));
-		ASSERT(pg != NULL);
+		pg = m_pMgr->GetGroupById(p->uGroupId);
+		ASSERT(pg != NULL); if(pg == NULL) continue;
 
 		m_pMgr->UnlockEntryPassword(p);
 

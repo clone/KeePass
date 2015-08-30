@@ -61,4 +61,13 @@ void _GetCurrentPwTime(PW_TIME *p);
 // returns 0 if pt1=pt2
 int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2);
 
+// Packs an array of integers to a TCHAR string
+void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount);
+
+// Unpacks a TCHAR string to an array of integers
+void str2ar(TCHAR *tszString, INT *pArray, INT nItemCount);
+
+// Hash a file
+BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash);
+
 #endif

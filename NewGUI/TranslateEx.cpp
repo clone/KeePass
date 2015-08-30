@@ -58,7 +58,10 @@ BOOL LoadTranslationTable(const char *pszTableName)
 	if(pszTableName == NULL) return FALSE;
 	if(strlen(pszTableName) == 0) return TRUE;
 	if((strcmp(pszTableName, "Standard") == 0) || (strcmp(pszTableName, "English") == 0))
+	{
+		_tcscpy(m_szCurrentTranslationTable, pszTableName);
 		return TRUE;
+	}
 
 	GetModuleFileName(NULL, szPath, 2 * MAX_PATH);
 
@@ -165,6 +168,8 @@ BOOL FreeCurrentTranslationTable()
 {
 	SAFE_DELETE_ARRAY(m_pTranslationStrings);
 	m_dwNumTrlStrings = 0;
+
+	_tcscpy(m_szCurrentTranslationTable, _T("English"));
 
 	if(m_bTableLoaded == FALSE) return FALSE;
 

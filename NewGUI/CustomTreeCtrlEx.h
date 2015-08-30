@@ -32,19 +32,42 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
+class CCustomOleDropHandler : public COleDropTarget
+{
+public:
+	DROPEFFECT OnDragEnter(CWnd* pWnd, COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
+	DROPEFFECT OnDragOver(CWnd* pWnd, COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
+	void OnDragLeave(CWnd* pWnd);
+	BOOL OnDrop(CWnd* pWnd, COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point);
+
+	void SetDragAccept(BOOL bAccept);
+	void _RemoveDropSelection();
+
+	CWnd *m_pTopParentI;
+	CTreeCtrl *m_pParentTree;
+
+private:
+	BOOL m_bAcceptDrop;
+};
+
+/////////////////////////////////////////////////////////////////////////////
+
 class CCustomTreeCtrlEx : public CTreeCtrl
 {
 public:
 	CCustomTreeCtrlEx();
+	virtual ~CCustomTreeCtrlEx();
+
+	BOOL InitDropHandler();
 
 	CWnd *m_pParentI;
+	CCustomOleDropHandler m_drop;
 
-public:
 	//{{AFX_VIRTUAL(CCustomTreeCtrlEx)
 	//}}AFX_VIRTUAL
 
-public:
-	virtual ~CCustomTreeCtrlEx();
+private:
+	BOOL m_bValidDropTarget;
 
 protected:
 	//{{AFX_MSG(CCustomTreeCtrlEx)

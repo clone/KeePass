@@ -36,22 +36,22 @@ static unsigned char g_shaLastString[32];
 
 void EraseCString(CString *pString)
 {
-	int i, j, len;
+	int j, len;
+	LPTSTR lpt;
 	const TCHAR tcPlus = ' ';
 	const TCHAR tcMod = '}' - tcPlus;
 
 	ASSERT(pString != NULL);
 
 	len = pString->GetLength();
+	lpt = pString->GetBuffer(0);
 
-	for(i = 0; i < 3; i++) // 3 rounds overwrite
+	for(j = 0; j < len; j++)
 	{
-		for(j = 0; j < len; j++)
-		{
-			pString->SetAt(j, (TCHAR)((rand() % tcMod) + tcPlus));
-		}
+		lpt[j] = (TCHAR)((rand() % tcMod) + tcPlus);
 	}
 
+	pString->FreeExtra();
 	pString->Empty();
 }
 

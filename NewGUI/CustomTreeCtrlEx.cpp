@@ -27,7 +27,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "../PwSafe.h"
 #include "../resource.h"
 #include "../PwSafeDlg.h"
@@ -45,10 +45,12 @@ static char THIS_FILE[] = __FILE__;
 CCustomTreeCtrlEx::CCustomTreeCtrlEx()
 {
 	m_pParentI = NULL;
+	m_bValidDropTarget = FALSE;
 }
 
 CCustomTreeCtrlEx::~CCustomTreeCtrlEx()
 {
+	m_bValidDropTarget = FALSE;
 }
 
 BEGIN_MESSAGE_MAP(CCustomTreeCtrlEx, CTreeCtrl)
@@ -91,4 +93,85 @@ void CCustomTreeCtrlEx::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	{
 		CTreeCtrl::OnSysKeyDown(nChar, nRepCnt, nFlags);
 	}
+}
+
+BOOL CCustomTreeCtrlEx::InitDropHandler()
+{
+	if(m_bValidDropTarget == TRUE) { ASSERT(FALSE); return FALSE; } // Initialized already
+
+	ASSERT(m_pParentI != NULL);
+	m_drop.m_pTopParentI = m_pParentI;
+	m_drop.m_pParentTree = this;
+
+	m_bValidDropTarget = m_drop.Register(this);
+	ASSERT(m_bValidDropTarget == TRUE);
+	return m_bValidDropTarget;
+}
+
+void CCustomOleDropHandler::SetDragAccept(BOOL bAccept)
+{
+	ASSERT((bAccept == TRUE) || (bAccept == FALSE));
+	m_bAcceptDrop = bAccept;
+}
+
+DROPEFFECT CCustomOleDropHandler::OnDragEnter(CWnd* pWnd, COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
+{
+	return OnDragOver(pWnd, pDataObject, dwKeyState, point);
+}
+
+DROPEFFECT CCustomOleDropHandler::OnDragOver(CWnd* pWnd, COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
+{
+	UINT dwState = 0;
+	const UINT uGood = TVHT_ONITEMSTATEICON | TVHT_ONITEMBUTTON | TVHT_ONITEMICON | TVHT_ONITEMINDENT | TVHT_ONITEMLABEL | TVHT_ONITEMRIGHT;
+	HTREEITEM h;
+
+	ASSERT(m_pTopParentI != NULL); ASSERT(m_pParentTree != NULL);
+
+	if(m_bAcceptDrop == FALSE) { _RemoveDropSelection(); return DROPEFFECT_NONE; } // Don't accept drop from other applications
+
+	h = m_pParentTree->HitTest(point, &dwState);
+	if(((dwState & uGood) > 0) && (h != NULL))
+	{
+		m_pParentTree->SelectDropTarget(h);
+	}
+	else
+	{
+		_RemoveDropSelection();
+		return DROPEFFECT_NONE;
+	}
+
+	if((dwKeyState & MK_CONTROL) == MK_CONTROL) return DROPEFFECT_COPY;
+	return DROPEFFECT_MOVE;
+}
+
+void CCustomOleDropHandler::OnDragLeave(CWnd* pWnd)
+{
+	_RemoveDropSelection();
+}
+
+BOOL CCustomOleDropHandler::OnDrop(CWnd* pWnd, COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point)
+{
+	UINT dwState = 0;
+	const UINT uGood = TVHT_ONITEMSTATEICON | TVHT_ONITEMBUTTON | TVHT_ONITEMICON | TVHT_ONITEMINDENT | TVHT_ONITEMLABEL | TVHT_ONITEMRIGHT;
+	HTREEITEM h;
+
+	ASSERT(m_pTopParentI != NULL); ASSERT(m_pParentTree != NULL);
+
+	if(m_bAcceptDrop == FALSE) return TRUE; // Don't accept drop from other applications
+
+	h = m_pParentTree->HitTest(point, &dwState);
+	if(((dwState & uGood) > 0) && (h != NULL))
+	{
+		((CPwSafeDlg *)m_pTopParentI)->_HandleEntryDrop(dropEffect, h);
+	}
+
+	m_bAcceptDrop = FALSE;
+	_RemoveDropSelection();
+	return TRUE;
+}
+
+void CCustomOleDropHandler::_RemoveDropSelection()
+{
+	ASSERT(m_pTopParentI != NULL); ASSERT(m_pParentTree != NULL);
+	m_pParentTree->SelectDropTarget(NULL);
 }

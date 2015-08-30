@@ -59,6 +59,7 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	m_bColAutoSize = FALSE;
 	m_bCloseMinimizes = FALSE;
 	m_bDisableUnsafe = FALSE;
+	m_bRememberLast = FALSE;
 	//}}AFX_DATA_INIT
 }
 
@@ -86,6 +87,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_COLAUTOSIZE, m_bColAutoSize);
 	DDX_Check(pDX, IDC_CHECK_CLOSEMIN, m_bCloseMinimizes);
 	DDX_Check(pDX, IDC_CHECK_DISABLEUNSAFE, m_bDisableUnsafe);
+	DDX_Check(pDX, IDC_CHECK_REMEMBERLAST, m_bRememberLast);
 	//}}AFX_DATA_MAP
 }
 
@@ -95,6 +97,8 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialog)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_MENU, OnSelChangeTabMenu)
 	ON_BN_CLICKED(IDC_BTN_CREATEASSOC, OnBtnCreateAssoc)
 	ON_BN_CLICKED(IDC_BTN_DELETEASSOC, OnBtnDeleteAssoc)
+	ON_BN_CLICKED(IDC_CHECK_REMEMBERLAST, OnCheckRememberLast)
+	ON_BN_CLICKED(IDC_CHECK_AUTOOPENLASTDB, OnCheckAutoOpenLastDb)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -110,10 +114,7 @@ BOOL COptionsDlg::OnInitDialog()
 	NewGUI_Button(&m_btnCreateAssoc, IDB_FILE, IDB_FILE);
 	NewGUI_Button(&m_btnDeleteAssoc, IDB_CANCEL, IDB_CANCEL);
 
-	m_banner.Attach(this, KCSB_ATTACH_TOP);
-	m_banner.SetColBkg(RGB(255,255,255));
-	m_banner.SetColBkg2(NewGUI_GetBgColor());
-	m_banner.SetColEdge(RGB(0,0,0));
+	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_OPTIONS),
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("Settings"));
@@ -134,6 +135,10 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(NULL, OPTGRP_STARTEXIT);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_EXIT), OPTGRP_STARTEXIT);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_AUTOSAVE), OPTGRP_STARTEXIT);
+	m_wndgrp.AddWindow(NULL, OPTGRP_STARTEXIT);
+	m_wndgrp.AddWindow(NULL, OPTGRP_STARTEXIT);
+	m_wndgrp.AddWindow(NULL, OPTGRP_STARTEXIT);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_REMEMBERLAST), OPTGRP_STARTEXIT);
 
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_IMGBUTTONS), OPTGRP_GUI);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_ENTRYGRID), OPTGRP_GUI);
@@ -337,4 +342,18 @@ void COptionsDlg::NotifyAssocChanged()
 		FreeLibrary(hShell32);
 	}
 	else { ASSERT(FALSE); }
+}
+
+void COptionsDlg::OnCheckRememberLast() 
+{
+	UpdateData(TRUE);
+	if(m_bRememberLast == FALSE) m_bOpenLastDb = FALSE;
+	UpdateData(FALSE);
+}
+
+void COptionsDlg::OnCheckAutoOpenLastDb() 
+{
+	UpdateData(TRUE);
+	if(m_bOpenLastDb == TRUE) m_bRememberLast = TRUE;
+	UpdateData(FALSE);
 }

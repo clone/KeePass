@@ -84,6 +84,8 @@ IDI_ICONPIC             ICON    DISCARDABLE     "res\\iconpic.ico"
 IDI_WORLD               ICON    DISCARDABLE     "res\\world.ico"
 IDI_OPTIONS             ICON    DISCARDABLE     "res\\options.ico"
 IDI_LOCKED              ICON    DISCARDABLE     "res\\locked.ico"
+IDI_UNLOCKED            ICON    DISCARDABLE     "res\\unlocked.ico"
+IDI_KEYHOLE             ICON    DISCARDABLE     "res\\keyhole.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -423,6 +425,8 @@ BEGIN
     CONTROL         "Disable unsafe (security-critical) operations like exports, etc.",
                     IDC_CHECK_DISABLEUNSAFE,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,18,202,342,10
+    CONTROL         "Remember last opened file",IDC_CHECK_REMEMBERLAST,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,0,215,343,10
 END
 
 IDD_ENTRYPROPERTIES_DLG DIALOG DISCARDABLE  0, 0, 351, 114
@@ -505,8 +509,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,9,5,2
- PRODUCTVERSION 0,9,5,2
+ FILEVERSION 0,9,6,1
+ PRODUCTVERSION 0,9,6,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -523,13 +527,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.sourceforge.net\0"
             VALUE "CompanyName", "Dominik Reichl\0"
-            VALUE "FileDescription", "KeePass Password Safe v0.95b\0"
-            VALUE "FileVersion", "0, 9, 5, 2\0"
+            VALUE "FileDescription", "KeePass Password Safe v0.96a\0"
+            VALUE "FileVersion", "0, 9, 6, 1\0"
             VALUE "InternalName", "PwSafe\0"
             VALUE "LegalCopyright", "Copyright (c) 2004 Dominik Reichl\0"
             VALUE "OriginalFilename", "KeePass.exe\0"
-            VALUE "ProductName", "KeePass Password Safe v0.95b\0"
-            VALUE "ProductVersion", "0, 9, 5, 2\0"
+            VALUE "ProductName", "KeePass Password Safe v0.96a\0"
+            VALUE "ProductVersion", "0, 9, 6, 1\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -695,19 +699,19 @@ BEGIN
         MENUITEM "Print Pre&view...",           ID_FILE_PRINTPREVIEW
         MENUITEM "&Print Complete Password List", ID_FILE_PRINT
         MENUITEM SEPARATOR
-        POPUP "Export Complete Database"
+        POPUP "Export To"
         BEGIN
-            MENUITEM "&TXT Format...",              ID_EXPORT_TXT
-            MENUITEM "&HTML Format...",             ID_EXPORT_HTML
-            MENUITEM "&XML Format...",              ID_EXPORT_XML
-            MENUITEM "&CSV Format...",              ID_EXPORT_CSV
+            MENUITEM "&TXT File...",                ID_EXPORT_TXT
+            MENUITEM "&HTML File...",               ID_EXPORT_HTML
+            MENUITEM "&XML File...",                ID_EXPORT_XML
+            MENUITEM "&CSV File...",                ID_EXPORT_CSV
         END
-        POPUP "Import To Database"
+        POPUP "Import From"
         BEGIN
-            MENUITEM "&Import From CSV",            ID_IMPORT_CSV
-            MENUITEM "Import From Code&Wallet",     ID_IMPORT_CWALLET
-            MENUITEM "Import From &PwSafe v2 TXT",  ID_IMPORT_PWSAFE
-            MENUITEM "Import From Personal &Vault TXT", ID_IMPORT_PVAULT
+            MENUITEM "&CSV File...",                ID_IMPORT_CSV
+            MENUITEM "Code&Wallet TXT File...",     ID_IMPORT_CWALLET
+            MENUITEM "&PwSafe v2 TXT File...",      ID_IMPORT_PWSAFE
+            MENUITEM "Personal &Vault TXT File...", ID_IMPORT_PVAULT
         END
         MENUITEM SEPARATOR
         MENUITEM "&Lock Workspace",             ID_FILE_LOCK

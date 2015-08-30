@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Slovenèina|
-|~LANGUAGEVERSION|             |0.94a|
+|~LANGUAGEVERSION|             |0.95b|
 |~LANGUAGEAUTHOR|              |Radoslav Bielik|
 |~LANGUAGEAUTHOREMAIL|         |rado@bielik.org, http://www.bielik.org|
 
@@ -333,7 +333,7 @@
     |Pri importovaní súboru došlo ku chybe. Súbor nemôe by importovanı|
 |&Import From CSV|             |Importova zo súboru &CSV|
 |Import From Code&Wallet|      |Importova zo súboru Code&Wallet|
-|Import From &PwSafe v2 TXT|   |Importova zo súboru &PwSafe v2|
+|Import From &PwSafe v2 TXT|   |Importova zo súboru &PwSafe v2 TXT|
 |Select &Font|                 |Zvo¾te &Font|
 |Select a new font for the list controls.|     |Zvo¾te novı font pre zoznamy.|
 
@@ -481,3 +481,49 @@
 |KeePass Password Database|			|Databáza hesiel KeePass|
 |Setup|						|Inštalácia|
 
+
+|&Database Settings...|				|Nastavenia databázy...|
+|Cannot access the selected drive.|		|Zvolená jednotka nebola nájdená.|
+|Click on an entry to jump to it.|
+	|Kliknite na záznam pre jeho zobrazenie.|
+|Database Settings|				|Nastavenia databázy|
+|Database Summary|				|Preh¾ad databázy|
+|Disable unsafe (security-critical) operations like exports, etc.|
+	|Zakáza nebezpeèné operácie ako napríklad export, atï.|
+|Exit?|						|Ukonèi?|
+|Expired Entries|
+	|Záznamy po vypršaní platnosti|
+|Here you can configure the current database.|
+	|Tu môete upravi nastavenia aktuálnej databázy.|
+|If you exit now, all changes to the current database will be lost.|
+	|Ak teraz program ukonèíte, všetky zmeny v aktuálnej databáze budú stratené.|
+|Make sure a writable medium is inserted.|
+	|Uistite sa e je vloené zapisovate¾né médium.|
+|Maybe it's read-only or the storage media has been removed.|
+	|Médium je len pre èítanie, alebo bolo odstránené z mechaniky.|
+|Not enough free disk space!|			|Nedostatok vo¾ného miesta na disku!|
+|Number of key encryption rounds:|
+	|Poèet opakovaní kódovania k¾úèa:|
+|Password List|					|Zoznam hesiel|
+|Quality:|					|Kvalita:|
+|Show All &Expired Entries...|			|Zobrazi záznamy &po vypršaní platnosti...|
+|The file couldn't be saved.|			|Nebolo moné uloi súbor.|
+|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
+	|Èím je toto èíslo vyššie, tım ašie sú uskutoènite¾né brute-force útoky, ale zároveò je o to pomalšie naèítanie a ukladanie databázy.|
+|This is a list of all expired entries|	
+	|Toto je zoznam všetkıch záznamov po vypršaní platnosti|
+|To execute this operation you must enable unsafe operations in the options dialog.|
+	|Pre vykonanie tejto operácie musíte povoli nebezpeèné operácie v monostiach programu.|
+|Unsafe operations are disabled.|		|Nebezpeèné operácie sú zakázané.|
+|Would you like to exit anyway?|
+	|Prajete si napriek tomu ukonèi program?|
+|You have changed an option that requires restarting KeePass to get active.|
+	|Zmenili ste nastavenie ktoré sa prejaví a po reštarte programu KeePass.|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
+	|Váš k¾úè je zakódovanı nieko¾ko krát za úèelom vytvorenia finálneho kódovacieho k¾úèa databázy. Tento postup pridáva konštantnı èasovı faktor a robí brute-force útoky ove¾a ašie uskutoènite¾nımi.|
+
+
+
+
+|Import From Personal &Vault TXT|		|Importova zo súboru Personal &Vault TXT|
+|bits|						|bitov|

@@ -608,6 +608,8 @@ BOOL CPwManager::DeleteGroupById(DWORD uGroupId)
 	DWORD i = 0, inx;
 	PW_ENTRY *p;
 
+	ASSERT(GetGroupById(uGroupId) != NULL);
+
 	if(m_dwNumEntries != 0)
 	{
 		while(1) // Remove all items in that group
@@ -631,13 +633,14 @@ BOOL CPwManager::DeleteGroupById(DWORD uGroupId)
 	{
 		for(i = inx; i < (m_dwNumGroups - 1); i++)
 		{
-			m_pGroups[i] = m_pGroups[i+1];
+			m_pGroups[i] = m_pGroups[i + 1];
 		}
 	}
 
 	mem_erase((unsigned char *)&m_pGroups[m_dwNumGroups - 1], sizeof(PW_GROUP));
 	m_dwNumGroups--;
 
+	FixGroupTree();
 	return TRUE;
 }
 
@@ -802,7 +805,6 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 	PW_DBHEADER hdr;
 	sha256_ctx sha32;
 	RD_UINT8 uFinalKey[32];
-	CString strTitle, strUserName, strURL, strPassword, strNotes;
 	char *p;
 	USHORT usFieldType;
 	DWORD dwFieldSize;
@@ -987,6 +989,8 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 	// Erase and delete memory file
 	mem_erase((unsigned char *)pVirtualFile, uAllocated);
 	SAFE_DELETE_ARRAY(pVirtualFile);
+
+	DeleteLostEntries();
 	return TRUE;
 }
 
@@ -2054,3 +2058,70 @@ void CPwManager::SetKeyEncRounds(DWORD dwRounds)
 	if(dwRounds == DWORD_MAX) m_dwKeyEncRounds = DWORD_MAX - 1;
 	else m_dwKeyEncRounds = dwRounds;
 }
+
+void CPwManager::DeleteLostEntries()
+{
+	DWORD i, dwEntryCount;
+	BOOL bFixed = TRUE;
+	PW_ENTRY *pe;
+	PW_GROUP *pg;
+
+	dwEntryCount = GetNumberOfEntries();
+	if(dwEntryCount == 0) return;
+
+	while(bFixed == TRUE)
+	{
+		bFixed = FALSE;
+
+		for(i = 0; i < dwEntryCount; i++)
+		{
+			pe = GetEntry(i);
+			ASSERT(pe != NULL); if(pe == NULL) break;
+
+			pg = GetGroupById(pe->uGroupId);
+			if(pg == NULL)
+			{
+				DeleteEntry(i);
+				dwEntryCount--;
+				bFixed = TRUE;
+				break;
+			}
+		}
+	}
+}
+
+/* DWORD CPwManager::MakeGroupTree(LPCTSTR lpTreeString, TCHAR tchSeparator)
+{
+	DWORD i, j = 0, dwCurGroup = 0, dwTestGroup;
+	DWORD dwId = DWORD_MAX;
+	TCHAR *ptzTemp;
+	DWORD dwStrLen;
+	DWORD dwLevel = 0;
+	TCHAR tch;
+
+	ASSERT(lpTreeString != NULL); if(lpTreeString == NULL) return DWORD_MAX;
+
+	dwStrLen = (DWORD)_tcslen(lpTreeString);
+	ptzTemp = new TCHAR[dwStrLen + 1]; ASSERT(ptzTemp != NULL);
+	ptzTemp[0] = 0;
+
+	for(i = 0; i < (dwStrLen + 1); i++)
+	{
+		tch = lpTreeString[i];
+
+		if((tch == tchSeparator) || (tch == 0))
+		{
+			ptzTemp[j] = 0;
+
+			j = 0;
+		}
+		else
+		{
+			ptzTemp[j] = tch;
+			j++;
+		}
+	}
+
+	SAFE_DELETE_ARRAY(ptzTemp);
+	return dwId;
+} */

@@ -196,10 +196,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	m_pGroups.SetCurSel(m_nGroupId);
 
 	// Configure banner control
-	m_banner.Attach(this, KCSB_ATTACH_TOP);
-	m_banner.SetColBkg(RGB(255,255,255));
-	m_banner.SetColBkg2(NewGUI_GetBgColor());
-	m_banner.SetColEdge(RGB(0,0,0));
+	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY),
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 

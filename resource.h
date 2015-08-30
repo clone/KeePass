@@ -55,6 +55,8 @@
 #define IDB_DISK                        192
 #define IDD_ENTRYLIST_DLG               195
 #define IDD_DBSETTINGS_DLG              196
+#define IDI_UNLOCKED                    197
+#define IDI_KEYHOLE                     198
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -168,6 +170,7 @@
 #define IDC_STATIC_PASSBITS             1141
 #define IDC_COMBO_ENCALGOS              1144
 #define IDC_EDIT_KEYENC                 1145
+#define IDC_CHECK_REMEMBERLAST          1148
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -317,9 +320,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        197
+#define _APS_NEXT_RESOURCE_VALUE        203
 #define _APS_NEXT_COMMAND_VALUE         32939
-#define _APS_NEXT_CONTROL_VALUE         1148
+#define _APS_NEXT_CONTROL_VALUE         1149
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

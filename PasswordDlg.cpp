@@ -142,13 +142,13 @@ BOOL CPasswordDlg::OnInitDialog()
 	}
 	m_cbDiskList.SetCurSel(0);
 
-	m_banner.Attach(this, KCSB_ATTACH_TOP);
-
-	m_banner.SetColBkg(RGB(255,255,255));
-	m_banner.SetColBkg2(NewGUI_GetBgColor());
-	m_banner.SetColEdge(RGB(0,0,0));
-	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY),
-		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
+	NewGUI_ConfigSideBanner(&m_banner, this);
+	if(m_bLoadMode == FALSE)
+		m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY),
+			KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
+	else
+		m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEYHOLE),
+			KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 
 	LPCTSTR lp;
 
@@ -296,35 +296,38 @@ void CPasswordDlg::OnOK()
 	{
 		m_cbDiskList.GetLBText(m_cbDiskList.GetCurSel(), strTemp);
 
-		if(GetDiskFreeSpaceEx((LPCTSTR)strTemp, &aBytes[0], &aBytes[1], &aBytes[2]) == FALSE)
+		if(m_bLoadMode == FALSE)
 		{
-			strTemp = TRL("Cannot access the selected drive.");
-			strTemp += _T("\r\n\r\n");
-			strTemp += TRL("Make sure a writable medium is inserted.");
-			MessageBox(strTemp, TRL("Stop"), MB_OK | MB_ICONWARNING);
-			return;
-		}
+			if(GetDiskFreeSpaceEx((LPCTSTR)strTemp, &aBytes[0], &aBytes[1], &aBytes[2]) == FALSE)
+			{
+				strTemp = TRL("Cannot access the selected drive.");
+				strTemp += _T("\r\n\r\n");
+				strTemp += TRL("Make sure a writable medium is inserted.");
+				MessageBox(strTemp, TRL("Stop"), MB_OK | MB_ICONWARNING);
+				return;
+			}
 
-		if(aBytes[2].QuadPart < 128)
-		{
-			MessageBox(TRL("Not enough free disk space!"), TRL("Stop"), MB_OK | MB_ICONWARNING);
-			return;
-		}
+			if(aBytes[2].QuadPart < 128)
+			{
+				MessageBox(TRL("Not enough free disk space!"), TRL("Stop"), MB_OK | MB_ICONWARNING);
+				return;
+			}
 
-		FILE *fpTest;
-		CString strTemp2 = strTemp;
-		strTemp2 += _T("12398756.323"); // Just a random filename
-		fpTest = _tfopen((LPCTSTR)strTemp2, _T("wb"));
-		if(fpTest == NULL)
-		{
-			strTemp = TRL("Cannot access the selected drive.");
-			strTemp += _T("\r\n\r\n");
-			strTemp += TRL("Make sure a writable medium is inserted.");
-			MessageBox(strTemp, TRL("Stop"), MB_OK | MB_ICONWARNING);
-			return;
+			FILE *fpTest;
+			CString strTemp2 = strTemp;
+			strTemp2 += _T("12398756.323"); // Just a random filename
+			fpTest = _tfopen((LPCTSTR)strTemp2, _T("wb"));
+			if(fpTest == NULL)
+			{
+				strTemp = TRL("Cannot access the selected drive.");
+				strTemp += _T("\r\n\r\n");
+				strTemp += TRL("Make sure a writable medium is inserted.");
+				MessageBox(strTemp, TRL("Stop"), MB_OK | MB_ICONWARNING);
+				return;
+			}
+			fclose(fpTest); Sleep(100);
+			DeleteFile(strTemp2);
 		}
-		fclose(fpTest); Sleep(100);
-		DeleteFile(strTemp2);
 
 		m_bKeyFile = TRUE;
 		m_strRealKey = strTemp;

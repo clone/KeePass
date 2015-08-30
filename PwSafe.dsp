@@ -286,6 +286,10 @@ SOURCE=.\res\key_smal.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\keyhole.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\language.bmp
 # End Source File
 # Begin Source File
@@ -371,6 +375,10 @@ SOURCE=.\res\tb_open.bmp
 # Begin Source File
 
 SOURCE=.\res\tb_save.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\unlocked.ico
 # End Source File
 # Begin Source File
 

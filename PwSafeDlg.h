@@ -80,6 +80,7 @@ public:
 
 	void ProcessResize();
 	void CleanUp();
+	void SetStatusTextEx(LPCTSTR lpStatusText, int nPane = -1);
 
 	void UpdateGroupList();
 	void UpdatePasswordList();
@@ -105,6 +106,8 @@ public:
 
 	void _OnPwlistColumnWidthChange(int icolumn = -1, int isize = -1);
 
+	void _HandleEntryDrop(DWORD dwDropType, HTREEITEM hTreeItem);
+
 	BOOL m_bTimer;
 	int m_nClipboardCountdown;
 	BOOL m_bOpenLastDb;
@@ -127,6 +130,7 @@ public:
 	BOOL m_bUserStars;
 	BOOL m_bDisableUnsafe;
 	BOOL m_bDisableUnsafeAtStart;
+	BOOL m_bRememberLast;
 
 	CStatusBarCtrl m_sbStatus;
 	BOOL m_bShowToolBar;
@@ -176,10 +180,15 @@ public:
 
 	DWORD m_dwClipboardSecs;
 	CString m_strFontSpec;
+	CString m_strListFontFace;
+	int m_nListFontSize;
 
 	DWORD m_dwLastNumSelectedItems;
 	DWORD m_dwLastFirstSelectedItem;
 	HTREEITEM m_hLastSelectedGroup;
+
+	BOOL m_bHashValid;
+	BYTE m_aHashOfFile[32];
 
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
@@ -324,6 +333,8 @@ protected:
 
 	LONG m_lSplitterPosHoriz;
 	LONG m_lSplitterPosVert;
+
+	INT m_aHeaderOrder[11];
 
 	//{{AFX_MSG(CPwSafeDlg)
 	virtual BOOL OnInitDialog();

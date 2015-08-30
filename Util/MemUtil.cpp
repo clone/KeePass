@@ -30,6 +30,7 @@
 #include "StdAfx.h"
 #include "MemUtil.h"
 #include "NewRandom.h"
+#include "../Crypto/sha2.h"
 
 void mem_erase(unsigned char *p, unsigned long u)
 {
@@ -175,4 +176,86 @@ int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2)
 	else if(pt1->btSecond > pt2->btSecond) return 1;
 
 	return 0; // They are exactly the same
+}
+
+// Packs an array of integers to a TCHAR string
+void ar2str(TCHAR *tszString, INT *pArray, INT nItemCount)
+{
+	INT i;
+	TCHAR tszTemp[20];
+
+	ASSERT(tszString != NULL); if(tszString == NULL) return;
+	ASSERT(pArray != NULL); if(pArray == NULL) return;
+
+	tszString[0] = 0;
+	if(nItemCount == 0) return;
+
+	_itot(pArray[0], tszString, 10);
+
+	for(i = 1; i < nItemCount; i++)
+	{
+		_tcscat(tszString, _T(" "));
+		_itot(pArray[i], tszTemp, 10);
+		_tcscat(tszString, tszTemp);
+	}
+}
+
+// Unpacks a TCHAR string to an array of integers
+void str2ar(TCHAR *tszString, INT *pArray, INT nItemCount)
+{
+	INT i = 0;
+	TCHAR *p = tszString;
+	TCHAR *lastp = tszString;
+
+	ASSERT(tszString != NULL); if(tszString == NULL) return;
+	ASSERT(pArray != NULL); if(pArray == NULL) return;
+
+	lastp--;
+	while(1)
+	{
+		if((*p == _T(' ')) || (*p == 0))
+		{
+			lastp++;
+			pArray[i] = _ttoi(lastp);
+			lastp = p;
+			i++;
+		}
+		if(i == nItemCount) break;
+
+		p++;
+	}
+}
+
+BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash)
+{
+	FILE *fp = NULL;
+	unsigned char *pBuf = NULL;
+	size_t nRead = 0;
+	sha256_ctx sha32;
+
+	ASSERT(lpFile != NULL); if(lpFile == NULL) return FALSE;
+	ASSERT(pHash != NULL); if(pHash == NULL) return FALSE;
+
+	pBuf = new unsigned char[1024];
+	ASSERT(pBuf != NULL); if(pBuf == NULL) return FALSE;
+
+	fp = _tfopen(lpFile, _T("rb"));
+	if(fp == NULL) return FALSE;
+
+	sha256_begin(&sha32);
+
+	while(1)
+	{
+		nRead = fread(pBuf, 1, 1024, fp);
+		if(nRead == 0) break;
+
+		sha256_hash(pBuf, (unsigned long)nRead, &sha32);
+		if(nRead != 1024) break;
+	}
+
+	sha256_end((unsigned char *)pHash, &sha32);
+	fclose(fp); fp = NULL;
+
+	SAFE_DELETE_ARRAY(pBuf);
+	return TRUE;
 }

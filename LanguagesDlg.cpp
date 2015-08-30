@@ -76,10 +76,7 @@ BOOL CLanguagesDlg::OnInitDialog()
 	NewGUI_Button(&m_btClose, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_Button(&m_btGetLang, IDB_LANGUAGE, IDB_LANGUAGE);
 
-	m_banner.Attach(this, KCSB_ATTACH_TOP);
-	m_banner.SetColBkg(RGB(255,255,255));
-	m_banner.SetColBkg2(NewGUI_GetBgColor());
-	m_banner.SetColEdge(RGB(0,0,0));
+	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_WORLD),
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("Load a language file"));

@@ -89,6 +89,7 @@ public:
 	BOOL	m_bColAutoSize;
 	BOOL	m_bCloseMinimizes;
 	BOOL	m_bDisableUnsafe;
+	BOOL	m_bRememberLast;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(COptionsDlg)
@@ -105,6 +106,8 @@ protected:
 	afx_msg void OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnBtnCreateAssoc();
 	afx_msg void OnBtnDeleteAssoc();
+	afx_msg void OnCheckRememberLast();
+	afx_msg void OnCheckAutoOpenLastDb();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

@@ -60,6 +60,63 @@
 #define LVS_EX_SI_MENU (/*LVS_EX_FLATSB|*/LVS_EX_ONECLICKACTIVATE|LVS_EX_UNDERLINEHOT)
 #define LVS_EX_SI_REPORT (/*(LVS_EX_FLATSB)*/ 0)
 
+#ifndef LVBKIF_SOURCE_NONE
+#define LVBKIF_SOURCE_NONE      0x00000000
+#define LVBKIF_SOURCE_HBITMAP   0x00000001
+#define LVBKIF_SOURCE_URL       0x00000002
+#define LVBKIF_SOURCE_MASK      0x00000003
+#define LVBKIF_STYLE_NORMAL     0x00000000
+#define LVBKIF_STYLE_TILE       0x00000010
+#define LVBKIF_STYLE_MASK       0x00000010
+#define LVBKIF_FLAG_TILEOFFSET  0x00000100
+#define LVBKIF_TYPE_WATERMARK   0x10000000
+
+typedef struct tagLVBKIMAGE
+{
+    ULONG ulFlags;
+    HBITMAP hbm;
+    LPTSTR pszImage;
+    UINT cchImageMax;
+    int xOffsetPercent;
+    int yOffsetPercent;
+} LVBKIMAGE, FAR *LPLVBKIMAGE;
+#endif
+
+#ifndef LWM_SETBKIMAGE
+#define LVM_SETBKIMAGEA (LVM_FIRST + 68)
+#define LVM_SETBKIMAGEW (LVM_FIRST + 138)
+#define LVM_GETBKIMAGEA (LVM_FIRST + 69)
+#define LVM_GETBKIMAGEW (LVM_FIRST + 139)
+#ifdef UNICODE
+#define LVM_SETBKIMAGE LVM_SETBKIMAGEW
+#define LVM_GETBKIMAGE LVM_GETBKIMAGEW
+#else
+#define LVM_SETBKIMAGE LVM_SETBKIMAGEA
+#define LVM_GETBKIMAGE LVM_GETBKIMAGEA
+#endif
+#endif
+
+#ifndef SB_SETTIPTEXT
+#define SB_SETTIPTEXTA		(WM_USER+16)
+#define SB_SETTIPTEXTW		(WM_USER+17)
+#ifdef UNICODE
+#define SB_SETTIPTEXT SB_SETTIPTEXTW
+#else
+#define SB_SETTIPTEXT SB_SETTIPTEXTA
+#endif
+#endif
+
+#ifndef SBT_TOOLTIPS
+#define SBT_TOOLTIPS 0x0800
+#endif
+
+#ifndef ListView_SetBkImage
+#define ListView_SetBkImage(hwnd, plvbki) \
+    (BOOL)SNDMSG((hwnd), LVM_SETBKIMAGE, 0, (LPARAM)(plvbki))
+#define ListView_GetBkImage(hwnd, plvbki) \
+    (BOOL)SNDMSG((hwnd), LVM_GETBKIMAGE, 0, (LPARAM)(plvbki))
+#endif
+
 #ifndef CDRF_NOTIFYSUBITEMDRAW
 #define CDRF_NOTIFYSUBITEMDRAW 0x00000020
 #define CDDS_SUBITEM           0x00020000
@@ -140,5 +197,10 @@ void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR 
 void NewGUI_TranslateCWnd(CWnd *pWnd);
 
 BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam);
+
+void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd);
+
+BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount);
+BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount);
 
 #endif // ___NEW_GUI_COMMON___

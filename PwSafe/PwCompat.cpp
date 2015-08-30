@@ -245,7 +245,7 @@ BOOL CPwManager::_OpenDatabaseV1(const TCHAR *pszFile)
 		pos += 4;
 		if(pos > uFileSize) { _OPENDB_FAIL; }
 
-		dw++;
+		dw++; // Increase group ID, to be compatible with i+1 group ID importing
 
 		ZeroMemory(pwTE.uuid, 16); // 0 = create new UUID
 

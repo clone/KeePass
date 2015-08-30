@@ -33,6 +33,7 @@
 #include "BtnST.h"
 #include "TranslateEx.h"
 #include "GradientProgressCtrl.h"
+#include "KCSideBannerWnd.h"
 
 #include "../PwSafe/PwUtil.h"
 
@@ -195,7 +196,7 @@ void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR 
 	ASSERT(pStatic != NULL); if(pStatic == NULL) return;
 
 	DWORD dwBits = EstimatePasswordBits(pszPassword);
-	if(dwBits > 9999) dwBits = 9999;
+	if(dwBits > 9999) dwBits = 9999; // 4 characters display limit
 
 	CString strQuality;
 	strQuality.Format(_T("%u"), dwBits);
@@ -204,4 +205,59 @@ void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR 
 	pStatic->SetWindowText((LPCTSTR)strQuality);
 	if(dwBits > 128) dwBits = 128;
 	pProgress->SetPos((int)dwBits);
+}
+
+void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
+{
+	CKCSideBannerWnd *p = (CKCSideBannerWnd *)pBanner;
+	CWnd *pParent = (CWnd *)pParentWnd;
+	ASSERT(pBanner != NULL); if(pBanner == NULL) return;
+	ASSERT(pParentWnd != NULL); if(pParentWnd == NULL) return;
+
+	p->Attach(pParent, KCSB_ATTACH_TOP);
+
+	// Original white-gray
+	// p->SetColBkg(RGB(255,255,255));
+	// p->SetColBkg2(NewGUI_GetBgColor());
+
+	p->SetColBkg(RGB(235, 235, 255));
+	p->SetColBkg2(RGB(192, 192, 255));
+
+	p->SetColEdge(RGB(0,0,0));
+}
+
+BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
+{
+	HWND hHeader;
+
+	ASSERT(hwListCtrl != NULL); if(hwListCtrl == NULL) return FALSE;
+	ASSERT(pOrder != NULL); if(pOrder == NULL) return FALSE;
+
+	hHeader = (HWND)SendMessage(hwListCtrl, LVM_GETHEADER, 0, 0);
+	ASSERT(hHeader != NULL); if(hHeader == NULL) return FALSE;
+
+	if(SendMessage(hHeader, HDM_GETORDERARRAY, (WPARAM)nColumnCount, (LPARAM)pOrder) == FALSE)
+	{
+		ASSERT(FALSE); return FALSE;
+	}
+
+	return TRUE;
+}
+
+BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
+{
+	HWND hHeader;
+
+	ASSERT(hwListCtrl != NULL); if(hwListCtrl == NULL) return FALSE;
+	ASSERT(pOrder != NULL); if(pOrder == NULL) return FALSE;
+
+	hHeader = (HWND)SendMessage(hwListCtrl, LVM_GETHEADER, 0, 0);
+	ASSERT(hHeader != NULL); if(hHeader == NULL) return FALSE;
+
+	if(SendMessage(hHeader, HDM_SETORDERARRAY, (WPARAM)nColumnCount, (LPARAM)pOrder) == FALSE)
+	{
+		ASSERT(FALSE); return FALSE;
+	}
+
+	return TRUE;
 }

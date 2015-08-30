@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |0.95b|
+|~LANGUAGEVERSION|             |0.96a|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -44,7 +44,7 @@
 |Password|                     |Passwort|
 |Notes|                        |Kommentare|
 
-|Ready.|                       |Fertig.|
+|Ready.|                       |Bereit.|
 
 |Either enter the password/passphrase or select the password disk's drive.|
     |Geben Sie entweder ein Passwort ein oder wählen Sie das Laufwerk der Schlüsseldiskette.|
@@ -162,7 +162,7 @@
 |Save Database &As...|         |Datenbank speichern &unter...|
 |Change &Master Key For This Database...|      |&Hauptschlüssel für diese Datenbank ändern...|
 |&Print Complete Password List|                |Komplette Passwortliste &drucken|
-|Export Complete Database|     |Komplette Datenbank exportieren|
+|Export To|                    |Exportieren nach|
 |&Lock Workspace|              |&Arbeitsfläche sperren|
 |&Unlock Workspace|            |&Arbeitsfläche entsperren|
 |&Exit|                        |&Beenden|
@@ -333,18 +333,17 @@
     |Es ist ein Fehler während des Importierens der CSV-Datei aufgetreten. Datei kann nicht importiert werden.|
 |An error occured while importing the file. File cannot be imported.|
     |Es ist ein Fehler während des Importierens aufgetreten. Datei kann nicht importiert werden.|
-|&Import From CSV|             |CSV-Datei &importieren|
-|Import From Code&Wallet|      |Code&Wallet-Textdatei importieren|
-|Import From &PwSafe v2 TXT|   |&PwSafe v2 TXT-Datei importieren|
+|&CSV File...|                 |&CSV-Datei...|
+|&PwSafe v2 TXT File...|       |&PwSafe v2 TXT-Datei...|
 |Select &Font|                 |&Font wählen|
 |Select a new font for the list controls.|     |Neue Schriftart für Listen auswählen.|
 
-|Import From Code&Wallet|      |Code&Wallet-Textdatei importieren|
-|&TXT Format...|               |Als &TXT-Datei exportieren...|
-|&HTML Format...|              |Als &HTML-Datei exportieren...|
-|&XML Format...|               |Als &XML-Datei exportieren...|
-|&CSV Format...|               |Als &CSV-Datei exportieren...|
-|Import To Database|           |In Datenbank importieren|
+|Code&Wallet TXT File...|      |Code&Wallet TXT-Datei...|
+|&TXT File...|                 |&TXT-Datei...|
+|&HTML File...|                |&HTML-Datei...|
+|&XML File...|                 |&XML-Datei...|
+|&CSV File...|                 |&CSV-Datei...|
+|Import From|                  |Importieren von|
 
 |&Get more languages...|       |Mehr &Sprachen herunterladen...|
 |Start and Exit|               |Start und Beenden|
@@ -512,4 +511,14 @@
     |Je größer diese Zahl ist, desto schwieriger sind Brute-Force-Attacken. Je größer allerdings diese Zahl ist, desto länger dauert auch das Laden und Speichern der Datenbank.|
 |Number of key encryption rounds:|        |Anzahl Passwort-Verschlüsselungsrunden:|
 |bits|                                    |bits|
-|Import From Personal &Vault TXT|         |Personal &Vault TXT-Datei importieren|
+|Personal &Vault TXT File...|             |Personal &Vault TXT-Datei...|
+|Imported from Password Safe|             |Von Password Safe importiert|
+|Remember last opened file|               |Letzte geöffnete Datei merken|
+|Total number of groups / entries|        |Gesamtanzahl Gruppen / Einträge|
+|Total: %u groups / %u entries|           |Gesamt: %u Gruppen, %u Einträge|
+|%u of %u selected|                       |%u von %u ausgewählt|
+|Number of selected entries (number of entries in the list)| |Anzahl ausgewählte Einträge (Anzahl Einträge in Liste)|
+|Status|                                  |Status|
+|The database file has been modified!|    |Die Datenbank-Datei wurde verändert!|
+|Most probably someone has changed the file while you were editing it.| |Wahrscheinlich hat jemand die Datenbank verändert während Sie sie editiert haben.|
+|Do you want to overwrite it?|            |Möchten Sie sie überschreiben?|

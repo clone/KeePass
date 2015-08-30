@@ -1,3 +1,37 @@
+04/07/04 - 0.96a
+- Finally added drag-n-drop support to move entries to other
+  groups (you were able to do this already before by using the
+  mass modify command, but now it's much more convenient and
+  intuitive)
+- New icons (thanks to Christopher Bolin)
+- The URL in the entry view now is a link, i.e. it is clickable
+- Lost entries are removed now when a database is opened
+- Key files can be loaded from read-only media (cd-rom) again
+- Fixed a bug in the PwSafe TXT import routine (note fields
+  containing tab characters weren't handled correctly)
+- Improved PwSafe TXT import routine (thanks to Andrew D. Bond,
+  it's now a bit more intelligent, recognizing URLs in titles)
+- Fixed a small bug in the list display routine (the password
+  of an entry wasn't displayed correctly after editing it)
+- Fixed a bug in the tree item (group) deletion routine
+- Fixed a bug in the language dialog (the 'restart now' message
+  wasn't translated correctly when switching from English to
+  any other language)
+- Added option to disable KeePass remembering the last opened
+  database
+- If an entry has an attached file, its description is shown in
+  the entry view
+- Fixed DPI scaling bug in the GUI resizing routine
+- The order of the password list columns is remembered now
+- Extended status bar, the status bar now shows the total
+  number of groups, entries, the number of currently selected
+  entries and the number of entries in the current list
+- Improved toolbar and entry view update behaviour
+- Multi-user environment improvement: KeePass now checks if the
+  currently opened database has been changed since it has been
+  opened and asks whether to overwrite it or not if it has been
+  modified
+
 04/06/05 - 0.95b
 - The XML exports now contain ALL information, times are
   encoded as strings, attached files are encoded in base 64

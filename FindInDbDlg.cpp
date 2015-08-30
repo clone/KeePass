@@ -87,10 +87,7 @@ BOOL CFindInDbDlg::OnInitDialog()
 	NewGUI_Button(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_Button(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 
-	m_banner.Attach(this, KCSB_ATTACH_TOP);
-	m_banner.SetColBkg(RGB(255,255,255));
-	m_banner.SetColBkg2(NewGUI_GetBgColor());
-	m_banner.SetColEdge(RGB(0,0,0));
+	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_SEARCH),
 		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 	m_banner.SetTitle(TRL("Find"));
