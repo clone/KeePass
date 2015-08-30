@@ -1,3 +1,17 @@
+04/07/29 - 0.96b
+- Added quickfind edit field right of the toolbar
+- Extended clipboard clearing to all other fields, all copied
+  strings are erased in the time you specify, not only the
+  password field
+- Removed an annoying message when unlocking of the workspace
+  fails
+- Fixed a buffer overflow in the main dialog
+- You now have 3 chances entering the password when opening a
+  database, the enter-password dialog is immediately displayed
+  again after entering a wrong password
+- Fixed a bug which caused the Ctrl-L hotkey not to work when
+  the workspace was locked
+
 04/07/04 - 0.96a
 - Finally added drag-n-drop support to move entries to other
   groups (you were able to do this already before by using the

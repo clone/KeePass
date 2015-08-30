@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |0.96a|
+|~LANGUAGEVERSION|             |0.96b|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -251,8 +251,8 @@
 |Self-Test(s) Failed|          |Selbsttest(s) fehlgeschlagen|
 
 |Clipboard cleared.|           |Zwischenablage gelöscht.|
-|Password copied to clipboard. Clipboard will be cleared in %d seconds.|
-    |Passwort in Zwischenablage kopiert. Zwischenablage wird in %d Sekunden gelöscht.|
+|Field copied to clipboard. Clipboard will be cleared in %d seconds.|
+    |Feld in Zwischenablage kopiert. Zwischenablage wird in %d Sekunden gelöscht.|
 
 |Failed to set the master key!|
     |Hauptschlüssel kann nicht gesetzt werden!|
@@ -369,8 +369,6 @@
 |Automatically lock workspace after the following number of seconds:|
     |Arbeitsfläche automatisch nach Anzahl Sekunden sperren:|
 |&Group Name|                  |&Gruppenname|
-|First close the open file before opening another one!|
-    |Die offene Datei muss zuerst geschlossen werden bevor eine andere geöffnet werden kann!|
 |Every second row has a different background color. Use this color:|
     |Jede zweite Zeile hat eine andere Hintergrundfarbe. Diese Farbe benutzen:|
 |Start:|                       |Start:|

@@ -107,6 +107,7 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 #else
 	ASSERT(sizeof(TCHAR) == 1);
 	paKey = new char[strlen(pszMasterKey) + 1];
+	ASSERT(paKey != NULL); if(paKey == NULL) return FALSE;
 	strcpy(paKey, pszMasterKey);
 #endif
 

@@ -159,6 +159,7 @@ CPwSafeDlg::CPwSafeDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CPwSafeDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CPwSafeDlg)
+	m_strQuickFind = _T("");
 	//}}AFX_DATA_INIT
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
@@ -173,6 +174,7 @@ void CPwSafeDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CPwSafeDlg)
+	DDX_Control(pDX, IDC_EDIT_QUICKFIND, m_cQuickFind);
 	DDX_Control(pDX, IDC_GROUPLIST, m_cGroups);
 	DDX_Control(pDX, IDC_TB_NEW, m_btnTbNew);
 	DDX_Control(pDX, IDC_TB_LOCK, m_btnTbLock);
@@ -188,6 +190,7 @@ void CPwSafeDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MENULINE, m_stcMenuLine);
 	DDX_Control(pDX, IDC_PWLIST, m_cList);
 	DDX_Control(pDX, IDC_RE_ENTRYVIEW, m_reEntryView);
+	DDX_Text(pDX, IDC_EDIT_QUICKFIND, m_strQuickFind);
 	//}}AFX_DATA_MAP
 }
 
@@ -2719,7 +2722,7 @@ void CPwSafeDlg::OnTimer(UINT nIDEvent)
 			else
 			{
 				CString str;
-				str.Format(TRL("Password copied to clipboard. Clipboard will be cleared in %d seconds."), m_nClipboardCountdown);
+				str.Format(TRL("Field copied to clipboard. Clipboard will be cleared in %d seconds."), m_nClipboardCountdown);
 				SetStatusTextEx((LPCTSTR)str);
 			}
 		}
@@ -2761,6 +2764,7 @@ void CPwSafeDlg::OnDblclkPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case 1:
 		OnPwlistCopyUser();
+		m_nClipboardCountdown = (int)m_dwClipboardSecs;
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		break;
 	case 2:
@@ -2772,42 +2776,42 @@ void CPwSafeDlg::OnDblclkPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case 4:
 		CopyStringToClipboard(p->pszAdditional);
-		m_nClipboardCountdown = -1;
+		m_nClipboardCountdown = (int)m_dwClipboardSecs;
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		break;
 	case 5:
 		_PwTimeToString(p->tCreation, &strData);
 		CopyStringToClipboard((LPCTSTR)strData);
-		m_nClipboardCountdown = -1;
+		m_nClipboardCountdown = (int)m_dwClipboardSecs;
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		break;
 	case 6:
 		_PwTimeToString(p->tLastMod, &strData);
 		CopyStringToClipboard((LPCTSTR)strData);
-		m_nClipboardCountdown = -1;
+		m_nClipboardCountdown = (int)m_dwClipboardSecs;
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		break;
 	case 7:
 		_PwTimeToString(p->tLastAccess, &strData);
 		CopyStringToClipboard((LPCTSTR)strData);
-		m_nClipboardCountdown = -1;
+		m_nClipboardCountdown = (int)m_dwClipboardSecs;
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		break;
 	case 8:
 		_PwTimeToString(p->tExpire, &strData);
 		CopyStringToClipboard((LPCTSTR)strData);
-		m_nClipboardCountdown = -1;
+		m_nClipboardCountdown = (int)m_dwClipboardSecs;
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		break;
 	case 9:
 		_UuidToString(p->uuid, &strData);
 		CopyStringToClipboard((LPCTSTR)strData);
-		m_nClipboardCountdown = -1;
+		m_nClipboardCountdown = (int)m_dwClipboardSecs;
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		break;
 	case 10:
 		CopyStringToClipboard(p->pszBinaryDesc);
-		m_nClipboardCountdown = -1;
+		m_nClipboardCountdown = (int)m_dwClipboardSecs;
 		SetStatusTextEx(TRL("Field copied to clipboard."));
 		break;
 	default:
@@ -3091,6 +3095,7 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 	int nRet;
 	CString strText;
 	const TCHAR *pSuffix = _T("");
+	int nOpenAttempts;
 
 	strFilter = TRL("Password Safe files");
 	strFilter += _T(" (*.kdb/*.pwd)|*.kdb;*.pwd|");
@@ -3113,55 +3118,61 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 		m_bDisplayDialog = bSaveDialogState;
 		if(m_bFileOpen == TRUE)
 		{
-			MessageBox(TRL("First close the open file before opening another one!"), TRL("Password Safe"),
-				MB_OK | MB_ICONWARNING);
+			// MessageBox(TRL("First close the open file before opening another one!"), TRL("Password Safe"),
+			//	MB_OK | MB_ICONWARNING);
 			return;
 		}
 
 		if(pszFile == NULL) strFile = dlg.GetPathName();
 		m_strLastDb = strFile;
 
-		CPasswordDlg dlgPass;
-		dlgPass.m_bLoadMode = TRUE;
-		dlgPass.m_bConfirm = FALSE;
-		dlgPass.m_strDescriptiveName = dlg.GetFileName();
-
-		if(dlgPass.DoModal() == IDCANCEL) { LCL_OD_CLEANUP; return; }
-		if(m_mgr.SetMasterKey(dlgPass.m_strRealKey, dlgPass.m_bKeyFile, NULL) == FALSE)
+		for(nOpenAttempts = 0; nOpenAttempts < 3; nOpenAttempts++)
 		{
-			MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"), MB_OK | MB_ICONWARNING);
-			LCL_OD_CLEANUP; return;
+			CPasswordDlg dlgPass;
+			dlgPass.m_bLoadMode = TRUE;
+			dlgPass.m_bConfirm = FALSE;
+			dlgPass.m_strDescriptiveName = dlg.GetFileName();
+
+			if(dlgPass.DoModal() == IDCANCEL) { LCL_OD_CLEANUP; return; }
+			if(m_mgr.SetMasterKey(dlgPass.m_strRealKey, dlgPass.m_bKeyFile, NULL) == FALSE)
+			{
+				MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"), MB_OK | MB_ICONWARNING);
+				continue;
+			}
+			EraseCString(&dlgPass.m_strRealKey);
+
+			if(m_mgr.OpenDatabase((LPCTSTR)strFile) == FALSE)
+			{
+				MessageBox(TRL("File cannot be opened!"), TRL("Password Safe"),
+					MB_ICONWARNING | MB_OK);
+			}
+			else
+			{
+				m_bHashValid = SHA256_HashFile((LPCTSTR)strFile, (BYTE *)m_aHashOfFile);
+
+				m_strFile = strFile;
+				m_bFileOpen = TRUE;
+				m_bModified = FALSE;
+				m_cList.EnableWindow(TRUE);
+				m_cGroups.EnableWindow(TRUE);
+
+				m_bLocked = FALSE;
+
+				pSuffix = _GetCmdAccelExt(_T("&Lock Workspace"));
+				strText = TRL("&Lock Workspace");
+				if(_tcslen(pSuffix) != 0) { strText += _T("\t"); strText += pSuffix; }
+				m_menu.SetMenuText(ID_FILE_LOCK, strText, MF_BYCOMMAND);
+				m_btnTbLock.SetTooltipText(TRL("&Lock Workspace"));
+
+				UpdateGroupList();
+				UpdatePasswordList();
+
+				LCL_OD_CLEANUP;
+				break;
+			}
+
+			LCL_OD_CLEANUP;
 		}
-		EraseCString(&dlgPass.m_strRealKey);
-
-		if(m_mgr.OpenDatabase((LPCTSTR)strFile) == FALSE)
-		{
-			MessageBox(TRL("File cannot be opened!"), TRL("Password Safe"),
-				MB_ICONWARNING | MB_OK);
-		}
-		else
-		{
-			m_bHashValid = SHA256_HashFile((LPCTSTR)strFile, (BYTE *)m_aHashOfFile);
-
-			m_strFile = strFile;
-			m_bFileOpen = TRUE;
-			m_bModified = FALSE;
-			m_cList.EnableWindow(TRUE);
-			m_cGroups.EnableWindow(TRUE);
-
-			m_bLocked = FALSE;
-
-			pSuffix = _GetCmdAccelExt(_T("&Lock Workspace"));
-			strText = TRL("&Lock Workspace");
-			if(_tcslen(pSuffix) != 0) { strText += _T("\t"); strText += pSuffix; }
-			m_menu.SetMenuText(ID_FILE_LOCK, strText, MF_BYCOMMAND);
-			m_btnTbLock.SetTooltipText(TRL("&Lock Workspace"));
-
-			UpdateGroupList();
-			UpdatePasswordList();
-		}
-
-		LCL_OD_CLEANUP;
 	}
 
 	strText = PWM_PRODUCT_NAME;
@@ -3201,7 +3212,7 @@ void CPwSafeDlg::OnFileSave()
 
 	if(m_bHashValid == TRUE)
 	{
-		BYTE aNewHash[20];
+		BYTE aNewHash[32];
 
 		if(SHA256_HashFile((LPCTSTR)m_strFile, (BYTE *)aNewHash) == TRUE)
 		{
@@ -4605,8 +4616,8 @@ void CPwSafeDlg::OnFileLock()
 		m_bExiting = FALSE;
 		if(m_bFileOpen == TRUE)
 		{
-			MessageBox(TRL("First close the open file before opening another one!"), TRL("Password Safe"),
-				MB_OK | MB_ICONWARNING);
+			// MessageBox(TRL("First close the open file before opening another one!"), TRL("Password Safe"),
+			//	MB_OK | MB_ICONWARNING);
 			m_bDisplayDialog = FALSE; return;
 		}
 
@@ -4966,10 +4977,24 @@ BOOL CPwSafeDlg::PreTranslateMessage(MSG* pMsg)
 
 		if(pWnd != NULL)
 		{
-			if(pWnd != &m_reEntryView)
+			if((pWnd != &m_reEntryView) || (m_bFileOpen == FALSE) || (m_bLocked == TRUE))
 			{
 				if(TranslateAccelerator(this->m_hWnd, m_hAccel, pMsg)) 
 					return(TRUE);
+			}
+		}
+	}
+
+	if(((pMsg->message == WM_KEYDOWN) || (pMsg->message == WM_KEYUP)) && (pMsg->wParam == VK_RETURN))
+	{
+		CWnd *pWnd = GetFocus();
+
+		if(pWnd != NULL)
+		{
+			if(pWnd == &m_cQuickFind)
+			{
+				if(pMsg->message == WM_KEYDOWN) _DoQuickFind();
+				return(TRUE);
 			}
 		}
 	}
@@ -5163,10 +5188,12 @@ void CPwSafeDlg::_UpdateToolBar()
 	if(m_bFileOpen == TRUE)
 	{
 		m_btnTbAddEntry.EnableWindow(TRUE);
+		m_cQuickFind.EnableWindow(TRUE);
 	}
 	else
 	{
 		m_btnTbAddEntry.EnableWindow(FALSE);
+		m_cQuickFind.EnableWindow(FALSE);
 	}
 
 	if(m_bLocked == FALSE)
@@ -5321,9 +5348,11 @@ void CPwSafeDlg::_ShowToolBar(BOOL bShow)
 	m_btnTbFind.ShowWindow(nCommand); m_btnTbLock.ShowWindow(nCommand);
 	m_btnTbAbout.ShowWindow(nCommand);
 
+	m_cQuickFind.ShowWindow(nCommand);
+
 	GetDlgItem(IDC_STATIC_TBSEP0)->ShowWindow(nCommand); GetDlgItem(IDC_STATIC_TBSEP1)->ShowWindow(nCommand);
 	GetDlgItem(IDC_STATIC_TBSEP2)->ShowWindow(nCommand); GetDlgItem(IDC_STATIC_TBSEP3)->ShowWindow(nCommand);
-	GetDlgItem(IDC_STATIC_TBSEP4)->ShowWindow(nCommand);
+	GetDlgItem(IDC_STATIC_TBSEP4)->ShowWindow(nCommand); GetDlgItem(IDC_STATIC_TBSEP5)->ShowWindow(nCommand);
 }
 
 void CPwSafeDlg::_RemoveSearchGroup()
@@ -6720,4 +6749,86 @@ void CPwSafeDlg::SetStatusTextEx(LPCTSTR lpStatusText, int nPane)
 	ASSERT(nPane < 3);
 
 	m_sbStatus.SetText(lpStatusText, nPane, 0);
+}
+
+void CPwSafeDlg::_DoQuickFind()
+{
+	UpdateData(TRUE);
+
+	const DWORD dwFlags = PWMF_TITLE | PWMF_USER | PWMF_URL | PWMF_PASSWORD | PWMF_ADDITIONAL | PWMF_GROUPNAME;
+
+	m_cList.DeleteAllItems();
+
+	PW_TIME tNow;
+	_GetCurrentPwTime(&tNow);
+
+	DWORD dw = 0;
+	DWORD cnt = 0;
+	DWORD dwGroupId;
+	DWORD dwGroupInx;
+	PW_ENTRY *p;
+	CString strTemp;
+	DWORD dwMaxItems = m_mgr.GetNumberOfEntries();
+
+	// Create the search group if it doesn't exist already
+	dwGroupId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
+	if(dwGroupId == DWORD_MAX)
+	{
+		PW_GROUP pwTemplate;
+		pwTemplate.pszGroupName = (TCHAR *)PWS_SEARCHGROUP;
+		pwTemplate.tCreation = tNow; CPwManager::_GetNeverExpireTime(&pwTemplate.tExpire);
+		pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
+		pwTemplate.uGroupId = 0; // 0 = create new group ID
+		pwTemplate.uImageId = 40; // 40 = 'search' icon
+		pwTemplate.usLevel = 0; pwTemplate.dwFlags = 0;
+
+		VERIFY(m_mgr.AddGroup(&pwTemplate));
+		dwGroupId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
+	}
+	ASSERT((dwGroupId != DWORD_MAX) && (dwGroupId != 0));
+	if((dwGroupId == DWORD_MAX) || (dwGroupId == 0)) return;
+
+	while(1)
+	{
+		dw = m_mgr.Find((LPCTSTR)m_strQuickFind, FALSE, dwFlags, cnt);
+
+		if(dw == DWORD_MAX) break;
+		else
+		{
+			p = m_mgr.GetEntry(dw);
+			ASSERT_ENTRY(p);
+			if(p == NULL) break;
+
+			if(p->uGroupId != dwGroupId)
+			{
+				dwGroupInx = m_mgr.GetGroupByIdN(p->uGroupId);
+				ASSERT(dwGroupInx != DWORD_MAX);
+
+				// The entry could get reallocated by AddEntry, therefor
+				// save it to a local CString object
+				m_mgr.UnlockEntryPassword(p);
+				strTemp = p->pszPassword;
+				m_mgr.LockEntryPassword(p);
+
+				_List_SetEntry(m_cList.GetItemCount(), p, TRUE, &tNow);
+
+				EraseCString(&strTemp); // Destroy the plaintext password
+			}
+		}
+
+		cnt = dw + 1;
+		if((DWORD)cnt >= dwMaxItems) break;
+	}
+
+	_Groups_SaveView();
+	UpdateGroupList();
+	_Groups_RestoreView();
+	HTREEITEM hSelect = _GroupIdToHTreeItem(dwGroupId);
+	if(hSelect != NULL)
+	{
+		m_cGroups.EnsureVisible(hSelect);
+		m_cGroups.SelectItem(hSelect);
+	}
+
+	m_bModified = TRUE;
 }

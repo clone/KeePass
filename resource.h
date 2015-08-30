@@ -171,6 +171,8 @@
 #define IDC_COMBO_ENCALGOS              1144
 #define IDC_EDIT_KEYENC                 1145
 #define IDC_CHECK_REMEMBERLAST          1148
+#define IDC_STATIC_TBSEP5               1150
+#define IDC_EDIT_QUICKFIND              1154
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -322,7 +324,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        203
 #define _APS_NEXT_COMMAND_VALUE         32939
-#define _APS_NEXT_CONTROL_VALUE         1149
+#define _APS_NEXT_CONTROL_VALUE         1155
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

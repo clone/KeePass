@@ -192,6 +192,7 @@ public:
 
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
+	CEdit	m_cQuickFind;
 	CCustomTreeCtrlEx	m_cGroups;
 	CButtonST	m_btnTbNew;
 	CButtonST	m_btnTbLock;
@@ -207,6 +208,7 @@ public:
 	CStatic	m_stcMenuLine;
 	CCustomListCtrlEx	m_cList;
 	CAutoRichEditCtrl	m_reEntryView;
+	CString	m_strQuickFind;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CPwSafeDlg)
@@ -282,6 +284,7 @@ protected:
 	void _PrintGroup(DWORD dwGroupId);
 	void _Find(DWORD dwFindGroupId);
 	void _RemoveSearchGroup();
+	void _DoQuickFind();
 
 	void _SelChangeView(UINT uID);
 	void _List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEntry, PW_TIME *ptNow);

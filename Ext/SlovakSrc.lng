@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Slovenèina|
-|~LANGUAGEVERSION|             |0.95b|
+|~LANGUAGEVERSION|             |0.96a|
 |~LANGUAGEAUTHOR|              |Radoslav Bielik|
 |~LANGUAGEAUTHOREMAIL|         |rado@bielik.org, http://www.bielik.org|
 
@@ -102,7 +102,7 @@
 
 |Group:|                       |Skupina:|
 |Title:|                       |Názov:|
-|UserName:|                    |Uívate¾ské meno:|
+|UserName:|                    |Uív. meno:|
 |URL:|                         |URL:|
 |Icon:|                        |Ikona:|
 |Password:|                    |Heslo:|
@@ -162,7 +162,6 @@
 |Save Database &As...|         |Uloi databázu &ako...|
 |Change &Master Key For This Database...|      |Zmeni hlavné &heslo pre túto databázu...|
 |&Print Complete Password List|                |&Tlaèi celı zoznam hesiel|
-|Export Complete Database|     |E&xport celej databázy|
 |&Lock Workspace|              |&Zamknú pracovnú plochu|
 |&Unlock Workspace|            |O&domknú pracovnú plochu|
 |&Exit|                        |&Koniec|
@@ -263,7 +262,7 @@
 |All files|                    |Všetky súbory|
 
 |The current file has been modified.|
-    |Otvorenı súbor bol zmenenı.|
+    |Aktuálny súbor bol zmenenı.|
 |Do you want to save the changes before closing?|
     |Prajete si uloi zmeny pred zatvorením súboru?|
 |Save Before Close?|           |Uloi pred zatvorením?|
@@ -331,18 +330,20 @@
     |Pri importovaní CSV súboru došlo ku chybe. Súbor nemôe by importovanı.|
 |An error occured while importing the file. File cannot be imported.|
     |Pri importovaní súboru došlo ku chybe. Súbor nemôe by importovanı|
-|&Import From CSV|             |Importova zo súboru &CSV|
-|Import From Code&Wallet|      |Importova zo súboru Code&Wallet|
-|Import From &PwSafe v2 TXT|   |Importova zo súboru &PwSafe v2 TXT|
+
 |Select &Font|                 |Zvo¾te &Font|
 |Select a new font for the list controls.|     |Zvo¾te novı font pre zoznamy.|
 
-|Import From Code&Wallet|      |Importova zo súboru Code&Wallet|
-|&TXT Format...|               |Exportova do &textového súboru...|
-|&HTML Format...|              |Exportova do &HTML...|
-|&XML Format...|               |Exportova do &XML...|
-|&CSV Format...|               |Exportova do &CSV...|
-|Import To Database|           |&Importova do databázy|
+|Export To|			|Exportova do...|
+|Import From|			|Importova z...|
+
+|&TXT File...|			|&Textového súboru...|
+|&HTML File...|			|&HTML súboru...|
+|&XML File...|			|&XML súboru...|
+|&CSV File...|			|&CSV súboru...|
+|&PwSafe v2 TXT File...|	|Súboru &PwSafe v2 TXT...|
+|Code&Wallet TXT File...|	|Súboru Code&Wallet TXT...|
+|Personal &Vault TXT File...|	|Súboru Personal &Vault TXT...|
 
 |&Get more languages...|       |Získa ïalšie &jazyky...|
 |Start and Exit|               |Spustenie a ukonèenie|
@@ -522,8 +523,17 @@
 |Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
 	|Váš k¾úè je zakódovanı nieko¾ko krát za úèelom vytvorenia finálneho kódovacieho k¾úèa databázy. Tento postup pridáva konštantnı èasovı faktor a robí brute-force útoky ove¾a ašie uskutoènite¾nımi.|
 
-
-
-
-|Import From Personal &Vault TXT|		|Importova zo súboru Personal &Vault TXT|
 |bits|						|bitov|
+
+|%u of %u selected|				|Zvolenıch %u z %u|
+|Do you want to overwrite it?|			|Prajete si ho prepísa?|
+|Imported from Password Safe|			|Importované z Password Safe|
+|Most probably someone has changed the file while you were editing it.|
+	|Niekto pravdepodobne upravil súbor kım ste s ním pracovali.|
+|Number of selected entries (number of entries in the list)|
+	|Poèet zvolenıch záznamov (poèet záznamov v zozname)|
+|Remember last opened file|			|Zapamäta naposledy otvorenı súbor|
+|Status|					|Stav|
+|The database file has been modified!|		|Súbor databázy bol zmenenı!|
+|Total number of groups / entries|		|Celkové mnostvo skupín / záznamov|
+|Total: %u groups / %u entries|			|Celkom: %u skupín / %u záznamov|
