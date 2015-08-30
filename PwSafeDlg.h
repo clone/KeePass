@@ -1,30 +1,20 @@
 /*
-  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
-  All rights reserved.
+  KeePass Password Safe - The Open-Source Password Manager
+  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  - Neither the name of ReichlSoft nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #if !defined(AFX_PWSAFEDLG_H__206CC2C3_063D_11D8_BF16_0050BF14F5CC__INCLUDED_)
@@ -49,6 +39,7 @@
 #include "NewGUI/SystemTrayEx.h"
 #include "NewGUI/AutoRichEditCtrl.h"
 #include "Util/PluginMgr.h"
+#include "Util/SInstance.h"
 #include "Util/SysDefEx.h"
 
 #define _CALLPLUGINS(__c,__l,__w) m_piMgr.CallPlugins((__c),(LPARAM)(__l),(LPARAM)(__w))
@@ -106,7 +97,7 @@ public:
 	inline void NotifyUserActivity();
 	void UpdateAutoSortMenuItems();
 	void BuildPluginMenu();
-	BOOL RegisterGlobalHotKey(int nHotKeyID, DWORD dwHotKey, BOOL bReleasePrevious);
+	BOOL RegisterGlobalHotKey(int nHotKeyID, DWORD dwHotKey, BOOL bReleasePrevious, BOOL bMessageBoxOnFail);
 	void _AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus);
 
 	void UpdateGroupList();
@@ -130,7 +121,7 @@ public:
 	HTREEITEM _GroupIdToHTreeItem(DWORD dwGroupId);
 
 	void _ProcessGroupKey(UINT nChar, UINT nFlags);
-	void _ProcessListKey(UINT nChar);
+	void _ProcessListKey(UINT nChar, BOOL bAlt);
 
 	void _OnPwlistColumnWidthChange(int icolumn = -1, int isize = -1);
 	void _SortListIfAutoSort();
@@ -228,7 +219,7 @@ public:
 
 	BOOL _IsUnsafeAllowed();
 
-	void _OpenDatabase(const TCHAR *pszFile, const TCHAR *pszPassword, const TCHAR *pszKeyFile, BOOL bOpenLocked);
+	void _OpenDatabase(const TCHAR *pszFile, const TCHAR *pszPassword, const TCHAR *pszKeyFile, BOOL bOpenLocked, LPCTSTR lpPreSelectPath);
 	BOOL _ChangeMasterKey(BOOL bCreateNew);
 	void _PrintGroup(DWORD dwGroupId);
 	void _Find(DWORD dwFindGroupId);
@@ -259,6 +250,9 @@ public:
 	BOOL m_bAutoShowExpired;
 	BOOL m_bAutoShowExpiredSoon;
 	BOOL m_bBackupEntries;
+	static BOOL m_bSecureEdits;
+	BOOL m_bSingleClickTrayIcon;
+	DWORD m_dwDefaultExpire;
 
 	BOOL m_bExiting;
 	BOOL m_bLocked;
@@ -266,6 +260,9 @@ public:
 	BOOL m_bShowWindow;
 	BOOL m_bWasMaximized;
 	BOOL m_bRestartApplication;
+
+	BOOL m_bCheckForInstance;
+	CInstanceChecker m_instanceChecker;
 
 	CPwManager m_mgr;
 	CPluginManager m_piMgr;
@@ -624,6 +621,7 @@ protected:
 	afx_msg void OnDrawClipboard();
 
 	afx_msg void OnEndSession(BOOL bEnding);
+	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 
 	DECLARE_MESSAGE_MAP()
 };

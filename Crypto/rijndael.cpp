@@ -1297,7 +1297,7 @@ int Rijndael::padDecrypt(const RD_UINT8 *input, int inputOctets, RD_UINT8 *outBu
 	if(m_state != Valid) return RIJNDAEL_NOT_INITIALIZED;
 	if(m_direction != Decrypt) return RIJNDAEL_BAD_DIRECTION;
 
-	if(input == 0 || inputOctets <= 0) return 0;
+	if((input == NULL) || (inputOctets <= 0)) return 0;
 
 	if((inputOctets % 16) != 0) return RIJNDAEL_CORRUPTED_DATA;
 

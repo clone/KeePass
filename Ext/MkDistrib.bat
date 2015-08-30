@@ -12,8 +12,8 @@ COPY /B ..\Release\KeePass.exp /B KeePass.exp
 DEL ..\Distrib\KeePass.chm
 COPY /B Doc\KeePass.chm /B ..\Distrib\KeePass.chm
 
-DEL ..\Distrib\License.html
-COPY /B License.html /B ..\Distrib\License.html
+DEL ..\Distrib\License.txt
+COPY /B License.txt /B ..\Distrib\License.txt
 
 DEL ..\Distrib\KeePass.ini
 COPY /B KeePass.ini /B ..\Distrib\KeePass.ini
@@ -87,6 +87,9 @@ COPY TraditionalChineseSrc.lng TraditionalChinese.lng
 DEL Ukrainian.lng
 COPY UkrainianSrc.lng Ukrainian.lng
 
+DEL SimplifiedChinese.lng
+COPY SimplifiedChineseSrc.lng SimplifiedChinese.lng
+
 ECHO.
 ECHO Have you updated the language information fields?
 
@@ -138,6 +141,8 @@ DEL ..\Debug\TraditionalChinese.lng
 COPY /B TraditionalChinese.lng /B ..\Debug\TraditionalChinese.lng > NUL
 DEL ..\Debug\Ukrainian.lng
 COPY /B Ukrainian.lng /B ..\Debug\Ukrainian.lng > NUL
+DEL ..\Debug\SimplifiedChinese.lng
+COPY /B SimplifiedChinese.lng /B ..\Debug\SimplifiedChinese.lng > NUL
 
 REM Copy latest language files into Release directory
 
@@ -187,9 +192,13 @@ DEL ..\Release\TraditionalChinese.lng
 COPY /B TraditionalChinese.lng /B ..\Release\TraditionalChinese.lng > NUL
 DEL ..\Release\Ukrainian.lng
 COPY /B Ukrainian.lng /B ..\Release\Ukrainian.lng > NUL
+DEL ..\Release\SimplifiedChinese.lng
+COPY /B SimplifiedChinese.lng /B ..\Release\SimplifiedChinese.lng > NUL
 
 REM Copy language reference file
 
 COPY /B German.lng /B Util\LangRef.src > NUL
 
 ECHO Have you updated the executable version information?
+PAUSE
+CLS

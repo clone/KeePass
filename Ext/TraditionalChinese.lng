@@ -1,7 +1,7 @@
 |~LANGUAGENAME|
 |繁體中文(臺灣)|
 |~LANGUAGEVERSION|
-|0.98b - 2|
+|0.99b - 1|
 |~LANGUAGEAUTHOR|
 |高祥元 (Kao Shiang-Yuan)|
 |~LANGUAGEAUTHOREMAIL|
@@ -426,10 +426,6 @@
 |在啟動時自動開啟上次使用的資料庫|
 |Automatically save database on exit|
 |在結束時自動儲存資料庫|
-|GUI: Display images on buttons|
-|圖形使用者介面：在按鈕上顯示圖示|
-|GUI: Show grid lines in password entry list|
-|圖形使用者介面：在密碼項目清單上顯示格線|
 |Workspace cannot be unlocked!|
 |無法解除鎖定！|
 |Workspace locked|
@@ -466,8 +462,6 @@
 |&PwSafe v2 TXT 檔案...|
 |Select &Font|
 |選擇字型(&F)|
-|Select a new font for the list controls.|
-|為清單項目選擇新字型(建議選擇支援中文的字型，大小設定為9)。|
 |Code&Wallet TXT File...|
 |Code&Wallet TXT File...|
 |&TXT File...|
@@ -504,20 +498,12 @@
 |安全|
 |KeePass is OSI Certified Open Source Software.|
 |KeePass是OSI認證的開放原始碼軟體。|
-|KeePass usage:|
-|KeePass usage:|
-|db = Path to database you wish to open on KeePass startup|
-|db = Path to database you wish to open on KeePass startup|
 |Automatically lock workspace after the following number of seconds:|
 |在下列秒數後自動鎖定：|
 |&Group Name|
 |群組名稱(&G)|
 |Every second row has a different background color. Use this color:|
 |在雙數列使用不同的背景顏色。選擇顏色：|
-|Start:|
-|開始：|
-|Exit:|
-|結束：|
 |Default|
 |預設|
 |More Colors...|
@@ -550,8 +536,6 @@
 |瀏覽KeePass首頁|
 |Field copied to clipboard.|
 |資料已複製到剪貼簿。|
-|A key-file already exists on this drive. Do you want to overwrite it?|
-|這個磁碟上已經有鑰匙檔案。您想要將其覆蓋嗎？|
 |Overwrite?|
 |覆蓋？|
 |Expires:|
@@ -574,8 +558,6 @@
 |顯示欄位(&C)|
 |Show &Entry View|
 |顯示項目內容|
-|GUI: Automatically resize table columns when resizing the main window|
-|圖形使用者介面：變更主視窗大小時自動調整欄位大小|
 |&Copy|
 |複製(&C)|
 |Copy &All|
@@ -890,3 +872,61 @@
 |自動輸入|
 |Help:|
 |說明：|
+|&Get more import plugins...|
+|取得更多匯入用的擴充套件(&G)|
+|A key-file already exists on this drive. Do you want to overwrite or reuse it?|
+|這個磁碟上已經有鑰匙檔案。您想要將它覆蓋或使用它？|
+|Advanced|
+|進階|
+|Automatically resize table columns when resizing the main window|
+|變更主視窗大小時自動調整欄位大小|
+|Backup|
+|備份|
+|Click [Cancel] to abort changing the key.|
+|若要終止變更鑰匙，按「取消」。|
+|Click [No] to reuse the selected key-file for this database.|
+|按「否」使用此鑰匙檔案|
+|Click [Yes] to overwrite the key-file.|
+|按「是」覆蓋鑰匙檔案|
+|Display images on buttons|
+|在按鈕上顯示圖示|
+|Encode/replace newline characters by '\n'|
+|用\n編碼/置換換行字元|
+|Export Options|
+|匯出選項|
+|Export backup entries (entries in the 'Backup' group)|
+|匯出備份項目(對「備份」群組中的項目)|
+|Failed to create backup of this entry!|
+|對此項目建立備份失敗！|
+|Fields to export|
+|要匯出的欄位|
+|Group Tree|
+|樹狀群組|
+|Here you can customize the exported files.|
+|您可以在這裡自訂匯出的檔案。|
+|Icon|
+|圖示|
+|Immediately after opening a database|
+|在開啟資料庫後立即顯示|
+|Show entries that will expire soon (if any)|
+|將要過期的項目(如果有的話)|
+|Show expired entries (if any)|
+|已經過期的項目(如果有的話)|
+|Integration|
+|整合|
+|Master key has been changed!|
+|主鑰匙已變更！|
+|Save the database now in order to get the new key applied.|
+|為了讓新的鑰匙生效，請儲存資料庫。|
+|Save backups of modified entries into the 'Backup' group|
+|為變更過的項目備份到「備份」群組|
+|Select a new font for the list controls:|
+|為清單項目選擇新字型(建議選擇支援中文的字型，例如新細明體，大小設定為9)：|
+|Show grid lines in password entry list|
+|在密碼項目清單上顯示格線|
+|Start KeePass at Windows startup (for current user)|
+|在Windows啟動時一併啟動KeePass(只對這個使用者有效)|
+|Start minimized and locked|
+|啟動時最小化並鎖定|
+|Unable to create/remove the auto-start key of KeePass in the Windows registry!|
+|無法在Windows登錄中建立/移除自動啟動設定|

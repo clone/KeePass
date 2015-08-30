@@ -2,29 +2,52 @@
 
 <html>
 <head>
-	<title>Installation and Uninstallation</title>
+	<title>Installation / Uninstallation / Portability</title>
 	<link rel="stylesheet" type="text/css" href="default.css" />
 </head>
 <body>
 
 <table class="tablebox"><tr><td class="boxtitle">
 <img src="images/movepaper.gif" width="31px" height="21px" class="singleimg">
-Installation and Uninstallation</td></tr></table>
+Installation, Uninstallation and Portability</td></tr></table>
 <br />
-The application doesn't need to be installed. The KeePass development team provides you
-an installer, which automates creating links in the startmenu etc., but you  can alternatively download
-the binary zip package. The zip package only contains the main executable, which runs fine without installing
-anything.<br />
+When downloading KeePass, you have the choice between 3 different packages:
+
+<ul>
+<li><b>KeePass-<i>X.XXx</i>.zip:</b> The binary ZIP package.</li>
+<li><b>KeePass-<i>X.XXx</i>-Setup.exe:</b> A Windows installer package.</li>
+<li><b>KeePass-<i>X.XXx</i>-Src.zip:</b> The full source code.</li>
+</ul>
+
+KeePass does not need to be installed. Just download the binary ZIP package, unpack
+it with your favorite packer and KeePass is ready to be used. Just copy it to
+a location of your choice (for example onto your portable USB stick), no
+additional configuration or installation is needed.<br />
 <br />
-KeePass doesn't, in contrast to many other applications, use any functions that require
-the latest Windows operating system, such like theming on XP or like a .NET application requiring the .NET
-framework.<br />
+The KeePass development team also provides you an installer, which automates
+creating links in the startmenu etc. Apart from those integration options, there's
+nothing different from the binary ZIP package.<br />
+<br />
+In contrast to many other applications, KeePass does not use any functions that require
+the latest Windows operating system, such like theming on XP or like a .NET application that
+requires the .NET framework.<br />
+<br />
+The source code package contains everything you need to compile KeePass. It includes
+all C++ source code and header files, resource files, source files of the documentation,
+all the latest language/translation files, sources for building the installer, etc.<br />
 <br />
 KeePass doesn't store anything on your system. The program doesn't create any new
 registry keys and it doesn't create any initialization files (ini) in your Windows directory.
 Deleting the KeePass directory (in case you downloaded the binary zip package) or using the
 uninstaller (in case you downloaded the installer package) leaves no trace of KeePass on your
-system.
+system.<br />
+<br />
+When using the portable version, make sure that KeePass has write access to
+its application directory. Otherwise, if it doesn't have, it'll attempt
+to store the configuration options (nothing security-relevant though) into the
+application configuration directory of the currently logged on user.
+For more about that, see this page:
+<a href="faq.html#nooptsave" target="_self">Option Saving</a>.
 
 </body>
 </html>

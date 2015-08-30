@@ -1,8 +1,12 @@
 // Modified version of BtnST.cpp
 // D. Reichl: Additional type conversions, unreferenced parameter declarations, etc.
+// - Added menu translation
 // Thanks to Michael Kaufmann for the v3.9 improvement patches
-#include "stdafx.h"
+
+#include "StdAfx.h"
 #include "BtnST.h"
+#include "../resource.h"
+#include "../PwSafeDlg.h"
 
 #ifdef	BTNST_USE_SOUND
 #pragma comment(lib, "winmm.lib")
@@ -475,6 +479,7 @@ BOOL CButtonST::OnClicked()
 #ifdef	BTNST_USE_BCMENU
 			BCMenu* psub = (BCMenu*)m_menuPopup.GetSubMenu(0);
 			if (m_csCallbacks.hWnd)	::SendMessage(m_csCallbacks.hWnd, m_csCallbacks.nMessage, (WPARAM)psub, m_csCallbacks.lParam);
+			CPwSafeDlg::_TranslateMenu(psub, FALSE);
 			DWORD dwRetValue = psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON | TPM_NONOTIFY | TPM_RETURNCMD, rWnd.left, rWnd.bottom, this, NULL);
 #else
 			HMENU hSubMenu = ::GetSubMenu(m_hMenu, 0);

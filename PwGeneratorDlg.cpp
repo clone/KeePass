@@ -1,35 +1,26 @@
 /*
-  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
-  All rights reserved.
+  KeePass Password Safe - The Open-Source Password Manager
+  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  - Neither the name of ReichlSoft nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "StdAfx.h"
 #include "PwSafe.h"
 #include "PwGeneratorDlg.h"
+#include "PwSafeDlg.h"
 
 #include "GetRandomDlg.h"
 
@@ -38,6 +29,7 @@
 
 #include "Crypto/sha2.h"
 
+#include "Util/StrUtil.h"
 #include "Util/NewRandom.h"
 
 #ifdef _DEBUG
@@ -61,7 +53,6 @@ CPwGeneratorDlg::CPwGeneratorDlg(CWnd* pParent /*=NULL*/)
 {
 	//{{AFX_DATA_INIT(CPwGeneratorDlg)
 	m_nCharacters = 16;
-	m_strPassword = _T("");
 	m_bCharSpec = FALSE;
 	m_strCharSet = _T("");
 	m_bGetEntropy = FALSE;
@@ -69,6 +60,7 @@ CPwGeneratorDlg::CPwGeneratorDlg(CWnd* pParent /*=NULL*/)
 	//}}AFX_DATA_INIT
 
 	m_bCanAccept = TRUE;
+	m_lpPassword = NULL;
 }
 
 void CPwGeneratorDlg::DoDataExchange(CDataExchange* pDX)
@@ -84,7 +76,6 @@ void CPwGeneratorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDOK, m_btnOK);
 	DDX_Control(pDX, IDC_LIST_OPTIONS, m_cList);
 	DDX_Text(pDX, IDC_EDIT_NUMCHARACTERS, m_nCharacters);
-	DDX_Text(pDX, IDC_EDIT_PW, m_strPassword);
 	DDX_Check(pDX, IDC_CHECK_CHARSPEC, m_bCharSpec);
 	DDX_Text(pDX, IDC_EDIT_ONLYCHARSPEC, m_strCharSet);
 	DDX_Check(pDX, IDC_CHECK_GETENTROPY, m_bGetEntropy);
@@ -116,20 +107,27 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
-	m_cEditPw.SetFont(&m_fStyle, TRUE);
-	m_btHidePw.SetFont(&m_fStyle, TRUE);
+	m_fSymbol.CreateFont(-13, 0, 0, 0, 0, FALSE, FALSE, 0,
+		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Symbol"));
 
 	// 'z' + 27 is that black dot in Tahoma
-	TCHAR tchDot = (TCHAR)(_T('z') + 27);
-	CString strStars = _T("");
-	strStars += tchDot; strStars += tchDot; strStars += tchDot;
+	// TCHAR tchDot = (TCHAR)(_T('z') + 27);
+	TCHAR tchDot = (TCHAR)0xb7;
+	CString strStars; strStars += tchDot; strStars += tchDot; strStars += tchDot;
 	m_btHidePw.SetWindowText(strStars);
 
 	NewGUI_XPButton(&m_btnOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btnCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_XPButton(&m_btGenerate, IDB_KEY_SMALL, IDB_KEY_SMALL);
 	NewGUI_XPButton(&m_btHidePw, -1, -1);
+
+	m_cEditPw.SetFont(&m_fStyle, TRUE);
+	m_btHidePw.SetFont(&m_fSymbol, TRUE);
+
 	m_btHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
+	CString strTT = TRL("Hide &Passwords Behind Asterisks (***)"); strTT.Remove(_T('&'));
+	m_btHidePw.SetTooltipText(strTT, TRUE);
 
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
@@ -153,6 +151,7 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 	m_btnOK.EnableWindow(FALSE);
 
 	int j = 0;
+	CString str;
 	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
 		TRL("Upper alphabetic characters (A, B, C, ...)"), 0, 0, 0, 0); j++;
 	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
@@ -165,10 +164,10 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 		TRL("Minus '-'"), 0, 0, 0, 0); j++;
 	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
 		TRL("Space ' '"), 0, 0, 0, 0); j++;
-	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
-		TRL("Special characters (!, §, $, %, &, ...)"), 0, 0, 0, 0); j++;
-	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
-		TRL("Higher ANSI characters (Â, ©, É, µ, ½, ...)"), 0, 0, 0, 0); j++;
+	str = TRL("Special characters"); str += _T(" (!, §, $, %, &, ...)");
+	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j, str, 0, 0, 0, 0); j++;
+	str = TRL("Higher ANSI characters");
+	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j, str, 0, 0, 0, 0); j++;
 	m_cList.InsertItem(LVIF_TEXT | LVIF_IMAGE, j,
 		TRL("Special brackets ('{', '}', '[', ...)"), 0, 0, 0, 0); j++;
 
@@ -218,7 +217,7 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 	}
 	else m_btnOK.ShowWindow(SW_SHOW);
 
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), _T(""));
 	OnCheckHidePw();
 
 	return TRUE;
@@ -227,6 +226,7 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 void CPwGeneratorDlg::CleanUp()
 {
 	m_fStyle.DeleteObject();
+	m_fSymbol.DeleteObject();
 	m_ilIcons.DeleteImageList();
 }
 
@@ -252,7 +252,11 @@ void CPwGeneratorDlg::OnOK()
 {
 	UpdateData(TRUE);
 
-	if(m_strPassword.GetLength() == 0) return;
+	ASSERT(m_lpPassword == NULL); if(m_lpPassword != NULL) m_cEditPw.DeletePassword(m_lpPassword);
+	m_lpPassword = m_cEditPw.GetPassword();
+	ASSERT(m_lpPassword != NULL); if(m_lpPassword == NULL) return;
+
+	if(_tcslen(m_lpPassword) == 0) { m_cEditPw.DeletePassword(m_lpPassword); m_lpPassword = NULL; return; }
 
 	_SaveOptions();
 
@@ -263,8 +267,6 @@ void CPwGeneratorDlg::OnOK()
 void CPwGeneratorDlg::OnCancel() 
 {
 	UpdateData(TRUE);
-
-	m_strPassword.Empty();
 
 	_SaveOptions();
 
@@ -281,6 +283,7 @@ void CPwGeneratorDlg::OnGenerateBtn()
 	BYTE aTemp[32];
 	TCHAR t;
 	BOOL bUpperAlpha, bLowerAlpha, bNum, bUnderline, bMinus, bSpace, bSpecial, bHigh, bBrackets;
+	CString strPassword;
 
 	ASSERT(sizeof(unsigned long) == 4);
 
@@ -306,7 +309,6 @@ void CPwGeneratorDlg::OnGenerateBtn()
 	bSpecial = _GetCheck(6);
 	bHigh = _GetCheck(7);
 	bBrackets = _GetCheck(8);
-	m_strPassword.Empty();
 
 	if(m_bCharSpec == FALSE)
 	{
@@ -361,50 +363,50 @@ void CPwGeneratorDlg::OnGenerateBtn()
 				if(bUpperAlpha == TRUE)
 				{
 					if((t >= _T('A')) && (t <= _T('Z')))
-						{ m_strPassword += t; uFinalChars++; }
+						{ strPassword += t; uFinalChars++; }
 				}
 
 				if(bLowerAlpha == TRUE)
 				{
 					if((t >= _T('a')) && (t <= _T('z')))
-						{ m_strPassword += t; uFinalChars++; }
+						{ strPassword += t; uFinalChars++; }
 				}
 
 				if(bNum == TRUE)
 				{
 					if((t >= _T('0')) && (t <= _T('9')))
-						{ m_strPassword += t; uFinalChars++; }
+						{ strPassword += t; uFinalChars++; }
 				}
 
 				if((bUnderline == TRUE) && (t == _T('_')))
-					{ m_strPassword += t; uFinalChars++; }
+					{ strPassword += t; uFinalChars++; }
 
 				if((bMinus == TRUE) && (t == _T('-')))
-					{ m_strPassword += t; uFinalChars++; }
+					{ strPassword += t; uFinalChars++; }
 
 				if((bSpace == TRUE) && (t == _T(' ')))
-					{ m_strPassword += t; uFinalChars++; }
+					{ strPassword += t; uFinalChars++; }
 
 				if(bSpecial == TRUE)
 				{
 					if(!((t == _T('[')) || (t == _T(']')) || (t == _T('{')) || (t == _T('}'))))
 					{
 						if((t >= _T('!')) && (t <= _T('/')))
-							{ m_strPassword += t; uFinalChars++; }
+							{ strPassword += t; uFinalChars++; }
 						if((t >= _T(':')) && (t <= _T('@')))
-							{ m_strPassword += t; uFinalChars++; }
+							{ strPassword += t; uFinalChars++; }
 						if((t >= _T('[')) && (t <= _T('`')))
-							{ m_strPassword += t; uFinalChars++; }
+							{ strPassword += t; uFinalChars++; }
 					}
 				}
 
 				if((bHigh == TRUE) && (((BYTE)t) >= _T('~')))
-					{ m_strPassword += t; uFinalChars++; }
+					{ strPassword += t; uFinalChars++; }
 
 				if(bBrackets == TRUE)
 				{
 					if((t == _T('[')) || (t == _T(']')) || (t == _T('{')) || (t == _T('}')))
-						{ m_strPassword += t; uFinalChars++; }
+						{ strPassword += t; uFinalChars++; }
 				}
 			}
 		}
@@ -418,7 +420,7 @@ void CPwGeneratorDlg::OnGenerateBtn()
 
 			if(bFound == true)
 			{
-				m_strPassword += t;
+				strPassword += t;
 				uFinalChars++;
 			}
 		}
@@ -428,7 +430,10 @@ void CPwGeneratorDlg::OnGenerateBtn()
 
 	UpdateData(FALSE);
 
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), strPassword);
+	m_cEditPw.SetPassword(strPassword);
+	EraseCString(&strPassword);
+
 	if(m_bCanAccept == TRUE) m_btnOK.EnableWindow(TRUE);
 }
 
@@ -540,10 +545,17 @@ void CPwGeneratorDlg::OnDeltaPosSpinNumChars(NMHDR* pNMHDR, LRESULT* pResult)
 void CPwGeneratorDlg::OnChangeEditPw() 
 {
 	UpdateData(TRUE);
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
 
-	if(m_strPassword.GetLength() == 0) m_btnOK.EnableWindow(FALSE);
-	else m_btnOK.EnableWindow(TRUE);
+	LPTSTR lp = m_cEditPw.GetPassword();
+	if(lp != NULL)
+	{
+		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lp);
+
+		if(_tcslen(lp) == 0) m_btnOK.EnableWindow(FALSE);
+		else m_btnOK.EnableWindow(TRUE);
+
+		m_cEditPw.DeletePassword(lp); lp = NULL;
+	}
 }
 
 void CPwGeneratorDlg::OnCheckHidePw() 
@@ -551,11 +563,18 @@ void CPwGeneratorDlg::OnCheckHidePw()
 	UpdateData(TRUE);
 
 	if(m_bHidePw == FALSE)
+	{
+		m_cEditPw.EnableSecureMode(FALSE);
 		m_cEditPw.SetPasswordChar(0);
+		m_cEditPw.SetFont(&m_fStyle, TRUE);
+	}
 	else
 	{
-		TCHAR tchDot = (TCHAR)(_T('z') + 27);
+		// TCHAR tchDot = (TCHAR)(_T('z') + 27);
+		TCHAR tchDot = (TCHAR)0xb7;
+		m_cEditPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
 		m_cEditPw.SetPasswordChar(tchDot);
+		m_cEditPw.SetFont(&m_fSymbol, TRUE);
 	}
 
 	UpdateData(FALSE);

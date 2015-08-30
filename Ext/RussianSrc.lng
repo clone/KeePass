@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Russian|
-|~LANGUAGEVERSION|             |0.99a|
+|~LANGUAGEVERSION|             |0.99b|
 |~LANGUAGEAUTHOR|              |Varrey|
 |~LANGUAGEAUTHOREMAIL|         |varrey@hotmail.com|
 
@@ -300,9 +300,9 @@
     |Автооткрытие последней используемой базы паролей при запуске|
 |Automatically save database on exit|
     |Автосохранение базы паролей при выходе|
-|GUI: Display images on buttons|
+|Display images on buttons|
     |Показывать картинки на кнопках|
-|GUI: Show grid lines in password entry list|
+|Show grid lines in password entry list|
     |Показывать линии в списке записей|
 |Workspace cannot be unlocked!|
     |Невозможно снять блокировку!|
@@ -336,7 +336,7 @@
 |&CSV File...|                 |&CSV файл...|
 |&PwSafe v2 TXT File...|       |&PwSafe v2 TXT файл...|
 |Select &Font|                 |Выбор &шрифта|
-|Select a new font for the list controls.|     |Выберите новый шрифт для списка объектов.|
+|Select a new font for the list controls:|     |Выберите новый шрифт для списка объектов:|
 
 |Code&Wallet TXT File...|      |Code&Wallet TXT файл...|
 |&TXT File...|                 |&TXT файл...|
@@ -402,8 +402,8 @@
 |Show &Columns|                |П&оказывать столбцы|
 |Show &Entry View|             |Показывать поле просмотра &записи|
 
-|GUI: Automatically resize table columns when resizing the main window|
-    |Автоизменение ширины столбцов таблицы при изменении размеров окна|
+|Automatically resize table columns when resizing the main window|
+    |Автоматически изменять ширину столбцов таблицы при изменении размеров окна|
 |&Copy|                        |&Копировать|
 |Copy &All|                    |Копировать &все|
 |&Undo|                        |&Отменить|
@@ -572,7 +572,7 @@
 |Invalid parameter|    |Неверный параметр|
 |Invalid random source||Неверный источник случайностей|
 |Invalid/corrupted file structure| |Неверная/испорченная структура файла|
-|Invalid/wrong key|    |Неверный ключ|
+|Invalid/wrong key|    |Неверный пароль|
 |It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.|
     |Возможно модуль совместим, но также возможно, что он приведет к аварийному завершению KeePass.|
 |KeePass - Save Before Close/Lock?| |KeePass - сохранить перед закрытием/блокировкой?|
@@ -612,10 +612,21 @@
 |Failed to create backup of this entry!|    |Невозможно создать копию для текущей записи!|
 |Immediately after opening a database|      |Действия сразу после открытия базы паролей|
 |Integration| |Интеграция|
-|Minimize window on startup| |Запускать в свернутом состоянии|
-|Save backups of modified entries into the "Backup" group| |Сохранять копии измененных записей в группе "Резервирование"|
+|Start minimized and locked| |Запускать в свернутом и заблокированном состоянии|
+|Save backups of modified entries into the 'Backup' group| |Сохранять копии измененных записей в группе "Резервирование"|
 |Show entries that will expire soon (if any)| |Показывать записи, которые скоро станут просроченными (если они есть)|
 |Show expired entries (if any)| |Показывать просроченные записи (если они есть)|
 |Start KeePass at Windows startup (for current user)| |Запускать KeePass при старте системы (для текущего пользователя)|
 |Unable to create/remove the auto-start key of KeePass in the Windows registry!|
     |Невозможно создать/удалить запить в реестре для автоматического старта KeePass!|
+
+|&Get more import plugins...| |&Новые модули после скачивания...|
+|Encode/replace newline characters by '\n'|  |Изменять символ перевода строки на '\n'|
+|Export Options|   |Настройки экспорта|
+|Export backup entries (entries in the 'Backup' group)| |Экспортировать резервные записи (из группы "Резервирование")|
+|Fields to export| |Поля для экспорта|
+|Group Tree|       |Дерево групп|
+|Here you can customize the exported files.| |Здесь вы можете настроить экспортируемые файлы.|
+|Icon| |Значок|
+|Master key has been changed!| |Основной пароль был изменен!|
+|Save the database now in order to get the new key applied.| |Сохраните базу паролей для применения нового основного пароля.|

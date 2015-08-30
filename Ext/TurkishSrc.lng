@@ -1,7 +1,7 @@
 |~LANGUAGENAME|                |Türkçe <Turkish>|
-|~LANGUAGEVERSION|             |0.97b|
+|~LANGUAGEVERSION|             |0.99b|
 |~LANGUAGEAUTHOR|              |Erhan BURHAN|
-|~LANGUAGEAUTHOREMAIL|         |<texas@xposta.com> <http://www.eburhan.com.tr.tc/>|
+|~LANGUAGEAUTHOREMAIL|         |<texas@xposta.com>|
 
 |&OK|                          |&Tamam|
 |&Cancel|                      |Ý&ptal|
@@ -49,7 +49,7 @@
 |Either enter the password/passphrase or select the password disk's drive.|
     |Parolayý giriniz ya da parolanýn bulunduðu disk sürücüyü seçiniz.|
 |Enter password:|              |Parola giriniz:|
-|or|                           |Veya|
+
 |Select the password disk drive where the key will be stored:|
     |Anahtarý depolamak istediðiniz sürücüyü seçiniz:|
 |Create a new password database - Enter master key|
@@ -152,29 +152,29 @@
 |&File|                        |&Dosya|
 |&Edit|                        |D&üzen|
 |&View|                        |&Görünüm|
-|&Extras|                      |&Extralar|
+|E&xtras|                      |&Ekstralar|
 |&?|                           |&?|
 
 |&New Database...|             |&Yeni veritabaný...|
 |&Open Database...|            |Veritabaný &aç...|
 |&Close Database|              |Veritabanýný &Kapat|
 |&Save Database|               |Veritabanýný &kaydet|
-|Save Database &As...|         |Veritabanýný &farklý yere kaydet...|
+|Save Database &As...|         |Veritabanýný &farklý kaydet...|
 |Change &Master Key For This Database...|      |Veritabanýnýn ana anahtarýný &deðiþtir...|
 |&Print Complete Password List|                |Bütün parola listesini &yazdýr|
-|Export To|                    |Dýþarýya ver|
+|&Export To|                    |Dýþarýya &ver|
 |&Lock Workspace|              |Çalýþma alanýný &kilitle|
 |&Unlock Workspace|            |Çalýþma alanýnýn kilidini &aç|
-|&Exit|                        |&Çýkýþ|
+|E&xit|                        |&Çýkýþ|
 
 |&Lock/Unlock Workspace|       |Çalýþma alanýný &kilitle/klidini aç|
 
-|&Options|                     |&Seçenekler|
-|&Add Password Group...|       |&Parola grubu ekle...|
-|Add Password &Subgroup...|    |&Alt parola grubu ekle...|
-|&Modify Password Group...|    |Parola grubunu &düzenle...|
+|&Options...|                     |&Seçenekler...|
+|Add Password &Group...|       |&Parola grubu ekle...|
+|Add Password Su&bgroup...|    |&Alt parola grubu ekle...|
+|Modif&y Password Group...|    |Parola grubunu &düzenle...|
 |&Delete Password Group...|    |Parola grubunu &sil...|
-|&Print Group|                 |Grubu &yazdýr...|
+|Pr&int Group|                 |Grubu &yazdýr...|
 |Export Group To &HTML...|     |Grubu &HTML olarak dýþarýya ver...|
 |Export Group To &XML...|      |Grubu &XML olarak dýþarýya ver...|
 |Export Group To &CSV...|      |Grubu &CSV olarak dýþarýya ver...|
@@ -183,7 +183,7 @@
 |Copy &Password To Clipboard|  |&Parolayý panoya kopyala|
 |Open &URL(s)|                 |&Web adresini (URL) aç|
 |&Find In Database...|         |&Veritabaný içerisinde bul...|
-|Find In This &Group...|       |Bu &grup içerisinde bul...|
+|Find In T&his Group...|       |Bu &grup içerisinde bul...|
 |&Add Entry...|                |Giriþ &ekle...|
 |&Edit/View Entry...|          |Giriþi &görüntüle/düzenle...|
 |&Delete Entry|                |Giriþi &sil|
@@ -203,13 +203,13 @@
 |Show User&Name Column|        |&Kullanýcý adý kolonunu göster|
 |Show &URL Column|             |&URL kolonunu göster|
 |Show &Password Column|        |&Parola kolonunu göster|
-|Show &Notes Column|           |&Notlar kolonunu göster|
+|Show Note&s Column|           |&Notlar kolonunu göster|
 |Main Window &Always On Top|   |Ana pencereyi daima üstte &tut|
-|&Hide Passwords Behind Asterisks (***)|       |Parolalarý yýldýz (***) iþaretleriyle &gizle|
+|Hide &Passwords Behind Asterisks (***)|       |Parolalarý yýldýz (***) iþaretleriyle &gizle|
 
 |Password &Generator|          |Parola Ü&reticisi|
 
-|Visit KeePass &Homepage|      |KeePass &web sitesini ziyaret et|
+|Visit &KeePass Homepage|      |KeePass &web sitesini ziyaret et|
 |&About KeePass...|            |KeePass &hakkýnda...|
 
 |&Database Settings...|        |&Veritabaný ayarlarý...|
@@ -269,7 +269,7 @@
     |Kullanýlan dosyada deðiþiklikler yapýlmýþ.|
 |Do you want to save the changes before closing?|
     |Kapatmadan önce deðiþiklikleri kaydetmek ister misiniz?|
-|Save Before Close?|           |Kapatmadan önce kaydedilsin mi?|
+|KeePass - Save Before Close/Lock?|   |KeePass - Kapatmadan/Kilitlemeden önce kaydedilsin mi?|
 
 |Deleting a group will delete all items in that group, too.|
     |Bir gurubu sildiðinizde o grup içindeki tüm öðeler de silinecektir.|
@@ -287,7 +287,7 @@
     |Aþaðýdaki listeden kullanmak istediðiniz dili seçenebilirsiniz.|
 |Available Languages|          |Kullanýlabilir diller|
 
-|Open &ReadMe File|            |&Beni oku dosyasýný aç|
+|Open &Help File|              |&Yardým dosyasýný aç|
 |Open &License File|           |Lisans dosyasýný &aç|
 |&Print License File|          |Lisans dosyasýný &yazdýr|
 
@@ -301,9 +301,9 @@
     |Son kullanýlan veritabanýný baþlangýçta otomatik olarak aç|
 |Automatically save database on exit|
     |Çýkýþta veritabanýný otomatik olarak kaydet|
-|GUI: Display images on buttons|
+|Display images on buttons|
     |GUI: Butonlarýn üzerinde resimleri göster|
-|GUI: Show grid lines in password entry list|
+|Show grid lines in password entry list|
     |GUI: Parola giriþi listesinde ýzgara çizgilerini göster|
 |Workspace cannot be unlocked!|
     |Çalýþma alaný kilitlenemez!|
@@ -316,7 +316,7 @@
 |Language file cannot be registered!|
     |Dil dosyasý gösterilemez!|
 |The language file has been installed.|
-    |Dil dosyasý kurulmuþ|
+    |Dil dosyasý kuruldu.|
 |You must restart KeePass in order to use the new language.|
     |Yeni dili kullanabilmeniz için KeePass yeniden baþlatýlmalýdýr.|
 |Do you wish to restart KeePass now?|
@@ -337,14 +337,14 @@
 |&CSV File...|                 |&CSV dosyasý...|
 |&PwSafe v2 TXT File...|       |&PwSafe v2 TXT dosyasý...|
 |Select &Font|                 |&Yazý tipi seç|
-|Select a new font for the list controls.|     |Liste kontrolleri için yeni bir yazý tipi seç|
+|Select a new font for the list controls:|     |Liste kontrolleri için yeni bir yazý tipi seç|
 
 |Code&Wallet TXT File...|      |Code&Wallet TXT dosyasý...|
 |&TXT File...|                 |&TXT dosyasý...|
 |&HTML File...|                |&HTML dosyasý...|
 |&XML File...|                 |&XML dosyasý...|
 |&CSV File...|                 |&CSV-Datei...|
-|Import From|                  |Ýçeriye al|
+|&Import From|                  |Ýçeriye al|
 
 |&Get more languages...|       |Daha fazla &dil dosyasý al...|
 |Start and Exit|               |Baþlangýç ve Çýkýþ|
@@ -364,16 +364,13 @@
 |Security|                     |Güvenlik|
 |KeePass is OSI Certified Open Source Software.|
     |KeePass, OSI sertifikalý ve açýk kaynak kodlu bir yazýlýmdýr.|
-|KeePass usage:|               |KeePass kullanýmý:|
-|db = Path to database you wish to open on KeePass startup|
-    |db = Baþlangýçta açýlmasýný istediðiniz veritabanýnýn yolu|
+
 |Automatically lock workspace after the following number of seconds:|
     |Aþaðýdaki süre sonunda (saniye cinsinden) çalýþma alanýný otomatik olarak kilitle:|
 |&Group Name|                  |&Grup ismi|
 |Every second row has a different background color. Use this color:|
     |Her iki satýrý farklý bir arkaplan rengiyle göster. Bu rengi kullan :|
-|Start:|                       |Baþlangýç :|
-|Exit:|                        |Çýkýþ :|
+
 |Default|                      |Varsayýlan|
 |More Colors...|               |Daha fazla renk...|
 |Search results|               |Arama Sonuçlarý|
@@ -386,7 +383,7 @@
 
 |Show &Creation Time Column|   |&Oluþturulma zamaný kolonuna göster|
 |Show Last &Modification Time Column|          |&Deðiþtirilme zamaný kolonunu göster|
-|Show Last Access &Time Column|                |&Eriþim zamaný kolonunu göster|
+|Show &Last Access Time Column|                |&Eriþim zamaný kolonunu göster|
 |Show &Expire Time Column|                     |&Süre sonu kolonunu göster|
 |Show UU&ID Column|                            |&UUID kolonunu göster|
 
@@ -394,22 +391,29 @@
 |Visit KeePass Homepage|       |KeePass web sitesini ziyaret et|
 |Field copied to clipboard.|   |Alan panoya kopyalandý.|
 
-|A key-file already exists on this drive. Do you want to overwrite it?|
-    |Bu disk sürücüde bir anahtar dosyasý zaten var. Üzerine yazmak ister misiniz?|
+|A key-file already exists on this drive. Do you want to overwrite or reuse it?|
+    |Bu disk sürücüde bir anahtar dosyasý zaten var. Üzerine yazmak veya tekrar kullanmak ister misiniz?|
+
+|Click [Yes] to overwrite the key-file.| |Anahtar dosyasýný üzerine yazmak için [Evet] butonuna týklayýn.|
+|Click [No] to reuse the selected key-file for this database.|
+    |Bu veritabaný için seçilmiþ anahtar dosyasýný tekrar kullanmak için [Hayýt] butonuna týklayýn.|
+|Click [Cancel] to abort changing the key.|
+    |Anahtar deðiþtirmeyi iptal etmek için [Ýptal] butonuna týklayýn.|
+
 |Overwrite?|                   |Üzerine yazýlsýn mý?|
 |Expires:|                     |Süre sonu :|
 |&Delete Selected Entries|     |&Seçili giriþi sil|
-|&Mass Modify (All Selected)...|               |Toplu &deðiþtir (hepsi seçili)...|
+|&Mass Modify (All Selected)...|               |Topluca &deðiþtir (hepsi seçili)...|
 |Change group:|                |Grubu deðiþtir:|
 |Change entry icon:|           |Giriþ simgesini deðiþtir:|
 |Change expiration time:|      |Süre sonunu deðiþtir:|
-|Mass Modify|                  |Toplu deðiþtir|
+|Mass Modify|                  |Topluca deðiþtir|
 |Change fields of all selected entries|        |Seçili olan tüm giriþlerin alanlarýný deðiþtir|
 |Show &Columns|                |&Kolonlarý göster|
 |Show &Entry View|             |&Giriþ görünümünü göster|
 
-|GUI: Automatically resize table columns when resizing the main window|
-    |GUI: Ana pencerenin boyutlarý deðiþtirildiðinde tablo kolonlarýný otomatik olarak yeninden boyutlandýr|
+|Automatically resize table columns when resizing the main window|
+    |Ana pencerenin boyutlarý deðiþtirildiðinde tablo kolonlarýný otomatik olarak yeninden boyutlandýr|
 |&Copy|                        |&Kopyala|
 |Copy &All|                    |&Hepsini kopyala|
 |&Undo|                        |&Geri al|
@@ -437,7 +441,7 @@
 |Translation author contact|   |Çevirmenle iletiþim|
 |&Rearrange|                   |Yeniden &düzenle|
 |&Sort Group List|             |Grup listesini &sýrala|
-|&Sort List By Title|          |&Baþlýða göre sýrala|
+|Sort List By &Title|          |&Baþlýða göre sýrala|
 |Sort List By User&Name|       |&Kullanýcý adýna göre sýrala|
 |Sort List By &URL|            |&URL'ye göre sýrala|
 |Sort List By &Password|       |&Parolaya göre sýrala|
@@ -449,7 +453,7 @@
 |Move Group One &Left|         |Grubu bir &sola taþý|
 |Move Group One &Right|        |Grubu bir &saða taþý|
 
-|Hide UserNames Behind &Asterisks (***)|  |Kullanýcý adlarýný yýldýz (***) iþaretleriyle gizle|
+|Hide &UserNames Behind Asterisks (***)|  |Kullanýcý adlarýný yýldýz (***) iþaretleriyle gizle|
 |Attachment:|                  |Ek dosya:|
 |Attachment|                   |Ek dosya|
 |Show &Attachment Column|      |&Ek dosya kolonunu göster|
@@ -460,9 +464,9 @@
 
 |There already is a file attached with this entry.|           |Bu giriþe baðlý zaten bir ek dosya var.|
 |Do you want to overwrite the current attachment?|            |Kullanýmda olan ek dosya üzerine yazmak istiyor musunuz?|
-|&Save Attached File To...|    |Ek dosyaya &Kaydet...|
+|&Save Attached File To...|    |Ek dosyaya &kaydet...|
 |There is no file attached with this entry.|                  |Bu giriþe baðlý ek dosya bulunmuyor.|
-|Remove the currently attached file|      |Kullanýmda olan ek dosyasý sil|
+|Remove the currently attached file|      |Kullanýmda olan ek dosyayý sil|
 
 |Close button [X] minimizes the main window instead of terminating the application|
     |Kapat [X] butonuna týklandýðýnda uygulamayý sonlardýrmak yerine simge durumuna küçült|
@@ -532,3 +536,114 @@
 |Mark database as modified on last-access time change|
     |Son eriþim zamanýný, düzenleme zamaný olarak deðiþtir.|
 |Se&lect All|                             |&Hepsini Seç|
+|Auto-&Sort Password List|                |Parola listesini otomatik &sýrala|
+|N&o Auto-Sort|                           |Otomatik sýralama &yok|
+|Auto-sorting of the password list is enabled, you cannot move entries manually.|
+    |Parola listesini otomatik sýralama etkin, giriþleri kendiniz taþýyamazsýnýz.|
+|Perform Auto-&Type|                      |Þimdi &otomatik yaz|
+|Auto-sorting of the password list is enabled, you cannot sort the list manually now.|
+    |Parola listesini otomatik sýralama etkin, þu andan itibaren listeyi kendiniz sýralayamazsýnýz.|
+|Select key-file manually...|             |Anahtar dosyasýný kendim seçeyim...|
+|Save key-file manually to...|            |Anahtar dosyasýný kendim kaydedeyim...|
+|Enter the new master key for this database.|
+    |Bu veritabaný için yeni ana anahtarý giriniz.|
+|Repeat master key|                       |Ana anahtarý tekrarla|
+|Repeat the master key for this database.||Bu veritabaný için ana anahtarý tekrarla|
+|Change password of this database - Enter new master key|
+    |Bu veritabanýnýn parolasýný deðiþtir -  Yeni bir ana anahtar gir|
+|Plugin|                                  |Eklenti|
+|cannot be loaded!|                       |yüklenemedi!|
+|Plugin Manager|                          |Eklenti Yöneticisi|
+|&Plugin Manager|                         |&Eklenti Yöneticisi|
+|Here you can configure all installed KeePass plugins.|
+    |Kurulu olan tüm KeePass eklentilerini buradan yapýlandýrabilirsiniz.|
+|This plugin has been designed for a different application version and may be incompatible with this one.|
+    |Bu eklenti farklý bir uygulama versiyonu için tasarlanmýþ ve bununla uyumsuzluk yaratabilir.|
+|Application version:|                    |Uygulama versiyonu:|
+|Plugin has been designed for:|           |Eklenti dizayn edildi:|
+|It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.|
+    |Es ist möglich, dass das Plugin kompatibel ist, aber es ist auch möglich dass KeePass abstürzen wird.|
+|Therefore save all data before you continue.|    |Devam etmeden önce bütün veriler kaydedilecek.|
+|Do you want to load the plugin?|         |Eklentiyi yüklemek istiyor musunuz ?|
+|This plugin will be disabled after you restart KeePass.|
+    |Bu eklenti KeePass yeniden baþlatýldýðýnda devre dýþý býrakýlacak.|
+|Enabled, loaded|                         |Etkin, yüklenmiþ|
+|Disabled, not loaded|                    |Devre dýþý, yüklenmemiþ|
+|This plugin will be enabled after you restart KeePass.|
+    |Bu eklenti KeePass yeniden baþlatýldýðýnda etkinleþtirilecek.|
+|&Enable|                                 |&Etkinleþtir|
+|&Disable|                                |&Devre dýþý býrak|
+|About &Plugin...|                        |Eklenti &hakkýnda...|
+|An error occured|                        |Bir hata oluþtu|
+|Error code|                              |Hata Kodu|
+|Unknown error|                           |Bilinmeyen Hata|
+|Success|                                 |Baþarýlý|
+|Invalid parameter|                       |Geçersiz Parametre|
+|Too few memory (RAM) available|          |Kullanýlabilir hafýza (RAM) çok az|
+|Invalid/wrong key|                       |Geçersiz/yanlýþ anahtar|
+|File access error: failed to open file in read mode|
+    |Dosya eriþim hatasý: Dosyayý okuma modunda açma baþarýsýz|
+|File access error: failed to open file in write mode|
+    |Dosya eriþim hatasý: Dosyayý yazma modunda açma baþarýsýz|
+|File error: error while reading from the file|
+    |Dosya hatasý: Dosyadan okunuyorken hata|
+|File error: error while writing to the file|
+    |Dosya hatasý: Dosyaya yazýyorken hata|
+|Internal error|                          |Dahili hata|
+|Invalid random source|                   |Geçersiz rasgele kaynak|
+|Invalid/corrupted file structure|        |Geçersiz/bozuk dosya yapýsý|
+|Encryption/decryption error|             |Þifreleme/Deþifreleme hatasý|
+|Get more plugins...|                     |Daha fazla eklenti al...|
+|Global auto-type hot key combination:|   |Otomatik tipli genel kýsa tuþ kombinasyonu:|
+|Unable to register a global hot key.|    |Genel bir kýsa tuþu kaydettirmek olanaksýz|
+|Most probably an other application has reserved this hot key already.|
+    |Büyük ihtimalle bir baþka uygulama bu kýsa tuþu kendisi için ayýrmýþ.|
+|You can choose an other hot key combination in 'Edit - Options - Setup'.|
+    |'Düzen - Seçenekler - Ýliþkilendirme' menüsünden bir baþka kýsayol seçebilirsiniz.|
+|and|                                     |ve|
+|You've selected the AND key mode, so you must enter a password AND select a key-file.|
+    |Anahtar modunu seçtiniz, bundan dolayý bir anahtar dosyasý seçip parolasýný girmelisiniz.|
+|Timed: copy data to the clipboard and clear it automatically after some seconds|
+    |Zamanlý : veriyi panoya kopyala ve birkaç saniye sonra otomatik olarak temizle|
+|Enhanced: allow pasting only once and protect against clipboard spies|
+    |Geliþmiþ: pano casusluðuna karþý korunmayý ve sadece birkez yapýþtýrmayý etkinleþtir|
+|Clipboard behavior:|                     |Pano davranýþý:|
+|Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.|
+    |UYARI! Bu seçeneðin sisteminizde doðru olarak çalýþmasý mümkün olmayabilir, özellikle herhangi bir pano arttýrma yazýlýmý ve benzeri bir þey kullanýyorsanýz.|
+|If you notice any problems with this enhanced method, just switch back to the timed clipboard clearing method.|
+    |Geliþmiþ olan bu yöntem ile ilgili herhangi bir problem çýkarsa, hemen zamanlý pano temizleme yöntemine tekrardan geçiþ yapýn.|
+|Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations.|
+    |.kdb dosyasý iliþkilendirmesini deðiþtirmek baþarýsýz. Kayýt defterine yazma ve dosya iliþkilendirmelerini deðiþtirme haklarýna sahip olduðunuzdan emin olun.|
+|Number the TANs consecutively, starting from this value|
+    |Bu deðerden baþlayan ardýþýk TAN numaralarý|
+|Never expires|                           |Süre sonu yok|
+|Auto-Type|                               |Otomatik Yaz|
+|Help:|                                   |Yardým:|
+|Advanced|                                |Geliþmiþ|
+|Start minimized and locked|              |Simge durumunda ve kilitli olarak baþlat|
+|Immediately after opening a database|    |Bir veritabanýný açtýktan sonra hemen|
+|Show expired entries (if any)|
+    |Süresi bitmiþ giriþleri göster (eðer varsa)|
+|Show entries that will expire soon (if any)|
+    |Yakýnda süresi bitecek giriþleri göster (eðer varsa)|
+|Integration|                             |Entegrasyon|
+|Start KeePass at Windows startup (for current user)|
+    |KeePass, Windows baþlangýcýnda çalýþsýn (güncel kullanýcý için)|
+|Unable to create/remove the auto-start key of KeePass in the Windows registry!|
+    |Windows kayýt defterinde kayýtlý KeePass'ýn otomatik baþlatma anahtarýný oluþturmak/kaldýrmak olanaksýz!|
+|Backup|                                  |Yedekleme|
+|Save backups of modified entries into the 'Backup' group|
+    |Deðiþtirilmiþ giriþleri yedeklerini 'Yedek' grubuna kaydet|
+|Failed to create backup of this entry!|  |Bu giriþin yedeðini oluþturma iþlemi baþarýsýz!|
+|Master key has been changed!|            |Ana anahtar deðiþtirildi!|
+|Save the database now in order to get the new key applied.|
+    |Yeni anahtarý uygulamak için veritabanýný þimdi kaydet.|
+|Fields to export|                        |Dýþarýya verilecek alanlar|
+|Icon|                                    |Simge|
+|Group Tree|                              |Grup Aðacý|
+|Export Options|                          |Seçenekleri dýþarýya ver|
+|Here you can customize the exported files.| |Dýþarýya aktarýlmýþ dosyalarý buradan özelleþtirebilirsiniz.|
+|Encode/replace newline characters by '\n'| |Yeni satýr karakterlerini '\n' ile deðiþtir/kodla|
+|Export backup entries (entries in the 'Backup' group)|
+    |Yedek giriþleri dýþarýya ver ('Yedek' grubundaki tüm giriþler)|
+|&Get more import plugins...|             |Ýçeriye daha fazla eklenti &al|

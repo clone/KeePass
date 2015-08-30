@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Slovenèina|
-|~LANGUAGEVERSION|             |0.98b|
+|~LANGUAGEVERSION|             |0.99b|
 |~LANGUAGEAUTHOR|              |Radoslav Bielik|
 |~LANGUAGEAUTHOREMAIL|         |rado@bielik.org, http://www.bielik.org|
 
@@ -297,10 +297,6 @@
     |Automaticky otvori poslednú pouitú databázu pri spustení|
 |Automatically save database on exit|
     |Automaticky uloi databázu pri ukonèení|
-|GUI: Display images on buttons|
-    |GUI: Zobrazi ikony tlaèítok|
-|GUI: Show grid lines in password entry list|
-    |GUI: Zobrazi mrieku v zozname hesiel|
 |Workspace cannot be unlocked!|
     |Pracovnú plochu nie je moné odomknú!|
 |Workspace locked|
@@ -332,7 +328,7 @@
     |Pri importovaní súboru došlo ku chybe. Súbor nemôe by importovanı|
 
 |Select &Font|                 |Zvo¾te &Font|
-|Select a new font for the list controls.|     |Zvo¾te novı font pre zoznamy.|
+|Select a new font for the list controls:|		|Zvo¾te novı font pre zoznamy:|
 
 |&Export To|			|&Exportova do...|
 |&Import From|			|&Importova z...|
@@ -363,16 +359,11 @@
 |Security|                     |Zabezpeèenie|
 |KeePass is OSI Certified Open Source Software.|
     |KeePass je OSI certifikovanı Open Source Software.|
-|KeePass usage:|               |Pouitie programu KeePass:|
-|db = Path to database you wish to open on KeePass startup|
-    |db = Cesta ku databáze ktorú si prajete otvori pri spustení programu|
 |Automatically lock workspace after the following number of seconds:|
     |Automaticky zamknú pracovnú plochu po nasledujúcom mnostve sekúnd:|
 |&Group Name|                  |Názov &skupiny|
 |Every second row has a different background color. Use this color:|
     |Kadı druhı riadok má inú farbu pozadia. Poui túto farbu:|
-|Start:|                       |Spustenie:|
-|Exit:|                        |Ukonèenie:|
 |Default|                      |Vıchodzie|
 |More Colors...|               |Viac farieb...|
 |Search results|               |Vısledky h¾adania|
@@ -393,9 +384,6 @@
 |Visit KeePass Homepage|       |Navštívi web stránku programu KeePass|
 |Field copied to clipboard.|   |Poloka bola skopírovaná do schránky.|
 
-|A key-file already exists on this drive. Do you want to overwrite it?|
-    |Súbor k¾úèa u na tomto disku existuje. Prajete si ho prepísa?|
-|Overwrite?|                   |Prepísa?|
 |Expires:|                     |Platnos do:|
 |&Delete Selected Entries|     |&Zmaza oznaèené záznamy|
 |&Mass Modify (All Selected)...|               |Upravi v&šetky zvolené záznamy...|
@@ -407,8 +395,8 @@
 |Show &Columns|                |Zobrazi &ståpce|
 |Show &Entry View|             |Zobrazi &vıpis záznamu|
 
-|GUI: Automatically resize table columns when resizing the main window|
-    |GUI: Automaticky zmeni šírku ståpcov pri zmene ve¾kosti hlavného okna|
+|Automatically resize table columns when resizing the main window|
+    |Automaticky zmeni šírku ståpcov pri zmene ve¾kosti hlavného okna|
 |&Copy|                        |&Kopírova|
 |Copy &All|                    |Kopírova &všetky|
 |&Undo|                        |&Spä|
@@ -559,8 +547,7 @@
 	|Je zapnuté automatické zoraïovanie zoznamu hesiel, nie je moné manuálne zoradi záznamy.|
 	
 
-|Perform Auto-&Type|
-	|&Automatické zadanie (Auto-Type)|
+
 
 |Change password of this database - Enter new master key|
 	|Zmeni heslo pre túto databázu - zadajte nové hlavné heslo|
@@ -574,12 +561,10 @@
 |Save key-file manually to...|	|Uloi súbor k¾úèa manuálne ako...|
 |Select key-file manually...|	|Zvoli súbor k¾úèa manuálne...|
 
-----------------------------------------------
 
-
-
-
-|Auto-Type|						|Automatické zadanie (Auto-Type)|
+|Perform Auto-&Type|
+	|&Automatické zadanie (Auto-Type)|
+|Auto-Type|						|Aut. zadanie|
 |Global auto-type hot key combination:|
 	|Globálna klávesová skratka pre funkciu automatické zadanie (auto-type):|
 |Most probably an other application has reserved this hot key already.|
@@ -626,6 +611,7 @@
 |Encryption/decryption error|	|Chyba šifrovania/dešifrovania|
 
 |Get more plugins...|			|Získa ïalšie pluginy...|
+|&Get more import plugins...|	|Získa ïalšie importovacie pluginy...|
 |Help:|							|Nápoveda:|
 |Here you can configure all installed KeePass plugins.|
 	|Tu môete meni nastavenia všetkıch nainštalovanıch pluginov.|
@@ -661,3 +647,64 @@
 |and|							|a|
 |cannot be loaded!|				|nemôe by naèítanı!|
 
+
+
+|Display images on buttons|
+    |Zobrazi ikony tlaèítok|
+|Show grid lines in password entry list|
+    |Zobrazi mrieku v zozname hesiel|
+
+|Advanced|
+	|Pokroèilé nastavenia|
+
+|Export Options|
+	|Nastavenia exportu|
+|Here you can customize the exported files.|
+	|Tu môete upravi nastavenia exportovanıch súborov.|
+|Encode/replace newline characters by '\n'|
+	|Nahrádza/kódova znaky nového riadku do '\n'|
+|Export backup entries (entries in the 'Backup' group)|
+	|Exportova zálohované záznamy (záznamy v skupine 'Záloha')|
+|Fields to export|
+	|Exportova tieto poloky|
+
+|Failed to create backup of this entry!|
+	|Nebolo moné vytvori zálohu tohoto záznamu!|
+	
+|Group Tree|					|Strom skupín|
+|Icon|							|Ikona|
+
+|Immediately after opening a database|
+	|Ihneï po otvorení databázy|
+|Show entries that will expire soon (if any)|
+	|Zobrazi záznamy ktorım èoskoro vyprší platnos (ak existujú)|
+|Show expired entries (if any)|
+	|Zobrazi záznamy po vypršaní platnosti (ak existujú)|
+
+
+|Master key has been changed!|
+	|Hlavné heslo bolo zmenené!|
+|Save the database now in order to get the new key applied.|
+	|Save the database now in order to get the new key applied.|
+
+|A key-file already exists on this drive. Do you want to overwrite or reuse it?|
+    |Súbor k¾úèa u na tomto disku existuje. Prajete si ho prepísa, alebo poui existujúci súbor?|
+|Overwrite?|                   |Prepísa?|
+|Click [Cancel] to abort changing the key.|
+	|Kliknite [Zruši] ak nechcete zmeni súbor k¾úèa.|
+|Click [No] to reuse the selected key-file for this database.|
+	|Kliknite [Nie] ak chcete poui existujúci súbor k¾úèa pre túto databázu.|
+|Click [Yes] to overwrite the key-file.|
+	|Kliknite [Áno] ak chcete prepísa súbor k¾úèa.|
+
+|Backup|						|Záloha|
+|Save backups of modified entries into the 'Backup' group|
+	|Uklada záloné kópie modifikovanıch záznamov do skupiny 'Záloha'|
+
+|Integration|					|Integrácia|
+|Start KeePass at Windows startup (for current user)|
+    |Spusti KeePass automaticky pri spustení Windows (pre aktívneho uívate¾a)|
+|Start minimized and locked|
+	|Spusti minimalizovanı a uzamknutı|
+|Unable to create/remove the auto-start key of KeePass in the Windows registry!|
+	|Nebolo moné vytvori/odstráni k¾úè pre automatické spustenie programu KeePass v registroch Windows!|

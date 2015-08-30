@@ -34,7 +34,6 @@
 |Find a string in the password list|           |Eine Zeichenfolge in der Passwortliste suchen|
 |Find text in password list|   |Text in Passwortliste suchen|
 
-|Database Format Version:|     |Datenbank-Format Version:|
 |About KeePass...|             |Über KeePass...|
 
 |Password Groups|              |Passwort-Gruppen|
@@ -46,8 +45,8 @@
 
 |Ready.|                       |Bereit.|
 
-|Either enter the password/passphrase or select the password disk's drive.|
-    |Geben Sie entweder ein Passwort ein oder wählen Sie das Laufwerk der Schlüsseldiskette.|
+|Enter the passphrase and/or select the key-disk's drive.|
+    |Geben Sie das Passwort ein und/oder wählen Sie das Laufwerk der Schlüsseldiskette aus.|
 |Enter password:|              |Passwort eingeben:|
 |Select the password disk drive where the key will be stored:|
     |Wählen Sie das Laufwerk der Schlüsseldiskette aus:|
@@ -93,10 +92,10 @@
     |Minus '-'|
 |Space ' '|
     |Leerzeichen ' '|
-|Special characters (!, §, $, %, &, ...)|
-    |Sonderzeichen (!, §, $, %, &, ...)|
-|Higher ANSI characters (Â, ©, É, µ, ½, ...)|
-    |Höhere ANSI-Zeichen (Â, ©, É, µ, ½, ...)|
+|Special characters|
+    |Sonderzeichen|
+|Higher ANSI characters|
+    |Höhere ANSI-Zeichen|
 |Special brackets ('{', '}', '[', ...)|
     |Spezielle Klammern ('{', '}', '[', ...)|
 
@@ -160,7 +159,7 @@
 |&Save Database|               |Datenbank &speichern|
 |Save Database &As...|         |Datenbank speichern &unter...|
 |Change &Master Key For This Database...|      |&Hauptschlüssel für diese Datenbank ändern...|
-|&Print Complete Password List|                |&Komplette Passwortliste drucken|
+|&Print...|                    |&Drucken...|
 |&Export To|                   |&Exportieren nach|
 |&Lock Workspace|              |&Arbeitsfläche sperren|
 |&Unlock Workspace|            |&Arbeitsfläche entsperren|
@@ -173,7 +172,7 @@
 |Add Password Su&bgroup...|    |Neue Passwort-U&ntergruppe erstellen...|
 |Modif&y Password Group...|    |Pass&wort-Gruppe bearbeiten...|
 |&Delete Password Group...|    |Passwort-Gruppe lös&chen...|
-|Pr&int Group|                 |Gruppe &drucken...|
+|Pr&int Group...|              |Gruppe &drucken...|
 |Export Group To &HTML...|     |Gruppe nach &HTML exportieren...|
 |Export Group To &XML...|      |Gruppe nach &XML exportieren...|
 |Export Group To &CSV...|      |Gruppe nach &CSV exportieren...|
@@ -216,8 +215,6 @@
 |&Minimize/Maximize Window To/From Tray|
     |Umschalten Hauptfenster/Tray|
 
-|%u.%u.%u.%u, compatible with %u.%u.x.x|
-    |%u.%u.%u.%u, kompatibel mit %u.%u.x.x|
 |Version |                     |Version |
 
 |Password and repeated password aren't identical!|
@@ -329,8 +326,6 @@
 
 |CSV files|                    |CSV-Dateien|
 |Text files|                   |Textdateien|
-|An error occured while importing the CSV file. File cannot be imported.|
-    |Es ist ein Fehler während des Importierens der CSV-Datei aufgetreten. Datei kann nicht importiert werden.|
 |An error occured while importing the file. File cannot be imported.|
     |Es ist ein Fehler während des Importierens aufgetreten. Datei kann nicht importiert werden.|
 |&CSV File...|                 |&CSV-Datei...|
@@ -504,8 +499,8 @@
 |Database Settings|                       |Datenbank-Einstellungen|
 |Here you can configure the current database.| |Hier können Sie die aktuelle Datenbank konfigurieren.|
 |Database Summary|                        |Datenbank-Zusammenfassung|
-|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
-    |Ihr Schlüssel wird mehrmals verschlüsselt, um den finalen Datenbank-Verschlüsselungscode zu erzeugen. Dies ist ein konstanter Zeitfaktor und eine Brute-Force-Attacke wird damit deutlich schwieriger.|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
+    |Ihr Schlüssel wird mehrmals verschlüsselt, um den finalen Datenbank-Verschlüsselungscode zu erzeugen. Dies ist ein konstanter Zeitfaktor und Wörterbuch-Attacken werden dadurch deutlich schwieriger.|
 |The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
     |Je größer diese Zahl ist, desto schwieriger sind Brute-Force-Attacken. Je größer allerdings diese Zahl ist, desto länger dauert auch das Laden und Speichern der Datenbank.|
 |Number of key encryption rounds:|        |Anzahl Passwort-Verschlüsselungsrunden:|
@@ -591,8 +586,8 @@
 |Encryption/decryption error|             |Fehler beim Verschlüsseln/Entschlüsseln|
 |Get more plugins...|                     |Mehr Plugins herunterladen...|
 |Global auto-type hot key combination:|   |Globale Auto-Type Hotkey-Kombination:|
-|Unable to register a global hot key.|    |Globaler HotKey kann nicht registriert werden.|
-|Most probably an other application has reserved this hot key already.|
+|Cannot register the global hot key.|     |Kann globalen HotKey nicht registrieren.|
+|Most probably another application has reserved this hot key already.|
     |Vermutlich hat sich bereits eine andere Anwendung diesen HotKey reserviert.|
 |You can choose an other hot key combination in 'Edit - Options - Setup'.|
     |Sie können eine andere HotKey-Kombination in 'Bearbeiten - Optionen - Setup' auswählen.|
@@ -643,3 +638,21 @@
 |Export backup entries (entries in the 'Backup' group)|
     |Backup-Einträge exportieren (Einträge in der 'Backup'-Gruppe)|
 |&Get more import plugins...|             |Mehr &Import-Plugins herunterladen...|
+|Field has been pasted.|                  |Feld wurde eingefügt.|
+|Waiting for paste command.|    |Warte auf Zwischenablage-Einfüge-Befehl.|
+|Paste operation completed.|              |Einfüge-Operation abgeschlossen.|
+|Limit to single instance|                |Auf eine Instanz limitieren|
+|Use more secure password edit controls|  |Sichere Passwort-Eingabefelder benutzen|
+|Single left click instead of double-click for default tray icon action|
+    |Einfacher Links-Klick statt Doppelklick für die Standard-Aktion des Tray-Icons|
+|Exclude entries in the '&Backup' group|  |Einträge in der '&Backup'-Gruppe ausschließen|
+|By default, new entries expire in the following number of days:|
+    |Neue Einträge laufen standardmäßig in der folgenden Anzahl Tagen ab:|
+|Click to expire the entry in %u days|    |Klicken, um den Eintrag in %u Tagen ablaufen zu lassen|
+|Calculate rounds for a 1-second delay on this computer|  |Anzahl Runden berechnen, die zu einer 1-Sekunden-Verzögerung auf diesem Computer führen|
+|The program is distributed under the terms of the GNU General Public License v2 or later.|
+    |Das Programm wird unter den Bestimmungen der GNU General Public License v2 oder neuer vertrieben.|
+|1 week|                                     |1 Woche|
+|2 weeks|                                    |2 Wochen|
+|1 month|                                    |1 Monat|
+|3 months|                                   |3 Monate|

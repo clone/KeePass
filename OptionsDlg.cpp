@@ -1,30 +1,20 @@
 /*
-  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
-  All rights reserved.
+  KeePass Password Safe - The Open-Source Password Manager
+  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  - Neither the name of ReichlSoft nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "StdAfx.h"
@@ -60,6 +50,9 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	m_bUsePuttyForURLs = FALSE;
 	m_bSaveOnLATMod = FALSE;
 	m_nClipboardMethod = -1;
+	m_bSecureEdits = FALSE;
+	m_bDefaultExpire = FALSE;
+	m_dwDefaultExpire = 0;
 	//}}AFX_DATA_INIT
 
 	m_pParentDlg = NULL;
@@ -92,6 +85,9 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_PUTTYURLS, m_bUsePuttyForURLs);
 	DDX_Check(pDX, IDC_CHECK_SAVEONLATMOD, m_bSaveOnLATMod);
 	DDX_Radio(pDX, IDC_RADIO_CLIPMETHOD_TIMED, m_nClipboardMethod);
+	DDX_Check(pDX, IDC_CHECK_SECUREEDITS, m_bSecureEdits);
+	DDX_Check(pDX, IDC_CHECK_DEFAULTEXPIRE, m_bDefaultExpire);
+	DDX_Text(pDX, IDC_EDIT_DEFAULTEXPIRE, m_dwDefaultExpire);
 	//}}AFX_DATA_MAP
 }
 
@@ -103,6 +99,8 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTN_DELETEASSOC, OnBtnDeleteAssoc)
 	ON_BN_CLICKED(IDC_RADIO_CLIPMETHOD_SECURE, OnRadioClipMethodSecure)
 	ON_BN_CLICKED(IDC_RADIO_CLIPMETHOD_TIMED, OnRadioClipMethodTimed)
+	ON_BN_CLICKED(IDC_CHECK_DEFAULTEXPIRE, OnCheckDefaultExpire)
+	ON_BN_CLICKED(IDC_CHECK_LOCKAFTERTIME, OnCheckLockAfterTime)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -162,6 +160,10 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY, TRUE);
 	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY, TRUE);
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_DISABLEUNSAFE), OPTGRP_SECURITY, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_SECUREEDITS), OPTGRP_SECURITY, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_DEFAULTEXPIRE), OPTGRP_SECURITY, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_DEFAULTEXPIRE), OPTGRP_SECURITY, TRUE);
 
 	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_ASSOC), OPTGRP_SETUP, TRUE);
 	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP, TRUE);
@@ -189,6 +191,7 @@ BOOL COptionsDlg::OnInitDialog()
 
 	m_olAdvanced.AddGroupText(TRL("Integration"), 9);
 	m_olAdvanced.AddCheckItem(TRL("Start KeePass at Windows startup (for current user)"), &m_bStartWithWindows, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Single left click instead of double-click for default tray icon action"), &m_bSingleClickTrayIcon, NULL, OL_LINK_NULL);
 
 	m_olAdvanced.AddGroupText(TRL(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Start and Exit"), 7);
@@ -196,6 +199,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Automatically open last used database on startup"), &m_bOpenLastDb, &m_bRememberLast, OL_LINK_SAME_TRIGGER_TRUE);
 	m_olAdvanced.AddCheckItem(TRL("Start minimized and locked"), &m_bStartMinimized, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Automatically save database on exit"), &m_bAutoSave, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Limit to single instance"), &m_bSingleInstance, NULL, OL_LINK_NULL);
 
 	m_olAdvanced.AddGroupText(TRL(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Immediately after opening a database"), 8);
@@ -234,7 +238,15 @@ BOOL COptionsDlg::OnInitDialog()
 	m_btnColorRowHighlight.SetCustomText(TRL("More Colors..."));
 	m_btnColorRowHighlight.SetDefaultText(TRL("Default"));
 
+	if(m_dwDefaultExpire == 0)
+	{
+		m_bDefaultExpire = FALSE;
+		GetDlgItem(IDC_EDIT_DEFAULTEXPIRE)->EnableWindow(FALSE);
+	}
+	else m_bDefaultExpire = TRUE;
+
 	UpdateData(FALSE);
+	OnCheckLockAfterTime();
 
 	return TRUE;
 }
@@ -248,7 +260,7 @@ void COptionsDlg::OnOK()
 	DWORD dwNewHotKey = ((DWORD)wMod << 16) | (DWORD)wVK;
 	if(dwNewHotKey != m_dwATHotKey)
 	{
-		if(m_pParentDlg->RegisterGlobalHotKey(HOTKEYID_AUTOTYPE, dwNewHotKey, (m_dwATHotKey != 0) ? TRUE : FALSE) == FALSE)
+		if(m_pParentDlg->RegisterGlobalHotKey(HOTKEYID_AUTOTYPE, dwNewHotKey, (m_dwATHotKey != 0) ? TRUE : FALSE, TRUE) == FALSE)
 			return;
 
 		m_dwATHotKey = dwNewHotKey;
@@ -256,6 +268,8 @@ void COptionsDlg::OnOK()
 
 	m_rgbRowHighlight = m_btnColorRowHighlight.GetColor();
 	if((m_bLockAfterTime == TRUE) && (m_nLockAfter < 5)) m_nLockAfter = 5;
+
+	if(m_bDefaultExpire == FALSE) m_dwDefaultExpire = 0;
 
 	m_ilIcons.DeleteImageList();
 	m_ilOptionIcons.DeleteImageList();
@@ -321,14 +335,20 @@ void COptionsDlg::OnBtnSelFont()
 
 void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult) 
 {
-	int n = m_tabMenu.GetCurSel();
+	int nCurSel = m_tabMenu.GetCurSel();
 
 	UNREFERENCED_PARAMETER(pNMHDR);
 
-	switch(n)
+	UpdateData(TRUE);
+
+	switch(nCurSel)
 	{
 	case OPTGRP_SECURITY:
 		m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
+		if(m_bLockAfterTime == FALSE)
+			GetDlgItem(IDC_EDIT_LOCKSECONDS)->EnableWindow(FALSE);
+		if(m_bDefaultExpire == FALSE)
+			GetDlgItem(IDC_EDIT_DEFAULTEXPIRE)->EnableWindow(FALSE);
 		break;
 	case OPTGRP_GUI:
 		m_wndgrp.HideAllExcept(OPTGRP_GUI);
@@ -338,7 +358,6 @@ void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case OPTGRP_MEMORY:
 		m_wndgrp.HideAllExcept(OPTGRP_MEMORY);
-		UpdateData(TRUE);
 		if(m_nClipboardMethod != CM_TIMED)
 			GetDlgItem(IDC_EDIT_CLIPBOARDTIME)->EnableWindow(FALSE);
 		break;
@@ -426,4 +445,20 @@ void COptionsDlg::OnRadioClipMethodTimed()
 	UpdateData(TRUE);
 	if(m_nClipboardMethod == CM_TIMED) GetDlgItem(IDC_EDIT_CLIPBOARDTIME)->EnableWindow(TRUE);
 	else GetDlgItem(IDC_EDIT_CLIPBOARDTIME)->EnableWindow(FALSE);
+}
+
+void COptionsDlg::OnCheckDefaultExpire() 
+{
+	UpdateData(TRUE);
+
+	if(m_bDefaultExpire == TRUE) GetDlgItem(IDC_EDIT_DEFAULTEXPIRE)->EnableWindow(TRUE);
+	else GetDlgItem(IDC_EDIT_DEFAULTEXPIRE)->EnableWindow(FALSE);
+}
+
+void COptionsDlg::OnCheckLockAfterTime() 
+{
+	UpdateData(TRUE);
+
+	if(m_bLockAfterTime == FALSE) GetDlgItem(IDC_EDIT_LOCKSECONDS)->EnableWindow(FALSE);
+	else GetDlgItem(IDC_EDIT_LOCKSECONDS)->EnableWindow(TRUE);
 }

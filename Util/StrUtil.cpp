@@ -1,30 +1,20 @@
 /*
-  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
-  All rights reserved.
+  KeePass Password Safe - The Open-Source Password Manager
+  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  - Neither the name of ReichlSoft nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "StdAfx.h"
@@ -348,7 +338,7 @@ C_FN_SHARE TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 
 	ASSERT(pUTF8String != NULL); if(pUTF8String == NULL) return NULL;
 
-	// Count needed Unicode chars (right counterpart to _StringToUTF8)
+	// Count the needed Unicode chars (right counterpart to _StringToUTF8)
 	i = 0; dwNumChars = 0;
 	while(1)
 	{
@@ -361,7 +351,7 @@ C_FN_SHARE TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 		dwNumChars++;
 		i += dwMoreBytes;
 	}
-	if(dwNumChars == 0) return NULL;
+	// if(dwNumChars == 0) return NULL;
 
 	dwPBufLength = dwNumChars + 2;
 	p = new WCHAR[dwPBufLength];
@@ -422,6 +412,41 @@ C_FN_SHARE TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 	SAFE_DELETE_ARRAY(p);
 	return (TCHAR *)pANSI;
 #endif
+}
+
+C_FN_SHARE BOOL _IsUTF8String(const UTF8_BYTE *pUTF8String)
+{
+	DWORD i = 0;
+	BYTE b0, b1, b2;
+
+	ASSERT(pUTF8String != NULL); if(pUTF8String == NULL) return FALSE;
+
+	if(pUTF8String[0] == 0xEF)
+		if(pUTF8String[1] == 0xBB)
+			if(pUTF8String[2] == 0xBF) i += 3;
+
+	while(1)
+	{
+		b0 = pUTF8String[i]; i++;
+
+		if(b0 >= 0x80)
+		{
+			b1 = pUTF8String[i]; i++;
+
+			if((b1 & 0xC0) != 0x80) return FALSE;
+
+			if((b0 & 0xE0) != 0xC0)
+			{
+				b2 = pUTF8String[i]; i++;
+
+				if((b2 & 0xC0) != 0x80) return FALSE;
+			}
+		}
+
+		if(b0 == 0) break;
+	}
+
+	return TRUE;
 }
 
 CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString)
@@ -579,7 +604,7 @@ C_FN_SHARE TCHAR *MakeSafeXmlString(const TCHAR *ptString)
 	};
 
 	TCHAR *pTrans[LOCAL_NUMXMLCONV] = {
-		_T("&lt;"), _T("&gt;"), _T("&amp;"), _T("&quot;"), _T("&apos;")
+		_T("&lt;"), _T("&gt;"), _T("&amp;"), _T("&quot;"), _T("&#39;")
 	};
 
 	ASSERT(ptString != NULL); if(ptString == NULL) return NULL;

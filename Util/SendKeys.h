@@ -61,13 +61,13 @@ private:
   void PopUpShiftKeys();
 
   static bool IsVkExtended(BYTE VKey);
-  void SendKeyUp(BYTE VKey);
   void SendKeyDown(BYTE VKey, WORD NumTimes, bool GenUpMsg, bool bDelay = false);
   void SendKey(WORD MKey, WORD NumTimes, bool GenDownMsg);
   static WORD StringToVKey(LPCTSTR KeyString, int &idx);
   void KeyboardEvent(BYTE VKey, BYTE ScanCode, LONG Flags);
 
 public:
+  void SendKeyUp(BYTE VKey);
 
   bool SendKeys(LPCTSTR KeysString, bool Wait = false);
   static bool AppActivate(HWND wnd);

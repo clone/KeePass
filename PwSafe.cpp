@@ -1,30 +1,20 @@
 /*
-  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
-  All rights reserved.
+  KeePass Password Safe - The Open-Source Password Manager
+  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  - Neither the name of ReichlSoft nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "StdAfx.h"
@@ -33,6 +23,7 @@
 
 #include "NewGUI/TranslateEx.h"
 #include "Util/MemUtil.h"
+#include "Util/PrivateConfig.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -84,6 +75,57 @@ BOOL CPwSafeApp::InitInstance()
 
 	CPwSafeDlg dlg;
 	m_pMainWnd = &dlg;
+
+	{
+		CPrivateConfig *pc = new CPrivateConfig(FALSE);
+
+		if(pc != NULL)
+		{
+			dlg.m_bCheckForInstance = pc->GetBool(PWMKEY_SINGLEINSTANCE, FALSE);
+			delete pc; pc = NULL;
+		}
+	}
+
+	if(dlg.m_bCheckForInstance == TRUE)
+	{
+		dlg.m_instanceChecker.ActivateChecker();
+
+		if(dlg.m_instanceChecker.PreviousInstanceRunning())
+		{
+			CString strFile;
+			LPCTSTR lpPassword = NULL;
+			LPCTSTR lpKeyFile = NULL;
+			LPCTSTR lpPreSelectPath = NULL;
+			DWORD dwData = 0;
+
+			ParseCurrentCommandLine(&strFile, &lpPassword, &lpKeyFile, &lpPreSelectPath);
+
+			if(strFile.GetLength() != 0)
+			{
+				if(lpPassword != NULL)
+				{
+					dwData |= (DWORD)_tcslen(lpPassword) << 16;
+					strFile = CString(lpPassword) + strFile;
+				}
+
+				if(lpKeyFile != NULL)
+				{
+					dwData |= (DWORD)_tcslen(lpKeyFile);
+					strFile = CString(lpKeyFile) + strFile;
+				}
+
+				dlg.m_instanceChecker.ActivatePreviousInstance((LPCTSTR)strFile, dwData);
+			}
+			else
+			{
+				dlg.m_instanceChecker.ActivatePreviousInstance();
+			}
+
+			m_pMainWnd = NULL;
+			return FALSE;
+		}
+	}
+
 	int nResponse = dlg.DoModal();
 
 	if(nResponse == IDOK) { }
@@ -283,5 +325,53 @@ BOOL CPwSafeApp::SetStartWithWindows(BOOL bAutoStart)
 	}
 
 	RegCloseKey(h); h = NULL;
+	return TRUE;
+}
+
+BOOL CPwSafeApp::ParseCurrentCommandLine(CString *psFile, LPCTSTR *lpPassword, LPCTSTR *lpKeyFile, LPCTSTR *lpPreSelectPath)
+{
+	long i;
+	BOOL bFirst = TRUE;
+
+	ASSERT(psFile != NULL); if(psFile == NULL) return FALSE;
+	psFile->Empty();
+
+	ASSERT(lpPassword != NULL); if(lpPassword == NULL) return FALSE;
+	*lpPassword = NULL;
+	ASSERT(lpKeyFile != NULL); if(lpKeyFile == NULL) return FALSE;
+	*lpKeyFile = NULL;
+	ASSERT(lpPreSelectPath != NULL); if(lpPreSelectPath == NULL) return FALSE;
+	*lpPreSelectPath = NULL;
+
+	if(__argc <= 1) return FALSE;
+
+	for(i = 1; i < (long)__argc; i++)
+	{
+		if((_tcsnicmp(__argv[i], _T("-pw:"), 4) == 0) && (_tcslen(__argv[i]) > 4))
+			*lpPassword = &__argv[i][4];
+		else if((_tcsnicmp(__argv[i], _T("-keyfile:"), 9) == 0) && (_tcslen(__argv[i]) > 9))
+			*lpKeyFile = &__argv[i][9];
+		else if((_tcsnicmp(__argv[i], _T("-preselect:"), 11) == 0) && (_tcslen(__argv[i]) > 11))
+			*lpPreSelectPath = &__argv[i][11];
+		else
+		{
+			if(bFirst != TRUE) *psFile += _T(" ");
+			*psFile += __argv[i];
+			bFirst = FALSE;
+		}
+	}
+
+	psFile->TrimLeft(); psFile->TrimRight();
+
+	if(psFile->GetLength() == 0) return FALSE;
+	if(psFile->Left(1) == _T("\"")) *psFile = psFile->Right(psFile->GetLength() - 1);
+	if(psFile->GetLength() == 0) return FALSE;
+	psFile->TrimLeft(); psFile->TrimRight();
+	if(psFile->GetLength() == 0) return FALSE;
+	if(psFile->Right(1) == _T("\"")) *psFile = psFile->Left(psFile->GetLength() - 1);
+	if(psFile->GetLength() == 0) return FALSE;
+	psFile->TrimLeft(); psFile->TrimRight();
+	if(psFile->GetLength() == 0) return FALSE;
+
 	return TRUE;
 }

@@ -1,30 +1,20 @@
 /*
-  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
-  All rights reserved.
+  KeePass Password Safe - The Open-Source Password Manager
+  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  - Neither the name of ReichlSoft nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "StdAfx.h"
@@ -59,9 +49,11 @@ char *CPwImport::_FileToMemory(const TCHAR *pszFile, unsigned long *pFileSize)
 	uFileSize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	pData = new char[uFileSize + 1];
+	pData = new char[uFileSize + 3];
 	if(pData == NULL) { fclose(fp); fp = NULL; return NULL; }
 	pData[uFileSize] = 0; // Terminate buffer
+	pData[uFileSize + 1] = 0;
+	pData[uFileSize + 2] = 0;
 
 	fread(pData, 1, uFileSize, fp);
 	fclose(fp); fp = NULL;
@@ -70,70 +62,99 @@ char *CPwImport::_FileToMemory(const TCHAR *pszFile, unsigned long *pFileSize)
 	return pData;
 }
 
-BOOL CPwImport::ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwGroupId)
+DWORD CPwImport::ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwGroupId)
 {
-	unsigned long uFileSize, i, j;
+	unsigned long uFileSize, i, j = 0;
 	char *pData;
 	char *pProcessed;
-	BOOL bInField;
+	char ch;
+	BOOL bInField = FALSE;
+	BOOL bUTF8 = FALSE;
+	DWORD dwFieldCounter = 0;
 
-	ASSERT(pszFile != NULL); if(pszFile == NULL) return FALSE;
-	ASSERT(pMgr != NULL); if(pMgr == NULL) return FALSE;
+	ASSERT(pszFile != NULL); if(pszFile == NULL) return 0;
+	ASSERT(pMgr != NULL); if(pMgr == NULL) return 0;
 
-	if((dwGroupId == DWORD_MAX) || (dwGroupId == 0)) return FALSE;
+	if((dwGroupId == DWORD_MAX) || (dwGroupId == 0)) return 0;
 
 	pData = _FileToMemory(pszFile, &uFileSize);
 	if(pData == NULL) return FALSE;
 
-	pProcessed = new char[uFileSize + 1];
-	if(pProcessed == NULL) { SAFE_DELETE_ARRAY(pData); return FALSE; }
+	pProcessed = new char[uFileSize + 2];
+	if(pProcessed == NULL) { SAFE_DELETE_ARRAY(pData); return 0; }
 
 	// Last character mustn't be an escape character
 	if(pData[uFileSize - 1] == '\\') pData[uFileSize - 1] = 0;
 
-	j = 0; bInField = FALSE;
 	if(uFileSize > 3)
 		if((pData[0] == 0xEF) && (pData[1] == 0xBB) && (pData[2] == 0xBF))
+		{
 			j += 3; // Skip UTF-8 initialization characters
+			bUTF8 = TRUE;
+		}
+
+	if(bUTF8 == FALSE) bUTF8 = _IsUTF8String((const UTF8_BYTE *)pData);
 
 	for(i = j; i < uFileSize; i++)
 	{
-		if(pData[i] == '\\')
+		ch = pData[i];
+
+		if((bInField == FALSE) && (ch == '\n'))
+		{
+			if((dwFieldCounter % 5) != 0)
+			{
+				SAFE_DELETE_ARRAY(pProcessed);
+				SAFE_DELETE_ARRAY(pData);
+				return (dwFieldCounter / 5);
+			}
+		}
+
+		if(ch == 0) continue;
+		else if((ch == '\\') && (pData[i+1] != 0))
 		{
 			i++; // Skip escape character
 			pProcessed[j] = pData[i]; // Write escaped symbol
 			j++; // Increase write counter
 		}
-		else if(pData[i] == '\"')
+		else if((bInField == FALSE) && (ch == ',') && (pData[i+1] == ','))
+		{
+			pProcessed[j] = 0; j++; dwFieldCounter++;
+		}
+		else if((bInField == FALSE) && (ch == ',') && (pData[i+1] == '\r'))
+		{
+			pProcessed[j] = 0; j++; dwFieldCounter++;
+		}
+		else if((bInField == FALSE) && (ch == ',') && (pData[i+1] == '\n'))
+		{
+			pProcessed[j] = 0; j++; dwFieldCounter++;
+		}
+		else if(ch == '\"')
 		{
 			if(bInField == TRUE)
 			{
-				pProcessed[j] = 0;
-				j++;
+				pProcessed[j] = 0; j++; dwFieldCounter++;
 
 				bInField = FALSE;
 			}
-			else
-				bInField = TRUE;
+			else bInField = TRUE;
 		}
 		else
 		{
 			if(bInField == TRUE)
 			{
-				pProcessed[j] = pData[i];
-				j++;
+				pProcessed[j] = ch; j++;
 			}
 		}
 	}
-	if(bInField == TRUE) { SAFE_DELETE_ARRAY(pData); SAFE_DELETE_ARRAY(pProcessed); return FALSE; }
+	if(bInField == TRUE) { SAFE_DELETE_ARRAY(pData); SAFE_DELETE_ARRAY(pProcessed); return (DWORD_MAX - 1); }
 
 	m_pLastMgr = pMgr;
 	m_dwLastGroupId = dwGroupId;
-	_AddStringStreamToDb(pProcessed, j);
+	_AddStringStreamToDb(pProcessed, j, bUTF8);
 
 	SAFE_DELETE_ARRAY(pProcessed);
 	SAFE_DELETE_ARRAY(pData);
-	return TRUE;
+	return DWORD_MAX;
 }
 
 BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
@@ -635,7 +656,7 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 	return TRUE;
 }
 
-void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamSize)
+void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamSize, BOOL bUTF8)
 {
 	unsigned long s;
 	char *pTitle = NULL, *pUserName = NULL, *pPassword = NULL, *pURL = NULL, *pNotes = NULL;
@@ -677,11 +698,22 @@ void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamS
 			PW_ENTRY pwTemplate;
 			PW_TIME tNow;
 
-			tszTitle = _UTF8ToString((UTF8_BYTE *)pTitle);
-			tszUserName = _UTF8ToString((UTF8_BYTE *)pUserName);
-			tszPassword = _UTF8ToString((UTF8_BYTE *)pPassword);
-			tszURL = _UTF8ToString((UTF8_BYTE *)pURL);
-			tszNotes = _UTF8ToString((UTF8_BYTE *)pNotes);
+			if(bUTF8 == TRUE)
+			{
+				tszTitle = _UTF8ToString((UTF8_BYTE *)pTitle);
+				tszUserName = _UTF8ToString((UTF8_BYTE *)pUserName);
+				tszPassword = _UTF8ToString((UTF8_BYTE *)pPassword);
+				tszURL = _UTF8ToString((UTF8_BYTE *)pURL);
+				tszNotes = _UTF8ToString((UTF8_BYTE *)pNotes);
+			}
+			else
+			{
+				tszTitle = (TCHAR *)pTitle;
+				tszUserName = (TCHAR *)pUserName;
+				tszPassword = (TCHAR *)pPassword;
+				tszURL = (TCHAR *)pURL;
+				tszNotes = (TCHAR *)pNotes;
+			}
 
 			memset(&pwTemplate, 0, sizeof(PW_ENTRY));
 			_GetCurrentPwTime(&tNow);
@@ -699,11 +731,14 @@ void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamS
 
 			m_pLastMgr->AddEntry(&pwTemplate);
 
-			SAFE_DELETE_ARRAY(tszTitle);
-			SAFE_DELETE_ARRAY(tszUserName);
-			SAFE_DELETE_ARRAY(tszPassword);
-			SAFE_DELETE_ARRAY(tszURL);
-			SAFE_DELETE_ARRAY(tszNotes);
+			if(bUTF8 == TRUE)
+			{
+				SAFE_DELETE_ARRAY(tszTitle);
+				SAFE_DELETE_ARRAY(tszUserName);
+				SAFE_DELETE_ARRAY(tszPassword);
+				SAFE_DELETE_ARRAY(tszURL);
+				SAFE_DELETE_ARRAY(tszNotes);
+			}
 		}
 	}
 }

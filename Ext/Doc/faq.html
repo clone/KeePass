@@ -15,9 +15,10 @@ Frequently Asked Questions (FAQ)</td></tr></table>
 	<ul>
 	<li><a href="#helpme" target="_self">How can I help you?</a></li>
 	<li><a href="#nooptsave" target="_self">My options aren't saved! Why?</a></li>
-	<li><a href="#multiuser" target="_self">Multi-user databases</a></li>
+	<!-- <li><a href="#multiuser" target="_self">Multi-user databases</a></li> -->
 	<li><a href="#multicards" target="_self">Rename columns / other "card types" feature requests</a></li>
 	<li><a href="#multisys" target="_self">Will there be KeePass versions for other OSs than Windows?</a></li>
+	<li><a href="#seceditex" target="_self">What are those 'Secure Edit Controls'?</a></li>
 	</ul>
 
 	<br /><br />
@@ -75,6 +76,7 @@ Frequently Asked Questions (FAQ)</td></tr></table>
 
 	<br /><br />
 
+	<!--
 	<a name="multiuser"></a>
 	<table class="tablebox"><tr><td class="boxtitle">
 	<img src="images/menuinfo.gif" width="31px" height="21px" class="singleimg">
@@ -104,7 +106,7 @@ Frequently Asked Questions (FAQ)</td></tr></table>
 	<a href="http://office.microsoft.com/en-us/assistance/HP052388541033.aspx" target="_blank">Microsoft Office Online: Overview of security and protection in Excel</a><br />
 	<a href="http://www.dotxls.com/excel-security/23/introduction-to-excel-security" target="_blank">DotXls: Excel Security and Excel Password Protection</a><br />
 
-	<br /><br />
+	<br /><br /> -->
 
 	<a name="multicards"></a>
 	<table class="tablebox"><tr><td class="boxtitle">
@@ -177,6 +179,33 @@ Frequently Asked Questions (FAQ)</td></tr></table>
 	Additional reading:<br />
 	<a href="http://sourceforge.net/forum/forum.php?thread_id=1162482&forum_id=329220" target="_blank">Open Discussion: KeePass for PalmOS...?</a><br />
 	<a href="http://sourceforge.net/forum/forum.php?thread_id=1030493&forum_id=329220" target="_blank">Open Discussion: WxWidgets support?</a><br />
+
+	<br /><br />
+
+	<a name="seceditex"></a>
+	<table class="tablebox"><tr><td class="boxtitle">
+	<img src="images/menuinfo.gif" width="31px" height="21px" class="singleimg">
+	What are those 'Secure Edit Controls'?</td></tr></table>
+	<br />
+	Secure Edit Controls are special password edit controls that are resistant to window spies and memory dumpers.<br />
+	<br />
+	There are many tools that read out the entered passwords of standard Windows password edit controls. These standard
+	edit controls aren't secure: other applications can easily get the entered texts, even though Windows shows the nice
+	password asterisks/dots. Secure edit controls are resistant to this. None of the window spies are able to read
+	out the contents of a Secure Edit Control.<br />
+	<br />
+	Additionally, Secure Edit Controls scramble the entered password in a way that it cannot even be found in the
+	process memory of the application. If Windows caches the whole application to disk <i>while entering the password</i>,
+	this wouldn't reveal the entered text anyway! The standard edit controls provided by Windows react completely different:
+	the password would be easily readable as plain-text.<br />
+	<br />
+	KeePass was the first application offering this level of security. Since the source code for Secure Edit Controls
+	is open-source, most probably many other password managers will adopt and integrate them soon, too.<br />
+	<br />
+	See the additional reading link [1] below for a detailed article on Secure Edit Controls (how they work, their limitations, etc.).<br />
+	<br />
+	Additional reading:<br />
+	<a href="http://www.codeproject.com/editctrl/SecEditEx.asp" target="_blank">[1] An article by Dominik Reichl on Secure Edit Controls</a><br />
 	<br />
 </body>
 </html>

@@ -1,30 +1,20 @@
 /*
-  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
-  All rights reserved.
+  KeePass Password Safe - The Open-Source Password Manager
+  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  - Neither the name of ReichlSoft nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "StdAfx.h"
@@ -263,7 +253,7 @@ C_FN_SHARE BOOL OpenUrlInNewBrowser(LPCTSTR lpURL)
 		_tcscat(pos, _T(" "));
 		_tcscat(pos, lpURL);
 
-		uResult = WinExec(tszKey, SW_SHOW);
+		uResult = WinExec(tszKey, KPSW_SHOWDEFAULT);
 	}
 
 	return uResult > 31 ? TRUE : FALSE;
@@ -308,7 +298,7 @@ C_FN_SHARE BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 		_tcscat(tszKey, (LPCTSTR)strURL);
 
 		// Execute the ssh client
-		bResult = WinExec(tszKey, SW_SHOW) > 31 ? TRUE : FALSE;
+		bResult = WinExec(tszKey, KPSW_SHOWDEFAULT) > 31 ? TRUE : FALSE;
 	}
 	else if(strURL.Find(_T("telnet:")) >= 0)
 	{
@@ -332,7 +322,7 @@ C_FN_SHARE BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 		_tcscat(tszKey, strURL.GetBuffer(0));
 
 		// Execute the ssh client
-		bResult = WinExec(tszKey, SW_SHOW) > 31 ? TRUE : FALSE;
+		bResult = WinExec(tszKey, KPSW_SHOWDEFAULT) > 31 ? TRUE : FALSE;
 	}
 
 	return bResult;
@@ -347,19 +337,19 @@ C_FN_SHARE void OpenUrlEx(LPCTSTR lpURL)
 	if(_tcsncmp(lpURL, _T("http://"), 7) == 0)
 	{
 		if(OpenUrlInNewBrowser(lpURL) == FALSE)
-			ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
+			ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, KPSW_SHOWDEFAULT);
 	}
 	else if(_tcsncmp(lpURL, _T("https://"), 8) == 0)
 	{
 		if(OpenUrlInNewBrowser(lpURL) == FALSE)
-			ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
+			ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, KPSW_SHOWDEFAULT);
 	}
 	else if(_tcsncmp(lpURL, _T("cmd://"), 6) == 0)
 	{
 		if(_tcslen(lpURL) != 6)
-			WinExec(((LPCSTR)lpURL) + (6 * sizeof(TCHAR)), SW_SHOW);
+			WinExec(((LPCSTR)lpURL) + (6 * sizeof(TCHAR)), KPSW_SHOWDEFAULT);
 	}
-	else ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
+	else ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, KPSW_SHOWDEFAULT);
 }
 
 C_FN_SHARE BOOL _FileAccessible(LPCTSTR lpFile)
@@ -394,17 +384,17 @@ C_FN_SHARE HINSTANCE _OpenLocalFile(TCHAR *szFile, int nMode)
 	if(nMode == OLF_OPEN)
 	{
 		hInst = ShellExecute(::GetActiveWindow(), _T("open"), szFileTempl,
-			NULL, szPath, SW_SHOW);
+			NULL, szPath, KPSW_SHOWDEFAULT);
 	}
 	else if(nMode == OLF_PRINT)
 	{
 		hInst = ShellExecute(::GetActiveWindow(), _T("print"), szFileTempl,
-			NULL, szPath, SW_SHOW);
+			NULL, szPath, KPSW_SHOWDEFAULT);
 	}
 	else if(nMode == OLF_EXPLORE)
 	{
 		hInst = ShellExecute(::GetActiveWindow(), _T("explore"), szFileTempl,
-			NULL, szPath, SW_SHOW);
+			NULL, szPath, KPSW_SHOWDEFAULT);
 	}
 	else
 	{
@@ -520,7 +510,7 @@ C_FN_SHARE BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
 	str += _T("::/");
 	str += lpTopicFile;
 
-	WinExec((LPCTSTR)str, SW_SHOW);
+	WinExec((LPCTSTR)str, KPSW_SHOWDEFAULT);
 
 	// STARTUPINFO sui;
 	// PROCESS_INFORMATION pi;

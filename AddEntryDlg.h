@@ -1,30 +1,20 @@
 /*
-  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
-  All rights reserved.
+  KeePass Password Safe - The Open-Source Password Manager
+  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  - Neither the name of ReichlSoft nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #ifndef AFX_ADDENTRYDLG_H__C5D4C3E0_0BAE_11D8_BF16_0050BF14F5CC__INCLUDED_
@@ -33,11 +23,11 @@
 #include "Util/SysDefEx.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/XHyperLink.h"
-#include "NewGUI/HyperEdit.h"
 #include "NewGUI/amsEdit.h"
 #include "NewGUI/AutoRichEditCtrl.h"
 #include "NewGUI/GradientProgressCtrl.h"
 #include "NewGUI/XPStyleButtonST.h"
+#include "NewGUI/SecureEditEx.h"
 
 #include "PwSafe/PwManager.h"
 
@@ -54,8 +44,10 @@ public:
 	void CleanUp();
 
 	void UpdateControlsStatus();
+	void SetExpireDays(DWORD dwDays);
 
 	CFont m_fStyle;
+	CFont m_fSymbol;
 	CImageList *m_pParentIcons;
 	CKCSideBannerWnd m_banner;
 
@@ -65,15 +57,19 @@ public:
 	int m_nGroupId;
 	int m_nIconId;
 
-	CString m_strPassword;
-	CString m_strRepeatPw;
 	CString m_strNotes;
 	PW_TIME m_tExpire;
+	DWORD m_dwDefaultExpire;
 
 	BCMenu m_popmenu;
 
+	LPTSTR m_lpPassword;
+	LPTSTR m_lpRepeatPw;
+
 	//{{AFX_DATA(CAddEntryDlg)
 	enum { IDD = IDD_ADDENTRY_DLG };
+	CXPStyleButtonST	m_btSelDefExpires;
+	CXPStyleButtonST	m_btSetToDefaultExpire;
 	CComboBoxEx	m_cbGroups;
 	CXHyperLink	m_hlHelpURL;
 	CXHyperLink	m_hlHelpAutoType;
@@ -88,9 +84,9 @@ public:
 	CXPStyleButtonST	m_btCancel;
 	CXPStyleButtonST	m_btRandomPw;
 	CXPStyleButtonST	m_btPickIcon;
-	CHyperEdit	m_pURL;
-	CEdit	m_pRepeatPw;
-	CEdit	m_pEditPw;
+	CEdit	m_pURL;
+	CSecureEditEx	m_pRepeatPw;
+	CSecureEditEx	m_pEditPw;
 	BOOL	m_bStars;
 	CString	m_strTitle;
 	CString	m_strURL;
@@ -126,6 +122,12 @@ protected:
 	afx_msg void OnRemoveAttachBtn();
 	afx_msg void OnChangeEditPassword();
 	afx_msg void OnCheckExpires();
+	afx_msg void OnSetDefaultExpireBtn();
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg void OnExpires1Week();
+	afx_msg void OnExpires2Weeks();
+	afx_msg void OnExpires1Month();
+	afx_msg void OnExpires3Months();
 	//}}AFX_MSG
 
 	afx_msg LRESULT OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam);

@@ -1,30 +1,20 @@
 /*
-  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
-  All rights reserved.
+  KeePass Password Safe - The Open-Source Password Manager
+  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  - Neither the name of ReichlSoft nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "StdAfx.h"
@@ -63,6 +53,7 @@ CPasswordDlg::CPasswordDlg(CWnd* pParent /*=NULL*/)
 	m_strDescriptiveName = _T("");
 	m_bOnce = FALSE;
 	m_hWindowIcon = NULL;
+	m_lpPreSelectPath = m_lpInitialKey = m_lpKey = m_lpKey2 = NULL;
 }
 
 void CPasswordDlg::DoDataExchange(CDataExchange* pDX)
@@ -115,14 +106,21 @@ BOOL CPasswordDlg::OnInitDialog()
 	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, "Tahoma");
-	m_pEditPw.SetFont(&m_fStyle, TRUE);
-	m_btStars.SetFont(&m_fStyle, TRUE);
+	m_fSymbol.CreateFont(-13, 0, 0, 0, 0, FALSE, FALSE, 0,
+		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Symbol"));
 
 	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_XPButton(&m_btMakePw, IDB_KEY_SMALL, IDB_KEY_SMALL);
 	NewGUI_XPButton(&m_btStars, -1, -1);
+
+	m_btStars.SetFont(&m_fSymbol, TRUE);
+	m_pEditPw.SetFont(&m_fSymbol, TRUE);
+
 	m_btStars.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
+	CString strTT = TRL("Hide &Passwords Behind Asterisks (***)"); strTT.Remove(_T('&'));
+	m_btStars.SetTooltipText(strTT, TRUE);
 
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
@@ -186,7 +184,7 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	LPCTSTR lp;
 
-	lp = TRL("Either enter the password/passphrase or select the password disk's drive.");
+	lp = TRL("Enter the passphrase and/or select the key-disk's drive.");
 	GetDlgItem(IDC_STATIC_INTRO)->SetWindowText(lp);
 
 	lp = TRL("Enter password:");
@@ -301,59 +299,127 @@ BOOL CPasswordDlg::OnInitDialog()
 	}
 
 	// Alternative password asterisk character: 0xB7 (smaller dot)
-	TCHAR tchDot = (TCHAR)(_T('z') + 27);
-	// TCHAR tchDot = (TCHAR)0xB7;
-	CString strStars = _T("");
-	strStars += tchDot; strStars += tchDot; strStars += tchDot;
+	// TCHAR tchDot = (TCHAR)(_T('z') + 27);
+	TCHAR tchDot = (TCHAR)0xb7;
+	CString strStars; strStars += tchDot; strStars += tchDot; strStars += tchDot;
 	m_btStars.SetWindowText(strStars);
 	m_bStars = TRUE;
 	OnCheckStars();
 
 	UpdateData(FALSE);
 
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
+	if(m_lpInitialKey != NULL)
+	{
+		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_lpInitialKey);
+		m_pEditPw.SetPassword(m_lpInitialKey);
+		m_pEditPw.DeletePassword(m_lpInitialKey); m_lpInitialKey = NULL;
+	}
+	else
+	{
+		m_pEditPw.SetPassword(m_lpInitialKey);
+		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), _T(""));
 
-	m_pEditPw.SetWindowText((LPCTSTR)m_strPassword);
+		if(m_lpPreSelectPath != NULL)
+		{
+			int i, nSpecLen = _tcslen(m_lpPreSelectPath);
+			CString strCBI;
+			BOOL bFound = FALSE;
+
+			for(i = 0; i < m_cbDiskList.GetCount(); i++)
+			{
+				m_cbDiskList.GetLBText(i, strCBI);
+				if(strCBI.GetLength() < nSpecLen) continue;
+
+				if(_tcsnicmp((LPCTSTR)strCBI, m_lpPreSelectPath, nSpecLen) == 0)
+				{
+					m_cbDiskList.SetCurSel(i);
+					OnSelChangeComboDiskList();
+					bFound = TRUE;
+					break;
+				}
+			}
+
+			if(bFound == FALSE)
+			{
+				COMBOBOXEXITEM cbi;
+				ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
+				cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
+				cbi.iItem = m_cbDiskList.GetCount();
+				cbi.pszText = (LPTSTR)m_lpPreSelectPath;
+				cbi.cchTextMax = (int)_tcslen(cbi.pszText);
+				cbi.iImage = cbi.iSelectedImage = 28;
+				cbi.iIndent = 0;
+				int nx = m_cbDiskList.InsertItem(&cbi);
+
+				m_cbDiskList.SetCurSel(nx);
+				OnSelChangeComboDiskList();
+			}
+
+			m_bKeyMethod = TRUE;
+			UpdateData(FALSE);
+			EnableClientWindows();
+		}
+	}
+
 	m_pEditPw.SetFocus();
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
 
 void CPasswordDlg::CleanUp()
 {
-	EraseCString(&m_strPassword);
-	ASSERT(m_strPassword.GetLength() == 0);
-
 	m_cbDiskList.ResetContent();
 	m_ilIcons.DeleteImageList();
 	m_fStyle.DeleteObject();
+	m_fSymbol.DeleteObject();
+}
+
+void CPasswordDlg::FreePasswords()
+{
+	ASSERT(m_lpKey != NULL);
+
+	if(m_lpKey != NULL)
+	{
+		m_pEditPw.DeletePassword(m_lpKey);
+		m_lpKey = NULL;
+	}
+
+	if(m_lpKey2 != NULL)
+	{
+		m_pEditPw.DeletePassword(m_lpKey2);
+		m_lpKey2 = NULL;
+	}
 }
 
 void CPasswordDlg::OnOK() 
 {
 	CString strTemp;
 	ULARGE_INTEGER aBytes[3];
+	LPTSTR lpPassword;
 
 	UpdateData(TRUE);
 
-	EraseCString(&m_strPassword);
-	m_pEditPw.GetWindowText(m_strPassword);
+	ASSERT((m_lpKey == NULL) && (m_lpKey2 == NULL));
+	m_lpKey = m_pEditPw.GetPassword();
+	lpPassword = m_lpKey;
 
 	// Validate input
 	if(m_bKeyMethod == PWM_KEYMETHOD_OR)
 	{
-		if(((m_strPassword.GetLength() == 0) ^ (m_cbDiskList.GetCurSel() == 0)) == 0)
+		if(!((_tcslen(m_lpKey) == 0) ^ (m_cbDiskList.GetCurSel() == 0)))
 		{
 			MessageBox(TRL("EITHER enter a password/passphrase OR select a key disk drive."),
 				TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+			FreePasswords();
 			return;
 		}
 	}
 	else // m_bKeyMethod == PWM_KEYMETHOD_AND
 	{
-		if((m_strPassword.GetLength() == 0) || (m_cbDiskList.GetCurSel() == 0))
+		if((_tcslen(m_lpKey) == 0) || (m_cbDiskList.GetCurSel() == 0))
 		{
 			MessageBox(TRL("You've selected the AND key mode, so you must enter a password AND select a key-file."),
 				TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
+			FreePasswords();
 			return;
 		}
 	}
@@ -361,8 +427,6 @@ void CPasswordDlg::OnOK()
 	if((m_bKeyMethod == PWM_KEYMETHOD_OR) && (m_cbDiskList.GetCurSel() == 0))
 	{
 		m_bKeyFile = FALSE;
-		EraseCString(&m_strRealKey);
-		m_strRealKey = m_strPassword;
 	}
 	else
 	{
@@ -378,12 +442,14 @@ void CPasswordDlg::OnOK()
 					strTemp += _T("\r\n\r\n");
 					strTemp += TRL("Make sure a writable medium is inserted.");
 					MessageBox(strTemp, TRL("Stop"), MB_OK | MB_ICONWARNING);
+					FreePasswords();
 					return;
 				}
 
 				if(aBytes[2].QuadPart < 128)
 				{
 					MessageBox(TRL("Not enough free disk space!"), TRL("Stop"), MB_OK | MB_ICONWARNING);
+					FreePasswords();
 					return;
 				}
 			}
@@ -398,6 +464,7 @@ void CPasswordDlg::OnOK()
 				strTemp += _T("\r\n\r\n");
 				strTemp += TRL("Make sure a writable medium is inserted.");
 				MessageBox(strTemp, TRL("Stop"), MB_OK | MB_ICONWARNING);
+				FreePasswords();
 				return;
 			}
 			fclose(fpTest); Sleep(100);
@@ -405,15 +472,13 @@ void CPasswordDlg::OnOK()
 		}
 
 		m_bKeyFile = TRUE;
-		EraseCString(&m_strRealKey);
-		m_strRealKey = strTemp;
-		ASSERT(m_strRealKey.GetLength() != 0);
-	}
 
-	if(m_bKeyMethod == PWM_KEYMETHOD_AND)
-	{
-		EraseCString(&m_strRealKey2);
-		m_strRealKey2 = m_strPassword;
+		if(m_bKeyMethod == PWM_KEYMETHOD_OR) m_pEditPw.DeletePassword(m_lpKey);
+		else m_lpKey2 = m_lpKey;
+
+		m_lpKey = new TCHAR[strTemp.GetLength() + 1];
+		ASSERT(m_lpKey != NULL); if(m_lpKey == NULL) { FreePasswords(); return; }
+		_tcscpy(m_lpKey, (LPCTSTR)strTemp);
 	}
 
 	CleanUp();
@@ -433,12 +498,18 @@ void CPasswordDlg::OnCheckStars()
 	UpdateData(TRUE);
 
 	if(m_bStars == FALSE)
+	{
+		m_pEditPw.EnableSecureMode(FALSE);
 		m_pEditPw.SetPasswordChar(0);
+		m_pEditPw.SetFont(&m_fStyle, TRUE);
+	}
 	else
 	{
-		TCHAR tchDot = (TCHAR)(_T('z') + 27);
-		// TCHAR tchDot = (TCHAR)0xB7;
+		// TCHAR tchDot = (TCHAR)(_T('z') + 27);
+		TCHAR tchDot = (TCHAR)0xb7;
+		m_pEditPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
 		m_pEditPw.SetPasswordChar(tchDot);
+		m_pEditPw.SetFont(&m_fSymbol, TRUE);
 	}
 
 	UpdateData(FALSE);
@@ -457,16 +528,15 @@ void CPasswordDlg::OnMakePasswordBtn()
 
 	if(dlg.DoModal() == IDOK)
 	{
-		EraseCString(&m_strPassword);
-		m_strPassword = dlg.m_strPassword;
-		EraseCString(&dlg.m_strPassword);
+		if(dlg.m_lpPassword != NULL)
+		{
+			m_pEditPw.SetPassword(dlg.m_lpPassword);
+			NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), dlg.m_lpPassword);
+			m_pEditPw.DeletePassword(dlg.m_lpPassword); dlg.m_lpPassword = NULL;
+		}
 
-		m_bStars = FALSE;
 		UpdateData(FALSE);
 		OnCheckStars();
-
-		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
-		m_pEditPw.SetWindowText((LPCTSTR)m_strPassword);
 	}
 
 	EnableClientWindows();
@@ -475,10 +545,9 @@ void CPasswordDlg::OnMakePasswordBtn()
 void CPasswordDlg::OnChangeEditPassword() 
 {
 	UpdateData(TRUE);
-	EraseCString(&m_strPassword);
-	m_pEditPw.GetWindowText(m_strPassword);
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
-	EraseCString(&m_strPassword);
+	LPTSTR lp = m_pEditPw.GetPassword();
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lp);
+	m_pEditPw.DeletePassword(lp); lp = NULL;
 	EnableClientWindows();
 }
 

@@ -64,6 +64,9 @@
 #define IDI_PLUGINS                     208
 #define IDR_OPTIONICONS                 210
 #define IDD_CHECKOPTIONS_DLG            212
+#define IDB_TB_DEFAULTEXPIRE            213
+#define IDR_EXPIRESMENU                 215
+#define IDB_CLOCK                       216
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -203,6 +206,15 @@
 #define IDC_HL_HELP_URL                 1180
 #define IDC_STATIC_HL_HELP              1181
 #define IDC_LIST_ADVANCED               1185
+#define IDC_CHECK_SECUREEDITS           1189
+#define IDC_CHECK_EXCLUDEBACKUPS        1190
+#define IDC_CHECK_DEFAULTEXPIRE         1192
+#define IDC_EDIT_DEFAULTEXPIRE          1193
+#define IDC_SETDEFAULTEXPIRE_BTN        1194
+#define IDC_HLINK_HELPFILE              1195
+#define IDC_HLINK_LICENSEFILE           1196
+#define IDC_BTN_CALCROUNDS              1198
+#define IDC_SELDEFEXPIRES_BTN           1200
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -377,15 +389,19 @@
 #define ID_BUTTON32970                  32970
 #define ID_BUTTON32971                  32971
 #define ID_IMPORT_GETMORE               32972
+#define ID_EXPIRES_1WEEK                32973
+#define ID_EXPIRES_2WEEKS               32974
+#define ID_EXPIRES_1MONTH               32975
+#define ID_EXPIRES_3MONTHS              32976
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        213
-#define _APS_NEXT_COMMAND_VALUE         32973
-#define _APS_NEXT_CONTROL_VALUE         1189
+#define _APS_NEXT_RESOURCE_VALUE        217
+#define _APS_NEXT_COMMAND_VALUE         32977
+#define _APS_NEXT_CONTROL_VALUE         1201
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

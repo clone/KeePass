@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Magyar|
-|~LANGUAGEVERSION|             |0.98b|
+|~LANGUAGEVERSION|             |0.99b|
 |~LANGUAGEAUTHOR|              |documan|
 |~LANGUAGEAUTHOREMAIL|         |documan at mailbox dot hu|
 
@@ -299,10 +299,6 @@
     |Az utoljára használt adatbázis megnyitása induláskor|
 |Automatically save database on exit|
     |Kilépéskor az adatbázis automatikus mentése|
-|GUI: Display images on buttons|
-    |GUI: Képek megjelenítése a gombokon|
-|GUI: Show grid lines in password entry list|
-    |GUI: Elválasztó vonalak mutatása a jelszó bejegyzések listájában|
 |Workspace cannot be unlocked!|
     |A munkafelület nem oldható fel!|
 |Workspace locked|
@@ -335,7 +331,6 @@
 |&CSV File...|                 |&CVS fájl...|
 |&PwSafe v2 TXT File...|       |&PwSafe v2 TXT fájl...|
 |Select &Font|                 |&Betûtípus választás|
-|Select a new font for the list controls.|     |Válassz egy új betûtípust a lista elemekhez.|
 
 |Code&Wallet TXT File...|      |Code&Wallet TXT fájl...|
 |&TXT File...|                 |&TXT fájl...|
@@ -362,16 +357,11 @@
 |Security|                     |Biztonság|
 |KeePass is OSI Certified Open Source Software.|
     |A KeePass OSI által hitelesített Nyílt Forráskódú program.|
-|KeePass usage:|               |KeePass használat:|
-|db = Path to database you wish to open on KeePass startup|
-    |db = A KeePass indításakor megnyitni kívánt adatbázis útvonala|
 |Automatically lock workspace after the following number of seconds:|
     |A munkafelület automatikus lezárása a következõ idõ elteltével (másodperc):|
 |&Group Name|                  |&Csoport neve|
 |Every second row has a different background color. Use this color:|
     |Minden második sor más hátterû. Ehhez ezt a színt használja:|
-|Start:|                       |Indítás:|
-|Exit:|                        |Kilépés:|
 |Default|                      |Alapérték|
 |More Colors...|               |Több szín...|
 |Search results|               |Keresési eredmény|
@@ -392,8 +382,6 @@
 |Visit KeePass Homepage|       |Ugrás a KeePass honlapjára|
 |Field copied to clipboard.|   |A mezõ a vágólapra lett másolva.|
 
-|A key-file already exists on this drive. Do you want to overwrite it?|
-    |Egy kulcs-fájl már létezik ezen a meghajtón. Szeretnéd azt felülírni?|
 |Overwrite?|                   |Felülírjam?|
 |Expires:|                     |Lejár:|
 |&Delete Selected Entries|     |Kijelölt bejegyzések &törlése|
@@ -406,8 +394,6 @@
 |Show &Columns|                |&Oszlopok mutatása|
 |Show &Entry View|             |&Bejegyzés nézet mutatása|
 
-|GUI: Automatically resize table columns when resizing the main window|
-    |GUI: Automatikusan méretezze át a táblázat oszlopait a fõablak átméretezésekor|
 |&Copy|                        |&Másolás|
 |Copy &All|                    |Minden m&ásolása|
 |&Undo|                        |&Visszavonás|
@@ -596,4 +582,35 @@
 |You've selected the AND key mode, so you must enter a password AND select a key-file.| |Az ÉS kulcs módot választottad, azaz meg kell adnod egy jelszót ÉS egy kulcs-fájlt kell választanod.|
 |and| |és|
 |cannot be loaded!| |nem betölthetõ|
+
+|A key-file already exists on this drive. Do you want to overwrite or reuse it?| |Egy kulcs-fájl már létezik ezen a lemezen. Szeretnéd ezt felülírni vagy ismét felhasználni?|
+|Advanced| |Haladó|
+|Backup| |Biztonsági mentés|
+|Click [Cancel] to abort changing the key.| |[Mégsem] a kulcs változatlanul hagyásához.|
+|Click [No] to reuse the selected key-file for this database.| |[Nem] a kijelölt kulcs-fájl újrahasznosításához.|
+|Click [Yes] to overwrite the key-file.| |[Igen] a kulcs-fájl felülírásához.|
+|Failed to create backup of this entry!| |Nem sikerült a bejegyzés biztonsági mentése!|
+|Immediately after opening a database| |Rögtön az adatbázis megnyitás után|
+|Integration| |Integrálás|
+|Show entries that will expire soon (if any)| |Mutassa azokat az elemeket, amelyek hamarosan lejárnak (ha van ilyen)|
+|Show expired entries (if any)| |Mutassa a lejárt elemeket (ha van ilyen)|
+|Start KeePass at Windows startup (for current user)| |A KeePass indítása a Windows indításakor (az aktuális felhasználónak)|
+|Unable to create/remove the auto-start key of KeePass in the Windows registry!| |Nem sikerült létrehozni/eltávolítani a KeePass auto-indítás bejegyzését a Windows registryben!|
+
+|&Get more import plugins...| |&Még több importáló bõvítmény...|
+|Automatically resize table columns when resizing the main window| |A táblázat oszlopainak automatikus átméretezése az ablak átméretezésekor|
+|Display images on buttons| |Képek megjelenítése a gombokon|
+|Encode/replace newline characters by '\n'| |Újsor-karakterek kódolása/cseréje '\n' karakterekre|
+|Export Options| |Exportálási opciók|
+|Export backup entries (entries in the 'Backup' group)| |Biztonsági mentések exportálása (a 'Biztonsági mentés' csoportból)|
+|Fields to export| |Exportálandó mezõk|
+|Group Tree| |Csoport fa|
+|Here you can customize the exported files.| |Itt szabhatod testre az exportálandó fájlokat.|
+|Icon| |Ikon|
+|Master key has been changed!| |A mester kulcs meg lett változtatva!|
+|Save backups of modified entries into the 'Backup' group| |Biztonsági mentések és változtatások mentése a 'Biztonsági mentés' csoportba|
+|Save the database now in order to get the new key applied.| |Mentsd el az adatbázist, hogy az új kulcs kerüljön alkalmazásra.|
+|Select a new font for the list controls:| |Válassz egy új betûtípust a lista elemekhez:|
+|Show grid lines in password entry list| |Keret kijelzése a jelszóbejegyzések listájában|
+|Start minimized and locked| |Indítás a tálcára kicsinyítve és lezárva|
 

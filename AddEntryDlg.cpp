@@ -1,30 +1,20 @@
 /*
-  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
-  All rights reserved.
+  KeePass Password Safe - The Open-Source Password Manager
+  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  - Neither the name of ReichlSoft nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "StdAfx.h"
@@ -71,14 +61,16 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 	m_bEditMode = FALSE;
 	m_pParentIcons = NULL;
 	m_strNotes = _T("");
-	m_strPassword = _T("");
-	m_strRepeatPw = _T("");
+	m_lpPassword = m_lpRepeatPw = NULL;
+	m_dwDefaultExpire = 0;
 }
 
 void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAddEntryDlg)
+	DDX_Control(pDX, IDC_SELDEFEXPIRES_BTN, m_btSelDefExpires);
+	DDX_Control(pDX, IDC_SETDEFAULTEXPIRE_BTN, m_btSetToDefaultExpire);
 	DDX_Control(pDX, IDC_COMBO_GROUPS, m_cbGroups);
 	DDX_Control(pDX, IDC_HL_HELP_URL, m_hlHelpURL);
 	DDX_Control(pDX, IDC_HL_HELP_AUTOTYPE, m_hlHelpAutoType);
@@ -123,6 +115,12 @@ BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	ON_BN_CLICKED(IDC_REMOVEATTACH_BTN, OnRemoveAttachBtn)
 	ON_EN_CHANGE(IDC_EDIT_PASSWORD, OnChangeEditPassword)
 	ON_BN_CLICKED(IDC_CHECK_EXPIRES, OnCheckExpires)
+	ON_BN_CLICKED(IDC_SETDEFAULTEXPIRE_BTN, OnSetDefaultExpireBtn)
+	ON_WM_CTLCOLOR()
+	ON_COMMAND(ID_EXPIRES_1WEEK, OnExpires1Week)
+	ON_COMMAND(ID_EXPIRES_2WEEKS, OnExpires2Weeks)
+	ON_COMMAND(ID_EXPIRES_1MONTH, OnExpires1Month)
+	ON_COMMAND(ID_EXPIRES_3MONTHS, OnExpires3Months)
 	//}}AFX_MSG_MAP
 
 	ON_REGISTERED_MESSAGE(WM_XHYPERLINK_CLICKED, OnXHyperLinkClicked)
@@ -143,9 +141,26 @@ BOOL CAddEntryDlg::OnInitDialog()
 	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
-	GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fStyle, TRUE);
-	GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fStyle, TRUE);
-	GetDlgItem(IDC_CHECK_HIDEPW)->SetFont(&m_fStyle, TRUE);
+	m_fSymbol.CreateFont(-13, 0, 0, 0, 0, FALSE, FALSE, 0,
+		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Symbol"));
+
+	if(m_bStars == FALSE)
+	{
+		GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fStyle, TRUE);
+		GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fStyle, TRUE);
+		m_pEditPw.EnableSecureMode(FALSE);
+		m_pRepeatPw.EnableSecureMode(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fSymbol, TRUE);
+		GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fSymbol, TRUE);
+		m_pEditPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
+		m_pRepeatPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
+	}
+
+	GetDlgItem(IDC_CHECK_HIDEPW)->SetFont(&m_fSymbol, TRUE);
 
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
@@ -158,12 +173,36 @@ BOOL CAddEntryDlg::OnInitDialog()
 	NewGUI_XPButton(&m_btSetAttachment, IDB_FILE, IDB_FILE, TRUE);
 	NewGUI_XPButton(&m_btSaveAttachment, IDB_DISK, IDB_DISK, TRUE);
 	NewGUI_XPButton(&m_btRemoveAttachment, IDB_TB_DELETEENTRY, IDB_TB_DELETEENTRY, TRUE);
+	NewGUI_XPButton(&m_btSetToDefaultExpire, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
+	NewGUI_XPButton(&m_btSelDefExpires, IDB_CLOCK, IDB_CLOCK, TRUE);
+
 	m_btHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
+	CString strTT = TRL("Hide &Passwords Behind Asterisks (***)"); strTT.Remove(_T('&'));
+	m_btHidePw.SetTooltipText(strTT, TRUE);
 
 	m_btRandomPw.SetTooltipText(TRL("Generate a random password..."));
 	m_btSetAttachment.SetTooltipText(TRL("Open file and set as attachment..."));
 	m_btSaveAttachment.SetTooltipText(TRL("Save attached file to disk..."));
 	m_btRemoveAttachment.SetTooltipText(TRL("Remove the currently attached file"));
+
+	strTT = TRL("Change expiration time:"); strTT.Remove(_T(':'));
+	m_btSelDefExpires.SetTooltipText(strTT);
+
+	m_btSelDefExpires.SetMenu(IDR_EXPIRESMENU, this->m_hWnd, TRUE, NULL, CSize(16, 15));
+
+	if(m_dwDefaultExpire != 0)
+	{
+		CString str, strTemp;
+		str.Format(TRL("Click to expire the entry in %u days"), m_dwDefaultExpire);
+
+		CTime t = CTime::GetCurrentTime();
+		t += CTimeSpan((LONG)m_dwDefaultExpire, 0, 0, 0);
+
+		strTemp.Format(_T(" (%04d-%02d-%02d)"), t.GetYear(), t.GetMonth(), t.GetDay());
+		str += strTemp;
+
+		m_btSetToDefaultExpire.SetTooltipText(str);
+	}
 
 	NewGUI_MakeHyperLink(&m_hlHelpAutoType);
 	m_hlHelpAutoType.EnableTooltip(FALSE);
@@ -216,19 +255,18 @@ BOOL CAddEntryDlg::OnInitDialog()
 	}
 
 	// 'z' + 27 is that black dot in Tahoma
-	TCHAR tchDot = (TCHAR)(_T('z') + 27);
-	CString strStars = _T("");
-	strStars += tchDot; strStars += tchDot; strStars += tchDot;
+	// TCHAR tchDot = (TCHAR)(_T('z') + 27);
+	TCHAR tchDot = (TCHAR)0xb7;
+	CString strStars; strStars += tchDot; strStars += tchDot; strStars += tchDot;
 	GetDlgItem(IDC_CHECK_HIDEPW)->SetWindowText(strStars);
 
 	// Configure link edit control
-	m_pURL.SetLinkOption(HEOL_AUTO);
-	m_pURL.SetUnderlineOption(HEOU_ALWAYS);
-	m_pURL.SetVisited(FALSE);
-	m_pURL.SetIEColours();
-	m_pURL.SetDblClkToJump(TRUE);
-
-	m_pURL.SetWindowText(m_strURL);
+	// m_pURL.SetLinkOption(HEOL_AUTO);
+	// m_pURL.SetUnderlineOption(HEOU_ALWAYS);
+	// m_pURL.SetVisited(FALSE);
+	// m_pURL.SetIEColours();
+	// m_pURL.SetDblClkToJump(TRUE);
+	// m_pURL.SetWindowText(m_strURL);
 
 	COleDateTime oleMin = AMS_MIN_OLEDATETIME;
 	COleDateTime oleMax(2999, 12, 31, 23, 59, 59);
@@ -269,19 +307,27 @@ BOOL CAddEntryDlg::OnInitDialog()
 		VERIFY(base64.Encode(pbRandom, 16, pbString, &dwSize));
 		SAFE_DELETE(pRand);
 		pbString[strlen((char *)pbString) - 3] = 0;
-		EraseCString(&m_strPassword);
-		m_strPassword = (char *)(pbString + 1);
-		EraseCString(&m_strRepeatPw);
-		m_strRepeatPw = (char *)(pbString + 1);
+		m_pEditPw.SetPassword((char *)(pbString + 1));
+		m_pRepeatPw.SetPassword((char *)(pbString + 1));
+		mem_erase(pbRandom, 16); mem_erase(pbString, 32);
 		UpdateData(FALSE);
-		m_pEditPw.SetWindowText((LPCTSTR)m_strPassword);
-		m_pRepeatPw.SetWindowText((LPCTSTR)m_strRepeatPw);
 	}
 
 	UpdateControlsStatus();
 
-	m_pEditPw.SetWindowText((LPCTSTR)m_strRepeatPw);
-	m_pRepeatPw.SetWindowText((LPCTSTR)m_strRepeatPw);
+	if(m_bEditMode == TRUE)
+	{
+		if(m_lpPassword != NULL)
+		{
+			m_pEditPw.SetPassword(m_lpPassword);
+			m_pEditPw.DeletePassword(m_lpPassword); m_lpPassword = NULL;
+		}
+		if(m_lpRepeatPw != NULL)
+		{
+			m_pRepeatPw.SetPassword(m_lpRepeatPw);
+			m_pRepeatPw.DeletePassword(m_lpRepeatPw); m_lpRepeatPw = NULL;
+		}
+	}
 
 	if(m_strTitle == PWS_TAN_ENTRY)
 	{
@@ -302,7 +348,9 @@ BOOL CAddEntryDlg::OnInitDialog()
 		GetDlgItem(IDC_EDIT_TITLE)->SetFocus();
 	}
 
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
+	LPTSTR lpTemp = m_pEditPw.GetPassword();
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lpTemp);
+	m_pEditPw.DeletePassword(lpTemp); lpTemp = NULL;
 
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
@@ -311,16 +359,17 @@ void CAddEntryDlg::CleanUp()
 {
 	m_cbGroups.ResetContent();
 	m_fStyle.DeleteObject();
+	m_fSymbol.DeleteObject();
 }
 
 void CAddEntryDlg::OnOK() 
 {
 	UpdateData(TRUE);
 
-	EraseCString(&m_strPassword);
-	m_pEditPw.GetWindowText(m_strPassword);
-	EraseCString(&m_strRepeatPw);
-	m_pRepeatPw.GetWindowText(m_strRepeatPw);
+	ASSERT(m_lpPassword == NULL); if(m_lpPassword != NULL) CSecureEditEx::DeletePassword(m_lpPassword);
+	m_lpPassword = m_pEditPw.GetPassword();
+	ASSERT(m_lpRepeatPw == NULL); if(m_lpRepeatPw != NULL) CSecureEditEx::DeletePassword(m_lpRepeatPw);
+	m_lpRepeatPw = m_pRepeatPw.GetPassword();
 
 	CString strGroupTest;
 	m_cbGroups.GetLBText(m_cbGroups.GetCurSel(), strGroupTest);
@@ -349,8 +398,10 @@ void CAddEntryDlg::OnOK()
 
 	m_nGroupId = m_cbGroups.GetCurSel();
 
-	if(m_strPassword != m_strRepeatPw)
+	if(_tcscmp(m_lpPassword, m_lpRepeatPw) != 0)
 	{
+		CSecureEditEx::DeletePassword(m_lpPassword); m_lpPassword = NULL;
+		CSecureEditEx::DeletePassword(m_lpRepeatPw); m_lpRepeatPw = NULL;
 		MessageBox(TRL("Password and repeated password aren't identical!"),
 			TRL("Stop"), MB_OK | MB_ICONWARNING);
 		return;
@@ -377,19 +428,30 @@ void CAddEntryDlg::OnCheckHidePw()
 
 	if(m_bStars == FALSE)
 	{
+		m_pEditPw.EnableSecureMode(FALSE);
+		m_pRepeatPw.EnableSecureMode(FALSE);
+
 		m_pEditPw.SetPasswordChar(0);
 		m_pRepeatPw.SetPasswordChar(0);
+
+		m_pEditPw.SetFont(&m_fStyle, TRUE);
+		m_pRepeatPw.SetFont(&m_fStyle, TRUE);
 	}
-	else
+	else // m_bStars == TRUE
 	{
-		TCHAR tchDot = (TCHAR)(_T('z') + 27);
+		m_pEditPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
+		m_pRepeatPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
+
+		// TCHAR tchDot = (TCHAR)(_T('z') + 27);
+		TCHAR tchDot = (TCHAR)0xb7;
 		m_pEditPw.SetPasswordChar(tchDot);
 		m_pRepeatPw.SetPasswordChar(tchDot);
+
+		m_pEditPw.SetFont(&m_fSymbol, TRUE);
+		m_pRepeatPw.SetFont(&m_fSymbol, TRUE);
 	}
 
 	UpdateData(FALSE);
-	m_pRepeatPw.RedrawWindow();
-	m_pEditPw.RedrawWindow();
 	m_pRepeatPw.SetFocus();
 	m_pEditPw.SetFocus();
 }
@@ -418,18 +480,15 @@ void CAddEntryDlg::OnRandomPwBtn()
 
 	if(dlg.DoModal() == IDOK)
 	{
-		EraseCString(&m_strPassword);
-		m_strPassword = dlg.m_strPassword;
-		EraseCString(&m_strRepeatPw);
-		m_strRepeatPw = dlg.m_strPassword;
-
-		EraseCString(&dlg.m_strPassword);
+		m_pEditPw.SetPassword((LPCTSTR)dlg.m_lpPassword);
+		m_pRepeatPw.SetPassword((LPCTSTR)dlg.m_lpPassword);
+		CSecureEditEx::DeletePassword(dlg.m_lpPassword); dlg.m_lpPassword = NULL;
 
 		UpdateData(FALSE);
 
-		m_pEditPw.SetWindowText((LPCTSTR)m_strPassword);
-		m_pRepeatPw.SetWindowText((LPCTSTR)m_strRepeatPw);
-		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
+		LPTSTR lp = m_pEditPw.GetPassword();
+		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lp);
+		m_pEditPw.DeletePassword(lp); lp = NULL;
 	}
 }
 
@@ -608,7 +667,7 @@ void CAddEntryDlg::UpdateControlsStatus()
 		m_btRemoveAttachment.EnableWindow(TRUE);
 	}
 
-	if(m_strTitle == CString(PWS_TAN_ENTRY)) m_btSetAttachment.EnableWindow(FALSE);
+	if(m_strTitle == CString(PWS_TAN_ENTRY)) m_btSetAttachment.EnableWindow(FALSE); // Unchangable
 
 	if(m_bExpires == TRUE)
 	{
@@ -620,15 +679,17 @@ void CAddEntryDlg::UpdateControlsStatus()
 		m_editDate.EnableWindow(FALSE);
 		m_editTime.EnableWindow(FALSE);
 	}
+
+	if(m_dwDefaultExpire == 0) m_btSetToDefaultExpire.EnableWindow(FALSE); // Unchangable
 }
 
 void CAddEntryDlg::OnChangeEditPassword() 
 {
 	UpdateData(TRUE);
 
-	EraseCString(&m_strPassword);
-	m_pEditPw.GetWindowText(m_strPassword);
-	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
+	LPTSTR lp = m_pEditPw.GetPassword();
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lp);
+	m_pEditPw.DeletePassword(lp); lp = NULL;
 }
 
 void CAddEntryDlg::OnCheckExpires() 
@@ -646,6 +707,59 @@ LRESULT CAddEntryDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
 		WU_OpenAppHelp(PWM_HELP_URLS);
 
 	return 0;
+}
+
+void CAddEntryDlg::OnSetDefaultExpireBtn() 
+{
+	if(m_dwDefaultExpire == 0) return;
+	SetExpireDays(m_dwDefaultExpire);
+}
+
+HBRUSH CAddEntryDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) 
+{
+	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	if((nCtlColor == CTLCOLOR_EDIT) && (pWnd != NULL))
+		if((pWnd->GetDlgCtrlID() == IDC_EDIT_URL) && (pDC != NULL))
+			pDC->SetTextColor(RGB(0, 0, 255));
+
+	return hbr;
+}
+
+void CAddEntryDlg::SetExpireDays(DWORD dwDays)
+{
+	UpdateData(TRUE);
+
+	m_bExpires = TRUE;
+
+	CTime t = CTime::GetCurrentTime();
+	t += CTimeSpan((LONG)dwDays, 0, 0, 0);
+
+	m_editDate.SetDate(t);
+	m_editTime.SetTime(t);
+
+	UpdateData(FALSE);
+	UpdateControlsStatus();
+}
+
+void CAddEntryDlg::OnExpires1Week() 
+{
+	SetExpireDays(7);
+}
+
+void CAddEntryDlg::OnExpires2Weeks() 
+{
+	SetExpireDays(14);
+}
+
+void CAddEntryDlg::OnExpires1Month() 
+{
+	SetExpireDays(30);
+}
+
+void CAddEntryDlg::OnExpires3Months() 
+{
+	SetExpireDays(91);
 }
 
 #pragma warning(pop)

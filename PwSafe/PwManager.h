@@ -1,30 +1,20 @@
 /*
-  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
-  All rights reserved.
+  KeePass Password Safe - The Open-Source Password Manager
+  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  - Neither the name of ReichlSoft nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #ifndef ___PASSWORD_MANAGER_H___
@@ -39,8 +29,8 @@
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
 
 // When making a Windows build, don't forget to update the verinfo resource
-#define PWM_VERSION_STR  _T("0.99b")
-#define PWM_VERSION_DW   0x00090902
+#define PWM_VERSION_STR  _T("0.99c")
+#define PWM_VERSION_DW   0x00090903
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -54,7 +44,7 @@
 #define PWM_EXENAME       _T("KeePass")
 
 #define PWM_README_FILE   _T("KeePass.chm")
-#define PWM_LICENSE_FILE  _T("License.html")
+#define PWM_LICENSE_FILE  _T("License.txt")
 
 #define PWM_HELP_AUTOTYPE _T("autotype.html")
 #define PWM_HELP_URLS     _T("autourl.html")
@@ -125,6 +115,10 @@
 #define PWMKEY_AUTOSHOWEXPIRED  _T("KeeShowExpiredAtOpen")
 #define PWMKEY_AUTOSHOWEXPIREDS _T("KeeShowSoonExpiredAtOpen")
 #define PWMKEY_BACKUPENTRIES    _T("KeeBackupEntries")
+#define PWMKEY_SINGLEINSTANCE   _T("KeeSingleInstance")
+#define PWMKEY_SECUREEDITS      _T("KeeSecureEditControls")
+#define PWMKEY_SINGLECLICKTRAY  _T("KeeSingleClickTrayIcon")
+#define PWMKEY_DEFAULTEXPIRE    _T("KeeDefaultExpire")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -150,17 +144,17 @@
 #define PWM_STD_KEYENCROUNDS    6000
 
 // Field flags (for example in Find function)
-#define PWMF_TITLE        1
-#define PWMF_USER         2
-#define PWMF_URL          4
-#define PWMF_PASSWORD     8
-#define PWMF_ADDITIONAL  16
-#define PWMF_GROUPNAME   32
-#define PWMF_CREATION    64
-#define PWMF_LASTMOD    128
-#define PWMF_LASTACCESS 256
-#define PWMF_EXPIRE     512
-#define PWMF_UUID      1024
+#define PWMF_TITLE              1
+#define PWMF_USER               2
+#define PWMF_URL                4
+#define PWMF_PASSWORD           8
+#define PWMF_ADDITIONAL        16
+#define PWMF_GROUPNAME         32
+#define PWMF_CREATION          64
+#define PWMF_LASTMOD          128
+#define PWMF_LASTACCESS       256
+#define PWMF_EXPIRE           512
+#define PWMF_UUID            1024
 
 #define PWGF_EXPANDED     1
 

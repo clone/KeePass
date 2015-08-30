@@ -1,3 +1,71 @@
+05/05/14 - 0.99c
+- Added new secure edit controls (if enabled, no password edit
+  control spies can read out the text of the control; the
+  password isn't even visible in the process memory of KeePass)
+- Added option to specify a default expire interval (new
+  entries can expire in N days by default, see options dialog)
+- Added single instance option
+- Added button right of the expiry edit control to select
+  common expire intervals (like 1 week, 2 weeks, 1 month, etc.)
+- Added command-line option to pre-select a key-disk (switch
+  -preselect:, you'll get prompted only for the password)
+- Made single click tray icon optional (default is double-click
+  but you can set it to a single left click in the advanced
+  options dialog)
+- Added button to the database settings dialog to calculate the
+  number of rounds that lead to a 1-second delay
+- The CSV import routine now supports local ANSI _and_ UTF-8
+- Changed order of fields in exported CSV files (to make it
+  compatible with the import-CSV routine)
+- CSV files with non-encoded empty fields (i.e. ',,' instead of
+  ',"",') are supported now
+- KeePass now doesn't crash any more when importing CSV files
+  that contain empty strings
+- Password show/hide flag isn't cleared automatically any more
+  after generating a random password using the password
+  generator
+- You can now select groups by pressing the initial character
+  of the group name (i.e. if you have a group named 'Test',
+  pressing the 'T' key while the tree control has the focus
+  will select the 'Test' group
+- Improved key releasing code (executed before auto-typing)
+- Added tooltips for the password asterisks masking buttons
+- Fixed a bug which marked the database as non-modified when
+  opening and closing an entry without changing something
+- Changed fonts for the password edit controls and show/hide
+  behind asterisks buttons (Windows XP password look)
+- The options are now saved immediately after closing the
+  options dialog (before, the options were saved at exit)
+- Changed code for apostrophes (') from apos to #39 (the
+  Internet Explorer doesn't support the correct apos code...)
+- The enhanced clipboard routines now work correctly together
+  with TAN entries
+- Added an option to the 'find' dialog to specify if KeePass
+  should include the entries in the 'Backup' group in the
+  search results or not
+- You can now use the 'Delete' key to delete entries
+- Fixed some minor problem with the 'higher ANSI characters'
+  string in the password generator
+- Added KPM_SAVEDB_POST plugin message (allows developers to
+  create file backup plugins)
+- KeePass now creates backups of deleted entries automatically,
+  if you've enabled the entry backup option
+- The 'KeePass' directory in the users application config path
+  is only created if KeePass really requires write access to it
+- The entry preview window is now cleared when the password
+  list is updated without specifying a selection
+- Removed hyperlink edit controls (leaked GUI objects)
+- KeePass now shows external windows in their default window
+  positions and sizes
+- Title banner in the 'find' dialog shows the selected group
+- Inapplicable checkboxes in the 'find' dialog are disabled now
+  when searching in a group
+- Added help link to the database settings dialog
+- Cleaned up the about dialog
+- Minor command-line improvements
+- Minor usability improvements in the options dialog
+- Several minor UI improvements
+
 05/04/01 - 0.99b
 - Improved exports: you can now choose the fields that will be
   exported

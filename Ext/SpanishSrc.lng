@@ -1,5 +1,5 @@
 |~LANGUAGENAME||Spanish (Español para España y Latinoamérica)|
-|~LANGUAGEVERSION||0.98b|
+|~LANGUAGEVERSION||0.99b|
 |~LANGUAGEAUTHOR||Marcel Trujillo|
 |~LANGUAGEAUTHOREMAIL||marcelito@gmail.com|
 |&OK||&OK|
@@ -197,8 +197,6 @@
 |Here you can configure KeePass.||Aquí usted puede configurar KeePass.|
 |Automatically open last used database on startup||Al inicio, abrir automáticamente la última base de datos utilizada|
 |Automatically save database on exit||Guardar automáticamente la base de datos al salir|
-|GUI: Display images on buttons||GUI: Mostrar imágenes en los botones|
-|GUI: Show grid lines in password entry list||GUI: Mostrar líneas guía en la lista de entrada de contraseñas|
 |Workspace cannot be unlocked!||¡Área de trabajo no puede ser desbloqueada!|
 |Workspace locked||Área de trabajo bloqueada|
 |Loading error||Error al cargar|
@@ -215,7 +213,6 @@
 |An error occured while importing the CSV file. File cannot be imported.||Un error ocurrió mientras se exportaba el archivo CSV. El archivo no fue importado.|
 |An error occured while importing the file. File cannot be imported.||Un error ocurrió mientras se exportaba el archivo. El archivo no fue importado.|
 |Select &Font||Seleccionar &Fuente|
-|Select a new font for the list controls.||Seleccionar una nueva fuente para la lista de controles.|
 |&Get more languages...||&Obtener más idiomas...|
 |Start and Exit||Iniciar y Salir|
 |Interface (GUI)||Interfaz (GUI)|
@@ -226,13 +223,9 @@
 |Encryption algorithm to use (for this database):||Algoritmo de encriptación a utilizar (para esta base de datos):|
 |Security||Seguridad|
 |KeePass is OSI Certified Open Source Software.||KeePass es un OSI Certified Open Source Software.|
-|KeePass usage:||Uso de KeePass:|
-|db = Path to database you wish to open on KeePass startup||db = Ruta de la base de datos que desea abrir al iniciar KeePass|
 |Automatically lock workspace after the following number of seconds:||Bloquear automáticamente el área de trabajo después de el siguiente número de segundos:|
 |&Group Name||Nombre del &Grupo|
 |Every second row has a different background color. Use this color:||Cada segunda fila tiene un color de fondo diferente. Use este color:|
-|Start:||Inicio:|
-|Exit:||Salir:|
 |Default||Por defecto|
 |More Colors...||Más colores...|
 |Search results||Resultados de la Búsqueda|
@@ -248,7 +241,6 @@
 |Show &ToolBar||&Mostrar barra de herramientas|
 |Visit KeePass Homepage||Visitar KeePass Homepage|
 |Field copied to clipboard.||Campo copiado al portapapeles.|
-|A key-file already exists on this drive. Do you want to overwrite it?||Un archivo de clave ya existe en esta unidad. ¿Desea usted sobreescribirlo?|
 |Overwrite?||¿Sobreescribir?|
 |Expires:||Expiración:|
 |&Delete Selected Entries||&Eliminar las entradas seleccionadas|
@@ -260,7 +252,6 @@
 |Change fields of all selected entries||Cambiar campos de las entradas seleccionadas|
 |Show &Columns||Mostrar &Columnas|
 |Show &Entry View||Mostrar &Visualación de Entradas|
-|GUI: Automatically resize table columns when resizing the main window||GUI: Redimensionar automáticamente las columnas de la tabla cuando se redimensione la ventana principal|
 |&Copy||&Copiar|
 |Copy &All||Copiar &Todos|
 |&Undo||&Deshacer|
@@ -441,5 +432,34 @@
 |Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.||¡Advertencia! Es posible que esta opción no funcione correctamente en su sistema, especialmente si usted está utilizando algún programa de portapapeles avanzado o algo similar.|
 |You can choose an other hot key combination in 'Edit - Options - Setup'.||Usted puede seleccionar otra combinación para la hot-key en 'Editar - Opciones - Configuración'.|
 |You've selected the AND key mode, so you must enter a password AND select a key-file.||Usted ha escogido el método de clave 'AND', debe introducir una contraseña y (AND) además seleccionar un archivo de clave.|
-|and||and (y)|
+|and||y|
 |cannot be loaded!||¡No puede ser cargado!|
+|A key-file already exists on this drive. Do you want to overwrite or reuse it?||Un archivo de clave ya existe en esta unidad. ¿Desea sobreescribirlo?|
+|Advanced||Avanzado|
+|Backup||Respaldo|
+|Click [Cancel] to abort changing the key.||Haga click en [Cancelar] para abortar el cambio de clave.|
+|Click [No] to reuse the selected key-file for this database.||Haga click en [No] para reutilizar el archivo de clave seleccionado para esta base de datos.|
+|Click [Yes] to overwrite the key-file.||Haga click en [Sí] para sobreescribir el archivo de clave|
+|Failed to create backup of this entry!||¡No se pudo crear una copia de seguridad de esta entrada!|
+|Immediately after opening a database||Inmediatamente después de abrir una base de datos|
+|Integration||Integración|
+|Show entries that will expire soon (if any)||Mostras entradas próximas a expirar (en caso de haberlas)|
+|Show expired entries (if any)||Mostrar entradas expiradas (en caso de haberlas)|
+|Start KeePass at Windows startup (for current user)||Iniciar KeePass al cargar Windows (usuario actual)|
+|Unable to create/remove the auto-start key of KeePass in the Windows registry!||¡Imposible crear/eliminar del registro de Windows la entrada de auto-inicio de KeePass!|
+|&Get more import plugins...||&Obtener más plugins para importar...|
+|Automatically resize table columns when resizing the main window||Modificar el tamaño de las columnas automáticamente al modificar el tamaño de la ventana principal|
+|Display images on buttons||Mostrar imágenes en los botones|
+|Encode/replace newline characters by '\n'||Codificar/reemplazar caracteres de nueva línea con '/n'|
+|Export Options||Exportar Opciones|
+|Export backup entries (entries in the 'Backup' group)||Exportar entradas de respaldo (entradas del grupo 'Respaldo')|
+|Fields to export||Campos a exportar|
+|Group Tree||Árbol de Grupos|
+|Here you can customize the exported files.||Aquí usted puede personalizar los archivos exportados.|
+|Icon||Icono|
+|Master key has been changed!||¡La clave maestra ha sido modificado!|
+|Save backups of modified entries into the 'Backup' group||Guardar en el grupo 'Respaldo' copias de seguridad de las entradas modificadas|
+|Save the database now in order to get the new key applied.||Guardar la base de datos ahora para que pueda ser aplicada la nueva clave.|
+|Select a new font for the list controls:||Seleccionar una nueva fuente para la lista de controles:|
+|Show grid lines in password entry list||Mostrar líneas cuadriculadas en la lista de contraseñas|
+|Start minimized and locked||Iniciar minimizado y bloqueado|

@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /machine:I386
-# ADD LINK32 /nologo /subsystem:windows /machine:I386 /out:"Release/KeePass.exe"
+# ADD LINK32 winmm.lib /nologo /subsystem:windows /machine:I386 /out:"Release/KeePass.exe"
 
 !ELSEIF  "$(CFG)" == "PwSafe - Win32 Debug"
 
@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 /nologo /subsystem:windows /debug /machine:I386 /out:"Debug/KeePass.exe" /pdbtype:sept
+# ADD LINK32 winmm.lib /nologo /subsystem:windows /debug /machine:I386 /out:"Debug/KeePass.exe" /pdbtype:sept
 
 !ENDIF 
 
@@ -265,6 +265,10 @@ SOURCE=.\res\clientic.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\clock.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\disk.bmp
 # End Source File
 # Begin Source File
@@ -357,6 +361,10 @@ SOURCE=.\res\tb_copyu.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\tb_defau.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\tb_delet.bmp
 # End Source File
 # Begin Source File
@@ -386,6 +394,10 @@ SOURCE=.\res\tb_save.bmp
 # Begin Source File
 
 SOURCE=.\res\unlocked.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\wizard.bmp
 # End Source File
 # Begin Source File
 
@@ -495,6 +507,14 @@ SOURCE=.\Util\SendKeys.cpp
 # Begin Source File
 
 SOURCE=.\Util\SendKeys.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Util\SInstance.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\Util\SInstance.h
 # End Source File
 # Begin Source File
 
@@ -648,15 +668,6 @@ SOURCE=.\NewGUI\GradientProgressCtrl.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\NewGUI\HyperEdit.cpp
-# ADD CPP /I ".."
-# End Source File
-# Begin Source File
-
-SOURCE=.\NewGUI\HyperEdit.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\NewGUI\KCSideBannerWnd.cpp
 # End Source File
 # Begin Source File
@@ -687,6 +698,14 @@ SOURCE=.\NewGUI\OptionsList.cpp
 # Begin Source File
 
 SOURCE=.\NewGUI\OptionsList.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\SecureEditEx.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\SecureEditEx.h
 # End Source File
 # Begin Source File
 

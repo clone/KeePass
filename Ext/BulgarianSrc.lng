@@ -1,4 +1,4 @@
-|~LANGUAGEVERSION| |0.99a|
+|~LANGUAGEVERSION| |0.99b|
 |~LANGUAGEAUTHOR|     |DonAngel|
 |~LANGUAGEAUTHOREMAIL| |public@doncho.net|
 |~LANGUAGENAME|       |Български|
@@ -279,12 +279,6 @@
     |При стартиране отваря автоматично последната използвана база|
 |Automatically save database on exit|
     |При изход автоматично записва базата|
-|GUI: Display images on buttons|
-    |Интерфейс: Показва картинки върху бутоните|
-|GUI: Show grid lines in password entry list|
-    |Интерфейс: Показва линии в списъка с паролите|
-|GUI: Automatically resize table columns when resizing the main window|
-    |Интерфейс: Автоматична промяна на колоните при промяна размерът на прозореца|
 |Workspace cannot be unlocked!|
     |Сесията не може да бъде отключена!|
 |Workspace locked|
@@ -315,7 +309,6 @@
 |An error occured while importing the file. File cannot be imported.|
     |Възникна грешка при импортиране на файла. Файлът не може да бъде импортиран.|
 |Select &Font|                 |Избор на &шрифт|
-|Select a new font for the list controls.|     |Избор на нов шрифт за интерфейса.|
 
 |&Get more languages...|       |Вземане на още &езици...|
 |Start and Exit|               |Старт и изход|
@@ -754,7 +747,7 @@
 |Advanced|
 	|Разширен|
 |Backup|
-	|Копие|
+	|Резервни|
 |Click [Cancel] to abort changing the key.|
 	|Натиснете [Отказ] за да спрете смяната на ключа.|
 |Click [No] to reuse the selected key-file for this database.|
@@ -762,15 +755,11 @@
 |Click [Yes] to overwrite the key-file.|
 	|Натиснете [Да] за да унищожите и създадете отново този ключ-файл.|
 |Failed to create backup of this entry!|
-	|създаването на копие за този запис е неуспешно!|
+	|Резервно копие за този запис не се създаде!|
 |Immediately after opening a database|
 	|Веднага след отваряне на файлът|
 |Integration|
 	|Интеграция|
-|Minimize window on startup|
-	|Минимизира при стартиране|
-|Save backups of modified entries into the "Backup" group|
-	|Прави копия на променените записи в група "Копие"|
 |Show entries that will expire soon (if any)|
 	|Показва записите, които ще изтекат скоро (ако има)|
 |Show expired entries (if any)|
@@ -780,4 +769,35 @@
 |Unable to create/remove the auto-start key of KeePass in the Windows registry!|
 	|Не успя да се създаде KeePass авто-старт ключ в Windows registry!|
 
-
+|&Get more import plugins...|
+	|&Вземане на още внасящи плъгини...|
+|Automatically resize table columns when resizing the main window|
+	|Автоматично мащабира колоните при преоразмеряване на основния прозорец|
+|Display images on buttons|
+	|Показва картинки на бутоните|
+|Encode/replace newline characters by '\n'|
+	|Прекодира/замества символите за нов ред с '\n'|
+|Export Options|
+	|Настройки на изнасянето|
+|Export backup entries (entries in the 'Backup' group)|
+	|Изнасяне на архивираните записи (записите в група 'Резервни')|
+|Fields to export|
+	|Полета за експорт|
+|Group Tree|
+	|Дърво на групи|
+|Here you can customize the exported files.|
+	|Тук се настройват файловете при износът.|
+|Icon|
+	|Икони|
+|Master key has been changed!|
+	|Главния ключ беше променен!|
+|Save backups of modified entries into the 'Backup' group|
+	|Създава резервни копия на променените записи в група 'Резерв'|
+|Save the database now in order to get the new key applied.|
+	|Базата ще се запише сега за да може новия ключ да се активира.|
+|Select a new font for the list controls:|
+	|Избор на нов шрифт за всички списъци:|
+|Show grid lines in password entry list|
+	|Показва линии на клетките в списъка с паролите|
+|Start minimized and locked|
+	|Стартиране минимизиран и заключен|

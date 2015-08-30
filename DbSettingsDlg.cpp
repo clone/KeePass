@@ -1,35 +1,29 @@
 /*
-  Copyright (c) 2003-2005, Dominik Reichl <dominik.reichl@t-online.de>
-  All rights reserved.
+  KeePass Password Safe - The Open-Source Password Manager
+  Copyright (C) 2003-2005 Dominik Reichl <dominik.reichl@t-online.de>
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer. 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-  - Neither the name of ReichlSoft nor the names of its contributors may be
-    used to endorse or promote products derived from this software without
-    specific prior written permission.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-  POSSIBILITY OF SUCH DAMAGE.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "StdAfx.h"
 #include "PwSafe.h"
 #include "DbSettingsDlg.h"
+#include <mmsystem.h>
+#include "PwSafe/PwManager.h"
+#include "Crypto/rijndael.h"
+#include "Util/WinUtil.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -55,6 +49,8 @@ void CDbSettingsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CDbSettingsDlg)
+	DDX_Control(pDX, IDC_HLINK_HELPFILE, m_hlHelp);
+	DDX_Control(pDX, IDC_BTN_CALCROUNDS, m_btCalcRounds);
 	DDX_Control(pDX, IDC_COMBO_ENCALGOS, m_cEncAlgos);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
 	DDX_Control(pDX, IDOK, m_btOK);
@@ -65,7 +61,10 @@ void CDbSettingsDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CDbSettingsDlg, CDialog)
 	//{{AFX_MSG_MAP(CDbSettingsDlg)
+	ON_BN_CLICKED(IDC_BTN_CALCROUNDS, OnBtnCalcRounds)
 	//}}AFX_MSG_MAP
+
+	ON_REGISTERED_MESSAGE(WM_XHYPERLINK_CLICKED, OnXHyperLinkClicked)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -79,6 +78,19 @@ BOOL CDbSettingsDlg::OnInitDialog()
 
 	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(&m_btCalcRounds, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE);
+
+	CString str;
+	m_btCalcRounds.GetWindowText(str);
+	m_btCalcRounds.SetTooltipText(str);
+	m_btCalcRounds.SetWindowText(_T(""));
+
+	str = TRL("Open &Help File"); str.Remove(_T('&'));
+	m_hlHelp.SetWindowText(str);
+	NewGUI_MakeHyperLink(&m_hlHelp);
+	m_hlHelp.EnableTooltip(FALSE);
+	m_hlHelp.SetNotifyParent(TRUE);
+	m_hlHelp.EnableURL(FALSE);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_OPTIONS),
@@ -119,4 +131,54 @@ void CDbSettingsDlg::OnCancel()
 {
 	UpdateData(TRUE);
 	CDialog::OnCancel();
+}
+
+void CDbSettingsDlg::OnBtnCalcRounds() 
+{
+	Rijndael rijndael;
+	RD_UINT8 aKeySeed[32];
+	RD_UINT8 aTest[32];
+	DWORD dwStartTime;
+	DWORD iRounds = 0;
+
+	UpdateData(TRUE);
+
+	memset(aKeySeed, 0x4b, 32);
+	memset(aTest, 0x8e, 32);
+
+	if(rijndael.init(Rijndael::ECB, Rijndael::Encrypt, aKeySeed, Rijndael::Key32Bytes, 0) != RIJNDAEL_SUCCESS)
+	{
+		MessageBox(TRL("Internal error"), TRL("Password Safe"), MB_ICONSTOP | MB_OK);
+		return;
+	}
+
+	dwStartTime = timeGetTime();
+
+	while(1)
+	{
+		rijndael.blockEncrypt(aTest, 256, aTest);
+		rijndael.blockEncrypt(aTest, 256, aTest);
+		rijndael.blockEncrypt(aTest, 256, aTest);
+		rijndael.blockEncrypt(aTest, 256, aTest);
+		rijndael.blockEncrypt(aTest, 256, aTest);
+		rijndael.blockEncrypt(aTest, 256, aTest);
+		rijndael.blockEncrypt(aTest, 256, aTest);
+		rijndael.blockEncrypt(aTest, 256, aTest);
+		iRounds += 8;
+
+		if(iRounds < 8) { iRounds = DWORD_MAX - 8; break; } // Overflow?
+		if((timeGetTime() - dwStartTime) > 1000) break;
+	}
+
+	m_dwNumKeyEnc = iRounds;
+	UpdateData(FALSE);
+}
+
+LRESULT CDbSettingsDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	if(wParam == IDC_HLINK_HELPFILE) WU_OpenAppHelp(_T("security.html"));
+
+	return 0;
 }
