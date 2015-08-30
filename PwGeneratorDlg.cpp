@@ -251,7 +251,6 @@ void CPwGeneratorDlg::OnGenerateBtn()
 {
 	CGetRandomDlg dlg;
 	CNewRandom newrand;
-	int nChars = 0;
 	sha256_ctx ctx;
 	unsigned long uCounter = 0, uFinalChars = 0, j;
 	BYTE aTemp[32];
@@ -478,6 +477,7 @@ void CPwGeneratorDlg::OnClickListOptions(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPwGeneratorDlg::OnRclickListOptions(NMHDR* pNMHDR, LRESULT* pResult) 
 {
+	UNREFERENCED_PARAMETER(pNMHDR);
 	*pResult = 0;
 }
 

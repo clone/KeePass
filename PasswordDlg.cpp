@@ -43,6 +43,10 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+#pragma warning(push)
+// Cast truncates constant value
+#pragma warning(disable: 4310)
+
 /////////////////////////////////////////////////////////////////////////////
 
 CPasswordDlg::CPasswordDlg(CWnd* pParent /*=NULL*/)
@@ -54,13 +58,16 @@ CPasswordDlg::CPasswordDlg(CWnd* pParent /*=NULL*/)
 
 	m_bLoadMode = TRUE;
 	m_bConfirm = FALSE;
+	m_bChanging = FALSE;
 	m_strDescriptiveName = _T("");
+	m_bOnce = FALSE;
 }
 
 void CPasswordDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CPasswordDlg)
+	DDX_Control(pDX, IDC_HL_SELECTFILE, m_hlSelFile);
 	DDX_Control(pDX, IDC_PROGRESS_PASSQUALITY, m_cPassQuality);
 	DDX_Control(pDX, IDC_CHECK_STARS, m_btStars);
 	DDX_Control(pDX, IDOK, m_btOK);
@@ -77,7 +84,10 @@ BEGIN_MESSAGE_MAP(CPasswordDlg, CDialog)
 	ON_BN_CLICKED(IDC_CHECK_STARS, OnCheckStars)
 	ON_BN_CLICKED(IDC_MAKEPASSWORD_BTN, OnMakePasswordBtn)
 	ON_EN_CHANGE(IDC_EDIT_PASSWORD, OnChangeEditPassword)
+	ON_CBN_SELCHANGE(IDC_COMBO_DISKLIST, OnSelChangeComboDiskList)
 	//}}AFX_MSG_MAP
+
+	ON_REGISTERED_MESSAGE(WM_XHYPERLINK_CLICKED, OnXHyperLinkClicked)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -85,6 +95,7 @@ END_MESSAGE_MAP()
 BOOL CPasswordDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
+	ASSERT(m_bOnce == FALSE);
 
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
@@ -142,6 +153,11 @@ BOOL CPasswordDlg::OnInitDialog()
 	}
 	m_cbDiskList.SetCurSel(0);
 
+	NewGUI_MakeHyperLink(&m_hlSelFile);
+	m_hlSelFile.EnableTooltip(FALSE);
+	m_hlSelFile.SetNotifyParent(TRUE);
+	m_hlSelFile.EnableURL(FALSE);
+
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	if(m_bLoadMode == FALSE)
 		m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY),
@@ -168,7 +184,8 @@ BOOL CPasswordDlg::OnInitDialog()
 			lp = TRL("Select the password disk drive where the key will be stored:");
 			GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
 
-			SetWindowText(TRL("Create a new password database - Enter master key"));
+			lp = TRL("Save key-file manually to...");
+			GetDlgItem(IDC_HL_SELECTFILE)->SetWindowText(lp);
 
 			CString str;
 			str = TRL("Set master key");
@@ -179,12 +196,24 @@ BOOL CPasswordDlg::OnInitDialog()
 			}
 			m_banner.SetTitle(str);
 
-			m_banner.SetCaption(TRL("Enter the master key for the new database."));
+			if(m_bChanging == FALSE)
+			{
+				SetWindowText(TRL("Create a new password database - Enter master key"));
+				m_banner.SetCaption(TRL("Enter the master key for the new database."));
+			}
+			else
+			{
+				SetWindowText(TRL("Change password of this database - Enter new master key"));
+				m_banner.SetCaption(TRL("Enter the new master key for this database."));
+			}
 		}
 		else
 		{
 			lp = TRL("Select the password disk drive to load the key from:");
 			GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
+
+			lp = TRL("Select key-file manually...");
+			GetDlgItem(IDC_HL_SELECTFILE)->SetWindowText(lp);
 
 			SetWindowText(TRL("Open database - Enter master key"));
 
@@ -213,10 +242,19 @@ BOOL CPasswordDlg::OnInitDialog()
 			GetDlgItem(IDC_STATIC_SELDISK)->ShowWindow(SW_HIDE);
 			GetDlgItem(IDC_COMBO_DISKLIST)->ShowWindow(SW_HIDE);
 			GetDlgItem(IDC_MAKEPASSWORD_BTN)->EnableWindow(FALSE);
+			GetDlgItem(IDC_HL_SELECTFILE)->ShowWindow(SW_HIDE);
 
-			SetWindowText(TRL("Create a new password database - Repeat master key"));
+			if(m_bChanging == FALSE)
+			{
+				SetWindowText(TRL("Create a new password database - Repeat master key"));
+				m_banner.SetCaption(TRL("Repeat the master key for the new database."));
+			}
+			else
+			{
+				SetWindowText(TRL("Repeat master key"));
+				m_banner.SetCaption(TRL("Repeat the master key for this database."));
+			}
 			m_banner.SetTitle(TRL("Repeat master password"));
-			m_banner.SetCaption(TRL("Repeat the master key for the new database."));
 
 			m_cPassQuality.ShowWindow(SW_HIDE);
 			GetDlgItem(IDC_STATIC_PASSBITS)->ShowWindow(SW_HIDE);
@@ -246,8 +284,9 @@ BOOL CPasswordDlg::OnInitDialog()
 		}
 	}
 
-	CString strStars = (TCHAR)(_T('z') + 27);
-	strStars += (TCHAR)(_T('z') + 27); strStars += (TCHAR)(_T('z') + 27);
+	TCHAR tchDot = (TCHAR)(_T('z') + 27);
+	CString strStars = _T("");
+	strStars += tchDot; strStars += tchDot; strStars += tchDot;
 	GetDlgItem(IDC_CHECK_STARS)->SetWindowText(strStars);
 	m_bStars = TRUE;
 	OnCheckStars();
@@ -301,24 +340,27 @@ void CPasswordDlg::OnOK()
 
 		if(m_bLoadMode == FALSE)
 		{
-			if(GetDiskFreeSpaceEx((LPCTSTR)strTemp, &aBytes[0], &aBytes[1], &aBytes[2]) == FALSE)
+			if(strTemp.GetAt(strTemp.GetLength() - 1) == _T('\\'))
 			{
-				strTemp = TRL("Cannot access the selected drive.");
-				strTemp += _T("\r\n\r\n");
-				strTemp += TRL("Make sure a writable medium is inserted.");
-				MessageBox(strTemp, TRL("Stop"), MB_OK | MB_ICONWARNING);
-				return;
-			}
+				if(GetDiskFreeSpaceEx((LPCTSTR)strTemp, &aBytes[0], &aBytes[1], &aBytes[2]) == FALSE)
+				{
+					strTemp = TRL("Cannot access the selected drive.");
+					strTemp += _T("\r\n\r\n");
+					strTemp += TRL("Make sure a writable medium is inserted.");
+					MessageBox(strTemp, TRL("Stop"), MB_OK | MB_ICONWARNING);
+					return;
+				}
 
-			if(aBytes[2].QuadPart < 128)
-			{
-				MessageBox(TRL("Not enough free disk space!"), TRL("Stop"), MB_OK | MB_ICONWARNING);
-				return;
+				if(aBytes[2].QuadPart < 128)
+				{
+					MessageBox(TRL("Not enough free disk space!"), TRL("Stop"), MB_OK | MB_ICONWARNING);
+					return;
+				}
 			}
 
 			FILE *fpTest;
 			CString strTemp2 = strTemp;
-			strTemp2 += _T("12398756.323"); // Just a random filename
+			strTemp2 += _T("t2ub8rf6.tmp"); // Just a random filename, will work for directories and files
 			fpTest = _tfopen((LPCTSTR)strTemp2, _T("wb"));
 			if(fpTest == NULL)
 			{
@@ -339,12 +381,14 @@ void CPasswordDlg::OnOK()
 	}
 
 	CleanUp();
+	ASSERT(m_bOnce == FALSE); m_bOnce = TRUE;
 	CDialog::OnOK();
 }
 
 void CPasswordDlg::OnCancel() 
 {
 	CleanUp();
+	ASSERT(m_bOnce == FALSE); m_bOnce = TRUE;
 	CDialog::OnCancel();
 }
 
@@ -355,7 +399,10 @@ void CPasswordDlg::OnCheckStars()
 	if(m_bStars == FALSE)
 		m_pEditPw.SetPasswordChar(0);
 	else
-		m_pEditPw.SetPasswordChar((TCHAR)(_T('z') + 27));
+	{
+		TCHAR tchDot = (TCHAR)(_T('z') + 27);
+		m_pEditPw.SetPasswordChar(tchDot);
+	}
 
 	UpdateData(FALSE);
 	m_pEditPw.RedrawWindow();
@@ -391,3 +438,53 @@ void CPasswordDlg::OnChangeEditPassword()
 	m_pEditPw.GetWindowText(m_strPassword);
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
 }
+
+LRESULT CPasswordDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	if(wParam == IDC_HL_SELECTFILE)
+	{
+		CString strFile;
+		DWORD dwFlags;
+		CString strFilter;
+
+		UpdateData(TRUE);
+
+		strFilter = TRL("All files");
+		strFilter += _T(" (*.*)|*.*||");
+
+		dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
+		// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
+		dwFlags |= 0x00080000 | 0x00800000;
+
+		if(m_bLoadMode == TRUE)
+			dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+		else
+			dwFlags |= OFN_HIDEREADONLY;
+
+		CFileDialog dlg(m_bLoadMode, NULL, NULL, dwFlags, strFilter, this);
+
+		if(dlg.DoModal() == IDOK)
+		{
+			strFile = dlg.GetPathName();
+
+			m_cbDiskList.AddCTString(WZ_ROOT_INDEX, 28, (LPCTSTR)strFile);
+			m_cbDiskList.SelectString(-1, (LPCTSTR)strFile);
+		}
+
+		UpdateData(FALSE);
+	}
+
+	return 0;
+}
+
+void CPasswordDlg::OnSelChangeComboDiskList() 
+{
+	if(m_cbDiskList.GetCurSel() == 0)
+		GetDlgItem(IDC_HL_SELECTFILE)->EnableWindow(TRUE);
+	else
+		GetDlgItem(IDC_HL_SELECTFILE)->EnableWindow(FALSE);
+}
+
+#pragma warning(pop)

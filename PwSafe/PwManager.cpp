@@ -94,7 +94,7 @@ void CPwManager::CleanUp()
 
 BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const CNewRandomInterface *pARI, BOOL bOverwrite)
 {
-	unsigned long uKeyLen;
+	unsigned long uKeyLen, uFileSize, uRead;
 	TCHAR szFile[2048];
 	sha256_ctx sha32;
 	char *paKey = NULL;
@@ -122,7 +122,7 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 	{
 		sha256_begin(&sha32);
 		sha256_hash((unsigned char *)paKey, uKeyLen, &sha32);
-		sha256_end(m_pMasterKey, &sha32);
+		sha256_end((unsigned char *)m_pMasterKey, &sha32);
 
 		mem_erase((unsigned char *)paKey, uKeyLen);
 		SAFE_DELETE_ARRAY(paKey);
@@ -134,8 +134,10 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 		SAFE_DELETE_ARRAY(paKey); // Don't need ASCII key any more from on now
 
 		_tcscpy(szFile, pszMasterKey);
-		if(szFile[_tcslen(szFile) - 1] != _T('\\')) _tcscat(szFile, _T("\\"));
-		_tcscat(szFile, _T("pwsafe.key"));
+		if(szFile[_tcslen(szFile) - 1] == _T('\\'))
+		{
+			_tcscat(szFile, _T("pwsafe.key"));
+		}
 
 		if(pARI == NULL) // If pARI is NULL: load key from disk
 		{
@@ -143,8 +145,32 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 
 			fp = _tfopen(szFile, _T("rb"));
 			if(fp == NULL) return FALSE;
-			if(fread(m_pMasterKey, 1, 32, fp) != 32) return FALSE;
-			fclose(fp);
+			fseek(fp, 0, SEEK_END);
+			uFileSize = (unsigned long)ftell(fp);
+			fseek(fp, 0, SEEK_SET);
+
+			if(uFileSize == 32)
+			{
+				if(fread(m_pMasterKey, 1, 32, fp) != 32)
+				{
+					fclose(fp); fp = NULL;
+					return FALSE;
+				}
+			}
+			else
+			{
+				sha256_begin(&sha32);
+				while(1)
+				{
+					uRead = (unsigned long)fread((unsigned char *)szFile, 1, 2048, fp);
+					if(uRead == 0) break;
+					sha256_hash((unsigned char *)szFile, uRead, &sha32);
+					if(uRead != 2048) break;
+				}
+				sha256_end((unsigned char *)m_pMasterKey, &sha32);
+			}
+
+			fclose(fp); fp = NULL;
 
 			return TRUE;
 		}
@@ -162,7 +188,7 @@ BOOL CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const 
 			fp = _tfopen(szFile, _T("wb"));
 			if(fp == NULL) return FALSE;
 			fwrite(aRandomBytes, 1, 32, fp);
-			fclose(fp);
+			fclose(fp); fp = NULL;
 
 			memcpy(m_pMasterKey, aRandomBytes, 32);
 
@@ -515,7 +541,7 @@ BOOL CPwManager::AddEntry(const PW_ENTRY *pTemplate)
 BOOL CPwManager::AddGroup(const PW_GROUP *pTemplate)
 {
 	PW_GROUP pT;
-	DWORD i, t, b;
+	DWORD i, t = 0, b;
 
 	ASSERT(pTemplate != NULL); if(pTemplate == NULL) return FALSE;
 
@@ -991,7 +1017,9 @@ BOOL CPwManager::OpenDatabase(const TCHAR *pszFile)
 	mem_erase((unsigned char *)pVirtualFile, uAllocated);
 	SAFE_DELETE_ARRAY(pVirtualFile);
 
+	_LoadAndRemoveAllMetaStreams();
 	DeleteLostEntries();
+	FixGroupTree();
 	return TRUE;
 }
 
@@ -1012,6 +1040,8 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	if(pszFile == NULL) return FALSE;
 	ASSERT(_tcslen(pszFile) != 0);
 	if(_tcslen(pszFile) == 0) return FALSE;
+
+	_AddAllMetaStreams();
 
 	uFileSize = sizeof(PW_DBHEADER);
 
@@ -1072,7 +1102,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	// Allocate enough memory
 	uAllocated = uFileSize + 16;
 	pVirtualFile = new char[uAllocated];
-	if(pVirtualFile == NULL) return FALSE;
+	if(pVirtualFile == NULL) { _LoadAndRemoveAllMetaStreams(); return FALSE; }
 
 	// Build header structure
 	hdr.dwSignature1 = PWM_DBSIG_1;
@@ -1082,7 +1112,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 	if(m_nAlgorithm == ALGO_AES) hdr.dwFlags |= PWM_FLAG_RIJNDAEL;
 	else if(m_nAlgorithm == ALGO_TWOFISH) hdr.dwFlags |= PWM_FLAG_TWOFISH;
-	else { ASSERT(FALSE); return FALSE; }
+	else { ASSERT(FALSE); _LoadAndRemoveAllMetaStreams(); return FALSE; }
 
 	hdr.dwVersion = PWM_DBVER_DW;
 	hdr.dwGroups = m_dwNumGroups;
@@ -1282,7 +1312,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 	// Generate m_pTransformedMasterKey from m_pMasterKey
 	if(_TransformMasterKey(hdr.aMasterSeed2) == FALSE)
-		{ ASSERT(FALSE); SAFE_DELETE_ARRAY(pVirtualFile); return FALSE; }
+		{ ASSERT(FALSE); SAFE_DELETE_ARRAY(pVirtualFile); _LoadAndRemoveAllMetaStreams(); return FALSE; }
 
 	// Hash the master password with the generated hash salt
 	sha256_begin(&sha32);
@@ -1313,6 +1343,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 		if(twofish.init(uFinalKey, 32, hdr.aEncryptionIV) == false)
 		{
 			SAFE_DELETE_ARRAY(pVirtualFile);
+			_LoadAndRemoveAllMetaStreams();
 			return FALSE;
 		}
 
@@ -1329,7 +1360,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	ASSERT((uEncryptedPartSize % 16) == 0);
 	if((uEncryptedPartSize > 2147483446) || (uEncryptedPartSize == 0))
 	{
-		ASSERT(FALSE); SAFE_DELETE_ARRAY(pVirtualFile);
+		ASSERT(FALSE); SAFE_DELETE_ARRAY(pVirtualFile); _LoadAndRemoveAllMetaStreams();
 		return FALSE;
 	}
 
@@ -1337,7 +1368,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	if(fp == NULL)
 	{
 		mem_erase((unsigned char *)pVirtualFile, uAllocated);
-		SAFE_DELETE_ARRAY(pVirtualFile);
+		SAFE_DELETE_ARRAY(pVirtualFile); _LoadAndRemoveAllMetaStreams();
 		return FALSE;
 	}
 
@@ -1348,6 +1379,7 @@ BOOL CPwManager::SaveDatabase(const TCHAR *pszFile)
 	fclose(fp); fp = NULL;
 	mem_erase((unsigned char *)pVirtualFile, uAllocated);
 	SAFE_DELETE_ARRAY(pVirtualFile);
+	_LoadAndRemoveAllMetaStreams();
 	return TRUE;
 }
 
@@ -1889,8 +1921,8 @@ void CPwManager::FixGroupTree()
 
 	for(i = 0; i < m_dwNumGroups; i++)
 	{
-		if(m_pGroups[i].usLevel > (usLastLevel + 1))
-			m_pGroups[i].usLevel = usLastLevel + 1;
+		if(m_pGroups[i].usLevel > (USHORT)(usLastLevel + 1))
+			m_pGroups[i].usLevel = (USHORT)(usLastLevel + 1);
 
 		usLastLevel = m_pGroups[i].usLevel;
 	}
@@ -2007,6 +2039,9 @@ void CPwManager::SubstEntryGroupIds(DWORD dwExistingId, DWORD dwNewId)
 {
 	DWORD i;
 
+	ASSERT(dwExistingId != DWORD_MAX); ASSERT(dwNewId != DWORD_MAX);
+	if(dwExistingId == dwNewId) return; // Nothing to do?
+
 	for(i = 0; i < m_dwNumEntries; i++)
 	{
 		if(m_pEntries[i].uGroupId == dwExistingId)
@@ -2044,7 +2079,7 @@ BOOL CPwManager::_TransformMasterKey(BYTE *pKeySeed)
 
 	// Do a quick test if the Rijndael class worked correctly
 	for(i = 0; i < 32; i++) aKey[i] = (RD_UINT8)i;
-	for(i = 0; i < 16; i++) aTest[i] = ((RD_UINT8)i << 4) | (RD_UINT8)i;
+	for(i = 0; i < 16; i++) aTest[i] = (RD_UINT8)(((RD_UINT8)i << 4) | (RD_UINT8)i);
 	if(rijndael.init(Rijndael::ECB, Rijndael::Encrypt, aKey, Rijndael::Key32Bytes, NULL) != RIJNDAEL_SUCCESS)
 		{ ASSERT(FALSE); return FALSE; }
 	if(rijndael.blockEncrypt(aTest, 128, aTest) != 128) { ASSERT(FALSE); }
@@ -2144,3 +2179,113 @@ BOOL CPwManager::IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupN
 	SAFE_DELETE_ARRAY(ptzTemp);
 	return dwId;
 } */
+
+BOOL CPwManager::_AddMetaStream(LPCTSTR lpMetaDataDesc, BYTE *pData, DWORD dwLength)
+{
+	PW_ENTRY pe;
+
+	ASSERT(lpMetaDataDesc != NULL); ASSERT(_tcslen(lpMetaDataDesc) != 0);
+	ASSERT(pData != NULL); if(pData == NULL) return FALSE;
+	ASSERT(dwLength != 0); if(dwLength == 0) return TRUE;
+
+	memset(&pe, 0, sizeof(PW_ENTRY));
+	pe.pBinaryData = pData; pe.pszAdditional = (TCHAR *)lpMetaDataDesc;
+	pe.pszBinaryDesc = PMS_ID_BINDESC; pe.pszPassword = _T("");
+	pe.pszTitle = PMS_ID_TITLE; pe.pszURL = PMS_ID_URL;
+	pe.pszUserName = PMS_ID_USER;
+	pe.tCreation = g_pwTimeNever; pe.tExpire = g_pwTimeNever;
+	pe.tLastAccess = g_pwTimeNever; pe.tLastMod = g_pwTimeNever;
+	pe.uBinaryDataLen = dwLength;
+	if(GetNumberOfGroups() != 0) pe.uGroupId = m_pGroups[0].uGroupId;
+
+	return AddEntry(&pe);
+}
+
+BOOL CPwManager::_IsMetaStream(PW_ENTRY *p)
+{
+	ASSERT_ENTRY(p); if(p == NULL) return FALSE;
+
+	if(p->pBinaryData == NULL) return FALSE;
+	if(p->pszAdditional == NULL) return FALSE;
+	if(p->pszBinaryDesc == NULL) return FALSE;
+	if(_tcscmp(p->pszBinaryDesc, PMS_ID_BINDESC) != 0) return FALSE;
+	if(p->pszTitle == NULL) return FALSE;
+	if(_tcscmp(p->pszTitle, PMS_ID_TITLE) != 0) return FALSE;
+	if(p->pszUserName == NULL) return FALSE;
+	if(_tcscmp(p->pszUserName, PMS_ID_USER) != 0) return FALSE;
+	if(p->pszURL == NULL) return FALSE;
+	if(_tcscmp(p->pszURL, PMS_ID_URL) != 0) return FALSE;
+	if(p->uImageId != 0) return FALSE;
+
+	return TRUE;
+}
+
+void CPwManager::_LoadAndRemoveAllMetaStreams()
+{
+	BOOL bChange = TRUE;
+	DWORD i;
+	DWORD dwEntryCount;
+	PW_ENTRY *p;
+
+	if(m_pEntries == NULL) return;
+	if(m_pGroups == NULL) return;
+	if(GetNumberOfEntries() == 0) return;
+	if(GetNumberOfGroups() == 0) return;
+
+	while(bChange == TRUE)
+	{
+		bChange = FALSE;
+		dwEntryCount = GetNumberOfEntries();
+		if(dwEntryCount == 0) break;
+
+		i = dwEntryCount - 1;
+		while(1)
+		{
+			p = GetEntry(i);
+			if(_IsMetaStream(p) == TRUE)
+			{
+				_ParseMetaStream(p);
+				VERIFY(DeleteEntry(i));
+				bChange = TRUE;
+				break;
+			}
+
+			if(i == 0) break;
+			i--;
+		}
+	}
+}
+
+BOOL CPwManager::_AddAllMetaStreams()
+{
+	PMS_SIMPLE_UI_STATE simpState;
+	BOOL b = TRUE;
+
+	memset(&simpState, 0, sizeof(PMS_SIMPLE_UI_STATE));
+
+	simpState.uLastSelectedGroupId = m_dwLastSelectedGroupId;
+	simpState.uLastTopVisibleGroupId = m_dwLastTopVisibleGroupId;
+	memcpy(simpState.aLastSelectedEntryUuid, m_aLastSelectedEntryUuid, 16);
+	memcpy(simpState.aLastTopVisibleEntryUuid, m_aLastTopVisibleEntryUuid, 16);
+
+	b &= _AddMetaStream(PMS_STREAM_SIMPLESTATE, (BYTE *)&simpState, sizeof(PMS_SIMPLE_UI_STATE));
+
+	ASSERT(b == TRUE); return b;
+}
+
+void CPwManager::_ParseMetaStream(PW_ENTRY *p)
+{
+	PMS_SIMPLE_UI_STATE *pState;
+
+	ASSERT(_IsMetaStream(p) == TRUE);
+
+	if(_tcscmp(p->pszAdditional, PMS_STREAM_SIMPLESTATE) == 0)
+	{
+		pState = (PMS_SIMPLE_UI_STATE *)p->pBinaryData;
+
+		m_dwLastSelectedGroupId = pState->uLastSelectedGroupId;
+		m_dwLastTopVisibleGroupId = pState->uLastTopVisibleGroupId;
+		memcpy(m_aLastSelectedEntryUuid, pState->aLastSelectedEntryUuid, 16);
+		memcpy(m_aLastTopVisibleEntryUuid, pState->aLastTopVisibleEntryUuid, 16);
+	}
+}

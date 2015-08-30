@@ -35,7 +35,7 @@
 // and on 128 bit blocks
 //
 
-// Added by Dominik Reichl to compile with MFC
+// Added by D. Reichl to compile with MFC
 #include "StdAfx.h"
 
 #define _RIJNDAEL_CPP_
@@ -46,6 +46,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Added by D. Reichl to avoid level 4 compiler warnings
+#pragma warning(push)
+#pragma warning(disable: 4244)
 
 static RD_UINT8 S[256]=
 {
@@ -1608,3 +1611,6 @@ void Rijndael::decrypt(const RD_UINT8 a[16], RD_UINT8 b[16])
 	*((RD_UINT32*)(b+ 8)) ^= *((RD_UINT32*)m_expandedKey[0][2]);
 	*((RD_UINT32*)(b+12)) ^= *((RD_UINT32*)m_expandedKey[0][3]);
 }
+
+// Enable warnings again
+#pragma warning(pop)

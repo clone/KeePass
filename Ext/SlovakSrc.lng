@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |SlovenËina|
-|~LANGUAGEVERSION|             |0.97b|
+|~LANGUAGEVERSION|             |0.97c|
 |~LANGUAGEAUTHOR|              |Radoslav Bielik|
 |~LANGUAGEAUTHOREMAIL|         |rado@bielik.org, http://www.bielik.org|
 
@@ -168,7 +168,7 @@
 
 |&Lock/Unlock Workspace|       |&Zamkn˙ù/Odomkn˙ù pracovn˙ plochu|
 
-|&Options|                     |M&oûnosti|
+|&Options...|                  |M&oûnosti...|
 |&Add Password Group...|       |Pridaù nov˙ &skupinu hesiel...|
 |Add Password &Subgroup...|    |Pridaù nov˙ &podskupinu hesiel...|
 |&Modify Password Group...|    |&Upraviù skupinu hesiel...|
@@ -437,16 +437,16 @@
 |Author|                       |Autor|
 |Translation author contact|   |Kontakt na autora prekladu|
 |&Rearrange|                   |Reor&ganizovaù|
-|&Sort Group List|             |Zotriediù zoznam &skupÌn|
-|&Sort List By Title|          |Zotriediù zoznam podæa &n·zvu|
-|Sort List By User&Name|       |Zotriediù zoznam podæa uûÌvateæskÈho &mena|
-|Sort List By &URL|            |Zotriediù zoznam podæa &URL|
-|Sort List By &Password|       |Zotriediù zoznam podæa &hesla|
-|Sort List By Note&s|          |Zotriediù zoznam podæa &pozn·mky|
-|Sort List By &Creation Time|  |Zotriediù zoznam podæa &d·tumu vytvorenia|
-|Sort List By Last &Modify Time|               |Zotriediù zoznam podæa d·tumu poslednej &zmeny|
-|Sort List By Last &Access Time|               |Zotriediù zoznam podæa d·tumu poslednÈho p&rÌstupu|
-|Sort List By &Expiration Time|                |Zotriediù zoznam podæa d·tumu p&latnosti|
+|&Sort Group List|             |Zoradiù zoznam &skupÌn|
+|&Sort List By Title|          |Zoradiù zoznam podæa &n·zvu|
+|Sort List By User&Name|       |Zoradiù zoznam podæa uûÌvateæskÈho &mena|
+|Sort List By &URL|            |Zoradiù zoznam podæa &URL|
+|Sort List By &Password|       |Zoradiù zoznam podæa &hesla|
+|Sort List By Note&s|          |Zoradiù zoznam podæa &pozn·mky|
+|Sort List By &Creation Time|  |Zoradiù zoznam podæa &d·tumu vytvorenia|
+|Sort List By Last &Modify Time|               |Zoradiù zoznam podæa d·tumu poslednej &zmeny|
+|Sort List By Last &Access Time|               |Zoradiù zoznam podæa d·tumu poslednÈho p&rÌstupu|
+|Sort List By &Expiration Time|                |Zoradiù zoznam podæa d·tumu p&latnosti|
 |Move Group One &Left|         |Presun˙ù skupinu o ˙roveÚ do&æava|
 |Move Group One &Right|        |Presun˙ù skupinu o ˙roveÚ dop&rava|
 
@@ -552,3 +552,7 @@
 |Use PuTTY for ssh: and telnet: URLs|
 	|PouûÌvaù PuTTY pre ssh: a telnet: URL adresy|
 
+|&No Auto-Sort|					|NezoraÔovaù &automaticky|
+|Auto-&Sort Password List|		|&AutomatickÈ zoraÔovanie zoznamu hesiel|
+|Auto-sorting of the password list is enabled, you cannot move entries manually.|
+	|Je zapnutÈ automatickÈ zoraÔovanie zoznamu hesiel, nie je moûnÈ manu·lne pres˙vaù z·znamy.|

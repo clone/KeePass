@@ -1,9 +1,11 @@
+// Modified version of BtnST.cpp
+// D. Reichl: Additional type conversions, unreferenced parameter declarations, etc.
 #include "stdafx.h"
 #include "BtnST.h"
 
 #ifdef	BTNST_USE_SOUND
 #pragma comment(lib, "winmm.lib")
-#include <Mmsystem.h>
+#include <mmsystem.h>
 #endif
 
 #ifdef _DEBUG
@@ -232,6 +234,8 @@ BOOL CButtonST::PreTranslateMessage(MSG* pMsg)
 
 HBRUSH CButtonST::CtlColor(CDC* pDC, UINT nCtlColor) 
 {
+	UNREFERENCED_PARAMETER(pDC);
+	UNREFERENCED_PARAMETER(nCtlColor);
 	return (HBRUSH)::GetStockObject(NULL_BRUSH); 
 } // End of CtlColor
 
@@ -269,6 +273,7 @@ LRESULT CButtonST::OnSetStyle(WPARAM wParam, LPARAM lParam)
 LRESULT CButtonST::OnSetCheck(WPARAM wParam, LPARAM lParam)
 {
 	ASSERT(m_bIsCheckBox);
+	UNREFERENCED_PARAMETER(lParam);
 
 	switch (wParam)
 	{
@@ -286,6 +291,7 @@ LRESULT CButtonST::OnSetCheck(WPARAM wParam, LPARAM lParam)
 
 LRESULT CButtonST::OnGetCheck(WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(wParam); UNREFERENCED_PARAMETER(lParam);
 	ASSERT(m_bIsCheckBox);
 	return GetCheck();
 } // End of OnGetCheck
@@ -421,6 +427,7 @@ void CButtonST::OnMouseMove(UINT nFlags, CPoint point)
 // Handler for WM_MOUSELEAVE
 LRESULT CButtonST::OnMouseLeave(WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(wParam); UNREFERENCED_PARAMETER(lParam);
 	CancelHover();
 	return 0;
 } // End of OnMouseLeave
@@ -723,7 +730,7 @@ void CButtonST::DrawTheIcon(CDC* pDC, BOOL bHasTitle, RECT* rpItem, CRect* rpCap
 	if ((m_bIsCheckBox && bIsPressed) || (!m_bIsCheckBox && (bIsPressed || m_bMouseOnButton)))
 		byIndex = 0;
 	else
-		byIndex = (m_csIcons[1].hIcon == NULL ? 0 : 1);
+		byIndex = (BYTE)(m_csIcons[1].hIcon == NULL ? 0 : 1);
 
 	CRect	rImage;
 	PrepareImageRect(bHasTitle, rpItem, rpCaption, bIsPressed, m_csIcons[byIndex].dwWidth, m_csIcons[byIndex].dwHeight, &rImage);
@@ -749,7 +756,7 @@ void CButtonST::DrawTheBitmap(CDC* pDC, BOOL bHasTitle, RECT* rpItem, CRect* rpC
 	if ((m_bIsCheckBox && bIsPressed) || (!m_bIsCheckBox && (bIsPressed || m_bMouseOnButton)))
 		byIndex = 0;
 	else
-		byIndex = (m_csBitmaps[1].hBitmap == NULL ? 0 : 1);
+		byIndex = (BYTE)(m_csBitmaps[1].hBitmap == NULL ? 0 : 1);
 
 	CRect	rImage;
 	PrepareImageRect(bHasTitle, rpItem, rpCaption, bIsPressed, m_csBitmaps[byIndex].dwWidth, m_csBitmaps[byIndex].dwHeight, &rImage);
@@ -809,6 +816,10 @@ void CButtonST::DrawTheBitmap(CDC* pDC, BOOL bHasTitle, RECT* rpItem, CRect* rpC
 
 void CButtonST::DrawTheText(CDC* pDC, LPCTSTR lpszText, RECT* rpItem, CRect* rpCaption, BOOL bIsPressed, BOOL bIsDisabled)
 {
+	UNREFERENCED_PARAMETER(rpItem);
+	UNREFERENCED_PARAMETER(bIsPressed);
+	UNREFERENCED_PARAMETER(bIsDisabled);
+
 	// Draw the button's title
 	// If button is pressed then "press" title also
 	if (m_bIsPressed && m_bIsCheckBox == FALSE)
@@ -1781,17 +1792,17 @@ DWORD CButtonST::OffsetColor(BYTE byColorIndex, short shOffset, BOOL bRepaint)
 	// Calculate max. allowed real offset
 	if (shOffset > 0)
 	{
-		if (byRed + shOffset > 255)		shOffsetR = 255 - byRed;
-		if (byGreen + shOffset > 255)	shOffsetG = 255 - byGreen;
-		if (byBlue + shOffset > 255)	shOffsetB = 255 - byBlue;
+		if (byRed + shOffset > 255)		shOffsetR = (short)(255 - byRed);
+		if (byGreen + shOffset > 255)	shOffsetG = (short)(255 - byGreen);
+		if (byBlue + shOffset > 255)	shOffsetB = (short)(255 - byBlue);
 
 		shOffset = min(min(shOffsetR, shOffsetG), shOffsetB);
 	} // if
 	else
 	{
-		if (byRed + shOffset < 0)		shOffsetR = -byRed;
-		if (byGreen + shOffset < 0)		shOffsetG = -byGreen;
-		if (byBlue + shOffset < 0)		shOffsetB = -byBlue;
+		if (byRed + shOffset < 0)		shOffsetR = (short)(-byRed);
+		if (byGreen + shOffset < 0)		shOffsetG = (short)(-byGreen);
+		if (byBlue + shOffset < 0)		shOffsetB = (short)(-byBlue);
 
 		shOffset = max(max(shOffsetR, shOffsetG), shOffsetB);
 	} // else
@@ -2307,7 +2318,7 @@ void CButtonST::SizeToContent()
 #ifdef	BTNST_USE_SOUND
 DWORD CButtonST::SetSound(LPCTSTR lpszSound, HMODULE hMod, BOOL bPlayOnClick, BOOL bPlayAsync)
 {
-	BYTE	byIndex = bPlayOnClick ? 1 : 0;
+	BYTE	byIndex = (BYTE)(bPlayOnClick ? 1 : 0);
 
 	// Store new sound
 	if (lpszSound)

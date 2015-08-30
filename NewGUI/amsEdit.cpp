@@ -1,5 +1,6 @@
 // amsEdit.cpp : implementation file for CEdit-derived classes
 // Created by: Alvaro Mendez - 07/17/2000
+// Modified by: Dominik Reichl - 11/20/2004
 //
 
 #include "stdafx.h"
@@ -132,6 +133,7 @@ void CAMSEdit::Redraw()
 // Returns true if the given character should be entered into the control.
 bool CAMSEdit::ShouldEnter(TCHAR c) const
 {
+	UNREFERENCED_PARAMETER(c);
 	return true;
 }
 
@@ -155,6 +157,8 @@ LONG CAMSEdit::OnClear(UINT wParam, LONG lParam)
 {
 	int nStart, nEnd;
 	GetSel(nStart, nEnd);
+
+	UNREFERENCED_PARAMETER(wParam); UNREFERENCED_PARAMETER(lParam);
 
 	if (nStart < nEnd)
 		SendMessage(WM_KEYDOWN, VK_DELETE); // delete the selection
@@ -204,6 +208,8 @@ BOOL CAMSEdit::OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT
 LONG CAMSEdit::OnSetText(UINT wParam, LONG lParam)
 {
 	LONG nResult = CEdit::Default();
+
+	UNREFERENCED_PARAMETER(wParam);
 
 	CString strText = GetValidText();
 	if (strText != (LPCTSTR)lParam)
@@ -536,7 +542,7 @@ CString CAMSEdit::MaskedBehavior::_GetValidText() const
 	for (int iPos = 0, iMaskPos = 0, nLen = strText.GetLength(); iPos < nLen; iPos++, iMaskPos++)
 	{
 		TCHAR c = strText[iPos];
-		TCHAR cMask = (iMaskPos < nMaskLen ? m_strMask[iMaskPos] : 0);
+		TCHAR cMask = (TCHAR)(iMaskPos < nMaskLen ? m_strMask[iMaskPos] : 0);
 
 		// If we've reached the end of the mask, break
 		if (!cMask)
@@ -962,7 +968,6 @@ const CString& CAMSEdit::NumericBehavior::GetPrefix() const
 void CAMSEdit::NumericBehavior::SetMask(const CString& strMask)
 {
 	int nDecimalPos = -1;
-	int nGroupingPos = -1;
 	int nLen = strMask.GetLength();
 
 	m_nMaxWholeDigits = 0;
@@ -1222,7 +1227,6 @@ CString CAMSEdit::NumericBehavior::_GetValidText() const
 	CString strText = m_pEdit->GetText();
 	CString strNewText;
 	bool bIsNegative = false;
-	int nPrefixLen = m_strPrefix.GetLength();
 
 	// Remove any invalid characters from the number
 	for (int iPos = 0, nDecimalPos = -1, nNewLen = 0, nLen = strText.GetLength(); iPos < nLen; iPos++)
@@ -1672,7 +1676,7 @@ CAMSEdit::DateBehavior::DateBehavior(CAMSEdit* pEdit) :
 
 		for (int iPos = 0; szShortDate[iPos]; iPos++)
 		{
-			TCHAR c = _totupper(szShortDate[iPos]);
+			TCHAR c = (TCHAR)_totupper(szShortDate[iPos]);
 			if (c == 'M')	// see if the month is first
 				break;
 			if (c == 'D')	// see if the day is first, and then set the flag
@@ -2752,6 +2756,7 @@ void CAMSEdit::DateBehavior::GetRange(COleDateTime* pDateMin, COleDateTime* pDat
 // Returns true if the given date is valid and falls within the range.
 bool CAMSEdit::DateBehavior::IsWithinRange(const COleDateTime& date, bool bDateOnly /*= true*/) const
 {
+	UNREFERENCED_PARAMETER(bDateOnly);
 	return (date.GetStatus() == COleDateTime::valid && date >= m_dateMin && date <= m_dateMax);
 }
 
@@ -3519,7 +3524,7 @@ bool CAMSEdit::TimeBehavior::ChangeAMPM(TCHAR c)
 	m_pEdit->GetSel(nStart, nEnd);
 
 	CString strAMPM = GetAMPM();
-	TCHAR cUpper = _totupper(c);
+	TCHAR cUpper = (TCHAR)_totupper(c);
 
 	switch (cUpper)
 	{
@@ -3938,6 +3943,7 @@ void CAMSEdit::TimeBehavior::GetRange(COleDateTime* pDateMin, COleDateTime* pDat
 // Returns true if the given date is valid and falls within the range.
 bool CAMSEdit::TimeBehavior::IsWithinRange(const COleDateTime& date, bool bDateOnly /*= true*/) const
 {
+	UNREFERENCED_PARAMETER(bDateOnly);
 	return (date.GetStatus() == COleDateTime::valid && date >= m_timeMin && date <= m_timeMax);
 }
 
@@ -4848,6 +4854,7 @@ END_MESSAGE_MAP()
 void CAMSMultiMaskedEdit::OnChar(UINT uChar, UINT nRepCnt, UINT c)
 {
 	ASSERT(m_pCurrentBehavior);
+	UNREFERENCED_PARAMETER(c);
 	m_pCurrentBehavior->_OnChar(uChar, nRepCnt, nRepCnt);
 }
 
@@ -4855,6 +4862,7 @@ void CAMSMultiMaskedEdit::OnChar(UINT uChar, UINT nRepCnt, UINT c)
 void CAMSMultiMaskedEdit::OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags)
 {
 	ASSERT(m_pCurrentBehavior);
+	UNREFERENCED_PARAMETER(nFlags);
 	m_pCurrentBehavior->_OnKeyDown(uChar, nRepCnt, nRepCnt);
 }
 

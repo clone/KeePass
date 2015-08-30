@@ -68,18 +68,16 @@ void CPwExport::SetNewLineSeq(BOOL bWindows)
 	else m_pszNewLine = _T("\n");
 }
 
-#define PWEXPSTR(sp) \
-{ \
-	ASSERT(sp != NULL); if(sp != NULL) { \
+#define PWEXPSTR(sp) { \
 	UTF8_BYTE *_pUtf8String = _StringToUTF8(sp); \
+	ASSERT(_pUtf8String != NULL); if(_pUtf8String != NULL) { \
 	fwrite(_pUtf8String, 1, strlen((char *)_pUtf8String), fp); \
 	SAFE_DELETE_ARRAY(_pUtf8String); } \
 }
 
-#define PWEXPSTRXML(sp) \
-{ \
-	ASSERT(sp != NULL); if(sp != NULL) { \
+#define PWEXPSTRXML(sp) { \
 	TCHAR *_pXmlString = MakeSafeXmlString(sp); \
+	ASSERT(_pXmlString != NULL); if(_pXmlString != NULL) { \
 	UTF8_BYTE *_pUtf8String = _StringToUTF8(_pXmlString); \
 	fwrite(_pUtf8String, 1, strlen((char *)_pUtf8String), fp); \
 	SAFE_DELETE_ARRAY(_pUtf8String); \

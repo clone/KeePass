@@ -57,6 +57,7 @@
 #define IDD_DBSETTINGS_DLG              196
 #define IDI_UNLOCKED                    197
 #define IDI_KEYHOLE                     198
+#define IDR_COLVIEW_MENU                204
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -175,6 +176,7 @@
 #define IDC_EDIT_QUICKFIND              1154
 #define IDC_CHECK_PUTTYURLS             1155
 #define IDC_CHECK_SAVEONLATMOD          1156
+#define IDC_HL_SELECTFILE               1159
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -331,14 +333,16 @@
 #define ID_VIEW_AUTOSORT_LASTACCESS     32948
 #define ID_VIEW_AUTOSORT_EXPIRE         32949
 #define ID_VIEW_AUTOSORT_NOSORT         32950
+#define ID_PWLIST_AUTOTYPE              32951
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        204
-#define _APS_NEXT_COMMAND_VALUE         32951
-#define _APS_NEXT_CONTROL_VALUE         1157
+#define _APS_3D_CONTROLS                     1
+#define _APS_NEXT_RESOURCE_VALUE        205
+#define _APS_NEXT_COMMAND_VALUE         32952
+#define _APS_NEXT_CONTROL_VALUE         1160
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

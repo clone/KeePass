@@ -37,17 +37,17 @@
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
 
 // When making a Windows build, don't forget to update the verinfo resource
-#define PWM_VERSION_STR  _T("0.97c")
+#define PWM_VERSION_STR  _T("0.98a")
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
 #define PWM_DBSIG_2      0xB54BFB65
-#define PWM_DBVER_DW     0x00030001
+#define PWM_DBVER_DW     0x00030002
 
 #define PWM_HOMEPAGE     _T("http://keepass.sourceforge.net")
 #define PWM_URL_TRL      _T("http://keepass.sourceforge.net/translations.php")
 
-#define PWM_README_FILE  _T("KeePass.html")
+#define PWM_README_FILE  _T("KeePass.chm")
 #define PWM_LICENSE_FILE _T("License.html")
 
 #define PWM_EXENAME       _T("KeePass")
@@ -145,6 +145,14 @@
 #define ALGO_AES          0
 #define ALGO_TWOFISH      1
 
+// Password Meta Streams
+#define PMS_ID_BINDESC  _T("bin-stream")
+#define PMS_ID_TITLE    _T("Meta-Info")
+#define PMS_ID_USER     _T("SYSTEM")
+#define PMS_ID_URL      _T("$")
+
+#define PMS_STREAM_SIMPLESTATE _T("Simple UI State")
+
 #pragma pack(1)
 
 typedef struct _PW_TIME
@@ -216,6 +224,30 @@ typedef struct _PW_ENTRY // Structure containing information about one entry
 	BYTE *pBinaryData;
 	DWORD uBinaryDataLen;
 } PW_ENTRY, *PPW_ENTRY;
+
+typedef struct _PMS_SIMPLE_UI_STATE
+{
+	DWORD uLastSelectedGroupId;
+	DWORD uLastTopVisibleGroupId;
+	BYTE aLastSelectedEntryUuid[16];
+	BYTE aLastTopVisibleEntryUuid[16];
+	DWORD dwReserved01;
+	DWORD dwReserved02;
+	DWORD dwReserved03;
+	DWORD dwReserved04;
+	DWORD dwReserved05;
+	DWORD dwReserved06;
+	DWORD dwReserved07;
+	DWORD dwReserved08;
+	DWORD dwReserved09;
+	DWORD dwReserved10;
+	DWORD dwReserved11;
+	DWORD dwReserved12;
+	DWORD dwReserved13;
+	DWORD dwReserved14;
+	DWORD dwReserved15;
+	DWORD dwReserved16;
+} PMS_SIMPLE_UI_STATE;
 
 #pragma pack()
 
@@ -325,6 +357,11 @@ public:
 
 	static BOOL IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName);
 
+	DWORD m_dwLastSelectedGroupId;
+	DWORD m_dwLastTopVisibleGroupId;
+	BYTE m_aLastSelectedEntryUuid[16];
+	BYTE m_aLastTopVisibleEntryUuid[16];
+
 protected:
 	virtual BOOL ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_GROUP *pGroup);
 	virtual BOOL ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_ENTRY *pEntry);
@@ -339,6 +376,12 @@ private:
 	BOOL _OpenDatabaseV2(const TCHAR *pszFile);
 	BOOL _ReadGroupFieldV2(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_GROUP *pGroup);
 	BOOL _ReadEntryFieldV2(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_ENTRY *pEntry);
+
+	BOOL _AddAllMetaStreams();
+	void _LoadAndRemoveAllMetaStreams();
+	BOOL _AddMetaStream(LPCTSTR lpMetaDataDesc, BYTE *pData, DWORD dwLength);
+	BOOL _IsMetaStream(PW_ENTRY *p);
+	void _ParseMetaStream(PW_ENTRY *p);
 
 	// Encrypt the master key a few times to make brute-force key-search harder
 	BOOL _TransformMasterKey(BYTE *pKeySeed);

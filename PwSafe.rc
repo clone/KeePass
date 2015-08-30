@@ -104,7 +104,7 @@ BEGIN
     LTEXT           "Database Format Version:",IDC_STATIC_DBFORMATTEXT,7,33,
                     97,8
     LTEXT           "<DYN_VERSION>",IDC_STATIC_DBFORMAT,106,33,155,8
-    PUSHBUTTON      "Open &ReadMe File",IDC_README_BTN,7,65,94,14
+    PUSHBUTTON      "Open &Help File",IDC_README_BTN,7,65,94,14
     PUSHBUTTON      "Open &License File",IDC_LICENSE_BTN,104,65,90,14
     LTEXT           "KeePass is OSI Certified Open Source Software.",
                     IDC_STATIC,7,20,254,8
@@ -158,15 +158,15 @@ BEGIN
     EDITTEXT        IDC_EDIT_QUICKFIND,213,3,88,13,ES_AUTOHSCROLL
 END
 
-IDD_PASSWORD_DLG DIALOG DISCARDABLE  0, 0, 352, 129
+IDD_PASSWORD_DLG DIALOG DISCARDABLE  0, 0, 352, 140
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | 
     WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_TITLE>"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,229,108,56,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,289,108,56,14
-    GROUPBOX        "Key",IDC_STATIC,7,28,338,72
+    DEFPUSHBUTTON   "&OK",IDOK,229,119,56,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,289,119,56,14
+    GROUPBOX        "Key",IDC_STATIC,7,28,338,81
     LTEXT           "<DYN_INTRO>",IDC_STATIC_INTRO,7,7,338,18
     LTEXT           "Enter password:",IDC_STATIC_ENTERPW,13,40,94,8
     EDITTEXT        IDC_EDIT_PASSWORD,109,38,211,14,ES_PASSWORD | 
@@ -179,11 +179,13 @@ BEGIN
     COMBOBOX        IDC_COMBO_DISKLIST,209,78,128,150,CBS_DROPDOWNLIST | 
                     CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | 
                     WS_TABSTOP
-    PUSHBUTTON      "&Generate Random Password",IDC_MAKEPASSWORD_BTN,7,108,
+    PUSHBUTTON      "&Generate Random Password",IDC_MAKEPASSWORD_BTN,7,119,
                     124,14
     CONTROL         "Progress1",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",
                     WS_BORDER,109,53,180,9
     RTEXT           "9999 bits",IDC_STATIC_PASSBITS,290,53,30,8
+    LTEXT           "Select key-file manually...",IDC_HL_SELECTFILE,209,93,
+                    130,8
 END
 
 IDD_ADDENTRY_DLG DIALOG DISCARDABLE  0, 0, 315, 279
@@ -197,6 +199,8 @@ BEGIN
     COMBOBOX        IDC_COMBO_GROUPS,67,7,167,211,CBS_DROPDOWNLIST | 
                     CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | 
                     WS_TABSTOP
+    LTEXT           "Icon:",IDC_STATIC,246,9,23,8
+    PUSHBUTTON      "&Pick One",IDC_PICKICON_BTN,271,7,37,14
     LTEXT           "Group:",IDC_STATIC,7,9,59,8
     LTEXT           "Title:",IDC_STATIC,7,27,58,8
     LTEXT           "UserName:",IDC_STATIC,7,46,58,8
@@ -209,26 +213,24 @@ BEGIN
     EDITTEXT        IDC_EDIT_URL,67,63,241,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT_PASSWORD,67,82,219,14,ES_PASSWORD | 
                     ES_AUTOHSCROLL
+    CONTROL         "***",IDC_CHECK_HIDEPW,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_TABSTOP,287,82,21,14
     EDITTEXT        IDC_EDIT_REPEATPW,67,96,219,14,ES_PASSWORD | 
                     ES_AUTOHSCROLL
+    PUSHBUTTON      "&Gen",IDC_RANDOMPW_BTN,287,96,21,14
     CONTROL         "",IDC_RE_NOTES,"RICHEDIT",ES_MULTILINE | ES_AUTOVSCROLL | 
                     ES_NOHIDESEL | ES_WANTRETURN | WS_BORDER | WS_VSCROLL | 
                     WS_TABSTOP,67,124,241,86
     EDITTEXT        IDC_EDIT_EXPIRE_DATE,67,215,68,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_EDIT_EXPIRE_TIME,135,215,173,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,254,315,1
-    CONTROL         "***",IDC_CHECK_HIDEPW,"Button",BS_AUTOCHECKBOX | 
-                    BS_PUSHLIKE | WS_TABSTOP,287,82,21,14
-    LTEXT           "Icon:",IDC_STATIC,246,9,23,8
-    PUSHBUTTON      "&Pick One",IDC_PICKICON_BTN,271,7,37,14
-    PUSHBUTTON      "&Gen",IDC_RANDOMPW_BTN,287,96,21,14
-    LTEXT           "Expires:",IDC_STATIC,7,217,58,8
     LTEXT           "Attachment:",IDC_STATIC,7,237,59,8
     EDITTEXT        IDC_EDIT_ATTACHMENT,67,234,176,14,ES_AUTOHSCROLL | 
                     ES_NOHIDESEL | ES_READONLY
     PUSHBUTTON      "",IDC_SETATTACH_BTN,244,234,22,14
     PUSHBUTTON      "",IDC_SAVEATTACH_BTN,266,234,21,14
     PUSHBUTTON      "",IDC_REMOVEATTACH_BTN,287,234,21,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,254,315,1
+    LTEXT           "Expires:",IDC_STATIC,7,217,58,8
     LTEXT           "Quality:",IDC_STATIC,7,111,58,8
     CONTROL         "Progress1",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",
                     WS_BORDER,67,110,187,9
@@ -350,11 +352,11 @@ BEGIN
                     WS_TABSTOP,87,38,131,10
     CONTROL         "N&otes",IDC_CHECK_NOTES,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,87,51,131,10
+    CONTROL         "&Group Name",IDC_CHECK_GROUPNAME,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,87,64,131,10
     GROUPBOX        "Options",IDC_STATIC,7,83,217,28
     CONTROL         "&Case sensitive",IDC_CHECK_CASESENSITIVE,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,13,95,205,10
-    CONTROL         "&Group Name",IDC_CHECK_GROUPNAME,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,87,64,131,10
 END
 
 IDD_LANGUAGES_DLG DIALOG DISCARDABLE  0, 0, 460, 212
@@ -517,8 +519,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,9,7,3
- PRODUCTVERSION 0,9,7,3
+ FILEVERSION 0,9,8,1
+ PRODUCTVERSION 0,9,8,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -535,15 +537,15 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.sourceforge.net\0"
             VALUE "CompanyName", "Dominik Reichl\0"
-            VALUE "FileDescription", "KeePass Password Safe v0.97c\0"
-            VALUE "FileVersion", "0, 9, 7, 3\0"
+            VALUE "FileDescription", "KeePass Password Safe v0.98a\0"
+            VALUE "FileVersion", "0, 9, 8, 1\0"
             VALUE "InternalName", "PwSafe\0"
             VALUE "LegalCopyright", "Copyright (c) 2003/2004 Dominik Reichl\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "KeePass.exe\0"
             VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "KeePass Password Safe v0.97c\0"
-            VALUE "ProductVersion", "0, 9, 7, 3\0"
+            VALUE "ProductName", "KeePass Password Safe v0.98a\0"
+            VALUE "ProductVersion", "0, 9, 8, 1\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -585,7 +587,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 345
         TOPMARGIN, 7
-        BOTTOMMARGIN, 122
+        BOTTOMMARGIN, 133
     END
 
     IDD_ADDENTRY_DLG, DIALOG
@@ -710,14 +712,14 @@ BEGIN
         MENUITEM "Print Pre&view...",           ID_FILE_PRINTPREVIEW
         MENUITEM "&Print Complete Password List", ID_FILE_PRINT
         MENUITEM SEPARATOR
-        POPUP "Export To"
+        POPUP "&Export To"
         BEGIN
             MENUITEM "&TXT File...",                ID_EXPORT_TXT
             MENUITEM "&HTML File...",               ID_EXPORT_HTML
             MENUITEM "&XML File...",                ID_EXPORT_XML
             MENUITEM "&CSV File...",                ID_EXPORT_CSV
         END
-        POPUP "Import From"
+        POPUP "&Import From"
         BEGIN
             MENUITEM "&CSV File...",                ID_IMPORT_CSV
             MENUITEM "Code&Wallet TXT File...",     ID_IMPORT_CWALLET
@@ -726,7 +728,7 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "&Lock Workspace",             ID_FILE_LOCK
-        MENUITEM "&Exit",                       ID_FILE_EXIT
+        MENUITEM "E&xit",                       ID_FILE_EXIT
     END
     POPUP "&Edit"
     BEGIN
@@ -741,16 +743,16 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Main Window &Always On Top",  ID_VIEW_ALWAYSONTOP, CHECKED
         MENUITEM SEPARATOR
-        MENUITEM "Hide UserNames Behind &Asterisks (***)", ID_VIEW_HIDEUSERS
+        MENUITEM "Hide &UserNames Behind Asterisks (***)", ID_VIEW_HIDEUSERS
         , CHECKED
-        MENUITEM "&Hide Passwords Behind Asterisks (***)", ID_VIEW_HIDESTARS
+        MENUITEM "Hide &Passwords Behind Asterisks (***)", ID_VIEW_HIDESTARS
         , CHECKED
         MENUITEM SEPARATOR
         POPUP "Auto-&Sort Password List"
         BEGIN
-            MENUITEM "&No Auto-Sort",               ID_VIEW_AUTOSORT_NOSORT
+            MENUITEM "N&o Auto-Sort",               ID_VIEW_AUTOSORT_NOSORT
             MENUITEM SEPARATOR
-            MENUITEM "&Sort List By Title",         ID_VIEW_AUTOSORT_TITLE
+            MENUITEM "Sort List By &Title",         ID_VIEW_AUTOSORT_TITLE
             MENUITEM "Sort List By User&Name",      ID_VIEW_AUTOSORT_USER
             MENUITEM "Sort List By &URL",           ID_VIEW_AUTOSORT_URL
             MENUITEM "Sort List By &Password",      ID_VIEW_AUTOSORT_PASSWORD
@@ -776,13 +778,13 @@ BEGIN
             MENUITEM "Show &URL Column",            ID_VIEW_URL, CHECKED
             MENUITEM "Show &Password Column",       ID_VIEW_PASSWORD
             , CHECKED
-            MENUITEM "Show &Notes Column",          ID_VIEW_NOTES, CHECKED
+            MENUITEM "Show Note&s Column",          ID_VIEW_NOTES, CHECKED
             MENUITEM SEPARATOR
             MENUITEM "Show &Creation Time Column",  ID_VIEW_CREATION
             , CHECKED
             MENUITEM "Show Last &Modification Time Column", ID_VIEW_LASTMOD
             , CHECKED
-            MENUITEM "Show Last Access &Time Column", ID_VIEW_LASTACCESS
+            MENUITEM "Show &Last Access Time Column", ID_VIEW_LASTACCESS
             , CHECKED
             MENUITEM "Show &Expire Time Column",    ID_VIEW_EXPIRE, CHECKED
             MENUITEM SEPARATOR
@@ -791,7 +793,7 @@ BEGIN
             MENUITEM "Show &Attachment Column",     ID_VIEW_ATTACH, CHECKED
         END
     END
-    POPUP "&Extras"
+    POPUP "E&xtras"
     BEGIN
         MENUITEM "Password &Generator",         ID_EXTRAS_GENPW
         MENUITEM "&TAN Wizard",                 ID_EXTRAS_TANWIZARD
@@ -800,9 +802,9 @@ BEGIN
     END
     POPUP "&?"
     BEGIN
-        MENUITEM "Visit KeePass &Homepage",     ID_INFO_HOMEPAGE
+        MENUITEM "Visit &KeePass Homepage",     ID_INFO_HOMEPAGE
         MENUITEM SEPARATOR
-        MENUITEM "Open &ReadMe File",           ID_INFO_README
+        MENUITEM "Open &Help File",             ID_INFO_README
         MENUITEM "Open &License File",          ID_INFO_LICENSE
         MENUITEM "&Print License File",         ID_INFO_PRINTLICENSE
         MENUITEM SEPARATOR
@@ -820,6 +822,8 @@ BEGIN
         MENUITEM "Open &URL(s)",                ID_PWLIST_VISITURL
         MENUITEM "&Save Attached File To...",   ID_PWLIST_SAVEATTACH
         MENUITEM SEPARATOR
+        MENUITEM "Perform Auto-&Type",          ID_PWLIST_AUTOTYPE
+        MENUITEM SEPARATOR
         MENUITEM "&Add Entry...",               ID_PWLIST_ADD
         MENUITEM "&Edit/View Entry...",         ID_PWLIST_EDIT
         MENUITEM "Dupli&cate Entry",            ID_PWLIST_DUPLICATE
@@ -828,7 +832,7 @@ BEGIN
         MENUITEM "Se&lect All",                 ID_PWLIST_SELECTALL
         MENUITEM SEPARATOR
         MENUITEM "&Find In Database...",        ID_PWLIST_FIND
-        MENUITEM "Find In This &Group...",      ID_PWLIST_FINDINGROUP
+        MENUITEM "Find In T&his Group...",      ID_PWLIST_FINDINGROUP
         MENUITEM SEPARATOR
         POPUP "&Rearrange"
         BEGIN
@@ -837,7 +841,7 @@ BEGIN
             MENUITEM "Mo&ve Entry One Down",        ID_PWLIST_MOVEDOWN
             MENUITEM "Move Entry To &Bottom",       ID_PWLIST_MOVEBOTTOM
             MENUITEM SEPARATOR
-            MENUITEM "&Sort List By Title",         ID_PWLIST_SORT_TITLE
+            MENUITEM "Sort List By &Title",         ID_PWLIST_SORT_TITLE
             MENUITEM "Sort List By User&Name",      ID_PWLIST_SORT_USER
             MENUITEM "Sort List By &URL",           ID_PWLIST_SORT_URL
             MENUITEM "Sort List By &Password",      ID_PWLIST_SORT_PASSWORD
@@ -858,10 +862,10 @@ IDR_GROUPLIST_MENU MENU DISCARDABLE
 BEGIN
     POPUP "Submenu"
     BEGIN
-        MENUITEM "&Add Password Group...",      ID_SAFE_ADDGROUP
-        MENUITEM "Add Password &Subgroup...",   ID_SAFE_ADDSUBGROUP
+        MENUITEM "Add Password &Group...",      ID_SAFE_ADDGROUP
+        MENUITEM "Add Password Su&bgroup...",   ID_SAFE_ADDSUBGROUP
         MENUITEM SEPARATOR
-        MENUITEM "&Modify Password Group...",   ID_SAFE_MODIFYGROUP
+        MENUITEM "Modif&y Password Group...",   ID_SAFE_MODIFYGROUP
         MENUITEM "&Delete Password Group...",   ID_SAFE_REMOVEGROUP
         MENUITEM SEPARATOR
         POPUP "&Rearrange"
@@ -877,8 +881,10 @@ BEGIN
             MENUITEM "&Sort Group List",            ID_GROUP_SORT
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Print Group",                ID_SAFE_PRINTGROUP
-        POPUP "Export To"
+        MENUITEM "Find In T&his Group...",      ID_PWLIST_FINDINGROUP
+        MENUITEM SEPARATOR
+        MENUITEM "Pr&int Group",                ID_SAFE_PRINTGROUP
+        POPUP "&Export To"
         BEGIN
             MENUITEM "Export Group To &TXT...",     ID_SAFE_EXPORTGROUP_TXT
             MENUITEM "Export Group To &HTML...",    ID_SAFE_EXPORTGROUP_HTML
@@ -902,7 +908,7 @@ BEGIN
         MENUITEM "&About KeePass...",           ID_INFO_ABOUT
         MENUITEM SEPARATOR
         MENUITEM "&Lock/Unlock Workspace",      ID_FILE_LOCK
-        MENUITEM "&Exit",                       ID_FILE_EXIT
+        MENUITEM "E&xit",                       ID_FILE_EXIT
     END
 END
 
@@ -919,6 +925,29 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Copy &All",                   ID_RE_COPYALL
         MENUITEM "&Select All",                 ID_RE_SELECTALL
+    END
+END
+
+IDR_COLVIEW_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "Submenu"
+    BEGIN
+        MENUITEM "Show &Title Column",          ID_VIEW_TITLE, CHECKED
+        MENUITEM "Show User&Name Column",       ID_VIEW_USERNAME, CHECKED
+        MENUITEM "Show &URL Column",            ID_VIEW_URL, CHECKED
+        MENUITEM "Show &Password Column",       ID_VIEW_PASSWORD, CHECKED
+        MENUITEM "Show Note&s Column",          ID_VIEW_NOTES, CHECKED
+        MENUITEM SEPARATOR
+        MENUITEM "Show &Creation Time Column",  ID_VIEW_CREATION, CHECKED
+        MENUITEM "Show Last &Modification Time Column", ID_VIEW_LASTMOD
+        , CHECKED
+        MENUITEM "Show &Last Access Time Column", ID_VIEW_LASTACCESS
+        , CHECKED
+        MENUITEM "Show &Expire Time Column",    ID_VIEW_EXPIRE, CHECKED
+        MENUITEM SEPARATOR
+        MENUITEM "Show UU&ID Column",           ID_VIEW_UUID, CHECKED
+        MENUITEM SEPARATOR
+        MENUITEM "Show &Attachment Column",     ID_VIEW_ATTACH, CHECKED
     END
 END
 
@@ -1016,6 +1045,7 @@ BEGIN
     BUTTON      ID_EXTRAS_SHOWEXPIRED
     BUTTON      ID_IMPORT_PVAULT
     BUTTON      ID_SAFE_EXPORTGROUP_TXT
+    BUTTON      ID_PWLIST_AUTOTYPE
 END
 
 IDR_CLIENTICONS TOOLBAR DISCARDABLE  16, 16
@@ -1111,7 +1141,9 @@ BEGIN
     "E",            ID_PWLIST_EDIT,         VIRTKEY, CONTROL, NOINVERT
     "F",            ID_PWLIST_FIND,         VIRTKEY, CONTROL, NOINVERT
     "G",            ID_SAFE_ADDGROUP,       VIRTKEY, CONTROL, NOINVERT
+    "H",            ID_VIEW_HIDESTARS,      VIRTKEY, CONTROL, NOINVERT
     "I",            ID_FILE_SHOWDBINFO,     VIRTKEY, CONTROL, NOINVERT
+    "J",            ID_VIEW_HIDEUSERS,      VIRTKEY, CONTROL, NOINVERT
     "K",            ID_PWLIST_DUPLICATE,    VIRTKEY, CONTROL, NOINVERT
     "L",            ID_FILE_LOCK,           VIRTKEY, CONTROL, NOINVERT
     "M",            ID_SAFE_OPTIONS,        VIRTKEY, CONTROL, NOINVERT
@@ -1121,7 +1153,9 @@ BEGIN
     "Q",            ID_FILE_CLOSE,          VIRTKEY, CONTROL, NOINVERT
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
     "U",            ID_PWLIST_VISITURL,     VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_PWLIST_AUTOTYPE,     VIRTKEY, CONTROL, NOINVERT
     VK_F1,          ID_INFO_README,         VIRTKEY, NOINVERT
+    VK_F1,          ID_INFO_README,         VIRTKEY, ALT, NOINVERT
     "X",            ID_FILE_EXIT,           VIRTKEY, CONTROL, NOINVERT
     "Y",            ID_PWLIST_ADD,          VIRTKEY, CONTROL, NOINVERT
     "Z",            ID_EXTRAS_GENPW,        VIRTKEY, CONTROL, NOINVERT

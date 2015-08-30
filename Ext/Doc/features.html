@@ -1,0 +1,193 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Features</title>
+	<link rel="stylesheet" type="text/css" href="default.css" />
+</head>
+<body>
+
+<table class="tablebox"><tr><td class="boxtitle">
+<img src="images/movepaper.gif" width="31px" height="21px" class="singleimg">
+KeePass Password Safe</td></tr></table>
+<br />
+Here are the "selling points" of KeePass. To get a first impression, you can also have a
+look at some of the <a href="screenshots.php">screenshots</a>.<br>
+
+<ul>
+<li><a href="#lnkAES">Highly encrypted databases</a></li>
+<li><a href="#lnkKeys">Support of master passwords and key-disks</a></li>
+<li><a href="#lnkAllWin">Runs on all Windows operating systems and doesn't need to be installed</a></li>
+<li><a href="#lnkExp">Export password list to TXT, HTML, XML or CSV files</a></li>
+<li><a href="#lnkImp">Import from CSV, CodeWallet(Pro) TXT and Password Safe v2 TXT files</a></li>
+<li><a href="#lnkTrans">Easy database transfer</a></li>
+<li><a href="#lnkGroups">Support of password groups</a></li>
+<li><a href="#lnkTimes">Time fields support</a></li>
+<li><a href="#lnkDragDrop">Drag-n-Drop support</a></li>
+<li><a href="#lnkFastCopy">Fast copy fields to the Windows clipboard</a></li>
+<li><a href="#lnkSearch">Searching and sorting</a></li>
+<li><a href="#lnkMultiLang">Multi-language translation support</a></li>
+<li><a href="#lnkRandGen">Strong random password generator</a></li>
+<li><a href="#lnkMemory">Low memory requirement</a></li>
+<li><a href="#lnkOpenSrc">Open-Source!</a></li>
+</ul>
+<br>
+
+<a name="lnkAES"></a>
+<b>Highly encrypted databases</b>
+<ul><li>KeePass supports the Advanced Encryption Standard (AES) and the Twofish algorithms to encrypt its password databases.</li>
+<li>Both ciphers are regarded as very secure by the cryptography community. Banks are using these algorithms, too.</li>
+<li>Even if you would use all computers in the world to attack
+one database, decrypting it would take longer than the age of the universe.</li>
+<li>Even quantum computers won't help that much. The algorithms are symmetric so its complexity would
+be reduced a bit, anyway, the sun will go nova before you have decrypted the database.</li>
+<li>The complete database is encrypted, not only the password fields. So your usernames, notes, etc. are hidden, too.</li>
+<li>SHA-256 is used as password hash. SHA-256 is a 256-bit cryptographically secure one-way hash
+function. Your master password is hashed using this algorithm and its output is used as key for
+the encryption algorithms (AES and Twofish).</li>
+<li>SHA-256 is based on the design of SHA-1 (160-bit), its precedessor. No attacks are known
+against SHA-1 and the SHA-2 familiy (256-, 384- and 512-bits), in contrast to many other algorithms
+like MD5 or MD4.</li>
+<li>In-memory protection: your passwords are encrypted while KeePass is running, so even if Windows caches the KeePass
+process to disk, this wouldn't reveal the passwords anyway.</li>
+<li>Also see the <a href="infosec.php">security information page</a>.</li>
+</ul><br>
+
+<a name="lnkKeys"></a>
+<b>Support of master passwords and key-disks</b>
+<ul>
+<li>One master password decrypts the complete database.</li>
+<li>Alternatively you can use key-disks. Key-disks provide better security than
+master passwords in most cases. You only have to carry the key-file with you, for example
+on a floppy disk, or you can burn it on CD. Of course, you shouldn't lose this disk then.</li>
+<li>Also see <a href="infokeys.php">keys information page</a>.</li>
+</ul><br>
+
+<a name="lnkAllWin"></a>
+<b>Runs on all Windows operating systems and doesn't need to be installed</b>
+<ul>
+<li>KeePass doesn't, in contrast to many other applications, use any functions that require
+the latest Windows operating system, such like theming on XP or like a .NET application requiring a .NET
+framework.</li>
+<li>The application doesn't need to be installed. The KeePass development team provides you
+an installer which automates creating links in the startmenu etc., but you also can download
+the binary zip package which contains only the main executable, which runs fine without installing
+anything.</li>
+<li>KeePass doesn't store anything on your system. The program doesn't create any new
+registry keys and it doesn't create any initialization files (ini) in your Windows directory.
+Deleting the KeePass directory (in case you downloaded the binary zip package) or using the
+uninstaller (in case you downloaded the installer package) leaves no trace of KeePass on your
+system.</li>
+<li>KeePass runs, without downloading any additional libraries, on Windows 95, 98, 98SE,
+ME, NT, 2000, XP, 2003</li>
+<li><img class="singleimg" src="images/winall.gif" /><sup>1</sup></li>
+<li>Even a 100% compatible version for the PocketPC is available (visit
+<a href="http://doncho.net/kppc/" target="_blank">KeePass PocketPC page</a>).</li>
+</ul><br>
+
+<a name="lnkExp"></a>
+<b>Export password list to TXT, HTML, XML or CSV files</b>
+<ul>
+<li>The password list can be exported to various formats like TXT, HTML, XML and CSV.</li>
+<li>The XML output can be easily used in other applications.</li>
+<li>The CSV output is fully compatible with most other password safes like the commercial
+closed-source Password Keeper and the closed-source Password Agent, also the CSVs
+can be imported in spreadsheet applications like Microsofts Excel or OpenOffice's Calc.</li>
+<li>The HTML output uses cascading style sheets (CSS) to format the table, so you can
+easily change the layout.</li>
+</ul><br>
+
+<a name="lnkImp"></a>
+<b>Import from CSV, CodeWallet(Pro) TXT and Password Safe v2 TXT files</b>
+<ul>
+<li>KeePass uses the common CSV export format of various passwords safes like Password Keeper and
+Password Agent. Exports from these programs can be easily imported to your KeePass databases.</li>
+<li>KeePass can parse and import TXT outputs of CodeWalletPro, a commercial closed-source password safe.</li>
+<li>KeePass can import TXT files created by Bruce Schneier's Password Safe v2.</li>
+</ul><br>
+
+<a name="lnkTrans"></a>
+<b>Easy database transfer</b>
+<ul>
+<li>A database consists of only one file that can be transferred from one computer to another easily.</li>
+</ul><br>
+
+<a name="lnkGroups"></a>
+<b>Support of password groups</b>
+<ul>
+<li>You can create, modify and delete groups, in which passwords can be sorted in.</li>
+<li>The groups can be arranged as a tree, so a group can have subgroups, those subgroups can have
+subgroups themselves, etc.</li>
+<li>Also see <a href="viewimg.php?imgpath=screenshots/main_big.jpg">this screenshot</a>.</li>
+</ul><br>
+
+<a name="lnkTimes"></a>
+<b>Time fields support</b>
+<ul>
+<li>KeePass supports time fields: creation time, last modification time, last access time and
+expiration time.</li>
+</ul><br>
+
+<a name="lnkDragDrop"></a>
+<b>Drag-n-drop support</b>
+<ul>
+<li>All fields, title, username, password, URL and notes can be drag-n-dropped into other
+windows.</li>
+</ul><br>
+
+<a name="lnkFastCopy"></a>
+<b>Fast copy fields to the Windows clipboard</b>
+<ul>
+<li>Just double-click on any field to copy it to the Windows clipboard.</li>
+</ul><br>
+
+<a name="lnkSearch"></a>
+<b>Searching and sorting</b>
+<ul>
+<li>You can search for specific entries in the databases.</li>
+<li>To sort a password group, just click on one of the column headers in the password list, you can
+sort by any column.</li>
+</ul><br>
+
+<a name="lnkMultiLang"></a>
+<b>Multi-language translation support</b>
+<ul>
+<li>KeePass can be translated into other languages very easily.</li>
+<li>Currently 12 different languages are available.</li>
+<li>See the <a href="translations.php">translations page</a>.</li>
+</ul><br>
+
+<a name="lnkRandGen"></a>
+<b>Strong random password generator</b>
+<ul>
+<li>KeePass can generate strong random passwords for you.</li>
+<li>You can define the possible output characters of the generator (number of characters and type).</li>
+<li>Random seeding through user input: mouse movement and random keyboard input.</li>
+</ul><br>
+
+<a name="lnkMemory"></a>
+<b>Low memory requirement</b>
+<ul>
+<li>KeePass uses very few memory, only the memory really needed is allocated.</li>
+<li>No unnecessary memory- and cpu-consuming things like any animations are used.</li>
+</ul><br>
+
+<a name="lnkOpenSrc"></a>
+<b>Open-Source!</b>
+<ul>
+<li>KeePass free and you have full access to its source code!</li>
+<li>Open-Source prevents from backdoors. You can have a look at its source code and
+compile it yourself.</li>
+<li>You can yourself check if the security is implemented correctly, you can, if you want,
+use any other encryption algorithm.</li>
+<li>Opening the sources also encourages other people to port the application to
+other systems (PocketPC version already in development) or write translations.</li>
+<li>KeePass is OSI Certified Open Source Software. OSI Certified is a certification mark of the Open Source Initiative.</li>
+<li><img class="singleimg" src="images/osi-certified-72x60.gif" /></li>
+</ul>
+
+<br><br><br>
+<small><sup>1</sup> The Windows logo and "Windows" are trademarks and are copyright &copy; Microsoft Corporation.</small>
+
+</body>
+</html>

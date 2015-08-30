@@ -46,6 +46,10 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+#pragma warning(push)
+// Cast truncates constant value
+#pragma warning(disable: 4310)
+
 /////////////////////////////////////////////////////////////////////////////
 
 CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
@@ -215,8 +219,9 @@ BOOL CAddEntryDlg::OnInitDialog()
 	}
 
 	// 'z' + 27 is that black dot in Tahoma
-	CString strStars = (TCHAR)(_T('z') + 27);
-	strStars += (TCHAR)(_T('z') + 27); strStars += (TCHAR)(_T('z') + 27);
+	TCHAR tchDot = (TCHAR)(_T('z') + 27);
+	CString strStars = _T("");
+	strStars += tchDot; strStars += tchDot; strStars += tchDot;
 	GetDlgItem(IDC_CHECK_HIDEPW)->SetWindowText(strStars);
 
 	// Configure link edit control
@@ -278,11 +283,19 @@ BOOL CAddEntryDlg::OnInitDialog()
 	if(m_strTitle == PWS_TAN_ENTRY)
 	{
 		GetDlgItem(IDC_EDIT_TITLE)->EnableWindow(FALSE);
+		GetDlgItem(IDC_EDIT_USERNAME)->EnableWindow(FALSE);
+		GetDlgItem(IDC_EDIT_URL)->EnableWindow(FALSE);
+		GetDlgItem(IDC_RANDOMPW_BTN)->EnableWindow(FALSE);
+		GetDlgItem(IDC_PICKICON_BTN)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_PASSWORD)->SetFocus();
 	}
 	else
 	{
 		GetDlgItem(IDC_EDIT_TITLE)->EnableWindow(TRUE);
+		GetDlgItem(IDC_EDIT_USERNAME)->EnableWindow(TRUE);
+		GetDlgItem(IDC_EDIT_URL)->EnableWindow(TRUE);
+		GetDlgItem(IDC_RANDOMPW_BTN)->EnableWindow(TRUE);
+		GetDlgItem(IDC_PICKICON_BTN)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT_TITLE)->SetFocus();
 	}
 
@@ -359,8 +372,9 @@ void CAddEntryDlg::OnCheckHidePw()
 	}
 	else
 	{
-		m_pEditPw.SetPasswordChar((TCHAR)(_T('z') + 27));
-		m_pRepeatPw.SetPasswordChar((TCHAR)(_T('z') + 27));
+		TCHAR tchDot = (TCHAR)(_T('z') + 27);
+		m_pEditPw.SetPasswordChar(tchDot);
+		m_pRepeatPw.SetPasswordChar(tchDot);
 	}
 
 	UpdateData(FALSE);
@@ -593,3 +607,5 @@ void CAddEntryDlg::OnChangeEditPassword()
 	m_pEditPw.GetWindowText(m_strPassword);
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), (LPCTSTR)m_strPassword);
 }
+
+#pragma warning(pop)

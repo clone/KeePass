@@ -98,7 +98,7 @@ public:
 	CString _MakeRtfString(LPCTSTR lptString);
 	void ShowEntryDetails(PW_ENTRY *p);
 
-	HTREEITEM _GetLastVisibleItem(CTreeCtrl *pTree);
+	HTREEITEM _GetLastGroupItem(CTreeCtrl *pTree);
 	void GroupSyncStates(BOOL bGuiToMgr = TRUE);
 
 	HTREEITEM _GroupIdToHTreeItem(DWORD dwGroupId);
@@ -168,6 +168,8 @@ public:
 	BOOL m_bMenu; // Menu created?
 
 	BCMenu m_popmenu;
+	BCMenu m_menuColView;
+	CToolTipCtrl m_tip;
 
 	CImageList m_ilIcons;
 	CFont m_fListFont;
@@ -196,6 +198,8 @@ public:
 
 	BOOL m_bHashValid;
 	BYTE m_aHashOfFile[32];
+
+	UINT m_uACP;
 
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
@@ -305,6 +309,8 @@ protected:
 
 	void _UpdateToolBar();
 	void _ShowToolBar(BOOL bShow = TRUE);
+	void _EnableViewMenuItems(BCMenu *pMenu);
+	void _UpdateGuiToManager();
 
 	void _TouchGroup(DWORD dwGroupId, BOOL bEdit);
 	void _TouchEntry(DWORD dwListIndex, BOOL bEdit);
@@ -315,6 +321,7 @@ protected:
 	void _FinishDragging(BOOL bDraggingImageList);
 
 	void _SortList(DWORD dwByField, BOOL bAutoSortCall = FALSE);
+	BOOL _CheckIfCanSort();
 
 	HTREEITEM _FindSelectInTree(CTreeCtrl *pTree, HTREEITEM hRoot, DWORD dwGroupId);
 
@@ -460,7 +467,6 @@ protected:
 	afx_msg void OnImportCsv();
 	afx_msg void OnUpdateImportCsv(CCmdUI* pCmdUI);
 	afx_msg void OnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnColumnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnImportCWallet();
 	afx_msg void OnUpdateImportCWallet(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateFileNew(CCmdUI* pCmdUI);
@@ -552,6 +558,9 @@ protected:
 	afx_msg void OnViewAutosortUrl();
 	afx_msg void OnViewAutosortUser();
 	afx_msg void OnUpdateSafeOptions(CCmdUI* pCmdUI);
+	afx_msg void OnPwlistAutoType();
+	afx_msg void OnUpdatePwlistAutoType(CCmdUI* pCmdUI);
+	afx_msg void OnColumnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

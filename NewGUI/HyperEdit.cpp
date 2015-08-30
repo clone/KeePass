@@ -276,7 +276,7 @@ void CHyperEdit::SetFontUnderline(CFont* pFont, BOOL bUnderline) const
   LOGFONT lf;
   if (! pFont->GetLogFont(&lf))
     return;
-  lf.lfUnderline = bUnderline ? 1 : 0;
+  lf.lfUnderline = (BYTE)(bUnderline ? 1 : 0);
   pFont->Detach();
   pFont->CreateFontIndirect(&lf);
 }
@@ -328,6 +328,8 @@ BOOL CHyperEdit::OnChange()
 // re-colour the text depending on the current states
 HBRUSH CHyperEdit::CtlColor(CDC* pDC, UINT nCtlColor) 
 {
+  UNREFERENCED_PARAMETER(nCtlColor);
+
   if (! m_bLink)
     return NULL;
   if (m_bHovering && m_crHover != (COLORREF)-1)

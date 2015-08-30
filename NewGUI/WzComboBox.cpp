@@ -204,7 +204,7 @@ WORD CWzComboBox::AddCTString(WORD wParentIdx,BYTE cType,LPCTSTR lpszString)
 		idx = CComboBox::InsertString(pos,lpszString);//InsertString is not a virtual function
 		LPITEMDATA pData = new ITEMDATA;
 		ASSERT(pData != NULL);
-		pData->cLevel = pParentData->cLevel + (unsigned char)1;
+		pData->cLevel = (unsigned char)(pParentData->cLevel + 1);
 		pData->cType = cType;
 		pData->wOriginIdx = (WORD)idx;
 		pData->wParentOriginIdx = pParentData->wOriginIdx;

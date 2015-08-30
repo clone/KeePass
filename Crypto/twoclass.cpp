@@ -90,12 +90,12 @@ int CTwofish::padEncrypt(RD_UINT8 *pInput, int nInputOctets, RD_UINT8 *pOutBuffe
 
 	for (i = 0; i < 16 - padLen; i++)
 	{
-		block[i] = pInput[i] ^ iv[i];
+		block[i] = (RD_UINT8)(pInput[i] ^ iv[i]);
 	}
 
 	for (i = 16 - padLen; i < 16; i++)
 	{
-		block[i] = (RD_UINT8)padLen ^ iv[i];
+		block[i] = (RD_UINT8)((RD_UINT8)padLen ^ iv[i]);
 	}
 
 	Twofish_encrypt(&m_key, (Twofish_Byte *)block, (Twofish_Byte *)pOutBuffer);

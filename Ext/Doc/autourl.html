@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Auto-complete URLs feature</title>
+	<link rel="stylesheet" type="text/css" href="default.css" />
+</head>
+<body>
+
+<table class="tablebox"><tr><td class="boxtitle">
+<img src="images/movepaper.gif" width="31px" height="21px" class="singleimg">
+URLs Field Capabilities</td></tr></table>
+<br />
+Index:
+<ul>
+<li><a href="#stdcp" target="_self">Standard capabilities</a></li>
+<li><a href="#cmdln" target="_self">Executing command-lines</a></li>
+<li><a href="#subst" target="_self">Substitutions</a></li>
+</ul>
+<br />
+
+<a name="stdcp"></a>
+<table class="tablebox"><tr><td class="boxtitle">
+&nbsp;Standard Capabilities</td></tr></table>
+<br />
+The URL field can execute any valid URL, for which you have defined a protocol handler. On most
+systems at least the http://, ftp:// and mailto: protocols are defined, but KeePass supports
+all registered protocols the Internet Explorer supports.<br />
+<br />
+So, if you globally (i.e. using the Windows Explorer) register PuTTY for ssh:// URLs,
+KeePass will automatically use PuTTY for ssh:// URLs, too. KeePass uses the same
+settings as the Windows and Internet Explorer does.<br />
+<br /><br />
+
+<a name="cmdln"></a>
+<table class="tablebox"><tr><td class="boxtitle">
+&nbsp;Executing command-lines</td></tr></table>
+<br />
+Instead of an URL, you can also execute command-lines. To tell KeePass that the data you entered
+is a command-line, prefix it using cmd://. So, if you would like to execute
+Notepad, your URL could look like this:<br />
+<br />
+<b>cmd://C:\WinNT\Notepad.exe C:\Test\MyTestFile.txt</b><br />
+<br />
+The virtual cmd:// protocol also supports parameters for executed applications, in contrast to
+the file:// protocol. This was the main reason why cmd:// was introduced, with file:// you
+aren't able to pass any parameters to started applications.<br />
+<br /><br />
+
+<a name="subst"></a>
+<table class="tablebox"><tr><td class="boxtitle">
+&nbsp;Substitutions</td></tr></table>
+<br />
+In the URL field, you can use several special strings that will get automatically replaced
+when the URL is executed. An example:<br />
+<br />
+<b>http://www.yoursite.com/default.php?user=%USERNAME%&pass=%PASSWORD%</b><br />
+<br />
+For this entry, KeePass will replace %USERNAME% by the data of the username field and %PASSWORD%
+by the data in the password field when you execute the link.<br />
+<br />
+The following substitutions are available:<br />
+<br />
+<center><table class="tablebox75">
+<tr><td class="smallboxtitle" width="50%">Field</td><td class="smallboxtitle" width="50%">Code</td></tr>
+<tr><td class="boxcontent" width="50%">Title field</td><td class="boxcontent" width="50%">{TITLE} or %TITLE%</td></tr>
+<tr><td class="boxcontent" width="50%">Username field</td><td class="boxcontent" width="50%">{USERNAME} or %USERNAME%</td></tr>
+<tr><td class="boxcontent" width="50%">URL field</td><td class="boxcontent" width="50%">{URL} or %URL%</td></tr>
+<tr><td class="boxcontent" width="50%">Password field</td><td class="boxcontent" width="50%">{PASSWORD} or %PASSWORD%</td></tr>
+<tr><td class="boxcontent" width="50%">Notes field</td><td class="boxcontent" width="50%">{NOTES} or %NOTES%</td></tr>
+</table></center>
+<br /><br />
+
+</body>
+</html>
+

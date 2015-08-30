@@ -149,6 +149,7 @@ void FixURL(CString *pstrURL)
 	if(strTemp.Left(9) == "prospero:") bPre = TRUE;
 	if(strTemp.Left(7) == "telnet:") bPre = TRUE;
 	if(strTemp.Left(5) == "wais:") bPre = TRUE;
+	if(strTemp.Left(4) == "cmd:") bPre = TRUE;
 
 	if(bPre == FALSE) // The string isn't a valid URL, so assume it's a HTTP
 	{
@@ -292,8 +293,7 @@ UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 	const WCHAR *pUni = NULL;
 	WCHAR *pUniBuffer = NULL;
 
-	ASSERT(pszSourceString != NULL);
-	if(pszSourceString == NULL) return NULL;
+	ASSERT(pszSourceString != NULL); if(pszSourceString == NULL) return NULL;
 
 #ifdef _UNICODE
 	dwLength = lstrlen(pszSourceString) + 1; // In order to be compatible with the code below, add 1 for the zero at the end of the buffer
@@ -398,7 +398,7 @@ DWORD _UTF8BytesNeeded(const TCHAR *pszString)
 #ifdef _UNICODE
 		us = (USHORT)pszString[i];
 #else
-		us = ((USHORT)((BYTE)pszString[i])) & 0x00FF;
+		us = (USHORT)(((USHORT)((BYTE)pszString[i])) & 0x00FF);
 #endif
 
 		if(us == 0) break;
@@ -499,7 +499,7 @@ TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 #endif
 }
 
-void ParseURL(CString *pString, PW_ENTRY *pEntry)
+void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString)
 {
 	CString str;
 	int nPos;
@@ -512,29 +512,61 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry)
 	while(1)
 	{
 		nPos = str.Find(_T("%TITLE%"));
+		if(nPos == -1) nPos = str.Find(_T("{TITLE}"));
 		if(nPos == -1) break;
-		str = str.Left(nPos) + pEntry->pszTitle + str.Right(str.GetLength() - nPos - 7);
+
+		if(bMakeSimString == FALSE)
+			str = str.Left(nPos) + pEntry->pszTitle + str.Right(str.GetLength() - nPos - 7);
+		else
+			str = str.Left(nPos) + TagSimString(pEntry->pszTitle) + str.Right(str.GetLength() - nPos - 7);
 	}
 
 	while(1)
 	{
 		nPos = str.Find(_T("%USERNAME%"));
+		if(nPos == -1) nPos = str.Find(_T("{USERNAME}"));
 		if(nPos == -1) break;
-		str = str.Left(nPos) + pEntry->pszUserName + str.Right(str.GetLength() - nPos - 10);
+
+		if(bMakeSimString == FALSE)
+			str = str.Left(nPos) + pEntry->pszUserName + str.Right(str.GetLength() - nPos - 10);
+		else
+			str = str.Left(nPos) + TagSimString(pEntry->pszUserName) + str.Right(str.GetLength() - nPos - 10);
+	}
+
+	while(1)
+	{
+		nPos = str.Find(_T("%URL%"));
+		if(nPos == -1) nPos = str.Find(_T("{URL}"));
+		if(nPos == -1) break;
+
+		if(bMakeSimString == FALSE)
+			str = str.Left(nPos) + pEntry->pszURL + str.Right(str.GetLength() - nPos - 5);
+		else
+			str = str.Left(nPos) + TagSimString(pEntry->pszURL) + str.Right(str.GetLength() - nPos - 5);
 	}
 
 	while(1)
 	{
 		nPos = str.Find(_T("%PASSWORD%"));
+		if(nPos == -1) nPos = str.Find(_T("{PASSWORD}"));
 		if(nPos == -1) break;
-		str = str.Left(nPos) + pEntry->pszPassword + str.Right(str.GetLength() - nPos - 10);
+
+		if(bMakeSimString == FALSE)
+			str = str.Left(nPos) + pEntry->pszPassword + str.Right(str.GetLength() - nPos - 10);
+		else
+			str = str.Left(nPos) + TagSimString(pEntry->pszPassword) + str.Right(str.GetLength() - nPos - 10);
 	}
 
 	while(1)
 	{
 		nPos = str.Find(_T("%NOTES%"));
+		if(nPos == -1) nPos = str.Find(_T("{NOTES}"));
 		if(nPos == -1) break;
-		str = str.Left(nPos) + pEntry->pszAdditional + str.Right(str.GetLength() - nPos - 7);
+
+		if(bMakeSimString == FALSE)
+			str = str.Left(nPos) + pEntry->pszAdditional + str.Right(str.GetLength() - nPos - 7);
+		else
+			str = str.Left(nPos) + TagSimString(pEntry->pszAdditional) + str.Right(str.GetLength() - nPos - 7);
 	}
 
 	*pString = str;
@@ -655,7 +687,7 @@ CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile)
 	LPPATHRELATIVEPATHTO lpRel;
 	HINSTANCE hShl;
 	TCHAR tszPath[MAX_PATH * 2];
-	BOOL bResult;
+	BOOL bResult = FALSE;
 	CString str;
 	BOOL bMod;
 
@@ -678,8 +710,8 @@ CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile)
 	{
 		bResult = lpRel(tszPath, lpBaseFile, 0, lpTargetFile, 0);
 	}
-
 	FreeLibrary(hShl); hShl = NULL;
+	if(bResult == FALSE) return CString(lpTargetFile);
 
 	str = tszPath;
 	while(1) // Remove all .\\ from the left of the path
@@ -829,6 +861,7 @@ void OpenUrlEx(LPCTSTR lpURL)
 	ASSERT(lpURL != NULL); if(lpURL == NULL) return;
 
 	if(_tcslen(lpURL) == 0) return;
+
 	if(_tcsncmp(lpURL, _T("http://"), 7) == 0)
 	{
 		if(OpenUrlInNewBrowser(lpURL) == FALSE)
@@ -839,8 +872,80 @@ void OpenUrlEx(LPCTSTR lpURL)
 		if(OpenUrlInNewBrowser(lpURL) == FALSE)
 			ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
 	}
+	else if(_tcsncmp(lpURL, _T("cmd://"), 6) == 0)
+	{
+		if(_tcslen(lpURL) != 6)
+			WinExec(((LPCSTR)lpURL) + (6 * sizeof(TCHAR)), SW_SHOW);
+	}
 	else
 	{
 		ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
 	}
+}
+
+CString ExtractAutoTypeCmd(LPCTSTR lpstr)
+{
+	TCHAR *lp;
+	TCHAR tch;
+	CString str = _T("");
+	CString strSource;
+	int nPos;
+
+	ASSERT(lpstr != NULL); if(lpstr == NULL) return CString("");
+
+	strSource = lpstr;
+	strSource.MakeLower();
+	lp = (TCHAR *)lpstr;
+
+	nPos = strSource.Find("auto-type:", 0);
+	if(nPos != -1)
+	{
+		lp += _tcslen("auto-type:");
+		lp += nPos;
+
+		while(1)
+		{
+			tch = *lp;
+
+			if(tch == '\0') break;
+			else if(tch == '\n') break;
+			else if(tch == '\r') { }
+			else str += tch;
+
+			lp++;
+		}
+	}
+
+	str.TrimLeft(); str.TrimRight();
+	return str;
+}
+
+CString TagSimString(LPCTSTR lpString)
+{
+	int i;
+	CString str = _T("");
+	TCHAR tch;
+
+	ASSERT(lpString != NULL); if(lpString == NULL) return str;
+
+	for(i = 0; i < (int)_tcslen(lpString); i++)
+	{
+		tch = lpString[i];
+
+		switch(tch)
+		{
+			case _T('+'): str += _T("{PLUS}"); break;
+			case _T('@'): str += _T("{AT}"); break;
+			case _T('^'): str += _T("{CARET}"); break;
+			case _T('~'): str += _T("{TILDE}"); break;
+			case _T('%'): str += _T("{PERCENT}"); break;
+			case _T('{'): str += _T("{LEFTBRACE}"); break;
+			case _T('}'): str += _T("{RIGHTBRACE}"); break;
+			case _T('('): str += _T("{LEFTPAREN}"); break;
+			case _T(')'): str += _T("{RIGHTPAREN}"); break;
+			default: str += tch; break;
+		}
+	}
+
+	return str;
 }

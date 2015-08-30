@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Security Information</title>
+	<link rel="stylesheet" type="text/css" href="default.css" />
+</head>
+<body>
+
+<table class="tablebox"><tr><td class="boxtitle">
+<img src="images/menunews.gif" width="31px" height="21px" class="singleimg">
+Security Information</td></tr></table>
+<br />
+
+In this section I will tell you how the databases are encrypted. If you aren't a cryptographer and don't
+know anything in the security field you won't understand that much. In this case just believe
+me it's secure ;-)<br /><br />All databases are encrypted. Currently they are encrypted using
+the Advanced Encryption Standard (AES/Rijndael), a 128-bit block cipher, using a 256-bit
+key. I've chosen the CBC block cipher mode. A 128-bit initialization vector (IV) is generated randomly
+each time you save the database.<br /><br />In order to generate the 256-bit key for AES the secure hash
+algorithm SHA-256 (which belongs to the SHA-2 family) is used. The user key (the passphrase the user enters
+or the binary string in the key-file) plus a random salt is hashed using SHA-256. The random salt is
+generated randomly each time you save the database and saved in it.<br /><br />Each time you start KeePass,
+the program will perform a quick self-test where the AES/Rijndael cipher and the SHA-256 are tested against
+their correct test vectors.<br /><br />
+
+</body>
+</html>

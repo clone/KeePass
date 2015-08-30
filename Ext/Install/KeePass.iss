@@ -7,9 +7,9 @@
 ; The name of the application should remain consistent across languages
 #define CrossAppName "KeePass"
 #define CrossAppFullName "KeePass Password Safe"
-#define KeeVersion "0.97c"
+#define KeeVersion "0.98a"
 ; VersionInfo cannot contain letters, use 3rd number
-#define KeeVVersion "0.9.7.3"
+#define KeeVVersion "0.9.8.1"
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl; LicenseFile: License.txt
@@ -47,7 +47,7 @@ Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription
 
 [Files]
 Source: ..\..\Distrib\KeePass.exe; DestDir: {app}; Flags: ignoreversion
-Source: ..\..\Distrib\KeePass.html; DestDir: {app}; Flags: ignoreversion
+Source: ..\..\Distrib\KeePass.chm; DestDir: {app}; Flags: ignoreversion
 Source: ..\..\Distrib\KeePass.ini; DestDir: {app}; Flags: ignoreversion onlyifdoesntexist
 Source: ..\..\Distrib\License.html; DestDir: {app}; Flags: ignoreversion
 

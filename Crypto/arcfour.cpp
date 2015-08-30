@@ -45,7 +45,10 @@ void arcfourCrypt(BYTE *pBuf, unsigned long uBufLen, BYTE *pKey, unsigned long u
 	i = 0; j = 0; k = 0;
 	for(w = 0; w < 256; w++) // Key setup
 	{
+#pragma warning(push)
+#pragma warning(disable: 4244)
 		j += S[w] + (BYTE)(pKey[k] + (BYTE)((uBufLen & 0xFF) << 2));
+#pragma warning(pop)
 
 		t = S[i];
 		S[i] = S[j];
@@ -60,13 +63,16 @@ void arcfourCrypt(BYTE *pBuf, unsigned long uBufLen, BYTE *pKey, unsigned long u
 	for(w = 0; w < uBufLen; w++) // Generate random bytes and XOR with PT
 	{
 		i++;
+#pragma warning(push)
+#pragma warning(disable: 4244)
 		j += S[i];
+#pragma warning(pop)
 
 		t = S[i];
 		S[i] = S[j];
 		S[j] = t;
 
-		t = S[i] + S[j];
+		t = (BYTE)(S[i] + S[j]);
 		pBuf[w] ^= S[t];
 	}
 }

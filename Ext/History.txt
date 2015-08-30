@@ -1,3 +1,39 @@
+04/11/21 - 0.98a
+- Implemented auto-type feature (KeePass can minimize itself
+  and type the username and password of the currently selected
+  entry into dialogs, webforms, etc.)
+- Added ability to select the key-file manually (you can store
+  multiple key-files on one disk now)
+- New CHM documentation file (many features are documented now)
+- You can now use command-lines in the URL fields, just prefix
+  the command-line using cmd://, so if you would like to
+  execute Notepad: cmd://C:\WinNT\Notepad.exe; the cmd://
+  protocol allows using parameters, in contrast to file://
+- Added hotkeys for hiding/showing the passwords (Ctrl+H) and
+  user names (Ctrl+J)
+- Bugfix: the toolbar is now updated after using the TAN wizard
+- Fixed all menu accelerator conflicts
+- Added "Find in group..." command to the groups context menu
+- KeePass now locks the workspace when pressing the Esc key in
+  the main window
+- Added column view context menu to the header control of the
+  password list
+- For the default action, the tray icon now accepts a single
+  left-click instead of a double-click
+- Added ability of storing (hidden) meta-streams in the
+  database, this will make future database format upgrades
+  easier and old KeePass versions will be able to load
+  databases created with a newer version, too
+- KeePass now remembers the complete UI state, i.e. the last
+  selected and top visible group and the last selected and top
+  visible entry (info saved in database, using meta-streams)
+- Added tooltip for quick-finder edit control in main window
+- URLs in the search group can be executed now
+- The entry preview window now uses the active system codepage
+  instead of the fixed Latin-1 codepage (1252)
+- Fixed misleading caption in the change-master-password dialog
+- Fixed a minor CRLF issue in the entry preview window
+
 04/10/09 - 0.97c
 - Fixed some problems in the relative paths handling
 - Added auto-sort password list feature, KeePass can sort the
@@ -11,7 +47,6 @@
   window's maximized state is correctly restored now
 - The associated browser with 'http' is used now, instead of
   the one associated with '.htm' files
-- Some minor GUI improvements
 
 04/09/19 - 0.97b
 - Improved in-memory passwords protection (for both master

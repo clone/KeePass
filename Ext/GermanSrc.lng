@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |0.97c|
+|~LANGUAGEVERSION|             |0.98a|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -152,7 +152,7 @@
 |&File|                        |&Datei|
 |&Edit|                        |&Bearbeiten|
 |&View|                        |&Ansicht|
-|&Extras|                      |&Extras|
+|E&xtras|                      |&Extras|
 |&?|                           |&?|
 
 |&New Database...|             |&Neue Datenbank...|
@@ -161,31 +161,31 @@
 |&Save Database|               |Datenbank &speichern|
 |Save Database &As...|         |Datenbank speichern &unter...|
 |Change &Master Key For This Database...|      |&Hauptschlüssel für diese Datenbank ändern...|
-|&Print Complete Password List|                |Komplette Passwortliste &drucken|
-|Export To|                    |Exportieren nach|
+|&Print Complete Password List|                |&Komplette Passwortliste drucken|
+|&Export To|                   |&Exportieren nach|
 |&Lock Workspace|              |&Arbeitsfläche sperren|
 |&Unlock Workspace|            |&Arbeitsfläche entsperren|
-|&Exit|                        |&Beenden|
+|E&xit|                        |&Beenden|
 
 |&Lock/Unlock Workspace|       |&Arbeitsfläche sperren/entsperren|
 
 |&Options...|                  |&Einstellungen...|
-|&Add Password Group...|       |&Neue Passwort-Gruppe...|
-|Add Password &Subgroup...|    |&Neue Passwort-Untergruppe erstellen...|
-|&Modify Password Group...|    |Passwort-Gruppe &bearbeiten...|
-|&Delete Password Group...|    |Passwort-Gruppe &löschen...|
-|&Print Group|                 |Gruppe &drucken...|
+|Add Password &Group...|       |Neue Passwort-&Gruppe...|
+|Add Password Su&bgroup...|    |Neue Passwort-U&ntergruppe erstellen...|
+|Modif&y Password Group...|    |Pass&wort-Gruppe bearbeiten...|
+|&Delete Password Group...|    |Passwort-Gruppe lös&chen...|
+|Pr&int Group|                 |Gruppe &drucken...|
 |Export Group To &HTML...|     |Gruppe nach &HTML exportieren...|
 |Export Group To &XML...|      |Gruppe nach &XML exportieren...|
 |Export Group To &CSV...|      |Gruppe nach &CSV exportieren...|
 |Export Group To &TXT...|      |Gruppe nach &TXT exportieren...|
-|Copy User&Name To Clipboard|  |Benutzername in Zwischenablage kopieren|
-|Copy &Password To Clipboard|  |Passwort in Zwischenablage kopieren|
-|Open &URL(s)|                 |URL(s) ö&ffnen|
+|Copy User&Name To Clipboard|  |&Benutzername in Zwischenablage kopieren|
+|Copy &Password To Clipboard|  |Passwort in Zwischenablage &kopieren|
+|Open &URL(s)|                 |&URL(s) öffnen|
 |&Find In Database...|         |In Datenbank &suchen...|
-|Find In This &Group...|       |In dieser &Gruppe suchen...|
-|&Add Entry...|                |Eintrag &hinzufügen...|
-|&Edit/View Entry...|          |Eintrag anzeigen/&bearbeiten...|
+|Find In T&his Group...|       |In dieser G&ruppe suchen...|
+|&Add Entry...|                |Eintrag hinzu&fügen...|
+|&Edit/View Entry...|          |Eintrag anz&eigen/bearbeiten...|
 |&Delete Entry|                |Eintrag &löschen|
 |Dupli&cate Entry|             |Eintrag dupli&zieren|
 |Move Entry To &Top|           |Eintrag an den Anfang|
@@ -203,13 +203,13 @@
 |Show User&Name Column|        |Spalte 'Benutzer&name' anzeigen|
 |Show &URL Column|             |Spalte '&URL' anzeigen|
 |Show &Password Column|        |Spalte '&Passwort' anzeigen|
-|Show &Notes Column|           |Spalte '&Kommentare' anzeigen|
+|Show Note&s Column|           |Spalte '&Kommentare' anzeigen|
 |Main Window &Always On Top|   |Hauptfenster &immer im Vordergrund|
-|&Hide Passwords Behind Asterisks (***)|       |Passwörter hinter Sternchen &verstecken (***)|
+|Hide &Passwords Behind Asterisks (***)|       |Passwörter hinter Sternchen &verstecken (***)|
 
 |Password &Generator|          |Passwort-&Generator|
 
-|Visit KeePass &Homepage|      |KeePass-&Homepage besuchen|
+|Visit &KeePass Homepage|      |&KeePass-Homepage besuchen|
 |&About KeePass...|            |Ü&ber KeePass...|
 
 |&Database Settings...|        |&Datenbank-Einstellungen...|
@@ -287,7 +287,7 @@
     |Wählen Sie eine Sprache in der Liste unten aus.|
 |Available Languages|          |Verfügbare Sprachen|
 
-|Open &ReadMe File|            |&ReadMe-Datei öffnen|
+|Open &Help File|              |&Hilfe-Datei öffnen|
 |Open &License File|           |&Lizenz-Datei öffnen|
 |&Print License File|          |Lizenz-Datei &drucken|
 
@@ -344,7 +344,7 @@
 |&HTML File...|                |&HTML-Datei...|
 |&XML File...|                 |&XML-Datei...|
 |&CSV File...|                 |&CSV-Datei...|
-|Import From|                  |Importieren von|
+|&Import From|                 |&Importieren von|
 
 |&Get more languages...|       |Mehr &Sprachen herunterladen...|
 |Start and Exit|               |Start und Beenden|
@@ -384,11 +384,11 @@
 |Expires|                      |Gültig bis|
 |UUID|                         |UUID|
 
-|Show &Creation Time Column|   |Erstellungs&zeit-Spalte anzeigen|
+|Show &Creation Time Column|   |&Erstellungszeit-Spalte anzeigen|
 |Show Last &Modification Time Column|          |&Letzte-Änderung-Spalte anzeigen|
-|Show Last Access &Time Column|                |Letzter-&Zugriff-Spalte anzeigen|
+|Show &Last Access Time Column|                |Letzter-&Zugriff-Spalte anzeigen|
 |Show &Expire Time Column|                     |&Gültig-bis-Spalte anzeigen|
-|Show UU&ID Column|                            |&UUID-Spalte anzeigen|
+|Show UU&ID Column|                            |UU&ID-Spalte anzeigen|
 
 |Show &ToolBar|                |&Toolbar anzeigen|
 |Visit KeePass Homepage|       |KeePass-Homepage besuchen|
@@ -399,13 +399,13 @@
 |Overwrite?|                   |Überschreiben?|
 |Expires:|                     |Gültig bis:|
 |&Delete Selected Entries|     |Ausgewählte Einträge &löschen|
-|&Mass Modify (All Selected)...|               |&Alle ausgewählten Einträge bearbeiten...|
+|&Mass Modify (All Selected)...|               |Alle ausgewä&hlten Einträge bearbeiten...|
 |Change group:|                |Gruppe ändern:|
 |Change entry icon:|           |Eintrags-Icon ändern:|
 |Change expiration time:|      |Ablaufdatum ändern:|
 |Mass Modify|                  |Alle ändern|
 |Change fields of all selected entries|        |Felder von allen ausgewählten Einträgen ändern|
-|Show &Columns|                |&Spalten anzeigen|
+|Show &Columns|                |Spalten &anzeigen|
 |Show &Entry View|             |&Eintrags-Ansicht anzeigen|
 
 |GUI: Automatically resize table columns when resizing the main window|
@@ -429,7 +429,7 @@
 |<TAN>|                        |<TAN>|
 |Print Pre&view...|            |Druck&vorschau...|
 
-|About &Translation...|        |Über Übersetzung...|
+|About &Translation...|        |Über &Übersetzung...|
 |Translation information|      |Informationen über die aktuelle Übersetzung|
 |Currently used language|      |Im Moment benutzte Übersetzung|
 |Language file version|        |Sprachdatei-Version|
@@ -437,19 +437,19 @@
 |Translation author contact|   |Übersetzungs-Autor Kontakt|
 |&Rearrange|                   |&Umordnen|
 |&Sort Group List|             |Gruppenliste &sortieren|
-|&Sort List By Title|          |Liste &sortieren nach Titel|
+|Sort List By &Title|          |Liste &sortieren nach Titel|
 |Sort List By User&Name|       |Liste sortieren nach &Benutzername|
 |Sort List By &URL|            |Liste sortieren nach &URL|
 |Sort List By &Password|       |Liste sortieren nach &Passwort|
 |Sort List By Note&s|          |Liste sortieren nach &Kommentaren|
 |Sort List By &Creation Time|  |Liste sortieren nach &Erstellungszeit|
-|Sort List By Last &Modify Time|               |Liste sortieren nach letzter Änderungs&zeit|
+|Sort List By Last &Modify Time|               |Liste sortieren nach &letzter Änderungszeit|
 |Sort List By Last &Access Time|               |Liste sortieren nach letzter &Zugriffszeit|
 |Sort List By &Expiration Time|                |Liste sortieren nach &Ablaufdatum|
 |Move Group One &Left|         |Gruppe eins nach &links|
 |Move Group One &Right|        |Gruppe eins nach &rechts|
 
-|Hide UserNames Behind &Asterisks (***)|  |Benutzername hinter &Sternchen verstecken (***)|
+|Hide &UserNames Behind Asterisks (***)|  |&Benutzername hinter Sternchen verstecken (***)|
 |Attachment:|                  |Anhang:|
 |Attachment|                   |Anhang|
 |Show &Attachment Column|      |&Anhangs-Spalte anzeigen|
@@ -460,7 +460,7 @@
 
 |There already is a file attached with this entry.|           |Es ist bereits eine Datei an diesen Eintrag angehängt.|
 |Do you want to overwrite the current attachment?|            |Wollen Sie den aktuellen Anhang überschreiben?|
-|&Save Attached File To...|    |Angehängte Datei &speichern unter...|
+|&Save Attached File To...|    |Angehängte Datei s&peichern unter...|
 |There is no file attached with this entry.|                  |Es ist keine Datei an diesen Eintrag angehängt.|
 |Remove the currently attached file|      |Den aktuellen Anhang entfernen|
 
@@ -531,8 +531,19 @@
 |Use PuTTY for ssh: and telnet: URLs|     |PuTTY für ssh: und telnet: URLs benutzen|
 |Mark database as modified on last-access time change|
     |Datenbank bei Änderung einer Letzten-Zugriffs-Zeit als geändert markieren|
-|Se&lect All|                             |A&lles markieren|
-|Auto-&Sort Password List|                |Passwort-Liste automatisch sortieren|
-|&No Auto-Sort|                           |&Nicht automatisch sortieren|
+|Se&lect All|                             |&Alles markieren|
+|Auto-&Sort Password List|                |Passwort-&Liste automatisch sortieren|
+|N&o Auto-Sort|                           |&Nicht automatisch sortieren|
 |Auto-sorting of the password list is enabled, you cannot move entries manually.|
     |Das automatische Sortieren der Passwort-Liste ist aktiviert, Sie können die Einträge nicht manuell bewegen.|
+|Perform Auto-&Type|                      |Auto-&Type ausführen|
+|Auto-sorting of the password list is enabled, you cannot sort the list manually now.|
+    |Das automatische Sortieren der Passwort-Liste ist aktiviert, Sie können die Liste jetzt nicht manuell sortieren.|
+|Select key-file manually...|             |Schlüsseldatei manuell auswählen...|
+|Save key-file manually to...|            |Schlüsseldatei manuell speichern...|
+|Enter the new master key for this database.|
+    |Geben Sie den neuen Hauptschlüssel für diese Datenbank an.|
+|Repeat master key|                       |Hauptschlüssel wiederholen|
+|Repeat the master key for this database.||Hauptschlüssel für diese Datenbank wiederholen|
+|Change password of this database - Enter new master key|
+    |Passwort dieser Datenbank ändern - Neuen Hauptschlüssel eingeben|

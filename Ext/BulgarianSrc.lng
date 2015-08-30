@@ -1,6 +1,6 @@
-|~LANGUAGEVERSION| |0.97b|
-|~LANGUAGEAUTHOR|     |Дончо Ангелов|
-|~LANGUAGEAUTHOREMAIL| |kppc@doncho.net|
+|~LANGUAGEVERSION| |0.97c|
+|~LANGUAGEAUTHOR|     |DonAngel|
+|~LANGUAGEAUTHOREMAIL| |donangel@poboxes.com|
 |~LANGUAGENAME|       |Български|
 
 |&OK|                          |&OK|
@@ -167,7 +167,6 @@
 
 |&Lock/Unlock Workspace|       |&Заключване/отключване на програмата|
 
-|&Options|                     |&Опции|
 |&Add Password Group...|       |&Нова група за пароли...|
 |&Modify Password Group...|    |&Редакция на групата за пароли...|
 |&Delete Password Group...|    |&Изтриване на групата за пароли...|
@@ -613,4 +612,14 @@
 |Use PuTTY for ssh: and telnet: URLs|
     |Използване на PuTTY за ssh: и telnet: URL-и|
     
+|&No Auto-Sort|
+	|&Без авто-сортиране|
 
+|&Options...|
+	|&Опции...|
+
+|Auto-&Sort Password List|
+	|Авто-&сортира списъка с пароли|
+	
+|Auto-sorting of the password list is enabled, you cannot move entries manually.|
+	|При включено Автоматично сортиране на списъка, ръчното местене на записите е забранено.|

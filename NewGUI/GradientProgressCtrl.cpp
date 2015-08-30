@@ -164,7 +164,7 @@ void CGradientProgressCtrl:: SetRange(int nLower, int nUpper)
 	m_nLower = nLower;
 	m_nUpper = nUpper;
 	m_nCurrentPosition = nLower;
-	CProgressCtrl::SetRange(nLower, nUpper);
+	CProgressCtrl::SetRange((short)nLower, (short)nUpper);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ void CGradientProgressCtrl:: SetRange32( int nLower, int nUpper )
 	m_nLower = nLower;
 	m_nUpper = nUpper;
 	m_nCurrentPosition = nLower;
-	CProgressCtrl::SetRange(nLower, nUpper);
+	CProgressCtrl::SetRange((short)nLower, (short)nUpper);
 }
 
 
@@ -392,5 +392,6 @@ void CGradientProgressCtrl::DrawGradient(CPaintDC *pDC, const RECT &rectClient, 
 BOOL CGradientProgressCtrl::OnEraseBkgnd(CDC* pDC) 
 {
 	// TODO: Add your message handler code here and/or call default
+	UNREFERENCED_PARAMETER(pDC);
 	return TRUE;
 }

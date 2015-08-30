@@ -35,6 +35,10 @@
  *    Used John A. Johnson's GradientFill() function, and used dynamic linking
  *	  of the MSIMG32.DLL (thanks to Irek Zielinski's code)
  *
+ *	v0.32b (20-Nov-2004) [D. Reichl]
+ *
+ *	- Added unreferenced parameter declarations, more explicit type casts to
+ *    compile better with warning level 4, removed unnecessary variables, etc.
  ****************************************************************************/
 
 #include "stdafx.h"
@@ -84,7 +88,8 @@ CKCSideBannerWnd::CKCSideBannerWnd()
 	font.DeleteObject();
 
 	// try and load the MSIMG32.LIB
-	if ( (m_hGradMod = LoadLibrary(_T("MSIMG32.DLL"))) )
+	m_hGradMod = LoadLibrary(_T("MSIMG32.DLL"));
+	if (m_hGradMod != NULL)
 		m_pGradFill = (PFNGRADFILL) GetProcAddress( m_hGradMod, "GradientFill" );
 }
 
@@ -395,6 +400,7 @@ void CKCSideBannerWnd::OnPaint()
 
 BOOL CKCSideBannerWnd::OnEraseBkgnd(CDC* pDC) 
 {
+	UNREFERENCED_PARAMETER(pDC);
 	return TRUE;
 }
 
@@ -403,7 +409,7 @@ BOOL CKCSideBannerWnd::OnEraseBkgnd(CDC* pDC)
 void CKCSideBannerWnd::DrawBackground(CDC* pDC, CRect rect)
 {
 	CBrush				nBrush, *pOldBrush = NULL;
-	CPen				nPen, *pOldPen = NULL;
+	CPen				nPen;
 
 	// Flat fill...
 	if ( m_uFillFlag & KCSB_FILL_FLAT || ( (m_colBkg == m_colBkg2) && (m_uFillFlag & KCSB_FILL_GRADIENT) ))
@@ -427,32 +433,32 @@ void CKCSideBannerWnd::DrawBackground(CDC* pDC, CRect rect)
 				{
 					vert[0].x = 0;
 					vert[0].y = rect.top;
-					vert[0].Red = GetRValue(m_colBkg2)<<8;
-					vert[0].Green = GetGValue(m_colBkg2)<<8;
-					vert[0].Blue = GetBValue(m_colBkg2)<<8;
+					vert[0].Red = (USHORT)(GetRValue(m_colBkg2)<<8);
+					vert[0].Green = (USHORT)(GetGValue(m_colBkg2)<<8);
+					vert[0].Blue = (USHORT)(GetBValue(m_colBkg2)<<8);
 					vert[0].Alpha = 0;
 
 					vert[1].x = rect.right;
 					vert[1].y = rect.bottom;
-					vert[1].Red = GetRValue(m_colBkg)<<8;
-					vert[1].Green = GetGValue(m_colBkg)<<8;
-					vert[1].Blue = GetBValue(m_colBkg)<<8;
+					vert[1].Red = (USHORT)(GetRValue(m_colBkg)<<8);
+					vert[1].Green = (USHORT)(GetGValue(m_colBkg)<<8);
+					vert[1].Blue = (USHORT)(GetBValue(m_colBkg)<<8);
 					vert[1].Alpha = 0;
 				}
 				else
 				{
 					vert[0].x = rect.right;
 					vert[0].y = rect.top;
-					vert[0].Red = GetRValue(m_colBkg)<<8;
-					vert[0].Green = GetGValue(m_colBkg)<<8;
-					vert[0].Blue = GetBValue(m_colBkg)<<8;
+					vert[0].Red = (USHORT)(GetRValue(m_colBkg)<<8);
+					vert[0].Green = (USHORT)(GetGValue(m_colBkg)<<8);
+					vert[0].Blue = (USHORT)(GetBValue(m_colBkg)<<8);
 					vert[0].Alpha = 0;
 
 					vert[1].x = 0;
 					vert[1].y = rect.bottom;
-					vert[1].Red = GetRValue(m_colBkg2)<<8;
-					vert[1].Green = GetGValue(m_colBkg2)<<8;
-					vert[1].Blue = GetBValue(m_colBkg2)<<8;
+					vert[1].Red = (USHORT)(GetRValue(m_colBkg2)<<8);
+					vert[1].Green = (USHORT)(GetGValue(m_colBkg2)<<8);
+					vert[1].Blue = (USHORT)(GetBValue(m_colBkg2)<<8);
 					vert[1].Alpha = 0;
 				}
 				uGFlag = GRADIENT_FILL_RECT_V;
@@ -461,16 +467,16 @@ void CKCSideBannerWnd::DrawBackground(CDC* pDC, CRect rect)
 			{
 				vert[0].x = 0;
 				vert[0].y = rect.top;
-				vert[0].Red = GetRValue(m_colBkg)<<8;
-				vert[0].Green = GetGValue(m_colBkg)<<8;
-				vert[0].Blue = GetBValue(m_colBkg)<<8;
+				vert[0].Red = (USHORT)(GetRValue(m_colBkg)<<8);
+				vert[0].Green = (USHORT)(GetGValue(m_colBkg)<<8);
+				vert[0].Blue = (USHORT)(GetBValue(m_colBkg)<<8);
 				vert[0].Alpha = 0;
 
 				vert[1].x = rect.right;
 				vert[1].y = rect.bottom;
-				vert[1].Red = GetRValue(m_colBkg2)<<8;
-				vert[1].Green = GetGValue(m_colBkg2)<<8;
-				vert[1].Blue = GetBValue(m_colBkg2)<<8;
+				vert[1].Red = (USHORT)(GetRValue(m_colBkg2)<<8);
+				vert[1].Green = (USHORT)(GetGValue(m_colBkg2)<<8);
+				vert[1].Blue = (USHORT)(GetBValue(m_colBkg2)<<8);
 				vert[1].Alpha = 0;
 				uGFlag = GRADIENT_FILL_RECT_H;
 			}
@@ -613,7 +619,7 @@ void CKCSideBannerWnd::DrawTextFields(CDC* pDC, CRect rect)
 	int				arrWidths[256];
 	pDC->GetCharWidth(0, 255, arrWidths);
 
-	int			nCount = m_strCaption.GetLength(), i, nHeight = 0;
+	int			i;
 	CPoint		ptDraw = pt2;
 	TCHAR		ch;
 

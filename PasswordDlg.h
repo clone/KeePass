@@ -30,9 +30,11 @@
 #ifndef AFX_PASSWORDDLG_H__8F02B880_0ADD_11D8_BF16_0050BF14F5CC__INCLUDED_
 #define AFX_PASSWORDDLG_H__8F02B880_0ADD_11D8_BF16_0050BF14F5CC__INCLUDED_
 
+#include "NewGUI/NewGUICommon.h"
 #include "NewGUI/WzComboBox.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/GradientProgressCtrl.h"
+#include "NewGUI/XHyperLink.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -45,6 +47,7 @@ public:
 
 	BOOL m_bLoadMode;
 	BOOL m_bConfirm;
+	BOOL m_bChanging;
 
 	CImageList m_ilIcons;
 	CFont m_fStyle;
@@ -58,6 +61,7 @@ public:
 
 	//{{AFX_DATA(CPasswordDlg)
 	enum { IDD = IDD_PASSWORD_DLG };
+	CXHyperLink	m_hlSelFile;
 	CGradientProgressCtrl	m_cPassQuality;
 	CButtonST	m_btStars;
 	CButtonST	m_btOK;
@@ -73,6 +77,9 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	//}}AFX_VIRTUAL
 
+private:
+	BOOL m_bOnce;
+
 protected:
 	//{{AFX_MSG(CPasswordDlg)
 	virtual BOOL OnInitDialog();
@@ -81,7 +88,10 @@ protected:
 	afx_msg void OnCheckStars();
 	afx_msg void OnMakePasswordBtn();
 	afx_msg void OnChangeEditPassword();
+	afx_msg void OnSelChangeComboDiskList();
 	//}}AFX_MSG
+
+	afx_msg LRESULT OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 };
 

@@ -36,6 +36,7 @@
 #define UTF8_BYTE BYTE
 
 typedef BOOL(WINAPI *LPPATHRELATIVEPATHTO)(LPTSTR pszPath, LPCTSTR pszFrom, DWORD dwAttrFrom, LPCTSTR pszTo, DWORD dwAttrTo);
+typedef HWND(WINAPI *LPHTMLHELP)(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD dwData); 
 
 void EraseCString(CString *pString);
 
@@ -48,7 +49,7 @@ void ClearClipboardIfOwner();
 void FixURL(CString *pstrURL);
 
 // Replace placeholders in pString by data in pEntry
-void ParseURL(CString *pString, PW_ENTRY *pEntry);
+void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString = FALSE);
 
 // String conversion functions
 char *_StringToAnsi(const TCHAR *lptString);
@@ -88,5 +89,8 @@ BOOL OpenUrlInNewBrowser(LPCTSTR lpURL);
 BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser);
 
 void OpenUrlEx(LPCTSTR lpURL);
+
+CString ExtractAutoTypeCmd(LPCTSTR lpstr);
+CString TagSimString(LPCTSTR lpString);
 
 #endif

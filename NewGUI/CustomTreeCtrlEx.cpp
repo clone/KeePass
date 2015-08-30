@@ -39,6 +39,9 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+#pragma warning(push)
+#pragma warning(disable: 4100)
+
 /////////////////////////////////////////////////////////////////////////////
 // CCustomTreeCtrlEx
 
@@ -188,3 +191,5 @@ void CCustomOleDropHandler::_RemoveDropSelection()
 	ASSERT(m_pTopParentI != NULL); ASSERT(m_pParentTree != NULL);
 	m_pParentTree->SelectDropTarget(NULL);
 }
+
+#pragma warning(pop)

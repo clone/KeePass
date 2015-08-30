@@ -1,5 +1,5 @@
 |~LANGUAGENAME||Spanish (Español para España y Latinoamérica)|
-|~LANGUAGEVERSION||0.97b|
+|~LANGUAGEVERSION||0.97c|
 |~LANGUAGEAUTHOR||Marcel Trujillo|
 |~LANGUAGEAUTHOREMAIL||marcelito@gmail.com|
 |&OK||&OK|
@@ -121,7 +121,7 @@
 |&Unlock Workspace||&Desbloquear área de trabajo|
 |&Exit||&Salir|
 |&Lock/Unlock Workspace||&Bloquear/Desbloquear área de trabajo|
-|&Options||&Opciones|
+|&Options...||&Opciones...|
 |&Add Password Group...||&Añadir Grupo de Contraseñas...|
 |&Modify Password Group...||&Modificar Grupo de Contraseñas...|
 |&Delete Password Group...||&Eliminar Grupo de Contraseñas...|
@@ -383,3 +383,6 @@
 |Total number of groups / entries||Número total de grupos / entradas|
 |Total: %u groups / %u entries||Total: %u grupo(s) / %u entrada(s)|
 |Se&lect All||Se&leccionar Todo|
+|Auto-&Sort Password List||Auto-&Ordenar Lista de Contraseñas|
+|&No Auto-Sort||&No Auto-Ordenar|
+|Auto-sorting of the password list is enabled, you cannot move entries manually.||Auto-ordenar la lista de contraseñas está activado, usted no puede mover las entradas manualmente.|

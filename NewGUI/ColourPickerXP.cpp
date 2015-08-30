@@ -682,6 +682,8 @@ BOOL CColourPickerXP::OnClicked()
 //***********************************************************************
 void CColourPickerXP::OnNMThemeChanged(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	UNREFERENCED_PARAMETER(pNMHDR);
+
 	// This feature requires Windows XP or greater.
 	// The symbol _WIN32_WINNT must be >= 0x0501.
 	// TODO: Add your control notification handler code here
@@ -723,6 +725,8 @@ void CColourPickerXP::OnMouseMove(UINT nFlags, CPoint point)
 //***********************************************************************
 LRESULT CColourPickerXP::OnMouseLeave(WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(wParam); UNREFERENCED_PARAMETER(lParam);
+
 	if (m_bMouseOver)
 	{
 		m_bMouseOver = FALSE;
@@ -756,6 +760,8 @@ void CColourPickerXP::DrawHotArrow(BOOL bHot)
 
 		m_xpCombo.DrawBackground(dc.GetSafeHdc(), CP_DROPDOWNBUTTON, (bHot ? CBXS_HOT : CBXS_NORMAL), &rcArrow, NULL);
     }
+#else
+	UNREFERENCED_PARAMETER(bHot);
 #endif
 }
 
@@ -1861,7 +1867,7 @@ void CColourPopupXP::ChangeSelection(int nIndex)
     }
 	else if (m_nCurrentSel == INVALID_COLOUR)
 	{
-		m_crColour = INVALID_COLOUR;
+		m_crColour = (COLORREF)INVALID_COLOUR;
         m_pParent->SendMessage(CPN_SELCHANGE, (WPARAM) m_crInitialColour, 0);
 	}
     else
@@ -1988,7 +1994,7 @@ void CColourPopupXP::DrawCell(CDC* pDC, int nIndex)
 	COLORREF clrHiLight;
 	COLORREF clrText;
 	bool bSelected;
-	COLORREF clr3dTopLeft, clr3dBottomRight;
+	COLORREF clr3dTopLeft = RGB(128,128,128), clr3dBottomRight = RGB(128,128,128);
 	if (m_nCurrentSel == nIndex)
 	{
 		bSelected = true;

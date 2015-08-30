@@ -40,6 +40,7 @@
 // This is a modified version of the original KCSideBannerWnd control.
 // I (Dominik Reichl) changed some variable names to compile with the
 // project and with my compiler. Thank you very much Peter!
+// - Improved API a bit (removed unnecessary col parameter)
 
 #if !defined(_KCSIDEBANNERWND_H_)
 #define _KCSIDEBANNERWND_H_
@@ -124,7 +125,7 @@ public:
 	void				SetColTxtTitle(COLORREF	col)					{ m_colTxtTitle = col; }
 	COLORREF			GetColTxtTitle()								{ return m_colTxtTitle; }
 	void				SetColTxtCaption(COLORREF col)					{ m_colTxtCaption = col; }
-	COLORREF			GetColTxtCaption(COLORREF col)					{ return m_colTxtCaption; }
+	COLORREF			GetColTxtCaption()								{ return m_colTxtCaption; }
 	void				SetEdgeOffset(CSize szOffset)					{ m_szEdgeOffset = szOffset; }
 	CSize				GetEdgeOffset()									{ return m_szEdgeOffset; }
 	void				SetCaptionOffset(CSize szOffset)				{ m_szCaptionOffset = szOffset; }

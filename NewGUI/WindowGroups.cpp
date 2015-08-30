@@ -82,7 +82,7 @@ BOOL CWindowGroups::ArrangeWindows(CWnd *pParentWindow)
 	CWnd *p;
 	CDWordArray aPos;
 	int i;
-	RECT rect;
+	RECT rect = { 0, 0, 0, 0 };
 
 	UNREFERENCED_PARAMETER(pParentWindow);
 

@@ -34,6 +34,7 @@
 #include "TranslateEx.h"
 #include "GradientProgressCtrl.h"
 #include "KCSideBannerWnd.h"
+#include "XHyperLink.h"
 
 #include "../PwSafe/PwUtil.h"
 
@@ -262,4 +263,15 @@ BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
 	}
 
 	return TRUE;
+}
+
+void NewGUI_MakeHyperLink(void *pXHyperLink)
+{
+	CXHyperLink *p = (CXHyperLink *)pXHyperLink;
+	ASSERT(p != NULL); if(p == NULL) return;
+
+	p->SetVisited(FALSE);
+	p->SetAutoSize(TRUE);
+	p->SetUnderline(CXHyperLink::ulAlways);
+	p->SetColours(RGB(0,0,255), RGB(0,0,255), RGB(100,100,255));
 }

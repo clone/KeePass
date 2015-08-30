@@ -203,4 +203,6 @@ void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd);
 BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount);
 BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount);
 
+void NewGUI_MakeHyperLink(void *pXHyperLink);
+
 #endif // ___NEW_GUI_COMMON___

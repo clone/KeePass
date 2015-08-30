@@ -84,9 +84,6 @@ BOOL CPwManager::_OpenDatabaseV1(const TCHAR *pszFile)
 	char *ptrURL;
 	char *ptrPassword;
 	char *ptrAdditional;
-	LPTSTR lpptr = NULL;
-	LPTSTR lptTitle = NULL, lptUserName = NULL, lptURL = NULL;
-	LPTSTR lptPassword = NULL, lptAdditional = NULL;
 	PW_TIME tNow;
 	PW_GROUP pwTG;
 	PW_ENTRY pwTE;

@@ -215,9 +215,7 @@ void CCeXDib::SetPaletteIndex(BYTE byIdx, BYTE byR, BYTE byG, BYTE byB)
 
 void CCeXDib::Draw(HDC hDC, DWORD dwX, DWORD dwY)
 {
-	HBITMAP	hBitmap = NULL;
 	HBITMAP	hOldBitmap = NULL;
-	HDC		hMemDC = NULL;
 
 	if (m_hBitmap == NULL)
 	{

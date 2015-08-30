@@ -43,7 +43,7 @@
 #include "BCMenu.h"
 
 // Uncomment the following line to enable support for sound effects
-#define	BTNST_USE_SOUND
+// #define	BTNST_USE_SOUND
 
 #if _MSC_VER >= 1000
 #pragma once

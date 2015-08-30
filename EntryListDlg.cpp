@@ -215,6 +215,7 @@ void CEntryListDlg::_AddEntryToList(PW_ENTRY *p)
 void CEntryListDlg::OnClickEntryList(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	*pResult = 0;
+	UNREFERENCED_PARAMETER(pNMHDR);
 
 	DWORD i;
 	UINT uState;

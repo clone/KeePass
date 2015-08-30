@@ -137,7 +137,7 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 	DWORD uFileSize, i, b;
 	CString str;
 	CString strLastCategory = _T("General");
-	DWORD dwLastGroupId;
+	DWORD dwLastGroupId = 0;
 	BOOL bInNotes = FALSE;
 
 	ASSERT(pMgr != NULL);
@@ -307,7 +307,7 @@ BOOL CPwImport::ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr)
 	DWORD uFileSize, i, b;
 	CString str;
 	CString strLastCategory = _T("General");
-	DWORD dwLastGroupId;
+	DWORD dwLastGroupId = 0;
 	BOOL bInNotes = FALSE;
 
 	ASSERT(pMgr != NULL);

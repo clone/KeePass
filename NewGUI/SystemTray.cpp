@@ -104,6 +104,10 @@ UINT CSystemTray::m_nMaxTooltipLength  = 64;     // This may change...
 const UINT CSystemTray::m_nTaskbarCreatedMsg = ::RegisterWindowMessage(_T("TaskbarCreated"));
 CWnd  CSystemTray::m_wndInvisible;
 
+// Added by D. Reichl to avoid level 4 compiler warnings
+#pragma warning(push)
+#pragma warning(disable: 4100)
+
 /////////////////////////////////////////////////////////////////////////////
 // CSystemTray construction/creation/destruction
 
@@ -1130,3 +1134,5 @@ void CSystemTray::MaximiseFromTray(CWnd* pWnd, BOOL bForceAnimation /*= TRUE*/)
     pWnd->SetForegroundWindow();
 #endif
 }
+
+#pragma warning(pop)

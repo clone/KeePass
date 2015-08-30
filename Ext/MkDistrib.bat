@@ -4,8 +4,8 @@ CLS
 IF EXIST ..\Debug\KeePass.exe COPY /B ..\Debug\KeePass.exe /B ..\Distrib\KeePass.exe
 IF EXIST ..\Release\KeePass.exe COPY /B ..\Release\KeePass.exe /B ..\Distrib\KeePass.exe
 
-DEL ..\Distrib\KeePass.html
-COPY /B KeePass.html /B ..\Distrib\KeePass.html
+DEL ..\Distrib\KeePass.chm
+COPY /B Doc\KeePass.chm /B ..\Distrib\KeePass.chm
 
 DEL ..\Distrib\License.html
 COPY /B License.html /B ..\Distrib\License.html

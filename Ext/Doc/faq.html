@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>FAQ</title>
+	<link rel="stylesheet" type="text/css" href="default.css" />
+</head>
+<body>
+
+<table class="tablebox"><tr><td class="boxtitle">
+<img src="images/movepaper.gif" width="31px" height="21px" class="singleimg">
+Frequently Asked Questions (FAQ)</td></tr></table>
+<br />
+
+	<ul>
+	<li><a href="#helpme" target="_self">How can I help you?</a></li>
+	<li><a href="#multiuser" target="_self">Multi-user databases</a></li>
+	<li><a href="#multisys" target="_self">Will there be KeePass versions for other OSs than Windows?</a></li>
+	</ul>
+
+	<br /><br />
+
+	<a name="helpme"></a>
+	<table class="tablebox"><tr><td class="boxtitle">
+	<img src="images/menuinfo.gif" width="31px" height="21px" class="singleimg">
+	How can I help you?</td></tr></table>
+	<br />
+	If you like KeePass and would like to help me in some way:
+	<ul>
+	<li><a href="http://sourceforge.net/donate/index.php?group_id=95013" target="_blank"><b>Donate</b></a><br />
+	This is maybe the best way of helping me, if you don't have that much time or experience in application development. This is
+	the recommended way of helping me for "standard users".</li>
+	<li><a href="http://keepass.sourceforge.net/translations.php" target="_blank"><b>Make a translation</b></a><br />
+	If you have some free time, you could make a translation of KeePass (of course only if you're language isn't offered already)!</li>
+	<li><a href="http://sourceforge.net/tracker/?atid=609908&group_id=95013&func=browse" target="_blank"><b>Test new releases and submit bugfixes</b></a><br />
+	KeePass is under constant development, new features get implemented, bugs get fixed. If you have some free time, you could just
+	test the new releases thoroughly and if you're a programmer, look through the sources to find bugs and maybe even submit fixes.</li>
+	<li><b>Spread the word</b><br />
+	KeePass isn't that widely-known yet. If you like KeePass, tell all your friends how great KeePass is, publish articles
+	about it, press it on CDs/DVDs, sell it with your USB sticks, submit it to software archives, talk in forums about it, etc.!</li>
+	</ul>
+
+	<br /><br />
+
+	<a name="multiuser"></a>
+	<table class="tablebox"><tr><td class="boxtitle">
+	<img src="images/menuinfo.gif" width="31px" height="21px" class="singleimg">
+	Multi-user databases</td></tr></table>
+	<br />
+	Implementing a multi-user system for KeePass is a frequent feature request...<br />
+	<br />
+	All these multi-user / view-only user things are only working if you're using a client-server system, where the user doesn't have full access to the underlying data structures.<br />
+	<br />
+	For KeePass, a multi-user system would be secure only on the GUI level (since it isn't a client-server application). I could add flags or something like ACLs (access control lists) to prevent/allow users editing/viewing defined sections of a database, but this isn't secure. For normal users (i.e. not programmers and not security experts) the ACLs would work very fine, but anyone who has just a very few bit experience in security can remove those ACLs, if he can read the database.<br />
+	<br />
+	KeePass is open-source, that means that everyone can get the source code, modify it and recompile it. If it would be only secure on the GUI level, an experienced programmer could just take the KeePass sources, remove all the ACL stuff and would have full access to the database, if he knows the main password.<br />
+	<br />
+	Since KeePass isn't a client-server application, it's "all or nothing": either you can read and write 100% of the current database or you cannot do anything with it.<br />
+	<br />
+	So, I will NOT implement those multi-user features. Of course some people would be happy about such features (quote: "I only need it to be secure on a GUI level!"), but soon someone would complain that anyone can modify entries of other users in multi-user databases and KeePass isn't secure. I won't implement such an insecure system.<br />
+	<br />
+	Some desktop (i.e. not server-client) password manager programs claim to have a working group rights management system, but this just isn't true. They're using ACLs, fine, but this only works on the GUI level and because their product isn't open-source. If you're only USING the program, the multi-user system works. If someone reverse-engineers the file format, he can do anything with the database, just as described above.<br />
+	<br />
+	Maybe you don't believe me what I'm saying here, since many programs offer multi-user features. In this case, please read the sites below about Excel cell protection security. Protecting certain parts of an Excel file is exactly the same problem as protecting a KeePass database from other users. Even Microsoft says that their cell protections just work for normal users and not on the security level.<br />
+	<br />
+	Please don't confuse this with other multi-user applications now! Multi-user systems CAN work, but only if the access of a user can really be restricted, for example when you're communicating with some server over the internet. In such a case multi-user systems work perfectly and are also 100% secure. It just doesn't and cannot work with the KeePass desktop application.<br />
+	<br />
+	Additional reading:<br />
+	<a href="http://sourceforge.net/forum/forum.php?thread_id=1112283&forum_id=329220" target="_blank">Forum discussion: hierarchical security</a><br />
+	<a href="http://sourceforge.net/forum/forum.php?thread_id=1000183&forum_id=329220" target="_blank">Forum discussion: view user and edit user</a><br />
+	<a href="http://office.microsoft.com/en-us/assistance/HP052388541033.aspx" target="_blank">Microsoft Office Online: Overview of security and protection in Excel</a><br />
+	<a href="http://www.dotxls.com/excel-security/23/introduction-to-excel-security" target="_blank">DotXls: Excel Security and Excel Password Protection</a><br />
+
+	<br /><br />
+
+	<a name="multisys"></a>
+	<table class="tablebox"><tr><td class="boxtitle">
+	<img src="images/menuinfo.gif" width="31px" height="21px" class="singleimg">
+	Will there be KeePass versions for other OSs than Windows?</td></tr></table>
+	<br />
+	The desktop KeePass application has been developed from start on to work on Windows operating systems. It uses the Microsoft Foundation
+	Classes (MFC) and several other platform-dependent stuff that makes porting relatively hard.<br />
+	<br />
+	Anyway, the KeePass core (i.e. the password management code, simply everything except the graphical user interface [GUI]) is
+	platform-independent and therefor "ports" are theoretically possible, although you cannot really speak of a port here,
+	since the whole user interface needs to be rewritten.<br />
+	<br />
+	Also, KeePass is written in C++. No chance to convert it to Java to make it platform-independent. If you would like a KeePass
+	written in Java, have fun rewriting it completely from scratch. Although C++ and Java are relatively similar, converting the
+	existing C++ code to Java involves much work, most probably more work than just writing a completely new password manager in Java.<br />
+	<br />
+	But people can make KeePass "ports", as one can easily see: <a href="http://doncho.net/kppc/" target="_blank">KeePass for PocketPC</a>.
+	I assume that, when rewriting the GUI code, you can "port" KeePass to almost any platform, since the core password
+	manager code is totally platform-independent.<br />
+	<br />
+	Now before you ask when the Linux/PalmOS/etc. versions are ready: I don't know. I myself just don't have the time to develop
+	these versions. Keep in mind that I'm developing KeePass in my free time and, apart from donations, don't get anything
+	for it. I will
+	happily develop KeePass for Windows, also in the future yes, but I don't have the time to develop a Linux version
+	for example. I also never
+	programmed any single PalmOS program, I don't even own a PalmOS.<br />
+	<br />
+	KeePass is Open-Source. If <i>you</i> have the time to develop KeePass-compatible applications (as said, it cannot be really "ported"),
+	feel free to contact me and I will happily support you as good as I can.<br />
+	<br />
+	Additional reading:<br />
+	<a href="http://sourceforge.net/forum/forum.php?thread_id=1162482&forum_id=329220" target="_blank">Open Discussion: KeePass for PalmOS...?</a><br />
+	<a href="http://sourceforge.net/forum/forum.php?thread_id=1030493&forum_id=329220" target="_blank">Open Discussion: WxWidgets support?</a><br />
+	<br />
+</body>
+</html>

@@ -100,6 +100,8 @@ DWORD CALLBACK CAutoRichEditCtrl::CBStreamIn(DWORD dwCookie, LPBYTE pbBuff, LONG
 */
 DWORD CALLBACK CAutoRichEditCtrl::CBStreamOut(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
+	UNREFERENCED_PARAMETER(pcb);
+
 	// Address of our string var is in psEntry
 	CString *psEntry = (CString *)dwCookie;
 
@@ -159,6 +161,9 @@ void CAutoRichEditCtrl::SetCharStyle(int MASK, int STYLE, int nStart, int nEnd)
 	CHARFORMAT cf;
 	cf.cbSize = sizeof(CHARFORMAT);
 	//cf.dwMask = MASK;
+
+	UNREFERENCED_PARAMETER(nStart);
+	UNREFERENCED_PARAMETER(nEnd);
 	
 	GetSelectionCharFormat(cf);
 	
@@ -366,6 +371,8 @@ BOOL CALLBACK CAutoRichEditCtrl::CBEnumFonts(LPLOGFONT lplf, LPTEXTMETRIC lptm, 
 {
 	// This function was written with the help of CCustComboBox, by Girish Bharadwaj.
 	// Available from Codeguru.
+
+	UNREFERENCED_PARAMETER(lptm);
 
 	if (dwType == TRUETYPE_FONTTYPE) 
 	{
