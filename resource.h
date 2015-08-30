@@ -63,6 +63,7 @@
 #define IDR_PLUGINS_MENU                207
 #define IDI_PLUGINS                     208
 #define IDR_OPTIONICONS                 210
+#define IDD_CHECKOPTIONS_DLG            212
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -375,15 +376,16 @@
 #define ID_BUTTON32969                  32969
 #define ID_BUTTON32970                  32970
 #define ID_BUTTON32971                  32971
+#define ID_IMPORT_GETMORE               32972
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        212
-#define _APS_NEXT_COMMAND_VALUE         32972
-#define _APS_NEXT_CONTROL_VALUE         1188
+#define _APS_NEXT_RESOURCE_VALUE        213
+#define _APS_NEXT_COMMAND_VALUE         32973
+#define _APS_NEXT_CONTROL_VALUE         1189
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

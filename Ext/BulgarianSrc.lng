@@ -1,4 +1,4 @@
-|~LANGUAGEVERSION| |0.98b|
+|~LANGUAGEVERSION| |0.99a|
 |~LANGUAGEAUTHOR|     |DonAngel|
 |~LANGUAGEAUTHOREMAIL| |public@doncho.net|
 |~LANGUAGENAME|       |Български|
@@ -331,16 +331,11 @@
 |Security|                     |Сигурност|
 |KeePass is OSI Certified Open Source Software.|
     |KeePass е OSI сертифициран софтуер с отворен код.|
-|KeePass usage:|               |Използване на KeePass:|
-|db = Path to database you wish to open on KeePass startup|
-    |db = Път към базата с пароли, която желаете да се отвори при стартиране|
 |Automatically lock workspace after the following number of seconds:|
     |Автоматично заключване на сесията след изминаване на брой секунди:|
 |&Group Name|                  |&Име на група|
 |Every second row has a different background color. Use this color:|
     |Всеки втори ред има различен фонов цвят. Моля изберете цвета:|
-|Start:|                       |Старт:|
-|Exit:|                        |Изход:|
 |Default|                      |По подразбиране|
 |More Colors...|               |Още цветове...|
 |Search results|               |Резултати от търсене|
@@ -360,8 +355,6 @@
 |Visit KeePass Homepage|       |Посещаване Web страницата на KeePass|
 |Field copied to clipboard.|   |Полето беше копирано в клипборда.|
 
-|A key-file already exists on this drive. Do you want to overwrite it?|
-    |Файлът с ключа вече съществува на това устройство. Сигурен ли сте, че искате да го презапишете?|
 |Overwrite?|                   |Презаписване?|
 |Expires:|                     |Изтича:|
 |&Delete Selected Entries|     |&Изтриване на избраните елементи|
@@ -752,3 +745,39 @@
 	|и|
 |cannot be loaded!|
 	|не може да се зареди!|
+
+
+
+
+|A key-file already exists on this drive. Do you want to overwrite or reuse it?|
+	|Ключ-файлът вече съществува на това устройство. Искате ли да се презапише или ще използвате този?|
+|Advanced|
+	|Разширен|
+|Backup|
+	|Копие|
+|Click [Cancel] to abort changing the key.|
+	|Натиснете [Отказ] за да спрете смяната на ключа.|
+|Click [No] to reuse the selected key-file for this database.|
+	|Натиснете [Не] за да използвате отново избрания ключ-файл и за този файл с пароли.|
+|Click [Yes] to overwrite the key-file.|
+	|Натиснете [Да] за да унищожите и създадете отново този ключ-файл.|
+|Failed to create backup of this entry!|
+	|създаването на копие за този запис е неуспешно!|
+|Immediately after opening a database|
+	|Веднага след отваряне на файлът|
+|Integration|
+	|Интеграция|
+|Minimize window on startup|
+	|Минимизира при стартиране|
+|Save backups of modified entries into the "Backup" group|
+	|Прави копия на променените записи в група "Копие"|
+|Show entries that will expire soon (if any)|
+	|Показва записите, които ще изтекат скоро (ако има)|
+|Show expired entries (if any)|
+	|Показва изтеклите записи (ако има)|
+|Start KeePass at Windows startup (for current user)|
+	|стартира KeePass при стартиране на Windows (за този потребител)|
+|Unable to create/remove the auto-start key of KeePass in the Windows registry!|
+	|Не успя да се създаде KeePass авто-старт ключ в Windows registry!|
+
+

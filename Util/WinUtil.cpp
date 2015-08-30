@@ -359,10 +359,7 @@ C_FN_SHARE void OpenUrlEx(LPCTSTR lpURL)
 		if(_tcslen(lpURL) != 6)
 			WinExec(((LPCSTR)lpURL) + (6 * sizeof(TCHAR)), SW_SHOW);
 	}
-	else
-	{
-		ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
-	}
+	else ShellExecute(NULL, _T("open"), lpURL, NULL, NULL, SW_SHOW);
 }
 
 C_FN_SHARE BOOL _FileAccessible(LPCTSTR lpFile)

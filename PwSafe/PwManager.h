@@ -39,8 +39,8 @@
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
 
 // When making a Windows build, don't forget to update the verinfo resource
-#define PWM_VERSION_STR  _T("0.99a")
-#define PWM_VERSION_DW   0x00090901
+#define PWM_VERSION_STR  _T("0.99b")
+#define PWM_VERSION_DW   0x00090902
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -135,6 +135,7 @@
 #define PWM_KEYMETHOD_AND       TRUE
 
 #define PWS_SEARCHGROUP          TRL("Search results")
+#define PWS_BACKUPGROUP_SRC      _T("Backup")
 #define PWS_BACKUPGROUP          TRL("Backup")
 #define PWS_DEFAULT_KEY_FILENAME _T("pwsafe.key")
 #define PWV_SOONTOEXPIRE_DAYS    7

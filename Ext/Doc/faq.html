@@ -52,12 +52,12 @@ Frequently Asked Questions (FAQ)</td></tr></table>
 	When saving the options, KeePass does the following:
 	<ul>
 	<li>Try to save the options to the global <i>KeePass.ini</i> file in the KeePass program directory.</li>
-	<li>If this fails (for example if the program directory is protected), write the options to a <i>KeePass.ini</i> file in the users directory.</li>
+	<li>If this fails (for example if the program directory is protected), write the options to a <i>KeePass.ini</i> file in the users directory (subdirectory 'KeePass' in application data).</li>
 	</ul>
 	When loading, KeePass performs the following:
 	<ul>
 	<li>Try to find the key (the option) in the global <i>KeePass.ini</i> file.</li>
-	<li>If this fails (file inaccessible or key doesn't exist), try loading it from the <i>KeePass.ini</i> file in the users directory.</li>
+	<li>If this fails (file inaccessible or key doesn't exist), try loading it from the <i>KeePass.ini</i> file in the users directory (subdirectory 'KeePass' in application data).</li>
 	</ul>
 	Now, if you use the KeePass installer and install it with admin rights, the program directory will be write-protected when working
 	as a normal user. That means that KeePass saves your options into your users directory, but loads them from the global <i>KeePass.ini</i>.<br />

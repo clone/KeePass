@@ -100,6 +100,10 @@ SOURCE=.\AddGroupDlg.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\CheckOptionsDlg.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\DbSettingsDlg.cpp
 # End Source File
 # Begin Source File
@@ -174,6 +178,10 @@ SOURCE=.\AddEntryDlg.h
 # Begin Source File
 
 SOURCE=.\AddGroupDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\CheckOptionsDlg.h
 # End Source File
 # Begin Source File
 

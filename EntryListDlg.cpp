@@ -113,6 +113,10 @@ BOOL CEntryListDlg::OnInitDialog()
 	PW_TIME tNow;
 	PW_ENTRY *p;
 	BOOL bAdded;
+	DWORD dwInvalid1, dwInvalid2;
+
+	dwInvalid1 = m_pMgr->GetGroupId(PWS_BACKUPGROUP_SRC);
+	dwInvalid2 = m_pMgr->GetGroupId(PWS_BACKUPGROUP);
 
 	_GetCurrentPwTime(&tNow);
 	dwDateNow = ((DWORD)tNow.shYear << 16) | ((DWORD)tNow.btMonth << 8) | ((DWORD)tNow.btDay & 0xff);
@@ -120,7 +124,9 @@ BOOL CEntryListDlg::OnInitDialog()
 	for(i = 0; i < m_pMgr->GetNumberOfEntries(); i++)
 	{
 		p = m_pMgr->GetEntry(i);
-		ASSERT(p != NULL);
+		ASSERT(p != NULL); if(p == NULL) continue;
+
+		if((p->uGroupId == dwInvalid1) || (p->uGroupId == dwInvalid2)) continue;
 
 		bAdded = FALSE;
 		if((m_nDisplayMode == ELDMODE_EXPIRED) || (m_nDisplayMode == ELDMODE_EXPSOONEXP))

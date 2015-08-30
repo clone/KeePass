@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Russian|
-|~LANGUAGEVERSION|             |0.98b|
+|~LANGUAGEVERSION|             |0.99a|
 |~LANGUAGEAUTHOR|              |Varrey|
 |~LANGUAGEAUTHOREMAIL|         |varrey@hotmail.com|
 
@@ -363,16 +363,11 @@
 |Security|                     |Безопасность|
 |KeePass is OSI Certified Open Source Software.|
     |KeePass - OSI сертифицированное приложение с открытым кодом.|
-|KeePass usage:|               |KeePass использует:|
-|db = Path to database you wish to open on KeePass startup|
-    |db = Путь к базе паролей, которая будет открыта при запуске|
 |Automatically lock workspace after the following number of seconds:|
     |Автоматически блокировать базу через (секунд):|
 |&Group Name|                  |&Названий групп|
 |Every second row has a different background color. Use this color:|
     |Каждая вторая строка имеет другой цвет фона. Использовать цвет:|
-|Start:|                       |Запуск:|
-|Exit:|                        |Выход:|
 |Default|                      |По усолчанию|
 |More Colors...|               |Больше цветов...|
 |Search results|               |Поиск результатов|
@@ -393,8 +388,8 @@
 |Visit KeePass Homepage|       |Перейти на домашнюю страницу KeePass|
 |Field copied to clipboard.|   |Поле скопировано в буфер обмена.|
 
-|A key-file already exists on this drive. Do you want to overwrite it?|
-    |Файл с базой уже сущесвует. Хотите переписать его?|
+|A key-file already exists on this drive. Do you want to overwrite or reuse it?|
+    |Файл с паролем уже сущесвует. Хотите переписать его или использовать повторно?|
 |Overwrite?|                   |Переписать?|
 |Expires:|                     |Окончание:|
 |&Delete Selected Entries|     |Удалить выделенные записи|
@@ -607,3 +602,20 @@
     |Вы выбрали режим "и" для ввода пароля, поэтому вы должны ввести пароль И выбрать диск/файл с паролем.|
 |and|                  |и|
 |cannot be loaded!|    |не может быть загружен!|
+
+|Advanced| |Продвинутые|
+|Backup|   |Резервирование|
+|Click [Cancel] to abort changing the key.| |Нажмите [Отмена] для прекращения изменения ключа.|
+|Click [No] to reuse the selected key-file for this database.|
+    |Нажмите [Нет] для повторного использования выбранного файла с паролем для этой базы.|
+|Click [Yes] to overwrite the key-file.|    |Нажмите [Да] для перезаписи файла с паролем.|
+|Failed to create backup of this entry!|    |Невозможно создать копию для текущей записи!|
+|Immediately after opening a database|      |Действия сразу после открытия базы паролей|
+|Integration| |Интеграция|
+|Minimize window on startup| |Запускать в свернутом состоянии|
+|Save backups of modified entries into the "Backup" group| |Сохранять копии измененных записей в группе "Резервирование"|
+|Show entries that will expire soon (if any)| |Показывать записи, которые скоро станут просроченными (если они есть)|
+|Show expired entries (if any)| |Показывать просроченные записи (если они есть)|
+|Start KeePass at Windows startup (for current user)| |Запускать KeePass при старте системы (для текущего пользователя)|
+|Unable to create/remove the auto-start key of KeePass in the Windows registry!|
+    |Невозможно создать/удалить запить в реестре для автоматического старта KeePass!|

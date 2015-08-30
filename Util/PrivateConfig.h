@@ -41,6 +41,9 @@
 #define PCFG_IN const
 #define PCFG_OUT
 
+// WINSHELLAPI (DECLSPEC_IMPORT?)
+typedef HRESULT(WINAPI *LPSHGETSPECIALFOLDERPATH)(HWND hwndOwner, LPTSTR lpszPath, int nFolder, BOOL fCreate);
+
 class CPP_CLASS_SHARE CPrivateConfig
 {
 public:

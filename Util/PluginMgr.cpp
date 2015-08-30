@@ -258,6 +258,8 @@ BOOL CPluginManager::LoadAllPlugins()
 			if(nRet == IDNO)
 			{
 				p->lpExit(0, 0);
+				p->bEnabled = FALSE;
+				p->lpInit = NULL; p->lpCall = NULL; p->lpExit = NULL;
 				FreeLibrary(p->hinstDLL); p->hinstDLL = NULL;
 				continue;
 			}
@@ -280,6 +282,7 @@ BOOL CPluginManager::UnloadAllPlugins()
 		{
 			ASSERT(p->lpExit != NULL);
 			if(p->lpExit != NULL) p->lpExit(0, 0);
+			p->lpInit = NULL; p->lpCall = NULL; p->lpExit = NULL;
 
 			FreeLibrary(p->hinstDLL); p->hinstDLL = NULL;
 		}

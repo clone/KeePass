@@ -1,3 +1,37 @@
+05/04/01 - 0.99b
+- Improved exports: you can now choose the fields that will be
+  exported
+- Newline characters can now be encoded/replaced by \n in
+  exported files
+- Changed the default Auto-Type-Window string to *{TITLE}*
+- The Auto-Type-Window strings are now case-insensitive
+- Existing / user-defined Auto-Type-Window strings override the
+  default string (i.e. only if no single matching user-defined
+  Auto-Type-Window string has been found, the titles of the
+  entries are used)
+- Exporting backup entries (entries in the "Backup" group) is
+  optional now
+- Fixed a bug which caused KeePass menus to be unresponsive
+  after startup when using the command-line
+- When the database gets auto-locked (timer), KeePass minimizes
+  itself to tray
+- KeePass now tries to close the database before Windows exits
+- KeePass doesn't crash any more when trying to load old
+  plugins
+- Expired entries in the 'Backup' group aren't shown any more
+  in the 'expired entries' dialog displayed at database open
+- Replaced 'start minimized' option by 'start minimized and
+  locked' option; KeePass won't ask you immediately at startup
+  for the password of the database if you enable this option
+- You now have 3 chances to confirm the password when changing
+  the master key
+- KeePass now displays dates/times in an ISO-like format
+- Entries in the "Backup" group are ignored now when searching
+  for auto-type-window strings
+- When using the users directory, KeePass now places its config
+  file in a 'KeePass' subdirectory instead of the root path
+- Several minor UI improvements
+
 05/03/29 - 0.99a
 - You can reuse existing key-disks now (when you select an
   existing key-disk, KeePass asks you if you want to overwrite

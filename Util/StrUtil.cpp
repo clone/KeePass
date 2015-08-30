@@ -150,7 +150,7 @@ CPP_FN_SHARE void _PwTimeToString(PW_TIME t, CString *pstrDest)
 {
 	ASSERT(pstrDest != NULL);
 	pstrDest->Empty();
-	pstrDest->Format(_T("%04u/%02u/%02u %02u:%02u:%02u"), t.shYear, t.btMonth,
+	pstrDest->Format(_T("%04u-%02u-%02u %02u:%02u:%02u"), t.shYear, t.btMonth,
 		t.btDay, t.btHour, t.btMinute, t.btSecond);
 }
 

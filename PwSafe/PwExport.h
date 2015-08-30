@@ -40,6 +40,27 @@
 #define PWEXP_CSV  4
 #define PWEXP_LAST 5
 
+typedef struct
+{
+	BOOL bGroup;
+	BOOL bGroupTree;
+	BOOL bTitle;
+	BOOL bUserName;
+	BOOL bURL;
+	BOOL bPassword;
+	BOOL bNotes;
+	BOOL bUUID;
+	BOOL bImage;
+	BOOL bCreationTime;
+	BOOL bLastAccTime;
+	BOOL bLastModTime;
+	BOOL bExpireTime;
+	BOOL bAttachment;
+
+	BOOL bEncodeNewlines;
+	BOOL bExportBackups;
+} PWEXPORT_OPTIONS;
+
 class CPwExport
 {
 public:
@@ -50,15 +71,33 @@ public:
 	void SetFormat(int nFormat);
 	void SetNewLineSeq(BOOL bWindows);
 
-	BOOL ExportAll(const TCHAR *pszFile);
-	BOOL ExportGroup(const TCHAR *pszFile, DWORD dwGroupId);
+	BOOL ExportAll(const TCHAR *pszFile, const PWEXPORT_OPTIONS *pOptions);
+	BOOL ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPORT_OPTIONS *pOptions);
 
 	CString MakeGroupTreeString(DWORD dwGroupId);
 
-private:
-	CPwManager *m_pMgr;
+	PWEXPORT_OPTIONS m_aDefaults[PWEXP_LAST];
 	int m_nFormat;
+
+private:
+	void _ExpStr(LPCTSTR lpString);
+	void _ExpXmlStr(LPCTSTR lpString);
+	void _ExpHtmlStr(LPCTSTR lpString);
+
+	void _ExpResetSkip();
+	void _ExpSetSep(LPCTSTR lpSep);
+	void _ExpStrIf(BOOL bCondition, LPCTSTR lpString);
+	void _ExpXmlStrIf(BOOL bCondition, LPCTSTR lpString);
+	void _ExpHtmlStrIf(BOOL bCondition, LPCTSTR lpString);
+	void _ExpCsvStrIf(BOOL bCondition, LPCTSTR lpString);
+
+	CPwManager *m_pMgr;
 	TCHAR *m_pszNewLine;
+
+	FILE *m_fp;
+	BOOL m_bOneSkipped;
+	LPCTSTR m_lpSep;
+	const PWEXPORT_OPTIONS *m_pOptions;
 };
 
 #endif

@@ -194,7 +194,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddGroupText(TRL("Start and Exit"), 7);
 	m_olAdvanced.AddCheckItem(TRL("Remember last opened file"), &m_bRememberLast, &m_bOpenLastDb, OL_LINK_SAME_TRIGGER_FALSE);
 	m_olAdvanced.AddCheckItem(TRL("Automatically open last used database on startup"), &m_bOpenLastDb, &m_bRememberLast, OL_LINK_SAME_TRIGGER_TRUE);
-	m_olAdvanced.AddCheckItem(TRL("Minimize window on startup"), &m_bStartMinimized, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Start minimized and locked"), &m_bStartMinimized, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Automatically save database on exit"), &m_bAutoSave, NULL, OL_LINK_NULL);
 
 	m_olAdvanced.AddGroupText(TRL(""), 0);
@@ -204,7 +204,7 @@ BOOL COptionsDlg::OnInitDialog()
 
 	m_olAdvanced.AddGroupText(TRL(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Backup"), 10);
-	m_olAdvanced.AddCheckItem(TRL("Save backups of modified entries into the \"Backup\" group"), &m_bBackupEntries, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Save backups of modified entries into the 'Backup' group"), &m_bBackupEntries, NULL, OL_LINK_NULL);
 
 	TCITEM tci;
 	ZeroMemory(&tci, sizeof(TCITEM));

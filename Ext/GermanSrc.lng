@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |0.99a|
+|~LANGUAGEVERSION|             |0.99b|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -300,10 +300,10 @@
     |Beim Start zuletzt benutzte Datenbank öffnen|
 |Automatically save database on exit|
     |Datenbank beim Beenden automatisch speichern|
-|GUI: Display images on buttons|
-    |GUI: Icons auf Buttons anzeigen|
-|GUI: Show grid lines in password entry list|
-    |GUI: Gitternetzlinien in Passwortliste anzeigen|
+|Display images on buttons|
+    |Icons auf Buttons anzeigen|
+|Show grid lines in password entry list|
+    |Gitternetzlinien in Passwortliste anzeigen|
 |Workspace cannot be unlocked!|
     |Arbeitsfläche kann nicht entsperrt werden!|
 |Workspace locked|
@@ -336,7 +336,7 @@
 |&CSV File...|                 |&CSV-Datei...|
 |&PwSafe v2 TXT File...|       |&PwSafe v2 TXT-Datei...|
 |Select &Font|                 |&Font wählen|
-|Select a new font for the list controls.|     |Neue Schriftart für Listen auswählen.|
+|Select a new font for the list controls:|     |Neue Schriftart für Listen auswählen:|
 
 |Code&Wallet TXT File...|      |Code&Wallet TXT-Datei...|
 |&TXT File...|                 |&TXT-Datei...|
@@ -408,8 +408,8 @@
 |Show &Columns|                |Spalten &anzeigen|
 |Show &Entry View|             |&Eintrags-Ansicht anzeigen|
 
-|GUI: Automatically resize table columns when resizing the main window|
-    |GUI: Spaltenbreite automatisch anpassen wenn die Größe des Hauptfensters verändert wird|
+|Automatically resize table columns when resizing the main window|
+    |Spaltenbreite automatisch anpassen wenn die Größe des Hauptfensters verändert wird|
 |&Copy|                        |&Kopieren|
 |Copy &All|                    |&Alles kopieren|
 |&Undo|                        |&Rückgängig|
@@ -616,7 +616,7 @@
 |Auto-Type|                               |Auto-Type|
 |Help:|                                   |Hilfe:|
 |Advanced|                                |Erweitert|
-|Minimize window on startup|              |Hauptfenster beim Starten minimieren|
+|Start minimized and locked|              |Minimiert und mit gesperrter Arbeitsfläche starten|
 |Immediately after opening a database|    |Sofort nach dem Öffnen einer Datenbank|
 |Show expired entries (if any)|
     |Abgelaufene Einträge anzeigen (falls es welche gibt)|
@@ -628,6 +628,18 @@
 |Unable to create/remove the auto-start key of KeePass in the Windows registry!|
     |Kann Autostart-Schlüssel von KeePass in Windows Registry nicht löschen!|
 |Backup|                                  |Backup|
-|Save backups of modified entries into the "Backup" group|
-    |Backups von geänderten Einträgen in die "Backup"-Gruppe speichern|
+|Save backups of modified entries into the 'Backup' group|
+    |Backups von geänderten Einträgen in die 'Backup'-Gruppe speichern|
 |Failed to create backup of this entry!|  |Kann kein Backup von diesem Eintrag erstellen!|
+|Master key has been changed!|            |Hauptschlüssel wurde geändert!|
+|Save the database now in order to get the new key applied.|
+    |Speichern Sie jetzt die Datenbank, um den neuen Schlüssel anzuwenden.|
+|Fields to export|                        |Zu exportierende Felder|
+|Icon|                                    |Icon|
+|Group Tree|                              |Gruppen-Baum|
+|Export Options|                          |Export-Optionen|
+|Here you can customize the exported files.| |Hier können Sie die exportierten Dateien anpassen.|
+|Encode/replace newline characters by '\n'| |Neue-Zeile-Zeichen durch '\n' ersetzen/codieren|
+|Export backup entries (entries in the 'Backup' group)|
+    |Backup-Einträge exportieren (Einträge in der 'Backup'-Gruppe)|
+|&Get more import plugins...|             |Mehr &Import-Plugins herunterladen...|

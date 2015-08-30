@@ -27,22 +27,64 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ___TRANSLATE_EX_H___
-#define ___TRANSLATE_EX_H___
+#if !defined(AFX_CHECKOPTIONSDLG_H__5F6F5781_A123_11D9_BF17_0050BF14F5CC__INCLUDED_)
+#define AFX_CHECKOPTIONSDLG_H__5F6F5781_A123_11D9_BF17_0050BF14F5CC__INCLUDED_
 
-#define MAX_TRANSLATION_STRINGS 470
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
 
-// Translate string, sptr must be a char*, _not_ a TCHAR* !
-#define TRL(sptr) _TRL(sptr)
+#include "NewGUI/NewGUICommon.h"
+#include "NewGUI/KCSideBannerWnd.h"
+#include "NewGUI/XPStyleButtonST.h"
+#include "NewGUI/OptionsList.h"
 
-#define TRL_MODE_DEF FALSE
-#define TRL_MODE_TRL TRUE
+typedef struct
+{
+	LPCTSTR lpString;
+	BOOL *pbValue;
+	int nIcon;
+} CHKOPT_PARAM;
 
-C_FN_SHARE BOOL LoadTranslationTable(const char *pszTableName);
-C_FN_SHARE BOOL FreeCurrentTranslationTable();
+/////////////////////////////////////////////////////////////////////////////
 
-C_FN_SHARE const char *_TRL(const char *pszDefString);
+class CCheckOptionsDlg : public CDialog
+{
+public:
+	CCheckOptionsDlg(CWnd* pParent = NULL);
 
-C_FN_SHARE const TCHAR *GetCurrentTranslationTable();
+	void CleanUp();
 
-#endif // ___TRANSLATE_EX_H___
+	DWORD m_dwNumParams;
+	CHKOPT_PARAM *m_pParams;
+
+	CString m_strTitle;
+	CString m_strDescription;
+
+	CKCSideBannerWnd m_banner;
+	CImageList m_ilOptionIcons;
+
+	//{{AFX_DATA(CCheckOptionsDlg)
+	enum { IDD = IDD_CHECKOPTIONS_DLG };
+	COptionsList	m_olOptions;
+	CXPStyleButtonST	m_btCancel;
+	CXPStyleButtonST	m_btOK;
+	//}}AFX_DATA
+
+	//{{AFX_VIRTUAL(CCheckOptionsDlg)
+	protected:
+	virtual void DoDataExchange(CDataExchange* pDX);
+	//}}AFX_VIRTUAL
+
+protected:
+	//{{AFX_MSG(CCheckOptionsDlg)
+	virtual BOOL OnInitDialog();
+	virtual void OnOK();
+	virtual void OnCancel();
+	//}}AFX_MSG
+	DECLARE_MESSAGE_MAP()
+};
+
+//{{AFX_INSERT_LOCATION}}
+
+#endif // !defined(AFX_CHECKOPTIONSDLG_H__5F6F5781_A123_11D9_BF17_0050BF14F5CC__INCLUDED_)

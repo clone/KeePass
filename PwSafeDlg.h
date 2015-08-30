@@ -35,6 +35,7 @@
 #endif // _MSC_VER >= 1000
 
 #include "PwSafe/PwManager.h"
+#include "PwSafe/PwExport.h"
 
 #include "NewGUI/NewGUICommon.h"
 #include "NewGUI/KCWndUtil.h"
@@ -116,6 +117,7 @@ public:
 	DWORD GetSelectedEntriesCount();
 	DWORD GetSelectedGroupId();
 
+	BOOL GetExportOptions(PWEXPORT_OPTIONS *pOptions, CPwExport *pPwExport);
 	CString GetExportFile(int nFormat, LPCTSTR lpFileName = NULL);
 	void ExportSelectedGroup(int nFormat);
 
@@ -226,7 +228,7 @@ public:
 
 	BOOL _IsUnsafeAllowed();
 
-	void _OpenDatabase(const TCHAR *pszFile, const TCHAR *pszPassword, const TCHAR *pszKeyFile);
+	void _OpenDatabase(const TCHAR *pszFile, const TCHAR *pszPassword, const TCHAR *pszKeyFile, BOOL bOpenLocked);
 	BOOL _ChangeMasterKey(BOOL bCreateNew);
 	void _PrintGroup(DWORD dwGroupId);
 	void _Find(DWORD dwFindGroupId);
@@ -611,6 +613,7 @@ protected:
 	afx_msg void OnColumnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnExtrasPluginMgr();
 	afx_msg LRESULT OnHotKey(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnImportGetMore();
 	//}}AFX_MSG
 
 	afx_msg void OnPluginMessage(UINT nID);

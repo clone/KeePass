@@ -42,15 +42,38 @@ CPrivateConfig::CPrivateConfig(BOOL bReqWriteAccess)
 	_tcscat(m_szFileLocal, _T(".ini"));
 
 	m_szFileUser[0] = 0; m_szFileUser[1] = 0;
-	SHGetSpecialFolderPath(NULL, m_szFileUser, CSIDL_APPDATA, TRUE);
-	DWORD uLen = (DWORD)_tcslen(m_szFileUser);
-	if(uLen != 0)
-	{
-		if(m_szFileUser[uLen - 1] != _T('\\'))
-			_tcscat(m_szFileUser, _T("\\"));
 
-		_tcscat(m_szFileUser, PWM_EXENAME);
+	HINSTANCE hShell32 = LoadLibrary("Shell32");
+	if(hShell32 != NULL)
+	{
+		LPSHGETSPECIALFOLDERPATH lpGet = (LPSHGETSPECIALFOLDERPATH)GetProcAddress(hShell32, "SHGetSpecialFolderPathA");
+
+		if(lpGet != NULL) lpGet(NULL, m_szFileUser, CSIDL_APPDATA, TRUE);
+		else { ASSERT(FALSE); }
+
+		lpGet = NULL; FreeLibrary(hShell32); hShell32 = NULL;
+	} else { ASSERT(FALSE); }
+
+	if(m_szFileUser[0] == 0)
+	{
+		_tcscpy(m_szFileUser, PWM_EXENAME);
 		_tcscat(m_szFileUser, _T(".ini"));
+	}
+	else
+	{
+		DWORD uLen = (DWORD)_tcslen(m_szFileUser);
+		if(uLen != 0)
+		{
+			if(m_szFileUser[uLen - 1] != _T('\\'))
+				_tcscat(m_szFileUser, _T("\\"));
+
+			_tcscat(m_szFileUser, PWM_EXENAME);
+			CreateDirectory(m_szFileUser, NULL);
+
+			_tcscat(m_szFileUser, _T("\\"));
+			_tcscat(m_szFileUser, PWM_EXENAME);
+			_tcscat(m_szFileUser, _T(".ini"));
+		}
 	}
 
 	_tcscpy(m_szFileGeneric, PWM_EXENAME);
