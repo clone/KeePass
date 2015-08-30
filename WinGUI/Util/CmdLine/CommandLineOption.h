@@ -29,7 +29,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ==========================================================================*/
 #pragma once
-#include "../../../KeePassLibCpp/SysDefEx.h"
 #include <cassert>
 #include <string>
 
@@ -47,7 +46,7 @@ returns the value.
 
 // CommandLineOption objects are immutable.
 
-class CPP_CLASS_SHARE CommandLineOption {
+class CommandLineOption {
 public:
     explicit CommandLineOption(const std_string& optionName);  // Precondition:  optionName is lower case or punctuation
     const std_string& optionName() const {return m_optionName;}

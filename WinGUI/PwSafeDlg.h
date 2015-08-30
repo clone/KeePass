@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -285,6 +285,12 @@ public:
 	static CString m_strDefaultAutoTypeSequence;
 	static BOOL m_bSortAutoTypeSelItems;
 
+	static BOOL m_bForceAllowChangeMasterKey;
+	static BOOL m_bForceAllowPrinting;
+	static BOOL m_bForceAllowImport;
+	static BOOL m_bForceAllowExport;
+	static BOOL m_bDisallowPrintingPasswords;
+
 private:
 	int m_nClipboardMethod;
 	BOOL m_bTimer;
@@ -461,7 +467,7 @@ private:
 		const CPrivateConfigEx& cConfig);
 
 	void RegisterRestoreHotKey(BOOL bRegister);
-	void DropToBackgroundIfOptionEnabled();
+	void DropToBackgroundIfOptionEnabled(bool bForceDrop);
 
 	LONG m_lNormalWndPosX;
 	LONG m_lNormalWndPosY;
@@ -721,6 +727,7 @@ protected:
 	afx_msg void OnInfoChkForUpd();
 	afx_msg void OnUpdateViewHide(CCmdUI *pCmdUI);
 	afx_msg void OnQuickFindSelChange();
+	afx_msg void OnInfoHelpSelectHelpSource();
 	//}}AFX_MSG
 
 	afx_msg void OnPluginMessage(UINT nID);

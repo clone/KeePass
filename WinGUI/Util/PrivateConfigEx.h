@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #pragma once
 
 #include "../../KeePassLibCpp/SysDefEx.h"
-#include "PrivateConfig.h" // Definitions
+#include "../../KeePassLibCpp/SDK/Details/KpDefs.h"
 
 #include <string>
 #include <vector>
@@ -51,6 +51,8 @@ public:
 
 	BOOL GetBool(const TCHAR *pszField, BOOL bDefault) const;
 	BOOL SetBool(const TCHAR *pszField, BOOL bValue);
+
+	BOOL GetEnforcedBool(LPCTSTR pszField, BOOL bDefault, BOOL bAllowGlobal) const;
 
 	std::vector<std::basic_string<TCHAR> > GetArray(LPCTSTR pszPrefix) const;
 

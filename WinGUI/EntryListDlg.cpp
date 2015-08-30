@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -284,7 +284,7 @@ void CEntryListDlg::_AddEntryToList(PW_ENTRY *p, BOOL bExpiredIcon)
 	CString strTemp;
 	_PwTimeToStringEx(pwe->tExpire, strTemp, CPwSafeDlg::m_bUseLocalTimeFormat);
 	lvi.iSubItem = 4;
-	lvi.pszText = (LPTSTR)(LPCTSTR)strTemp;
+	lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strTemp);
 	m_cList.SetItem(&lvi);
 
 	// Ignore m_bShowUUID, the UUID field is needed in all cases

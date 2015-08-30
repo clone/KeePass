@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -277,7 +277,7 @@ KP_SHARE BOOL PE_SetPasswordAndLock(void *pMgr, PW_ENTRY *pEntry, LPCTSTR lpPass
 	p->UnlockEntryPassword(pEntry);
 
 	SAFE_DELETE_ARRAY(pEntry->pszPassword);
-	pEntry->pszPassword = _TcsSafeDupAlloc(lpPassword);
+	pEntry->pszPassword = _TcsCryptDupAlloc(lpPassword);
 
 	p->LockEntryPassword(pEntry);
 	return TRUE;

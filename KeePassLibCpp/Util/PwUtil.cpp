@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -42,25 +42,23 @@ CPwUtil::CPwUtil()
 }
 
 // Very simple password quality estimation function
-DWORD CPwUtil::EstimatePasswordBits(LPCTSTR pszPassword)
+DWORD CPwUtil::EstimatePasswordBits(LPCTSTR lpPassword)
 {
-	DWORD i, dwLen, dwCharSpace, dwBits;
 	BOOL bChLower = FALSE, bChUpper = FALSE, bChNumber = FALSE;
 	BOOL bChSimpleSpecial = FALSE, bChExtSpecial = FALSE, bChHigh = FALSE;
 	BOOL bChEscape = FALSE;
-	TCHAR tch;
-	double dblBitsPerChar, dblEffectiveLength = 0.0;
+	double dblEffectiveLength = 0.0;
 	std::map<TCHAR, unsigned int> vCharCounts;
 	std::map<int, unsigned int> vDifferences;
 
-	ASSERT(pszPassword != NULL); if(pszPassword == NULL) return 0;
+	ASSERT(lpPassword != NULL); if(lpPassword == NULL) return 0;
 
-	dwLen = (DWORD)_tcslen(pszPassword);
+	const DWORD dwLen = static_cast<DWORD>(_tcslen(lpPassword));
 	if(dwLen == 0) return 0; // Zero bits of information :)
 
-	for(i = 0; i < dwLen; i++) // Get character types
+	for(DWORD i = 0; i < dwLen; ++i) // Get character types
 	{
-		tch = pszPassword[i];
+		const TCHAR tch = lpPassword[i];
 
 		if(tch < _T(' ')) bChEscape = TRUE;
 		if((tch >= _T('A')) && (tch <= _T('Z'))) bChUpper = TRUE;
@@ -75,7 +73,7 @@ DWORD CPwUtil::EstimatePasswordBits(LPCTSTR pszPassword)
 		double dblDiffFactor = 1.0;
 		if(i >= 1)
 		{
-			int iDiff = (int)tch - (int)pszPassword[i - 1];
+			const int iDiff = (int)tch - (int)lpPassword[i - 1];
 
 			if(vDifferences.find(iDiff) == vDifferences.end())
 				vDifferences[iDiff] = 1;
@@ -98,7 +96,7 @@ DWORD CPwUtil::EstimatePasswordBits(LPCTSTR pszPassword)
 		}
 	}
 
-	dwCharSpace = 0;
+	DWORD dwCharSpace = 0;
 	if(bChEscape == TRUE) dwCharSpace += CHARSPACE_ESCAPE;
 	if(bChUpper == TRUE) dwCharSpace += CHARSPACE_ALPHA;
 	if(bChLower == TRUE) dwCharSpace += CHARSPACE_ALPHA;
@@ -109,8 +107,8 @@ DWORD CPwUtil::EstimatePasswordBits(LPCTSTR pszPassword)
 
 	ASSERT(dwCharSpace != 0); if(dwCharSpace == 0) return 0;
 
-	dblBitsPerChar = log((double)dwCharSpace) / log(2.00);
-	dwBits = (DWORD)(ceil(dblBitsPerChar * dblEffectiveLength));
+	const double dblBitsPerChar = log((double)dwCharSpace) / log(2.00);
+	const DWORD dwBits = static_cast<DWORD>(ceil(dblBitsPerChar * dblEffectiveLength));
 
 	ASSERT(dwBits != 0);
 	return dwBits;
@@ -167,6 +165,14 @@ BOOL CPwUtil::SaveHexKey32(FILE *fp, BYTE *pBuf)
 
 	mem_erase((BYTE *)buf, 64);
 	return TRUE;
+}
+
+LPCTSTR CPwUtil::GetUniCvtPtr(LPCTSTR lpBase, BOOL bTranslate)
+{
+	if(lpBase == NULL) return PWU_CVT_EX; // NULL is allowed, return unique default pointer
+
+	if(bTranslate != FALSE) return _TRL(lpBase);
+	return lpBase; // Untranslated
 }
 
 BOOL CPwUtil::ConvertStrToHex(char ch1, char ch2, BYTE& bt)
@@ -235,7 +241,7 @@ CString CPwUtil::FormatError(int nErrorCode, DWORD dwFlags)
 		str += TRL("Invalid parameter");
 		break;
 	case PWE_NO_MEM:
-		str += TRL("Too few memory (RAM) available");
+		str += TRL("Too little memory (RAM) available");
 		break;
 	case PWE_INVALID_KEY:
 		str += TRL("Invalid/wrong key");
@@ -321,7 +327,7 @@ BOOL CPwUtil::MemAllocCopyEntry(__in_ecount(1) const PW_ENTRY *pExisting,
 
 	pDestination->pszAdditional = _TcsSafeDupAlloc(pExisting->pszAdditional);
 	pDestination->pszBinaryDesc = _TcsSafeDupAlloc(pExisting->pszBinaryDesc);
-	pDestination->pszPassword = _TcsSafeDupAlloc(pExisting->pszPassword);
+	pDestination->pszPassword = _TcsCryptDupAlloc(pExisting->pszPassword);
 	pDestination->pszTitle = _TcsSafeDupAlloc(pExisting->pszTitle);
 	pDestination->pszURL = _TcsSafeDupAlloc(pExisting->pszURL);
 	pDestination->pszUserName = _TcsSafeDupAlloc(pExisting->pszUserName);
@@ -553,6 +559,25 @@ std::basic_string<TCHAR> CPwErrorInfo::ToString() const
 	return m_strFinal;
 }
 */
+
+CString CPwUtil::CreateUUIDStr(CNewRandom* pRandomSource)
+{
+	if(pRandomSource == NULL) { ASSERT(FALSE); return CString(); }
+
+	BYTE pbUuid[16];
+	randCreateUUID(&pbUuid[0], pRandomSource);
+
+	CString str;
+	_UuidToString(&pbUuid[0], &str);
+	return str;
+}
+
+DWORD CPwUtil::GetUniCPT(LPCTSTR lp)
+{
+	DWORD dwRel = 0; // See CPT specs
+	while(*lp != 0) { dwRel = (ROTL32UE(dwRel, 5) + *lp); ++lp; }
+	return dwRel;
+}
 
 PG_TREENODE CPwUtil::GroupsToTree(CPwManager* pMgr)
 {

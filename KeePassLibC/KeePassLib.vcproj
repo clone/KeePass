@@ -840,6 +840,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\KeePassLibCpp\PwStructs.h"
+				>
+			</File>
+			<File
+				RelativePath="..\KeePassLibCpp\PwStructsEx.h"
+				>
+			</File>
+			<File
 				RelativePath="..\KeePassLibCpp\SysDefEx.h"
 				>
 			</File>
@@ -860,6 +868,14 @@
 				</File>
 				<File
 					RelativePath="..\KeePassLibCpp\Crypto\KeyTransform.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Crypto\MemoryProtectionEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Crypto\MemoryProtectionEx.h"
 					>
 				</File>
 				<File
@@ -979,6 +995,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\KeePassLibCpp\Util\EntryUtil.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\EntryUtil.h"
+					>
+				</File>
+				<File
 					RelativePath="..\KeePassLibCpp\Util\MemUtil.cpp"
 					>
 				</File>
@@ -1066,6 +1090,62 @@
 					RelativePath="..\KeePassLibCpp\Details\PwFileImpl.cpp"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="SDK"
+				>
+				<File
+					RelativePath="..\KeePassLibCpp\SDK\KpSDK.h"
+					>
+				</File>
+				<Filter
+					Name="Details"
+					>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpAPI.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpCommandLine.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpCommandLineOption.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpConfig.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpDatabase.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpFullPathName.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpPlugin.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpUnknown.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpUtilities.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\KpDefs.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\KpGuids.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

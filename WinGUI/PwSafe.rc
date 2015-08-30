@@ -110,7 +110,7 @@ CAPTION "About KeePass..."
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,203,111,58,14,WS_GROUP
-    LTEXT           "Copyright © 2003-2008 Dominik Reichl.",IDC_STATIC,7,7,254,8
+    LTEXT           "Copyright © 2003-2009 Dominik Reichl.",IDC_STATIC,7,7,254,8
     LTEXT           "KeePass is OSI Certified Open Source Software.",IDC_STATIC,7,20,254,8
     LTEXT           "The program is distributed under the terms of the GNU General Public License v2 or later.",IDC_STATIC,7,33,254,17
     LTEXT           "<>",IDC_HLINK_HOMEPAGE,7,65,254,8
@@ -138,8 +138,8 @@ BEGIN
     PUSHBUTTON      "&Edit/View Entry...",IDC_TB_EDITENTRY,71,2,15,14,NOT WS_TABSTOP
     PUSHBUTTON      "&Delete Entry",IDC_TB_DELETEENTRY,87,2,15,14,NOT WS_TABSTOP
     CONTROL         "",IDC_STATIC_TBSEP1,"Static",SS_ETCHEDVERT,105,2,1,15
-    PUSHBUTTON      "Copy User &Name to Clipboard",IDC_TB_COPYUSER,109,2,15,14,NOT WS_TABSTOP
-    PUSHBUTTON      "Copy &Password to Clipboard",IDC_TB_COPYPW,125,2,15,14,NOT WS_TABSTOP
+    PUSHBUTTON      "Copy User &Name",IDC_TB_COPYUSER,109,2,15,14,NOT WS_TABSTOP
+    PUSHBUTTON      "Copy &Password",IDC_TB_COPYPW,125,2,15,14,NOT WS_TABSTOP
     CONTROL         "",IDC_STATIC_TBSEP2,"Static",SS_ETCHEDVERT,143,2,1,15
     PUSHBUTTON      "&Find in Database...",IDC_TB_FIND,147,2,15,14,NOT WS_TABSTOP
     CONTROL         "",IDC_STATIC_TBSEP3,"Static",SS_ETCHEDVERT,165,2,1,15
@@ -434,7 +434,7 @@ BEGIN
     DEFPUSHBUTTON   "&Close",IDOK,349,178,58,14
     CONTROL         "List1",IDC_PLUGINS_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,400,163
     PUSHBUTTON      "&Help",IDC_BTN_PLGHELP,7,178,58,14
-    LTEXT           "Get More Plugins...",IDC_STATIC_HL_GETPLUGINS,73,181,221,8
+    LTEXT           "Get more plugins...",IDC_STATIC_HL_GETPLUGINS,73,181,221,8
 END
 
 IDD_IMPORT_OPTIONS_DLG DIALOGEX 0, 0, 318, 177
@@ -590,6 +590,21 @@ BEGIN
     CONTROL         "&URL",IDC_RADIO_REFURL,"Button",BS_AUTORADIOBUTTON,283,229,62,10
     CONTROL         "Notes",IDC_RADIO_REFNOTES,"Button",BS_AUTORADIOBUTTON,347,215,62,10
     PUSHBUTTON      "&Help",IDC_BTN_HELP,7,252,58,14
+END
+
+IDD_HELPSOURCE_DLG DIALOGEX 0, 0, 231, 148
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Help Source"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,103,127,58,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,166,127,58,14
+    LTEXT           "Use the following help source when a ""Help"" button within KeePass is clicked:",IDC_STATIC_HELPSOURCE_INTRO,7,7,217,17
+    CONTROL         "Local help file",IDC_RADIO_HELP_LOCAL,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,30,217,10
+    CONTROL         "Online help center",IDC_RADIO_HELP_ONLINE,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,7,75,217,10
+    LTEXT           "The local help file is a snapshot of the product documentation at the point when this product version was published. It is not updated automatically.",IDC_STATIC_HELP_LOCAL_HINT,18,43,206,25
+    LTEXT           "The online help center always contains the latest version of the product documentation. Internet connection is required.",IDC_STATIC_HELP_ONLINE_HINT,18,88,206,25
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,0,121,231,1
 END
 
 
@@ -784,6 +799,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 266
     END
+
+    IDD_HELPSOURCE_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 224
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 141
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -794,8 +817,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,4,0
- PRODUCTVERSION 1,1,4,0
+ FILEVERSION 1,1,5,0
+ PRODUCTVERSION 1,1,5,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -812,13 +835,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.14"
-            VALUE "FileVersion", "1.1.4.0"
+            VALUE "FileDescription", "KeePass Password Safe 1.15"
+            VALUE "FileVersion", "1.1.5.0"
             VALUE "InternalName", "PwSafe"
-            VALUE "LegalCopyright", "Copyright (c) 2003-2008 Dominik Reichl"
+            VALUE "LegalCopyright", "Copyright (c) 2003-2009 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.14"
-            VALUE "ProductVersion", "1.1.4.0"
+            VALUE "ProductName", "KeePass Password Safe 1.15"
+            VALUE "ProductVersion", "1.1.5.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -850,15 +873,6 @@ BEGIN
         MENUITEM "Print Pre&view...",           ID_FILE_PRINTPREVIEW
         MENUITEM "&Print...",                   ID_FILE_PRINT
         MENUITEM SEPARATOR
-        POPUP "&Export To"
-        BEGIN
-            MENUITEM "&TXT File...",                ID_EXPORT_TXT
-            MENUITEM "&HTML File...",               ID_EXPORT_HTML
-            MENUITEM "&XML File...",                ID_EXPORT_XML
-            MENUITEM "&CSV File...",                ID_EXPORT_CSV
-            MENUITEM SEPARATOR
-            MENUITEM "&KeePass Database...",        ID_EXPORT_KEEPASS
-        END
         POPUP "&Import From"
         BEGIN
             MENUITEM "&CSV File...",                ID_IMPORT_CSV
@@ -869,6 +883,15 @@ BEGIN
             MENUITEM "&KeePass Database...",        ID_IMPORT_KEEPASS
             MENUITEM SEPARATOR
             MENUITEM "&Get More Import Plugins...", ID_IMPORT_GETMORE
+        END
+        POPUP "&Export To"
+        BEGIN
+            MENUITEM "&TXT File...",                ID_EXPORT_TXT
+            MENUITEM "&HTML File...",               ID_EXPORT_HTML
+            MENUITEM "&XML File...",                ID_EXPORT_XML
+            MENUITEM "&CSV File...",                ID_EXPORT_CSV
+            MENUITEM SEPARATOR
+            MENUITEM "&KeePass Database...",        ID_EXPORT_KEEPASS
         END
         MENUITEM SEPARATOR
         MENUITEM "&Lock Workspace",             ID_FILE_LOCK
@@ -935,7 +958,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Repair KeePass Database File...", ID_EXTRAS_REPAIRDB
         MENUITEM SEPARATOR
-        MENUITEM "Show All &Expired Entries",   ID_EXTRAS_SHOWEXPIRED
+        MENUITEM "Show &Expired Entries",       ID_EXTRAS_SHOWEXPIRED
         MENUITEM SEPARATOR
         MENUITEM "&Options...",                 ID_SAFE_OPTIONS
         MENUITEM "&Plugins...",                 ID_EXTRAS_PLUGINMGR
@@ -943,6 +966,7 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "&Help Contents",              ID_INFO_README
+        MENUITEM "Help &Source...",             ID_INFO_HELP_SELECTHELPSOURCE
         MENUITEM SEPARATOR
         MENUITEM "Visit &KeePass Homepage",     ID_INFO_HOMEPAGE
         MENUITEM "&Donate...",                  ID_INFO_DONATE
@@ -958,8 +982,8 @@ IDR_PWLIST_MENU MENU
 BEGIN
     POPUP "Submenu"
     BEGIN
-        MENUITEM "Copy User &Name to Clipboard", ID_PWLIST_COPYUSER
-        MENUITEM "Copy &Password to Clipboard", ID_PWLIST_COPYPW
+        MENUITEM "Copy User &Name",             ID_PWLIST_COPYUSER
+        MENUITEM "Copy &Password",              ID_PWLIST_COPYPW
         MENUITEM "Open &URL(s)",                ID_PWLIST_VISITURL
         MENUITEM "&Save Attached File To...",   ID_PWLIST_SAVEATTACH
         MENUITEM SEPARATOR
@@ -999,11 +1023,11 @@ IDR_GROUPLIST_MENU MENU
 BEGIN
     POPUP "Submenu"
     BEGIN
-        MENUITEM "Add Password &Group...",      ID_SAFE_ADDGROUP
-        MENUITEM "Add Password Su&bgroup...",   ID_SAFE_ADDSUBGROUP
+        MENUITEM "Add &Group...",               ID_SAFE_ADDGROUP
+        MENUITEM "Add Su&bgroup...",            ID_SAFE_ADDSUBGROUP
         MENUITEM SEPARATOR
-        MENUITEM "Modif&y Password Group...",   ID_SAFE_MODIFYGROUP
-        MENUITEM "&Delete Password Group...",   ID_SAFE_REMOVEGROUP
+        MENUITEM "Ed&it Group...",              ID_SAFE_MODIFYGROUP
+        MENUITEM "&Delete Group...",            ID_SAFE_REMOVEGROUP
         MENUITEM SEPARATOR
         POPUP "&Rearrange"
         BEGIN
@@ -1092,9 +1116,6 @@ IDR_PLUGINS_MENU MENU
 BEGIN
     POPUP "Submenu"
     BEGIN
-        MENUITEM "&Enable",                     ID_PLUGIN_ENABLE
-        MENUITEM "&Disable",                    ID_PLUGIN_DISABLE
-        MENUITEM SEPARATOR
         MENUITEM "&Options...",                 ID_PLUGIN_CONFIG
         MENUITEM "About &Plugin...",            ID_PLUGIN_ABOUT
     END
@@ -1255,6 +1276,7 @@ BEGIN
     BUTTON      ID_SAFE_EXPORTGROUP_KEEPASS
     BUTTON      ID_EXPORT_KEEPASS
     BUTTON      ID_INFO_CHKFORUPD
+    BUTTON      ID_INFO_HELP_SELECTHELPSOURCE
 END
 
 

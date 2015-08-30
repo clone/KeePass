@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,12 +22,16 @@
 #include "PwSafeDlg.h"
 
 #include "../KeePassLibCpp/Util/TranslateEx.h"
+#include "../KeePassLibCpp/Util/AppUtil.h"
 #include "../KeePassLibCpp/Util/MemUtil.h"
 #include "../KeePassLibCpp/Util/StrUtil.h"
+#include "../KeePassLibCpp/Crypto/MemoryProtectionEx.h"
 #include "Util/PrivateConfigEx.h"
 #include "Util/WinUtil.h"
 #include "Util/CmdLine/CmdArgs.h"
 #include "Util/CmdLine/Executable.h"
+#include "Plugins/KpCommandLineImpl.h"
+#include "Plugins/KpUtilitiesImpl.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -75,11 +79,15 @@ BOOL CPwSafeApp::InitInstance()
 #endif
 #endif
 
-	if(ProcessControlCommands() == TRUE) return FALSE;
+	if(ProcessControlCommands() == TRUE)
+	{
+		this->_App_CleanUp();
+		return FALSE;
+	}
 
 	// Create application's mutex object to make our presence public
 	m_pAppMutex = new CMutex(FALSE, MTXNAME_LOCAL, NULL);
-	if(m_pAppMutex == NULL) { ASSERT(FALSE); }
+	ASSERT(m_pAppMutex != NULL);
 
 	m_hGlobalMutex = CPwSafeApp::CreateGlobalMutex();
 	ASSERT(m_hGlobalMutex != NULL);
@@ -118,6 +126,7 @@ BOOL CPwSafeApp::InitInstance()
 	if(pc != NULL)
 	{
 		dlg.m_bCheckForInstance = pc->GetBool(PWMKEY_SINGLEINSTANCE, FALSE);
+		CMemoryProtectionEx::SetEnabledAtStart(pc->GetBool(PWMKEY_USEDPAPIFORMEMPROT, TRUE));
 		delete pc; pc = NULL;
 	}
 
@@ -178,7 +187,7 @@ BOOL CPwSafeApp::InitInstance()
 
 			m_pMainWnd = NULL;
 
-			NewGUI_CleanUp();
+			this->_App_CleanUp();
 			return FALSE;
 		}
 	}
@@ -186,14 +195,20 @@ BOOL CPwSafeApp::InitInstance()
 	NSCAPI_Initialize(); // Initialize natural string comparison API
 
 	const INT_PTR nResponse = dlg.DoModal();
-
 	if(nResponse == IDOK) { }
 	else if(nResponse == IDCANCEL) { }
 
-	NSCAPI_Exit(); // Cleanup natural string comparison API
+	NSCAPI_Exit(); // Clean up natural string comparison API
 
-	NewGUI_CleanUp();
+	this->_App_CleanUp();
 	return FALSE;
+}
+
+void CPwSafeApp::_App_CleanUp()
+{
+	NewGUI_CleanUp();
+	CKpCommandLineImpl::ClearStatic();
+	CMemoryProtectionEx::Release();
 }
 
 int CPwSafeApp::ExitInstance()
@@ -519,19 +534,63 @@ LPCTSTR CPwSafeApp::GetPasswordFont()
 
 BOOL CPwSafeApp::ProcessControlCommands()
 {
+	LPCTSTR lpTrimChars = _T("\"' \t\r\n\\$%");
+
 	CString strCmdLine = (LPCTSTR)GetCommandLine();
-	strCmdLine = strCmdLine.Trim(_T("\"' \t\r\n\\$%"));
+	strCmdLine = strCmdLine.Trim(lpTrimChars);
 	strCmdLine = strCmdLine.MakeLower();
 
-	if(strCmdLine.GetLength() >= 6)
+	if((strCmdLine.Right(9) == _T("-exit-all")) ||
+		(strCmdLine.Right(9) == _T("/exit-all")))
 	{
-		if((strCmdLine.Right(10) == _T("--exit-all")) ||
-			(strCmdLine.Right(9) == _T("/exit-all")))
-		{
-			::SendMessage(HWND_BROADCAST, CPwSafeDlg::GetKeePassControlMessageID(),
-				KPCM_EXIT, 0);
-			return TRUE;
-		}
+		::SendMessage(HWND_BROADCAST, CPwSafeDlg::GetKeePassControlMessageID(),
+			KPCM_EXIT, 0);
+		return TRUE;
+	}
+
+	if((strCmdLine.Right(18) == _T("-clear-urloverride")) ||
+		(strCmdLine.Right(18) == _T("/clear-urloverride")))
+	{
+		CPrivateConfigEx cfg(TRUE);
+		cfg.Set(PWMKEY_URLOVERRIDE, _T(""));
+		return TRUE;
+	}
+
+	if((strCmdLine.Right(16) == _T("-get-urloverride")) ||
+		(strCmdLine.Right(16) == _T("/get-urloverride")))
+	{
+		CPrivateConfigEx cfg(FALSE);
+		TCHAR tszUrlOverride[SI_REGSIZE]; tszUrlOverride[0] = 0;
+		cfg.Get(PWMKEY_URLOVERRIDE, tszUrlOverride);
+
+		std::basic_string<TCHAR> strOutFile = WU_GetTempDirectory();
+		strOutFile += _T("KeePass_UrlOverride.tmp");
+
+		std::basic_string<TCHAR> strContent = _T("[KeePass]\r\n");
+		strContent += PWMKEY_URLOVERRIDE;
+		strContent += _T("=");
+		strContent += tszUrlOverride;
+		strContent += _T("\r\n");
+		VERIFY(AU_WriteBigFile(strOutFile.c_str(), (const BYTE*)strContent.c_str(),
+			strContent.size() * sizeof(TCHAR)) == PWE_SUCCESS);
+		return TRUE;
+	}
+
+	// Pre-check whether the option is present or not; if the option is not present,
+	// the CmdArgs instance must not be created at this point of time (plugins
+	// haven't added option prefixes yet, so creating the CmdArgs instance leads
+	// to unknown option errors here)
+	int nSetUrl = strCmdLine.Find(_T("-set-urloverride:"));
+	if(nSetUrl < 0) nSetUrl = strCmdLine.Find(_T("-set-urloverride="));
+	if(nSetUrl < 0) nSetUrl = strCmdLine.Find(_T("/set-urloverride:"));
+	if(nSetUrl < 0) nSetUrl = strCmdLine.Find(_T("/set-urloverride="));
+	if(nSetUrl >= 0)
+	{
+		const std_string strUrlOverride = CmdArgs::instance().getUrlOverride();
+
+		CPrivateConfigEx cfg(TRUE);
+		cfg.Set(PWMKEY_URLOVERRIDE, strUrlOverride.c_str());
+		return TRUE;
 	}
 
 	return FALSE;

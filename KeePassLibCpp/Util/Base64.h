@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,9 +24,6 @@
 
 #include "../SysDefEx.h"
 #include <vector>
-
-#define CB64_PROTOCOL     "base64://"
-#define CB64_PROTOCOL_LEN 9
 
 class CBase64Codec
 {

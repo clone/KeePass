@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,11 +21,17 @@
 #include "PrivateConfigEx.h"
 
 #include "WinUtil.h"
-#include "../Plugins/MsgInterface.h"
+#include "../Plugins/KpApiImpl.h"
 #include "../Plugins/PluginMgr.h"
 #include "../../KeePassLibCpp/PwManager.h"
 #include "../../KeePassLibCpp/Util/AppUtil.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
+
+// A GUID used to detect non-existing keys in queries
+#define PCFG_NOTFOUND _T("DD1B11FE241D475AA14A7555729D6BCB")
+
+typedef HRESULT(WINAPI *LPSHGETSPECIALFOLDERPATH)(HWND hwndOwner,
+	LPTSTR lpszPath, int nFolder, BOOL fCreate);
 
 CPrivateConfigEx::CPrivateConfigEx(BOOL bRequireWriteAccess)
 {
@@ -53,7 +59,7 @@ void CPrivateConfigEx::GetConfigPaths()
 	ASSERT(SI_REGSIZE >= _countof(tszAppDir));
 
 	TCHAR tszTemp[SI_REGSIZE];
-	VERIFY(GetApplicationDirectory(tszTemp, SI_REGSIZE - 1, TRUE, FALSE));
+	VERIFY(AU_GetApplicationDirectory(tszTemp, SI_REGSIZE - 1, TRUE, FALSE));
 	m_strFileGlobal = tszTemp;
 	m_strFileGlobal += _T("\\");
 	m_strFileGlobal += PWM_EXENAME;
@@ -207,6 +213,8 @@ BOOL CPrivateConfigEx::Get(LPCTSTR pszField, LPTSTR pszValue) const
 
 BOOL CPrivateConfigEx::Set(LPCTSTR pszField, LPCTSTR pszValue)
 {
+	// pszValue may be NULL -- this deletes the item
+
 	if(m_bPreferUser == TRUE)
 	{
 		if(this->SetIn(pszField, pszValue, CFG_ID_USER) == TRUE) return TRUE;
@@ -218,7 +226,7 @@ BOOL CPrivateConfigEx::Set(LPCTSTR pszField, LPCTSTR pszValue)
 		if(this->SetIn(pszField, pszValue, CFG_ID_USER) == TRUE) return TRUE;
 	}
 
-	KP_Call(KPC_STATUSBARTEXT, (LPARAM)TRL("Failed to save the configuration."), 0, 0);
+	CKpApiImpl::Instance().SetStatusBarText(TRL("Failed to save the configuration."));
 	return FALSE;
 }
 
@@ -257,7 +265,7 @@ BOOL CPrivateConfigEx::SetIn(LPCTSTR pszField, LPCTSTR pszValue, int nConfigID)
 {
 	ASSERT(pszField != NULL); if(pszField == NULL) return FALSE;
 	ASSERT(_tcslen(pszField) > 0); if(_tcslen(pszField) == 0) return FALSE;
-	ASSERT(pszValue != NULL); if(pszValue == NULL) return FALSE;
+	// pszValue may be NULL -- this deletes the item
 
 	ASSERT(m_bCanWrite == TRUE);
 
@@ -293,6 +301,30 @@ BOOL CPrivateConfigEx::SetBool(const TCHAR *pszField, BOOL bValue)
 {
 	ASSERT((bValue == FALSE) || (bValue == TRUE));
 	return this->Set(pszField, (bValue == FALSE) ? CFG_VAL_FALSE : CFG_VAL_TRUE);
+}
+
+BOOL CPrivateConfigEx::GetEnforcedBool(LPCTSTR pszField, BOOL bDefault,
+	BOOL bAllowGlobal) const
+{
+	TCHAR tszTemp[SI_REGSIZE];
+
+	if(this->GetIn(pszField, tszTemp, CFG_ID_ENFORCED) == TRUE)
+	{
+		if(_tcsicmp(tszTemp, CFG_VAL_TRUE) == 0) return TRUE;
+		else if(_tcsicmp(tszTemp, CFG_VAL_FALSE) == 0) return FALSE;
+		return bDefault;
+	}
+
+	if(bAllowGlobal == TRUE)
+	{
+		if(this->GetIn(pszField, tszTemp, CFG_ID_GLOBAL) == TRUE)
+		{
+			if(_tcsicmp(tszTemp, CFG_VAL_TRUE) == 0) return TRUE;
+			else if(_tcsicmp(tszTemp, CFG_VAL_FALSE) == 0) return FALSE;
+		}
+	}
+
+	return bDefault;
 }
 
 std::vector<std::basic_string<TCHAR> > CPrivateConfigEx::GetArray(

@@ -77,8 +77,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,4,0
- PRODUCTVERSION 1,1,4,0
+ FILEVERSION 1,1,5,0
+ PRODUCTVERSION 1,1,5,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -95,13 +95,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Library 1.14"
-            VALUE "FileVersion", "1.1.4.0"
+            VALUE "FileDescription", "KeePass Library 1.15"
+            VALUE "FileVersion", "1.1.5.0"
             VALUE "InternalName", "KeePassLib"
-            VALUE "LegalCopyright", "Copyright (c) 2003-2008 Dominik Reichl"
+            VALUE "LegalCopyright", "Copyright (c) 2003-2009 Dominik Reichl"
             VALUE "OriginalFilename", "KeePassLibCXX.dll"
-            VALUE "ProductName", "KeePass Library 1.14"
-            VALUE "ProductVersion", "1.1.4.0"
+            VALUE "ProductName", "KeePass Library 1.15"
+            VALUE "ProductVersion", "1.1.5.0"
         END
     END
     BLOCK "VarFileInfo"

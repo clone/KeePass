@@ -30,6 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 ==========================================================================*/
 
 // DR 2008-09-10: Added 'lock' command line option
+// DR 2008-11-25: Added 'set-urloverride' command line option
 
 #pragma once
 #include "FullPathName.h"
@@ -49,14 +50,15 @@ CmdArgs objects are immutable.
 
 class CmdArgs {
 public:
-    static CPP_FN_SHARE const CmdArgs& instance();
+    static const CmdArgs& instance();
 
-    const FullPathName& getDatabase() const {return m_database;}
-    const FullPathName&  getKeyfile() const {return m_keyfile;}
-    bool        preselectIsInEffect() const {return m_isPreselect;}
-    bool         readonlyIsInEffect() const {return m_isReadOnly;}
-    const std_string&   getPassword() const {return m_Password;}
-	bool             lockIsInEffect() const {return m_isLock;}
+    const FullPathName&  getDatabase() const {return m_database;}
+    const FullPathName&   getKeyfile() const {return m_keyfile;}
+    bool         preselectIsInEffect() const {return m_isPreselect;}
+    bool          readonlyIsInEffect() const {return m_isReadOnly;}
+    const std_string&    getPassword() const {return m_Password;}
+	bool              lockIsInEffect() const {return m_isLock;}
+	const std_string& getUrlOverride() const {return m_urlOverride;}
 
 private:
     CmdArgs();
@@ -67,4 +69,5 @@ private:
     bool         m_isReadOnly;
     std_string   m_Password;  // empty() <==> not set
     bool         m_isLock;
+	std_string   m_urlOverride;
 };

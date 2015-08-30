@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -229,11 +229,11 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 
 				PW_ENTRY pwTemplate;
 				memset(&pwTemplate, 0, sizeof(PW_ENTRY));
-				pwTemplate.pszAdditional = (TCHAR *)(LPCTSTR)strNotes;
-				pwTemplate.pszPassword = (TCHAR *)(LPCTSTR)strPassword;
-				pwTemplate.pszTitle = (TCHAR *)(LPCTSTR)strTitle;
-				pwTemplate.pszURL = (TCHAR *)(LPCTSTR)strURL;
-				pwTemplate.pszUserName = (TCHAR *)(LPCTSTR)strUserName;
+				pwTemplate.pszAdditional = const_cast<LPTSTR>((LPCTSTR)strNotes);
+				pwTemplate.pszPassword = const_cast<LPTSTR>((LPCTSTR)strPassword);
+				pwTemplate.pszTitle = const_cast<LPTSTR>((LPCTSTR)strTitle);
+				pwTemplate.pszURL = const_cast<LPTSTR>((LPCTSTR)strURL);
+				pwTemplate.pszUserName = const_cast<LPTSTR>((LPCTSTR)strUserName);
 				pwTemplate.tCreation = tNow; CPwManager::GetNeverExpireTime(&pwTemplate.tExpire);
 				pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
 				pwTemplate.uGroupId = dwLastGroupId;
@@ -416,11 +416,11 @@ BOOL CPwImport::ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr)
 
 				_GetCurrentPwTime(&tNow);
 				memset(&pwTemplate, 0, sizeof(PW_ENTRY));
-				pwTemplate.pszAdditional = (TCHAR *)(LPCTSTR)strNotes;
-				pwTemplate.pszPassword = (TCHAR *)(LPCTSTR)strPassword;
-				pwTemplate.pszTitle = (TCHAR *)(LPCTSTR)strTitle;
-				pwTemplate.pszURL = (TCHAR *)(LPCTSTR)strURL;
-				pwTemplate.pszUserName = (TCHAR *)(LPCTSTR)strUserName;
+				pwTemplate.pszAdditional = const_cast<LPTSTR>((LPCTSTR)strNotes);
+				pwTemplate.pszPassword = const_cast<LPTSTR>((LPCTSTR)strPassword);
+				pwTemplate.pszTitle = const_cast<LPTSTR>((LPCTSTR)strTitle);
+				pwTemplate.pszURL = const_cast<LPTSTR>((LPCTSTR)strURL);
+				pwTemplate.pszUserName = const_cast<LPTSTR>((LPCTSTR)strUserName);
 				pwTemplate.tCreation = tNow; CPwManager::GetNeverExpireTime(&pwTemplate.tExpire);
 				pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
 				pwTemplate.uGroupId = dwLastGroupId;
@@ -654,11 +654,11 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 
 			memset(&pwTemplate, 0, sizeof(PW_ENTRY));
 			_GetCurrentPwTime(&tNow);
-			pwTemplate.pszAdditional = (TCHAR *)(LPCTSTR)strNotes;
-			pwTemplate.pszPassword = (TCHAR *)(LPCTSTR)strPassword;
-			pwTemplate.pszTitle = (TCHAR *)(LPCTSTR)strTitle;
+			pwTemplate.pszAdditional = const_cast<LPTSTR>((LPCTSTR)strNotes);
+			pwTemplate.pszPassword = const_cast<LPTSTR>((LPCTSTR)strPassword);
+			pwTemplate.pszTitle = const_cast<LPTSTR>((LPCTSTR)strTitle);
 			pwTemplate.pszURL = g_pNullString;
-			pwTemplate.pszUserName = (TCHAR *)(LPCTSTR)strUserName;
+			pwTemplate.pszUserName = const_cast<LPTSTR>((LPCTSTR)strUserName);
 			pwTemplate.tCreation = tNow; CPwManager::GetNeverExpireTime(&pwTemplate.tExpire);
 			pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
 			pwTemplate.uImageId = _GetPreferredIcon((LPCTSTR)strTitle);

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@
 #include "../Util/StrUtil.h"
 #include "../Util/TranslateEx.h"
 #include "PwCompatImpl.h"
+
+#include <boost/static_assert.hpp>
 
 #define _OPENDB_FAIL_LIGHT \
 { \
@@ -81,7 +83,6 @@
 // To open a file in rescue mode, set it to TRUE.
 int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *pRepair)
 {
-	FILE *fp;
 	char *pVirtualFile;
 	unsigned long uFileSize, uAllocated, uEncryptedPartSize;
 	unsigned long pos;
@@ -95,7 +96,7 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *p
 	PW_GROUP pwGroupTemplate;
 	PW_ENTRY pwEntryTemplate;
 
-	ASSERT(sizeof(char) == 1);
+	BOOST_STATIC_ASSERT(sizeof(char) == 1);
 
 	ASSERT(pszFile != NULL); if(pszFile == NULL) return PWE_INVALID_PARAM;
 	ASSERT(pszFile[0] != 0); if(pszFile[0] == 0) return PWE_INVALID_PARAM; // Length != 0
@@ -105,7 +106,7 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *p
 
 	if(pRepair != NULL) { ZeroMemory(pRepair, sizeof(PWDB_REPAIR_INFO)); }
 
-	fp = NULL;
+	FILE *fp = NULL;
 	_tfopen_s(&fp, pszFile, _T("rb"));
 	if(fp == NULL) return PWE_NOFILEACCESS_READ;
 
@@ -170,11 +171,15 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *p
 	// Generate m_pTransformedMasterKey from m_pMasterKey
 	if(_TransformMasterKey(hdr.aMasterSeed2) == FALSE) { ASSERT(FALSE); _OPENDB_FAIL; }
 
+	ProtectTransformedMasterKey(false);
+
 	// Hash the master password with the salt in the file
 	sha256_begin(&sha32);
 	sha256_hash(hdr.aMasterSeed, 16, &sha32);
 	sha256_hash(m_pTransformedMasterKey, 32, &sha32);
 	sha256_end((unsigned char *)uFinalKey, &sha32);
+
+	ProtectTransformedMasterKey(true);
 
 	if(pRepair == NULL)
 	{
@@ -228,6 +233,8 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *p
 		ASSERT(FALSE); _OPENDB_FAIL; // This should never happen
 	}
 
+	mem_erase(uFinalKey, 32);
+
 #if 0
 	// For debugging purposes, a file containing the plain text is created.
 	// This code of course must not be compiled into the final binary.
@@ -255,10 +262,11 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *p
 	// Check if key is correct (with very high probability)
 	if(pRepair == NULL)
 	{
+		unsigned char vContentsHash[32];
 		sha256_begin(&sha32);
 		sha256_hash((unsigned char *)pVirtualFile + sizeof(PW_DBHEADER), uEncryptedPartSize, &sha32);
-		sha256_end((unsigned char *)uFinalKey, &sha32);
-		if(memcmp(hdr.aContentsHash, uFinalKey, 32) != 0)
+		sha256_end(vContentsHash, &sha32);
+		if(memcmp(hdr.aContentsHash, vContentsHash, 32) != 0)
 			{ _OPENDB_FAIL_LIGHT; return PWE_INVALID_KEY; }
 	}
 
@@ -360,11 +368,10 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 	_AddAllMetaStreams();
 
 	DWORD uFileSize = sizeof(PW_DBHEADER);
-
 	BYTE *pbt;
 
 	// Get the size of all groups
-	for(i = 0; i < m_dwNumGroups; i++)
+	for(i = 0; i < m_dwNumGroups; ++i)
 	{
 		uFileSize += 94; // 6+4+6+6+5+6+5+6+5+6+5+6+4+6+6+2+6+4 = 94
 
@@ -374,7 +381,7 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 	}
 
 	// Get the size of all entries together
-	for(i = 0; i < m_dwNumEntries; i++)
+	for(i = 0; i < m_dwNumEntries; ++i)
 	{
 		ASSERT_ENTRY(&m_pEntries[i]);
 
@@ -630,11 +637,15 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 	if(_TransformMasterKey(hdr.aMasterSeed2) == FALSE)
 		{ ASSERT(FALSE); SAFE_DELETE_ARRAY(pVirtualFile); _LoadAndRemoveAllMetaStreams(false); return PWE_CRYPT_ERROR; }
 
+	ProtectTransformedMasterKey(false);
+
 	// Hash the master password with the generated hash salt
 	sha256_begin(&sha32);
 	sha256_hash(hdr.aMasterSeed, 16, &sha32);
 	sha256_hash(m_pTransformedMasterKey, 32, &sha32);
 	sha256_end((unsigned char *)uFinalKey, &sha32);
+
+	ProtectTransformedMasterKey(true);
 
 #if 0
 	// For debugging purposes, a file containing the plain text is created.
@@ -652,8 +663,6 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 	if(m_nAlgorithm == ALGO_AES)
 	{
 		CRijndael aes;
-
-		// Initialize Rijndael/AES
 		if(aes.Init(CRijndael::CBC, CRijndael::EncryptDir, uFinalKey,
 			CRijndael::Key32Bytes, hdr.aEncryptionIV) != RIJNDAEL_SUCCESS)
 		{
@@ -661,14 +670,13 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 			return PWE_CRYPT_ERROR;
 		}
 
-		uEncryptedPartSize = (unsigned long)aes.PadEncrypt((UINT8 *)pVirtualFile +
-			sizeof(PW_DBHEADER), pos - sizeof(PW_DBHEADER), (UINT8 *)pVirtualFile +
-			sizeof(PW_DBHEADER));
+		uEncryptedPartSize = static_cast<unsigned long>(aes.PadEncrypt(
+			(UINT8 *)pVirtualFile + sizeof(PW_DBHEADER), pos - sizeof(PW_DBHEADER),
+			(UINT8 *)pVirtualFile + sizeof(PW_DBHEADER)));
 	}
 	else if(m_nAlgorithm == ALGO_TWOFISH)
 	{
 		CTwofish twofish;
-
 		if(twofish.Init(uFinalKey, 32, hdr.aEncryptionIV) == false)
 		{
 			SAFE_DELETE_ARRAY(pVirtualFile);
@@ -676,9 +684,9 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 			return PWE_CRYPT_ERROR;
 		}
 
-		uEncryptedPartSize = (unsigned long)twofish.PadEncrypt(
+		uEncryptedPartSize = static_cast<unsigned long>(twofish.PadEncrypt(
 			(UINT8 *)pVirtualFile + sizeof(PW_DBHEADER),
-			pos - sizeof(PW_DBHEADER), (UINT8 *)pVirtualFile + sizeof(PW_DBHEADER));
+			pos - sizeof(PW_DBHEADER), (UINT8 *)pVirtualFile + sizeof(PW_DBHEADER)));
 	}
 	else
 	{
@@ -687,6 +695,8 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 		_LoadAndRemoveAllMetaStreams(false);
 		return PWE_INVALID_PARAM;
 	}
+
+	mem_erase(uFinalKey, 32);
 
 	// Check if all went correct
 	ASSERT((uEncryptedPartSize % 16) == 0);

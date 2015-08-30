@@ -39,6 +39,11 @@
  *
  *	- Added unreferenced parameter declarations, more explicit type casts to
  *    compile better with warning level 4, removed unnecessary variables, etc.
+ *
+ *	v0.32c (10-Dec-2008) [D. Reichl]
+ *
+ *	- Replaced sample title and caption strings by whitespace strings
+ *
  ****************************************************************************/
 
 #include "stdafx.h"
@@ -64,8 +69,8 @@ CKCSideBannerWnd::CKCSideBannerWnd()
 , m_colTxtTitle(RGB(0,0,0))
 , m_colTxtCaption(RGB(0,0,0))
 , m_colEdge(RGB(0,0,0))
-, m_strTitle(_T("This is the sample title"))
-, m_strCaption(_T("This is the sample caption..."))
+, m_strTitle(_T(" "))
+, m_strCaption(_T(" "))
 , m_szEdgeOffset(5,3)
 , m_szCaptionOffset(4, 10)
 , m_uIconPos(KCSB_ICON_RIGHT)

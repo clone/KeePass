@@ -29,7 +29,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ==========================================================================*/
 #pragma once
-#include "../../../KeePassLibCpp/SysDefEx.h"
 #include <cassert>
 #include <string>
 
@@ -66,8 +65,7 @@ public:
                 PATH_AND_FILENAME = 1<<3}; // path does not end in "\"; last part is filename.
 
     FullPathName() : m_state(UNINITIALIZED) {}
-    CPP_FN_SHARE explicit FullPathName(const std_string& pathName);
-    CPP_FN_SHARE ~FullPathName();  // Support static run-time library usage.
+    explicit FullPathName(const std_string& pathName);
     STATE getState() const {return m_state;}
 
     const std_string& getFullPathName() const {

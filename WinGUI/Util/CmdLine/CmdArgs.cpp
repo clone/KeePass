@@ -30,6 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 ==========================================================================*/
 
 // DR 2008-09-10: Added 'lock' command line option
+// DR 2008-11-25: Added 'set-urloverride' command line option
 
 #include "StdAfx.h"
 #include "CmdArgs.h"
@@ -46,11 +47,12 @@ const CmdArgs& CmdArgs::instance() {
 CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false), m_isLock(false) {
 
     // Command line options:
-    const CommandLineOption keyfile  (_T("keyfile:"));
-    const CommandLineOption preselect(_T("preselect:"));
-    const CommandLineOption readonly (_T("readonly"));
-    const CommandLineOption pw       (_T("pw:"));
-    const CommandLineOption lockcw   (_T("lock"));
+    const CommandLineOption keyfile    (_T("keyfile:"));
+    const CommandLineOption preselect  (_T("preselect:"));
+    const CommandLineOption readonly   (_T("readonly"));
+    const CommandLineOption pw         (_T("pw:"));
+    const CommandLineOption lockcw     (_T("lock"));
+	const CommandLineOption urloverride(_T("set-urloverride:"));
 
     // For each command line argument ...
     typedef CommandLineTokens::const_iterator const_iterator;
@@ -105,9 +107,14 @@ CmdArgs::CmdArgs() : m_isPreselect(false), m_isReadOnly(false), m_isLock(false) 
             m_isReadOnly = true;
             }
 
-        // minimize option:
+        // lock option:
         else if(lockcw.isOption(argument)) {
             m_isLock = true;
+            }
+
+        // set-urloverride option:
+        else if(urloverride.isOption(argument)) {
+            m_urlOverride = urloverride.optionValue(argument);
             }
 
         // Plugin options:

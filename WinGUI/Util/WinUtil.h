@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,10 +28,6 @@
 
 #include <string>
 
-#define OLF_OPEN 0
-#define OLF_PRINT 1
-#define OLF_EXPLORE 2
-
 #define KPSW_SHOWDEFAULT SW_SHOWDEFAULT
 
 // The following definitions must be at least 256, maximum 32767
@@ -39,6 +35,9 @@
 #define WU_MAX_MACHINE_LEN 1024
 
 #define CFN_CLIPBOARD_VIEWER_IGNORE _T("Clipboard Viewer Ignore")
+
+#define APPHS_LOCAL  0
+#define APPHS_ONLINE 1
 
 typedef struct _AV_APP_INFO
 {
@@ -85,22 +84,22 @@ BOOL WU_SysCreateProcess(LPCTSTR lpFile, LPCTSTR lpParameters);
 BOOL _FileAccessible(LPCTSTR lpFile);
 BOOL _FileWritable(LPCTSTR lpFile);
 
-// Must be exported:
-C_FN_SHARE int _OpenLocalFile(LPCTSTR szFile, int nMode);
-C_FN_SHARE BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD dwBufLen);
+int _OpenLocalFile(LPCTSTR szFile, int nMode);
+BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD dwBufLen);
 
 std::vector<std::basic_string<TCHAR> > WU_GetFileNames(BOOL bOpenMode,
 	LPCTSTR lpSuffix, LPCTSTR lpFilter, BOOL bAllowMultiSelect,
 	CWnd* pParent, BOOL bAddToRecent, BOOL bNoChangeDir);
 
+int WU_GetAppHelpSource();
+void WU_SetAppHelpSource(int nSource);
 BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile);
 
 UINT TWinExec(LPCTSTR lpCmdLine, WORD uCmdShow);
 
-BOOL WU_IsWin9xSystem();
-BOOL WU_IsAtLeastWinVistaSystem();
 BOOL WU_SupportsMultiLineTooltips();
 
+std::basic_string<TCHAR> WU_GetTempDirectory();
 std::basic_string<TCHAR> WU_GetTempFile(LPCTSTR lpSuffix);
 std::basic_string<TCHAR> WU_GetUserName();
 
@@ -133,7 +132,7 @@ CString FilterTrlComment(LPCTSTR lpEnglishString);
 
 void WU_GetUserApplications(std::vector<AV_APP_INFO>& vStorage);
 
-BOOL WU_CreateDirectoryTree(LPCTSTR lpDirPath);
+HRESULT WU_CreateDirectoryTree(LPCTSTR lpDirPath);
 
 // void WU_MouseClick(bool bRightClick);
 

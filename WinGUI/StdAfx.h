@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -98,6 +98,19 @@
 #undef _WIN32_WINNT
 #endif
 #define _WIN32_WINNT 0x0500
+
+// Redefine the buggy version of AFXASSUME if we are being compiled on
+// VC 2005 which generates the compiler warning "C4189: '__afx_condVal' :
+// local variable is initialized but not referenced"; this bug was fixed
+// in VC 2008
+#if (_MSC_VER < 1500)
+#ifdef AFXASSUME
+#if !defined(_PREFAST_) && !defined(_DEBUG)
+#undef AFXASSUME
+#define AFXASSUME(cond) ((void)0)
+#endif
+#endif
+#endif
 
 //{{AFX_INSERT_LOCATION}}
 

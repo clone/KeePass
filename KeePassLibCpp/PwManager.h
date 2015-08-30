@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 
 #include "Util/NewRandom.h"
 #include "Crypto/Rijndael.h"
+#include "PwStructs.h"
 
 // General product information
 #define PWM_PRODUCT_NAME       _T("KeePass Password Safe")
@@ -36,11 +37,11 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.14")
+#define PWM_VERSION_STR  _T("1.15")
 #else
-#define PWM_VERSION_STR  _T("1.14 Unicode")
+#define PWM_VERSION_STR  _T("1.15 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01010400
+#define PWM_VERSION_DW   0x01010500
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
@@ -52,6 +53,7 @@
 #define PWM_URL_PLUGINS  _T("http://keepass.info/plugins.html")
 #define PWM_URL_VERSION  _T("http://keepass.info/update/version1.txt")
 #define PWM_URL_DONATE   _T("http://keepass.info/donate.html")
+#define PWM_URL_HELP     _T("http://keepass.info/help/")
 
 #define PWM_EXENAME       _T("KeePass")
 
@@ -177,6 +179,13 @@
 #define PWMKEY_DROPTOBACKONCOPY _T("KeeDropToBackOnCopy")
 #define PWMKEY_SORTAUTOTYPESELITEMS _T("KeeSortAutoTypeSelItems")
 #define PWMKEY_CLEARCLIPONDBCLOSE   _T("KeeClearClipboardOnDbClose")
+#define PWMKEY_USEHELPCENTER        _T("KeeUseHelpCenter")
+#define PWMKEY_USEDPAPIFORMEMPROT   _T("KeeUseDPAPIForMemoryProtection")
+#define PWMKEY_FORCEALLOWCHANGEMKEY _T("KeeForceAllowChangeMasterKey")
+#define PWMKEY_FORCEALLOWPRINTING   _T("KeeForceAllowPrinting")
+#define PWMKEY_FORCEALLOWIMPORT     _T("KeeForceAllowImport")
+#define PWMKEY_FORCEALLOWEXPORT     _T("KeeForceAllowExport")
+#define PWMKEY_DISALLOWPRINTINGPWS  _T("KeeDisallowPrintingPasswords")
 
 #define PWMKEY_GENPROFILE       _T("KeeGenProfile")
 #define PWMKEY_GENPROFILEAUTO   _T("KeeGenProfileAuto")
@@ -215,6 +224,8 @@
 #define PWM_STD_ICON_GROUP_PKG   25
 
 #define PWM_STD_MAX_HISTORYITEMS 12
+
+#define PWM_STD_HRSLINK_FCT      2
 
 // Field flags (for example in Find function)
 // These flags must be disjoint to PWMS_* flags
@@ -284,6 +295,8 @@
 #define PMS_STREAM_CUSTOMKVP         _T("Custom KVP")
 #define PMS_STREAM_KPXICON2          _T("KPX_CUSTOM_ICONS_2")
 
+#define PMD_HREL_ID     PWM_PRODUCT_NAME
+
 #ifdef VPA_MODIFY
 #error VPA_MODIFY must not be defined already.
 #else
@@ -291,89 +304,6 @@
 #endif
 
 #pragma pack(1)
-
-typedef struct _PW_TIME
-{
-	USHORT shYear; // Year, 2004 means 2004
-	BYTE btMonth;  // Month, ranges from 1 = Jan to 12 = Dec
-	BYTE btDay;    // Day, the first day is 1
-	BYTE btHour;   // Hour, begins with hour 0, max value is 23
-	BYTE btMinute; // Minutes, begins at 0, max value is 59
-	BYTE btSecond; // Seconds, begins at 0, max value is 59
-
-#ifdef VPF_ALIGN
-	BYTE btDummy;
-#endif
-} PW_TIME, *PPW_TIME;
-
-typedef struct _PW_DBHEADER // The database header
-{
-	DWORD dwSignature1; // = PWM_DBSIG_1
-	DWORD dwSignature2; // = PWM_DBSIG_2
-	DWORD dwFlags;
-	DWORD dwVersion;
-
-	BYTE aMasterSeed[16]; // Seed that gets hashed with the userkey to form the final key
-	UINT8 aEncryptionIV[16]; // IV used for content encryption
-
-	DWORD dwGroups; // Number of groups in the database
-	DWORD dwEntries; // Number of entries in the database
-
-	BYTE aContentsHash[32]; // SHA-256 hash of the database, used for integrity check
-
-	BYTE aMasterSeed2[32]; // Used for the dwKeyEncRounds AES transformations
-	DWORD dwKeyEncRounds;
-} PW_DBHEADER, *PPW_DBHEADER;
-
-typedef struct _PW_GROUP // Structure containing information about one group
-{
-	DWORD uGroupId;
-	DWORD uImageId;
-	TCHAR *pszGroupName;
-
-	PW_TIME tCreation;
-	PW_TIME tLastMod;
-	PW_TIME tLastAccess;
-	PW_TIME tExpire;
-
-	USHORT usLevel;
-
-#ifdef VPF_ALIGN
-	USHORT usDummy;
-#endif
-
-	DWORD dwFlags; // Used by KeePass internally, don't use
-} PW_GROUP, *PPW_GROUP;
-
-typedef struct _PW_ENTRY // Structure containing information about one entry
-{
-	BYTE uuid[16];
-	DWORD uGroupId;
-	DWORD uImageId;
-
-	TCHAR *pszTitle;
-	TCHAR *pszURL;
-	TCHAR *pszUserName;
-
-	DWORD uPasswordLen;
-	TCHAR *pszPassword;
-
-	TCHAR *pszAdditional;
-
-	PW_TIME tCreation;
-	PW_TIME tLastMod;
-	PW_TIME tLastAccess;
-	PW_TIME tExpire;
-
-	TCHAR *pszBinaryDesc; // A string describing what is in pBinaryData
-	BYTE *pBinaryData;
-	DWORD uBinaryDataLen;
-} PW_ENTRY, *PPW_ENTRY;
-
-typedef struct _PW_UUID_STRUCT
-{
-	BYTE uuid[16];
-} PW_UUID_STRUCT;
 
 typedef struct _PMS_SIMPLE_UI_STATE
 {
@@ -399,13 +329,6 @@ typedef struct _PMS_SIMPLE_UI_STATE
 	DWORD dwReserved16;
 } PMS_SIMPLE_UI_STATE;
 
-typedef struct _PWDB_REPAIR_INFO
-{
-	DWORD dwOriginalGroupCount;
-	DWORD dwOriginalEntryCount;
-	DWORD dwRecognizedMetaStreamCount;
-} PWDB_REPAIR_INFO, *PPWDB_REPAIR_INFO;
-
 typedef struct _PWDB_META_STREAM
 {
 	std::basic_string<TCHAR> strName;
@@ -425,11 +348,8 @@ typedef std::pair<std::basic_string<TCHAR>, std::basic_string<TCHAR> > CustomKvp
 #else
 #define ASSERT_ENTRY(pp)
 #endif
-#ifndef DWORD_MAX
-#define DWORD_MAX 0xFFFFFFFF
-#endif
 
-class CPP_CLASS_SHARE CPwManager : boost::noncopyable
+class CPwManager : boost::noncopyable
 {
 public:
 	CPwManager();
@@ -437,8 +357,9 @@ public:
 
 	void InitPrimaryInstance();
 
-	// Set the master key for the database.
-	int SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const TCHAR *pszSecondKey, const CNewRandomInterface *pARI, BOOL bOverwrite);
+	// Set the master key for the database
+	int SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const TCHAR *pszSecondKey,
+		const CNewRandomInterface *pARI, BOOL bOverwrite);
 
 	DWORD GetNumberOfEntries() const; // Returns number of entries in database
 	DWORD GetNumberOfGroups() const; // Returns number of groups in database
@@ -507,12 +428,11 @@ public:
 		DWORD searchFlags, DWORD nStart);
 
 	// Get and set the algorithm used to encrypt the database
-	BOOL SetAlgorithm(int nAlgorithm);
 	int GetAlgorithm() const;
+	BOOL SetAlgorithm(int nAlgorithm);
 
 	DWORD GetKeyEncRounds() const;
 	void SetKeyEncRounds(DWORD dwRounds);
-	const PW_DBHEADER *GetLastDatabaseHeader() const;
 
 	// Get the never-expire time
 	static void GetNeverExpireTime(__out_ecount(1) PW_TIME *pPwTime);
@@ -522,8 +442,10 @@ public:
 
 	void SubstEntryGroupIds(DWORD dwExistingId, DWORD dwNewId);
 
-	void GetRawMasterKey(__out_ecount(32) BYTE *pStorage) const;
+	const PW_DBHEADER *GetLastDatabaseHeader() const;
+	void GetRawMasterKey(__out_ecount(32) BYTE *pStorage);
 	void SetRawMasterKey(__in_ecount(32) const BYTE *pNewKey);
+	void ClearMasterKey(BOOL bClearKey, BOOL bClearTransformedKey);
 
 	std::basic_string<TCHAR> GetPropertyString(DWORD dwPropertyId) const;
 	BOOL SetPropertyString(DWORD dwPropertyId, LPCTSTR lpValue);
@@ -540,6 +462,8 @@ public:
 
 private:
 	void CleanUp(); // Delete everything and release all allocated memory
+
+	void _DetMetaInfo();
 
 	void _AllocEntries(DWORD uEntries);
 	void _DeleteEntryList(BOOL bFreeStrings);
@@ -567,6 +491,9 @@ private:
 
 	static BYTE* SerializeCustomKvp(const CustomKvp& kvp);
 	static bool DeserializeCustomKvp(const BYTE *pStream, CustomKvp& kvpBuffer);
+
+	void ProtectMasterKey(bool bProtectKey);
+	void ProtectTransformedMasterKey(bool bProtectKey);
 
 	PW_ENTRY *m_pEntries; // List containing all entries
 	DWORD m_dwMaxEntries; // Maximum number of items that can be stored in the list

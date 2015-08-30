@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #include "../../KeePassLibCpp/Util/PwUtil.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
 #include "../../KeePassLibCpp/Util/MemUtil.h"
+#include "../../KeePassLibCpp/Util/AppUtil.h"
 
 static BOOL g_bImgButtons = 0;
 static CThemeHelperST* g_pThemeHelper = NULL;
@@ -253,7 +254,7 @@ void NewGUI_ConfigQualityMeter(void *pWnd)
 	p->SetPos(0);
 }
 
-void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword)
+void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, LPCTSTR pszPassword)
 {
 	CGradientProgressCtrl *pProgress = (CGradientProgressCtrl *)pProgressBar;
 	CStatic *pStatic = (CStatic *)pStaticDesc;
@@ -489,7 +490,7 @@ void NewGUI_SetCueBanner_TB(HWND hTextBox, LPCTSTR lpText)
 
 	// On Windows XP there's a drawing bug at the left border (text is
 	// not displayed correctly), therefore prepend a space on Windows XP
-	CString strSearchTr = ((WU_IsAtLeastWinVistaSystem() == FALSE) ? _T(" ") : _T(""));
+	CString strSearchTr = ((AU_IsAtLeastWinVistaSystem() == FALSE) ? _T(" ") : _T(""));
 	strSearchTr += lpText;
 
 #ifndef _UNICODE

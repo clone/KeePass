@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,13 +32,14 @@
 #include "WinUtil.h"
 #include "CmdLine/Executable.h"
 #include "SprEngine/SprEngine.h"
-#include "PrivateConfig.h"
+#include "PrivateConfigEx.h"
 #include "AppLocator.h"
 #include "../Plugins/PluginMgr.h"
 #include "../../KeePassLibCpp/Util/AppUtil.h"
 #include "../../KeePassLibCpp/Util/MemUtil.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
+#include "../../KeePassLibCpp/PwStructsEx.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/algorithm/string.hpp>
@@ -49,6 +50,8 @@ static unsigned char g_shaLastString[32];
 // static LPCTSTR g_lpChildWindowText = NULL;
 
 static UINT g_uCfIgnoreID = 0; // ID of CFN_CLIPBOARD_VIEWER_IGNORE
+
+static int g_nAppHelpSource = APPHS_LOCAL;
 
 #ifndef _WIN32_WCE
 
@@ -272,7 +275,7 @@ CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile)
 	else return CString(lpTargetFile);
 }
 #else
-CPP_FN_SHARE CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile)
+CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile)
 {
 	return CString(lpTargetFile);
 }
@@ -467,7 +470,7 @@ void OpenUrlEx(LPCTSTR lpURL, HWND hParent)
 
 	std::basic_string<TCHAR> strURL = WU_ExpandEnvironmentVars(lpURL);
 
-	CPrivateConfig cfg(FALSE);
+	CPrivateConfigEx cfg(FALSE);
 	BOOL bPrevMethod = cfg.GetBool(PWMKEY_HTMURLMETHOD, FALSE);
 	if(bPrevMethod == FALSE)
 	{
@@ -693,7 +696,7 @@ BOOL _FileWritable(LPCTSTR lpFile)
 	return TRUE;
 }
 
-C_FN_SHARE int _OpenLocalFile(LPCTSTR szFile, int nMode)
+int _OpenLocalFile(LPCTSTR szFile, int nMode)
 {
 	std_string strPath = Executable::instance().getPathOnly();
 
@@ -746,7 +749,7 @@ BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD
 	{
 		strSample = dlg.GetPathName();
 
-		if((DWORD)strSample.GetLength() < dwBufLen)
+		if(static_cast<DWORD>(strSample.GetLength()) < dwBufLen)
 		{
 			_tcscpy_s(lpStoreBuf, dwBufLen, (LPCTSTR)strSample);
 			return TRUE;
@@ -809,21 +812,46 @@ std::vector<std::basic_string<TCHAR> > WU_GetFileNames(BOOL bOpenMode,
 	return v;
 }
 
+int WU_GetAppHelpSource()
+{
+	return g_nAppHelpSource;
+}
+
+void WU_SetAppHelpSource(int nSource)
+{
+	ASSERT((nSource >= 0) && (nSource <= 1));
+	g_nAppHelpSource = nSource;
+}
+
 BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
 {
-	ASSERT(lpTopicFile != NULL); if(lpTopicFile == NULL) return FALSE;
+	if(g_nAppHelpSource == APPHS_LOCAL)
+	{
+		TCHAR tszBuf[MAX_PATH * 2];
+		AU_GetApplicationDirectory(tszBuf, MAX_PATH * 2 - 2, TRUE, TRUE);
 
-	TCHAR tszBuf[MAX_PATH * 2];
-	GetApplicationDirectory(tszBuf, MAX_PATH * 2 - 2, TRUE, TRUE);
+		CString str = _T("hh.exe ms-its:");
+		str += tszBuf;
+		str += _T("/");
+		str += PWM_README_FILE;
 
-	CString str = _T("hh.exe ms-its:");
-	str += tszBuf;
-	str += _T("/");
-	str += PWM_README_FILE;
-	str += _T("::/");
-	str += lpTopicFile;
+		if(lpTopicFile != NULL)
+		{
+			str += _T("::/");
+			str += lpTopicFile;
+		}
 
-	TWinExec(str, KPSW_SHOWDEFAULT);
+		TWinExec(str, KPSW_SHOWDEFAULT);
+	}
+	else // APPHS_ONLINE
+	{
+		CString str = PWM_HOMEPAGE;
+		if(lpTopicFile != NULL) str += lpTopicFile;
+		else str = PWM_URL_HELP;
+
+		OpenUrlEx(str, NULL);
+	}
+
 	return TRUE;
 }
 
@@ -861,26 +889,6 @@ UINT TWinExec(LPCTSTR lpCmdLine, WORD wCmdShow)
 	return ((bResult != FALSE) ? 32 : ERROR_FILE_NOT_FOUND);
 }
 
-BOOL WU_IsWin9xSystem()
-{
-	OSVERSIONINFO osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-
-	return ((osvi.dwMajorVersion <= 4) ? TRUE : FALSE);
-}
-
-BOOL WU_IsAtLeastWinVistaSystem()
-{
-	OSVERSIONINFO osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osvi);
-
-	return ((osvi.dwMajorVersion >= 6) ? TRUE : FALSE);
-}
-
 BOOL WU_SupportsMultiLineTooltips()
 {
 	OSVERSIONINFO osvi;
@@ -892,16 +900,24 @@ BOOL WU_SupportsMultiLineTooltips()
 		TRUE : FALSE);
 }
 
+std::basic_string<TCHAR> WU_GetTempDirectory()
+{
+	TCHAR szDir[MAX_PATH * 2];
+	GetTempPath(MAX_PATH * 2 - 2, szDir);
+	if(szDir[_tcslen(szDir) - 1] != _T('\\'))
+		_tcscat_s(szDir, _countof(szDir), _T("\\"));
+	VERIFY(WU_CreateDirectoryTree(szDir) == S_OK);
+
+	std::basic_string<TCHAR> str = szDir;
+	return str;
+}
+
 std::basic_string<TCHAR> WU_GetTempFile(LPCTSTR lpSuffix)
 {
 	if((lpSuffix == NULL) || (lpSuffix[0] == 0))
 		lpSuffix = _T(".tmp");
 
-	TCHAR szDir[MAX_PATH * 2];
-	GetTempPath(MAX_PATH * 2 - 2, szDir);
-	if(szDir[_tcslen(szDir) - 1] != _T('\\'))
-		_tcscat_s(szDir, _countof(szDir), _T("\\"));
-	VERIFY(WU_CreateDirectoryTree(szDir));
+	const std::basic_string<TCHAR> strTempDir = WU_GetTempDirectory();
 
 	const DWORD dwOffset = (GetTickCount() << 10);
 	std::basic_string<TCHAR> tszFile;
@@ -910,7 +926,7 @@ std::basic_string<TCHAR> WU_GetTempFile(LPCTSTR lpSuffix)
 		const DWORD dwTest = dwOffset + rand();
 
 		CString strTest;
-		strTest.Format(_T("%s%s%u%s"), szDir, _T("Tmp"), dwTest, lpSuffix);
+		strTest.Format(_T("%s%s%u%s"), strTempDir.c_str(), _T("Tmp"), dwTest, lpSuffix);
 		if(_FileAccessible(strTest) == TRUE) continue; // Exists already
 		if(_FileWritable(strTest) == FALSE) continue; // Test write access
 
@@ -1206,7 +1222,7 @@ std::basic_string<TCHAR> WU_FreeDriveIfCurrent(TCHAR tchDriveLetter)
 
 	TCHAR tszTemp[SI_REGSIZE];
 	if(GetTempPath(SI_REGSIZE - 1, tszTemp) == 0) { ASSERT(FALSE); return strEmpty; }
-	VERIFY(WU_CreateDirectoryTree(tszTemp));
+	VERIFY(WU_CreateDirectoryTree(tszTemp) == S_OK);
 
 	WU_SetCurrentDirectory(&tszTemp[0]);
 	return strDir;
@@ -1286,9 +1302,9 @@ void WU_GetUserApplications(std::vector<AV_APP_INFO>& vStorage)
 	}
 }
 
-BOOL WU_CreateDirectoryTree(LPCTSTR lpDirPath)
+HRESULT WU_CreateDirectoryTree(LPCTSTR lpDirPath)
 {
-	ASSERT(lpDirPath != NULL); if(lpDirPath == NULL) return TRUE;
+	ASSERT(lpDirPath != NULL); if(lpDirPath == NULL) return E_POINTER;
 
 	std::basic_string<TCHAR> strPath = lpDirPath;
 	std::basic_string<TCHAR> strSeps = _T("/\\");
@@ -1306,10 +1322,10 @@ BOOL WU_CreateDirectoryTree(LPCTSTR lpDirPath)
 
 		if((CreateDirectory(strCur.c_str(), NULL) == FALSE) &&
 			(GetLastError() != ERROR_ALREADY_EXISTS))
-			return FALSE;
+			return E_FAIL;
 	}
 
-	return TRUE;
+	return S_OK;
 }
 
 /* void WU_MouseClick(bool bRightClick)

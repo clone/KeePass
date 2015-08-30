@@ -35,6 +35,15 @@
  *    Used John A. Johnson's GradientFill() function, and used dynamic linking
  *	  of the MSIMG32.DLL (thanks to Irek Zielinski's code)
  *
+ *	v0.32b (20-Nov-2004) [D. Reichl]
+ *
+ *	- Added unreferenced parameter declarations, more explicit type casts to
+ *    compile better with warning level 4, removed unnecessary variables, etc.
+ *
+ *	v0.32c (10-Dec-2008) [D. Reichl]
+ *
+ *	- Replaced sample title and caption strings by whitespace strings
+ *
  ****************************************************************************/
 
 // This is a modified version of the original KCSideBannerWnd control.
@@ -74,8 +83,6 @@
 #define	KCSB_FILL_TEXTURE		4
 
 typedef BOOL (CALLBACK*PFNGRADFILL)(HDC, PTRIVERTEX, ULONG, PVOID, ULONG, ULONG);
-
-#ifndef KPP_NO_MFC
 
 /////////////////////////////////////////////////////////////////////////////
 // CKCSideBannerWnd window
@@ -213,8 +220,6 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
-
-#endif // KPP_NO_MFC
 
 /////////////////////////////////////////////////////////////////////////////
 

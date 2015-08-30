@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -52,7 +52,8 @@ class CNewRandomInterface
 public:
 	virtual ~CNewRandomInterface() { }
 
-	virtual BOOL GenerateRandomSequence(unsigned long uRandomSeqSize, unsigned char *pBuffer) const = 0;
+	virtual BOOL GenerateRandomSequence(unsigned long uRandomSeqSize,
+		unsigned char *pBuffer) const = 0;
 };
 
 // Seed is 128 bits = 4 32-bit DWORDs

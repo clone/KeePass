@@ -1375,6 +1375,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\HelpSourceDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="IconPickerDlg.cpp"
 				>
 				<FileConfiguration
@@ -2192,6 +2196,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HelpSourceDlg.h"
+				>
+			</File>
+			<File
 				RelativePath="IconPickerDlg.h"
 				>
 			</File>
@@ -2790,6 +2798,14 @@
 			</File>
 			<File
 				RelativePath=".\Util\UpdateCheck.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\VersionInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Util\VersionInfo.h"
 				>
 			</File>
 			<File
@@ -4309,6 +4325,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\KeePassLibCpp\PwStructs.h"
+				>
+			</File>
+			<File
+				RelativePath="..\KeePassLibCpp\PwStructsEx.h"
+				>
+			</File>
+			<File
 				RelativePath="..\KeePassLibCpp\SysDefEx.h"
 				>
 			</File>
@@ -4329,6 +4353,14 @@
 				</File>
 				<File
 					RelativePath="..\KeePassLibCpp\Crypto\KeyTransform.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Crypto\MemoryProtectionEx.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Crypto\MemoryProtectionEx.h"
 					>
 				</File>
 				<File
@@ -4544,20 +4576,112 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="SDK"
+				>
+				<File
+					RelativePath="..\KeePassLibCpp\SDK\KpSDK.h"
+					>
+				</File>
+				<Filter
+					Name="Details"
+					>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpAPI.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpCommandLine.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpCommandLineOption.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpConfig.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpDatabase.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpFullPathName.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpPlugin.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpUnknown.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\IKpUtilities.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\KpDefs.h"
+						>
+					</File>
+					<File
+						RelativePath="..\KeePassLibCpp\SDK\Details\KpGuids.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Plugins"
 			>
 			<File
-				RelativePath=".\Plugins\KeePluginDef.h"
+				RelativePath=".\Plugins\KpApiImpl.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Plugins\MsgInterface.cpp"
+				RelativePath=".\Plugins\KpApiImpl.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Plugins\MsgInterface.h"
+				RelativePath=".\Plugins\KpCommandLineImpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Plugins\KpCommandLineImpl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Plugins\KpCommandLineOptionImpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Plugins\KpCommandLineOptionImpl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Plugins\KpDatabaseImpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Plugins\KpDatabaseImpl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Plugins\KpFullPathNameImpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Plugins\KpFullPathNameImpl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Plugins\KpUtilitiesImpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Plugins\KpUtilitiesImpl.h"
 				>
 			</File>
 			<File

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,16 +28,13 @@
 #include "../../KeePassLibCpp/SysDefEx.h"
 #include <boost/utility.hpp>
 
-#define SI_REGSIZE 2048
-
 // A GUID used to detect non-existing keys in queries
-#define PCFG_NOTFOUND _T("2C3317110FC211DA94B900E08161165F")
+// #define PCFG_NOTFOUND _T("2C3317110FC211DA94B900E08161165F")
 
 // WINSHELLAPI (DECLSPEC_IMPORT?)
-typedef HRESULT(WINAPI *LPSHGETSPECIALFOLDERPATH)(HWND hwndOwner, LPTSTR lpszPath, int nFolder, BOOL fCreate);
+// typedef HRESULT(WINAPI *LPSHGETSPECIALFOLDERPATH)(HWND hwndOwner, LPTSTR lpszPath, int nFolder, BOOL fCreate);
 
-// Export for plugins:
-class CPP_CLASS_SHARE CPrivateConfig : boost::noncopyable
+/* class CPrivateConfig : boost::noncopyable
 {
 public:
 	CPrivateConfig(BOOL bRequireWriteAccess);
@@ -54,6 +51,6 @@ private:
 	TCHAR m_szFileLocal[MAX_PATH * 2];
 	TCHAR m_szFileUser[MAX_PATH * 2];
 	TCHAR m_szFileGeneric[MAX_PATH];
-};
+}; */
 
 #endif // ___PRIVATE_CONFIG_H___

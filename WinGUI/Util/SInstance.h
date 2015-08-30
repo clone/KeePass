@@ -3,7 +3,7 @@ Module : SINSTANCE.H
 Purpose: Defines the interface for an MFC wrapper class to do instance checking
 Created: PJN / 29-07-1998
 
-Copyright (c) 1998 - 2006 by PJ Naughter.  
+Copyright (c) 1996 - 2008 by PJ Naughter (Web: www.naughter.com, Email: pjna@naughter.com)
 
 All rights reserved.
 
@@ -17,13 +17,13 @@ to maintain a single distribution point for the source code.
 
 */
 
+
+/////////////////////////// Macros / Defines //////////////////////////////////
+
+#pragma once
+
 #ifndef __SINSTANCE_H__
 #define __SINSTANCE_H__
-
-#ifndef __AFXMT_H__
-#pragma message("to avoid this message, you should put afxmt.h in your PCH (normally stdafx.h)")
-#include <afxmt.h>
-#endif
 
 #ifndef CSINGLEINSTANCE_EXT_CLASS
 #define CSINGLEINSTANCE_EXT_CLASS
@@ -32,6 +32,15 @@ to maintain a single distribution point for the source code.
 #ifndef CSINGLEINSTANCE_EXT_API
 #define CSINGLEINSTANCE_EXT_API
 #endif
+
+
+//////////////////////////// Includes /////////////////////////////////////////
+
+#ifndef __AFXMT_H__
+#pragma message("To avoid this message, please put afxmt.h in your pre compiled header (normally stdafx.h)")
+#include <afxmt.h>
+#endif
+
 
 //////////////////////////// Classes //////////////////////////////////////////
 
@@ -46,7 +55,7 @@ public:
 	void ActivateChecker();
 	BOOL TrackFirstInstanceRunning();
 	BOOL PreviousInstanceRunning();
-	HWND ActivatePreviousInstance(LPCTSTR lpCmdLine = NULL, DWORD dwCopyDataItemData = 0); 
+	HWND ActivatePreviousInstance(LPCTSTR lpCmdLine = NULL, ULONG_PTR dwCopyDataItemData = 0, DWORD dwTimeout = 30000); 
 	void QuitPreviousInstance(int nExitCode = 0);
 
 protected:

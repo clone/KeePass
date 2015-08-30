@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 
 // #include "StrUtil.h"
 
-// C_FN_SHARE LPTSTR PwEntryToString(const PW_ENTRY *lpEntry);
-// C_FN_SHARE BOOL StringToPwEntry(PW_ENTRY *pEntry, LPCTSTR lpEntryString);
+// LPTSTR PwEntryToString(const PW_ENTRY *lpEntry);
+// BOOL StringToPwEntry(PW_ENTRY *pEntry, LPCTSTR lpEntryString);
 
 // BOOL ReadPwStringItem(LPCTSTR lpEntryString, DWORD *pdwPos, CString *pStore);
 

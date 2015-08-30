@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -185,7 +185,7 @@ void NewGUI_ToolBarButton(void *pButton, int nBitmapIn = -1, int nBitmapOut = -1
 void NewGUI_SetThemeHelper(void *pThemeHelper);
 
 void NewGUI_ConfigQualityMeter(void *pWnd);
-void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword);
+void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, LPCTSTR pszPassword);
 
 void NewGUI_TranslateCWnd(CWnd *pWnd);
 

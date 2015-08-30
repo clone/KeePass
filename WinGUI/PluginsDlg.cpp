@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "../KeePassLibCpp/Util/StrUtil.h"
 #include "Util/WinUtil.h"
-#include "Util/PrivateConfig.h"
 #include "Util/CmdLine/Executable.h"
 
 #ifdef _DEBUG
@@ -60,8 +59,6 @@ void CPluginsDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CPluginsDlg, CDialog)
 	//{{AFX_MSG_MAP(CPluginsDlg)
 	ON_NOTIFY(NM_RCLICK, IDC_PLUGINS_LIST, OnRClickPluginsList)
-	ON_COMMAND(ID_PLUGIN_ENABLE, OnPluginEnable)
-	ON_COMMAND(ID_PLUGIN_DISABLE, OnPluginDisable)
 	ON_COMMAND(ID_PLUGIN_CONFIG, OnPluginConfig)
 	ON_COMMAND(ID_PLUGIN_ABOUT, OnPluginAbout)
 	ON_BN_CLICKED(IDC_BTN_PLGHELP, &CPluginsDlg::OnBtnClickedPlgHelp)
@@ -104,9 +101,9 @@ BOOL CPluginsDlg::OnInitDialog()
 
 	RECT rect;
 	m_cList.GetWindowRect(&rect);
-	int nWidth = (rect.right - rect.left - GetSystemMetrics(SM_CXVSCROLL) - 8) / 6;
-	m_cList.InsertColumn(0, TRL("Files"), LVCFMT_LEFT, nWidth * 2, 0);
-	m_cList.InsertColumn(1, TRL("Status"), LVCFMT_LEFT, nWidth * 4, 1);
+	const int nWidth = (rect.right - rect.left - GetSystemMetrics(SM_CXVSCROLL) - 8) / 6;
+	m_cList.InsertColumn(0, TRL("Plugin"), LVCFMT_LEFT, nWidth * 3, 0);
+	m_cList.InsertColumn(1, TRL("Author"), LVCFMT_LEFT, nWidth * 3, 1);
 	m_cList.InsertColumn(2, TRL("ID"), LVCFMT_LEFT, 0, 2);
 
 	// TCHAR tszBase[MAX_PATH]; tszBase[0] = 0; tszBase[1] = 0;
@@ -118,8 +115,8 @@ BOOL CPluginsDlg::OnInitDialog()
 	//		tszBase[jj + 1] = 0;
 	//		break;
 	//	}
-	std_string strBase = Executable::instance().getPathOnly();
-	VERIFY(m_pPiMgr->AddAllPlugins(strBase.c_str(), _T("*.dll"), FALSE)); // Updates existing list
+	// std_string strBase = Executable::instance().getPathOnly();
+	// VERIFY(m_pPiMgr->AddAllPlugins(strBase.c_str(), _T("*.dll"), FALSE)); // Updates existing list
 
 	UpdateGUI();
 
@@ -140,9 +137,9 @@ void CPluginsDlg::UpdateGUI()
 {
 	m_cList.DeleteAllItems();
 
-	for(size_t i = 0; i < m_pPiMgr->m_plugins.size(); i++)
+	for(size_t i = 0; i < m_pPiMgr->m_plugins.size(); ++i)
 	{
-		KP_PLUGIN_INSTANCE *p = &m_pPiMgr->m_plugins[i];
+		KP_PLUGIN_INSTANCE* p = &m_pPiMgr->m_plugins[i];
 		ASSERT(p != NULL); if(p == NULL) continue;
 
 		LV_ITEM lvi;
@@ -150,30 +147,42 @@ void CPluginsDlg::UpdateGUI()
 
 		lvi.iItem = static_cast<int>(i);
 		lvi.mask = LVIF_TEXT | LVIF_IMAGE;
-		lvi.iImage = ((p->bEnabled == TRUE) ? 20 : 45);
+		
+		// lvi.iImage = ((p->bEnabled == TRUE) ? 20 : 45);
+		lvi.iImage = ((p->hinstDLL != NULL) ? 20 : 45);
 
-		CString str, strT;
-		strT = p->tszFile;
-		str = CsFileOnly(&strT);
-		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)str);
+		CString strPlugin = p->strName.c_str();
+		LPCTSTR lpPluginVer = p->strVersion.c_str();
+		if((lpPluginVer != NULL) && (lpPluginVer[0] != 0))
+		{
+			strPlugin += _T(" (");
+			strPlugin += lpPluginVer;
+			strPlugin += _T(")");
+		}
+
+		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strPlugin);
 		m_cList.InsertItem(&lvi);
 
 		lvi.mask = LVIF_TEXT;
 
-		if((p->hinstDLL != NULL) && (p->bEnabled == FALSE))
-			lvi.pszText = (LPTSTR)TRL("This plugin will be disabled after you restart KeePass.");
-		else if((p->hinstDLL != NULL) && (p->bEnabled == TRUE))
-			lvi.pszText = (LPTSTR)TRL("Enabled, loaded");
-		else if((p->hinstDLL == NULL) && (p->bEnabled == FALSE))
-			lvi.pszText = (LPTSTR)TRL("Disabled, not loaded");
-		else if((p->hinstDLL == NULL) && (p->bEnabled == TRUE))
-			lvi.pszText = (LPTSTR)TRL("This plugin will be enabled after you restart KeePass.");
-		else { ASSERT(FALSE); lvi.pszText = _T(""); }
+		// if((p->hinstDLL != NULL) && (p->bEnabled == FALSE))
+		//	lvi.pszText = (LPTSTR)TRL("This plugin will be disabled after you restart KeePass.");
+		// else if((p->hinstDLL != NULL) && (p->bEnabled == TRUE))
+		//	lvi.pszText = (LPTSTR)TRL("Enabled, loaded");
+		// else if((p->hinstDLL == NULL) && (p->bEnabled == FALSE))
+		//	lvi.pszText = (LPTSTR)TRL("Disabled, not loaded");
+		// else if((p->hinstDLL == NULL) && (p->bEnabled == TRUE))
+		//	lvi.pszText = (LPTSTR)TRL("This plugin will be enabled after you restart KeePass.");
+		// else { ASSERT(FALSE); lvi.pszText = _T(""); }
+
+		CString strAuthor = p->strAuthor.c_str();
+		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strAuthor);
 
 		lvi.iSubItem = 1;
 		m_cList.SetItem(&lvi);
 
 		lvi.iSubItem = 2;
+		CString strT;
 		strT.Format(_T("%u"), p->dwPluginID);
 		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strT);
 		m_cList.SetItem(&lvi);
@@ -202,11 +211,11 @@ void CPluginsDlg::OnRClickPluginsList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	m_popmenu.LoadToolbar(IDR_INFOICONS, IDB_INFOICONS_EX);
 
-	BCMenu *psub = NewGUI_GetBCMenu(m_popmenu.GetSubMenu(0));
+	BCMenu* psub = NewGUI_GetBCMenu(m_popmenu.GetSubMenu(0));
 	if(psub == NULL) { ASSERT(FALSE); psub = &m_popmenu; }
 
-	psub->ModifyODMenu(NULL, (UINT)ID_PLUGIN_ENABLE, m_pImgList, 2);
-	psub->ModifyODMenu(NULL, (UINT)ID_PLUGIN_DISABLE, m_pImgList, 45);
+	// psub->ModifyODMenu(NULL, (UINT)ID_PLUGIN_ENABLE, m_pImgList, 2);
+	// psub->ModifyODMenu(NULL, (UINT)ID_PLUGIN_DISABLE, m_pImgList, 45);
 	psub->ModifyODMenu(NULL, (UINT)ID_PLUGIN_CONFIG, m_pImgList, 21);
 	psub->ModifyODMenu(NULL, (UINT)ID_PLUGIN_ABOUT, m_pImgList, 22);
 
@@ -214,13 +223,13 @@ void CPluginsDlg::OnRClickPluginsList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	if(p != NULL)
 	{
-		if(p->bEnabled == FALSE)
-		{
-			psub->EnableMenuItem(ID_PLUGIN_DISABLE, MF_BYCOMMAND | MF_GRAYED);
-			psub->EnableMenuItem(ID_PLUGIN_CONFIG, MF_BYCOMMAND | MF_GRAYED);
-			psub->EnableMenuItem(ID_PLUGIN_ABOUT, MF_BYCOMMAND | MF_GRAYED);
-		}
-		else psub->EnableMenuItem(ID_PLUGIN_ENABLE, MF_BYCOMMAND | MF_GRAYED);
+		// if(p->bEnabled == FALSE)
+		// {
+		//	psub->EnableMenuItem(ID_PLUGIN_DISABLE, MF_BYCOMMAND | MF_GRAYED);
+		//	psub->EnableMenuItem(ID_PLUGIN_CONFIG, MF_BYCOMMAND | MF_GRAYED);
+		//	psub->EnableMenuItem(ID_PLUGIN_ABOUT, MF_BYCOMMAND | MF_GRAYED);
+		// }
+		// else psub->EnableMenuItem(ID_PLUGIN_ENABLE, MF_BYCOMMAND | MF_GRAYED);
 
 		if(p->hinstDLL == NULL)
 		{
@@ -230,8 +239,8 @@ void CPluginsDlg::OnRClickPluginsList(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 	else
 	{
-		psub->EnableMenuItem(ID_PLUGIN_ENABLE, MF_BYCOMMAND | MF_GRAYED);
-		psub->EnableMenuItem(ID_PLUGIN_DISABLE, MF_BYCOMMAND | MF_GRAYED);
+		// psub->EnableMenuItem(ID_PLUGIN_ENABLE, MF_BYCOMMAND | MF_GRAYED);
+		// psub->EnableMenuItem(ID_PLUGIN_DISABLE, MF_BYCOMMAND | MF_GRAYED);
 		psub->EnableMenuItem(ID_PLUGIN_CONFIG, MF_BYCOMMAND | MF_GRAYED);
 		psub->EnableMenuItem(ID_PLUGIN_ABOUT, MF_BYCOMMAND | MF_GRAYED);
 	}
@@ -266,26 +275,6 @@ DWORD CPluginsDlg::GetSelectedPluginID()
 	}
 
 	return DWORD_MAX;
-}
-
-void CPluginsDlg::OnPluginEnable()
-{
-	const DWORD dwID = GetSelectedPluginID();
-	if(dwID == DWORD_MAX) return;
-
-	m_pPiMgr->EnablePluginByID(dwID, TRUE);
-
-	UpdateGUI();
-}
-
-void CPluginsDlg::OnPluginDisable()
-{
-	const DWORD dwID = GetSelectedPluginID();
-	if(dwID == DWORD_MAX) return;
-
-	m_pPiMgr->EnablePluginByID(dwID, FALSE);
-
-	UpdateGUI();
 }
 
 void CPluginsDlg::OnPluginConfig()

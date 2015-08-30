@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,6 +30,9 @@
 
 #include "../PwManager.h"
 
+#define PWU_CVT_EX PMD_HREL_ID
+#define PWU_SPN_CONST 0x9AEAA5A3
+
 typedef struct _PG_TREENODE
 {
 	PW_GROUP g;
@@ -43,11 +46,12 @@ private:
 
 public:
 	// Very simple password quality estimation function
-	static DWORD EstimatePasswordBits(LPCTSTR pszPassword);
+	static DWORD EstimatePasswordBits(LPCTSTR lpPassword);
 
 	static BOOL LoadHexKey32(FILE *fp, BYTE *pBuf);
 	static BOOL SaveHexKey32(FILE *fp, BYTE *pBuf);
 
+	static LPCTSTR GetUniCvtPtr(LPCTSTR lpBase, BOOL bTranslate);
 	static CString FormatError(int nErrorCode, DWORD dwFlags);
 
 	static BOOL MemAllocCopyEntry(__in_ecount(1) const PW_ENTRY *pExisting,
@@ -69,6 +73,8 @@ public:
 	static BOOL IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName);
 
 	static BOOL IsZeroUUID(__in_ecount(16) const BYTE *pUUID);
+	static CString CreateUUIDStr(CNewRandom* pRandomSource);
+	static DWORD GetUniCPT(LPCTSTR lp);
 
 	static BOOL IsTANEntry(const PW_ENTRY *pe);
 

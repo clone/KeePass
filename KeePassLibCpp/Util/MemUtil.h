@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,14 +22,7 @@
 
 #pragma once
 
-#include "../../KeePassLibCpp/PwManager.h"
-
-// Safely delete pointers
-#ifndef SAFE_DELETE
-#define SAFE_DELETE(p)       { if((p) != NULL) { delete (p); (p) = NULL; } }
-#define SAFE_DELETE_ARRAY(p) { if((p) != NULL) { delete [](p); (p) = NULL; } }
-#define SAFE_RELEASE(p)      { if((p) != NULL) { (p)->Release(); (p) = NULL; } }
-#endif
+#include "../PwStructs.h"
 
 // Securely erase memory
 void mem_erase(unsigned char *p, size_t u);
@@ -56,8 +49,5 @@ void str2ar(TCHAR *tszString, INT *pArray, INT nItemCount);
 
 // Hash a file
 BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash);
-
-// Must be exported:
-C_FN_SHARE void DeleteArrayCtx(BYTE **p);
 
 #endif

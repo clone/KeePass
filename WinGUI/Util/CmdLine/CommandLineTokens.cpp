@@ -28,6 +28,9 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGE.
 ==========================================================================*/
+
+// DR 2009-01-03: Added main window NULL check
+
 #include "StdAfx.h"
 #include "CommandLineTokens.h"
 #include "../../../KeePassLibCpp/Util/TranslateEx.h"
@@ -192,5 +195,7 @@ void CommandLineTokens::displayIgnoredMessage(const std_string& argument, const 
 	message += reason;
 	message += _T(".");
 
-    VERIFY(MessageBox(AfxGetMainWnd()->m_hWnd, message.c_str(), TRL("KeePass Initialization"), MB_OK | MB_ICONWARNING) != 0);
+	CWnd* mainWnd = AfxGetMainWnd(); // DR 2009-01-03
+	HWND parentWindow = ((mainWnd != NULL) ? mainWnd->m_hWnd : NULL);
+    VERIFY(MessageBox(parentWindow, message.c_str(), TRL("KeePass Initialization"), MB_OK | MB_ICONWARNING) != 0);
 }

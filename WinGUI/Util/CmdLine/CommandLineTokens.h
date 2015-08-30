@@ -29,7 +29,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ==========================================================================*/
 #pragma once
-#include "../../../KeePassLibCpp/SysDefEx.h"
 #include <string>
 #include <vector>
 
@@ -101,11 +100,11 @@ public:
     const_iterator begin() const {return m_TokenContainer.begin();}
     const_iterator   end() const {return m_TokenContainer.end();}
 
-    static CPP_FN_SHARE const CommandLineTokens& instance();
+    static const CommandLineTokens& instance();
     static void displayIgnoredMessage(const std_string& argument, const std_string& reason);
 
 private:
     CommandLineTokens();
-    
+
     string_vector m_TokenContainer;        
 };

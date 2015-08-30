@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "PwSafeDlg.h"
 #include "PasswordDlg.h"
 
+#include "../KeePassLibCpp/Util/MemUtil.h"
 #include "../KeePassLibCpp/Util/StrUtil.h"
 #include "../KeePassLibCpp/Util/Base64.h"
 #include "../KeePassLibCpp/Util/PwUtil.h"
@@ -194,7 +195,7 @@ BOOL CPasswordDlg::OnInitDialog()
 		const KP_KEYPROV_INFO_CPP& keyProv = m_vKeyProv[iProv];
 
 		ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
-		cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
+		cbi.mask = (CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE);
 		cbi.iItem = j; ++j;
 		cbi.pszText = const_cast<TCHAR *>(keyProv.strName.c_str());
 		cbi.cchTextMax = static_cast<int>(keyProv.strName.size());
@@ -792,13 +793,13 @@ void CPasswordDlg::QueryKeyProviders()
 	{
 		KP_PLUGIN_INSTANCE& p = v[i];
 
-		if(p.bEnabled == FALSE) continue;
+		// if(p.bEnabled == FALSE) continue;
 		if(p.hinstDLL == NULL) continue;
-		if(p.lpCall == NULL) { ASSERT(FALSE); continue; }
+		if(p.pInterface == NULL) { ASSERT(FALSE); continue; }
 
 		KP_KEYPROV_INFO cInfo;
 		ZeroMemory(&cInfo, sizeof(KP_KEYPROV_INFO));
-		p.lpCall(KPM_KEYPROV_QUERY_INFO_FIRST, NULL, (LPARAM)&cInfo);
+		p.pInterface->OnMessage(KPM_KEYPROV_QUERY_INFO_FIRST, NULL, (LPARAM)&cInfo);
 
 		if(cInfo.lpName != NULL)
 		{
@@ -807,7 +808,7 @@ void CPasswordDlg::QueryKeyProviders()
 			while(true)
 			{
 				ZeroMemory(&cInfo, sizeof(KP_KEYPROV_INFO));
-				p.lpCall(KPM_KEYPROV_QUERY_INFO_NEXT, NULL, (LPARAM)&cInfo);
+				p.pInterface->OnMessage(KPM_KEYPROV_QUERY_INFO_NEXT, NULL, (LPARAM)&cInfo);
 
 				if(cInfo.lpName != NULL) AddKeyProvider(cInfo);
 				else break;

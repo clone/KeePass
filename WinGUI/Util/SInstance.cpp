@@ -91,8 +91,25 @@ History: PJN / 25-03-2000 Neville Franks made the following changes. Contact nev
                           5. Code now uses newer C++ style casts instead of C style casts.
                           6. Fixed a number of level 4 warnings in the sample app.
                           7. Updated code to compile cleanly using VC 2005.
+         PJN / 17-03-2007 1. Updated copyright details.
+                          2. Optimized _INSTANCE_DATA constructor code
+                          3. Reworked how the method CInstanceChecker::GetMMFFilename creates the name of the memory mapped filename
+                          the code requires for sharing. Now the main instance name appears before the hard coded string. This
+                          ensures that the CInstanceChecker class works correctly for terminal sessions i.e. kernel objects prefixed
+                          with the value "Local\". Thanks to Mathias Berchtold for reporting this issue.
+                          4. Updated the sample app code to clean compile on VC 2005
+                          5. QuitPreviousInstance now uses GetLastActivePopup API to ensure it posts the WM_QUIT message to the 
+                          correct window of the previous instance.
+         PJN / 02-02-2008 1. Updated copyright details
+                          2. Removed VC 6 style classwizard comments from the sample apps code
+                          3. Updated ActivatePreviousInstance method to support Win64 compliant data
+                          4. ActivatePreviousInstance now takes a "dwTimeout" parameter which it now uses internally as the timeout when
+                          calling SendMessageTimeout instead of SendMessage. The code now uses SendMessageTimeout instead of SendMessage 
+                          to ensure we do not hang if the previous instance itself is hung. Thanks to Paul Shore for suggesting this 
+                          update.
+                          5. Updated the sample apps to clean compile on VC 2008
 
-Copyright (c) 1996 - 2006 by PJ Naughter (Web: www.naughter.com, Email: pjna@naughter.com)
+Copyright (c) 1996 - 2008 by PJ Naughter (Web: www.naughter.com, Email: pjna@naughter.com)
 
 All rights reserved.
 
@@ -106,6 +123,7 @@ to maintain a single distribution point for the source code.
 
 */
 
+
 /////////////////////////////////  Includes  //////////////////////////////////
 
 #include "stdafx.h"
@@ -115,8 +133,6 @@ to maintain a single distribution point for the source code.
 /////////////////////////////// Defines / Macros //////////////////////////////
 
 #ifdef _DEBUG
-#undef THIS_FILE
-static char BASED_CODE THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -131,23 +147,25 @@ struct CWindowInstance
 
 //Class which is used as a static to ensure that we
 //only close the file mapping at the very last chance
-class _INSTANCE_DATA
+class _SINSTANCE_DATA
 {
 public:
-  _INSTANCE_DATA();
-  ~_INSTANCE_DATA();
+//Constructors / Destructors
+  _SINSTANCE_DATA();
+  ~_SINSTANCE_DATA();
 
 protected:
+//Member variables
   HANDLE hInstanceData;
+
   friend class CInstanceChecker;
 };
 
-_INSTANCE_DATA::_INSTANCE_DATA()
+_SINSTANCE_DATA::_SINSTANCE_DATA() : hInstanceData(NULL)
 {
-  hInstanceData = NULL;
 }
 
-_INSTANCE_DATA::~_INSTANCE_DATA()
+_SINSTANCE_DATA::~_SINSTANCE_DATA()
 {
   if (hInstanceData != NULL)
   {
@@ -156,7 +174,7 @@ _INSTANCE_DATA::~_INSTANCE_DATA()
   }
 }
 
-static _INSTANCE_DATA instanceData;
+static _SINSTANCE_DATA g_sinstanceData;
 
 
 CInstanceChecker::CInstanceChecker(const CString& sUniqueName) : m_executeMutex(FALSE, sUniqueName)
@@ -164,8 +182,8 @@ CInstanceChecker::CInstanceChecker(const CString& sUniqueName) : m_executeMutex(
   //Hive away the unique name as we will also be using it for the name of the memory mapped file
   m_sName = sUniqueName;
 
-  // Only one object of type CInstanceChecker should be created
-  ASSERT(instanceData.hInstanceData == NULL);
+  //Only one object of type CInstanceChecker should be created
+  ASSERT(g_sinstanceData.hInstanceData == NULL);
   m_pExecuteLock = NULL;
 }
 
@@ -193,8 +211,8 @@ void CInstanceChecker::ReleaseLock()
   }  
 }
 
-// Track the first instance of our App.
-// return TRUE on success, else FALSE
+//Track the first instance of our App.
+//return TRUE on success, else FALSE
 BOOL CInstanceChecker::TrackFirstInstanceRunning()
 {
   //If a previous instance is running, just return prematurely
@@ -205,21 +223,21 @@ BOOL CInstanceChecker::TrackFirstInstanceRunning()
 
   //First create the MMF
   int nMMFSize = sizeof(CWindowInstance);
-  instanceData.hInstanceData = ::CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, nMMFSize, GetMMFFilename());
-  if (instanceData.hInstanceData == NULL)
+  g_sinstanceData.hInstanceData = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, nMMFSize, GetMMFFilename());
+  if (g_sinstanceData.hInstanceData == NULL)
   {
     TRACE(_T("Failed to create the MMF even though this is the first instance, you might want to consider overriding GetMMFFilename()\n"));
     return FALSE;
   }
 
   //Open the MMF
-  CWindowInstance* pInstanceData = static_cast<CWindowInstance*>(::MapViewOfFile(instanceData.hInstanceData, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, nMMFSize));
+  CWindowInstance* pInstanceData = static_cast<CWindowInstance*>(MapViewOfFile(g_sinstanceData.hInstanceData, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, nMMFSize));
   ASSERT(pInstanceData != NULL);   //Opening the MMF should work
 
-  // Lock the data prior to updating it
+  //Lock the data prior to updating it
   CSingleLock dataLock(&m_instanceDataMutex, TRUE);
   pInstanceData->hMainWnd = GetWindowToTrack();
-  ::UnmapViewOfFile(pInstanceData);
+  UnmapViewOfFile(pInstanceData);
 
   //Since this will be the last function that will be called 
   //when this is the first instance we can release the lock
@@ -232,7 +250,7 @@ BOOL CInstanceChecker::TrackFirstInstanceRunning()
 BOOL CInstanceChecker::PreviousInstanceRunning()
 {
   //Try to open the MMF first to see if we are the second instance
-  HANDLE hPrevInstance = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, GetMMFFilename());
+  HANDLE hPrevInstance = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, GetMMFFilename());
   BOOL bPreviousInstance = (hPrevInstance != NULL);
   if (hPrevInstance)
     CloseHandle(hPrevInstance);
@@ -242,8 +260,8 @@ BOOL CInstanceChecker::PreviousInstanceRunning()
 
 CString CInstanceChecker::GetMMFFilename()
 {
-  CString sMMF(_T("CInstanceChecker_MMF_"));
-  sMMF += m_sName;
+  CString sMMF(m_sName);
+  sMMF += _T("_CInstanceChecker_MMF");
   return sMMF;
 }
 
@@ -254,25 +272,27 @@ HWND CInstanceChecker::GetWindowToTrack()
   return AfxGetMainWnd()->GetSafeHwnd();
 }
 
-// Activate the Previous Instance of our Application.
-HWND CInstanceChecker::ActivatePreviousInstance(LPCTSTR lpCmdLine, DWORD dwCopyDataItemData)
+//Activate the Previous Instance of our Application.
+HWND CInstanceChecker::ActivatePreviousInstance(LPCTSTR lpCmdLine, ULONG_PTR dwCopyDataItemData, DWORD dwTimeout)
 {
+  //What will be the return value from this function (assume the worst)
+  HWND hWindow = NULL;
+
   //Try to open the previous instances MMF
-  HANDLE hPrevInstance = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, GetMMFFilename());
+  HANDLE hPrevInstance = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, GetMMFFilename());
   if (hPrevInstance)
   {
-    // Open up the MMF
+    //Open up the MMF
     int nMMFSize = sizeof(CWindowInstance);
-    CWindowInstance* pInstanceData = static_cast<CWindowInstance*>(::MapViewOfFile(hPrevInstance, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, nMMFSize));
-    if (pInstanceData != NULL) //Opening the MMF should work
+    CWindowInstance* pInstanceData = static_cast<CWindowInstance*>(MapViewOfFile(hPrevInstance, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, nMMFSize));
+    if (pInstanceData) //Opening the MMF should work
     {
       //Lock the data prior to reading from it
       CSingleLock dataLock(&m_instanceDataMutex, TRUE);
 
       //activate the old window
       ASSERT(pInstanceData->hMainWnd); //Something gone wrong with the MMF
-      HWND hWindow = pInstanceData->hMainWnd;
-
+      hWindow = pInstanceData->hMainWnd;
       if (hWindow)
       {
         CWnd wndPrev;
@@ -306,8 +326,15 @@ HWND CInstanceChecker::ActivatePreviousInstance(LPCTSTR lpCmdLine, DWORD dwCopyD
           if (pMainWindow)
             hSender = pMainWindow->GetSafeHwnd();
 
-          //Send the message to the previous instance
-          wndPrev.SendMessage(WM_COPYDATA, reinterpret_cast<WPARAM>(hSender), reinterpret_cast<LPARAM>(&cds));
+          //Send the message to the previous instance. Use SendMessageTimeout instead of SendMessage to ensure we 
+          //do not hang if the previous instance itself is hung
+          DWORD_PTR dwResult = 0;
+          if (SendMessageTimeout(hWindow, WM_COPYDATA, reinterpret_cast<WPARAM>(hSender), reinterpret_cast<LPARAM>(&cds),
+                                 SMTO_ABORTIFHUNG, dwTimeout, &dwResult) == 0)
+          {
+            //Previous instance is not responding to messages
+            hWindow = NULL;
+          }
 
           //Tidy up the heap memory we have used
           delete [] pszLocalCmdLine;
@@ -318,53 +345,44 @@ HWND CInstanceChecker::ActivatePreviousInstance(LPCTSTR lpCmdLine, DWORD dwCopyD
       }
 
       //Unmap the MMF we were using
-      ::UnmapViewOfFile(pInstanceData);
-
-      //Close the file handle now that we 
-      ::CloseHandle(hPrevInstance);
-
-      //When we have activate the previous instance, we can release the lock
-      ReleaseLock();
-
-      //return the Window handle of the previous instance
-      return hWindow;
+      UnmapViewOfFile(pInstanceData);
     }
 
     //Close the file handle now that we 
-    ::CloseHandle(hPrevInstance);
+    CloseHandle(hPrevInstance);
 
     //When we have activate the previous instance, we can release the lock
     ReleaseLock();
   }
 
-  return NULL;
+  return hWindow;
 }
 
 void CInstanceChecker::QuitPreviousInstance(int nExitCode)
 {
   //Try to open the previous instances MMF
-  HANDLE hPrevInstance = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, GetMMFFilename());
+  HANDLE hPrevInstance = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, GetMMFFilename());
 	if (hPrevInstance)
 	{
 		// Open up the MMF
 		int nMMFSize = sizeof(CWindowInstance);
-		CWindowInstance* pInstanceData = static_cast<CWindowInstance*>(::MapViewOfFile(hPrevInstance, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, nMMFSize));
+		CWindowInstance* pInstanceData = static_cast<CWindowInstance*>(MapViewOfFile(hPrevInstance, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, nMMFSize));
 		if (pInstanceData != NULL) //Opening the MMF should work
 		{
 		  // Lock the data prior to reading from it
 		  CSingleLock dataLock(&m_instanceDataMutex, TRUE);
 
 		  //activate the old window
-		  ASSERT(pInstanceData->hMainWnd); //Something gone wrong with the MMF
-		  HWND hWindow = pInstanceData->hMainWnd;
+		  ASSERT(pInstanceData->hMainWnd); //Something gone wrong with the MMF?
+		  HWND hWnd = pInstanceData->hMainWnd;
 
       //Ask it to exit
-		  if (hWindow)
-			  PostMessage(hWindow, WM_QUIT, nExitCode, 0);
+      HWND hChildWnd = GetLastActivePopup(hWnd);
+  	  PostMessage(hChildWnd, WM_QUIT, nExitCode, 0);
 	  }
 
     //Close the file handle now that we 
-    ::CloseHandle(hPrevInstance);
+    CloseHandle(hPrevInstance);
   }
 }
 

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@
 
 #include "StdAfx.h"
 #include "CustomComboBoxEx.h"
-#include "../Util/WinUtil.h"
+#include "../../KeePassLibCpp/Util/AppUtil.h"
 
 bool CCustomComboBoxEx::_CanHandleKey(TCHAR tchKey)
 {
 	// The feature is supported natively by Windows Vista
-	if(WU_IsAtLeastWinVistaSystem() == TRUE) return false;
+	if(AU_IsAtLeastWinVistaSystem() == TRUE) return false;
 
 	return ((tchKey >= _T('A')) && (tchKey <= _T('Z')));
 }

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -17,16 +17,32 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___KEEPASS_MESSAGE_INTERFACE_H___
-#define ___KEEPASS_MESSAGE_INTERFACE_H___
+#ifndef ___KPFULLPATHNAMEIMPL_H___
+#define ___KPFULLPATHNAMEIMPL_H___
 
-#include "KeePluginDef.h"
+#include "../../KeePassLibCpp/SDK/KpSDK.h"
+#include "../Util/CmdLine/FullPathName.h"
 
-void KPMI_SetMainDialog(void *pMainPwSafeDlg);
+#pragma pack(1)
 
-C_FN_SHARE DWORD_PTR KP_API KP_Call(DWORD dwCode, LPARAM lParamW, LPARAM lParamL, LPARAM lParamM);
-C_FN_SHARE DWORD_PTR KP_API KP_Query(DWORD dwCode, LPARAM lParam);
+class CKpFullPathNameImpl : public IKpFullPathName
+{
+public:
+	CKpFullPathNameImpl(LPCTSTR lpPath);
 
-void KPMI_AutoType(PW_ENTRY *pEntry, LONG_PTR lFlags);
+	KP_DECL_IUNKNOWN;
 
-#endif // ___KEEPASS_MESSAGE_INTERFACE_H___
+	STDMETHODIMP_(DWORD) GetState();
+	STDMETHODIMP_(LPCTSTR) GetFullPathName();
+	STDMETHODIMP_(LPCTSTR) GetPathOnly();
+	STDMETHODIMP_(LPCTSTR) GetFileName();
+
+private:
+	KP_DECL_STDREFIMPL;
+
+	FullPathName* m_pFpn;
+};
+
+#pragma pack()
+
+#endif // ___KPFULLPATHNAMEIMPL_H___

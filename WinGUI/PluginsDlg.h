@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 #include "NewGUI/BCMenu.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/XHyperLink.h"
-#include "afxwin.h"
+#include <afxwin.h>
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -69,8 +69,6 @@ protected:
 	virtual void OnOK();
 	virtual void OnCancel();
 	afx_msg void OnRClickPluginsList(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnPluginEnable();
-	afx_msg void OnPluginDisable();
 	afx_msg void OnPluginConfig();
 	afx_msg void OnPluginAbout();
 	afx_msg void OnBtnClickedPlgHelp();

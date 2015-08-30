@@ -32,8 +32,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "FullPathName.h"
 #include <memory>
 
-FullPathName::~FullPathName(){}
-
 FullPathName::FullPathName(const std_string& pathName) 
     : m_state(PATH_AND_FILENAME) {  // Optimistic (and typical) state initialization.
 	TCHAR* filePart;

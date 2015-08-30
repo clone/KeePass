@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ WCHAR *_StringToUnicode(const char *pszString)
 	return p;
 }
 
-C_FN_SHARE UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
+UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 {
 	DWORD i, j = 0;
 	DWORD dwLength, dwBytesNeeded;
@@ -160,7 +160,7 @@ C_FN_SHARE UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString)
 	return p;
 }
 
-C_FN_SHARE DWORD _UTF8NumChars(const UTF8_BYTE *pUTF8String)
+DWORD _UTF8NumChars(const UTF8_BYTE *pUTF8String)
 {
 	DWORD i = 0, dwLength = 0;
 	BYTE bt;
@@ -182,7 +182,7 @@ C_FN_SHARE DWORD _UTF8NumChars(const UTF8_BYTE *pUTF8String)
 }
 
 // This returns the needed bytes to represent the string, without terminating NULL character
-C_FN_SHARE DWORD _UTF8BytesNeeded(const TCHAR *pszString)
+DWORD _UTF8BytesNeeded(const TCHAR *pszString)
 {
 	DWORD i = 0;
 	DWORD dwBytes = 0;
@@ -216,7 +216,7 @@ C_FN_SHARE DWORD _UTF8BytesNeeded(const TCHAR *pszString)
 	return dwBytes;
 }
 
-C_FN_SHARE TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
+TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 {
 	DWORD i, j;
 	DWORD dwNumChars, dwMoreBytes, dwPBufLength;
@@ -311,7 +311,7 @@ C_FN_SHARE TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 #endif
 }
 
-C_FN_SHARE BOOL _IsUTF8String(const UTF8_BYTE *pUTF8String)
+BOOL _IsUTF8String(const UTF8_BYTE *pUTF8String)
 {
 	DWORD i = 0;
 	BYTE b0, b1, b2;

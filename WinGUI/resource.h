@@ -87,6 +87,7 @@
 #define IDB_AUTOTYPE                    241
 #define IDD_OPTIONS_AUTOTYPE_DLG        242
 #define IDD_FIELDREF_DLG                243
+#define IDD_HELPSOURCE_DLG              244
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -313,6 +314,11 @@
 #define IDC_RADIO_IDUUID                1292
 #define IDC_CHECK_SORTATITEMS           1293
 #define IDC_CHECK_EXCLUDEEXPIRED        1294
+#define IDC_RADIO_HELP_LOCAL            1295
+#define IDC_STATIC_HELP_LOCAL_HINT      1296
+#define IDC_RADIO_HELP_ONLINE           1297
+#define IDC_STATIC_HELP_ONLINE_HINT     1298
+#define IDC_STATIC_HELPSOURCE_INTRO     1299
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -471,8 +477,6 @@
 #define ID_VIEW_AUTOSORT_NOSORT         32950
 #define ID_PWLIST_AUTOTYPE              32951
 #define ID_EXTRAS_PLUGINMGR             32952
-#define ID_PLUGIN_ENABLE                32954
-#define ID_PLUGIN_DISABLE               32955
 #define ID_PLUGIN_CONFIG                32959
 #define ID_PLUGIN_ABOUT                 32960
 #define ID_BUTTON32961                  32961
@@ -529,15 +533,17 @@
 #define ID_INSERTFIELDREFERENCE_INPASSWORDFIELD 33034
 #define ID_INSERTFIELDREFERENCE_INNOTESFIELD 33035
 #define ID_POPUP_AUTOTYPE_INSERTDEFAULT 33037
+#define ID_HELP_SELECTHELPSOURCE        33038
+#define ID_INFO_HELP_SELECTHELPSOURCE   33039
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        244
-#define _APS_NEXT_COMMAND_VALUE         33038
-#define _APS_NEXT_CONTROL_VALUE         1295
+#define _APS_NEXT_RESOURCE_VALUE        245
+#define _APS_NEXT_COMMAND_VALUE         33040
+#define _APS_NEXT_CONTROL_VALUE         1300
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

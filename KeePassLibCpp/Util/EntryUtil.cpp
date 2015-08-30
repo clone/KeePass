@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 /*
 // The entry must be unlocked already!
-C_FN_SHARE LPTSTR PwEntryToString(const PW_ENTRY *lpEntry)
+LPTSTR PwEntryToString(const PW_ENTRY *lpEntry)
 {
 	ASSERT(lpEntry != NULL); if(lpEntry == NULL) return NULL;
 
@@ -61,7 +61,7 @@ C_FN_SHARE LPTSTR PwEntryToString(const PW_ENTRY *lpEntry)
 }
 
 // The returned entry contains the password in plain-text
-C_FN_SHARE BOOL StringToPwEntry(PW_ENTRY *pEntry, LPCTSTR lpEntryString)
+BOOL StringToPwEntry(PW_ENTRY *pEntry, LPCTSTR lpEntryString)
 {
 	ASSERT(pEntry != NULL); if(pEntry == NULL) return FALSE;
 	ASSERT(lpEntryString != NULL); if(lpEntryString == NULL) return FALSE;
@@ -104,7 +104,7 @@ C_FN_SHARE BOOL StringToPwEntry(PW_ENTRY *pEntry, LPCTSTR lpEntryString)
 	pEntry->pszTitle = _TcsSafeDupAlloc((LPCTSTR)strTitle);
 	pEntry->pszUserName = _TcsSafeDupAlloc((LPCTSTR)strUserName);
 	pEntry->pszURL = _TcsSafeDupAlloc((LPCTSTR)strURL);
-	pEntry->pszPassword = _TcsSafeDupAlloc((LPCTSTR)strPassword);
+	pEntry->pszPassword = _TcsCryptDupAlloc((LPCTSTR)strPassword);
 	pEntry->pszAdditional = _TcsSafeDupAlloc((LPCTSTR)strNotes);
 	return TRUE;
 }

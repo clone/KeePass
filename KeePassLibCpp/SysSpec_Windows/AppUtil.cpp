@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #include "../Util/PwUtil.h"
 #include "../PwManager.h"
 
-BOOL GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpecial, BOOL bMakeURL)
+BOOL AU_GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpecial, BOOL bMakeURL)
 {
 	int i, j = 0;
 
@@ -60,47 +60,43 @@ BOOL GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpec
 }
 
 #ifndef _WIN32_WCE
-BOOL SecureDeleteFile(LPCTSTR pszFilePath)
+BOOL AU_SecureDeleteFile(LPCTSTR pszFilePath)
 {
-	HANDLE hFile;
-	DWORD i, m, dwSizeLo, dwTmp;
-	int n;
-	BYTE *pBuf;
-	BOOL bRet;
+	DWORD dwDummy = 0, dwTmp = 0;
 
-	hFile = CreateFile(pszFilePath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
-		NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE hFile = CreateFile(pszFilePath, GENERIC_WRITE, FILE_SHARE_READ |
+		FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 	if(hFile == INVALID_HANDLE_VALUE) return FALSE;
 
-	dwSizeLo = GetFileSize(hFile, NULL);
+	const DWORD dwSizeLo = GetFileSize(hFile, NULL);
 	if(dwSizeLo == 0) { CloseHandle(hFile); return DeleteFile(pszFilePath); }
 
 	SetFilePointer(hFile, 0, NULL, FILE_END);
-	WriteFile(hFile, &i, 4, &dwTmp, NULL);
+	WriteFile(hFile, &dwDummy, 4, &dwTmp, NULL);
 	FlushFileBuffers(hFile);
 
-	pBuf = new BYTE[SDF_BUF_SIZE];
+	BYTE* pBuf = new BYTE[SDF_BUF_SIZE];
 	if(pBuf == NULL) { CloseHandle(hFile); return FALSE; }
 
 	// Four rounds: zeros, ones, random, random
-	for(n = 0; n < 4; n++)
+	for(int n = 0; n < 4; ++n)
 	{
 		if(n == 0) memset(pBuf, 0, SDF_BUF_SIZE);
 		else if(n == 1) memset(pBuf, 0xFF, SDF_BUF_SIZE);
 		else
 		{
-			for(i = 0; i < SDF_BUF_SIZE; i++)
-				pBuf[i] = (BYTE)randXorShift();
+			for(DWORD j = 0; j < SDF_BUF_SIZE; ++j)
+				pBuf[j] = static_cast<BYTE>(randXorShift());
 		}
 
-		SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
-		i = dwSizeLo + (DWORD)n; // Each round one more character at the end
+		VERIFY(SetFilePointer(hFile, 0, NULL, FILE_BEGIN) == 0);
+		DWORD i = (dwSizeLo + static_cast<DWORD>(n)); // Each round one more character at the end
 
 		while(i != 0)
 		{
-			m = ((i < SDF_BUF_SIZE) ? i : SDF_BUF_SIZE);
+			const DWORD m = ((i < SDF_BUF_SIZE) ? i : SDF_BUF_SIZE);
 
-			bRet = WriteFile(hFile, pBuf, m, &dwTmp, NULL);
+			const BOOL bRet = WriteFile(hFile, pBuf, m, &dwTmp, NULL);
 			FlushFileBuffers(hFile);
 
 			ASSERT(bRet == TRUE);
@@ -159,4 +155,24 @@ int AU_WriteBigFile(LPCTSTR lpFilePath, const BYTE* pData, DWORD dwDataSize)
 
 	if(bMadeUnhidden) CPwUtil::HideFile(lpFilePath, true);
 	return nResult;
+}
+
+BOOL AU_IsWin9xSystem()
+{
+	OSVERSIONINFO osvi;
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+
+	return ((osvi.dwMajorVersion <= 4) ? TRUE : FALSE);
+}
+
+BOOL AU_IsAtLeastWinVistaSystem()
+{
+	OSVERSIONINFO osvi;
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&osvi);
+
+	return ((osvi.dwMajorVersion >= 6) ? TRUE : FALSE);
 }

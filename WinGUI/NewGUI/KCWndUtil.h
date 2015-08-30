@@ -21,8 +21,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#ifndef KPP_NO_MFC
-
 class CWndUtil  
 {
 protected:
@@ -68,7 +66,5 @@ protected:
 	// class registration/information
 	CString					m_strClassName;
 };
-
-#endif // KPP_NO_MFC
 
 #endif // !defined(AFX_WNDUTIL_H__979E2102_DC7C_461D_AA76_40F06C0FBF87__INCLUDED_)

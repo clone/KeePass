@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ static std::vector<LPTSTR> m_vTrlStrings;
 
 static std::basic_string<TCHAR> m_strTableName;
 
-C_FN_SHARE BOOL LoadTranslationTable(LPCTSTR pszTableName)
+BOOL LoadTranslationTable(LPCTSTR pszTableName)
 {
 	FreeCurrentTranslationTable();
 
@@ -145,7 +145,7 @@ C_FN_SHARE BOOL LoadTranslationTable(LPCTSTR pszTableName)
 	return TRUE;
 }
 
-C_FN_SHARE BOOL FreeCurrentTranslationTable()
+BOOL FreeCurrentTranslationTable()
 {
 	m_vDefStrings.clear();
 	m_vTrlStrings.clear();
@@ -156,7 +156,7 @@ C_FN_SHARE BOOL FreeCurrentTranslationTable()
 	return TRUE;
 }
 
-C_FN_SHARE void _SortTrlTable()
+void _SortTrlTable()
 {
 	const size_t uNumStrings = m_vDefStrings.size();
 	if(uNumStrings <= 1) return;
@@ -181,7 +181,7 @@ C_FN_SHARE void _SortTrlTable()
 	}
 }
 
-C_FN_SHARE LPCTSTR _TRL(LPCTSTR pszDefString)
+LPCTSTR _TRL(LPCTSTR pszDefString)
 {
 	ASSERT(pszDefString != NULL); if(pszDefString == NULL) return _T("");
 
@@ -211,7 +211,7 @@ C_FN_SHARE LPCTSTR _TRL(LPCTSTR pszDefString)
 	return pszDefString; */
 }
 
-C_FN_SHARE LPCTSTR GetCurrentTranslationTable()
+LPCTSTR GetCurrentTranslationTable()
 {
 	return m_strTableName.c_str();
 }

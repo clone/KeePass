@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -205,7 +205,7 @@ void CFieldRefDlg::OnBnClickedOk()
 	else if(nID == IDC_RADIO_IDPASSWORD)
 	{
 		m_pMgr->UnlockEntryPassword(p);
-		strId = CString(_T("P:")) + CString(p->pszPassword);
+		strId = (CString(_T("P:")) + CString(p->pszPassword));
 		m_pMgr->LockEntryPassword(p);
 	}
 	else if(nID == IDC_RADIO_IDURL) strId = CString(_T("A:")) + CString(p->pszURL);

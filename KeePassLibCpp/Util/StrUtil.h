@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@
 #include <boost/regex.hpp>
 
 #include "../PwManager.h"
-
-#define UTF8_BYTE BYTE
 
 #define METAMODE_NULL     0
 #define METAMODE_AUTOTYPE 1
@@ -70,17 +68,15 @@ char *_StringToAnsi(const WCHAR *lptString);
 WCHAR *_StringToUnicode(const char *pszString);
 
 // Convert UCS-2 to UTF-8 and the other way round
-// (must be exported)
-C_FN_SHARE UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString);
-C_FN_SHARE TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String);
+UTF8_BYTE *_StringToUTF8(const TCHAR *pszSourceString);
+TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String);
 
-C_FN_SHARE DWORD _UTF8NumChars(const UTF8_BYTE *pUTF8String);
+DWORD _UTF8NumChars(const UTF8_BYTE *pUTF8String);
 
 // This returns the needed bytes to represent the string, without terminating NULL character
-C_FN_SHARE DWORD _UTF8BytesNeeded(const TCHAR *pszString);
+DWORD _UTF8BytesNeeded(const TCHAR *pszString);
 
-// Must be exported:
-C_FN_SHARE BOOL _IsUTF8String(const UTF8_BYTE *pUTF8String);
+BOOL _IsUTF8String(const UTF8_BYTE *pUTF8String);
 
 // Convert PW_TIME structure to a CString
 void _PwTimeToString(PW_TIME t, CString *pstrDest);
@@ -91,8 +87,7 @@ void _PwTimeToXmlTime(PW_TIME t, CString *pstrDest);
 // Convert UUID to string
 void _UuidToString(const BYTE *pUuid, CString *pstrDest);
 
-// Must be exported:
-C_FN_SHARE void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid);
+void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid);
 
 // Get the filename of the file in psFilePath
 CString CsFileOnly(const CString *psFilePath);
@@ -106,10 +101,14 @@ char *szcpy(char *szDestination, const char *szSource);
 
 CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart, DWORD dwInstance);
 
-// C_FN_SHARE void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath);
+// void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath);
 
 // Allocate enough memory and clone the parameter string
 TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource);
+
+// Allocate enough memory and clone the parameter string,
+// suitable for memory protection using DPAPI
+LPTSTR _TcsCryptDupAlloc(LPCTSTR lpSource);
 
 void RemoveAcceleratorTip(CString *pString);
 
@@ -119,7 +118,7 @@ void RemoveAcceleratorTip(CString *pString);
 bool StrMatchText(LPCTSTR lpEntryData, LPCTSTR lpSearch,
 	BOOL bCaseSensitive, const boost::basic_regex<TCHAR>* pUseRegex);
 
-std::basic_string<TCHAR> GetQuotedAppPath(const std::basic_string<TCHAR>& strPath);
+std::basic_string<TCHAR> SU_GetQuotedPath(const std::basic_string<TCHAR>& strPath);
 
 /////////////////////////////////////////////////////////////////////////////
 // Natural string comparison API
@@ -167,6 +166,23 @@ public:
 
 private:
 	std::vector<TCHAR> m_vBuf;
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// Set of strings
+
+class CStringSetEx : boost::noncopyable
+{
+public:
+	CStringSetEx();
+	virtual ~CStringSetEx();
+
+	void Clear();
+
+	LPCTSTR Add(LPCTSTR lpString);
+
+private:
+	std::vector<LPTSTR> m_vStrings;
 };
 
 #endif

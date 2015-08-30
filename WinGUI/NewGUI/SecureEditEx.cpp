@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005-2008, Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (c) 2005-2009, Dominik Reichl <dominik.reichl@t-online.de>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -333,7 +333,7 @@ void CSecureEditEx::_InsertCharacters(unsigned int uPos, LPCTSTR lpSource, unsig
 
 		*lp = lpSource[i];
 
-		if(bAppend) m_apChars.InsertAt(static_cast<int>(uPos + i), lp, 1);
+		if(!bAppend) m_apChars.InsertAt(static_cast<int>(uPos + i), lp, 1);
 		else m_apChars.Add(lp);
 	}
 

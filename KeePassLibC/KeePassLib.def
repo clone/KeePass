@@ -1,6 +1,6 @@
 ; KeePassLib.def : Declares the module parameters for the DLL.
 
-LIBRARY      "KeePassLibC"
+; LIBRARY      "KeePassLibC"
 ; DESCRIPTION  'KeePassLibC Windows Dynamic Link Library'
 
 EXPORTS

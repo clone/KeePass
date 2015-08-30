@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 
 #include "AppUtil.h"
 #include "MemUtil.h"
+#include "../Crypto/MemoryProtectionEx.h"
 
 #ifndef _WIN32_WCE
 #include <boost/algorithm/string.hpp>
@@ -175,7 +176,7 @@ void _UuidToString(const BYTE *pUuid, CString *pstrDest)
 	}
 }
 
-C_FN_SHARE void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
+void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 {
 	ASSERT((ptszSource != NULL) && (pUuid != NULL));
 	if((ptszSource == NULL) || (pUuid == NULL)) return;
@@ -618,7 +619,7 @@ CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart,
 /* #pragma warning(push)
 #pragma warning(disable: 4996) // _tcscpy deprecated
 
-C_FN_SHARE void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath)
+void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath)
 {
 	unsigned int i;
 
@@ -649,9 +650,36 @@ TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource)
 	}
 	else
 	{
-		const size_t sizeNewBuffer = _tcslen(tszSource) + 1;
+		const size_t sizeNewBuffer = (_tcslen(tszSource) + 1);
 		ptsz = new TCHAR[sizeNewBuffer];
 		if(ptsz != NULL) _tcscpy_s(ptsz, sizeNewBuffer, tszSource); // Clone
+	}
+
+	return ptsz;
+}
+
+LPTSTR _TcsCryptDupAlloc(LPCTSTR lpSource)
+{
+	ASSERT((CRYPTPROTECTMEMORY_BLOCK_SIZE % sizeof(TCHAR)) == 0);
+
+	TCHAR *ptsz;
+	if(lpSource == NULL)
+	{
+		ptsz = new TCHAR[CRYPTPROTECTMEMORY_BLOCK_SIZE / sizeof(TCHAR)];
+		if(ptsz != NULL) ptsz[0] = 0; // Terminate string
+	}
+	else
+	{
+		const DWORD bytesNewText = static_cast<DWORD>(((_tcslen(lpSource) + 1) * sizeof(TCHAR)));
+		const DWORD allocSize = CMemoryProtectionEx::ToBlockSize(bytesNewText);
+		const DWORD allocChars = (allocSize / sizeof(TCHAR)); // See ASSERT above
+		ASSERT(CMemoryProtectionEx::ToBlockSize(allocChars * sizeof(TCHAR)) ==
+			(allocChars * sizeof(TCHAR)));
+
+		ptsz = new TCHAR[allocChars];
+
+		ASSERT(allocChars >= static_cast<DWORD>(_tcslen(lpSource) + 1));
+		if(ptsz != NULL) _tcscpy_s(ptsz, allocChars, lpSource); // Clone
 	}
 
 	return ptsz;
@@ -714,7 +742,7 @@ bool StrMatchText(LPCTSTR lpEntryData, LPCTSTR lpSearch,
 }
 
 #ifndef _WIN32_WCE
-std::basic_string<TCHAR> GetQuotedAppPath(const std::basic_string<TCHAR>& strPath)
+std::basic_string<TCHAR> SU_GetQuotedPath(const std::basic_string<TCHAR>& strPath)
 {
 	std::basic_string<TCHAR> str = strPath;
 
@@ -734,6 +762,9 @@ std::basic_string<TCHAR> GetQuotedAppPath(const std::basic_string<TCHAR>& strPat
 }
 #endif
 
+/////////////////////////////////////////////////////////////////////////////
+// WCharStream class
+
 WCharStream::WCharStream(LPCWSTR lpData)
 {
 	ASSERT(lpData != NULL); if(lpData == NULL) return;
@@ -751,6 +782,9 @@ WCHAR WCharStream::ReadChar()
 	++m_dwPosition;
 	return tValue;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// CStringBuilderEx class
 
 CStringBuilderEx::CStringBuilderEx()
 {
@@ -779,4 +813,39 @@ std::basic_string<TCHAR> CStringBuilderEx::ToString() const
 	vCopy.push_back(0);
 
 	return std::basic_string<TCHAR>(&vCopy[0]);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// CStringSetEx class
+
+CStringSetEx::CStringSetEx()
+{
+}
+
+CStringSetEx::~CStringSetEx()
+{
+	this->Clear();
+}
+
+void CStringSetEx::Clear()
+{
+	for(size_t i = 0; i < m_vStrings.size(); ++i)
+		SAFE_DELETE_ARRAY(m_vStrings[i]);
+
+	m_vStrings.clear();
+}
+
+LPCTSTR CStringSetEx::Add(LPCTSTR lpString)
+{
+	if(lpString == NULL) { ASSERT(FALSE); return NULL; }
+
+	for(size_t i = 0; i < m_vStrings.size(); ++i)
+	{
+		if(_tcscmp(m_vStrings[i], lpString) == 0)
+			return m_vStrings[i];
+	}
+
+	LPTSTR lp = _TcsSafeDupAlloc(lpString);
+	m_vStrings.push_back(lp);
+	return lp;
 }

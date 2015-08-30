@@ -634,10 +634,14 @@ void BCMenu::DrawItem_WinXP (LPDRAWITEMSTRUCT lpDIS)
 	int BCMENU_PAD=4;
 	if(xp_draw_3D_bitmaps)BCMENU_PAD=7;
 	int barwidth=m_iconX+BCMENU_PAD;
+	bool bDrawFocusRect = false; // DR: Added
 
 	// remove the selected bit if it's grayed out
 	if(lpDIS->itemState & ODS_GRAYED&&!xp_select_disabled){
-		if(lpDIS->itemState & ODS_SELECTED)lpDIS->itemState=lpDIS->itemState & ~ODS_SELECTED;
+		if(lpDIS->itemState & ODS_SELECTED){
+			lpDIS->itemState=lpDIS->itemState & ~ODS_SELECTED;
+			bDrawFocusRect = true; // DR: Added
+		}
 #ifdef BCMENU_USE_MEMDC
 		pMemDC=new BCMenuMemDC(pDC,&lpDIS->rcItem);
 		pDC = pMemDC;
@@ -748,6 +752,8 @@ void BCMenu::DrawItem_WinXP (LPDRAWITEMSTRUCT lpDIS)
 
 			pDC->Draw3dRect (rect,m_clrBack,m_clrBack);
 			pDC->Draw3dRect (rect2,m_newclrBack,m_newclrBack);
+
+			if(bDrawFocusRect) pDC->Draw3dRect (rect,crSelect,crSelect); // DR: Added
 		}
 
 		// draw the text if there is any

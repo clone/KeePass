@@ -41,7 +41,7 @@ Executable objects are immutable.
 
 class Executable {
 public:
-    static CPP_FN_SHARE const FullPathName& instance();   
+    static const FullPathName& instance();   
 
 private:
     Executable();

@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include "UpdateCheck.h"
 #include "../../KeePassLibCpp/PwManager.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
-#include "../Plugins/MsgInterface.h"
+#include "../Plugins/KpApiImpl.h"
 #include <string>
 
 DWORD WINAPI CFU_Thread(LPVOID lpParameter);
@@ -57,7 +57,7 @@ void CFU_Report(LPCTSTR lpInfo, int nIcon)
 		std::basic_string<TCHAR> str = TRL("Check For Update");
 		str += _T(": ");
 		str += lpInfo;
-		KP_Call(KPC_STATUSBARTEXT, (LPARAM)str.c_str(), 0, 0);
+		CKpApiImpl::Instance().SetStatusBarText(str.c_str());
 	}
 }
 

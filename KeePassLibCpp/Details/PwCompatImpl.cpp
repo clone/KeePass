@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -181,7 +181,7 @@ BOOL CPwCompatImpl::OpenDatabaseV1(CPwManager* pMgr, const TCHAR *pszFile)
 	// Add groups from the memory file to the internal structures
 	j = 0;
 	pos = sizeof(PW_DBHEADER_V1);
-	for(i = 0; i < hdr.dwGroups; i++)
+	for(i = 0; i < hdr.dwGroups; ++i)
 	{
 		ptrTemp = &pVirtualFile[pos];
 		j = strlen(ptrTemp);
@@ -207,7 +207,7 @@ BOOL CPwCompatImpl::OpenDatabaseV1(CPwManager* pMgr, const TCHAR *pszFile)
 	}
 
 	// Get the entries
-	for(i = 0; i < hdr.dwEntries; i++)
+	for(i = 0; i < hdr.dwEntries; ++i)
 	{
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 
@@ -244,7 +244,7 @@ BOOL CPwCompatImpl::OpenDatabaseV1(CPwManager* pMgr, const TCHAR *pszFile)
 		pos += 4;
 		if(pos > uFileSize) { _OPENDB_FAIL; }
 
-		dw++; // Increase group ID, to be compatible with i+1 group ID importing
+		++dw; // Increase group ID, to be compatible with i+1 group ID importing
 
 		ZeroMemory(pwTE.uuid, 16); // 0 = create new UUID
 
@@ -430,7 +430,7 @@ BOOL CPwCompatImpl::OpenDatabaseV2(CPwManager* pMgr, const TCHAR *pszFile)
 		bRet = ReadEntryFieldV2(pMgr, usFieldType, dwFieldSize,
 			(BYTE *)p, &pwEntryTemplate);
 		if((usFieldType == 0xFFFF) && (bRet == TRUE))
-			uCurEntry++; // Now and ONLY now the counter gets increased
+			++uCurEntry; // Now and ONLY now the counter gets increased
 
 		p += dwFieldSize;
 		pos += dwFieldSize;

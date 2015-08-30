@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,8 +21,9 @@
 #include "Base64.h"
 #include "StrUtil.h"
 #include "MemUtil.h"
+#include "../SDK/Details/KpDefs.h"
 
-static const char *g_pCodes =
+static const char* g_pCodes =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 static const unsigned char g_pMap[256] =
@@ -57,16 +58,15 @@ CBase64Codec::CBase64Codec()
 
 bool CBase64Codec::Encode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen)
 {
-	DWORD i, len2, leven;
-	BYTE *p;
-
 	ASSERT((pIn != NULL) && (uInLen != 0) && (pOut != NULL) && (uOutLen != NULL));
 
-	len2 = ((uInLen + 2) / 3) << 2;
+	const DWORD len2 = (((uInLen + 2) / 3) << 2);
 	if((*uOutLen) < (len2 + 1)) return false;
 
-	p = pOut;
-	leven = 3 * (uInLen / 3);
+	BYTE *p = pOut;
+	const DWORD leven = (3 * (uInLen / 3));
+
+	DWORD i;
 	for(i = 0; i < leven; i += 3)
 	{
 		*p++ = g_pCodes[pIn[0] >> 2];
@@ -76,11 +76,11 @@ bool CBase64Codec::Encode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOut
 		pIn += 3;
 	}
 
-	if (i < uInLen)
+	if(i < uInLen)
 	{
-		DWORD a = pIn[0];
-		DWORD b = (((i + 1) < uInLen) ? pIn[1] : 0);
-		DWORD c = 0;
+		const DWORD a = pIn[0];
+		const DWORD b = (((i + 1) < uInLen) ? pIn[1] : 0);
+		const DWORD c = 0;
 
 		*p++ = g_pCodes[a >> 2];
 		*p++ = g_pCodes[((a & 3) << 4) + (b >> 4)];
@@ -95,15 +95,14 @@ bool CBase64Codec::Encode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOut
 
 bool CBase64Codec::Decode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOutLen)
 {
-	DWORD t, x, y, z;
-	BYTE c;
 	DWORD g = 3;
 
 	ASSERT((pIn != NULL) && (uInLen != 0) && (pOut != NULL) && (uOutLen != NULL));
 
-	for(x = y = z = t = 0; x < uInLen; x++)
+	DWORD t, x, y, z;
+	for(x = y = z = t = 0; x < uInLen; ++x)
 	{
-		c = g_pMap[pIn[x]];
+		BYTE c = g_pMap[pIn[x]];
 		if(c == 255) continue;
 		if(c == 254) { c = 0; g--; }
 

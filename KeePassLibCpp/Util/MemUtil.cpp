@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -90,9 +90,12 @@ void _GetCurrentPwTime(PW_TIME *p)
 	GetLocalTime(&t);
 
 	ZeroMemory(p, sizeof(PW_TIME));
-	p->btDay = (BYTE)t.wDay; p->btHour = (BYTE)t.wHour;
-	p->btMinute = (BYTE)t.wMinute; p->btMonth = (BYTE)t.wMonth;
-	p->btSecond = (BYTE)t.wSecond; p->shYear = (USHORT)t.wYear;
+	p->btDay = static_cast<BYTE>(t.wDay);
+	p->btHour = static_cast<BYTE>(t.wHour);
+	p->btMinute = static_cast<BYTE>(t.wMinute);
+	p->btMonth = static_cast<BYTE>(t.wMonth);
+	p->btSecond = static_cast<BYTE>(t.wSecond);
+	p->shYear = static_cast<USHORT>(t.wYear);
 }
 
 int _pwtimecmp(const PW_TIME *pt1, const PW_TIME *pt2)
@@ -227,10 +230,4 @@ BOOL SHA256_HashFile(LPCTSTR lpFile, BYTE *pHash)
 
 	SAFE_DELETE_ARRAY(pBuf);
 	return TRUE;
-}
-
-C_FN_SHARE void DeleteArrayCtx(BYTE **p)
-{
-	if(p == NULL) return;
-	SAFE_DELETE_ARRAY(*p);
 }

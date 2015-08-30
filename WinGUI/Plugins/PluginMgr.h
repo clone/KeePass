@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #ifndef ___PLUGIN_MGR_H___
 #define ___PLUGIN_MGR_H___
 
-#include "KeePluginDef.h"
+#include "../../KeePassLibCpp/SDK/KpSDK.h"
 #include <vector>
 #include <boost/utility.hpp>
 
@@ -28,22 +28,31 @@
 
 typedef std::basic_string<TCHAR> std_string;
 
+typedef struct
+{
+	DWORD dwPluginID; // Assigned by KeePass, used internally
+	std_string strPath;
+	HMODULE hinstDLL;
+
+	IKpPlugin* pInterface;
+
+	std_string strName;
+	std_string strVersion;
+	std_string strAuthor;
+} KP_PLUGIN_INSTANCE, *LPKP_PLUGIN_INSTANCE;
+
 class CPluginManager : boost::noncopyable
 {
 public:
     static CPluginManager& Instance();
 
-	BOOL SetAppInfo(const KP_APP_INFO *pAppInfo);
+	// BOOL SetAppInfo(const KP_APP_INFO *pAppInfo);
 	BOOL SetDirectCommandRange(DWORD dwFirstCommand, DWORD dwLastCommand);
-	BOOL AssignPluginCommands();
 
-	BOOL AddPlugin(LPCTSTR lpFile, BOOL bEnable);
-	BOOL AddAllPlugins(LPCTSTR lpBaseSearchPath, LPCTSTR lpMask, BOOL bOnlyKnown);
+	// BOOL EnablePluginByID(DWORD dwPluginID, BOOL bEnable = TRUE);
+	// BOOL EnablePluginByStr(LPCTSTR lpPluginFile, BOOL bEnable = TRUE);
 
-	BOOL EnablePluginByID(DWORD dwPluginID, BOOL bEnable = TRUE);
-	BOOL EnablePluginByStr(LPCTSTR lpPluginFile, BOOL bEnable = TRUE);
-
-	KP_PLUGIN_INSTANCE *GetPluginByID(DWORD dwID);
+	KP_PLUGIN_INSTANCE* GetPluginByID(DWORD dwID);
 
 	BOOL LoadAllPlugins();
 	BOOL UnloadAllPlugins();
@@ -51,25 +60,30 @@ public:
 	BOOL CallSinglePlugin(DWORD dwPluginID, DWORD dwCode, LPARAM lParamW, LPARAM lParamL);
 	BOOL CallPlugins(DWORD dwCode, LPARAM lParamW, LPARAM lParamL);
 
-    BOOL UsesCmdArg(const std_string& argument) const;  // Returns true if a plugin uses argument.
+    bool UsesCmdArg(const std_string& argument) const;  // Returns true if a plugin uses argument.
 
 	std::vector<KP_PLUGIN_INSTANCE> m_plugins;
-	std::vector<std_string> m_vKnownNames;
+	// std::vector<std_string> m_vKnownNames;
 
 private:
 	CPluginManager();
 	~CPluginManager();
 
-	BOOL IsPluginValid(LPCTSTR lpFile);
+	std::vector<std_string> FindPluginCandidates();
+
+	bool _IsValidPlugin(LPCTSTR lpFile, KP_PLUGIN_INSTANCE* pOutStruct);
 	void CleanUp();
 
+	BOOL _AssignPluginCommands();
+
 	static void ClearStructure(KP_PLUGIN_INSTANCE* p);
+	static void FreePluginDllEx(HMODULE h);
 
 	DWORD m_dwFreePluginID;
 	DWORD m_dwFirstCommand;
 	DWORD m_dwLastCommand;
 
-	KP_APP_INFO m_kpAppInfo;
+	// KP_APP_INFO m_kpAppInfo;
 };
 
 inline BOOL _CallPlugins(DWORD dwCode, LPARAM lParamW, LPARAM lParamL)

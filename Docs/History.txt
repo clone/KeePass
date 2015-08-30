@@ -1,3 +1,51 @@
+09/02/13 - 1.15
+- Completely new plugin architecture (exposing a lot more
+  functionality to plugins, faster, requires less memory, safer
+  memory management / cross-module calls, more secure, and
+  allows independent development of KeePass and plugins, i.e.
+  starting with 1.15 KeePass can be updated without requiring
+  plugins to be updated and vice versa)
+- Added option to use advanced in-memory protection (DPAPI,
+  only Windows Vista and higher; the key is stored in a secure,
+  non-swappable memory area managed by Windows; option enabled
+  by default)
+- The hash of the master key and its transformed version are
+  now in-memory protected
+- Added help source selection dialog (by default the online
+  help center is used)
+- Added '-set-urloverride', '-clear-urloverride' and
+  '-get-urloverride' command line options
+- Focused disabled menu items are now drawn with a transparent
+  selection rectangle
+- Windows XP and higher: added support for double-buffering in
+  the entry list
+- Windows Vista and higher: added support for alpha-blended
+  marquee selection in the entry list
+- Added KeeForceAllowChangeMasterKey, KeeForceAllowPrinting,
+  KeeForceAllowImport and KeeForceAllowExport configuration
+  options (these override the option to disable unsafe
+  operations and the mini mode setting; they are only loaded
+  from the enforced and global INI files, not the local one)
+- Added KeeDisallowPrintingPasswords configuration option to
+  disallow printing passwords and viewing them in the print
+  preview
+- Added multi-user documentation
+
+- Improved plugin loading performance
+- Plugins don't need to be manually enabled anymore (just copy
+  the plugin files into the KeePass application directory)
+- Improved main menu items order
+- Improved main menu accelerators
+- Improved group main menu item texts
+- Improved performance of various entry list operations
+- Hash of master key is now cleared when closing a database
+- Hash of file key is now cleared after opening/saving files
+- Various code optimizations
+- Minor other improvements
+
+- Fixed cursor navigation problem in secure edit controls
+- Fixed random access violation in OnScreenKeyboard plugin
+
 08/10/18 - 1.14
 - KeePass is now also available as MSI package
 - Entry field references are now dereferenced in drag&drop
@@ -9,7 +57,7 @@
   URLs
 - Improved compatibility of the database auto-saving option
   (at exit and locking) with other options
-- Consecutive delays now add up
+- Consecutive auto-type delays now add up
 - Improved encoding detection in file import routines
 - Several 64-bit code improvements
 - Various code optimizations

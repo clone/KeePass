@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2008 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2009 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -203,9 +203,7 @@ UINT32 TestCryptoImpl()
 
 	twofish.Init(g_uVectTwofishKey, 32, NULL);
 	if(twofish.PadEncrypt(g_uVectTwofishPlain, 16, aTemp) <= 0)
-	{
 		uTestMask |= TI_ERR_TWOFISH;
-	}
 	else
 	{
 		if(memcmp(aTemp, g_uVectTwofishCipher, 16) != 0)
@@ -237,33 +235,33 @@ UINT32 TestTypeDefs()
 {
 	UINT32 uTestMask = 0;
 
-	uint_32t sha32 = 0xFFFFFFFFul; sha32++;
+	uint_32t sha32 = 0xFFFFFFFFul; ++sha32;
 	if(sha32 != 0) uTestMask |= TI_ERR_SHAVAR32;
-	sha32 = 0; sha32--;
+	sha32 = 0; --sha32;
 	if(sha32 != 0xFFFFFFFFul) uTestMask |= TI_ERR_SHAVAR32;
 
-	uint_64t sha64 = li_64(FFFFFFFFFFFFFFFF); sha64++;
+	uint_64t sha64 = li_64(FFFFFFFFFFFFFFFF); ++sha64;
 	if(sha64 != 0) uTestMask |= TI_ERR_SHAVAR64;
-	sha64 = 0; sha64--;
+	sha64 = 0; --sha64;
 	if(sha64 != li_64(FFFFFFFFFFFFFFFF)) uTestMask |= TI_ERR_SHAVAR64;
 
 	// Test type overflows
-	UINT8 u8 = 0xFF; u8++;
+	UINT8 u8 = 0xFF; ++u8;
 	if(u8 != 0) uTestMask |= TI_ERR_UINT_TYPE;
-	UINT16 u16 = 0xFFFF; u16++;
+	UINT16 u16 = 0xFFFF; ++u16;
 	if(u16 != 0) uTestMask |= TI_ERR_UINT_TYPE;
-	UINT32 u32 = 0xFFFFFFFF; u32++;
+	UINT32 u32 = 0xFFFFFFFF; ++u32;
 	if(u32 != 0) uTestMask |= TI_ERR_UINT_TYPE;
-	UINT64 u64 = 0xFFFFFFFFFFFFFFFF; u64++;
+	UINT64 u64 = 0xFFFFFFFFFFFFFFFF; ++u64;
 	if(u64 != 0) uTestMask |= TI_ERR_UINT_TYPE;
 
-	INT8 i8 = 127; i8++;
+	INT8 i8 = 127; ++i8;
 	if(i8 != (-128)) uTestMask |= TI_ERR_INT_TYPE;
-	INT16 i16 = 32767; i16++;
+	INT16 i16 = 32767; ++i16;
 	if(i16 != (-32768)) uTestMask |= TI_ERR_INT_TYPE;
-	INT32 i32 = 2147483647; i32++;
+	INT32 i32 = 2147483647; ++i32;
 	if(i32 != (-2147483647 - 1)) uTestMask |= TI_ERR_INT_TYPE;
-	INT64 i64 = 9223372036854775807i64; i64++;
+	INT64 i64 = 9223372036854775807i64; ++i64;
 	if(i64 != (-9223372036854775807i64 - 1)) uTestMask |= TI_ERR_INT_TYPE;
 
 	return uTestMask;

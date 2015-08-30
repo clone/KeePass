@@ -2,10 +2,10 @@ CLS
 MKDIR WinGUI_Distrib
 COPY /B WinGUI_Bin\Debug\KeePass.exe /B WinGUI_Distrib\KeePass.exe
 
-DEL ..\Ext\WinGUI_API\KeePass.lib
-COPY /B WinGUI_Bin\Debug\KeePass.lib /B ..\Ext\WinGUI_API\KeePass.lib
-DEL ..\Ext\WinGUI_API\KeePass.exp
-COPY /B WinGUI_Bin\Debug\KeePass.exp /B ..\Ext\WinGUI_API\KeePass.exp
+REM DEL ..\Ext\WinGUI_API\KeePass.lib
+REM COPY /B WinGUI_Bin\Debug\KeePass.lib /B ..\Ext\WinGUI_API\KeePass.lib
+REM DEL ..\Ext\WinGUI_API\KeePass.exp
+REM COPY /B WinGUI_Bin\Debug\KeePass.exp /B ..\Ext\WinGUI_API\KeePass.exp
 
 DEL WinGUI_Distrib\KeePass.chm
 COPY /B ..\..\..\Homepage_KeePass\Build_Chm_v1\KeePass.chm /B WinGUI_Distrib\KeePass.chm
