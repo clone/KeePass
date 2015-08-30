@@ -1,3 +1,6 @@
+11/04/07 - 1.19b
+- Command line options provided by plugins work correctly again
+
 11/04/03 - 1.19
 - Added option to remember key sources (key file paths,
   provider names, ...); it's enabled by default

@@ -399,6 +399,7 @@ private:
 	CSystemTrayEx m_systray;
 	HACCEL m_hAccel;
 
+	std::basic_string<TCHAR> m_strInitialEnvDir;
 	std::vector<std::basic_string<TCHAR> > m_vTempFiles;
 
 	BOOL m_bShowColumn[11];

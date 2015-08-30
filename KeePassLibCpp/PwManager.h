@@ -37,11 +37,11 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.19")
+#define PWM_VERSION_STR  _T("1.19b")
 #else
-#define PWM_VERSION_STR  _T("1.19 Unicode")
+#define PWM_VERSION_STR  _T("1.19b Unicode")
 #endif
-#define PWM_VERSION_DW   0x01010900
+#define PWM_VERSION_DW   0x01010901
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903

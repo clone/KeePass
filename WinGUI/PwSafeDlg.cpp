@@ -761,11 +761,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	}
 	else CPwGeneratorDlg::SetOptions(CString(_T("11100000001")), CString(_T("")), 16); */
 
-	// Ensure that relative paths on the command line are evaluated relatively to
-	// the initial working directory instead of the last used directory that
-	// KeePass remembers; for this, we ensure the CmdArgs singleton is constructed
-	// before restoring the remembered last directory; FR 3059831
-	CmdArgs::instance().getDatabase();
+	m_strInitialEnvDir = WU_GetCurrentDirectory();
 
 	cConfig.Get(PWMKEY_LASTDIR, szTemp);
 	if(szTemp[0] != 0) WU_SetCurrentDirectory(szTemp);
@@ -1332,14 +1328,20 @@ BOOL CPwSafeDlg::OnInitDialog()
 	//	jj++;
 	// }
 
+	// Plugins might access the command line parameters, so restore the
+	// initial working directory now
+	const std::basic_string<TCHAR> strCurDir = WU_GetCurrentDirectory();
+	WU_SetCurrentDirectory(m_strInitialEnvDir.c_str());
+
 	VERIFY(CPluginManager::Instance().LoadAllPlugins());
 	BuildPluginMenu();
-
 	_CallPlugins(KPM_DELAYED_INIT, 0, 0);
+	_CallPlugins(KPM_READ_COMMAND_ARGS, 0, 0);
+
+	WU_SetCurrentDirectory(strCurDir.c_str());
 
 	CString strLoadedIniLastDb;
 	BOOL bTriedOpenDb = FALSE;
-	_CallPlugins(KPM_READ_COMMAND_ARGS, 0, 0);
 	if(_ParseCommandLine() == FALSE)
 	{
 		if((m_bOpenLastDb == TRUE) && (m_bRememberLast == TRUE))
@@ -1523,6 +1525,14 @@ BOOL CPwSafeDlg::_ParseCommandLine()
 
 	if(_FileAccessible(str) == TRUE)
 		_OpenDatabase(NULL, str, lpPassword, lpKeyFile, FALSE, lpPreSelectPath, FALSE); */
+
+	// Ensure that relative paths on the command line are evaluated relatively to
+	// the initial working directory instead of the last used directory that
+	// KeePass remembers; FR 3059831
+	const std::basic_string<TCHAR> strCurDir = WU_GetCurrentDirectory();
+	WU_SetCurrentDirectory(m_strInitialEnvDir.c_str());
+	CmdArgs::instance().getDatabase();
+	WU_SetCurrentDirectory(strCurDir.c_str());
 
 	m_bFileReadOnly = (CmdArgs::instance().readonlyIsInEffect() ? TRUE : FALSE);
 
