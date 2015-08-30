@@ -94,6 +94,7 @@
 
 // Warning C4251: Class 'CArray<TYPE,ARG_TYPE>' requires a DLL interface that will be used by the clients of the class
 #pragma warning(disable: 4251)
+
 // Warning C4275: Class 'CClass' isn't a DLL interface and has been declared
 // as base class for the DLL interface class 'CClass2'
 #pragma warning(disable: 4275)

@@ -52,8 +52,9 @@ public:
 
 	BOOL InitDropHandler();
 
-	BOOL EnsureVisible(HTREEITEM hItem);
-	UINT GetCount();
+	bool LockRedrawEx(bool bBlockRedrawing);
+	bool LockRedrawEx(bool bBlockRedrawing, bool bFullInvalidate);
+	void DeleteAllItemsEx();
 
 	CWnd *m_pParentI;
 	CCustomOleDropHandler m_drop;
@@ -62,6 +63,8 @@ public:
 	//}}AFX_VIRTUAL
 
 private:
+	bool m_bRedrawingEnabled;
+
 	BOOL m_bValidDropTarget;
 
 protected:

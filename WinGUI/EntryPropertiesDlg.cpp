@@ -64,6 +64,7 @@ void CEntryPropertiesDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_MODEXPIRE, m_bModExpire);
 	DDX_Check(pDX, IDC_CHECK_MODGROUP, m_bModGroup);
 	DDX_Check(pDX, IDC_CHECK_MODICON, m_bModIcon);
+	DDX_Control(pDX, IDC_RADIO_NOEXPIRE, m_btRadioNoExpire);
 	//}}AFX_DATA_MAP
 }
 
@@ -130,20 +131,19 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 	m_cbGroups.SetImageList(m_pParentIcons);
 
 	ASSERT(m_pMgr != NULL); // Must have been initialized by parent
-	unsigned int i; PW_GROUP *p;
-	COMBOBOXEXITEM cbi;
-	for(i = 0; i < m_pMgr->GetNumberOfGroups(); i++) // Add groups to combo box
+	for(DWORD i = 0; i < m_pMgr->GetNumberOfGroups(); i++) // Add groups to combo box
 	{
-		p = m_pMgr->GetGroup(i);
+		PW_GROUP *p = m_pMgr->GetGroup(i);
 		ASSERT(p != NULL);
 
+		COMBOBOXEXITEM cbi;
 		ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
 		cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
-		cbi.iItem = (int)i;
-		cbi.pszText = (LPTSTR)p->pszGroupName;
-		cbi.cchTextMax = (int)_tcslen(p->pszGroupName);
-		cbi.iImage = cbi.iSelectedImage = (int)p->uImageId;
-		cbi.iIndent = (int)p->usLevel;
+		cbi.iItem = static_cast<int>(i);
+		cbi.pszText = p->pszGroupName;
+		cbi.cchTextMax = static_cast<int>(_tcslen(p->pszGroupName));
+		cbi.iImage = cbi.iSelectedImage = static_cast<int>(p->uImageId);
+		cbi.iIndent = static_cast<int>(p->usLevel);
 		m_cbGroups.InsertItem(&cbi);
 	}
 
@@ -158,26 +158,31 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 	m_banner.SetCaption(strBannerCap);
 	SetWindowText(TRL("Mass Modify"));
 
+	SYSTEMTIME tNow;
+	ZeroMemory(&tNow, sizeof(SYSTEMTIME));
+	::GetLocalTime(&tNow);
+	COleDateTime oleNow(tNow);
+
 	COleDateTime oleMin = AMS_MIN_OLEDATETIME;
 	COleDateTime oleMax(2999, 12, 28, 23, 59, 59);
 	m_editDate.SetRange(oleMin, oleMax);
 	m_editTime.SetRange(oleMin, oleMax);
-	m_editDate.SetDate(oleMax);
+
+	m_editDate.SetDate(oleNow);
 	m_editTime.SetAMPM(true);
 	m_editTime.Show24HourFormat(true);
 	m_editTime.ShowSeconds(true);
-	m_editTime.SetTime(oleMax);
+	m_editTime.SetTime(oleNow);
 
 	m_bModGroup = FALSE;
 	m_cbGroups.EnableWindow(FALSE);
 	m_bModIcon = FALSE;
 	GetDlgItem(IDC_BUTTON_SELECT_ICON)->EnableWindow(FALSE);
 	m_bModExpire = FALSE;
-	m_editTime.EnableWindow(FALSE);
-	m_editDate.EnableWindow(FALSE);
-	m_btSelDefExpires.EnableWindow(FALSE);
 
 	UpdateData(FALSE);
+	::SendMessage(GetDlgItem(IDC_RADIO_EXPIRES)->m_hWnd, BM_SETCHECK, BST_CHECKED, 0);
+	OnCheckModExpire();
 
 	if(m_dwDefaultExpire == 0) m_btSetToDefaultExpire.EnableWindow(FALSE); // Unchangable
 	else m_btSetToDefaultExpire.EnableWindow(TRUE);
@@ -204,12 +209,17 @@ void CEntryPropertiesDlg::OnOK()
 	if(m_editDate.GetWindowTextLength() == 0) m_editDate.SetDate(2999, 12, 28);
 	if(m_editTime.GetWindowTextLength() == 0) m_editTime.SetTime(23, 59, 59);
 
-	m_tExpire.shYear = (USHORT)m_editDate.GetYear();
-	m_tExpire.btMonth = (BYTE)m_editDate.GetMonth();
-	m_tExpire.btDay = (BYTE)m_editDate.GetDay();
-	m_tExpire.btHour = (BYTE)m_editTime.GetHour();
-	m_tExpire.btMinute = (BYTE)m_editTime.GetMinute();
-	m_tExpire.btSecond = (BYTE)m_editTime.GetSecond();
+	if((m_btRadioNoExpire.GetCheck() & BST_CHECKED) != 0)
+		CPwManager::GetNeverExpireTime(&m_tExpire);
+	else
+	{
+		m_tExpire.shYear = static_cast<USHORT>(m_editDate.GetYear());
+		m_tExpire.btMonth = static_cast<BYTE>(m_editDate.GetMonth());
+		m_tExpire.btDay = static_cast<BYTE>(m_editDate.GetDay());
+		m_tExpire.btHour = static_cast<BYTE>(m_editTime.GetHour());
+		m_tExpire.btMinute = static_cast<BYTE>(m_editTime.GetMinute());
+		m_tExpire.btSecond = static_cast<BYTE>(m_editTime.GetSecond());
+	}
 
 	m_nGroupInx = m_cbGroups.GetCurSel();
 
@@ -224,9 +234,8 @@ void CEntryPropertiesDlg::OnCancel()
 void CEntryPropertiesDlg::OnButtonSelectIcon() 
 {
 	CIconPickerDlg dlg;
-
 	dlg.m_pImageList = m_pParentIcons;
-	dlg.m_uNumIcons = (UINT)m_pParentIcons->GetImageCount();
+	dlg.m_uNumIcons = static_cast<UINT>(m_pParentIcons->GetImageCount());
 
 	if(dlg.DoModal() == IDOK)
 	{
@@ -241,6 +250,8 @@ void CEntryPropertiesDlg::OnCheckModExpire()
 {
 	UpdateData(TRUE);
 
+	m_btRadioNoExpire.EnableWindow(m_bModExpire);
+	GetDlgItem(IDC_RADIO_EXPIRES)->EnableWindow(m_bModExpire);
 	m_editTime.EnableWindow(m_bModExpire);
 	m_editDate.EnableWindow(m_bModExpire);
 	m_btSelDefExpires.EnableWindow(m_bModExpire);

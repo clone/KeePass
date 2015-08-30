@@ -39,6 +39,8 @@ CCustomTreeCtrlEx::CCustomTreeCtrlEx()
 {
 	m_pParentI = NULL;
 	m_bValidDropTarget = FALSE;
+
+	m_bRedrawingEnabled = true;
 }
 
 CCustomTreeCtrlEx::~CCustomTreeCtrlEx()
@@ -117,14 +119,37 @@ void CCustomTreeCtrlEx::OnMouseMove(UINT nFlags, CPoint point)
 	CTreeCtrl::OnMouseMove(nFlags, point);
 }
 
-BOOL CCustomTreeCtrlEx::EnsureVisible(HTREEITEM hItem)
+bool CCustomTreeCtrlEx::LockRedrawEx(bool bBlockRedrawing)
 {
-	return CTreeCtrl::EnsureVisible(hItem);
+	return this->LockRedrawEx(bBlockRedrawing, false);
 }
 
-UINT CCustomTreeCtrlEx::GetCount()
+bool CCustomTreeCtrlEx::LockRedrawEx(bool bBlockRedrawing, bool bFullInvalidate)
 {
-	return CTreeCtrl::GetCount();
+	if(bBlockRedrawing && m_bRedrawingEnabled)
+	{
+		m_bRedrawingEnabled = false;
+		this->SetRedraw(FALSE);
+		return true;
+	}
+	else if(!bBlockRedrawing && !m_bRedrawingEnabled)
+	{
+		m_bRedrawingEnabled = true;
+		this->SetRedraw(TRUE);
+		this->Invalidate(bFullInvalidate ? TRUE : FALSE);
+		return true;
+	}
+
+	return false;
+}
+
+void CCustomTreeCtrlEx::DeleteAllItemsEx()
+{
+	if(this->GetCount() == 0) return;
+
+	const bool bLocked = this->LockRedrawEx(true);
+	VERIFY(this->DeleteAllItems());
+	if(bLocked) { VERIFY(this->LockRedrawEx(false)); }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -142,15 +167,14 @@ DROPEFFECT CCustomOleDropHandler::OnDragEnter(CWnd* pWnd, COleDataObject* pDataO
 
 DROPEFFECT CCustomOleDropHandler::OnDragOver(CWnd* pWnd, COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
 {
-	UINT dwState = 0;
 	const UINT uGood = TVHT_ONITEMSTATEICON | TVHT_ONITEMBUTTON | TVHT_ONITEMICON | TVHT_ONITEMINDENT | TVHT_ONITEMLABEL | TVHT_ONITEMRIGHT;
-	HTREEITEM h;
 
 	ASSERT(m_pTopParentI != NULL); ASSERT(m_pParentTree != NULL);
 
 	if(m_bAcceptDrop == FALSE) { _RemoveDropSelection(); return DROPEFFECT_NONE; } // Don't accept drop from other applications
 
-	h = m_pParentTree->HitTest(point, &dwState);
+	UINT dwState = 0;
+	HTREEITEM h = m_pParentTree->HitTest(point, &dwState);
 	if(((dwState & uGood) > 0) && (h != NULL))
 	{
 		m_pParentTree->SelectDropTarget(h);

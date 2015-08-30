@@ -92,6 +92,8 @@ public:
 	BOOL m_bEnableRemoteCtrl;
 	BOOL m_bUseLocalTimeFormat;
 	BOOL m_bRegisterRestoreHotKey;
+	BOOL m_bFocusResAfterQuickFind;
+	BOOL m_bAlwaysAllowIpc;
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };

@@ -27,11 +27,15 @@
 // Maximum temporary buffer for SecureDeleteFile
 #define SDF_BUF_SIZE 4096
 
+#define AU_MAX_WRITE_BLOCK 65535
+
 // Get the application's directory; without \\ at the end
 BOOL GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpecial, BOOL bMakeURL);
 
 #ifndef _WIN32_WCE
 BOOL SecureDeleteFile(LPCTSTR pszFilePath);
 #endif
+
+int AU_WriteBigFile(LPCTSTR lpFilePath, const BYTE* pData, DWORD dwDataSize);
 
 #endif

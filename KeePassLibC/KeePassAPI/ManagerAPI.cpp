@@ -271,7 +271,7 @@ KP_SHARE int OpenDatabase(void *pMgr, const TCHAR *pszFile, PWDB_REPAIR_INFO *pR
 KP_SHARE int SaveDatabase(void *pMgr, const TCHAR *pszFile)
 {
 	DECL_MGR_N(pMgr);
-	return p->SaveDatabase(pszFile);
+	return p->SaveDatabase(pszFile, NULL);
 }
 
 KP_SHARE void MoveInGroup(void *pMgr, DWORD idGroup, DWORD dwFrom, DWORD dwTo)

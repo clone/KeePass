@@ -21,6 +21,7 @@
 #define ___WIN_UTIL_EX_H___
 
 #include "../../KeePassLibCpp/SysDefEx.h"
+#include "../../KeePassLibCpp/PasswordGenerator/PasswordGenerator.h"
 
 #include <string>
 
@@ -35,6 +36,12 @@
 #define WU_MAX_MACHINE_LEN 1024
 
 #define CFN_CLIPBOARD_VIEWER_IGNORE _T("Clipboard Viewer Ignore")
+
+typedef struct _AV_APP_INFO
+{
+	std::basic_string<TCHAR> strDisplayName;
+	std::basic_string<TCHAR> strPath;
+} AV_APP_INFO;
 
 #ifndef _WIN32_WCE
 void CopyStringToClipboard(const TCHAR *lptString);
@@ -78,6 +85,10 @@ BOOL _FileWritable(LPCTSTR lpFile);
 C_FN_SHARE int _OpenLocalFile(LPCTSTR szFile, int nMode);
 C_FN_SHARE BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD dwBufLen);
 
+std::vector<std::basic_string<TCHAR> > WU_GetFileNames(BOOL bOpenMode,
+	LPCTSTR lpSuffix, LPCTSTR lpFilter, BOOL bAllowMultiSelect,
+	CWnd* pParent, BOOL bAddToRecent, BOOL bNoChangeDir);
+
 BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile);
 
 UINT TWinExec(LPCTSTR lpCmdLine, WORD uCmdShow);
@@ -103,5 +114,18 @@ std::basic_string<TCHAR> WU_ExpandEnvironmentVars(LPCTSTR lpSrc);
 BOOL WU_IsAbsolutePath(LPCTSTR lpPath);
 
 void WU_FillPlaceholders(CString* pString);
+
+BOOL WU_FlushStorageBuffers(TCHAR tchDriveLetter, BOOL bOnlyIfRemovable);
+BOOL WU_FlushStorageBuffersEx(LPCTSTR lpFileOnStorage, BOOL bOnlyIfRemovable);
+
+std::basic_string<TCHAR> WU_GetCurrentDirectory();
+std::basic_string<TCHAR> WU_FreeDriveIfCurrent(TCHAR tchDriveLetter);
+
+PWG_ERROR PwgGenerateWithExtVerify(std::vector<TCHAR>& vOutPassword,
+	const PW_GEN_SETTINGS_EX* pSettings, CNewRandom* pRandomSource);
+
+CString FilterTrlComment(LPCTSTR lpEnglishString);
+
+void WU_GetUserApplications(std::vector<AV_APP_INFO>& vStorage);
 
 #endif

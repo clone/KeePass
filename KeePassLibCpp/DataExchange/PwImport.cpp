@@ -544,7 +544,10 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 				else
 					str6 = _T("      ");
 
-				str3.MakeLower(); str4.MakeLower(); str5.MakeLower(); str6.MakeLower();
+				str3 = str3.MakeLower();
+				str4 = str4.MakeLower();
+				str5 = str5.MakeLower();
+				str6 = str6.MakeLower();
 
 				if((str4 == _T(".com")) || (str4 == _T(".org")) || (str4 == _T(".edu"))
 					|| (str4 == _T(".net")) || (str4 == _T(".zip"))

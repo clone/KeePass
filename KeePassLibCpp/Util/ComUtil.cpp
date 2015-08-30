@@ -25,6 +25,7 @@
 #define ASSERT(x) ATLASSERT(x)
 #endif
 
+// Do not validate any members of the query in this function
 BOOL RCPackQuery(RC_STRING& strQueryBuffer, const RC_QUERY& rcQuery)
 {
 	std::basic_stringstream<TCHAR> ss;
@@ -43,6 +44,7 @@ BOOL RCPackQuery(RC_STRING& strQueryBuffer, const RC_QUERY& rcQuery)
 	return TRUE;
 }
 
+// Do not validate any members of the query in this function
 BOOL RCUnpackQuery(RC_QUERY& rcQueryBuffer, const RC_STRING& strQuery)
 {
 	std::basic_stringstream<TCHAR> ss(strQuery + _T("@"));
@@ -77,7 +79,7 @@ BOOL RCUnpackQuery(RC_QUERY& rcQueryBuffer, const RC_STRING& strQuery)
 		ReadFixedString(strTest, ss, 1);
 		ASSERT((strTest.size() == 1) && (strTest[0] == _T('@')));
 	}
-	catch (...)
+	catch(...)
 	{
 		return FALSE;
 	}

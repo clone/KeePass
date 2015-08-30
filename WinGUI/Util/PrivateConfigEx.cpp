@@ -22,6 +22,7 @@
 
 #include "WinUtil.h"
 #include "../Plugins/MsgInterface.h"
+#include "../Plugins/PluginMgr.h"
 #include "../../KeePassLibCpp/PwManager.h"
 #include "../../KeePassLibCpp/Util/AppUtil.h"
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
@@ -132,8 +133,15 @@ void CPrivateConfigEx::FlushGlobal(BOOL bDeleteCache)
 
 	if(m_bCanWrite == TRUE)
 	{
-		VERIFY(CopyFile(m_strFileCachedGlobal.c_str(), m_strFileGlobal.c_str(),
-			FALSE) != FALSE);
+		CPrivateConfigEx::FlushIni(m_strFileCachedGlobal.c_str());
+
+		const BOOL bCopyResult = CopyFile(m_strFileCachedGlobal.c_str(),
+			m_strFileGlobal.c_str(), FALSE);
+
+		if(bCopyResult != FALSE)
+			_CallPlugins(KPM_OPTIONS_SAVE_GLOBAL,
+				(LPARAM)m_strFileGlobal.c_str(), 0);
+		else { ASSERT(FALSE); }
 	}
 
 	if(bDeleteCache == TRUE)
@@ -142,6 +150,16 @@ void CPrivateConfigEx::FlushGlobal(BOOL bDeleteCache)
 			m_strFileCachedGlobal.clear();
 		else { ASSERT(FALSE); }
 	}
+}
+
+void CPrivateConfigEx::FlushIni(LPCTSTR lpIniFilePath)
+{
+	ASSERT(lpIniFilePath != NULL); if(lpIniFilePath == NULL) return;
+	ASSERT(lpIniFilePath[0] != 0); if(lpIniFilePath[0] == 0) return;
+
+	// Do not verify the following call, as it always returns FALSE
+	// on Windows 95 / 98 / ME
+	WritePrivateProfileString(NULL, NULL, NULL, lpIniFilePath);
 }
 
 BOOL CPrivateConfigEx::Get(LPCTSTR pszField, LPTSTR pszValue) const
@@ -290,4 +308,14 @@ std::vector<std::basic_string<TCHAR> > CPrivateConfigEx::GetArray(
 	}
 
 	return v;
+}
+
+std::basic_string<TCHAR> CPrivateConfigEx::GetSafe(const TCHAR *pszField)
+{
+	TCHAR tszTemp[SI_REGSIZE];
+
+	if(this->Get(pszField, tszTemp) == FALSE)
+		return std::basic_string<TCHAR>();
+
+	return std::basic_string<TCHAR>(tszTemp);
 }

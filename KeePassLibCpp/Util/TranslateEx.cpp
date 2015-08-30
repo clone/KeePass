@@ -19,212 +19,187 @@
 
 #include "StdAfx.h"
 #include "TranslateEx.h"
+#include <vector>
+#include <string>
 
 #include "StrUtil.h"
 #include "MemUtil.h"
 
-static BOOL m_bTableLoaded = FALSE;
-static LPTSTR m_pTranslationStrings = NULL;
+static LPTSTR m_lpTranslationData = NULL;
 
-static DWORD m_dwNumTrlStrings = 0;
+static std::vector<LPTSTR> m_vDefStrings;
+static std::vector<LPTSTR> m_vTrlStrings;
 
-static LPTSTR m_pDefString[MAX_TRANSLATION_STRINGS];
-static LPTSTR m_pTrlString[MAX_TRANSLATION_STRINGS];
-
-C_FN_SHARE void _SortTrlTable();
-
-static TCHAR m_szCurrentTranslationTable[2 * MAX_PATH];
+static std::basic_string<TCHAR> m_strTableName;
 
 C_FN_SHARE BOOL LoadTranslationTable(LPCTSTR pszTableName)
 {
-	FILE *fp = NULL;
-	TCHAR szPath[2 * MAX_PATH];
-	size_t i = 0;
-	size_t dwLength = 0;
-	BOOL bMode = FALSE;
-	BOOL bScanning = FALSE;
+	FreeCurrentTranslationTable();
 
-	if(m_bTableLoaded == TRUE) FreeCurrentTranslationTable();
+	if(pszTableName == NULL) { ASSERT(FALSE); return TRUE; }
+	if(pszTableName[0] == 0) return TRUE;
 
-	ASSERT(pszTableName != NULL); if(pszTableName == NULL) return FALSE;
-	if(_tcslen(pszTableName) == 0) return TRUE;
-	if((_tcscmp(pszTableName, _T("Standard")) == 0) || (_tcscmp(pszTableName, _T("English")) == 0))
+	if((_tcsicmp(pszTableName, _T("Standard")) == 0) ||
+		(_tcsicmp(pszTableName, _T("English")) == 0))
 	{
-		_tcscpy_s(m_szCurrentTranslationTable, _countof(m_szCurrentTranslationTable), pszTableName);
+		m_strTableName = pszTableName;
 		return TRUE;
 	}
 
-	GetModuleFileName(NULL, szPath, 2 * MAX_PATH);
+	TCHAR szPath[MAX_PATH * 3];
+	ZeroMemory(&szPath[0], MAX_PATH * 3 * sizeof(TCHAR));
+	GetModuleFileName(NULL, &szPath[0], MAX_PATH * 3 - 2);
 
-	i = _tcslen(szPath) - 1;
-	while(1)
+	size_t uPathPos = _tcslen(szPath) - 1;
+	while(uPathPos != 0)
 	{
-		if((szPath[i] == _T('\\')) || (szPath[i] == _T('/')))
+		if((szPath[uPathPos] == _T('\\')) || (szPath[uPathPos] == _T('/')))
 		{
-			szPath[i+1] = 0;
+			szPath[uPathPos + 1] = 0;
 			break;
 		}
-		i--;
-		if(i == 0) break;
+		--uPathPos;
 	}
 	_tcscat_s(szPath, _countof(szPath), pszTableName);
 	_tcscat_s(szPath, _countof(szPath), _T(".lng"));
 
+	FILE *fp = NULL;
 	_tfopen_s(&fp, szPath, _T("rb"));
 	if(fp == NULL) return FALSE;
 
 	fseek(fp, 0, SEEK_END);
-	dwLength = ftell(fp);
+	const long lFileLength = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	UTF8_BYTE *pTranslationStrings8 = new UTF8_BYTE[dwLength + 1];
-	if(pTranslationStrings8 == NULL) { fclose(fp); fp = NULL; return FALSE; }
-	pTranslationStrings8[dwLength] = 0;
+	UTF8_BYTE *pTranslation8 = new UTF8_BYTE[lFileLength + 1];
+	if(pTranslation8 == NULL) { fclose(fp); fp = NULL; return FALSE; }
+	pTranslation8[lFileLength] = 0;
 
-	fread(pTranslationStrings8, 1, dwLength, fp);
+	fread(pTranslation8, 1, static_cast<size_t>(lFileLength), fp);
 	fclose(fp); fp = NULL;
 
-	m_pTranslationStrings = _UTF8ToString(pTranslationStrings8);
-	SAFE_DELETE_ARRAY(pTranslationStrings8);
+	m_lpTranslationData = _UTF8ToString(pTranslation8);
+	SAFE_DELETE_ARRAY(pTranslation8);
+	if(m_lpTranslationData == NULL) { ASSERT(FALSE); return FALSE; }
+	
+	const size_t dwLength = _tcslen(m_lpTranslationData);
+	BOOL bMode = TRL_MODE_DEF;
+	BOOL bScanning = FALSE;
 
-	if(m_pTranslationStrings == NULL) return FALSE;
-	dwLength = _tcslen(m_pTranslationStrings);
-
-	m_dwNumTrlStrings = 0;
-
-	bMode = TRL_MODE_DEF;
-	bScanning = FALSE;
-
-	i = 0;
+	size_t i = 0;
 	if(dwLength > 3)
-		if((m_pTranslationStrings[0] == 0xEF) && (m_pTranslationStrings[1] == 0xBB) &&
-			(m_pTranslationStrings[2] == 0xBF))
+		if((m_lpTranslationData[0] == 0xEF) && (m_lpTranslationData[1] == 0xBB) &&
+			(m_lpTranslationData[2] == 0xBF))
 		{
 			i += 3; // Skip UTF-8 initialization characters
 		}
 
-	for( ; i < dwLength; i++)
+	for( ; i < dwLength; ++i)
 	{
-		if(m_pTranslationStrings[i] == _T('|'))
+		if(m_lpTranslationData[i] == _T('|'))
 		{
+			m_lpTranslationData[i] = 0;
+
 			if((bMode == TRL_MODE_DEF) && (bScanning == FALSE))
 			{
-				m_pDefString[m_dwNumTrlStrings] = &m_pTranslationStrings[i+1];
-				m_pTranslationStrings[i] = 0;
+				m_vDefStrings.push_back(&m_lpTranslationData[i + 1]);
 				bScanning = TRUE;
-
-				continue;
 			}
-
-			if((bMode == TRL_MODE_DEF) && (bScanning == TRUE))
+			else if((bMode == TRL_MODE_DEF) && (bScanning == TRUE))
 			{
-				m_pTranslationStrings[i] = 0;
 				bMode = TRL_MODE_TRL;
 				bScanning = FALSE;
-
-				continue;
 			}
-			if((bMode == TRL_MODE_TRL) && (bScanning == FALSE))
+			else if((bMode == TRL_MODE_TRL) && (bScanning == FALSE))
 			{
-				m_pTrlString[m_dwNumTrlStrings] = &m_pTranslationStrings[i+1];
-				m_pTranslationStrings[i] = 0;
+				m_vTrlStrings.push_back(&m_lpTranslationData[i + 1]);
 				bScanning = TRUE;
-
-				continue;
 			}
-			if((bMode == TRL_MODE_TRL) && (bScanning == TRUE))
+			else // if((bMode == TRL_MODE_TRL) && (bScanning == TRUE))
 			{
-				m_pTranslationStrings[i] = 0;
 				bMode = TRL_MODE_DEF;
 				bScanning = FALSE;
-
-				m_dwNumTrlStrings++;
-				if(m_dwNumTrlStrings == MAX_TRANSLATION_STRINGS) break;
-
-				continue;
 			}
-
-			// We should never get here
-			ASSERT(FALSE);
 		}
 	}
 
-	ASSERT(m_dwNumTrlStrings < MAX_TRANSLATION_STRINGS);
 	ASSERT(bMode == TRL_MODE_DEF);
 	ASSERT(bScanning == FALSE);
 
-	for(i = 0; i < m_dwNumTrlStrings; i++)
+	ASSERT(m_vDefStrings.size() == m_vTrlStrings.size());
+	if(m_vDefStrings.size() != m_vTrlStrings.size())
 	{
-		if(_tcslen(m_pTrlString[i]) == 0)
-		{
-			m_pTrlString[i] = m_pDefString[i];
-		}
+		FreeCurrentTranslationTable();
+		return FALSE;
 	}
 
-	_tcscpy_s(m_szCurrentTranslationTable, _countof(m_szCurrentTranslationTable), pszTableName);
+	for(size_t uZeroScan = 0; uZeroScan < m_vDefStrings.size(); ++uZeroScan)
+	{
+		if(m_vTrlStrings[uZeroScan][0] == 0)
+			m_vTrlStrings[uZeroScan] = m_vDefStrings[uZeroScan];
+	}
 
 	_SortTrlTable();
-	m_bTableLoaded = TRUE;
+
+	m_strTableName = pszTableName;
 	return TRUE;
 }
 
 C_FN_SHARE BOOL FreeCurrentTranslationTable()
 {
-	SAFE_DELETE_ARRAY(m_pTranslationStrings);
-	m_dwNumTrlStrings = 0;
+	m_vDefStrings.clear();
+	m_vTrlStrings.clear();
 
-	_tcscpy_s(m_szCurrentTranslationTable, _countof(m_szCurrentTranslationTable), _T("English"));
+	SAFE_DELETE_ARRAY(m_lpTranslationData);
 
-	if(m_bTableLoaded == FALSE) return FALSE;
-
+	m_strTableName = _T("English");
 	return TRUE;
 }
 
 C_FN_SHARE void _SortTrlTable()
 {
-	unsigned long i, j = 0, min;
-	TCHAR *v;
+	const size_t uNumStrings = m_vDefStrings.size();
+	if(uNumStrings <= 1) return;
 
-	if(m_dwNumTrlStrings <= 1) return;
-
-	for(i = 0; i < (m_dwNumTrlStrings - 1); i++)
+	for(size_t i = 0; i < (uNumStrings - 1); ++i)
 	{
-		min = i;
+		size_t uMin = i;
 
-		for(j = i + 1; j < m_dwNumTrlStrings; j++)
+		for(size_t j = i + 1; j < uNumStrings; ++j)
 		{
-			if(_tcscmp(m_pDefString[j], m_pDefString[min]) < 0)
-				min = j;
+			if(_tcscmp(m_vDefStrings[j], m_vDefStrings[uMin]) < 0)
+				uMin = j;
 		}
 
-		v = m_pDefString[min];
-		m_pDefString[min] = m_pDefString[i];
-		m_pDefString[i] = v;
-		v = m_pTrlString[min];
-		m_pTrlString[min] = m_pTrlString[i];
-		m_pTrlString[i] = v;
+		LPTSTR v = m_vDefStrings[uMin];
+		m_vDefStrings[uMin] = m_vDefStrings[i];
+		m_vDefStrings[i] = v;
+
+		v = m_vTrlStrings[uMin];
+		m_vTrlStrings[uMin] = m_vTrlStrings[i];
+		m_vTrlStrings[i] = v;
 	}
 }
 
 C_FN_SHARE LPCTSTR _TRL(LPCTSTR pszDefString)
 {
-	if(m_dwNumTrlStrings == 0) return pszDefString;
-
 	ASSERT(pszDefString != NULL); if(pszDefString == NULL) return _T("");
 
+	const size_t uNumStrings = m_vDefStrings.size();
+	if(uNumStrings == 0) return pszDefString;
+
 	// Fast binary search on the sorted list of translation strings:
-	static int l, r, x, c;
-	l = 0; r = ((int)m_dwNumTrlStrings) - 1;
+	int l = 0, r = static_cast<int>(uNumStrings) - 1;
 	while(l != r)
 	{
-		x = (l + r) >> 1;
-		c = _tcscmp(m_pDefString[x], pszDefString);
+		const int x = ((l + r) >> 1);
+		const int c = _tcscmp(m_vDefStrings[x], pszDefString);
 		if(c < 0) l = x + 1;
 		else r = x;
 	}
-	if(_tcscmp(m_pDefString[l], pszDefString) == 0) return m_pTrlString[l];
+	if(_tcscmp(m_vDefStrings[l], pszDefString) == 0) return m_vTrlStrings[l];
 
-	return pszDefString;
+	return pszDefString; // English default
 
 	// Previous slow sequencial search (array doesn't have to be sorted):
 	/* static unsigned long i;
@@ -238,5 +213,5 @@ C_FN_SHARE LPCTSTR _TRL(LPCTSTR pszDefString)
 
 C_FN_SHARE LPCTSTR GetCurrentTranslationTable()
 {
-	return m_szCurrentTranslationTable;
+	return m_strTableName.c_str();
 }

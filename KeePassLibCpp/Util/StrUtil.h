@@ -39,6 +39,8 @@
 #define CLIPBOARD_DELAYED_USERNAME 2
 #define CLIPBOARD_DELAYED_USERPASS 3
 
+#define PRL_MAX_DEPTH 10
+
 typedef BOOL(WINAPI *LPPATHRELATIVEPATHTO)(LPTSTR pszPath, LPCTSTR pszFrom, DWORD dwAttrFrom, LPCTSTR pszTo, DWORD dwAttrTo);
 
 void EraseCString(CString *pString);
@@ -48,8 +50,15 @@ void EraseTCharVector(std::vector<TCHAR>& vBuffer);
 // Fix an URL if necessary (check protocol, form, etc.)
 void FixURL(CString *pstrURL);
 
+BOOL SeqReplace(CString& str, LPCTSTR lpFind, LPCTSTR lpReplaceWith,
+	BOOL bMakeSimString, BOOL bCmdQuotes, BOOL bRemoveMeta);
+
 // Replace placeholders in pString by data in pEntry
-void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes);
+void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes,
+	CPwManager* pDataSource, DWORD dwRecursionLevel);
+
+BOOL FillRefPlaceholders(CString& str, BOOL bMakeSimString, BOOL bCmdQuotes,
+	CPwManager* pDataSource, DWORD dwRecursionLevel);
 
 CString CsRemoveMeta(CString *psString);
 
@@ -109,6 +118,22 @@ bool StrMatchText(LPCTSTR lpEntryData, LPCTSTR lpSearch,
 	BOOL bCaseSensitive, const boost::basic_regex<TCHAR>* pUseRegex);
 
 std::basic_string<TCHAR> GetQuotedAppPath(const std::basic_string<TCHAR>& strPath);
+
+/////////////////////////////////////////////////////////////////////////////
+// Natural string comparison API
+
+void NSCAPI_Initialize();
+bool NSCAPI_Supported();
+void NSCAPI_Exit();
+
+typedef int(*LPCTSTRCMPEX)(LPCTSTR x, LPCTSTR y);
+typedef int(WINAPI *LPCWSTRCMPEX)(LPCWSTR x, LPCWSTR y);
+
+int StrCmpNaturalEx(LPCTSTR x, LPCTSTR y);
+LPCTSTRCMPEX StrCmpGetNaturalMethodOrFallback();
+
+/////////////////////////////////////////////////////////////////////////////
+// Wide character stream
 
 class WCharStream
 {

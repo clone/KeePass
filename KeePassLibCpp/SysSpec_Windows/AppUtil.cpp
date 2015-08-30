@@ -21,6 +21,7 @@
 #include "../Util/AppUtil.h"
 #include "../Util/MemUtil.h"
 #include "../Util/NewRandom.h"
+#include "../PwManager.h"
 
 BOOL GetApplicationDirectory(LPTSTR lpStoreBuf, DWORD dwBufLen, BOOL bFilterSpecial, BOOL bMakeURL)
 {
@@ -119,3 +120,34 @@ BOOL SecureDeleteFile(LPCTSTR pszFilePath)
 	return TRUE;
 }
 #endif
+
+int AU_WriteBigFile(LPCTSTR lpFilePath, const BYTE* pData, DWORD dwDataSize)
+{
+	HANDLE hFile = CreateFile(lpFilePath, GENERIC_WRITE, 0, NULL,
+		CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if(hFile == INVALID_HANDLE_VALUE) return PWE_NOFILEACCESS_WRITE;
+
+	int nResult = PWE_SUCCESS;
+	DWORD dwRemaining = dwDataSize, dwPosition = 0;
+
+	while(dwRemaining != 0)
+	{
+		const DWORD dwWrite = ((dwRemaining > AU_MAX_WRITE_BLOCK) ?
+			AU_MAX_WRITE_BLOCK : dwRemaining);
+
+		DWORD dwWritten = 0;
+		if(WriteFile(hFile, &pData[dwPosition], dwWrite, &dwWritten, NULL) == FALSE)
+		{
+			nResult = PWE_FILEERROR_WRITE;
+			break;
+		}
+		if(dwWritten == 0) { nResult = PWE_FILEERROR_WRITE; break; }
+
+		dwPosition += dwWritten;
+		dwRemaining -= dwWritten;
+	}
+
+	VERIFY(FlushFileBuffers(hFile));
+	VERIFY(CloseHandle(hFile));
+	return nResult;
+}

@@ -1,3 +1,131 @@
+08/04/12 - 1.11
+- Master key transformations (rounds) are now computed in two
+  threads; on dual/multi core processors this results in almost
+  twice the performance as before (by doubling the amount of
+  rounds you'll get the same waiting time as in 1.10, but the
+  protection against dictionary and guessing attack is doubled)
+- On Windows Vista, some of the message boxes are now displayed
+  as modern task dialogs
+- Database files are now verified (read and hashed) after
+  writing them to disk (in order to prevent data loss caused by
+  damaged/broken devices and/or file systems)
+- When saving databases to removable media, KeePass now tries
+  to lock and unlock the volume, which effectively flushes all
+  system caches related to this drive (this prevents data loss
+  caused by removing USB sticks without correctly unmounting in
+  Windows first; but it only works when no other program is
+  using the drive)
+- Improved database file writing algorithm (small block writes
+  and explicit flushing)
+- The system's INI cache is now flushed before copying the
+  temporary global INI file to the application directory
+  (improves Windows 95 / 98 / ME compatibility)
+- Added placeholders for referencing fields of other entries
+  (dereferenced when starting URLs and performing auto-type,
+  see the auto-type placeholders documentation)
+- Added natural sorting (when sorting the entry list, KeePass
+  now performs a human-like comparison instead of a simple
+  lexicographical one; this sorts entries with numbers more
+  logically; only supported with ShlWApi/IE 6.0.2800)
+- Added pattern placeholder 's' to generate special characters
+  of the printable 7-bit ASCII character set
+- KeePass now locks when the system is suspending (if the
+  option for locking on locking Windows or switching user is
+  enabled)
+- Added a 'Tools' button menu in the entry editing dialog
+- Tools button menu: Added command to select an application for
+  the URL field (will be prefixed with cmd://)
+- Tools button menu: Added command to select a document for the
+  URL field (will be prefixed with cmd://)
+- Tools button menu: Added command to insert a placeholder into
+  the URL field
+- Tools button menu: Added command to select an auto-type
+  target window (a dialog will be opened, in which you can
+  select an existing currently-opened window; an appropriate
+  auto-type definition will be added in the notes field)
+- Several entry context menu commands are now only enabled if
+  applicable (if the user name field of an entry is empty, the
+  'Copy User Name' command is disabled, etc.)
+- A " - Copy" suffix is now appended to duplicated entries
+- After duplicating entries, the new entries are selected
+- Added ability to sort entries based on UUIDs
+- Added advanced option to focus the entry list after a
+  successful quick search (toolbar; disabled by default)
+- Added support for large translation/language files
+- Added option to always allow full access through remote
+  control (disabled by default, and marked with "not
+  recommended")
+- Added radio buttons for removing the expiry time from
+  entries in the mass-modify dialog
+- Added generic Wiki and '$' client icons
+- Added certificate and mobile phone client icons (thanks to
+  oppitronic)
+- Added ability to specify the minimum length and minimum
+  estimated quality that master passwords must have (see help
+  file -> Features -> Composite Master Key; for admins)
+- Added interface for writing master password requirements
+  validation plugins (see the KPM_VALIDATE_MASTERPASSWORD
+  message)
+- Added interface for writing entry validation plugins (see the
+  KPM_VALIDATE_ENTRY message)
+- Added interface for writing generated passwords validation
+  plugins (see the KPM_VALIDATE_GENPASSWORD message)
+- Added plugin interface for storing custom data in KeePass KDB
+  databases (for example some history, logging, ...)
+- Plugins can now execute auto-type (KPC_AUTOTYPE)
+- Added ability to specify a window title suffix in the INI
+  file (KeeWindowTitleSuffix)
+- Added more simple and robust plugin interface for editing and
+  deleting entries
+- The dialog banner text color can be changed in the INI file
+  now (KeeBannerColorText, set to BGR-Quad)
+- The gradient direction in dialog banners can now be specified
+  in the INI file (KeeBannerFlip)
+- In mini mode, no passwords are generated automatically for
+  new entries
+- In mini mode, clicking the 'Generate Password' button in the
+  entry window immediately generates a new password based on
+  the automatic generation profile, instead of showing the
+  password generator dialog
+- In mini mode, the URL field is replaced by a combo box, in
+  which you can select one of the plugin-provided user
+  applications (KPM_USERAPP_GETFIRST and KPM_USERAPP_GETNEXT)
+
+- If natural sorting is supported, TANs are not prefixed with
+  zeros anymore
+- Removed 'Loading error' message that appeared when checking
+  for an update and a new version is available
+- TAN indices are now stored in the user name field (the notes
+  field can therefore be used now for storing confirmation
+  messages and/or transaction details)
+- "User Name" is now translated correctly in TXT exports
+- On Windows XP and higher, dialog banners now have black
+  background gradients by default
+- Improved list view item focusing
+- Icon of the 'Generate Password' button in the entry editing
+  dialog is now always visible
+- Passwords generated by the automatic generation profile can
+  now be accepted
+- The help can now consistently be accessed through buttons in
+  the lower left of dialogs
+- Improved apple icon (inverted colors)
+- Improved group tree redrawing when closing a database
+- Correct times are assigned to incoming entries through RC
+- Improved placeholder replacement engine for URLs and auto-
+  type (prevents infinite recursion)
+- Multiple files can now be selected in the import file dialog
+  (except KDB format)
+- Import file dialogs do not change the working directory
+  anymore
+- In the mass-modify dialog the expiry time now defaults to the
+  current local time instead of the 'never expires' time
+- Upgraded to Boost libraries version 1.34.1
+- Minor UI improvements (improved error messages, ...)
+- Minor other improvements
+
+- Fixed randomly appearing bug in TAN numbering routine
+- Fixed random failure of local date/time formatting routine
+
 08/01/12 - 1.10
 - Added configuration file caching (highly increases
   performance when running KeePass from slow devices like USB

@@ -107,7 +107,7 @@ BOOL CAddGroupDlg::OnInitDialog()
 void CAddGroupDlg::OnOK() 
 {
 	CString strRef = PWS_SEARCHGROUP, strTest; // PWS_SEARCHGROUP is translated
-	strRef.MakeLower();
+	strRef = strRef.MakeLower();
 
 	UpdateData(TRUE);
 
@@ -117,7 +117,7 @@ void CAddGroupDlg::OnOK()
 		return;
 	}
 	strTest = m_strGroupName;
-	strTest.MakeLower();
+	strTest = strTest.MakeLower();
 	if(strTest == strRef)
 	{
 		MessageBox(TRL("The group you selected cannot store entries. Please select a different group."),
@@ -136,9 +136,8 @@ void CAddGroupDlg::OnCancel()
 void CAddGroupDlg::OnSetIconBtn() 
 {
 	CIconPickerDlg dlg;
-
 	dlg.m_pImageList = m_pParentImageList;
-	dlg.m_uNumIcons = m_pParentImageList->GetImageCount();
+	dlg.m_uNumIcons = static_cast<UINT>(m_pParentImageList->GetImageCount());
 	dlg.m_nSelectedIcon = m_nIconId;
 
 	if(dlg.DoModal() == IDOK)

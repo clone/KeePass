@@ -26,6 +26,8 @@
 #include "NewGUI/GradientProgressCtrl.h"
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/SecureEditEx.h"
+#include "Util/WinUtil.h"
+#include "afxwin.h"
 
 #define PWAE_STDURL_A ""
 #define PWAE_STDURL   _T(PWAE_STDURL_A)
@@ -44,17 +46,27 @@ private:
 	void SetExpireDays(DWORD dwDays, BOOL bSetTime);
 	void PerformMiniModeAdjustments();
 
+	KP_ENTRY _CurrentDataToEntry(bool bUpdateData);
+	void _ClearStringsCache();
+
+	void SelectFileAsUrl(LPCTSTR lpFilter);
+	void InsertIntoUrl(LPCTSTR lpText);
+
+	void UrlToCombo(bool bGuiToInternals);
+
 	CFont m_fStyle;
 	CFont m_fSymbol;
 	CKCSideBannerWnd m_banner;
 	CToolTipCtrl m_tipSecClear;
 
-	BCMenu m_popmenu;
+	std::vector<LPTSTR> m_vStringsCache;
+	std::vector<AV_APP_INFO> m_vApps;
 
 public:
 	CPwManager *m_pMgr;
 	CImageList *m_pParentIcons;
 	BOOL m_bEditMode;
+	const PW_ENTRY *m_pOriginalEntry;
 
 	DWORD m_dwEntryIndex;
 	int m_nGroupId;
@@ -69,7 +81,7 @@ public:
 
 	//{{AFX_DATA(CAddEntryDlg)
 	enum { IDD = IDD_ADDENTRY_DLG };
-	CXPStyleButtonST	m_btHelp;
+	CXPStyleButtonST	m_btTools;
 	CXPStyleButtonST	m_btSelDefExpires;
 	CXPStyleButtonST	m_btSetToDefaultExpire;
 	CComboBoxEx	m_cbGroups;
@@ -134,13 +146,25 @@ protected:
 	afx_msg void OnExpires12Months();
 	afx_msg void OnExpiresNow();
 	afx_msg void OnReNotesClickLink(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnHelpURLFieldFeatures();
+	afx_msg void OnHelpAutoType();
+	afx_msg void OnBnClickedEntryToolsBtn();
+	afx_msg void OnUrlFieldSelApp();
+	afx_msg void OnUrlFieldSelDoc();
+	afx_msg void OnUrlFieldInsTitle();
+	afx_msg void OnUrlFieldInsUserName();
+	afx_msg void OnUrlFieldInsPassword();
+	afx_msg void OnUrlFieldInsNotes();
+	afx_msg void OnUrlFieldInsAppDir();
+	afx_msg void OnUrlFieldInsIE();
+	afx_msg void OnUrlFieldInsFirefox();
+	afx_msg void OnUrlFieldInsOpera();
+	afx_msg void OnAutoTypeSelectTargetWindow();
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnHelpURLFieldFeatures();
-	afx_msg void OnHelpAutoType();
-	afx_msg void OnHelpOpenFile();
+	CComboBox m_cmbUrl;
 };
 
 //{{AFX_INSERT_LOCATION}}

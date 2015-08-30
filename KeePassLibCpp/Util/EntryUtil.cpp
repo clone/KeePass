@@ -144,3 +144,61 @@ BOOL ReadPwStringItem(LPCTSTR lpEntryString, DWORD *pdwPos, CString *pStore)
 	return TRUE;
 }
 */
+
+/*
+int _CompareEntriesEx(void *pContext, const void *pEntryX, const void *pEntryY)
+{
+	if(pContext == NULL) { ASSERT(FALSE); return 0; }
+	if(pEntryX == NULL) { ASSERT(FALSE); return 0; }
+	if(pEntryY == NULL) { ASSERT(FALSE); return 0; }
+
+	const CEE_CONTEXT *c = (const CEE_CONTEXT *)pContext;
+	const PW_ENTRY *x = (const PW_ENTRY *)pEntryX;
+	const PW_ENTRY *y = (const PW_ENTRY *)pEntryY;
+
+	int iResult;
+	switch(c->dwSortByField)
+	{
+	case 0:
+		iResult = c->lpCompare(x->pszTitle, y->pszTitle);
+		break;
+	case 1:
+		iResult = c->lpCompare(x->pszUserName, y->pszUserName);
+		break;
+	case 2:
+		iResult = c->lpCompare(x->pszURL, y->pszURL);
+		break;
+	case 3:
+		UnlockEntryPassword(x);
+		UnlockEntryPassword(y);
+		iResult = c->lpCompare(x->pszPassword, y->pszPassword);
+		LockEntryPassword(x);
+		LockEntryPassword(y);
+		break;
+	case 4:
+		iResult = c->lpCompare(x->pszAdditional, y->pszAdditional);
+		break;
+	case 5:
+		iResult = _pwtimecmp(&x->tCreation, &y->tCreation);
+		break;
+	case 6:
+		iResult = _pwtimecmp(&x->tLastMod, &y->tLastMod);
+		break;
+	case 7:
+		iResult = _pwtimecmp(&x->tLastAccess, &y->tLastAccess);
+		break;
+	case 8:
+		iResult = _pwtimecmp(&x->tExpire, &y->tExpire);
+		break;
+	case 9:
+		iResult = memcmp(&x->uuid[0], &y->uuid[0], 16);
+		break;
+	default:
+		ASSERT(FALSE);
+		iResult = c->lpCompare(x->pszTitle, y->pszTitle);
+		break;
+	}
+
+	return iResult;
+}
+*/

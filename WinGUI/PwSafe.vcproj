@@ -2245,10 +2245,6 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath="res\bin1.bin"
-				>
-			</File>
-			<File
 				RelativePath="res\cancel.bmp"
 				>
 			</File>
@@ -2413,7 +2409,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\toolssma.bmp"
+				>
+			</File>
+			<File
 				RelativePath="res\unlocked.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\winprops.bmp"
 				>
 			</File>
 			<File
@@ -4224,6 +4228,18 @@
 				RelativePath="NewGUI\XPStyleButtonST.h"
 				>
 			</File>
+			<Filter
+				Name="TaskDialog"
+				>
+				<File
+					RelativePath=".\NewGUI\TaskDialog\VistaTaskDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\NewGUI\TaskDialog\VistaTaskDialog.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="KeePassLibCpp"
@@ -4257,6 +4273,14 @@
 				</File>
 				<File
 					RelativePath="..\KeePassLibCpp\Crypto\ARCFour.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Crypto\KeyTransform.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Crypto\KeyTransform.h"
 					>
 				</File>
 				<File
@@ -4324,7 +4348,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\KeePassLibCpp\SysSpec_Windows\StrUtil_Encoding.cpp"
+					RelativePath="..\KeePassLibCpp\SysSpec_Windows\StrUtilEx.cpp"
 					>
 				</File>
 				<File

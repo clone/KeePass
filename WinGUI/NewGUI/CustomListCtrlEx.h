@@ -34,8 +34,11 @@ public:
 	COLORREF GetRowColorEx();
 	void SetRowColorEx(COLORREF rgbColor);
 
-	BOOL EnsureVisible(int nItem, BOOL bPartialOK);
-	int GetItemCount();
+	void FocusItem(int iIndex, BOOL bAlsoSelect);
+
+	bool LockRedrawEx(bool bBlockRedrawing);
+	bool LockRedrawEx(bool bBlockRedrawing, bool bFullInvalidate);
+	void DeleteAllItemsEx();
 
 	CWnd *m_pParentI;
 	BOOL *m_pbShowColumns;
@@ -49,6 +52,8 @@ public:
 private:
 	COLORREF m_rgbRowColor;
 	BOOL m_bColorize;
+
+	bool m_bRedrawingEnabled;
 
 protected:
 	//{{AFX_MSG(CCustomListCtrlEx)

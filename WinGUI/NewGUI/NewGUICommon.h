@@ -202,7 +202,9 @@ void NewGUI_MoveWnd(CWnd *pWnd, long lMoveRightPixels, long lMoveDownPixels,
 	CWnd *pParent);
 void NewGUI_Resize(CWnd *pWnd, long lAddX, long lAddY, CWnd *pParent);
 
-void NewGUI_SetBannerColors(COLORREF crStart, COLORREF crEnd);
+void NewGUI_SetWin32Banner();
+void NewGUI_SetBannerColors(COLORREF crStart, COLORREF crEnd, COLORREF crText);
+void NewGUI_SetBannerParams(bool bBannerFlip);
 
 BOOL NewGUI_RemoveMenuCommand(BCMenu *pMenu, UINT uCommandID);
 void NewGUI_RemoveInvalidSeparators(BCMenu *pMenu, BOOL bIsTopLevel);
@@ -222,5 +224,7 @@ void NewGUI_ComboBox_UpdateHistory(CComboBox& comboBox,
 	const std::basic_string<TCHAR>& strNew,
 	std::vector<std::basic_string<TCHAR> >* pvHistoryItems,
 	size_t dwMaxHistoryItems);
+
+BOOL NewGUI_SetIcon(BCMenu& rMenu, UINT uCommand, int nResourceID);
 
 #endif // ___NEW_GUI_COMMON___

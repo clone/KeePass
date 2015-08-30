@@ -24,8 +24,10 @@
 
 #include "../KeePassLibCpp/Util/StrUtil.h"
 #include "../KeePassLibCpp/Util/Base64.h"
+#include "../KeePassLibCpp/Util/PwUtil.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "Util/WinUtil.h"
+#include "Util/PrivateConfigEx.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -401,7 +403,7 @@ void CPasswordDlg::CleanUp()
 	m_fSymbol.DeleteObject();
 	m_fBold.DeleteObject();
 
-	_CALLPLUGINS(KPM_KEYPROV_FINALIZE, 0, 0);
+	_CallPlugins(KPM_KEYPROV_FINALIZE, 0, 0);
 }
 
 void CPasswordDlg::PerformMiniModeAdjustments()
@@ -447,13 +449,11 @@ void CPasswordDlg::OnOK()
 {
 	CString strTemp;
 	ULARGE_INTEGER aBytes[3];
-	LPTSTR lpPassword;
 
 	UpdateData(TRUE);
 
 	ASSERT((m_lpKey == NULL) && (m_lpKey2 == NULL));
 	m_lpKey = m_pEditPw.GetPassword();
-	lpPassword = m_lpKey;
 
 	if(m_bConfirm == FALSE)
 	{
@@ -477,6 +477,51 @@ void CPasswordDlg::OnOK()
 				FreePasswords();
 				return;
 			}
+		}
+	}
+
+	// Validate master password properties
+	if((m_lpKey[0] != 0) && (m_bConfirm == FALSE) && (m_bLoadMode == FALSE))
+	{
+		CPrivateConfigEx cfg(FALSE);
+		std::basic_string<TCHAR> strMinLen = cfg.GetSafe(PWMKEY_MASTERPW_MINLEN);
+		std::basic_string<TCHAR> strMinQuality = cfg.GetSafe(PWMKEY_MASTERPW_MINQUALITY);
+		CString strValMsg;
+
+		if(strMinLen.size() > 0)
+		{
+			const long lMinLen = _ttol(strMinLen.c_str());
+			if(static_cast<long>(_tcslen(m_lpKey)) < lMinLen)
+			{
+				strValMsg.Format(TRL("The master password must be at least %u characters long!"),
+					static_cast<unsigned int>(lMinLen));
+				MessageBox(strValMsg, PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
+				FreePasswords();
+				return;
+			}
+		}
+
+		if(strMinQuality.size() > 0)
+		{
+			const long lMinQuality = _ttol(strMinQuality.c_str());
+			const DWORD lCurQuality = CPwUtil::EstimatePasswordBits(m_lpKey);
+			if(static_cast<long>(lCurQuality) < lMinQuality)
+			{
+				strValMsg.Format(TRL("The estimated quality of the master password must be at least %u bits!"),
+					static_cast<unsigned int>(lMinQuality));
+				MessageBox(strValMsg, PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
+				FreePasswords();
+				return;
+			}
+		}
+
+		LPTSTR lpValMsg = NULL;
+		_CallPlugins(KPM_VALIDATE_MASTERPASSWORD, (LPARAM)m_lpKey, (LPARAM)&lpValMsg);
+		if((lpValMsg != NULL) && (lpValMsg[0] != 0))
+		{
+			MessageBox(lpValMsg, PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
+			FreePasswords();
+			return;
 		}
 	}
 
@@ -667,12 +712,18 @@ void CPasswordDlg::EnableClientWindows()
 		}
 	}
 
+	m_btBrowseKeyFile.EnableWindow(TRUE);
 	m_btStars.EnableWindow(TRUE);
 	m_pEditPw.EnableWindow(TRUE);
 	m_cbDiskList.EnableWindow(TRUE);
 
-	if(nComboSel == 0) m_btBrowseKeyFile.EnableWindow(TRUE);
-	else m_btBrowseKeyFile.EnableWindow(FALSE);
+	// if(nComboSel == 0) m_btBrowseKeyFile.EnableWindow(TRUE);
+	// else m_btBrowseKeyFile.EnableWindow(FALSE);
+}
+
+void CPasswordDlg::UpdateAndCheckBox()
+{
+	EnableClientWindows();
 }
 
 void CPasswordDlg::OnCheckKeymethodAnd() 
@@ -689,16 +740,12 @@ BOOL CPasswordDlg::PreTranslateMessage(MSG* pMsg)
 
 void CPasswordDlg::OnBnClickedBrowseKeyFile()
 {
-	CString strFile;
-	DWORD dwFlags;
-	CString strFilter;
-
 	UpdateData(TRUE);
 
-	strFilter = TRL("All Files");
+	CString strFilter = TRL("All Files");
 	strFilter += _T(" (*.*)|*.*||");
 
-	dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
+	DWORD dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
 	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 	dwFlags |= 0x00080000 | 0x00800000;
 
@@ -708,17 +755,16 @@ void CPasswordDlg::OnBnClickedBrowseKeyFile()
 		dwFlags |= OFN_HIDEREADONLY;
 
 	CFileDialog dlg(m_bLoadMode, NULL, NULL, dwFlags, strFilter, this);
-
 	if(dlg.DoModal() == IDOK)
 	{
-		strFile = dlg.GetPathName();
+		CString strFile = dlg.GetPathName();
 
 		COMBOBOXEXITEM cbi;
 		ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
 		cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
 		cbi.iItem = m_cbDiskList.GetCount();
 		cbi.pszText = (LPTSTR)(LPCTSTR)strFile;
-		cbi.cchTextMax = (int)_tcslen(cbi.pszText);
+		cbi.cchTextMax = static_cast<int>(_tcslen(cbi.pszText));
 		cbi.iImage = cbi.iSelectedImage = 28;
 		cbi.iIndent = 0;
 		int nx = m_cbDiskList.InsertItem(&cbi);
@@ -798,7 +844,7 @@ std::basic_string<TCHAR> CPasswordDlg::GetKeyFromProvider(LPCTSTR lpDisplayName)
 
 	KP_KEYPROV_KEY kpKey;
 	ZeroMemory(&kpKey, sizeof(KP_KEYPROV_KEY));
-	_CALLPLUGINS(KPM_KEYPROV_QUERY_KEY, (LPARAM)lpDisplayName, (LPARAM)&kpKey);
+	_CallPlugins(KPM_KEYPROV_QUERY_KEY, (LPARAM)lpDisplayName, (LPARAM)&kpKey);
 
 	if((kpKey.lpData == NULL) || (kpKey.dwDataSize == 0))
 	{

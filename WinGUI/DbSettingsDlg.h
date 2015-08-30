@@ -22,7 +22,7 @@
 
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
-#include "NewGUI/XHyperLink.h"
+#include "afxwin.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -35,7 +35,7 @@ public:
 
 	//{{AFX_DATA(CDbSettingsDlg)
 	enum { IDD = IDD_DBSETTINGS_DLG };
-	CXHyperLink	m_hlHelp;
+	CXPStyleButtonST	m_btHelp;
 	CXPStyleButtonST	m_btCalcRounds;
 	CComboBox	m_cEncAlgos;
 	CXPStyleButtonST	m_btCancel;
@@ -56,9 +56,9 @@ protected:
 	virtual void OnOK();
 	virtual void OnCancel();
 	afx_msg void OnBtnCalcRounds();
+	afx_msg void OnBtnClickedHelp();
 	//}}AFX_MSG
 
-	afx_msg LRESULT OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 };
 

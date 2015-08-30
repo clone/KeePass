@@ -46,6 +46,8 @@ CCustomListCtrlEx::CCustomListCtrlEx()
 
 	m_pParentI = NULL;
 	m_pbShowColumns = NULL;
+
+	m_bRedrawingEnabled = true;
 }
 
 CCustomListCtrlEx::~CCustomListCtrlEx()
@@ -202,12 +204,60 @@ void CCustomListCtrlEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	CListCtrl::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
-BOOL CCustomListCtrlEx::EnsureVisible(int nItem, BOOL bPartialOK)
+void CCustomListCtrlEx::FocusItem(int iIndex, BOOL bAlsoSelect)
 {
-	return CListCtrl::EnsureVisible(nItem, bPartialOK);
+	ASSERT(iIndex >= 0); if(iIndex < 0) return;
+
+	const int nItemCount = this->GetItemCount();
+	if(iIndex >= nItemCount) return; // No assert
+
+	for(int i = nItemCount - 1; i >= 0; --i)
+	{
+		ASSERT((i >= 0) && (i < nItemCount));
+		if(i == iIndex) continue;
+
+		const UINT uState = this->GetItemState(i, LVIS_FOCUSED);
+		if(uState != 0) this->SetItemState(i, 0, LVIS_FOCUSED);
+	}
+
+	const UINT uItemState = this->GetItemState(iIndex, LVIS_FOCUSED | LVIS_SELECTED);
+
+	if((bAlsoSelect == TRUE) && ((uItemState & LVIS_SELECTED) == 0))
+		this->SetItemState(iIndex, LVIS_SELECTED, LVIS_SELECTED);
+
+	if((uItemState & LVIS_FOCUSED) == 0)
+		this->SetItemState(iIndex, LVIS_FOCUSED, LVIS_FOCUSED);
 }
 
-int CCustomListCtrlEx::GetItemCount()
+bool CCustomListCtrlEx::LockRedrawEx(bool bBlockRedrawing)
 {
-	return CListCtrl::GetItemCount();
+	return this->LockRedrawEx(bBlockRedrawing, false);
+}
+
+bool CCustomListCtrlEx::LockRedrawEx(bool bBlockRedrawing, bool bFullInvalidate)
+{
+	if(bBlockRedrawing && m_bRedrawingEnabled)
+	{
+		m_bRedrawingEnabled = false;
+		this->SetRedraw(FALSE);
+		return true;
+	}
+	else if(!bBlockRedrawing && !m_bRedrawingEnabled)
+	{
+		m_bRedrawingEnabled = true;
+		this->SetRedraw(TRUE);
+		this->Invalidate(bFullInvalidate ? TRUE : FALSE);
+		return true;
+	}
+
+	return false;
+}
+
+void CCustomListCtrlEx::DeleteAllItemsEx()
+{
+	if(this->GetItemCount() == 0) return;
+
+	const bool bLocked = this->LockRedrawEx(true);
+	VERIFY(this->DeleteAllItems());
+	if(bLocked) { VERIFY(this->LockRedrawEx(false)); }
 }

@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../../KeePassLibCpp/SysDefEx.h"
+#include "../../KeePassLibCpp/PasswordGenerator/PasswordGenerator.h"
 #include <string>
 
 // Interface names
@@ -50,8 +51,8 @@
 /////////////////////////////////////////////////////////////////////////////
 // Callback-like communication functions
 
-typedef DWORD(KP_API *LPKP_CALL)(DWORD dwCode, LPARAM lParamW, LPARAM lParamL, LPARAM lParamM);
-typedef DWORD(KP_API *LPKP_QUERY)(DWORD dwCode, LPARAM lParam);
+typedef DWORD_PTR(KP_API *LPKP_CALL)(DWORD dwCode, LPARAM lParamW, LPARAM lParamL, LPARAM lParamM);
+typedef DWORD_PTR(KP_API *LPKP_QUERY)(DWORD dwCode, LPARAM lParam);
 
 /////////////////////////////////////////////////////////////////////////////
 // KeePass plugin structures
@@ -89,14 +90,34 @@ typedef struct
 	KP_MENU_ITEM *pMenuItems;
 } KP_PLUGIN_INFO, *LPKP_PLUGIN_INFO;
 
+typedef struct // Structure containing information about one entry
+{
+	const void *pOriginalEntry; // Pointer to the previous PW_ENTRY
+
+	BYTE uuid[16];
+	DWORD uGroupIndex;
+	DWORD uImageId;
+
+	LPCTSTR lpTitle;
+	LPCTSTR lpURL;
+	LPCTSTR lpUserName;
+	LPCTSTR lpPassword;
+	LPCTSTR lpAdditional;
+} KP_ENTRY, *PKP_ENTRY;
+
+typedef struct
+{
+	LPCTSTR lpPassword;
+	const PW_GEN_SETTINGS_EX* lpSettings;
+} KP_GENERATED_PASSWORD, *LPKP_GENERATED_PASSWORD;
+
 #pragma pack()
 
-/*
-Note 1:  If the plugin does not define command line options, set cmdLineArgPrefix to null.
-         If the plugin defines command line options, cmdLineArgPrefix should point to
-         a null terminated lower case string whose last character is dot _T('.').
-         This string represents the prefix for the command line arguments.
-*/
+// Note 1:
+// If the plugin does not define command line options, set cmdLineArgPrefix to null.
+// If the plugin defines command line options, cmdLineArgPrefix should point to
+// a null terminated lower case string whose last character is dot _T('.').
+// This string represents the prefix for the command line arguments.
 
 /////////////////////////////////////////////////////////////////////////////
 // Functions called by KeePass (must be exported by the plugin DLL)
@@ -232,8 +253,19 @@ typedef struct
 #define KPM_KEYPROV_QUERY_KEY        61
 #define KPM_KEYPROV_FINALIZE         62
 
-// The following is unused. It's always the last command ID + 1
-#define KPM_NEXT 63
+#define KPM_OPTIONS_SAVE_GLOBAL      63
+
+#define KPM_VALIDATE_MASTERPASSWORD  64
+#define KPM_VALIDATE_ENTRY           65
+#define KPM_VALIDATE_GENPASSWORD     66
+
+#define KPM_SELECTAPP_ASURL          67
+
+#define KPM_USERAPP_GETFIRST         68
+#define KPM_USERAPP_GETNEXT          69
+
+// The following is unused; it's always the last command ID + 1
+#define KPM_NEXT 70
 
 /////////////////////////////////////////////////////////////////////////////
 // KeePass query IDs (used in function KP_Query)
@@ -250,6 +282,7 @@ typedef struct
 #define KPQ_GET_GROUP         6
 #define KPQ_ABSOLUTE_DB_PATH  7
 #define KPQ_TRANSLATION_NAME  8
+#define KPQ_GET_CUSTOMKVP     9
 
 /////////////////////////////////////////////////////////////////////////////
 // KeePass call result codes (return value from KP_Call)
@@ -272,6 +305,15 @@ typedef struct
 #define KPC_UPDATE_UI              9
 #define KPC_OPENFILE_DIALOG       10
 #define KPC_ADD_ENTRY             11
+#define KPC_EDIT_ENTRY            12
+#define KPC_DELETE_ENTRY          13
+#define KPC_AUTOTYPE              14
+#define KPC_SET_CUSTOMKVP         15
+
+/////////////////////////////////////////////////////////////////////////////
+// KeePass call flags (used in function KP_Call)
+
+#define KPF_AUTOTYPE_LOSEFOCUS    0x10000
 
 /////////////////////////////////////////////////////////////////////////////
 // Key provider structures

@@ -74,7 +74,7 @@ PWG_ERROR PwgGenerateEx(std::vector<TCHAR>& vOutPassword,
 
 #ifdef _UNICODE
 	vOutPassword.resize(vOutBuffer.size());
-	for(DWORD dwCopy = 0; dwCopy < vOutBuffer.size(); ++dwCopy)
+	for(size_t dwCopy = 0; dwCopy < vOutBuffer.size(); ++dwCopy)
 		vOutPassword[dwCopy] = vOutBuffer[dwCopy];
 #else
 	char *pFinalString = _StringToAnsi(&vOutBuffer[0]);
@@ -310,8 +310,10 @@ void PwgStringToProfile(const std::basic_string<TCHAR>& strProfile,
 
 #ifdef _UNICODE
 	const char *lpEncoded = _StringToAnsi(strProfile.c_str());
+	std::basic_string<char> strEncoded = lpEncoded;
+	SAFE_DELETE_ARRAY(lpEncoded);
 #else
-	const char *lpEncoded = strProfile.c_str();
+	std::basic_string<char> strEncoded = strProfile.c_str();
 #endif
 
 	DWORD dwDecodedSize = static_cast<DWORD>(strProfile.size() + 130);
@@ -319,7 +321,8 @@ void PwgStringToProfile(const std::basic_string<TCHAR>& strProfile,
 	scoped_array<BYTE> pDecoded(new BYTE[dwDecodedSize]);
 	memset(pDecoded.get(), 0, dwDecodedSize);
 
-	if(CBase64Codec::Decode((BYTE *)lpEncoded, szlen(lpEncoded), pDecoded.get(),
+	if(CBase64Codec::Decode((BYTE *)strEncoded.c_str(),
+		static_cast<DWORD>(strEncoded.size()), pDecoded.get(),
 		&dwDecodedSize) == false) { ASSERT(FALSE); return; }
 
 	ASSERT(pDecoded.get()[0] <= PWGD_VERSION_BYTE);

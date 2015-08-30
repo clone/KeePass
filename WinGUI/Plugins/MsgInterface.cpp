@@ -20,6 +20,8 @@
 #include "StdAfx.h"
 #include "MsgInterface.h"
 
+#include <boost/static_assert.hpp>
+
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
 
 #include "../Resource.h"
@@ -82,6 +84,14 @@ C_FN_SHARE DWORD_PTR KP_API KP_Call(DWORD dwCode, LPARAM lParamW, LPARAM lParamL
 		return WU_GetFileNameSz(TRUE, (LPCTSTR)lParamW, (LPTSTR)lParamL, (DWORD)lParamM);
 	else if(dwCode == KPC_ADD_ENTRY)
 		return g_pMainDlg->m_mgr.AddEntry((const PW_ENTRY *)lParamW);
+	else if(dwCode == KPC_EDIT_ENTRY)
+		return g_pMainDlg->m_mgr.SetEntry((DWORD)lParamW, (const PW_ENTRY *)lParamL);
+	else if(dwCode == KPC_DELETE_ENTRY)
+		return g_pMainDlg->m_mgr.DeleteEntry((DWORD)lParamW);
+	else if(dwCode == KPC_AUTOTYPE)
+		KPMI_AutoType((PW_ENTRY *)lParamW, lParamL);
+	else if((dwCode == KPC_SET_CUSTOMKVP) && (g_pMainDlg->m_bFileOpen == TRUE))
+		return g_pMainDlg->m_mgr.SetCustomKvp((LPCTSTR)lParamW, (LPCTSTR)lParamL);
 
 	return KPR_SUCCESS;
 }
@@ -90,7 +100,8 @@ C_FN_SHARE DWORD_PTR KP_API KP_Query(DWORD dwCode, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
-	if(dwCode == KPQ_VERSION) return PWM_VERSION_DW;
+	if(dwCode == KPQ_VERSION)
+		return PWM_VERSION_DW;
 	else if(dwCode == KPQ_FILEOPEN)
 		return g_pMainDlg->m_bFileOpen;
 	else if(dwCode == KPQ_PWLIST_ITEMCOUNT)
@@ -101,19 +112,30 @@ C_FN_SHARE DWORD_PTR KP_API KP_Query(DWORD dwCode, LPARAM lParam)
 		g_pMainDlg->m_mgr.GetNeverExpireTime((PW_TIME *)lParam);
 	else if(dwCode == KPQ_GET_GROUP)
 	{
-		ASSERT(sizeof(void *) == sizeof(DWORD));
+		BOOST_STATIC_ASSERT(sizeof(void *) == sizeof(DWORD_PTR));
 		return (DWORD_PTR)g_pMainDlg->m_mgr.GetGroup((DWORD)lParam);
 	}
 	else if(dwCode == KPQ_ABSOLUTE_DB_PATH)
 	{
-		ASSERT(sizeof(LPCTSTR) == sizeof(DWORD));
+		BOOST_STATIC_ASSERT(sizeof(LPCTSTR) == sizeof(DWORD_PTR));
 		return (DWORD_PTR)(LPCTSTR)g_pMainDlg->m_strFileAbsolute;
 	}
 	else if(dwCode == KPQ_TRANSLATION_NAME)
 	{
-		ASSERT(sizeof(LPCTSTR) == sizeof(DWORD));
+		BOOST_STATIC_ASSERT(sizeof(LPCTSTR) == sizeof(DWORD_PTR));
 		return (DWORD_PTR)GetCurrentTranslationTable();
 	}
+	else if((dwCode == KPQ_GET_CUSTOMKVP) && (g_pMainDlg->m_bFileOpen == TRUE))
+		return (DWORD_PTR)g_pMainDlg->m_mgr.GetCustomKvp((LPCTSTR)lParam);
 
 	return 0;
+}
+
+void KPMI_AutoType(PW_ENTRY *pEntry, LONG_PTR lFlags)
+{
+	const DWORD dwAutoTypeSeq = static_cast<DWORD>(lFlags & 0xFFFF);
+	const BOOL bLoseFocus = (((lFlags & KPF_AUTOTYPE_LOSEFOCUS) != 0) ?
+		TRUE : FALSE);
+
+	g_pMainDlg->_AutoType(pEntry, bLoseFocus, dwAutoTypeSeq);
 }

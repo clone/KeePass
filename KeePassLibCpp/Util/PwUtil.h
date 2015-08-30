@@ -64,6 +64,8 @@ public:
 
 	static BOOL IsTANEntry(const PW_ENTRY *pe);
 
+	// static void ProtectMemory(UINT8 *pMem, size_t uBytes, bool bEncrypt);
+
 private:
 	inline static BOOL ConvertStrToHex(char ch1, char ch2, BYTE& bt);
 	inline static void ConvertHexToStr(BYTE bt, char& ch1, char& ch2);

@@ -20,19 +20,17 @@
 #include "StdAfx.h"
 #include "PwSafe.h"
 #include "DbSettingsDlg.h"
-#include <mmsystem.h>
 #include "../KeePassLibCpp/PwManager.h"
-#include "../KeePassLibCpp/Crypto/Rijndael.h"
+#include "../KeePassLibCpp/Crypto/KeyTransform.h"
+#include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "Util/WinUtil.h"
+#include "NewGUI/NewGUICommon.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
-
-#include "NewGUI/NewGUICommon.h"
-#include "../KeePassLibCpp/Util/TranslateEx.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -50,7 +48,6 @@ void CDbSettingsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CDbSettingsDlg)
-	DDX_Control(pDX, IDC_HLINK_HELPFILE, m_hlHelp);
 	DDX_Control(pDX, IDC_BTN_CALCROUNDS, m_btCalcRounds);
 	DDX_Control(pDX, IDC_COMBO_ENCALGOS, m_cEncAlgos);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
@@ -58,15 +55,15 @@ void CDbSettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_CBIndex(pDX, IDC_COMBO_ENCALGOS, m_nAlgorithm);
 	DDX_Text(pDX, IDC_EDIT_KEYENC, m_dwNumKeyEnc);
 	DDX_Text(pDX, IDC_EDIT_DEFAULTUSER, m_strDefaultUserName);
+	DDX_Control(pDX, IDC_BTN_SECHELP, m_btHelp);
 	//}}AFX_DATA_MAP
 }
 
 BEGIN_MESSAGE_MAP(CDbSettingsDlg, CDialog)
 	//{{AFX_MSG_MAP(CDbSettingsDlg)
 	ON_BN_CLICKED(IDC_BTN_CALCROUNDS, OnBtnCalcRounds)
+	ON_BN_CLICKED(IDC_BTN_SECHELP, &CDbSettingsDlg::OnBtnClickedHelp)
 	//}}AFX_MSG_MAP
-
-	ON_REGISTERED_MESSAGE(WM_XHYPERLINK_CLICKED, OnXHyperLinkClicked)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -81,18 +78,12 @@ BOOL CDbSettingsDlg::OnInitDialog()
 	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_XPButton(m_btCalcRounds, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
+	NewGUI_XPButton(m_btHelp, IDB_HELP_SMALL, IDB_HELP_SMALL);
 
 	CString str;
 	m_btCalcRounds.GetWindowText(str);
 	m_btCalcRounds.SetTooltipText(str + _T("."));
 	m_btCalcRounds.SetWindowText(_T(""));
-
-	str = TRL("Open &Help File"); str.Remove(_T('&'));
-	m_hlHelp.SetWindowText(str);
-	NewGUI_MakeHyperLink(&m_hlHelp);
-	m_hlHelp.EnableTooltip(FALSE);
-	m_hlHelp.SetNotifyParent(TRUE);
-	m_hlHelp.EnableURL(FALSE);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_OPTIONS),
@@ -137,50 +128,12 @@ void CDbSettingsDlg::OnCancel()
 
 void CDbSettingsDlg::OnBtnCalcRounds() 
 {
-	CRijndael rijndael;
-	UINT8 aKeySeed[32];
-	UINT8 aTest[32];
-	DWORD iRounds = 0;
-
 	UpdateData(TRUE);
-
-	memset(aKeySeed, 0x4b, 32);
-	memset(aTest, 0x8e, 32);
-
-	if(rijndael.Init(CRijndael::ECB, CRijndael::EncryptDir, aKeySeed, CRijndael::Key32Bytes, 0) != RIJNDAEL_SUCCESS)
-	{
-		MessageBox(TRL("Internal error"), PWM_PRODUCT_NAME_SHORT,
-			MB_ICONSTOP | MB_OK);
-		return;
-	}
-
-	const DWORD dwStartTime = timeGetTime();
-
-	while(true)
-	{
-		rijndael.BlockEncrypt(aTest, 256, aTest);
-		rijndael.BlockEncrypt(aTest, 256, aTest);
-		rijndael.BlockEncrypt(aTest, 256, aTest);
-		rijndael.BlockEncrypt(aTest, 256, aTest);
-		rijndael.BlockEncrypt(aTest, 256, aTest);
-		rijndael.BlockEncrypt(aTest, 256, aTest);
-		rijndael.BlockEncrypt(aTest, 256, aTest);
-		rijndael.BlockEncrypt(aTest, 256, aTest);
-		iRounds += 8;
-
-		if(iRounds < 8) { iRounds = DWORD_MAX - 8; break; } // Overflow?
-		if((timeGetTime() - dwStartTime) > 1000) break;
-	}
-
-	m_dwNumKeyEnc = iRounds;
+	m_dwNumKeyEnc = CKeyTransform::Benchmark(1000);
 	UpdateData(FALSE);
 }
 
-LRESULT CDbSettingsDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
+void CDbSettingsDlg::OnBtnClickedHelp()
 {
-	UNREFERENCED_PARAMETER(lParam);
-
-	if(wParam == IDC_HLINK_HELPFILE) WU_OpenAppHelp(PWM_HELP_SECURITY);
-
-	return 0;
+	WU_OpenAppHelp(PWM_HELP_SECURITY);
 }

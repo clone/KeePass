@@ -23,6 +23,7 @@
 
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "../KeePassLibCpp/Util/MemUtil.h"
+#include "../KeePassLibCpp/Util/StrUtil.h"
 #include "Util/PrivateConfigEx.h"
 #include "Util/WinUtil.h"
 #include "Util/CmdLine/CmdArgs.h"
@@ -104,9 +105,11 @@ BOOL CPwSafeApp::InitInstance()
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osvi);
-
 	if((osvi.dwMajorVersion == 5) && (osvi.dwMinorVersion == 0)) // Windows 2000
 		g_bForceSimpleAsterisks = TRUE;
+	if((osvi.dwMajorVersion <= 4) || ((osvi.dwMajorVersion == 5) &&
+		(osvi.dwMinorVersion == 0))) // Restore old banner style if running on < XP
+		NewGUI_SetWin32Banner();
 
 	CPwSafeDlg dlg;
 	m_pMainWnd = &dlg;
@@ -180,10 +183,14 @@ BOOL CPwSafeApp::InitInstance()
 		}
 	}
 
+	NSCAPI_Initialize(); // Initialize natural string comparison API
+
 	const INT_PTR nResponse = dlg.DoModal();
 
 	if(nResponse == IDOK) { }
 	else if(nResponse == IDCANCEL) { }
+
+	NSCAPI_Exit(); // Cleanup natural string comparison API
 
 	NewGUI_CleanUp();
 	return FALSE;
@@ -479,10 +486,10 @@ void CPwSafeApp::CreateHiColorImageList(CImageList *pImageList, WORD wResourceID
 	CBitmap bmpImages;
 	VERIFY(bmpImages.LoadBitmap(MAKEINTRESOURCE(wResourceID)));
 
-	VERIFY(pImageList->Create(czSize, czSize, ILC_COLOR24 | ILC_MASK, bmpImages.GetBitmapDimension().cx / czSize, 0));
-	pImageList->Add(&bmpImages, RGB(255,0,255));
+	VERIFY(pImageList->Create(czSize, czSize, ILC_COLOR24 | ILC_MASK, 0, 0));
+	VERIFY(pImageList->Add(&bmpImages, RGB(255, 0, 255)) >= 0);
 
-	bmpImages.DeleteObject();
+	VERIFY(bmpImages.DeleteObject());
 }
 
 BOOL CPwSafeApp::IsMBThreadACP()
@@ -514,7 +521,7 @@ BOOL CPwSafeApp::ProcessControlCommands()
 {
 	CString strCmdLine = (LPCTSTR)GetCommandLine();
 	strCmdLine.Trim(_T("\"' \t\r\n\\$%"));
-	strCmdLine.MakeLower();
+	strCmdLine = strCmdLine.MakeLower();
 
 	if(strCmdLine.GetLength() >= 6)
 	{

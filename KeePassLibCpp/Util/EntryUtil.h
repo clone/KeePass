@@ -20,9 +20,21 @@
 #ifndef ___ENTRY_UTIL_H___
 #define ___ENTRY_UTIL_H___
 
+// #include "StrUtil.h"
+
 // C_FN_SHARE LPTSTR PwEntryToString(const PW_ENTRY *lpEntry);
 // C_FN_SHARE BOOL StringToPwEntry(PW_ENTRY *pEntry, LPCTSTR lpEntryString);
 
 // BOOL ReadPwStringItem(LPCTSTR lpEntryString, DWORD *pdwPos, CString *pStore);
+
+// typedef int(*LPENTRYCOMPARE)(void *, const void *, const void *);
+
+// typedef struct _CEE_CONTEXT
+// {
+//	DWORD dwSortByField;
+//	LPCTSTRCMPEX lpCompare;
+// } CEE_CONTEXT;
+
+// int _CompareEntriesEx(void *pContext, const void *pEntryX, const void *pEntryY);
 
 #endif // ___ENTRY_UTIL_H___

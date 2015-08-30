@@ -28,6 +28,7 @@ IMPLEMENT_DYNAMIC(CPermissionDlg, CDialog)
 
 CPermissionDlg::CPermissionDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CPermissionDlg::IDD, pParent)
+	, m_bAlwaysAllowFullAccess(FALSE)
 {
 	m_nPermission = RC_PERMISSION_DENYACCESS;
 	m_nActivationCountdown = 3;
@@ -44,6 +45,7 @@ void CPermissionDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDOK, m_btnOK);
 	DDX_Control(pDX, IDC_READONLY, m_btnReadOnly);
 	DDX_Text(pDX, IDC_STC_APP, m_strApp);
+	DDX_Check(pDX, IDC_CB_ALWAYSALLOW, m_bAlwaysAllowFullAccess);
 }
 
 BEGIN_MESSAGE_MAP(CPermissionDlg, CDialog)
@@ -101,6 +103,7 @@ void CPermissionDlg::OnOK()
 {
 	if(m_nActivationCountdown != -1) return;
 	
+	UpdateData(TRUE); // Get the always-allow flag
 	m_nPermission = RC_PERMISSION_FULLACCESS;
 
 	KillTimer(1);

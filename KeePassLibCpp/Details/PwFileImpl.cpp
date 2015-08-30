@@ -22,6 +22,7 @@
 #include "../Crypto/TwofishClass.h"
 #include "../Crypto/SHA2/SHA2.h"
 #include "../Crypto/ARCFour.h"
+#include "../Util/AppUtil.h"
 #include "../Util/Base64.h"
 #include "../Util/PwUtil.h"
 #include "../Util/MemUtil.h"
@@ -342,10 +343,8 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *p
 	return PWE_SUCCESS;
 }
 
-int CPwManager::SaveDatabase(const TCHAR *pszFile)
+int CPwManager::SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32)
 {
-	FILE *fp;
-	char *pVirtualFile;
 	DWORD uEncryptedPartSize, uAllocated, i, pos, dwFieldSize;
 	PW_DBHEADER hdr;
 	UINT8 uFinalKey[32];
@@ -417,7 +416,7 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile)
 
 	// Allocate enough memory
 	uAllocated = uFileSize + 16;
-	pVirtualFile = new char[uAllocated];
+	char *pVirtualFile = new char[uAllocated];
 	ASSERT(pVirtualFile != NULL);
 	if(pVirtualFile == NULL) { _LoadAndRemoveAllMetaStreams(false); return PWE_NO_MEM; }
 
@@ -692,7 +691,7 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile)
 	// Check if all went correct
 	ASSERT((uEncryptedPartSize % 16) == 0);
 	if((uEncryptedPartSize > 2147483446) || ((uEncryptedPartSize == 0) &&
-		(GetNumberOfGroups() != 0)))
+		(this->GetNumberOfGroups() != 0)))
 	{
 		ASSERT(FALSE);
 		SAFE_DELETE_ARRAY(pVirtualFile);
@@ -700,30 +699,25 @@ int CPwManager::SaveDatabase(const TCHAR *pszFile)
 		return PWE_CRYPT_ERROR;
 	}
 
-	fp = NULL;
-	_tfopen_s(&fp, pszFile, _T("wb"));
-	if(fp == NULL)
+	const DWORD dwToWrite = uEncryptedPartSize + sizeof(PW_DBHEADER);
+	const int nWriteRes = AU_WriteBigFile(pszFile, (BYTE *)pVirtualFile, dwToWrite);
+	if(nWriteRes != PWE_SUCCESS)
 	{
 		mem_erase((unsigned char *)pVirtualFile, uAllocated);
 		SAFE_DELETE_ARRAY(pVirtualFile);
 		_LoadAndRemoveAllMetaStreams(false);
-		return PWE_NOFILEACCESS_WRITE;
+		return nWriteRes;
 	}
 
-	// Write memory file to disk
-	if(fwrite(pVirtualFile, 1, uEncryptedPartSize + sizeof(PW_DBHEADER), fp) !=
-		uEncryptedPartSize + sizeof(PW_DBHEADER))
+	if(pWrittenDataHash32 != NULL) // Caller requests hash of written data
 	{
-		mem_erase((unsigned char *)pVirtualFile, uAllocated);
-		SAFE_DELETE_ARRAY(pVirtualFile);
-		_LoadAndRemoveAllMetaStreams(false);
-		return PWE_FILEERROR_WRITE;
+		sha256_ctx shaWritten;
+		sha256_begin(&shaWritten);
+		sha256_hash((unsigned char *)pVirtualFile, dwToWrite, &shaWritten);
+		sha256_end(pWrittenDataHash32, &shaWritten);
 	}
 
-	// Close file, erase and delete memory
-	fclose(fp); fp = NULL;
-
-	memcpy(&m_dbLastHeader, &hdr, sizeof(PW_DBHEADER));
+	memcpy(&m_dbLastHeader, &hdr, sizeof(PW_DBHEADER)); // Backup last database header
 
 	mem_erase((unsigned char *)pVirtualFile, uAllocated);
 	SAFE_DELETE_ARRAY(pVirtualFile);

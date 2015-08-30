@@ -32,6 +32,7 @@ static CRemoteControl *g_pRCInstance = NULL;
 CRemoteControl::CRemoteControl()
 {
 	m_bEnableRC = FALSE;
+	m_bAlwaysAllowFullAccess = FALSE;
 	m_pDefaultMgr = NULL;
 	m_hWndMain = NULL;
 
@@ -74,6 +75,16 @@ void CRemoteControl::FreeStatic()
 	}
 
 	m_hWndMain = NULL;
+}
+
+void CRemoteControl::SetAlwaysAllowFullAccess(BOOL bAllow)
+{
+	m_bAlwaysAllowFullAccess = bAllow;
+}
+
+BOOL CRemoteControl::GetAlwaysAllowFullAccess() const
+{
+	return m_bAlwaysAllowFullAccess;
 }
 
 void CRemoteControl::EnableRemoteControl(BOOL bEnable)
@@ -154,9 +165,19 @@ BOOL CRemoteControl::ProcessRequest(LPCTSTR lpIncomingRequest)
 
 		CPermissionDlg dlg;
 		dlg.m_strApp = rcQuery.strParamW.c_str();
-		dlg.DoModal();
 
-		dwPermission = static_cast<DWORD>(dlg.m_nPermission);
+		if(m_bAlwaysAllowFullAccess == FALSE)
+		{
+			dlg.DoModal();
+			dwPermission = static_cast<DWORD>(dlg.m_nPermission);
+
+			if((dwPermission == RC_PERMISSION_FULLACCESS) &&
+				(dlg.m_bAlwaysAllowFullAccess != FALSE))
+			{
+				m_bAlwaysAllowFullAccess = TRUE;
+			}
+		}
+		else dwPermission = RC_PERMISSION_FULLACCESS;
 
 		RC_CLIENT rcClient;
 		rcClient.strID = rcQuery.strClientID;
@@ -200,7 +221,7 @@ BOOL CRemoteControl::ProcessRequest(LPCTSTR lpIncomingRequest)
 			if(p != NULL)
 			{
 				CString strIndex = rcQuery.strParamL.c_str();
-				strIndex.MakeLower();
+				strIndex = strIndex.MakeLower();
 				strIndex += _T(": ");
 
 				strReturn = (LPCTSTR)ExtractParameterFromString(p->pszAdditional, (LPCTSTR)strIndex, 0);
@@ -244,9 +265,7 @@ BOOL CRemoteControl::ProcessRequest(LPCTSTR lpIncomingRequest)
 		if(dwPermission == RC_PERMISSION_FULLACCESS)
 		{
 			if(rcQuery.strCommand == RCCMD_ENTRY_ADD_BYURL)
-			{
 				this->AddEntry(strRetrievedName, rcQuery);
-			}
 		}
 	}
 
@@ -376,12 +395,18 @@ void CRemoteControl::AddEntry(const RC_STRING& strRetrievedName, const RC_QUERY&
 			PW_ENTRY pe;
 			ZeroMemory(&pe, sizeof(PW_ENTRY));
 
-			pe.pszTitle = (TCHAR *)rcQuery.strParamW.c_str();
-			pe.pszUserName = (TCHAR *)strRetrievedName.c_str();
+			pe.pszTitle = const_cast<TCHAR *>(rcQuery.strParamW.c_str());
+			pe.pszUserName = const_cast<TCHAR *>(strRetrievedName.c_str());
 			pe.uGroupId = dwGroupID;
 			pe.pszURL = pe.pszTitle;
-			pe.pszAdditional = (TCHAR *)strNotes.c_str();
+			pe.pszAdditional = const_cast<TCHAR *>(strNotes.c_str());
 			m_pDefaultMgr->GetNeverExpireTime(&pe.tExpire);
+
+			PW_TIME tNow;
+			_GetCurrentPwTime(&tNow);
+			memcpy(&pe.tCreation, &tNow, sizeof(PW_TIME));
+			memcpy(&pe.tLastMod, &tNow, sizeof(PW_TIME));
+			memcpy(&pe.tLastAccess, &tNow, sizeof(PW_TIME));
 
 			m_pDefaultMgr->AddEntry(&pe);
 			m_bRequiresGUIUpdate = TRUE;

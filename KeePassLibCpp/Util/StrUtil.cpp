@@ -66,7 +66,7 @@ void FixURL(CString *pstrURL)
 
 	// Load string and make lower
 	strTemp = *pstrURL;
-	strTemp.MakeLower();
+	strTemp = strTemp.MakeLower();
 
 	// If the string begins with one of the following prefixes it is an URL
 	if(strTemp.Left(5) == _T("http:")) bPre = TRUE;
@@ -116,10 +116,10 @@ void _PwTimeToStringEx(const PW_TIME& t, CString& strDest, BOOL bUseLocalFormat)
 	if(bUseLocalFormat == TRUE)
 	{
 		SYSTEMTIME st;
+		ZeroMemory(&st, sizeof(SYSTEMTIME));
 		st.wYear = t.shYear;
 		st.wMonth = t.btMonth;
 		st.wDay = t.btDay;
-		st.wDayOfWeek = 0;
 		st.wHour = t.btHour;
 		st.wMinute = t.btMinute;
 		st.wSecond = t.btSecond;
@@ -207,129 +207,93 @@ C_FN_SHARE void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 	}
 }
 
-void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes)
+BOOL SeqReplace(CString& str, LPCTSTR lpFind, LPCTSTR lpReplaceWith,
+	BOOL bMakeSimString, BOOL bCmdQuotes, BOOL bRemoveMeta)
 {
-	CString str, strTemp;
-	int nPos;
+	ASSERT(lpFind != NULL); if(lpFind == NULL) return FALSE;
+	ASSERT(lpReplaceWith != NULL); if(lpReplaceWith == NULL) return FALSE;
 
+	const int nFindLen = static_cast<int>(_tcslen(lpFind));
+	CString strFindLower = lpFind;
+	strFindLower = strFindLower.MakeLower();
+
+	BOOL bReplaced = FALSE;
+	for(int iLoop = 0; iLoop < 20; ++iLoop)
+	{
+		const int nPos = str.Find(lpFind);
+		if(nPos < 0) break;
+
+		const int nStrLen = str.GetLength();
+
+		CString strTemp = lpReplaceWith;
+		if(bRemoveMeta == TRUE) strTemp = CsRemoveMeta(&strTemp);
+
+		if(bMakeSimString == FALSE)
+		{
+			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
+
+			str = str.Left(nPos) + strTemp + str.Right(nStrLen - nPos - nFindLen);
+		}
+		else
+			str = str.Left(nPos) + TagSimString(strTemp) + str.Right(nStrLen -
+				nPos - nFindLen);
+
+		bReplaced = TRUE;
+	}
+
+	return bReplaced;
+}
+
+void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes,
+	CPwManager* pDataSource, DWORD dwRecursionLevel)
+{
 	ASSERT(pString != NULL); if(pString == NULL) return;
 	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return;
+	ASSERT(pDataSource != NULL); if(pDataSource == NULL) return;
+	if(dwRecursionLevel >= PRL_MAX_DEPTH) return;
 
-	str = *pString;
+	CString str = *pString;
 
-	while(1)
+	TCHAR tszBufP[512];
+	VERIFY(GetApplicationDirectory(tszBufP, 512 - 1, TRUE, FALSE));
+
+	for(int iLoop = 0; iLoop < 20; ++iLoop)
 	{
-		nPos = str.Find(_T("{TITLE}"));
-		if(nPos == -1) break;
+		BOOL b = FALSE;
 
-		if(bMakeSimString == FALSE)
-		{
-			strTemp = pEntry->pszTitle;
-			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
-			
-			str = str.Left(nPos) + strTemp + str.Right(str.GetLength() - nPos - 7);
-		}
-		else
-			str = str.Left(nPos) + TagSimString(pEntry->pszTitle) + str.Right(str.GetLength() - nPos - 7);
-	}
+		b |= SeqReplace(str, _T("{TITLE}"), pEntry->pszTitle, bMakeSimString, bCmdQuotes, FALSE);
+		b |= SeqReplace(str, _T("{USERNAME}"), pEntry->pszUserName, bMakeSimString, bCmdQuotes, FALSE);
+		b |= SeqReplace(str, _T("{URL}"), pEntry->pszURL, bMakeSimString, bCmdQuotes, FALSE);
 
-	while(1)
-	{
-		nPos = str.Find(_T("{USERNAME}"));
-		if(nPos == -1) break;
+		pDataSource->UnlockEntryPassword(pEntry);
+		b |= SeqReplace(str, _T("{PASSWORD}"), pEntry->pszPassword, bMakeSimString, bCmdQuotes, FALSE);
+		pDataSource->LockEntryPassword(pEntry);
 
-		if(bMakeSimString == FALSE)
-		{
-			strTemp = pEntry->pszUserName;
-			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
-			
-			str = str.Left(nPos) + strTemp + str.Right(str.GetLength() - nPos - 10);
-		}
-		else
-			str = str.Left(nPos) + TagSimString(pEntry->pszUserName) + str.Right(str.GetLength() - nPos - 10);
-	}
+		b |= SeqReplace(str, _T("{NOTES}"), pEntry->pszAdditional, bMakeSimString, bCmdQuotes, FALSE);
 
-	while(1)
-	{
-		nPos = str.Find(_T("{URL}"));
-		if(nPos == -1) break;
+		b |= SeqReplace(str, _T("{APPDIR}"), &tszBufP[0], bMakeSimString, bCmdQuotes, FALSE);
 
-		if(bMakeSimString == FALSE)
-		{
-			strTemp = pEntry->pszURL;
-			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
+		str.Replace(_T("{CLEARFIELD}"), _T("{DELAY 150}{HOME}(+{END}){DEL}{DELAY 150}"));
 
-			str = str.Left(nPos) + strTemp + str.Right(str.GetLength() - nPos - 5);
-		}
-		else
-			str = str.Left(nPos) + TagSimString(pEntry->pszURL) + str.Right(str.GetLength() - nPos - 5);
-	}
+		b |= FillRefPlaceholders(str, bMakeSimString, bCmdQuotes, pDataSource, dwRecursionLevel);
 
-	while(1)
-	{
-		nPos = str.Find(_T("{PASSWORD}"));
-		if(nPos == -1) break;
-
-		if(bMakeSimString == FALSE)
-		{
-			strTemp = pEntry->pszPassword;
-			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
-
-			str = str.Left(nPos) + strTemp + str.Right(str.GetLength() - nPos - 10);
-		}
-		else
-			str = str.Left(nPos) + TagSimString(pEntry->pszPassword) + str.Right(str.GetLength() - nPos - 10);
-	}
-
-	while(1)
-	{
-		nPos = str.Find(_T("{NOTES}"));
-		if(nPos == -1) break;
-
-		if(bMakeSimString == FALSE)
-		{
-			strTemp = pEntry->pszAdditional;
-			strTemp = CsRemoveMeta(&strTemp);
-
-			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
-
-			str = str.Left(nPos) + strTemp + str.Right(str.GetLength() - nPos - 7);
-			EraseCString(&strTemp);
-		}
-		else
-		{
-			strTemp = pEntry->pszAdditional;
-			strTemp = CsRemoveMeta(&strTemp);
-			str = str.Left(nPos) + TagSimString((LPCTSTR)strTemp) + str.Right(str.GetLength() - nPos - 7);
-			EraseCString(&strTemp);
-		}
-	}
-
-	while(1)
-	{
-		nPos = str.Find(_T("{APPDIR}"));
-		if(nPos == -1) break;
-		TCHAR tszBufP[512];
-		GetApplicationDirectory(tszBufP, 512 - 1, TRUE, FALSE);
-		if(bMakeSimString == FALSE)
-			str = str.Left(nPos) + tszBufP + str.Right(str.GetLength() - nPos - 8);
-		else
-			str = str.Left(nPos) + TagSimString(tszBufP) + str.Right(str.GetLength() - nPos - 8);
+		if(b == FALSE) break;
 	}
 
 	if(bMakeSimString == TRUE)
 	{
 		CString strSourceCopy = str;
-
 		EraseCString(&str);
 
-		for(nPos = 0; nPos < strSourceCopy.GetLength(); nPos++)
+		for(int nPos = 0; nPos < strSourceCopy.GetLength(); ++nPos)
 		{
 			unsigned char uch = static_cast<unsigned char>(strSourceCopy.GetAt(nPos));
 
 			if(uch > 0x7E)
 			{
 				str += _T("(%{NUMPAD0}");
+
+				CString strTemp;
 				strTemp.Format(_T("%u"), uch);
 				ASSERT(strTemp.GetLength() == 3);
 
@@ -344,14 +308,74 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 			}
 			else str += static_cast<TCHAR>(uch);
 		}
-
-		EraseCString(&strTemp);
 	}
 
-	str.Replace(_T("{CLEARFIELD}"), _T("{DELAY 150}{HOME}(+{END}){DEL}{DELAY 150}"));
-
 	*pString = str;
-	EraseCString(&str);
+}
+
+BOOL FillRefPlaceholders(CString& str, BOOL bMakeSimString, BOOL bCmdQuotes,
+	CPwManager* pDataSource, DWORD dwRecursionLevel)
+{
+	ASSERT(pDataSource != NULL); if(pDataSource == NULL) return FALSE;
+	
+	UNREFERENCED_PARAMETER(bMakeSimString);
+
+	LPCTSTR lpStart = _T("{REF:");
+	const int nStartLen = static_cast<int>(_tcslen(lpStart));
+	LPCTSTR lpEnd = _T("}");
+	// const int nEndLen = static_cast<int>(_tcslen(lpEnd));
+
+	BOOL bReplaced = FALSE;
+	for(int iLoop = 0; iLoop < 20; ++iLoop)
+	{
+		const int nStart = str.Find(lpStart);
+		if(nStart < 0) break;
+		const int nEnd = str.Find(lpEnd, nStart);
+		if(nEnd < 0) break;
+
+		CString strRef = str.Mid(nStart + nStartLen, nEnd - nStart - nStartLen);
+		if(strRef.GetLength() <= 4) break;
+		if(strRef.GetAt(1) != _T('@')) break;
+		if(strRef.GetAt(3) != _T(':')) break;
+
+		const TCHAR tchScan = static_cast<TCHAR>(toupper(strRef.GetAt(2)));
+		const TCHAR tchWanted = static_cast<TCHAR>(toupper(strRef.GetAt(0)));
+		CString strID = strRef.Mid(4);
+
+		DWORD dwFlags = 0;
+		if(tchScan == _T('T')) dwFlags |= PWMF_TITLE;
+		else if(tchScan == _T('U')) dwFlags |= PWMF_USER;
+		else if(tchScan == _T('A')) dwFlags |= PWMF_URL;
+		else if(tchScan == _T('P')) dwFlags |= PWMF_PASSWORD;
+		else if(tchScan == _T('N')) dwFlags |= PWMF_ADDITIONAL;
+		else if(tchScan == _T('I')) dwFlags |= PWMF_UUID;
+		else break;
+
+		const DWORD dwIndex = pDataSource->Find(strID, FALSE, dwFlags, 0);
+		if(dwIndex != DWORD_MAX)
+		{
+			PW_ENTRY *pFound = pDataSource->GetEntry(dwIndex);
+			ASSERT_ENTRY(pFound);
+
+			CString strInsData;
+			if(tchWanted == _T('T')) strInsData = pFound->pszTitle;
+			else if(tchWanted == _T('U')) strInsData = pFound->pszUserName;
+			else if(tchWanted == _T('A')) strInsData = pFound->pszURL;
+			else if(tchWanted == _T('P')) strInsData = pFound->pszPassword;
+			else if(tchWanted == _T('N')) strInsData = pFound->pszAdditional;
+			else if(tchWanted == _T('I')) _UuidToString(pFound->uuid, &strInsData);
+			else break;
+
+			ParseURL(&strInsData, pFound, FALSE, bCmdQuotes, pDataSource, dwRecursionLevel + 1);
+
+			str = str.Left(nStart) + strInsData + str.Right(str.GetLength() -
+				nEnd - 1);
+			bReplaced = TRUE;
+		}
+		else break;
+	}
+
+	return bReplaced;
 }
 
 CString CsRemoveMeta(CString *psString)
@@ -364,7 +388,7 @@ CString CsRemoveMeta(CString *psString)
 	ASSERT(psString != NULL); if(psString == NULL) return str;
 
 	str = *psString;
-	strLower = str; strLower.MakeLower();
+	strLower = str; strLower = strLower.MakeLower();
 
 	for(i = 0; i < 2; i++)
 	{
@@ -504,16 +528,15 @@ DWORD szlen(const char *pszString)
 CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart,
 	DWORD dwInstance)
 {
-	TCHAR *lp;
-	TCHAR tch;
-	CString str = _T("");
-	int nPos = -1, nSearchFrom = 0;
+	CString str;
 
 	ASSERT(lpstr != NULL); if(lpstr == NULL) return str; // _T("")
 
 	CString strSource = lpstr;
-	strSource.MakeLower();
-	lp = (TCHAR *)lpstr;
+	strSource = strSource.MakeLower();
+	TCHAR *lp = (TCHAR *)lpstr;
+
+	int nPos = -1, nSearchFrom = 0;
 
 	// nPos = strSource.Find(lpStart, 0);
 	while(dwInstance != DWORD_MAX)
@@ -523,7 +546,7 @@ CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart,
 		if(nPos != -1) nSearchFrom = nPos + 1;
 		else return str; // _T("")
 
-		dwInstance--;
+		--dwInstance;
 	}
 
 	if(nPos != -1)
@@ -533,7 +556,7 @@ CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart,
 
 		while(1)
 		{
-			tch = *lp;
+			const TCHAR tch = *lp;
 
 			if(tch == '\0') break;
 			else if(tch == '\n') break;
@@ -550,15 +573,13 @@ CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart,
 
 CString TagSimString(LPCTSTR lpString)
 {
-	int i;
-	CString str = _T("");
-	TCHAR tch;
+	CString str;
 
 	ASSERT(lpString != NULL); if(lpString == NULL) return str;
 
-	for(i = 0; i < (int)_tcslen(lpString); i++)
+	for(int i = 0; i < (int)_tcslen(lpString); ++i)
 	{
-		tch = lpString[i];
+		const TCHAR tch = lpString[i];
 
 		switch(tch)
 		{
@@ -675,7 +696,7 @@ bool StrMatchText(LPCTSTR lpEntryData, LPCTSTR lpSearch,
 	if(bCaseSensitive == FALSE)
 	{
 		CString strEntryData = lpEntryData;
-		strEntryData.MakeLower();
+		strEntryData = strEntryData.MakeLower();
 		return (strEntryData.Find(lpSearch) != -1);
 	}
 

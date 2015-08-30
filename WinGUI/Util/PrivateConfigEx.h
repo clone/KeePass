@@ -54,6 +54,8 @@ public:
 
 	std::vector<std::basic_string<TCHAR> > GetArray(LPCTSTR pszPrefix) const;
 
+	std::basic_string<TCHAR> GetSafe(const TCHAR *pszField);
+
 	// Get the KeePass application data path (directory, not INI
 	// file), without a terminating separator
 	std::basic_string<TCHAR> GetUserPath() const { return m_strUserPath; }
@@ -64,6 +66,8 @@ private:
 
 	BOOL GetIn(LPCTSTR pszField, LPTSTR pszValue, int nConfigID) const;
 	BOOL SetIn(LPCTSTR pszField, LPCTSTR pszValue, int nConfigID);
+
+	static void FlushIni(LPCTSTR lpIniFilePath);
 
 	static BOOL m_bInstanceActive;
 

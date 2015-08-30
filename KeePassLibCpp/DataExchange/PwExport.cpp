@@ -383,7 +383,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 		_ExpStrIf(pOptions->bGroup, TRL("Password Groups"));
 		_ExpStrIf(pOptions->bGroupTree, TRL("Group Tree"));
 		_ExpStrIf(pOptions->bTitle, TRL("Title"));
-		_ExpStrIf(pOptions->bUserName, TRL("UserName"));
+		_ExpStrIf(pOptions->bUserName, TRL("User Name"));
 		_ExpStrIf(pOptions->bURL, TRL("URL"));
 		_ExpStrIf(pOptions->bPassword, TRL("Password"));
 		_ExpStrIf(pOptions->bNotes, TRL("Notes"));
@@ -801,7 +801,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 	}
 	else if(m_nFormat == PWEXP_KEEPASS)
 	{
-		if(pStoreMgr->SaveDatabase(pszFile) != PWE_SUCCESS) bReturn = FALSE;
+		if(pStoreMgr->SaveDatabase(pszFile, NULL) != PWE_SUCCESS) bReturn = FALSE;
 	}
 	else { ASSERT(FALSE); } // Unknown format, should never happen
 

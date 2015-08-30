@@ -48,6 +48,9 @@ public:
 	void InitStatic(CPwManager *pDefaultMgr, HWND hWndMain);
 	void FreeStatic();
 
+	void SetAlwaysAllowFullAccess(BOOL bAllow);
+	BOOL GetAlwaysAllowFullAccess() const;
+
 	void EnableRemoteControl(BOOL bEnable);
 	BOOL IsEnabled() const;
 
@@ -64,6 +67,7 @@ private:
 	void SplitFields(const RC_STRING& strAsm, std::vector<RC_STRING>& vIDs, std::vector<RC_STRING>& vValues);
 
 	BOOL m_bEnableRC;
+	BOOL m_bAlwaysAllowFullAccess;
 	CPwManager *m_pDefaultMgr;
 	HWND m_hWndMain;
 

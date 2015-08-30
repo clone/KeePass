@@ -81,7 +81,7 @@ CKCSideBannerWnd::CKCSideBannerWnd()
 
 	CFont			font;
 
-	font.CreatePointFont(110, _T("Tahoma Bold"));
+	font.CreatePointFont(110, _T("Tahoma")); // DR: Removed bold
 	font.GetLogFont(&m_lfTitle);
 	font.DeleteObject();
 	font.CreatePointFont(85, _T("Tahoma"));

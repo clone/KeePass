@@ -47,8 +47,6 @@
 #include "../KeePassLibCpp/SysDefEx.h"
 #include "afxwin.h"
 
-#define _CALLPLUGINS(__c,__l,__w) CPluginManager::Instance().CallPlugins((__c),(__l),(__w))
-
 #define GUI_GROUPLIST_EXT 170
 // Standard Windows Dialog GUI_SPACER = 11
 #define GUI_SPACER 4
@@ -306,6 +304,7 @@ private:
 	BOOL m_bLockOnWinLock;
 
 	BOOL m_bExiting;
+	BOOL m_bIsLocking;
 	BOOL m_bLocked;
 	long m_nLockedViewParams[3];
 	BOOL m_bWasMaximized;
@@ -325,6 +324,7 @@ private:
 	BOOL m_bStartMinimized;
 	BOOL m_bQuickFindIncBackup;
 	BOOL m_bCheckForUpdate;
+	BOOL m_bFocusResAfterQuickFind;
 
 	CStatusBarCtrl m_sbStatus;
 	BOOL m_bShowToolBar;
@@ -385,6 +385,7 @@ private:
 	DWORD m_dwLastNumSelectedItems;
 	DWORD m_dwLastFirstSelectedItem;
 	HTREEITEM m_hLastSelectedGroup;
+	DWORD m_dwLastEntryIndex;
 
 	BOOL m_bHashValid;
 	BYTE m_aHashOfFile[32];
@@ -433,11 +434,12 @@ private:
 	CRemoteControl m_remoteControl;
 
 	CString m_strDefaultAutoTypeSequence;
+	CString m_strWindowTitleSuffix;
 
 	static BOOL m_bUnintrusiveMiniMode;
 
 private:
-	void ChangeLockStateOnWindowChange(BOOL bLocked);
+	void _ChangeLockState(BOOL bLocked);
 	void SetViewHideState(BOOL bReqVisible, BOOL bPreferTray);
 	void ToggleViewHideState(BOOL bPreferTray);
 	void SetTrayState(BOOL bMinimizeToTray);

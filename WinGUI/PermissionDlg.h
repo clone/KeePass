@@ -39,6 +39,11 @@ public:
 	int m_nActivationCountdown;
 	CString m_strBtnOK;
 	CString m_strBtnReadOnly;
+	CString m_strApp;
+	BOOL m_bAlwaysAllowFullAccess;
+	CXPStyleButtonST m_btnCancel;
+	CXPStyleButtonST m_btnOK;
+	CXPStyleButtonST m_btnReadOnly;
 
 	enum { IDD = IDD_PERMISSION_DLG };
 
@@ -51,10 +56,4 @@ protected:
 	virtual void OnCancel();
 	afx_msg void OnBnClickedReadOnly();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-public:
-	CXPStyleButtonST m_btnCancel;
-	CXPStyleButtonST m_btnOK;
-	CXPStyleButtonST m_btnReadOnly;
-public:
-	CString m_strApp;
 };

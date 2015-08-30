@@ -197,6 +197,7 @@ BEGIN
     RTEXT           "1024 bits",IDC_STATIC_PASSBITS,256,92,30,8
     LTEXT           "URL:",IDC_STATIC,7,108,57,8
     EDITTEXT        IDC_EDIT_URL,67,105,241,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_URL,67,105,241,181,CBS_DROPDOWN | CBS_SORT | NOT WS_VISIBLE | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Notes:",IDC_STATIC,7,126,58,8
     CONTROL         "",IDC_RE_NOTES,"RICHEDIT",TCS_HOTTRACK | TCS_FOCUSONBUTTONDOWN | TCS_MULTISELECT | WS_BORDER | WS_VSCROLL | WS_TABSTOP,67,124,241,86
     CONTROL         "Expires:",IDC_CHECK_EXPIRES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,216,57,10
@@ -210,7 +211,7 @@ BEGIN
     PUSHBUTTON      "",IDC_SAVEATTACH_BTN,266,234,21,14
     PUSHBUTTON      "",IDC_REMOVEATTACH_BTN,287,234,21,14
     CONTROL         "",IDC_STATIC_DLGSEP,"Static",SS_ETCHEDHORZ,0,254,315,1
-    PUSHBUTTON      "&Help",IDC_ENTRYHELP_BTN,7,258,58,14
+    PUSHBUTTON      "&Tools",IDC_ENTRYTOOLS_BTN,7,258,58,14
 END
 
 IDD_ICONPICKER_DLG DIALOGEX 0, 0, 320, 210
@@ -304,7 +305,7 @@ BEGIN
     CONTROL         "Tab1",IDC_TAB_MENU,"SysTabControl32",WS_TABSTOP,7,7,380,192
     CONTROL         "Lock workspace when minimizing the main window",IDC_CHECK_LOCKMIN,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,128,337,10
-    CONTROL         "Lock workspace when locking Windows or switching user",IDC_CHECK_LOCKONWINLOCK,
+    CONTROL         "Lock workspace when locking Windows, switching user or sleeping",IDC_CHECK_LOCKONWINLOCK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,122,353,10
     CONTROL         "Automatically lock workspace after the following number of seconds:",IDC_CHECK_LOCKAFTERTIME,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,178,336,10
@@ -352,23 +353,25 @@ BEGIN
     CONTROL         "List1",IDC_LIST_ADVANCED,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHAREIMAGELISTS | LVS_NOLABELWRAP | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,16,28,361,161
 END
 
-IDD_ENTRYPROPERTIES_DLG DIALOGEX 0, 0, 351, 114
+IDD_ENTRYPROPERTIES_DLG DIALOGEX 0, 0, 351, 127
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_TITLE>"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,225,93,58,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,286,93,58,14
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,87,351,1
-    CONTROL         "Change group:",IDC_CHECK_MODGROUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,8,115,10
+    DEFPUSHBUTTON   "&OK",IDOK,225,106,58,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,286,106,58,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,100,351,1
+    CONTROL         "Change group:",IDC_CHECK_MODGROUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,8,113,10
     CONTROL         "",IDC_COMBO_GROUPS,"ComboBoxEx32",CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP,124,7,220,172
-    CONTROL         "Change entry icon:",IDC_CHECK_MODICON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,31,115,10
-    PUSHBUTTON      "",IDC_BUTTON_SELECT_ICON,123,29,21,14
-    CONTROL         "Change expiration time:",IDC_CHECK_MODEXPIRE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,53,115,10
-    EDITTEXT        IDC_EDIT_EXPIRE_DATE,124,51,62,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_EXPIRE_TIME,187,51,112,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "",IDC_SELDEFEXPIRES_BTN,301,51,22,14
-    PUSHBUTTON      "",IDC_SETDEFAULTEXPIRE_BTN,323,51,21,14
+    CONTROL         "Change entry icon:",IDC_CHECK_MODICON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,28,114,10
+    PUSHBUTTON      "",IDC_BUTTON_SELECT_ICON,123,26,21,14
+    CONTROL         "Change expiration time:",IDC_CHECK_MODEXPIRE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,48,114,10
+    CONTROL         "Never expires",IDC_RADIO_NOEXPIRE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,123,48,221,10
+    CONTROL         "Expires:",IDC_RADIO_EXPIRES,"Button",BS_AUTORADIOBUTTON,123,62,221,10
+    EDITTEXT        IDC_EDIT_EXPIRE_DATE,133,75,64,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_EXPIRE_TIME,199,75,100,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_SELDEFEXPIRES_BTN,301,75,22,14
+    PUSHBUTTON      "",IDC_SETDEFAULTEXPIRE_BTN,323,75,21,14
 END
 
 IDD_TANWIZARD_DLG DIALOGEX 0, 0, 378, 258
@@ -420,7 +423,7 @@ BEGIN
     GROUPBOX        "General",IDC_STATIC,7,120,363,31
     LTEXT           "Default user name for new entries:",IDC_STATIC,13,133,177,8
     EDITTEXT        IDC_EDIT_DEFAULTUSER,193,130,170,14,ES_AUTOHSCROLL
-    LTEXT           "<>",IDC_HLINK_HELPFILE,7,165,201,8
+    PUSHBUTTON      "&Help",IDC_BTN_SECHELP,7,161,58,14
 END
 
 IDD_PLUGINS_DLG DIALOGEX 0, 0, 414, 199
@@ -430,8 +433,8 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "&Close",IDOK,349,178,58,14
     CONTROL         "List1",IDC_PLUGINS_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,400,163
-    LTEXT           "Get More Plugins...",IDC_STATIC_HL_GETPLUGINS,91,182,221,8
-    LTEXT           "Open &Help File",IDC_STATIC_HL_HELP,7,182,75,8
+    PUSHBUTTON      "&Help",IDC_BTN_PLGHELP,7,178,58,14
+    LTEXT           "Get More Plugins...",IDC_STATIC_HL_GETPLUGINS,73,181,221,8
 END
 
 IDD_IMPORT_OPTIONS_DLG DIALOGEX 0, 0, 318, 177
@@ -451,7 +454,7 @@ BEGIN
     LTEXT           "KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.",IDC_STATIC,19,127,292,26
 END
 
-IDD_PERMISSION_DLG DIALOGEX 0, 0, 273, 118
+IDD_PERMISSION_DLG DIALOGEX 0, 0, 273, 145
 STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_NOIDLEMSG | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "KeePass Password Safe"
@@ -459,11 +462,14 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     PUSHBUTTON      "&Full",IDOK,120,97,72,14
     DEFPUSHBUTTON   "&Deny",IDCANCEL,194,97,72,14
-    PUSHBUTTON      "&Read-Only",IDC_READONLY,45,97,72,14
+    PUSHBUTTON      "&Read-Only",IDC_READONLY,46,97,72,14
     LTEXT           "The following application requests access to your currently opened KeePass database:",IDC_STATIC,7,7,259,17
     LTEXT           "<>",IDC_STC_APP,7,27,259,8
     LTEXT           "Note that the application title has been supplied by the requesting application and may therefore be incorrect (a malicious program could try to access your database).",IDC_STATIC,7,40,259,25
     LTEXT           "Do you grant the application access to your KeePass database?",IDC_STATIC,7,71,259,19
+    CONTROL         "Always grant full access through remote control (not recommended)",IDC_CB_ALWAYSALLOW,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,128,263,10
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,0,122,273,1
 END
 
 IDD_PW_GENERATOR_EX_DLG DIALOGEX 0, 0, 305, 314
@@ -525,21 +531,21 @@ BEGIN
     COMBOBOX        IDC_COMBO_INPUT,7,27,282,167,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_SORT | WS_VSCROLL | WS_TABSTOP
 END
 
-IDD_PW_GEN_ADV_DLG DIALOGEX 0, 0, 276, 142
+IDD_PW_GEN_ADV_DLG DIALOGEX 0, 0, 276, 146
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Password Generator"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,150,121,58,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,211,121,58,14
+    DEFPUSHBUTTON   "&OK",IDOK,150,125,58,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,211,125,58,14
     GROUPBOX        "Advanced",IDC_STATIC,7,7,262,76
     CONTROL         "No repeating characters",IDC_CHECK_NO_REPEAT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,19,248,10
     CONTROL         "Exclude look-alike characters",IDC_CHECK_EXCLUDE_LOOKALIKE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,32,248,10
     LTEXT           "Exclude the following characters:",IDC_STATIC_EXCLUDECHARS,14,49,246,8
     EDITTEXT        IDC_EDIT_EXCLUDECHARS,14,60,248,14,ES_AUTOHSCROLL
-    LTEXT           "Options/rules marked with an asterisk reduce the security of generated passwords. Only enable them if you are forced to follow such rules by the website/application.",IDC_STATIC_SECREDUCINFO,7,89,262,25
-    PUSHBUTTON      "&Help",IDC_BTN_HELP,7,121,58,14
+    LTEXT           "Options/rules marked with an asterisk reduce the security of generated passwords. Only enable them if you are forced to follow such rules by the website, application or password policy.",IDC_STATIC_SECREDUCINFO,7,89,262,33
+    PUSHBUTTON      "&Help",IDC_BTN_HELP,7,125,58,14
 END
 
 
@@ -644,7 +650,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 344
         TOPMARGIN, 7
-        BOTTOMMARGIN, 107
+        BOTTOMMARGIN, 120
     END
 
     IDD_TANWIZARD_DLG, DIALOG
@@ -692,7 +698,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 266
         TOPMARGIN, 7
-        BOTTOMMARGIN, 111
+        BOTTOMMARGIN, 138
     END
 
     IDD_PW_GENERATOR_EX_DLG, DIALOG
@@ -716,7 +722,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 269
         TOPMARGIN, 7
-        BOTTOMMARGIN, 135
+        BOTTOMMARGIN, 139
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -728,8 +734,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,0,1
- PRODUCTVERSION 1,1,0,1
+ FILEVERSION 1,1,1,0
+ PRODUCTVERSION 1,1,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -746,13 +752,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.info/"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.10"
-            VALUE "FileVersion", "1.1.0.1"
+            VALUE "FileDescription", "KeePass Password Safe 1.11"
+            VALUE "FileVersion", "1.1.1.0"
             VALUE "InternalName", "PwSafe"
             VALUE "LegalCopyright", "Copyright (c) 2003-2008 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.10"
-            VALUE "ProductVersion", "1.1.0.1"
+            VALUE "ProductName", "KeePass Password Safe 1.11"
+            VALUE "ProductVersion", "1.1.1.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -1051,14 +1057,29 @@ BEGIN
     END
 END
 
-IDR_ENTRYHELP_MENU MENU 
+IDR_ENTRYTOOLS_MENU MENU 
 BEGIN
     POPUP "Popup"
     BEGIN
-        MENUITEM "Open &Help File",             ID_POPUP_OPENHELPFILE
+        MENUITEM "URL Field: Help",             ID_POPUP_URLFIELDFEATURES
+        MENUITEM "URL Field: Select Application...", ID_POPUP_URLFIELD_SELAPP
+        MENUITEM "URL Field: Select Document...", ID_POPUP_URLFIELD_SELDOC
+        POPUP "URL Field: Insert Placeholder"
+        BEGIN
+            MENUITEM "{TITLE}",                     ID_URLFIELD_INS_TITLE
+            MENUITEM "{USERNAME}",                  ID_URLFIELD_INS_USERNAME
+            MENUITEM "{PASSWORD}",                  ID_URLFIELD_INS_PASSWORD
+            MENUITEM "{NOTES}",                     ID_URLFIELD_INS_NOTES
+            MENUITEM SEPARATOR
+            MENUITEM "{APPDIR}",                    ID_URLFIELD_INS_APPDIR
+            MENUITEM SEPARATOR
+            MENUITEM "{INTERNETEXPLORER}",          ID_URLFIELD_INS_IE
+            MENUITEM "{FIREFOX}",                   ID_URLFIELD_INS_FIREFOX
+            MENUITEM "{OPERA}",                     ID_URLFIELD_INS_OPERA
+        END
         MENUITEM SEPARATOR
-        MENUITEM "URL Field Features",          ID_POPUP_URLFIELDFEATURES
-        MENUITEM "Auto-Type",                   ID_POPUP_AUTOTYPE
+        MENUITEM "Auto-Type: Help",             ID_POPUP_AUTOTYPE
+        MENUITEM "Auto-Type: Select Target Window...", ID_POPUP_AUTOTYPE_SELTARGET
     END
 END
 
@@ -1203,6 +1224,8 @@ IDB_HELP_SMALL          BITMAP                  "res\\help_sma.bmp"
 IDB_HELP_SMALL_POPUP    BITMAP                  "res\\help_smp.bmp"
 IDB_TB_SAVE_AS          BITMAP                  "res\\tb_save1.bmp"
 IDB_RANDOM_KEY          BITMAP                  "res\\randomke.bmp"
+IDB_TOOLS_SMALL         BITMAP                  "res\\toolssma.bmp"
+IDB_WINPROPS_SMALL      BITMAP                  "res\\winprops.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -24,6 +24,7 @@
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/AMSEdit.h"
 #include "../KeePassLibCpp/PwManager.h"
+#include "afxwin.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -56,6 +57,7 @@ public:
 	BOOL	m_bModExpire;
 	BOOL	m_bModGroup;
 	BOOL	m_bModIcon;
+	CButton m_btRadioNoExpire;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CEntryPropertiesDlg)

@@ -20,6 +20,11 @@
 #include "StdAfx.h"
 #include <mmsystem.h>
 
+#pragma warning(push)
+#pragma warning(disable: 4201) // Non-standard extension: nameless structure/union
+#include <winioctl.h>
+#pragma warning(pop)
+
 #ifdef _UNICODE
 #include <atlbase.h>
 #endif
@@ -28,6 +33,7 @@
 #include "CmdLine/Executable.h"
 #include "PrivateConfig.h"
 #include "AppLocator.h"
+#include "../Plugins/PluginMgr.h"
 #include "../../KeePassLibCpp/Util/AppUtil.h"
 #include "../../KeePassLibCpp/Util/MemUtil.h"
 #include "../../KeePassLibCpp/Util/StrUtil.h"
@@ -388,8 +394,6 @@ BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 	if(strURL.Find(_T("ssh:")) >= 0)
 	{
 		TCHAR tszKey[MAX_PATH << 1];
-
-		// TODO: Make this configurable
 		_tcscpy_s(tszKey, _countof(tszKey), _T("PUTTY.EXE -ssh "));
 
 		// Parse out the "http://" and "ssh://"
@@ -421,8 +425,6 @@ BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 	else if(strURL.Find(_T("telnet:")) >= 0)
 	{
 		TCHAR tszKey[MAX_PATH << 1];
-
-		// TODO: Make this configurable
 		_tcscpy_s(tszKey, _countof(tszKey), _T("PUTTY.EXE "));
 
 		// Parse out the "http://" and "telnet://"
@@ -723,7 +725,6 @@ BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD
 	}
 
 	CFileDialog dlg(bOpenMode, lpSuffix, strSample, dwFlags, strFilter, NULL);
-
 	if(dlg.DoModal() == IDOK)
 	{
 		strSample = dlg.GetPathName();
@@ -737,6 +738,59 @@ BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD
 	}
 
 	return FALSE;
+}
+
+std::vector<std::basic_string<TCHAR> > WU_GetFileNames(BOOL bOpenMode,
+	LPCTSTR lpSuffix, LPCTSTR lpFilter, BOOL bAllowMultiSelect,
+	CWnd* pParent, BOOL bAddToRecent, BOOL bNoChangeDir)
+{
+	std::vector<std::basic_string<TCHAR> > v;
+
+	std::basic_string<TCHAR> strDir = WU_GetCurrentDirectory();
+
+	std::basic_string<TCHAR> strInitial = _T("*.");
+	strInitial += ((lpSuffix != NULL) ? lpSuffix : _T("*"));
+
+	DWORD dwFlags = 0;
+	if(bAllowMultiSelect == TRUE) dwFlags |= OFN_ALLOWMULTISELECT;
+	if(bAddToRecent == FALSE) dwFlags |= OFN_DONTADDTORECENT;
+	if(bNoChangeDir == TRUE) dwFlags |= OFN_NOCHANGEDIR;
+
+	dwFlags |= (OFN_EXPLORER | OFN_ENABLESIZING);
+	dwFlags |= (OFN_EXTENSIONDIFFERENT | OFN_HIDEREADONLY | OFN_LONGNAMES);
+	dwFlags |= OFN_PATHMUSTEXIST;
+
+	if(bOpenMode == FALSE) // Save
+		dwFlags |= OFN_OVERWRITEPROMPT;
+	else // Open
+		dwFlags |= OFN_FILEMUSTEXIST;
+
+	CFileDialog dlg(bOpenMode, NULL, strInitial.c_str(), dwFlags, lpFilter, pParent);
+	if(dlg.DoModal() == IDOK)
+	{
+		if(bAllowMultiSelect == FALSE)
+		{
+			CString strSelected = dlg.GetPathName();
+			LPCTSTR lpSelected = strSelected; // Avoid cast
+			v.push_back(lpSelected);
+		}
+		else // Multi-select
+		{
+			POSITION pos = dlg.GetStartPosition();
+			
+			while(pos != NULL)
+			{
+				CString strFile = dlg.GetNextPathName(pos);
+				LPCTSTR lpFile = strFile; // Avoid cast
+				v.push_back(lpFile);
+			}
+		}
+	}
+
+	if((bNoChangeDir == TRUE) && (strDir.size() > 0))
+		::SetCurrentDirectory(strDir.c_str());
+
+	return v;
 }
 
 BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile)
@@ -1050,4 +1104,161 @@ void WU_FillPlaceholders(CString* pString)
 	ASSERT(pString != NULL); if(pString == NULL) return;
 
 	AppLocator::FillPlaceholders(pString);
+}
+
+BOOL WU_FlushStorageBuffers(TCHAR tchDriveLetter, BOOL bOnlyIfRemovable)
+{
+	if(bOnlyIfRemovable == TRUE)
+	{
+		std::basic_string<TCHAR> strRoot;
+		strRoot += tchDriveLetter;
+		strRoot += _T(":\\");
+
+		if(GetDriveType(strRoot.c_str()) != DRIVE_REMOVABLE) return TRUE;
+	}
+
+	std::basic_string<TCHAR> strDevice = _T("\\\\.\\");
+	strDevice += tchDriveLetter;
+	strDevice += _T(":");
+
+	HANDLE hDevice = CreateFile(strDevice.c_str(), GENERIC_READ |
+		GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+		OPEN_EXISTING, 0, NULL);
+	if(hDevice == INVALID_HANDLE_VALUE) { ASSERT(FALSE); return FALSE; }
+
+	std::basic_string<TCHAR> strDir = WU_FreeDriveIfCurrent(tchDriveLetter);
+
+	BOOL bResult = TRUE;
+	DWORD dwDummy = 0;
+	if(DeviceIoControl(hDevice, FSCTL_LOCK_VOLUME, NULL, 0, NULL, 0,
+		&dwDummy, NULL) != FALSE)
+	{
+		dwDummy = 0;
+		VERIFY(DeviceIoControl(hDevice, FSCTL_UNLOCK_VOLUME, NULL, 0,
+			NULL, 0, &dwDummy, NULL));
+	}
+	else bResult = FALSE;
+
+	if(strDir.size() > 0) { VERIFY(SetCurrentDirectory(strDir.c_str())); }
+
+	VERIFY(CloseHandle(hDevice));
+	return bResult;
+}
+
+BOOL WU_FlushStorageBuffersEx(LPCTSTR lpFileOnStorage, BOOL bOnlyIfRemovable)
+{
+	if(lpFileOnStorage == NULL) { ASSERT(FALSE); return FALSE; }
+	if(_tcslen(lpFileOnStorage) < 3) return FALSE;
+	if(lpFileOnStorage[1] != _T(':')) return FALSE;
+	if(lpFileOnStorage[2] != _T('\\')) return FALSE;
+
+	const TCHAR tchDrive = static_cast<TCHAR>(toupper(
+		static_cast<int>(lpFileOnStorage[0])));
+	return WU_FlushStorageBuffers(tchDrive, bOnlyIfRemovable);
+}
+
+std::basic_string<TCHAR> WU_GetCurrentDirectory()
+{
+	TCHAR tszDir[SI_REGSIZE];
+	if(GetCurrentDirectory(SI_REGSIZE - 1, tszDir) == 0)
+	{
+		ASSERT(FALSE);
+		return std::basic_string<TCHAR>();
+	}
+
+	return std::basic_string<TCHAR>(tszDir);
+}
+
+std::basic_string<TCHAR> WU_FreeDriveIfCurrent(TCHAR tchDriveLetter)
+{
+	std::basic_string<TCHAR> strEmpty;
+
+	std::basic_string<TCHAR> strDir = WU_GetCurrentDirectory();
+	if(strDir.size() < 3) return strEmpty;
+	if(strDir[1] != _T(':')) return strEmpty;
+	if(strDir[2] != _T('\\')) return strEmpty;
+
+	const TCHAR tchPar = static_cast<TCHAR>(toupper(static_cast<int>(tchDriveLetter)));
+	const TCHAR tchCur = static_cast<TCHAR>(toupper(static_cast<int>(strDir[0])));
+	if(tchPar != tchCur) return strEmpty;
+
+	TCHAR tszTemp[SI_REGSIZE];
+	if(GetTempPath(SI_REGSIZE - 1, tszTemp) == 0) { ASSERT(FALSE); return strEmpty; }
+
+	VERIFY(SetCurrentDirectory(tszTemp));
+	return strDir;
+}
+
+PWG_ERROR PwgGenerateWithExtVerify(std::vector<TCHAR>& vOutPassword,
+	const PW_GEN_SETTINGS_EX* pSettings, CNewRandom* pRandomSource)
+{
+	PWG_ERROR e;
+	const TCHAR tchNull = 0;
+
+	while(true)
+	{
+		e = PwgGenerateEx(vOutPassword, pSettings, pRandomSource);
+		if(e != PWGE_SUCCESS) break;
+
+		KP_GENERATED_PASSWORD gp;
+		ZeroMemory(&gp, sizeof(KP_GENERATED_PASSWORD));
+		gp.lpPassword = ((vOutPassword.size() > 0) ? &vOutPassword[0] : &tchNull);
+		gp.lpSettings = pSettings;
+
+		LPCTSTR lpObjection = NULL;
+		_CallPlugins(KPM_VALIDATE_GENPASSWORD, (LPARAM)&gp, (LPARAM)&lpObjection);
+		if(lpObjection == NULL) break;
+	}
+
+	return e;
+}
+
+CString FilterTrlComment(LPCTSTR lpEnglishString)
+{
+	if(lpEnglishString == NULL) { ASSERT(FALSE); return CString(); }
+	if(lpEnglishString[0] == 0) { ASSERT(FALSE); return CString(); }
+
+	CString strTrl = TRL_VAR(lpEnglishString);
+	const int nStart = strTrl.Find(_T('['));
+	const int nEnd = strTrl.Find(_T(']'));
+	if((nStart >= 0) && (nEnd >= 0) && (nEnd > nStart))
+	{
+		CString strRet = strTrl.Left(nStart) + strTrl.Right(strTrl.GetLength() -
+			nEnd - 1);
+		return strRet.Trim(_T(" \t\r\n"));
+	}
+	else { ASSERT(FALSE); }
+
+	CString strEng = lpEnglishString;
+	const int nEngStart = strEng.Find(_T('['));
+	const int nEngEnd = strEng.Find(_T(']'));
+	if((nEngStart >= 0) && (nEngEnd >= 0) && (nEngEnd > nEngStart))
+	{
+		CString strEngRet = strEng.Left(nEngStart) + strEng.Right(
+			strEng.GetLength() - nEngEnd - 1);
+		return strEngRet.Trim(_T(" \t\r\n"));
+	}
+
+	ASSERT(FALSE);
+	return CString();
+}
+
+void WU_GetUserApplications(std::vector<AV_APP_INFO>& vStorage)
+{
+	vStorage.clear();
+
+	LPCTSTR lpDisplay = NULL;
+	LPCTSTR lpPath = NULL;
+
+	_CallPlugins(KPM_USERAPP_GETFIRST, (LPARAM)&lpDisplay, (LPARAM)&lpPath);
+	while((lpDisplay != NULL) && (lpPath != NULL))
+	{
+		AV_APP_INFO appInfo;
+		appInfo.strDisplayName = lpDisplay;
+		appInfo.strPath = lpPath;
+		vStorage.push_back(appInfo);
+
+		lpDisplay = NULL; lpPath = NULL;
+		_CallPlugins(KPM_USERAPP_GETNEXT, (LPARAM)&lpDisplay, (LPARAM)&lpPath);
+	}
 }

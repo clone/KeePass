@@ -200,6 +200,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddCheckItem(TRL("Disable all auto-type features"), &m_bDisableAutoType, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Copy URLs to clipboard instead of launching them (exception: cmd:// URLs)"), &m_bCopyURLs, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Enable remote control (allow applications to communicate with KeePass)"), &m_bEnableRemoteCtrl, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Always grant full access through remote control (not recommended)"), &m_bAlwaysAllowIpc, NULL, OL_LINK_NULL);
 
 	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Start and exit"), 7);
@@ -223,12 +224,13 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddGroupText(_T(""), 0);
 	m_olAdvanced.AddGroupText(TRL("Advanced"), 11);
 	// m_olAdvanced.AddCheckItem(TRL("Automatically generate random passwords for new entries"), &m_bAutoPwGen, NULL, OL_LINK_NULL);
-	m_olAdvanced.AddCheckItem(TRL("Include backup entries in quick searches (toolbar)"), &m_bQuickFindIncBackup, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Exit program instead of locking the workspace after the specified time"), &m_bExitInsteadOfLockAT, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Show full path in the title bar (instead of file name only)"), &m_bShowFullPath, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Disable 'Save' button if the database hasn't been modified"), &m_bAllowSaveIfModifiedOnly, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Use local date/time format instead of ISO notation"), &m_bUseLocalTimeFormat, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Register Ctrl-Alt-K hot key (brings the KeePass window to front)"), &m_bRegisterRestoreHotKey, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Include backup entries in quick searches (toolbar)"), &m_bQuickFindIncBackup, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Focus entry list after a successful quick search (toolbar)"), &m_bFocusResAfterQuickFind, NULL, OL_LINK_NULL);
 
 	AddTcItem(TRL(OPTSZ_SECURITY), 29);
 	AddTcItem(TRL(OPTSZ_GUI), 6);

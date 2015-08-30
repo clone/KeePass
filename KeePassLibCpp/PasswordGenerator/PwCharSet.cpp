@@ -175,6 +175,7 @@ bool PwCharSet::AddCharSet(WCHAR chCharSetIdentifier)
 		case L'u': this->Add(PDCS_UPPER_CASE); break;
 		case L'p': this->Add(PDCS_PUNCTUATION); break;
 		case L'b': this->Add(PDCS_BRACKETS); break;
+		case L's': this->Add(PDCS_PRINTASCIISPEC); break;
 		case L'S': this->Add(PDCS_UPPER_CASE, PDCS_LOWER_CASE);
 			this->Add(PDCS_NUMERIC, PDCS_PRINTASCIISPEC); break;
 		case L'v': this->Add(PDCS_LOWER_VOWELS); break;

@@ -24,9 +24,9 @@
 
 #include "IconPickerDlg.h"
 #include "PwGeneratorExDlg.h"
+#include "SingleLineEditDlg.h"
 #include "../KeePassLibCpp/Util/MemUtil.h"
 #include "../KeePassLibCpp/Util/StrUtil.h"
-#include "Util/WinUtil.h"
 #include "NewGUI/NewGUICommon.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "../KeePassLibCpp/Util/Base64.h"
@@ -65,13 +65,14 @@ CAddEntryDlg::CAddEntryDlg(CWnd* pParent /*=NULL*/)
 	m_strNotes = _T("");
 	m_lpPassword = m_lpRepeatPw = NULL;
 	m_dwDefaultExpire = 0;
+	m_pOriginalEntry = NULL;
 }
 
 void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAddEntryDlg)
-	DDX_Control(pDX, IDC_ENTRYHELP_BTN, m_btHelp);
+	DDX_Control(pDX, IDC_ENTRYTOOLS_BTN, m_btTools);
 	DDX_Control(pDX, IDC_SELDEFEXPIRES_BTN, m_btSelDefExpires);
 	DDX_Control(pDX, IDC_SETDEFAULTEXPIRE_BTN, m_btSetToDefaultExpire);
 	DDX_Control(pDX, IDC_COMBO_GROUPS, m_cbGroups);
@@ -97,13 +98,13 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_ATTACHMENT, m_strAttachment);
 	DDX_Check(pDX, IDC_CHECK_EXPIRES, m_bExpires);
 	//}}AFX_DATA_MAP
+	DDX_Control(pDX, IDC_COMBO_URL, m_cmbUrl);
 }
 
 BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	//{{AFX_MSG_MAP(CAddEntryDlg)
 	ON_COMMAND(ID_POPUP_AUTOTYPE, OnHelpAutoType)
 	ON_COMMAND(ID_POPUP_URLFIELDFEATURES, OnHelpURLFieldFeatures)
-	ON_COMMAND(ID_POPUP_OPENHELPFILE, OnHelpOpenFile)
 	ON_BN_CLICKED(IDC_CHECK_HIDEPW, OnCheckHidePw)
 	ON_BN_CLICKED(IDC_PICKICON_BTN, OnPickIconBtn)
 	ON_BN_CLICKED(IDC_RANDOMPW_BTN, OnRandomPwBtn)
@@ -129,6 +130,18 @@ BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	ON_COMMAND(ID_EXPIRES_12MONTHS, OnExpires12Months)
 	ON_COMMAND(ID_EXPIRES_NOW, OnExpiresNow)
 	ON_NOTIFY(EN_LINK, IDC_RE_NOTES, OnReNotesClickLink)
+	ON_BN_CLICKED(IDC_ENTRYTOOLS_BTN, &CAddEntryDlg::OnBnClickedEntryToolsBtn)
+	ON_COMMAND(ID_POPUP_URLFIELD_SELAPP, &CAddEntryDlg::OnUrlFieldSelApp)
+	ON_COMMAND(ID_POPUP_URLFIELD_SELDOC, &CAddEntryDlg::OnUrlFieldSelDoc)
+	ON_COMMAND(ID_URLFIELD_INS_TITLE, &CAddEntryDlg::OnUrlFieldInsTitle)
+	ON_COMMAND(ID_URLFIELD_INS_USERNAME, &CAddEntryDlg::OnUrlFieldInsUserName)
+	ON_COMMAND(ID_URLFIELD_INS_PASSWORD, &CAddEntryDlg::OnUrlFieldInsPassword)
+	ON_COMMAND(ID_URLFIELD_INS_NOTES, &CAddEntryDlg::OnUrlFieldInsNotes)
+	ON_COMMAND(ID_URLFIELD_INS_APPDIR, &CAddEntryDlg::OnUrlFieldInsAppDir)
+	ON_COMMAND(ID_URLFIELD_INS_IE, &CAddEntryDlg::OnUrlFieldInsIE)
+	ON_COMMAND(ID_URLFIELD_INS_FIREFOX, &CAddEntryDlg::OnUrlFieldInsFirefox)
+	ON_COMMAND(ID_URLFIELD_INS_OPERA, &CAddEntryDlg::OnUrlFieldInsOpera)
+	ON_COMMAND(ID_POPUP_AUTOTYPE_SELTARGET, &CAddEntryDlg::OnAutoTypeSelectTargetWindow)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -153,9 +166,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	if(m_bStars == FALSE)
 	{
-		// GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fStyle, TRUE);
 		m_pEditPw.SetFont(&m_fStyle, TRUE);
-		// GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fStyle, TRUE);
 		m_pRepeatPw.SetFont(&m_fStyle, TRUE);
 
 		m_pEditPw.EnableSecureMode(FALSE);
@@ -163,23 +174,20 @@ BOOL CAddEntryDlg::OnInitDialog()
 	}
 	else
 	{
-		// GetDlgItem(IDC_EDIT_PASSWORD)->SetFont(&m_fSymbol, TRUE);
 		m_pEditPw.SetFont(&m_fSymbol, TRUE);
-		// GetDlgItem(IDC_EDIT_REPEATPW)->SetFont(&m_fSymbol, TRUE);
 		m_pRepeatPw.SetFont(&m_fSymbol, TRUE);
 
 		m_pEditPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
 		m_pRepeatPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
 	}
 
-	// GetDlgItem(IDC_CHECK_HIDEPW)->SetFont(&m_fSymbol, TRUE);
 	m_btHidePw.SetFont(&m_fSymbol, TRUE);
 
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
 	NewGUI_XPButton(m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(m_btRandomPw, IDB_RANDOM_KEY, IDB_RANDOM_KEY);
+	NewGUI_XPButton(m_btRandomPw, IDB_RANDOM_KEY, IDB_RANDOM_KEY, TRUE);
 	NewGUI_XPButton(m_btPickIcon, -1, -1);
 	NewGUI_XPButton(m_btHidePw, -1, -1);
 	NewGUI_XPButton(m_btSetAttachment, IDB_FILE, IDB_FILE, TRUE);
@@ -187,7 +195,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	NewGUI_XPButton(m_btRemoveAttachment, IDB_TB_DELETEENTRY, IDB_TB_DELETEENTRY, TRUE);
 	NewGUI_XPButton(m_btSetToDefaultExpire, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
 	NewGUI_XPButton(m_btSelDefExpires, IDB_CLOCK, IDB_CLOCK, TRUE);
-	NewGUI_XPButton(m_btHelp, IDB_HELP_SMALL_POPUP, IDB_HELP_SMALL_POPUP, TRUE);
+	NewGUI_XPButton(m_btTools, IDB_TOOLS_SMALL, IDB_TOOLS_SMALL);
 
 	m_btHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 	m_btHidePw.SetTooltipText(TRL("Hide passwords behind asterisks (***)."), TRUE);
@@ -203,7 +211,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	m_btSelDefExpires.SetTooltipText(strTT);
 
 	m_btSelDefExpires.SetMenu(IDR_EXPIRESMENU, this->m_hWnd, TRUE, NULL, CSize(16, 15));
-	m_btHelp.SetMenu(IDR_ENTRYHELP_MENU, this->m_hWnd, TRUE, NULL, CSize(16, 16));
+	// m_btTools.SetMenu(IDR_ENTRYTOOLS_MENU, this->m_hWnd, TRUE, NULL, CSize(16, 16));
 
 	m_btPickIcon.SetTooltipText(TRL("Choose an icon."), TRUE);
 	if((m_nIconId >= 0) && (m_pParentIcons != NULL))
@@ -289,7 +297,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	// TCHAR tchDot = (TCHAR)(_T('z') + 27);
 	TCHAR tchDot = CPwSafeApp::GetPasswordCharacter();
 	CString strStars; strStars += tchDot; strStars += tchDot; strStars += tchDot;
-	GetDlgItem(IDC_CHECK_HIDEPW)->SetWindowText(strStars);
+	m_btHidePw.SetWindowText(strStars);
 
 	// Configure link edit control
 	// m_pURL.SetLinkOption(HEOL_AUTO);
@@ -338,7 +346,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 	// removed m_bStars = TRUE; -> Parent can decide to show the password or not
 	OnCheckHidePw(); // Update GUI based on m_bStars flag
 
-	if(m_bEditMode == FALSE) // Generate a pseudo-random password
+	// Generate a pseudo-random password
+	if((m_bEditMode == FALSE) && (CPwSafeDlg::m_bMiniMode == FALSE))
 	{
 		/* CNewRandom *pRand = new CNewRandom();
 		DWORD dwSize = 32;
@@ -362,7 +371,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 		m_pRepeatPw.SetPassword(_T(""));
 
 		std::vector<TCHAR> strPassword;
-		if(PwgGenerateEx(strPassword, &CPwSafeDlg::m_pgsAutoProfile,
+		if(PwgGenerateWithExtVerify(strPassword, &CPwSafeDlg::m_pgsAutoProfile,
 			NULL) == PWGE_SUCCESS)
 		{
 			if(strPassword.size() > 0)
@@ -400,20 +409,20 @@ BOOL CAddEntryDlg::OnInitDialog()
 	{
 		GetDlgItem(IDC_EDIT_TITLE)->EnableWindow(FALSE);
 		GetDlgItem(IDC_EDIT_USERNAME)->EnableWindow(FALSE);
-		GetDlgItem(IDC_EDIT_URL)->EnableWindow(FALSE);
-		// GetDlgItem(IDC_RANDOMPW_BTN)->EnableWindow(FALSE);
+		m_pURL.EnableWindow(FALSE);
 		m_btRandomPw.EnableWindow(FALSE);
-		// GetDlgItem(IDC_PICKICON_BTN)->EnableWindow(FALSE);
 		m_btPickIcon.EnableWindow(FALSE);
-		GetDlgItem(IDC_EDIT_PASSWORD)->SetFocus();
+		m_btTools.EnableWindow(FALSE);
+		m_pEditPw.SetFocus();
 	}
 	else
 	{
 		GetDlgItem(IDC_EDIT_TITLE)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT_USERNAME)->EnableWindow(TRUE);
-		GetDlgItem(IDC_EDIT_URL)->EnableWindow(TRUE);
-		GetDlgItem(IDC_RANDOMPW_BTN)->EnableWindow(TRUE);
-		GetDlgItem(IDC_PICKICON_BTN)->EnableWindow(TRUE);
+		m_pURL.EnableWindow(TRUE);
+		m_btRandomPw.EnableWindow(TRUE);
+		m_btPickIcon.EnableWindow(TRUE);
+		m_btTools.EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT_TITLE)->SetFocus();
 	}
 
@@ -448,6 +457,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 		m_btHidePw.MoveWindow(&rcMover);
 	}
 
+	if(CPwSafeDlg::m_bMiniMode == TRUE) this->UrlToCombo(false);
+
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
 
@@ -462,6 +473,7 @@ void CAddEntryDlg::CleanUp()
 void CAddEntryDlg::OnOK() 
 {
 	UpdateData(TRUE);
+	if(CPwSafeDlg::m_bMiniMode == TRUE) this->UrlToCombo(true);
 
 	if(m_editDate.GetWindowTextLength() == 0) m_editDate.SetDate(2999, 12, 28);
 	if(m_editTime.GetWindowTextLength() == 0) m_editTime.SetTime(23, 59, 59);
@@ -500,7 +512,17 @@ void CAddEntryDlg::OnOK()
 		CSecureEditEx::DeletePassword(m_lpPassword); m_lpPassword = NULL;
 		CSecureEditEx::DeletePassword(m_lpRepeatPw); m_lpRepeatPw = NULL;
 		MessageBox(TRL("Password and repeated password aren't identical!"),
-			TRL("Stop"), MB_OK | MB_ICONWARNING);
+			PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
+		return;
+	}
+
+	KP_ENTRY kpCur = _CurrentDataToEntry(false);
+	LPTSTR lpValMsg = NULL;
+	_CallPlugins(KPM_VALIDATE_ENTRY, (LPARAM)&kpCur, (LPARAM)&lpValMsg);
+	_ClearStringsCache();
+	if((lpValMsg != NULL) && (lpValMsg[0] != 0))
+	{
+		MessageBox(lpValMsg, PWM_PRODUCT_NAME_SHORT, MB_OK | MB_ICONWARNING);
 		return;
 	}
 
@@ -558,9 +580,8 @@ void CAddEntryDlg::OnCheckHidePw()
 void CAddEntryDlg::OnPickIconBtn() 
 {
 	CIconPickerDlg dlg;
-
 	dlg.m_pImageList = m_pParentIcons;
-	dlg.m_uNumIcons = (UINT)m_pParentIcons->GetImageCount();
+	dlg.m_uNumIcons = static_cast<UINT>(m_pParentIcons->GetImageCount());
 	dlg.m_nSelectedIcon = m_nIconId;
 
 	if(dlg.DoModal() == IDOK)
@@ -574,26 +595,45 @@ void CAddEntryDlg::OnPickIconBtn()
 
 void CAddEntryDlg::OnRandomPwBtn() 
 {
-	CPwGeneratorExDlg dlg;
+	LPTSTR lpPassword = NULL;
 
-	UpdateData(TRUE);
-
-	dlg.InitEx(1, m_bStars, FALSE);
-
-	if(dlg.DoModal() == IDOK)
+	if(CPwSafeDlg::m_bMiniMode == TRUE)
 	{
-		LPTSTR lpPassword = dlg.GetGeneratedPassword();
-		m_pEditPw.SetPassword(lpPassword); // Allows NULL
-		m_pRepeatPw.SetPassword(lpPassword);
-		CSecureEditEx::DeletePassword(lpPassword); lpPassword = NULL;
+		std::vector<TCHAR> genPassword;
+		if(PwgGenerateWithExtVerify(genPassword, &CPwSafeDlg::m_pgsAutoProfile,
+			NULL) == PWGE_SUCCESS)
+		{
+			lpPassword = CSecureEditEx::AllocMemory(genPassword.size() + 1);
 
-		UpdateData(FALSE);
+			for(std::vector<TCHAR>::size_type pos = 0; pos < genPassword.size(); ++pos)
+				lpPassword[pos] = genPassword[pos];
+			lpPassword[genPassword.size()] = 0;
+		}
+		else { ASSERT(FALSE); }
 
-		LPTSTR lpCur = m_pEditPw.GetPassword();
-		NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS),
-			lpCur);
-		CSecureEditEx::DeletePassword(lpCur); lpCur = NULL;
+		EraseTCharVector(genPassword);
 	}
+	else // CPwSafeDlg::m_bMiniMode == FALSE
+	{
+		UpdateData(TRUE);
+
+		CPwGeneratorExDlg dlg;
+		dlg.InitEx(1, m_bStars, FALSE);
+
+		if(dlg.DoModal() == IDOK) lpPassword = dlg.GetGeneratedPassword();
+	}
+
+	if(lpPassword == NULL) return;
+
+	m_pEditPw.SetPassword(lpPassword);
+	m_pRepeatPw.SetPassword(lpPassword);
+	CSecureEditEx::DeletePassword(lpPassword); lpPassword = NULL;
+
+	UpdateData(FALSE);
+
+	LPTSTR lpCur = m_pEditPw.GetPassword();
+	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), lpCur);
+	CSecureEditEx::DeletePassword(lpCur); lpCur = NULL;
 }
 
 void CAddEntryDlg::OnReCopyAll() 
@@ -645,22 +685,23 @@ BOOL CAddEntryDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		POINT pt;
 		GetCursorPos(&pt);
 
-		m_popmenu.LoadMenu(IDR_RECTX_MENU);
+		BCMenu menu;
+		menu.LoadMenu(IDR_RECTX_MENU);
 
-		m_popmenu.SetMenuDrawMode(BCMENU_DRAWMODE_XP); // <<<!=>>> BCMENU_DRAWMODE_ORIGINAL
-		m_popmenu.SetSelectDisableMode(FALSE);
-		m_popmenu.SetXPBitmap3D(TRUE);
-		m_popmenu.SetBitmapBackground(RGB(255, 0, 255));
-		m_popmenu.SetIconSize(16, 16);
+		menu.SetMenuDrawMode(BCMENU_DRAWMODE_XP); // <<<!=>>> BCMENU_DRAWMODE_ORIGINAL
+		menu.SetSelectDisableMode(FALSE);
+		menu.SetXPBitmap3D(TRUE);
+		menu.SetBitmapBackground(RGB(255, 0, 255));
+		menu.SetIconSize(16, 16);
 
-		m_popmenu.LoadToolbar(IDR_INFOICONS, IDB_INFOICONS_EX);
+		menu.LoadToolbar(IDR_INFOICONS, IDB_INFOICONS_EX);
 
-		BCMenu *pSub = NewGUI_GetBCMenu(m_popmenu.GetSubMenu(0));
-		if(pSub == NULL) { ASSERT(FALSE); pSub = &m_popmenu; }
+		BCMenu *pSub = NewGUI_GetBCMenu(menu.GetSubMenu(0));
+		if(pSub == NULL) { ASSERT(FALSE); pSub = &menu; }
 		CPwSafeDlg::_TranslateMenu(pSub, TRUE, NULL);
 		
 		pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, this);
-		m_popmenu.DestroyMenu();
+		menu.DestroyMenu();
 	}
 	
 	return CDialog::OnNotify(wParam, lParam, pResult);
@@ -680,8 +721,8 @@ void CAddEntryDlg::OnSetAttachBtn()
 	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 	dwFlags |= 0x00080000 | 0x00800000;
 	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	
 	CFileDialog dlg(TRUE, NULL, NULL, dwFlags, strFilter, this);
-
 	if(dlg.DoModal() == IDOK)
 	{
 		int nRet;
@@ -733,8 +774,8 @@ void CAddEntryDlg::OnSaveAttachBtn()
 	dwFlags |= OFN_EXTENSIONDIFFERENT;
 	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 	dwFlags |= 0x00080000 | 0x00800000 | OFN_NOREADONLYRETURN;
-	CFileDialog dlg(FALSE, NULL, strSample, dwFlags, strFilter, this);
 
+	CFileDialog dlg(FALSE, NULL, strSample, dwFlags, strFilter, this);
 	if(dlg.DoModal() == IDOK)
 		CPwUtil::SaveBinaryData(pEntry, dlg.GetPathName());
 
@@ -899,11 +940,6 @@ void CAddEntryDlg::OnReNotesClickLink(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-void CAddEntryDlg::OnHelpOpenFile()
-{
-	_OpenLocalFile(PWM_README_FILE, OLF_OPEN);
-}
-
 void CAddEntryDlg::OnHelpURLFieldFeatures()
 {
 	WU_OpenAppHelp(PWM_HELP_URLS);
@@ -918,20 +954,303 @@ void CAddEntryDlg::PerformMiniModeAdjustments()
 {
 	if(CPwSafeDlg::m_bMiniMode == FALSE) return;
 
+	WU_GetUserApplications(m_vApps);
+
 	NewGUI_DisableHideWnd(GetDlgItem(IDC_STATIC_ATTACH));
 	NewGUI_DisableHideWnd(GetDlgItem(IDC_EDIT_ATTACHMENT));
 	NewGUI_DisableHideWnd(&m_btSetAttachment);
 	NewGUI_DisableHideWnd(&m_btSaveAttachment);
 	NewGUI_DisableHideWnd(&m_btRemoveAttachment);
-	NewGUI_DisableHideWnd(&m_btHelp);
+	// NewGUI_DisableHideWnd(&m_btTools);
 
 	long lMoveY = -NewGUI_GetWndBasePosDiff(GetDlgItem(IDC_STATIC_DLGSEP), &m_btSetAttachment).cy;
 	NewGUI_MoveWnd(GetDlgItem(IDC_STATIC_DLGSEP), 0, lMoveY, this);
-	// NewGUI_MoveWnd(&m_btHelp, 0, lMoveY, this);
+	NewGUI_MoveWnd(&m_btTools, 0, lMoveY, this);
 	NewGUI_MoveWnd(&m_btOK, 0, lMoveY, this);
 	NewGUI_MoveWnd(&m_btCancel, 0, lMoveY, this);
 
+	m_pURL.ShowWindow(SW_HIDE);
+	m_cmbUrl.EnableWindow(TRUE);
+	m_cmbUrl.ShowWindow(SW_SHOW);
+
 	NewGUI_Resize(this, 0, lMoveY, NULL);
+}
+
+KP_ENTRY CAddEntryDlg::_CurrentDataToEntry(bool bUpdateData)
+{
+	if(bUpdateData) UpdateData(TRUE);
+
+	KP_ENTRY e;
+	ZeroMemory(&e, sizeof(KP_ENTRY));
+
+	if(m_pOriginalEntry != NULL)
+	{
+		e.pOriginalEntry = m_pOriginalEntry;
+		memcpy(e.uuid, m_pOriginalEntry->uuid, 16);
+	}
+
+	e.uGroupIndex = static_cast<DWORD>(m_cbGroups.GetCurSel());
+	e.uImageId = static_cast<DWORD>(m_nIconId);
+
+	e.lpTitle = _TcsSafeDupAlloc(m_strTitle);
+	m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpTitle));
+
+	e.lpURL = _TcsSafeDupAlloc(m_strURL);
+	m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpURL));
+
+	e.lpUserName = _TcsSafeDupAlloc(m_strUserName);
+	m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpUserName));
+
+	LPTSTR lpPw = m_pEditPw.GetPassword();
+	e.lpPassword = _TcsSafeDupAlloc(lpPw);
+	CSecureEditEx::DeletePassword(lpPw);
+	m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpPassword));
+
+	CString strNotes;
+	m_reNotes.GetWindowText(strNotes);
+	e.lpAdditional = _TcsSafeDupAlloc(strNotes);
+	m_vStringsCache.push_back(const_cast<LPTSTR>(e.lpAdditional));
+
+	return e;
+}
+
+void CAddEntryDlg::_ClearStringsCache()
+{
+	for(size_t i = 0; i < m_vStringsCache.size(); ++i)
+	{
+		LPTSTR lp = m_vStringsCache[i];
+		mem_erase((unsigned char *)lp, _tcslen(lp) * sizeof(TCHAR));
+		SAFE_DELETE_ARRAY(lp);
+	}
+
+	m_vStringsCache.clear();
+}
+
+void CAddEntryDlg::OnBnClickedEntryToolsBtn()
+{
+	RECT rect;
+	m_btTools.GetWindowRect(&rect);
+	const int x = rect.left;
+	const int y = rect.bottom;
+
+	BCMenu menu;
+	menu.LoadMenu(IDR_ENTRYTOOLS_MENU);
+
+	menu.SetMenuDrawMode(BCMENU_DRAWMODE_XP); // <<<!=>>> BCMENU_DRAWMODE_ORIGINAL
+	menu.SetSelectDisableMode(FALSE);
+	menu.SetXPBitmap3D(TRUE);
+	menu.SetBitmapBackground(RGB(255, 0, 255));
+	menu.SetIconSize(16, 16);
+	// menu.LoadToolbar(IDR_INFOICONS, IDB_INFOICONS_EX);
+
+	VERIFY(NewGUI_SetIcon(menu, ID_POPUP_AUTOTYPE, IDB_TB_ABOUT));
+	VERIFY(NewGUI_SetIcon(menu, ID_POPUP_URLFIELDFEATURES, IDB_TB_ABOUT));
+	VERIFY(NewGUI_SetIcon(menu, ID_URLFIELD_INS_USERNAME, IDB_TB_COPYUSER));
+	VERIFY(NewGUI_SetIcon(menu, ID_URLFIELD_INS_PASSWORD, IDB_TB_COPYPW));
+	VERIFY(NewGUI_SetIcon(menu, ID_POPUP_AUTOTYPE_SELTARGET, IDB_WINPROPS_SMALL));
+
+	BCMenu *pSub = NewGUI_GetBCMenu(menu.GetSubMenu(0));
+	if(pSub == NULL) { ASSERT(FALSE); pSub = &menu; }
+	CPwSafeDlg::_TranslateMenu(pSub, FALSE, NULL);
+
+	if(CPwSafeDlg::m_bMiniMode == TRUE)
+	{
+		NewGUI_RemoveMenuCommand(pSub, ID_POPUP_AUTOTYPE);
+		NewGUI_RemoveMenuCommand(pSub, ID_POPUP_AUTOTYPE_SELTARGET);
+
+		NewGUI_RemoveInvalidSeparators(pSub, FALSE);
+	}
+
+	VERIFY(pSub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, x, y, this));
+	VERIFY(menu.DestroyMenu());
+}
+
+void CAddEntryDlg::SelectFileAsUrl(LPCTSTR lpFilter)
+{
+	UpdateData(TRUE);
+
+	const DWORD dwFlags = OFN_DONTADDTORECENT | OFN_ENABLESIZING |
+		OFN_EXPLORER | OFN_EXTENSIONDIFFERENT | OFN_FILEMUSTEXIST |
+		OFN_HIDEREADONLY | OFN_LONGNAMES | OFN_NOCHANGEDIR |
+		OFN_NOTESTFILECREATE | OFN_PATHMUSTEXIST;
+
+	CFileDialog dlg(TRUE, _T("exe"), _T(""), dwFlags, lpFilter, this, 0);
+	if(dlg.DoModal() == IDOK)
+	{
+		m_strURL = _T("cmd://\"");
+		m_strURL += dlg.GetPathName();
+		m_strURL += _T("\"");
+
+		UpdateData(FALSE);
+	}
+}
+
+void CAddEntryDlg::OnUrlFieldSelApp()
+{
+	LPCTSTR lpPath = NULL;
+	VERIFY(_CallPlugins(KPM_SELECTAPP_ASURL, NULL, (LPARAM)&lpPath));
+	if(lpPath != NULL)
+	{
+		UpdateData(TRUE);
+		m_strURL = lpPath;
+		UpdateData(FALSE);
+		return;
+	}
+
+	CString strFilter = TRL("Application");
+	strFilter += _T(" (*.exe, *.com, *.bat, *.cmd)|*.exe;*.com;*.bat;*.cmd|");
+	strFilter += TRL("All Files");
+	strFilter += _T(" (*.*)|*.*||");
+
+	SelectFileAsUrl(strFilter);
+}
+
+void CAddEntryDlg::OnUrlFieldSelDoc()
+{
+	CString strFilter = TRL("All Files");
+	strFilter += _T(" (*.*)|*.*||");
+
+	SelectFileAsUrl(strFilter);
+}
+
+void CAddEntryDlg::InsertIntoUrl(LPCTSTR lpText)
+{
+	m_pURL.ReplaceSel(lpText, TRUE);
+}
+
+void CAddEntryDlg::OnUrlFieldInsTitle()
+{
+	InsertIntoUrl(_T("{TITLE}"));
+}
+
+void CAddEntryDlg::OnUrlFieldInsUserName()
+{
+	InsertIntoUrl(_T("{USERNAME}"));
+}
+
+void CAddEntryDlg::OnUrlFieldInsPassword()
+{
+	InsertIntoUrl(_T("{PASSWORD}"));
+}
+
+void CAddEntryDlg::OnUrlFieldInsNotes()
+{
+	InsertIntoUrl(_T("{NOTES}"));
+}
+
+void CAddEntryDlg::OnUrlFieldInsAppDir()
+{
+	InsertIntoUrl(_T("{APPDIR}"));
+}
+
+void CAddEntryDlg::OnUrlFieldInsIE()
+{
+	InsertIntoUrl(_T("{INTERNETEXPLORER}"));
+}
+
+void CAddEntryDlg::OnUrlFieldInsFirefox()
+{
+	InsertIntoUrl(_T("{FIREFOX}"));
+}
+
+void CAddEntryDlg::OnUrlFieldInsOpera()
+{
+	InsertIntoUrl(_T("{OPERA}"));
+}
+
+BOOL CALLBACK _Lcl_AED_EnumWindowsProc(HWND hWnd, LPARAM lParam)
+{
+	std::vector<std::basic_string<TCHAR> >* pStorage =
+		(std::vector<std::basic_string<TCHAR> >*)lParam;
+
+	const int nLen = GetWindowTextLength(hWnd);
+	if(nLen <= 0) return TRUE;
+
+	LONG lStyle = GetWindowLong(hWnd, GWL_STYLE);
+	if((lStyle & WS_VISIBLE) == 0) return TRUE;
+
+	const int nMaxLen = 2048;
+	TCHAR tszText[nMaxLen];
+	ZeroMemory(tszText, nMaxLen * sizeof(TCHAR));
+	GetWindowText(hWnd, tszText, 2048 - 2);
+	if(tszText[0] != 0)
+	{
+		std::basic_string<TCHAR> strName = (LPCTSTR)&tszText[0];
+		pStorage->push_back(strName);
+	}
+
+	return TRUE;
+}
+
+void CAddEntryDlg::OnAutoTypeSelectTargetWindow()
+{
+	std::vector<std::basic_string<TCHAR> > vWindows;
+	VERIFY(::EnumWindows(_Lcl_AED_EnumWindowsProc, (LPARAM)&vWindows));
+
+	CString strTitle = TRL("Auto-Type: Select Target Window...");
+	strTitle = strTitle.TrimRight(_T("."));
+
+	CSingleLineEditDlg dlg;
+	dlg.InitEx(strTitle, TRL("Select the target window for the current entry."),
+		TRL("To specify the target window, either select an existing currently-opened window from the drop-down list, or enter the window title manually:"),
+		DWORD_MAX, _T(""), vWindows);
+
+	if(dlg.DoModal() == IDOK)
+	{
+		CString strNew = _T("Auto-Type-Window: ");
+		strNew += dlg.GetEnteredText();
+		strNew += _T("\r\n");
+
+		CString strText;
+		m_reNotes.GetWindowText(strText);
+		if(strText.GetLength() > 0) strNew += _T("\r\n");
+
+		strNew += strText;
+
+		m_reNotes.SetRTF(CString(), SF_TEXT); // Force scrolling
+		m_reNotes.SetRTF(strNew, SF_TEXT);
+	}
+}
+
+void CAddEntryDlg::UrlToCombo(bool bGuiToInternals)
+{
+	if(bGuiToInternals)
+	{
+		CString strUrl;
+		m_cmbUrl.GetWindowText(strUrl);
+
+		for(size_t i = 0; i < m_vApps.size(); ++i)
+		{
+			if(strUrl == m_vApps[i].strDisplayName.c_str())
+			{
+				strUrl = m_vApps[i].strPath.c_str();
+				break;
+			}
+		}
+
+		m_pURL.SetWindowText(strUrl);
+		m_strURL = strUrl;
+	}
+	else // Internals to GUI
+	{
+		CString strPath;
+		m_pURL.GetWindowText(strPath);
+
+		m_cmbUrl.ResetContent();
+		for(size_t i = 0; i < m_vApps.size(); ++i)
+		{
+			m_cmbUrl.InsertString(static_cast<int>(i), m_vApps[i].strDisplayName.c_str());
+
+			if(strPath == m_vApps[i].strPath.c_str())
+				m_cmbUrl.SetWindowText(m_vApps[i].strDisplayName.c_str());
+		}
+
+		if(m_cmbUrl.GetWindowTextLength() == 0)
+		{
+			m_pURL.GetWindowText(strPath);
+			m_cmbUrl.SetWindowText(strPath);
+		}
+	}
 }
 
 #pragma warning(pop)

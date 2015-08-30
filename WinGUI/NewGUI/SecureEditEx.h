@@ -88,6 +88,7 @@ private:
 	int m_nOldLen;
 
 public:
+	static LPTSTR AllocMemory(size_t uCount);
 	static void SetMemoryEx(void *pDest, int c, size_t uCount);
 	static void DeleteTPtr(LPTSTR lp, BOOL bIsArray, BOOL bIsString);
 

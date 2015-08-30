@@ -74,14 +74,16 @@
 #define IDD_IMPORT_OPTIONS_DLG          227
 #define IDD_PERMISSION_DLG              229
 #define IDB_HELP_SMALL                  230
-#define IDR_ENTRYHELP_MENU              231
+#define IDR_ENTRYTOOLS_MENU             231
 #define IDB_HELP_SMALL_POPUP            232
 #define IDD_PW_GENERATOR_EX_DLG         233
 #define IDB_TB_SAVE_AS                  234
 #define IDD_SINGLELINEEDIT_DLG          235
 #define IDD_PW_GEN_ADV_DLG              236
 #define IDB_ROLL                        237
-#define IDB_RANDOM_KEY                  237
+#define IDB_RANDOM_KEY                  238
+#define IDB_TOOLS_SMALL                 239
+#define IDB_WINPROPS_SMALL              240
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -238,6 +240,7 @@
 #define IDC_READONLY                    1213
 #define IDC_STC_APP                     1214
 #define IDC_ENTRYHELP_BTN               1215
+#define IDC_ENTRYTOOLS_BTN              1215
 #define IDC_TANHELP_BTN                 1216
 #define IDC_EDIT_GENCOUNT               1217
 #define IDC_SPIN_GENCOUNT               1218
@@ -283,6 +286,12 @@
 #define IDC_STATIC_EXCLUDECHARS         1267
 #define IDC_EDIT_EXCLUDECHARS           1268
 #define IDC_STATIC_SECREDUCINFO         1269
+#define IDC_BTN_SECHELP                 1270
+#define IDC_BTN_PLGHELP                 1271
+#define IDC_CB_ALWAYSALLOW              1272
+#define IDC_COMBO_URL                   1273
+#define IDC_RADIO_NOEXPIRE              1274
+#define IDC_RADIO_EXPIRES               1275
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -478,15 +487,29 @@
 #define ID_POPUP_URLFIELDFEATURES       33002
 #define ID_POPUP_AUTOTYPE               33003
 #define ID_POPUP_OPENHELPFILE           33004
+#define ID_POPUP_HELP                   33005
+#define ID_POPUP_URLFIELD               33006
+#define ID_POPUP_URLFIELD_SELAPP        33007
+#define ID_POPUP_URLFIELD_SELDOC        33009
+#define ID_POPUP_URLFIELD_PLACEHOLDERS  33011
+#define ID_URLFIELD_INS_TITLE           33013
+#define ID_URLFIELD_INS_USERNAME        33015
+#define ID_URLFIELD_INS_PASSWORD        33017
+#define ID_URLFIELD_INS_NOTES           33019
+#define ID_URLFIELD_INS_APPDIR          33021
+#define ID_URLFIELD_INS_IE              33023
+#define ID_URLFIELD_INS_FIREFOX         33025
+#define ID_URLFIELD_INS_OPERA           33027
+#define ID_POPUP_AUTOTYPE_SELTARGET     33029
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        238
-#define _APS_NEXT_COMMAND_VALUE         33005
-#define _APS_NEXT_CONTROL_VALUE         1270
+#define _APS_NEXT_RESOURCE_VALUE        241
+#define _APS_NEXT_COMMAND_VALUE         33030
+#define _APS_NEXT_CONTROL_VALUE         1276
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

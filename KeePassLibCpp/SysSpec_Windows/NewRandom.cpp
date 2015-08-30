@@ -23,6 +23,7 @@
 
 #include <wincrypt.h>
 #include <objbase.h>
+#include <mmsystem.h>
 
 #include "../Util/NewRandom.h"
 #include "../Util/MemUtil.h"
@@ -50,10 +51,10 @@ CNewRandom::~CNewRandom()
 
 void CNewRandom::Initialize()
 {
-	g_dwNewRandomInstanceCounter++;
+	++g_dwNewRandomInstanceCounter;
 
 	DWORD dw;
-	dw = GetTickCount();
+	dw = timeGetTime();
 	AddRandomObject(&dw, 4);
 
 	LARGE_INTEGER li;
@@ -61,6 +62,7 @@ void CNewRandom::Initialize()
 	AddRandomObject(&li, sizeof(LARGE_INTEGER));
 
 	SYSTEMTIME st;
+	ZeroMemory(&st, sizeof(SYSTEMTIME));
 	GetLocalTime(&st);
 	AddRandomObject(&st, sizeof(SYSTEMTIME));
 

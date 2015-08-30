@@ -24,22 +24,27 @@
 
 #include "../SysDefEx.h"
 
-#define MAX_TRANSLATION_STRINGS 590
-
-// Translate a string
-#ifndef _UNICODE
-#define TRL(sptr) _TRL(sptr)
+// Translate a string (character sequence in code)
+#ifndef TRL
+#define TRL(w__sptr_) _TRL(_T(w__sptr_))
 #else
-#define TRL(sptr) _TRL(_T(sptr))
+#error TRL is defined already!
 #endif
 
-#define TRL_VAR(stptr) _TRL(stptr)
+// Translate a variable (do not apply _T macro)
+#ifndef TRL_VAR
+#define TRL_VAR(w__stptr_) _TRL(w__stptr_)
+#else
+#error TRL_VAR is defined already!
+#endif
 
 #define TRL_MODE_DEF FALSE
 #define TRL_MODE_TRL TRUE
 
 C_FN_SHARE BOOL LoadTranslationTable(LPCTSTR pszTableName);
 C_FN_SHARE BOOL FreeCurrentTranslationTable();
+
+C_FN_SHARE void _SortTrlTable();
 
 C_FN_SHARE LPCTSTR _TRL(LPCTSTR pszDefString);
 

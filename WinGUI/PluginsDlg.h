@@ -31,6 +31,7 @@
 #include "NewGUI/BCMenu.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/XHyperLink.h"
+#include "afxwin.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -51,10 +52,10 @@ public:
 
 	//{{AFX_DATA(CPluginsDlg)
 	enum { IDD = IDD_PLUGINS_DLG };
-	CXHyperLink	m_hlHelp;
 	CXHyperLink	m_hlGetPlugins;
 	CXPStyleButtonST	m_btClose;
 	CListCtrl	m_cList;
+	CXPStyleButtonST m_btHelp;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CPluginsDlg)
@@ -72,6 +73,7 @@ protected:
 	afx_msg void OnPluginDisable();
 	afx_msg void OnPluginConfig();
 	afx_msg void OnPluginAbout();
+	afx_msg void OnBtnClickedPlgHelp();
 	//}}AFX_MSG
 
 	afx_msg LRESULT OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam);

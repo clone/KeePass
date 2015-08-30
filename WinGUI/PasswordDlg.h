@@ -61,6 +61,7 @@ private:
 	void CleanUp();
 
 	void EnableClientWindows();
+	void UpdateAndCheckBox();
 	void PerformMiniModeAdjustments();
 
 	void QueryKeyProviders();

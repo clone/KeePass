@@ -80,6 +80,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib"
 				OutputFile="$(OutDir)\KeePassLibC32.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -180,6 +181,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib"
 				OutputFile="$(OutDir)\KeePassLibC64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -279,6 +281,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib"
 				OutputFile="$(OutDir)\KeePassLibC32.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -480,6 +483,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib"
 				OutputFile="$(OutDir)\KeePassLibC32.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -851,6 +855,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\KeePassLibCpp\Crypto\KeyTransform.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Crypto\KeyTransform.h"
+					>
+				</File>
+				<File
 					RelativePath="..\KeePassLibCpp\Crypto\Rijndael.cpp"
 					>
 				</File>
@@ -935,7 +947,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\KeePassLibCpp\SysSpec_Windows\StrUtil_Encoding.cpp"
+					RelativePath="..\KeePassLibCpp\SysSpec_Windows\StrUtilEx.cpp"
 					>
 				</File>
 				<File
@@ -956,6 +968,14 @@
 				</File>
 				<File
 					RelativePath="..\KeePassLibCpp\Util\Base64.h"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\ComUtil.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\KeePassLibCpp\Util\ComUtil.h"
 					>
 				</File>
 				<File

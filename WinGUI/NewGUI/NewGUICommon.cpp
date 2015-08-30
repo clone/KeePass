@@ -36,19 +36,27 @@
 static BOOL g_bImgButtons = 0;
 static CThemeHelperST *g_pThemeHelper = NULL;
 
-static COLORREF m_crBannerStart = RGB(235, 235, 255); // = RGB(151, 154, 173);
-static COLORREF m_crBannerEnd = RGB(192, 192, 255); // = RGB(27, 27, 37);
-static COLORREF m_crBannerText = RGB(0, 0, 0); // RGB(255, 255, 255);
-static bool m_bBannerFlip = false; // = true;
-static CFont* m_pfBannerTitle = NULL;
+static COLORREF m_crBannerStart = RGB(151, 154, 173); // = RGB(235, 235, 255);
+static COLORREF m_crBannerEnd = RGB(27, 27, 37); // = RGB(192, 192, 255);
+static COLORREF m_crBannerText = RGB(255, 255, 255); // RGB(0, 0, 0);
+static bool m_bBannerFlip = true; // = false;
+static CFont* m_pfBannerTitleFont = NULL;
 
 void NewGUI_CleanUp()
 {
-	if(m_pfBannerTitle != NULL)
+	if(m_pfBannerTitleFont != NULL)
 	{
-		m_pfBannerTitle->DeleteObject();
-		SAFE_DELETE(m_pfBannerTitle);
+		m_pfBannerTitleFont->DeleteObject();
+		SAFE_DELETE(m_pfBannerTitleFont);
 	}
+}
+
+void NewGUI_SetWin32Banner()
+{
+	m_crBannerStart = RGB(235, 235, 255);
+	m_crBannerEnd = RGB(192, 192, 255);
+	m_crBannerText = RGB(0, 0, 0);
+	m_bBannerFlip = false;
 }
 
 COLORREF NewGUI_GetBgColor()
@@ -284,18 +292,19 @@ void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
 
 	if(m_bBannerFlip) p->SetSwapGradientDirection(true);
 
-	/* if(m_pfBannerTitle != NULL) p->SetTitleFont(m_pfBannerTitle);
+	if(m_pfBannerTitleFont != NULL) p->SetTitleFont(m_pfBannerTitleFont);
 	else
 	{
 		LOGFONT lf;
 		ZeroMemory(&lf, sizeof(LOGFONT));
 		p->GetTitleFont(&lf);
 		lf.lfWeight = FW_BOLD;
-		m_pfBannerTitle = new CFont();
-		m_pfBannerTitle->CreateFontIndirect(&lf);
 
-		p->SetTitleFont(m_pfBannerTitle);
-	} */
+		m_pfBannerTitleFont = new CFont();
+		VERIFY(m_pfBannerTitleFont->CreateFontIndirect(&lf));
+
+		p->SetTitleFont(m_pfBannerTitleFont);
+	}
 }
 
 BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
@@ -336,7 +345,7 @@ BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount)
 
 void NewGUI_MakeHyperLink(void *pXHyperLink)
 {
-	CXHyperLink *p = (CXHyperLink *)pXHyperLink;
+	CXHyperLink *p = reinterpret_cast<CXHyperLink *>(pXHyperLink);
 	ASSERT(p != NULL); if(p == NULL) return;
 
 	p->SetVisited(FALSE);
@@ -388,7 +397,7 @@ void NewGUI_Resize(CWnd *pWnd, long lAddX, long lAddY, CWnd *pParent)
 	pWnd->MoveWindow(&rect);
 }
 
-void NewGUI_SetBannerColors(COLORREF crStart, COLORREF crEnd)
+void NewGUI_SetBannerColors(COLORREF crStart, COLORREF crEnd, COLORREF crText)
 {
 	ASSERT(sizeof(COLORREF) == sizeof(DWORD));
 
@@ -396,6 +405,13 @@ void NewGUI_SetBannerColors(COLORREF crStart, COLORREF crEnd)
 		m_crBannerStart = crStart;
 	if(crEnd != DWORD_MAX)
 		m_crBannerEnd = crEnd;
+	if(crText != DWORD_MAX)
+		m_crBannerText = crText;
+}
+
+void NewGUI_SetBannerParams(bool bBannerFlip)
+{
+	m_bBannerFlip = bBannerFlip;
 }
 
 BOOL NewGUI_RemoveMenuCommand(BCMenu *pMenu, UINT uCommandID)
@@ -568,4 +584,17 @@ void NewGUI_ComboBox_UpdateHistory(CComboBox& comboBox,
 		comboBox.AddString(HCMBX_SEPARATOR);
 		comboBox.AddString(HCMBX_CLEARLIST);
 	}
+}
+
+BOOL NewGUI_SetIcon(BCMenu& rMenu, UINT uCommand, int nResourceID)
+{
+	CString strMenuItemText;
+	if(rMenu.GetMenuText(uCommand, strMenuItemText, MF_BYCOMMAND) == FALSE)
+		return FALSE;
+	if(strMenuItemText.GetLength() == 0) return FALSE;
+
+	if(rMenu.ModifyODMenu(NULL, uCommand, nResourceID) == FALSE)
+		return FALSE;
+
+	return TRUE;
 }

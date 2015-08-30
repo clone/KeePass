@@ -155,6 +155,12 @@ void CSecureEditEx::SetMemoryEx(void *pDest, int c, size_t uCount)
 	memset(pDest, c, uCount);
 }
 
+// Allocates memory that can be freed by DeleteTPtr
+LPTSTR CSecureEditEx::AllocMemory(size_t uCount)
+{
+	return new TCHAR[uCount];
+}
+
 // Securely erase and free a string/pointer
 void CSecureEditEx::DeleteTPtr(LPTSTR lp, BOOL bIsArray, BOOL bIsString)
 {
@@ -196,7 +202,7 @@ LPTSTR CSecureEditEx::GetPassword()
 	LPTSTR lp = new TCHAR[nNumChars + 1];
 	ASSERT(lp != NULL); if(lp == NULL) return NULL;
 
-	for(int i = 0; i < nNumChars; i++)
+	for(int i = 0; i < nNumChars; ++i)
 	{
 		// Get one character
 		LPTSTR tchp = (LPTSTR)m_apChars.GetAt(i);

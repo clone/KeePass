@@ -50,10 +50,10 @@ void CPluginsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CPluginsDlg)
-	DDX_Control(pDX, IDC_STATIC_HL_HELP, m_hlHelp);
 	DDX_Control(pDX, IDC_STATIC_HL_GETPLUGINS, m_hlGetPlugins);
 	DDX_Control(pDX, IDOK, m_btClose);
 	DDX_Control(pDX, IDC_PLUGINS_LIST, m_cList);
+	DDX_Control(pDX, IDC_BTN_PLGHELP, m_btHelp);
 	//}}AFX_DATA_MAP
 }
 
@@ -64,6 +64,7 @@ BEGIN_MESSAGE_MAP(CPluginsDlg, CDialog)
 	ON_COMMAND(ID_PLUGIN_DISABLE, OnPluginDisable)
 	ON_COMMAND(ID_PLUGIN_CONFIG, OnPluginConfig)
 	ON_COMMAND(ID_PLUGIN_ABOUT, OnPluginAbout)
+	ON_BN_CLICKED(IDC_BTN_PLGHELP, &CPluginsDlg::OnBtnClickedPlgHelp)
 	//}}AFX_MSG_MAP
 
 	ON_REGISTERED_MESSAGE(WM_XHYPERLINK_CLICKED, OnXHyperLinkClicked)
@@ -82,6 +83,7 @@ BOOL CPluginsDlg::OnInitDialog()
 	ASSERT(m_pImgList != NULL);
 
 	NewGUI_XPButton(m_btClose, IDB_OK, IDB_OK);
+	NewGUI_XPButton(m_btHelp, IDB_HELP_SMALL, IDB_HELP_SMALL);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_PLUGINS),
@@ -93,11 +95,6 @@ BOOL CPluginsDlg::OnInitDialog()
 	m_hlGetPlugins.EnableTooltip(FALSE);
 	m_hlGetPlugins.SetNotifyParent(TRUE);
 	m_hlGetPlugins.EnableURL(FALSE);
-
-	NewGUI_MakeHyperLink(&m_hlHelp);
-	m_hlHelp.EnableTooltip(FALSE);
-	m_hlHelp.SetNotifyParent(TRUE);
-	m_hlHelp.EnableURL(FALSE);
 
 	m_cList.SetImageList(m_pImgList, LVSIL_SMALL);
 
@@ -141,30 +138,25 @@ void CPluginsDlg::OnCancel()
 
 void CPluginsDlg::UpdateGUI()
 {
-	LV_ITEM lvi;
-
 	m_cList.DeleteAllItems();
 
-	ZeroMemory(&lvi, sizeof(LV_ITEM));
-
-	unsigned int i;
-	KP_PLUGIN_INSTANCE *p;
-	CString str, strT;
-
-	for(i = 0; i < m_pPiMgr->m_plugins.size(); i++)
+	for(size_t i = 0; i < m_pPiMgr->m_plugins.size(); i++)
 	{
-		p = &m_pPiMgr->m_plugins[i];
+		KP_PLUGIN_INSTANCE *p = &m_pPiMgr->m_plugins[i];
 		ASSERT(p != NULL); if(p == NULL) continue;
 
-		lvi.iItem = (int)i;
-		lvi.iSubItem = 0;
+		LV_ITEM lvi;
+		ZeroMemory(&lvi, sizeof(LV_ITEM));
+
+		lvi.iItem = static_cast<int>(i);
 		lvi.mask = LVIF_TEXT | LVIF_IMAGE;
 
 		lvi.iImage = (p->bEnabled == TRUE) ? 20 : 45;
 
+		CString str, strT;
 		strT = p->tszFile;
 		str = CsFileOnly(&strT);
-		lvi.pszText = (TCHAR *)(LPCTSTR)str;
+		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)str);
 		m_cList.InsertItem(&lvi);
 
 		lvi.mask = LVIF_TEXT;
@@ -184,7 +176,7 @@ void CPluginsDlg::UpdateGUI()
 
 		lvi.iSubItem = 2;
 		strT.Format(_T("%u"), p->dwPluginID);
-		lvi.pszText = (LPTSTR)(LPCTSTR)strT;
+		lvi.pszText = const_cast<LPTSTR>((LPCTSTR)strT);
 		m_cList.SetItem(&lvi);
 	}
 }
@@ -252,27 +244,25 @@ void CPluginsDlg::OnRClickPluginsList(NMHDR* pNMHDR, LRESULT* pResult)
 
 DWORD CPluginsDlg::GetSelectedPluginID()
 {
-	DWORD i;
-	UINT uState;
-	LV_ITEM lvi;
-	TCHAR tszBuf[13];
-
-	tszBuf[12] = 0;
-	ZeroMemory(&lvi, sizeof(LV_ITEM));
-
-	for(i = 0; i < (DWORD)m_cList.GetItemCount(); i++)
+	for(int i = 0; i < m_cList.GetItemCount(); ++i)
 	{
-		uState = m_cList.GetItemState((int)i, LVIS_SELECTED);
-		if(uState & LVIS_SELECTED)
+		const UINT uState = m_cList.GetItemState(i, LVIS_SELECTED);
+		if((uState & LVIS_SELECTED) != 0)
 		{
-			lvi.iItem = (int)i;
+			TCHAR tszBuf[13];
+			ZeroMemory(&tszBuf[0], 13 * sizeof(TCHAR));
+
+			LV_ITEM lvi;
+			ZeroMemory(&lvi, sizeof(LV_ITEM));
+
+			lvi.iItem = i;
 			lvi.iSubItem = 2;
 			lvi.mask = LVIF_TEXT;
 			lvi.pszText = tszBuf;
 			lvi.cchTextMax = 12;
 			m_cList.GetItem(&lvi);
 
-			return (DWORD)_ttoi(lvi.pszText);
+			return static_cast<DWORD>(_ttol(lvi.pszText));
 		}
 	}
 
@@ -281,7 +271,7 @@ DWORD CPluginsDlg::GetSelectedPluginID()
 
 void CPluginsDlg::OnPluginEnable()
 {
-	DWORD dwID = GetSelectedPluginID();
+	const DWORD dwID = GetSelectedPluginID();
 	if(dwID == DWORD_MAX) return;
 
 	m_pPiMgr->EnablePluginByID(dwID, TRUE);
@@ -291,7 +281,7 @@ void CPluginsDlg::OnPluginEnable()
 
 void CPluginsDlg::OnPluginDisable()
 {
-	DWORD dwID = GetSelectedPluginID();
+	const DWORD dwID = GetSelectedPluginID();
 	if(dwID == DWORD_MAX) return;
 
 	m_pPiMgr->EnablePluginByID(dwID, FALSE);
@@ -301,14 +291,14 @@ void CPluginsDlg::OnPluginDisable()
 
 void CPluginsDlg::OnPluginConfig()
 {
-	DWORD dwID = GetSelectedPluginID();
+	const DWORD dwID = GetSelectedPluginID();
 	ASSERT(dwID != DWORD_MAX); if(dwID == DWORD_MAX) return;
 	m_pPiMgr->CallSinglePlugin(dwID, KPM_DIRECT_CONFIG, (LPARAM)m_hWnd, 0);
 }
 
 void CPluginsDlg::OnPluginAbout()
 {
-	DWORD dwID = GetSelectedPluginID();
+	const DWORD dwID = GetSelectedPluginID();
 	ASSERT(dwID != DWORD_MAX); if(dwID == DWORD_MAX) return;
 	m_pPiMgr->CallSinglePlugin(dwID, KPM_PLUGIN_INFO, (LPARAM)m_hWnd, 0);
 }
@@ -319,9 +309,12 @@ LRESULT CPluginsDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
 
 	if(wParam == IDC_STATIC_HL_GETPLUGINS)
 		ShellExecute(NULL, NULL, PWM_URL_PLUGINS, NULL, NULL, SW_SHOW);
-	else if(wParam == IDC_STATIC_HL_HELP)
-		WU_OpenAppHelp(PWM_HELP_PLUGINS);
 
 	OnCancel();
 	return 0;
+}
+
+void CPluginsDlg::OnBtnClickedPlgHelp()
+{
+	WU_OpenAppHelp(PWM_HELP_PLUGINS);
 }

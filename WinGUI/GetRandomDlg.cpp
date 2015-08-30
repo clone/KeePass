@@ -139,8 +139,8 @@ void CGetRandomDlg::OnMouseMove(UINT nFlags, CPoint point)
 			{
 				m_bMouseActive = FALSE;
 
-				GetDlgItem(IDC_BEGIN_MOUSEINPUT)->EnableWindow(TRUE);
-				GetDlgItem(IDC_BEGIN_MOUSEINPUT)->SetFocus();
+				m_btMouseInput.EnableWindow(TRUE);
+				m_btMouseInput.SetFocus();
 			}
 		}
 	}
@@ -150,12 +150,10 @@ void CGetRandomDlg::OnMouseMove(UINT nFlags, CPoint point)
 
 void CGetRandomDlg::OnBeginMouseInput() 
 {
-	int x, y;
-
 	GetDlgItem(IDC_STATIC_RANDOM)->GetWindowRect(&m_rect);
 
-	x = m_rect.left + ((m_rect.right - m_rect.left) / 2);
-	y = m_rect.top + ((m_rect.bottom - m_rect.top) / 2);
+	const int x = m_rect.left + ((m_rect.right - m_rect.left) / 2);
+	const int y = m_rect.top + ((m_rect.bottom - m_rect.top) / 2);
 
 	SetCursorPos(x, y);
 
@@ -163,7 +161,7 @@ void CGetRandomDlg::OnBeginMouseInput()
 
 	m_cMouseProgress.SetPos(0);
 
-	GetDlgItem(IDC_BEGIN_MOUSEINPUT)->EnableWindow(FALSE);
+	m_btMouseInput.EnableWindow(FALSE);
 
 	m_dwCurPoint = 0;
 	m_bMouseActive = TRUE;

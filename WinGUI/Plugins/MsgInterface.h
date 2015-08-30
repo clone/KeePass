@@ -27,4 +27,6 @@ void KPMI_SetMainDialog(void *pMainPwSafeDlg);
 C_FN_SHARE DWORD_PTR KP_API KP_Call(DWORD dwCode, LPARAM lParamW, LPARAM lParamL, LPARAM lParamM);
 C_FN_SHARE DWORD_PTR KP_API KP_Query(DWORD dwCode, LPARAM lParam);
 
+void KPMI_AutoType(PW_ENTRY *pEntry, LONG_PTR lFlags);
+
 #endif // ___KEEPASS_MESSAGE_INTERFACE_H___

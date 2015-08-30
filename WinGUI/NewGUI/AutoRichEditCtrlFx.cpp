@@ -44,24 +44,33 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 
-CString CAutoRichEditCtrlFx::GetRTF()
+CString CAutoRichEditCtrlFx::_StreamOutEx(int nFormat)
 {
 	EDITSTREAM es;
-
 	ZeroMemory(&es, sizeof(EDITSTREAM));
+
 	es.pfnCallback = CBStreamOut;
 
-	CString sRTF;
-	es.dwCookie = (DWORD_PTR)&sRTF;
+	CString sBuffer;
+	es.dwCookie = (DWORD_PTR)&sBuffer;
 
-	StreamOut(SF_RTF, es);
-	return sRTF;
+	this->StreamOut(nFormat, es);
+	return sBuffer;
+}
+
+CString CAutoRichEditCtrlFx::GetRTF()
+{
+	return this->_StreamOutEx(SF_RTF);
+}
+
+CString CAutoRichEditCtrlFx::GetTXT()
+{
+	return this->_StreamOutEx(SF_TEXT);
 }
 
 void CAutoRichEditCtrlFx::SetRTF(CString sRTF, int nStreamType)
 {
 	EDITSTREAM es;
-
 	ZeroMemory(&es, sizeof(EDITSTREAM));
 
 #ifdef _UNICODE
@@ -73,7 +82,7 @@ void CAutoRichEditCtrlFx::SetRTF(CString sRTF, int nStreamType)
 	m_strStreamInCache = sRTF;
 	es.dwCookie = (DWORD_PTR)&m_strStreamInCache;
 
-	StreamIn(nStreamType, es);
+	this->StreamIn(nStreamType, es);
 }
 
 DWORD CALLBACK CAutoRichEditCtrlFx::CBStreamIn(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)

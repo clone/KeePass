@@ -70,4 +70,9 @@ private:
 	KP_APP_INFO m_kpAppInfo;
 };
 
+inline BOOL _CallPlugins(DWORD dwCode, LPARAM lParamW, LPARAM lParamL)
+{
+	return CPluginManager::Instance().CallPlugins(dwCode, lParamW, lParamL);
+}
+
 #endif

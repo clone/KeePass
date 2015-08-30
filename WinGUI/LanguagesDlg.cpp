@@ -134,10 +134,10 @@ BOOL CLanguagesDlg::OnInitDialog()
 		chk_w = ff.FindNextFile();
 
 		csTmp = ff.GetFileTitle();
-		csTmp.MakeLower();
+		csTmp = csTmp.MakeLower();
 		if((csTmp != _T("standard")) && (csTmp != _T("english")))
 		{
-			LoadTranslationTable((LPCTSTR)ff.GetFileTitle());
+			VERIFY(LoadTranslationTable((LPCTSTR)ff.GetFileTitle()));
 
 			strTemp = (LPCTSTR)ff.GetFileTitle();
 			// strTemp += _T(" - ");
@@ -169,7 +169,6 @@ BOOL CLanguagesDlg::OnInitDialog()
 	ff.Close();
 
 	VERIFY(LoadTranslationTable(szCurrentlyLoaded));
-
 	return TRUE;
 }
 

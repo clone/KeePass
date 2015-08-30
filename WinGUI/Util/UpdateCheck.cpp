@@ -110,7 +110,7 @@ DWORD WINAPI CFU_Thread(LPVOID lpParameter)
 					CFU_Report(TRL("You have the latest version."), MB_ICONINFORMATION);
 				else if((g_dwCacheCurVer >= 0x01000001) && (dwVer == (g_dwCacheCurVer - 1)))
 					CFU_Report(TRL("You have the latest version."), MB_ICONINFORMATION);
-				else // dwVer < g_dwCacheCurVer
+				else if(dwVer < g_dwCacheCurVer)
 					CFU_Report(TRL("Loading error"), MB_ICONSTOP);
 
 				if(dwVer > g_dwCacheCurVer)

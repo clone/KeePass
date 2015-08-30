@@ -36,11 +36,11 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.10")
+#define PWM_VERSION_STR  _T("1.11")
 #else
-#define PWM_VERSION_STR  _T("1.10 Unicode")
+#define PWM_VERSION_STR  _T("1.11 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01010001
+#define PWM_VERSION_DW   0x01010100
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
@@ -154,6 +154,7 @@
 #define PWMKEY_CHECKFORUPDATE   _T("KeeCheckForUpdate")
 #define PWMKEY_LOCKONWINLOCK    _T("KeeLockOnWinLock")
 #define PWMKEY_ENABLEREMOTECTRL _T("KeeEnableRemoteCtrl")
+#define PWMKEY_ALWAYSALLOWIPC   _T("KeeAlwaysAllowIPC")
 #define PWMKEY_DEFAULTATSEQ     _T("KeeDefaultAutoTypeSequence")
 #define PWMKEY_USELOCALTIMEFMT  _T("KeeUseLocalTimeFormat")
 #define PWMKEY_TANCHARS         _T("KeeTANCharacters")
@@ -162,8 +163,14 @@
 #define PWMKEY_UNINTRUSIVEMINIMODE _T("KeeUnintrusiveMiniMode")
 #define PWMKEY_BANNERCOLORSTART _T("KeeBannerColorStart")
 #define PWMKEY_BANNERCOLOREND   _T("KeeBannerColorEnd")
+#define PWMKEY_BANNERCOLORTEXT  _T("KeeBannerColorText")
+#define PWMKEY_BANNERFLIP       _T("KeeBannerFlip")
 #define PWMKEY_ROOTONNEW        _T("KeeRootInNewDb")
 #define PWMKEY_GROUPONNEW_PRE   _T("KeeGroupInNewDb")
+#define PWMKEY_WNDTITLESUFFIX   _T("KeeWindowTitleSuffix")
+#define PWMKEY_MASTERPW_MINLEN  _T("KeeMasterPasswordMinLength")
+#define PWMKEY_MASTERPW_MINQUALITY _T("KeeMasterPasswordMinQuality")
+#define PWMKEY_FOCUSRESAFTERQUICKFIND _T("KeeFocusResultsAfterQuickFind")
 
 #define PWMKEY_GENPROFILE       _T("KeeGenProfile")
 #define PWMKEY_GENPROFILEAUTO   _T("KeeGenProfileAuto")
@@ -244,9 +251,11 @@
 #define PWE_INVALID_FILEHEADER    14
 #define PWE_NOFILEACCESS_READ_KEY 15
 #define PWE_KEYPROV_INVALID_KEY   16
+#define PWE_FILEERROR_VERIFY      17
 
 // Format Flags
 #define PWFF_NO_INTRO              1
+#define PWFF_INVKEY_WITH_CODE      2
 
 // Property IDs
 #define PWP_DEFAULT_USER_NAME      1
@@ -263,6 +272,7 @@
 #define PMS_STREAM_SIMPLESTATE       _T("Simple UI State")
 #define PMS_STREAM_DEFAULTUSER       _T("Default User Name")
 #define PMS_STREAM_SEARCHHISTORYITEM _T("Search History Item")
+#define PMS_STREAM_CUSTOMKVP         _T("Custom KVP")
 #define PMS_STREAM_KPXICON2          _T("KPX_CUSTOM_ICONS_2")
 
 #ifdef VPA_MODIFY
@@ -395,6 +405,8 @@ typedef struct _PWDB_META_STREAM
 
 #pragma pack()
 
+typedef std::pair<std::basic_string<TCHAR>, std::basic_string<TCHAR> > CustomKvp;
+
 #ifdef _DEBUG
 #define ASSERT_ENTRY(pp) ASSERT((pp) != NULL); ASSERT((pp)->pszTitle != NULL); \
 	ASSERT((pp)->pszUserName != NULL); ASSERT((pp)->pszURL != NULL); \
@@ -466,7 +478,7 @@ public:
 	int OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *pRepair);
 	// int OpenDatabaseEx(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *pRepair,
 	//	CPwErrorInfo *pErrorInfo);
-	int SaveDatabase(const TCHAR *pszFile);
+	int SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32);
 
 	// Move entries and groups
 	void MoveInGroup(DWORD idGroup, DWORD dwFrom, DWORD dwTo);
@@ -507,6 +519,9 @@ public:
 
 	std::vector<std::basic_string<TCHAR> >* AccessPropertyStrArray(DWORD dwPropertyId);
 
+	BOOL SetCustomKvp(LPCTSTR lpKey, LPCTSTR lpValue);
+	LPCTSTR GetCustomKvp(LPCTSTR lpKey) const;
+
 	DWORD m_dwLastSelectedGroupId;
 	DWORD m_dwLastTopVisibleGroupId;
 	BYTE m_aLastSelectedEntryUuid[16];
@@ -539,6 +554,9 @@ private:
 
 	void MoveInternal(DWORD dwFrom, DWORD dwTo);
 
+	static BYTE* SerializeCustomKvp(const CustomKvp& kvp);
+	static bool DeserializeCustomKvp(const BYTE *pStream, CustomKvp& kvpBuffer);
+
 	PW_ENTRY *m_pEntries; // List containing all entries
 	DWORD m_dwMaxEntries; // Maximum number of items that can be stored in the list
 	DWORD m_dwNumEntries; // Current number of items stored in the list
@@ -560,6 +578,7 @@ private:
 
 	std::basic_string<TCHAR> m_strDefaultUserName;
 	std::vector<std::basic_string<TCHAR> > m_vSearchHistory;
+	std::vector<CustomKvp> m_vCustomKVPs;
 
 	std::vector<PWDB_META_STREAM> m_vUnknownMetaStreams;
 };

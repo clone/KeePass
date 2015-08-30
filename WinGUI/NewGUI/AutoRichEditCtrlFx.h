@@ -53,7 +53,7 @@ public:
 	void SetRTF(CString sRTF, int nStreamType);
 	CString GetRTF();
 
-	CString m_strStreamInCache;
+	CString GetTXT();
 
 protected:
 	//{{AFX_MSG(CAutoRichEditCtrlFx)
@@ -65,9 +65,13 @@ private:
 	static DWORD CALLBACK CBStreamIn(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb);
 	static DWORD CALLBACK CBStreamOut(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb);
 
-#ifdef _UNICODE	
+#ifdef _UNICODE
 	static DWORD CALLBACK CBStreamInRTF(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb);
-#endif	
+#endif
+
+	CString _StreamOutEx(int nFormat);
+
+	CString m_strStreamInCache;
 };
 
 /////////////////////////////////////////////////////////////////////////////

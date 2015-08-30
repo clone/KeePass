@@ -269,11 +269,11 @@ BOOL CPwGeneratorExDlg::OnInitDialog()
 	if(m_bShowInTaskbar == TRUE)
 		m_hPrevParent = WU_ShowWindowInTaskbar(this->m_hWnd, NULL, TRUE);
 
-	if(CPwSafeDlg::m_bMiniMode == TRUE)
-	{
-		m_btnAdvanced.EnableWindow(FALSE);
-		m_btnAdvanced.ShowWindow(SW_HIDE);
-	}
+	// if(CPwSafeDlg::m_bMiniMode == TRUE)
+	// {
+	//	m_btnAdvanced.EnableWindow(FALSE);
+	//	m_btnAdvanced.ShowWindow(SW_HIDE);
+	// }
 
 	this->EnableControlsEx(FALSE);
 	return TRUE;
@@ -484,8 +484,7 @@ void CPwGeneratorExDlg::EnableControlsEx(BOOL bSelectCustom)
 	if(m_dwRequestedPasswords > 0)
 	{
 		ENSURE_VISIBLE_STATE(m_btnOK, TRUE);
-		ENSURE_ENABLED_STATE(m_btnOK, ((lpPassword[0] != 0) ? TRUE : FALSE) &
-			bNoAutoProfile);
+		ENSURE_ENABLED_STATE(m_btnOK, (lpPassword[0] != 0) ? TRUE : FALSE);
 	}
 	else // Can't accept
 	{
@@ -726,7 +725,7 @@ void CPwGeneratorExDlg::OnBnClickedGenerateBtn()
 	}
 
 	std::vector<TCHAR> strPassword;
-	USHORT uError = PwgGenerateEx(strPassword, &pws, &randomSource);
+	USHORT uError = PwgGenerateWithExtVerify(strPassword, &pws, &randomSource);
 
 	if(uError != PWGE_SUCCESS)
 	{

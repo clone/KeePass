@@ -25,6 +25,7 @@
 #include "MemUtil.h"
 #include "StrUtil.h"
 #include "TranslateEx.h"
+#include "../Crypto/ARCFour.h"
 
 #define CHARSPACE_ESCAPE      60
 #define CHARSPACE_ALPHA       26
@@ -169,16 +170,16 @@ BOOL CPwUtil::SaveHexKey32(FILE *fp, BYTE *pBuf)
 
 BOOL CPwUtil::ConvertStrToHex(char ch1, char ch2, BYTE& bt)
 {
-	if((ch1 >= '0') && (ch1 <= '9')) bt = (BYTE)(ch1 - '0');
-	else if((ch1 >= 'a') && (ch1 <= 'f')) bt = (BYTE)(ch1 - 'a' + 10);
-	else if((ch1 >= 'A') && (ch1 <= 'F')) bt = (BYTE)(ch1 - 'A' + 10);
+	if((ch1 >= '0') && (ch1 <= '9')) bt = static_cast<BYTE>(ch1 - '0');
+	else if((ch1 >= 'a') && (ch1 <= 'f')) bt = static_cast<BYTE>(ch1 - 'a' + 10);
+	else if((ch1 >= 'A') && (ch1 <= 'F')) bt = static_cast<BYTE>(ch1 - 'A' + 10);
 	else return FALSE;
 
 	bt <<= 4;
 
-	if((ch2 >= '0') && (ch2 <= '9')) bt |= (BYTE)(ch2 - '0');
-	else if((ch2 >= 'a') && (ch2 <= 'f')) bt |= (BYTE)(ch2 - 'a' + 10);
-	else if((ch2 >= 'A') && (ch2 <= 'F')) bt |= (BYTE)(ch2 - 'A' + 10);
+	if((ch2 >= '0') && (ch2 <= '9')) bt |= static_cast<BYTE>(ch2 - '0');
+	else if((ch2 >= 'a') && (ch2 <= 'f')) bt |= static_cast<BYTE>(ch2 - 'a' + 10);
+	else if((ch2 >= 'A') && (ch2 <= 'F')) bt |= static_cast<BYTE>(ch2 - 'A' + 10);
 	else return FALSE;
 
 	return TRUE;
@@ -186,13 +187,13 @@ BOOL CPwUtil::ConvertStrToHex(char ch1, char ch2, BYTE& bt)
 
 void CPwUtil::ConvertHexToStr(BYTE bt, char& ch1, char& ch2)
 {
-	char chq = (char)(bt >> 4);
-	if(chq < 10) ch1 = (char)(chq + '0');
-	else ch1 = (char)(chq - 10 + 'a');
+	char chq = static_cast<char>(bt >> 4);
+	if(chq < 10) ch1 = static_cast<char>(chq + '0');
+	else ch1 = static_cast<char>(chq - 10 + 'a');
 
-	chq = (char)(bt & 0x0F);
-	if(chq < 10) ch2 = (char)(chq + '0');
-	else ch2 = (char)(chq - 10 + 'a');
+	chq = static_cast<char>(bt & 0x0F);
+	if(chq < 10) ch2 = static_cast<char>(chq + '0');
+	else ch2 = static_cast<char>(chq - 10 + 'a');
 }
 
 CString CPwUtil::FormatError(int nErrorCode, DWORD dwFlags)
@@ -203,19 +204,23 @@ CString CPwUtil::FormatError(int nErrorCode, DWORD dwFlags)
 	{
 		TCHAR tszTemp[24];
 		_stprintf_s(tszTemp, _countof(tszTemp), _T("%08X"),
-			(unsigned int)nErrorCode);
+			static_cast<unsigned int>(nErrorCode));
 
 		if((dwFlags & PWFF_NO_INTRO) == 0)
 		{
-			str = TRL("An error occured"); str += _T("!\r\n");
+			str = TRL("An error occurred"); str += _T("!\r\n");
 		}
 
 		str += TRL("Error code"); str += _T(": 0x");
 		str += tszTemp;
+		str += _T(".");
 
 		if((dwFlags & PWFF_NO_INTRO) == 0) str += _T("\r\n\r\n");
 		else str += _T("\r\n");
 	}
+
+	if((nErrorCode == PWE_INVALID_KEY) && ((dwFlags & PWFF_INVKEY_WITH_CODE) == 0))
+		str.Empty();
 
 	switch(nErrorCode)
 	{
@@ -270,6 +275,9 @@ CString CPwUtil::FormatError(int nErrorCode, DWORD dwFlags)
 		break;
 	case PWE_KEYPROV_INVALID_KEY:
 		str += TRL("The key provider plugin did not supply a valid key");
+		break;
+	case PWE_FILEERROR_VERIFY:
+		str += TRL("File error: error while writing to the file"); // Same as write
 		break;
 	default:
 		ASSERT(FALSE);
@@ -466,6 +474,25 @@ BOOL CPwUtil::IsTANEntry(const PW_ENTRY *pe)
 
 	return ((_tcscmp(pe->pszTitle, PWS_TAN_ENTRY) != 0) ? FALSE : TRUE);
 }
+
+/* void CPwUtil::ProtectMemory(UINT8 *pMem, size_t uBytes, bool bEncrypt)
+{
+#ifdef _WIN32
+	DWORD dwBytes = static_cast<DWORD>(uBytes);
+	dwBytes += CRYPTPROTECTMEMORY_BLOCK_SIZE - (dwBytes % CRYPTPROTECTMEMORY_BLOCK_SIZE);
+	ASSERT((uBytes <= dwBytes) && (dwBytes <= uBytes + CRYPTPROTECTMEMORY_BLOCK_SIZE));
+	ASSERT((dwBytes % CRYPTPROTECTMEMORY_BLOCK_SIZE) == 0);
+
+	if(bEncrypt)
+	{
+		VERIFY(CryptProtectMemory(pMem, dwBytes, CRYPTPROTECTMEMORY_SAME_PROCESS));
+	}
+	else
+	{
+		VERIFY(CryptUnprotectMemory(pMem, dwBytes, CRYPTPROTECTMEMORY_SAME_PROCESS));
+	}
+#endif
+} */
 
 /* CPwErrorInfo::CPwErrorInfo()
 {

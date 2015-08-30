@@ -20,12 +20,15 @@
 #include "StdAfx.h"
 #include "MemUtil.h"
 
+#include <boost/static_assert.hpp>
+
 #include "NewRandom.h"
 #include "../Crypto/SHA2/SHA2.h"
 
 void mem_erase(unsigned char *p, size_t u)
 {
-	ASSERT(sizeof(unsigned char) == 1);
+	BOOST_STATIC_ASSERT(sizeof(char) == 1); // Used within SecureZeroMemory
+	BOOST_STATIC_ASSERT(sizeof(unsigned char) == 1);
 	ASSERT(p != NULL); if(p == NULL) return;
 
 	if(u == 0) return; // Nothing to erase
@@ -38,7 +41,11 @@ void mem_erase(unsigned char *p, size_t u)
 	// for(unsigned long i = 0; i < u; ++i)
 	//	p[i] = (unsigned char)(rand() & 0xFF);
 
+#ifdef _WIN32
+	SecureZeroMemory(p, u);
+#else
 	memset(p, 0, u);
+#endif
 }
 
 // Pack time to 5 byte structure:
@@ -79,6 +86,7 @@ void _GetCurrentPwTime(PW_TIME *p)
 	ASSERT(p != NULL); if(p == NULL) return;
 
 	SYSTEMTIME t;
+	ZeroMemory(&t, sizeof(SYSTEMTIME));
 	GetLocalTime(&t);
 
 	ZeroMemory(p, sizeof(PW_TIME));
