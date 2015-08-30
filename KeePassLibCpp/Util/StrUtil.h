@@ -50,8 +50,11 @@ void EraseTCharVector(std::vector<TCHAR>& vBuffer);
 // Fix an URL if necessary (check protocol, form, etc.)
 void FixURL(CString *pstrURL);
 
+// If pReferenceSource is not NULL, it'll be used to dereference
+// lpReplaceWith before replacing lpFind
 BOOL SeqReplace(CString& str, LPCTSTR lpFind, LPCTSTR lpReplaceWith,
-	BOOL bMakeSimString, BOOL bCmdQuotes, BOOL bRemoveMeta);
+	BOOL bMakeSimString, BOOL bCmdQuotes, BOOL bRemoveMeta, PW_ENTRY* peEntryInfo,
+	CPwManager* pReferenceSource, DWORD dwRecursionLevel);
 
 // Replace placeholders in pString by data in pEntry
 void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmdQuotes,

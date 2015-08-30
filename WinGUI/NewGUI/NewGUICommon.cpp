@@ -489,7 +489,7 @@ void NewGUI_SetCueBanner_TB(HWND hTextBox, LPCTSTR lpText)
 
 	// On Windows XP there's a drawing bug at the left border (text is
 	// not displayed correctly), therefore prepend a space on Windows XP
-	CString strSearchTr = ((WU_IsWinVistaSystem() == FALSE) ? _T(" ") : _T(""));
+	CString strSearchTr = ((WU_IsAtLeastWinVistaSystem() == FALSE) ? _T(" ") : _T(""));
 	strSearchTr += lpText;
 
 #ifndef _UNICODE
@@ -597,4 +597,35 @@ BOOL NewGUI_SetIcon(BCMenu& rMenu, UINT uCommand, int nResourceID)
 		return FALSE;
 
 	return TRUE;
+}
+
+int CALLBACK NgslCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+{
+	std::pair<CListCtrl*, int>* pParam = (std::pair<CListCtrl*, int>*)lParamSort;
+	if(pParam == NULL) { ASSERT(FALSE); return 0; }
+
+	CListCtrl* pCtrl = pParam->first;
+
+	ASSERT(pCtrl->GetHeaderCtrl()->GetItemCount() == pParam->second);
+	for(int iColumn = 0; iColumn < pParam->second; ++iColumn)
+	{
+		CString x = pCtrl->GetItemText((int)lParam1, iColumn);
+		CString y = pCtrl->GetItemText((int)lParam2, iColumn);
+
+		const int nCmp = x.Compare(y);
+		if(nCmp != 0) return nCmp;
+	}
+
+	return 0;
+}
+
+void NewGUI_SortList(CListCtrl* pListCtrl)
+{
+	if(pListCtrl == NULL) { ASSERT(FALSE); return; }
+
+	std::pair<CListCtrl*, int> spParam(pListCtrl,
+		pListCtrl->GetHeaderCtrl()->GetItemCount());
+
+	VERIFY(ListView_SortItemsEx(pListCtrl->m_hWnd, NgslCompareFunc,
+		(LPARAM)&spParam) != FALSE);
 }

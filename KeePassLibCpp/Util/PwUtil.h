@@ -24,9 +24,17 @@
 
 #include "../SysDefEx.h"
 #include <string>
+#include <vector>
 #include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "../PwManager.h"
+
+typedef struct _PG_TREENODE
+{
+	PW_GROUP g;
+	std::vector<boost::shared_ptr<_PG_TREENODE> > vChildNodes;
+} PG_TREENODE;
 
 class CPwUtil : boost::noncopyable
 {
@@ -66,9 +74,24 @@ public:
 
 	// static void ProtectMemory(UINT8 *pMem, size_t uBytes, bool bEncrypt);
 
+	static PG_TREENODE GroupsToTree(CPwManager* pMgr);
+	static boost::shared_ptr<PG_TREENODE> FindGroupInTree(PG_TREENODE* pRoot,
+		DWORD dwGroupId, bool bUnlinkGroup, int iMoveGroup);
+	static void FlattenGroupTree(PW_GROUP* pStorage, PG_TREENODE* pRoot,
+		DWORD dwStorageCount);
+
+#ifdef _DEBUG
+	static void CheckGroupList(CPwManager* pMgr);
+#endif
+
 private:
 	inline static BOOL ConvertStrToHex(char ch1, char ch2, BYTE& bt);
 	inline static void ConvertHexToStr(BYTE bt, char& ch1, char& ch2);
+
+	static boost::shared_ptr<PG_TREENODE> GroupToTreeNode(CPwManager* pMgr,
+		DWORD dwIndex, DWORD& dwAllocCount);
+	static void FlattenGroupTreeInternal(PW_GROUP* pStorage, PG_TREENODE* pRoot,
+		DWORD& dwIndex, DWORD dwStorageCount, USHORT usLevel);
 };
 
 /* class CPwErrorInfo

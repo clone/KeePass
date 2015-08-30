@@ -201,11 +201,11 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 			if((strTitle.IsEmpty() == FALSE) || (strUserName.IsEmpty() == FALSE) ||
 				(strURL.IsEmpty() == FALSE) || (strPassword.IsEmpty() == FALSE))
 			{
-				strTitle.TrimLeft(); strTitle.TrimRight();
-				strURL.TrimLeft(); strURL.TrimRight();
-				strUserName.TrimLeft(); strUserName.TrimRight();
-				strPassword.TrimLeft(); strPassword.TrimRight();
-				strNotes.TrimLeft(); strNotes.TrimRight();
+				strTitle.Trim();
+				strURL.Trim();
+				strUserName.Trim();
+				strPassword.Trim();
+				strNotes.Trim();
 
 				PW_ENTRY pwTemplate;
 				PW_TIME tNow;
@@ -250,7 +250,7 @@ BOOL CPwImport::ImportCWalletToDb(const TCHAR *pszFile, CPwManager *pMgr)
 		if(str.Left(10) == _T("Category: "))
 		{
 			strLastCategory = str.Right(str.GetLength() - 10);
-			strLastCategory.TrimLeft(); strLastCategory.TrimRight();
+			strLastCategory.Trim();
 
 			while(1)
 			{
@@ -375,11 +375,11 @@ BOOL CPwImport::ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr)
 			if((strTitle.IsEmpty() == FALSE) || (strUserName.IsEmpty() == FALSE) ||
 				(strURL.IsEmpty() == FALSE) || (strPassword.IsEmpty() == FALSE))
 			{
-				strTitle.TrimLeft(); strTitle.TrimRight();
-				strURL.TrimLeft(); strURL.TrimRight();
-				strUserName.TrimLeft(); strUserName.TrimRight();
-				strPassword.TrimLeft(); strPassword.TrimRight();
-				strNotes.TrimLeft(); strNotes.TrimRight();
+				strTitle.Trim();
+				strURL.Trim();
+				strUserName.Trim();
+				strPassword.Trim();
+				strNotes.Trim();
 
 				PW_ENTRY pwTemplate;
 				PW_TIME tNow;
@@ -417,7 +417,7 @@ BOOL CPwImport::ImportPVaultToDb(const TCHAR *pszFile, CPwManager *pMgr)
 		{
 			strLastCategory = str.Right(str.GetLength() - 12);
 			strLastCategory = strLastCategory.Left(strLastCategory.GetLength() - 12);
-			strLastCategory.TrimLeft(); strLastCategory.TrimRight();
+			strLastCategory.Trim();
 
 			if(strLastCategory.GetLength() == 0)
 				strLastCategory = TRL("General");

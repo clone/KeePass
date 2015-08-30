@@ -54,7 +54,6 @@ void CEntryListDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEntryListDlg)
-	DDX_Control(pDX, IDC_STATIC_PRODUCTNAME, m_stcProductName);
 	DDX_Control(pDX, IDCANCEL, m_btClose);
 	DDX_Control(pDX, IDC_ENTRYLIST, m_cList);
 	//}}AFX_DATA_MAP
@@ -93,8 +92,6 @@ BOOL CEntryListDlg::OnInitDialog()
 	if(m_nDisplayMode == ELDMODE_LIST) strWindowText = PWM_PRODUCT_NAME;
 	SetWindowText(strWindowText);
 
-	m_stcProductName.SetWindowText(PWM_PRODUCT_NAME);
-
 	m_cList.SetImageList(m_pImgList, LVSIL_SMALL);
 
 	int nColWidth = 160;
@@ -102,17 +99,17 @@ BOOL CEntryListDlg::OnInitDialog()
 
 	if(m_nDisplayMode != ELDMODE_LIST)
 	{
-		aColWidths[0] = nColWidth / 2 + 20;
-		aColWidths[1] = nColWidth - 8;
-		aColWidths[2] = nColWidth - 8;
+		aColWidths[0] = nColWidth / 2 + 37;
+		aColWidths[1] = nColWidth - 8 - 6;
+		aColWidths[2] = nColWidth - 8 - 6;
 		aColWidths[3] = nColWidth / 2;
 		aColWidths[4] = nColWidth / 2;
 	}
 	else
 	{
-		aColWidths[0] = nColWidth / 2 + 25;
-		aColWidths[1] = nColWidth - 8 + 50;
-		aColWidths[2] = nColWidth - 8 + 35;
+		aColWidths[0] = nColWidth / 2 + 37;
+		aColWidths[1] = nColWidth - 8 + 50 - 6;
+		aColWidths[2] = nColWidth - 8 + 35 - 6;
 		aColWidths[3] = 0;
 		aColWidths[4] = 0;
 	}
@@ -150,16 +147,11 @@ BOOL CEntryListDlg::OnInitDialog()
 		rect.top -= 200; rect.bottom -= 200; rect.left -= 80; rect.right -= 80;
 		m_btClose.MoveWindow(&rect);
 
-		m_stcProductName.GetWindowRect(&rect);
-		ScreenToClient(&rect);
-		rect.top -= 200; rect.bottom -= 200;
-		m_stcProductName.MoveWindow(&rect);
-
 		GetWindowRect(&rect);
 		rect.bottom -= 200; rect.right -= 80;
 		MoveWindow(&rect);
 
-		for(i = 0; i < (DWORD)m_vEntryList.size(); i++)
+		for(i = 0; i < static_cast<DWORD>(m_vEntryList.size()); ++i)
 		{
 			p = m_pMgr->GetEntryByUuid(m_vEntryList[i].uuid);
 			if(p == NULL) continue;
@@ -211,6 +203,8 @@ BOOL CEntryListDlg::OnInitDialog()
 
 	if(m_nDisplayMode == ELDMODE_LIST)
 	{
+		NewGUI_SortList(&m_cList);
+
 		if(m_cList.GetItemCount() != 0)
 			m_cList.SetItemState(0, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 
@@ -234,22 +228,19 @@ void CEntryListDlg::OnCancel()
 
 void CEntryListDlg::_AddEntryToList(PW_ENTRY *p, BOOL bExpiredIcon)
 {
-	LV_ITEM lvi;
-	CString strTemp;
 	PW_ENTRY *pwe = p;
-	PW_GROUP *pwg;
-
 	ASSERT(pwe != NULL);
 
-	DWORD dwInsertPos = (DWORD)m_cList.GetItemCount();
+	const DWORD dwInsertPos = (DWORD)m_cList.GetItemCount();
 
+	LV_ITEM lvi;
 	ZeroMemory(&lvi, sizeof(LV_ITEM));
-	lvi.iItem = (int)dwInsertPos;
+	lvi.iItem = static_cast<int>(dwInsertPos);
 	lvi.iSubItem = 0;
-	lvi.iImage = (bExpiredIcon == TRUE) ? 45 : p->uImageId;
+	lvi.iImage = ((bExpiredIcon == TRUE) ? 45 : p->uImageId);
 
 	lvi.mask = LVIF_TEXT | LVIF_IMAGE;
-	pwg = m_pMgr->GetGroupById(pwe->uGroupId);
+	PW_GROUP *pwg = m_pMgr->GetGroupById(pwe->uGroupId);
 	ASSERT(pwg != NULL); if(pwg == NULL) return;
 	lvi.pszText = pwg->pszGroupName;
 
@@ -290,14 +281,15 @@ void CEntryListDlg::_AddEntryToList(PW_ENTRY *p, BOOL bExpiredIcon)
 		m_pMgr->LockEntryPassword(pwe);
 	}
 
-	lvi.iSubItem = 4;
+	CString strTemp;
 	_PwTimeToStringEx(pwe->tExpire, strTemp, CPwSafeDlg::m_bUseLocalTimeFormat);
+	lvi.iSubItem = 4;
 	lvi.pszText = (LPTSTR)(LPCTSTR)strTemp;
 	m_cList.SetItem(&lvi);
 
 	// Ignore m_bShowUUID, the UUID field is needed in all cases
-	lvi.iSubItem = 5;
 	_UuidToString(pwe->uuid, &strTemp);
+	lvi.iSubItem = 5;
 	lvi.pszText = (LPTSTR)(LPCTSTR)strTemp;
 	m_cList.SetItem(&lvi);
 }
@@ -329,7 +321,7 @@ void CEntryListDlg::SaveSelectedEntry()
 	if(bFound == FALSE) return;
 
 	ZeroMemory(&lvi, sizeof(LV_ITEM));
-	lvi.iItem = (int)i;
+	lvi.iItem = static_cast<int>(i);
 	lvi.iSubItem = 5;
 	lvi.mask = LVIF_TEXT;
 	lvi.pszText = tszTemp;

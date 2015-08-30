@@ -54,12 +54,17 @@
 #define SE_XORPAD_SIZE 32
 #endif
 
+class CSecureDropTarget;
+
 class CSecureEditEx : public CEdit
 {
 // Construction
 public:
 	CSecureEditEx();
 	virtual ~CSecureEditEx();
+
+	void InitEx();
+
 	void EnableSecureMode(BOOL bEnable = TRUE);
 	BOOL IsSecureModeEnabled();
 
@@ -82,10 +87,15 @@ private:
 	void _DeleteCharacters(unsigned int uPos, unsigned int uCount);
 	void _EncryptBuffer(BOOL bEncrypt = TRUE);
 
+	BOOL _RegisterDropTarget();
+	void _Paste(LPCTSTR lpSource);
+
 	BOOL m_bSecMode;
 	LPTSTR m_pXorPad;
 	CPtrArray m_apChars;
 	int m_nOldLen;
+
+	CSecureDropTarget* m_pSecDrop;
 
 public:
 	static LPTSTR AllocMemory(size_t uCount);
@@ -110,6 +120,26 @@ protected:
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()
+};
+
+/////////////////////////////////////////////////////////////////////////////
+
+class CSecureDropTarget : public COleDropTarget
+{
+public:
+	CSecureDropTarget(CSecureEditEx* pControl);
+
+private:
+	CSecureEditEx* m_pControl;
+
+protected:
+	// Implement COleDropTarget
+	virtual DROPEFFECT OnDragEnter(CWnd* pWnd, COleDataObject* pDataObject,
+		DWORD dwKeyState, CPoint point);
+	virtual DROPEFFECT OnDragOver(CWnd* pWnd, COleDataObject* pDataObject,
+		DWORD dwKeyState, CPoint point);
+	virtual BOOL OnDrop(CWnd* pWnd, COleDataObject* pDataObject,
+		DROPEFFECT dropEffect, CPoint point);
 };
 
 /////////////////////////////////////////////////////////////////////////////

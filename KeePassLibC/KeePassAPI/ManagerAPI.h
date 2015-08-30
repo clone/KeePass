@@ -77,7 +77,7 @@ KP_SHARE int OpenDatabase(void *pMgr, const TCHAR *pszFile, PWDB_REPAIR_INFO *pR
 KP_SHARE int SaveDatabase(void *pMgr, const TCHAR *pszFile);
 
 // Move entries and groups
-KP_SHARE void MoveInGroup(void *pMgr, DWORD idGroup, DWORD dwFrom, DWORD dwTo);
+KP_SHARE void MoveEntry(void *pMgr, DWORD idGroup, DWORD dwFrom, DWORD dwTo);
 KP_SHARE BOOL MoveGroup(void *pMgr, DWORD dwFrom, DWORD dwTo);
 
 // Sort entry and group lists

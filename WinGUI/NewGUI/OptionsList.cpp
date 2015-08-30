@@ -115,7 +115,7 @@ void COptionsList::SetListItemCheck(int nItem, BOOL bCheck)
 
 	lvi.mask = LVIF_IMAGE;
 	lvi.iItem = nItem;
-	lvi.iImage = (bCheck == TRUE) ? OL_CHECK_TRUE : OL_CHECK_FALSE;
+	lvi.iImage = ((bCheck == TRUE) ? OL_CHECK_TRUE : OL_CHECK_FALSE);
 
 	SetItem(&lvi);
 }
@@ -158,7 +158,7 @@ void COptionsList::AddCheckItem(LPCTSTR lpItemText, BOOL *pValueStorage, BOOL *p
 	lvi.iSubItem = 0;
 	lvi.pszText = (LPTSTR)lpItemText;
 	lvi.cchTextMax = static_cast<int>(_tcslen(lpItemText));
-	lvi.iImage = (*pValueStorage == TRUE) ? OL_CHECK_TRUE : OL_CHECK_FALSE;
+	lvi.iImage = ((*pValueStorage == TRUE) ? OL_CHECK_TRUE : OL_CHECK_FALSE);
 	lvi.iIndent = 1;
 
 	InsertItem(&lvi);
@@ -213,7 +213,7 @@ void COptionsList::ToggleItem(int nItem)
 
 	if(pb != NULL)
 	{
-		*pb = (*pb == TRUE) ? FALSE : TRUE;
+		*pb = ((*pb == TRUE) ? FALSE : TRUE);
 
 		SetListItemCheck(nItem, *pb);
 
@@ -243,7 +243,7 @@ void COptionsList::ToggleItem(int nItem)
 					if(*pb == FALSE) { *pbl = TRUE; SetListItemCheck(n, TRUE); }
 					break;
 				case OL_LINK_INV_TRIGGER_ALWAYS:
-					*pbl = (*pb == TRUE) ? FALSE : TRUE;
+					*pbl = ((*pb == TRUE) ? FALSE : TRUE);
 					SetListItemCheck(n, *pbl);
 					break;
 				default:

@@ -1,3 +1,67 @@
+08/08/14 - 1.12
+- Groups in the group list now behave like folders in Windows
+  Explorer when moving groups/folders (i.e. sub-groups are also
+  moved)
+- Added advanced option to drop to the background when copying
+  data to the clipboard
+- Added auto-type configuration dialog (button 'Auto-Type' in
+  the options dialog, tab page 'Advanced'); this dialog now
+  contains all options related to auto-type
+- The default auto-type sequence can now be configured in the
+  Auto-Type configuration dialog
+- Added option to prepend a special auto-type initialization
+  sequence for Internet Explorer and Maxthon windows to fix a
+  focus issue (option enabled by default)
+- Added field reference creation dialog (accessible through
+  the 'Tools' menu in the entry editing dialog)
+- KeePass now follows field references in indirect auto-type
+  sequence paths
+- Field references are dereferenced when copying data to the
+  clipboard
+- Secure edit controls in the master key and entry dialogs now
+  accept text drops
+- Group names in the entry details view are now clickable;
+  click it to jump to the group of the entry (especially useful
+  for jumping from search results to the real group of an
+  entry)
+- Added documentation about how to customize KeePass (networks)
+- KeePass now shows an explicit file corruption warning message
+  when saving to a file fails
+- KeePass on Windows <= XP now mimics the extended combobox
+  behavior seen on Windows Vista: when pressing a character
+  key, the next string starting with this character is selected
+  (for example a file can be selected in the key files list now
+  by pressing the key corresponding to the drive)
+- Entries in the auto-type entry selection window are now
+  sorted
+
+- The auto-type sequence and auto-type window definition lines
+  are now removed before copying the contents of the notes
+  field to the clipboard, executing an URL and/or auto-typing
+- KeePass recreates the temporary system/account directory, if
+  it has accidently been deleted
+- When using the installation package and Windows Vista,
+  settings are now stored in the user's profile directory
+  (instead of Virtual Store; like on Windows XP and earlier)
+- If the option to remember the last used file is disabled,
+  KeePass now won't remember the last used directory either
+- Entry details view is now cleared when no entry is selected
+- All edit combo boxes can now auto-scroll horizontally
+- When security-critical operations are disabled, the 'unhide'
+  button in the master key dialog is disabled now
+- The read-only flag is not cleared anymore when closing a file
+  (consequently locking will not clear the read-only flag)
+- When deleting a subgroup tree, backup entries of all deleted
+  entries are now created in the 'Backup' group
+- Improved status bar updating on WTS notifications
+- {INSERT} works like {INS} now
+- Various code optimizations
+- Minor installer improvements
+- Minor other improvements
+
+- "User Name" is now translated correctly in TXT exports
+- Referencing passwords of other entries now works correctly
+
 08/04/12 - 1.11
 - Master key transformations (rounds) are now computed in two
   threads; on dual/multi core processors this results in almost

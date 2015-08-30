@@ -143,8 +143,8 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *p
 				SAFE_DELETE_ARRAY(pVirtualFile);
 			}
 
-			return (CPwCompatImpl::OpenDatabaseV2(this, pszFile) != FALSE) ?
-				PWE_SUCCESS : PWE_UNKNOWN;
+			return ((CPwCompatImpl::OpenDatabaseV2(this, pszFile) != FALSE) ?
+				PWE_SUCCESS : PWE_UNKNOWN);
 		}
 		else if(hdr.dwVersion <= 0x00010002)
 		{
@@ -154,8 +154,8 @@ int CPwManager::OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *p
 				SAFE_DELETE_ARRAY(pVirtualFile);
 			}
 			
-			return (CPwCompatImpl::OpenDatabaseV1(this, pszFile) != FALSE) ?
-				PWE_SUCCESS : PWE_UNKNOWN;
+			return ((CPwCompatImpl::OpenDatabaseV1(this, pszFile) != FALSE) ?
+				PWE_SUCCESS : PWE_UNKNOWN);
 		}
 		else { ASSERT(FALSE); _OPENDB_FAIL; }
 	}

@@ -150,8 +150,7 @@ void CPluginsDlg::UpdateGUI()
 
 		lvi.iItem = static_cast<int>(i);
 		lvi.mask = LVIF_TEXT | LVIF_IMAGE;
-
-		lvi.iImage = (p->bEnabled == TRUE) ? 20 : 45;
+		lvi.iImage = ((p->bEnabled == TRUE) ? 20 : 45);
 
 		CString str, strT;
 		strT = p->tszFile;

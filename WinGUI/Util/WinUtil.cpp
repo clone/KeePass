@@ -40,6 +40,7 @@
 #include "../../KeePassLibCpp/Util/TranslateEx.h"
 
 #include <boost/scoped_array.hpp>
+#include <boost/algorithm/string.hpp>
 
 using boost::scoped_array;
 
@@ -56,7 +57,9 @@ static UINT g_uCfIgnoreID = 0; // ID of CFN_CLIPBOARD_VIEWER_IGNORE
 #define CF_TTEXTEX CF_TEXT
 #endif
 
-void CopyStringToClipboard(const TCHAR *lptString)
+// If pReferenceSource is not NULL, lptString will first be dereferenced
+// before being copied to the clipboard
+void CopyStringToClipboard(const TCHAR *lptString, CPwManager *pReferenceSource)
 {
 	if(OpenClipboard(NULL) == FALSE) { ASSERT(FALSE); return; }
 	if(EmptyClipboard() == FALSE) { ASSERT(FALSE); return; }
@@ -67,7 +70,11 @@ void CopyStringToClipboard(const TCHAR *lptString)
 		return;
 	}
 
-	size_t uDataSize = _tcslen(lptString) * sizeof(TCHAR); // Get length
+	CString strData = lptString;
+	if(pReferenceSource != NULL)
+		FillRefPlaceholders(strData, FALSE, FALSE, pReferenceSource, 0);
+
+	size_t uDataSize = static_cast<size_t>(strData.GetLength()) * sizeof(TCHAR);
 	if(uDataSize == 0) // No string to copy => empty clipboard only
 	{
 		CloseClipboard();
@@ -81,13 +88,13 @@ void CopyStringToClipboard(const TCHAR *lptString)
 	if(globalHandle == NULL) { ASSERT(FALSE); CloseClipboard(); return; }
 	LPVOID globalData = GlobalLock(globalHandle);
 	if(globalData == NULL) { ASSERT(FALSE); CloseClipboard(); return; }
-	_tcscpy_s((TCHAR *)globalData, _tcslen(lptString) + 1, lptString); // Copy string plus NULL-byte to global memory
+	_tcscpy_s((TCHAR *)globalData, uDataSize, (LPCTSTR)strData); // Copy string plus NULL-byte to global memory
 	GlobalUnlock(globalHandle); // Unlock before SetClipboardData!
 
 	VERIFY(SetClipboardData(CF_TTEXTEX, globalHandle)); // Set clipboard data to our global memory block
 	VERIFY(CloseClipboard()); // Close clipboard, and done
 
-	RegisterOwnClipboardData((unsigned char *)lptString, uDataSize - sizeof(TCHAR));
+	RegisterOwnClipboardData((unsigned char *)(LPCTSTR)strData, uDataSize - sizeof(TCHAR));
 }
 
 void RegisterOwnClipboardData(unsigned char* pData, unsigned long dwDataSize)
@@ -163,26 +170,30 @@ BOOL MakeClipboardDelayRender(HWND hOwner, HWND *phNextCB)
 	return bResult;
 }
 
-void CopyDelayRenderedClipboardData(const TCHAR *lptString)
+void CopyDelayRenderedClipboardData(const TCHAR *lptString, CPwManager *pReferenceSource)
 {
 	ASSERT(lptString != NULL); if(lptString == NULL) return;
 
 	SetClipboardIgnoreFormat();
 
-	const size_t cch = _tcslen(lptString);
+	CString strData = lptString;
+	if(pReferenceSource != NULL)
+		FillRefPlaceholders(strData, FALSE, FALSE, pReferenceSource, 0);
+
+	const size_t cch = static_cast<size_t>(strData.GetLength());
 	HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE, (cch + 1) * sizeof(TCHAR));
 	ASSERT(hglb != NULL); if(hglb == NULL) return;
 
 	// Copy the text from pboxLocalClip
 	LPTSTR lptstr = (LPTSTR)GlobalLock(hglb);
-	if(cch > 1) memcpy(lptstr, lptString, cch * sizeof(TCHAR));
+	if(cch > 1) memcpy(lptstr, (LPCTSTR)strData, cch * sizeof(TCHAR));
 	lptstr[cch] = (TCHAR)0;
 	GlobalUnlock(hglb);
 
 	// Put the delayed clipboard data in the clipboard.
 	SetClipboardData(CF_TTEXTEX, hglb);
 
-	RegisterOwnClipboardData((unsigned char *)lptString, cch * sizeof(TCHAR));
+	RegisterOwnClipboardData((unsigned char *)(LPCTSTR)strData, cch * sizeof(TCHAR));
 }
 
 void SetClipboardIgnoreFormat()
@@ -311,7 +322,7 @@ BOOL GetRegKeyEx(HKEY hkeyBase, LPCTSTR lpSubKey, LPTSTR lpRetData)
 		VERIFY(RegCloseKey(hkey) == ERROR_SUCCESS);
 	}
 
-	return (lRetVal == ERROR_SUCCESS) ? TRUE : FALSE;
+	return ((lRetVal == ERROR_SUCCESS) ? TRUE : FALSE);
 }
 
 #pragma warning(pop)
@@ -380,7 +391,7 @@ BOOL OpenUrlInNewBrowser(LPCTSTR lpURL)
 		uResult = TWinExec(strExec.c_str(), KPSW_SHOWDEFAULT);
 	}
 
-	return (uResult > 31) ? TRUE : FALSE;
+	return ((uResult > 31) ? TRUE : FALSE);
 }
 
 BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
@@ -420,7 +431,7 @@ BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 		_tcscat_s(tszKey, _countof(tszKey), (LPCTSTR)strURL);
 
 		// Execute the ssh client
-		bResult = (TWinExec(tszKey, KPSW_SHOWDEFAULT) > 31) ? TRUE : FALSE;
+		bResult = ((TWinExec(tszKey, KPSW_SHOWDEFAULT) > 31) ? TRUE : FALSE);
 	}
 	else if(strURL.Find(_T("telnet:")) >= 0)
 	{
@@ -442,7 +453,7 @@ BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 		_tcscat_s(tszKey, _countof(tszKey), strURL.GetBuffer(0));
 
 		// Execute the ssh client
-		bResult = (TWinExec(tszKey, KPSW_SHOWDEFAULT) > 31) ? TRUE : FALSE;
+		bResult = ((TWinExec(tszKey, KPSW_SHOWDEFAULT) > 31) ? TRUE : FALSE);
 	}
 
 	return bResult;
@@ -842,7 +853,7 @@ UINT TWinExec(LPCTSTR lpCmdLine, WORD wCmdShow)
 		CloseHandle(pi.hProcess);
 
 	SAFE_DELETE_ARRAY(lp);
-	return (bResult != FALSE) ? 32 : ERROR_FILE_NOT_FOUND;
+	return ((bResult != FALSE) ? 32 : ERROR_FILE_NOT_FOUND);
 }
 
 BOOL WU_IsWin9xSystem()
@@ -855,7 +866,7 @@ BOOL WU_IsWin9xSystem()
 	return ((osvi.dwMajorVersion <= 4) ? TRUE : FALSE);
 }
 
-BOOL WU_IsWinVistaSystem()
+BOOL WU_IsAtLeastWinVistaSystem()
 {
 	OSVERSIONINFO osvi;
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
@@ -878,22 +889,20 @@ BOOL WU_SupportsMultiLineTooltips()
 
 std::basic_string<TCHAR> WU_GetTempFile(LPCTSTR lpSuffix)
 {
-	TCHAR szDir[MAX_PATH * 2];
-
 	if((lpSuffix == NULL) || (lpSuffix[0] == 0))
 		lpSuffix = _T(".tmp");
 
+	TCHAR szDir[MAX_PATH * 2];
 	GetTempPath(MAX_PATH * 2 - 2, szDir);
 	if(szDir[_tcslen(szDir) - 1] != _T('\\'))
 		_tcscat_s(szDir, _countof(szDir), _T("\\"));
+	VERIFY(WU_CreateDirectoryTree(szDir));
 
+	const DWORD dwOffset = (GetTickCount() << 10);
 	std::basic_string<TCHAR> tszFile;
-	DWORD dwIndex = 0;
-	while(true)
+	for(size_t iTry = 0; iTry < 100; ++iTry)
 	{
-		dwIndex += 13;
-
-		DWORD dwTest = ((DWORD)rand() << 16) + (DWORD)rand() + dwIndex;
+		const DWORD dwTest = dwOffset + rand();
 
 		CString strTest;
 		strTest.Format(_T("%s%s%u%s"), szDir, _T("Tmp"), dwTest, lpSuffix);
@@ -1184,6 +1193,7 @@ std::basic_string<TCHAR> WU_FreeDriveIfCurrent(TCHAR tchDriveLetter)
 
 	TCHAR tszTemp[SI_REGSIZE];
 	if(GetTempPath(SI_REGSIZE - 1, tszTemp) == 0) { ASSERT(FALSE); return strEmpty; }
+	VERIFY(WU_CreateDirectoryTree(tszTemp));
 
 	VERIFY(SetCurrentDirectory(tszTemp));
 	return strDir;
@@ -1262,3 +1272,46 @@ void WU_GetUserApplications(std::vector<AV_APP_INFO>& vStorage)
 		_CallPlugins(KPM_USERAPP_GETNEXT, (LPARAM)&lpDisplay, (LPARAM)&lpPath);
 	}
 }
+
+BOOL WU_CreateDirectoryTree(LPCTSTR lpDirPath)
+{
+	ASSERT(lpDirPath != NULL); if(lpDirPath == NULL) return TRUE;
+
+	std::basic_string<TCHAR> strPath = lpDirPath;
+	std::basic_string<TCHAR> strSeps = _T("/\\");
+	std::vector<std::basic_string<TCHAR> > vDirs;
+	boost::algorithm::split(vDirs, strPath, boost::algorithm::is_any_of(strSeps));
+
+	std::basic_string<TCHAR> strCur;
+	for(size_t i = 0; i < vDirs.size(); ++i)
+	{
+		if(vDirs[i].size() == 0) continue;
+		if(strCur.size() > 0) strCur += _T("\\");
+		strCur += vDirs[i];
+
+		if(strCur[strCur.size() - 1] == _T(':')) continue;
+
+		if((CreateDirectory(strCur.c_str(), NULL) == FALSE) &&
+			(GetLastError() != ERROR_ALREADY_EXISTS))
+			return FALSE;
+	}
+
+	return TRUE;
+}
+
+/* void WU_MouseClick(bool bRightClick)
+{
+	INPUT inputClick;
+
+	ZeroMemory(&inputClick, sizeof(INPUT));
+	inputClick.type = INPUT_MOUSE;
+	inputClick.mi.dwFlags = (bRightClick ? MOUSEEVENTF_RIGHTDOWN : MOUSEEVENTF_LEFTDOWN);
+	inputClick.mi.dwExtraInfo = GetMessageExtraInfo();
+	VERIFY(SendInput(1, &inputClick, sizeof(INPUT)) == 1);
+
+	ZeroMemory(&inputClick, sizeof(INPUT));
+	inputClick.type = INPUT_MOUSE;
+	inputClick.mi.dwFlags = (bRightClick ? MOUSEEVENTF_RIGHTUP : MOUSEEVENTF_LEFTUP);
+	inputClick.mi.dwExtraInfo = GetMessageExtraInfo();
+	VERIFY(SendInput(1, &inputClick, sizeof(INPUT)) == 1);
+} */

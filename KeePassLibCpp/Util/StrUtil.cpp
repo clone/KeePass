@@ -23,7 +23,9 @@
 #include "AppUtil.h"
 #include "MemUtil.h"
 
+#ifndef _WIN32_WCE
 #include <boost/algorithm/string.hpp>
+#endif
 
 // Securely erase a CString object
 void EraseCString(CString *pString)
@@ -182,33 +184,34 @@ C_FN_SHARE void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid)
 	ASSERT(_tcslen(ptszSource) == 32);
 	if(_tcslen(ptszSource) != 32) return;
 
-	TCHAR ch;
-	BYTE bt;
-	DWORD i;
-	for(i = 0; i < 16; i++)
+	for(DWORD i = 0; i < 16; ++i)
 	{
-		ch = ptszSource[i << 1];
+		TCHAR ch = ptszSource[i << 1];
 
+		BYTE bt;
 		if((ch >= _T('0')) && (ch <= _T('9')))
-			bt = (BYTE)(ch - _T('0'));
+			bt = static_cast<BYTE>(ch - _T('0'));
 		else
-			bt = (BYTE)(ch - _T('a') + 0x0A);
+			bt = static_cast<BYTE>(ch - _T('a') + 0x0A);
 		ASSERT(bt < 0x10);
 		bt <<= 4;
 
 		ch = ptszSource[(i << 1) + 1];
 
 		if((ch >= _T('0')) && (ch <= _T('9')))
-			bt |= (BYTE)(ch - _T('0'));
+			bt |= static_cast<BYTE>(ch - _T('0'));
 		else
-			bt |= (BYTE)(ch - _T('a') + 0x0A);
+			bt |= static_cast<BYTE>(ch - _T('a') + 0x0A);
 
 		pUuid[i] = bt;
 	}
 }
 
+// If pReferenceSource is not NULL, it'll be used to dereference
+// lpReplaceWith before replacing lpFind
 BOOL SeqReplace(CString& str, LPCTSTR lpFind, LPCTSTR lpReplaceWith,
-	BOOL bMakeSimString, BOOL bCmdQuotes, BOOL bRemoveMeta)
+	BOOL bMakeSimString, BOOL bCmdQuotes, BOOL bRemoveMeta, PW_ENTRY* peEntryInfo,
+	CPwManager* pReferenceSource, DWORD dwRecursionLevel)
 {
 	ASSERT(lpFind != NULL); if(lpFind == NULL) return FALSE;
 	ASSERT(lpReplaceWith != NULL); if(lpReplaceWith == NULL) return FALSE;
@@ -226,14 +229,30 @@ BOOL SeqReplace(CString& str, LPCTSTR lpFind, LPCTSTR lpReplaceWith,
 		const int nStrLen = str.GetLength();
 
 		CString strTemp = lpReplaceWith;
-		if(bRemoveMeta == TRUE) strTemp = CsRemoveMeta(&strTemp);
+		bool bDoFilter = true;
 
-		if(bMakeSimString == FALSE)
+		if((pReferenceSource != NULL) && (strTemp.GetLength() > 0))
 		{
-			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
+			CString strInner = strTemp;
+			ParseURL(&strInner, peEntryInfo, bMakeSimString, bCmdQuotes, pReferenceSource,
+				dwRecursionLevel + 1);
 
-			str = str.Left(nPos) + strTemp + str.Right(nStrLen - nPos - nFindLen);
+			if(strInner != strTemp)
+			{
+				strTemp = strInner;
+				bDoFilter = false;
+			}
 		}
+
+		if(bDoFilter)
+		{
+			if(bRemoveMeta == TRUE) strTemp = CsRemoveMeta(&strTemp);
+
+			if(bCmdQuotes == TRUE) strTemp.Replace(_T("\""), _T("\"\"\""));
+		}
+
+		if((bMakeSimString == FALSE) || (bDoFilter == false))
+			str = str.Left(nPos) + strTemp + str.Right(nStrLen - nPos - nFindLen);
 		else
 			str = str.Left(nPos) + TagSimString(strTemp) + str.Right(nStrLen -
 				nPos - nFindLen);
@@ -261,17 +280,25 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 	{
 		BOOL b = FALSE;
 
-		b |= SeqReplace(str, _T("{TITLE}"), pEntry->pszTitle, bMakeSimString, bCmdQuotes, FALSE);
-		b |= SeqReplace(str, _T("{USERNAME}"), pEntry->pszUserName, bMakeSimString, bCmdQuotes, FALSE);
-		b |= SeqReplace(str, _T("{URL}"), pEntry->pszURL, bMakeSimString, bCmdQuotes, FALSE);
+		b |= SeqReplace(str, _T("{TITLE}"), pEntry->pszTitle, bMakeSimString,
+			bCmdQuotes, FALSE, pEntry, pDataSource, dwRecursionLevel);
+		b |= SeqReplace(str, _T("{USERNAME}"), pEntry->pszUserName, bMakeSimString,
+			bCmdQuotes, FALSE, pEntry, pDataSource, dwRecursionLevel);
+		b |= SeqReplace(str, _T("{URL}"), pEntry->pszURL, bMakeSimString,
+			bCmdQuotes, FALSE, pEntry, pDataSource, dwRecursionLevel);
 
 		pDataSource->UnlockEntryPassword(pEntry);
-		b |= SeqReplace(str, _T("{PASSWORD}"), pEntry->pszPassword, bMakeSimString, bCmdQuotes, FALSE);
+		b |= SeqReplace(str, _T("{PASSWORD}"), pEntry->pszPassword, bMakeSimString,
+			bCmdQuotes, FALSE, pEntry, pDataSource, dwRecursionLevel);
 		pDataSource->LockEntryPassword(pEntry);
 
-		b |= SeqReplace(str, _T("{NOTES}"), pEntry->pszAdditional, bMakeSimString, bCmdQuotes, FALSE);
+		CString strNotes = ((pEntry->pszAdditional != NULL) ? pEntry->pszAdditional : _T(""));
+		strNotes = CsRemoveMeta(&strNotes);
+		b |= SeqReplace(str, _T("{NOTES}"), strNotes, bMakeSimString,
+			bCmdQuotes, FALSE, pEntry, pDataSource, dwRecursionLevel);
 
-		b |= SeqReplace(str, _T("{APPDIR}"), &tszBufP[0], bMakeSimString, bCmdQuotes, FALSE);
+		b |= SeqReplace(str, _T("{APPDIR}"), &tszBufP[0], bMakeSimString,
+			bCmdQuotes, FALSE, NULL, NULL, dwRecursionLevel); // {APPDIR} can't contain reference
 
 		str.Replace(_T("{CLEARFIELD}"), _T("{DELAY 150}{HOME}(+{END}){DEL}{DELAY 150}"));
 
@@ -287,7 +314,7 @@ void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString, BOOL bCmd
 
 		for(int nPos = 0; nPos < strSourceCopy.GetLength(); ++nPos)
 		{
-			unsigned char uch = static_cast<unsigned char>(strSourceCopy.GetAt(nPos));
+			const unsigned char uch = static_cast<unsigned char>(strSourceCopy.GetAt(nPos));
 
 			if(uch > 0x7E)
 			{
@@ -361,8 +388,17 @@ BOOL FillRefPlaceholders(CString& str, BOOL bMakeSimString, BOOL bCmdQuotes,
 			if(tchWanted == _T('T')) strInsData = pFound->pszTitle;
 			else if(tchWanted == _T('U')) strInsData = pFound->pszUserName;
 			else if(tchWanted == _T('A')) strInsData = pFound->pszURL;
-			else if(tchWanted == _T('P')) strInsData = pFound->pszPassword;
-			else if(tchWanted == _T('N')) strInsData = pFound->pszAdditional;
+			else if(tchWanted == _T('P'))
+			{
+				pDataSource->UnlockEntryPassword(pFound);
+				strInsData = pFound->pszPassword;
+				pDataSource->LockEntryPassword(pFound);
+			}
+			else if(tchWanted == _T('N'))
+			{
+				CString strNotes = pFound->pszAdditional;
+				strInsData = CsRemoveMeta(&strNotes);
+			}
 			else if(tchWanted == _T('I')) _UuidToString(pFound->uuid, &strInsData);
 			else break;
 
@@ -417,19 +453,15 @@ CString CsRemoveMeta(CString *psString)
 
 CString CsFileOnly(const CString *psFilePath)
 {
-	CString str;
-	int i, j, k;
-
 	ASSERT(psFilePath != NULL); if(psFilePath == NULL) return CString("");
 
-	i = psFilePath->ReverseFind(_T('\\'));
-	j = psFilePath->ReverseFind(_T('/'));
-	k = (i > j) ? i : j;
+	const int i = psFilePath->ReverseFind(_T('\\'));
+	const int j = psFilePath->ReverseFind(_T('/'));
+	const int k = ((i > j) ? i : j);
 
-	if(k <= -1) str = *psFilePath;
-	else str = psFilePath->Right(psFilePath->GetLength() - k - 1);
-
-	return str;
+	if(k <= -1) return *psFilePath;
+	
+	return psFilePath->Right(psFilePath->GetLength() - k - 1);
 }
 
 #define LOCAL_NUMXMLCONV 7
@@ -567,7 +599,7 @@ CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart,
 		}
 	}
 
-	str.TrimLeft(); str.TrimRight();
+	str.Trim();
 	return str;
 }
 
@@ -663,8 +695,7 @@ void RemoveAcceleratorTip(CString *pString)
 
 	pString->Remove(_T('&'));
 
-	pString->TrimLeft();
-	pString->TrimRight();
+	pString->Trim();
 }
 
 // Assumes that lpSearch is lower-case when bCaseSensitive == FALSE
@@ -703,6 +734,7 @@ bool StrMatchText(LPCTSTR lpEntryData, LPCTSTR lpSearch,
 	return (_tcsstr(lpEntryData, lpSearch) != NULL);
 }
 
+#ifndef _WIN32_WCE
 std::basic_string<TCHAR> GetQuotedAppPath(const std::basic_string<TCHAR>& strPath)
 {
 	std::basic_string<TCHAR> str = strPath;
@@ -721,6 +753,7 @@ std::basic_string<TCHAR> GetQuotedAppPath(const std::basic_string<TCHAR>& strPat
 
 	return str.substr(iStart + 1, iEnd - iStart - 1);
 }
+#endif
 
 WCharStream::WCharStream(LPCWSTR lpData)
 {

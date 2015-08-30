@@ -219,7 +219,7 @@ void CNewRandom::GetRandomBuffer(__out_bcount(dwSize) BYTE *pBuf, DWORD dwSize)
 		sha256_hash((BYTE *)&m_dwCounter, 4, &hashctx);
 		sha256_end(aTemp, &hashctx);
 
-		dw = (dwSize < 32) ? dwSize : 32;
+		dw = ((dwSize < 32) ? dwSize : 32);
 		memcpy(pBuf, aTemp, dw);
 		pBuf += dw;
 		dwSize -= dw;

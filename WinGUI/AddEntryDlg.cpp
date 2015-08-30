@@ -21,10 +21,11 @@
 #include "PwSafe.h"
 #include "PwSafeDlg.h"
 #include "AddEntryDlg.h"
-
+#include "FieldRefDlg.h"
 #include "IconPickerDlg.h"
 #include "PwGeneratorExDlg.h"
 #include "SingleLineEditDlg.h"
+
 #include "../KeePassLibCpp/Util/MemUtil.h"
 #include "../KeePassLibCpp/Util/StrUtil.h"
 #include "NewGUI/NewGUICommon.h"
@@ -97,8 +98,8 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RE_NOTES, m_reNotes);
 	DDX_Text(pDX, IDC_EDIT_ATTACHMENT, m_strAttachment);
 	DDX_Check(pDX, IDC_CHECK_EXPIRES, m_bExpires);
-	//}}AFX_DATA_MAP
 	DDX_Control(pDX, IDC_COMBO_URL, m_cmbUrl);
+	//}}AFX_DATA_MAP
 }
 
 BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
@@ -142,6 +143,11 @@ BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	ON_COMMAND(ID_URLFIELD_INS_FIREFOX, &CAddEntryDlg::OnUrlFieldInsFirefox)
 	ON_COMMAND(ID_URLFIELD_INS_OPERA, &CAddEntryDlg::OnUrlFieldInsOpera)
 	ON_COMMAND(ID_POPUP_AUTOTYPE_SELTARGET, &CAddEntryDlg::OnAutoTypeSelectTargetWindow)
+	ON_COMMAND(ID_INSERTFIELDREFERENCE_INTITLEFIELD, &CAddEntryDlg::OnInsertFieldReferenceInTitleField)
+	ON_COMMAND(ID_INSERTFIELDREFERENCE_INUSERNAMEFIELD, &CAddEntryDlg::OnInsertFieldReferenceInUserNameField)
+	ON_COMMAND(ID_INSERTFIELDREFERENCE_INPASSWORDFIELD, &CAddEntryDlg::OnInsertFieldReferenceInPasswordField)
+	ON_COMMAND(ID_INSERTFIELDREFERENCE_INURLFIELD, &CAddEntryDlg::OnInsertFieldReferenceInUrlField)
+	ON_COMMAND(ID_INSERTFIELDREFERENCE_INNOTESFIELD, &CAddEntryDlg::OnInsertFieldReferenceInNotesField)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -163,6 +169,9 @@ BOOL CAddEntryDlg::OnInitDialog()
 	m_fSymbol.CreateFont(-13, 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, CPwSafeApp::GetPasswordFont());
+
+	m_pEditPw.InitEx();
+	m_pRepeatPw.InitEx();
 
 	if(m_bStars == FALSE)
 	{
@@ -1251,6 +1260,65 @@ void CAddEntryDlg::UrlToCombo(bool bGuiToInternals)
 			m_cmbUrl.SetWindowText(strPath);
 		}
 	}
+}
+
+CString CAddEntryDlg::GetEntryFieldRef()
+{
+	CFieldRefDlg dlg;
+	dlg.InitEx(m_pMgr, m_pParentIcons);
+
+	if(dlg.DoModal() == IDOK) return dlg.m_strFieldRef;
+	return CString();
+}
+
+void CAddEntryDlg::OnInsertFieldReferenceInTitleField()
+{
+	UpdateData(TRUE);
+	m_strTitle += GetEntryFieldRef();
+	UpdateData(FALSE);
+}
+
+void CAddEntryDlg::OnInsertFieldReferenceInUserNameField()
+{
+	UpdateData(TRUE);
+	m_strUserName += GetEntryFieldRef();
+	UpdateData(FALSE);
+}
+
+void CAddEntryDlg::OnInsertFieldReferenceInPasswordField()
+{
+	LPTSTR lpPw = m_pEditPw.GetPassword();
+	LPTSTR lpRe = m_pRepeatPw.GetPassword();
+
+	CString strNew = GetEntryFieldRef();
+	CString strPw = CString(lpPw) + strNew;
+	CString strRe = CString(lpRe) + strNew;
+
+	m_pEditPw.SetPassword(strPw);
+	m_pRepeatPw.SetPassword(strRe);
+
+	EraseCString(&strPw);
+	EraseCString(&strRe);
+	CSecureEditEx::DeletePassword(lpPw);
+	CSecureEditEx::DeletePassword(lpRe);
+}
+
+void CAddEntryDlg::OnInsertFieldReferenceInUrlField()
+{
+	UpdateData(TRUE);
+	m_strURL += GetEntryFieldRef();
+	UpdateData(FALSE);
+}
+
+void CAddEntryDlg::OnInsertFieldReferenceInNotesField()
+{
+	CString str;
+	m_reNotes.GetWindowText(str);
+
+	CString strNew = GetEntryFieldRef();
+
+	if(str.GetLength() > 0) m_reNotes.SetWindowText(str + CString(_T("\r\n")) + strNew);
+	else m_reNotes.SetWindowText(strNew);
 }
 
 #pragma warning(pop)

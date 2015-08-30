@@ -784,42 +784,50 @@ BOOL CPwManager::DeleteEntry(DWORD dwIndex)
 	return TRUE;
 }
 
-BOOL CPwManager::DeleteGroupById(DWORD uGroupId)
+BOOL CPwManager::DeleteGroupById(DWORD uGroupId, BOOL bCreateBackupEntries)
 {
-	DWORD i = 0, inx;
-	PW_ENTRY *p;
-
 	ASSERT(GetGroupById(uGroupId) != NULL);
 
-	if(m_dwNumEntries != 0)
+	const DWORD dwInvGroup1 = this->GetGroupId(PWS_BACKUPGROUP);
+	const DWORD dwInvGroup2 = this->GetGroupId(PWS_BACKUPGROUP_SRC);
+
+	DWORD i = 0;
+	if(m_dwNumEntries > 0)
 	{
 		while(1) // Remove all items in that group
 		{
-			p = &m_pEntries[i];
+			PW_ENTRY* p = &m_pEntries[i];
 			if(p->uGroupId == uGroupId)
 			{
-				VERIFY(DeleteEntry(i));
-				i--;
+				if((bCreateBackupEntries != FALSE) && (p->uGroupId != dwInvGroup1) &&
+					(p->uGroupId != dwInvGroup2))
+				{
+					this->UnlockEntryPassword(p);
+					VERIFY(this->BackupEntry(p, NULL) == TRUE);
+					this->LockEntryPassword(p);
+				}
+
+				VERIFY(this->DeleteEntry(i));
+				--i;
 			}
 
-			i++;
-			if(i >= m_dwNumEntries) break;
+			if(++i >= m_dwNumEntries) break;
 		}
 	}
 
-	inx = GetGroupByIdN(uGroupId);
+	const DWORD inx = GetGroupByIdN(uGroupId);
 	SAFE_DELETE_ARRAY(m_pGroups[inx].pszGroupName);
 
 	if(inx != (m_dwNumGroups - 1))
 	{
-		for(i = inx; i < (m_dwNumGroups - 1); i++)
+		for(i = inx; i < (m_dwNumGroups - 1); ++i)
 		{
 			m_pGroups[i] = m_pGroups[i + 1];
 		}
 	}
 
 	mem_erase((unsigned char *)&m_pGroups[m_dwNumGroups - 1], sizeof(PW_GROUP));
-	m_dwNumGroups--;
+	--m_dwNumGroups;
 
 	FixGroupTree();
 	return TRUE;
@@ -916,12 +924,10 @@ void CPwManager::LockEntryPassword(__inout_ecount(1) PW_ENTRY *pEntry)
 
 void CPwManager::UnlockEntryPassword(__inout_ecount(1) PW_ENTRY *pEntry)
 {
-	ASSERT_ENTRY(pEntry);
-	LockEntryPassword(pEntry); // OFB encryption mode
+	LockEntryPassword(pEntry);
 
 #ifdef _DEBUG
-	unsigned int i;
-	for(i = 0; i < pEntry->uPasswordLen; ++i)
+	for(DWORD i = 0; i < pEntry->uPasswordLen; ++i)
 	{
 		ASSERT(pEntry->pszPassword[i] != 0);
 	}
@@ -1071,37 +1077,83 @@ void CPwManager::MoveInternal(DWORD dwFrom, DWORD dwTo)
 
 BOOL CPwManager::MoveGroup(DWORD dwFrom, DWORD dwTo)
 {
-	LONG i, dir;
-
 	ASSERT((dwFrom != DWORD_MAX) && (dwTo != DWORD_MAX));
-
 	if(dwFrom == dwTo) return TRUE;
-	if(dwFrom >= m_dwNumGroups) return FALSE;
-	if(dwTo >= m_dwNumGroups) return FALSE;
+	if((dwFrom >= m_dwNumGroups) || (dwTo >= m_dwNumGroups)) return FALSE;
 
 	// Set moving direction
-	if(dwFrom < dwTo) dir = 1;
-	else dir = -1;
+	const LONG lDir = ((dwFrom < dwTo) ? 1 : -1);
 
-	i = (LONG)dwFrom;
-
+	LONG i = static_cast<LONG>(dwFrom);
 	while(true)
 	{
-		if(i == (LONG)dwTo) break;
+		if(i == static_cast<LONG>(dwTo)) break;
 
-		PW_GROUP pg = m_pGroups[i];
-		m_pGroups[i] = m_pGroups[i + dir];
-		m_pGroups[i + dir] = pg;
+		PW_GROUP g = m_pGroups[i];
+		m_pGroups[i] = m_pGroups[i + lDir];
+		m_pGroups[i + lDir] = g;
 
-		i += dir;
+		i += lDir;
 	}
 
 	FixGroupTree();
-
 	return TRUE;
 }
 
-void CPwManager::MoveInGroup(DWORD idGroup, DWORD dwFrom, DWORD dwTo)
+BOOL CPwManager::MoveGroupEx(DWORD dwFromId, DWORD dwToId)
+{
+	ASSERT((dwFromId != DWORD_MAX) && (dwToId != DWORD_MAX));
+	if((dwFromId == DWORD_MAX) || (dwToId == DWORD_MAX)) return FALSE;
+	ASSERT((dwFromId != 0) && (dwToId != 0));
+	if((dwFromId == 0) || (dwToId == 0)) return FALSE;
+	if(dwFromId == dwToId) return TRUE;
+
+	PW_GROUP* pgFrom = GetGroupById(dwFromId);
+	PW_GROUP* pgTo = GetGroupById(dwToId);
+	if((pgFrom == NULL) || (pgTo == NULL)) { ASSERT(FALSE); return FALSE; }
+
+	PG_TREENODE tnRoot = CPwUtil::GroupsToTree(this);
+
+	boost::shared_ptr<PG_TREENODE> pFrom = CPwUtil::FindGroupInTree(&tnRoot,
+		dwFromId, false, 0);
+	boost::shared_ptr<PG_TREENODE> pTo = CPwUtil::FindGroupInTree(&tnRoot,
+		dwToId, false, 0);
+	if((pFrom.get() == NULL) || (pTo.get() == NULL)) { ASSERT(FALSE); return FALSE; }
+
+	boost::shared_ptr<PG_TREENODE> pIsSub = CPwUtil::FindGroupInTree(pFrom.get(),
+		dwToId, false, 0);
+	if(pIsSub.get() != NULL) return FALSE;
+
+	// Now move
+	pFrom = CPwUtil::FindGroupInTree(&tnRoot, dwFromId, true, 0); // Unlink
+	pTo->vChildNodes.push_back(pFrom);
+
+	CPwUtil::FlattenGroupTree(m_pGroups, &tnRoot, m_dwNumGroups);
+#ifdef _DEBUG
+	CPwUtil::CheckGroupList(this);
+#endif
+	return TRUE;
+}
+
+BOOL CPwManager::MoveGroupExDir(DWORD dwGroupId, INT iDirection)
+{
+	ASSERT((dwGroupId != 0) && (dwGroupId != DWORD_MAX));
+	if((dwGroupId == 0) || (dwGroupId == DWORD_MAX)) return FALSE;
+
+	PG_TREENODE tnRoot = CPwUtil::GroupsToTree(this);
+
+	boost::shared_ptr<PG_TREENODE> p = CPwUtil::FindGroupInTree(&tnRoot,
+		dwGroupId, false, iDirection);
+	if(p.get() == NULL) { ASSERT(FALSE); return FALSE; }
+
+	CPwUtil::FlattenGroupTree(m_pGroups, &tnRoot, m_dwNumGroups);
+#ifdef _DEBUG
+	CPwUtil::CheckGroupList(this);
+#endif
+	return TRUE;
+}
+
+void CPwManager::MoveEntry(DWORD idGroup, DWORD dwFrom, DWORD dwTo)
 {
 	if((dwFrom >= m_dwNumEntries) || (dwFrom == DWORD_MAX)) return;
 	if((dwTo >= m_dwNumEntries) || (dwTo == DWORD_MAX)) return;
@@ -1511,17 +1563,14 @@ DWORD CPwManager::DeleteLostEntries()
 BOOL CPwManager::BackupEntry(__in_ecount(1) const PW_ENTRY *pe,
 	__out_opt BOOL *pbGroupCreated)
 {
-	PW_ENTRY pwe;
-	PW_GROUP pwg;
-	DWORD dwGroupId;
-
 	ASSERT_ENTRY(pe); if(pe == NULL) return FALSE;
 
 	if(pbGroupCreated != NULL) *pbGroupCreated = FALSE;
 
-	dwGroupId = GetGroupId(PWS_BACKUPGROUP);
+	DWORD dwGroupId = GetGroupId(PWS_BACKUPGROUP);
 	if(dwGroupId == DWORD_MAX)
 	{
+		PW_GROUP pwg;
 		ZeroMemory(&pwg, sizeof(PW_GROUP));
 		pwg.pszGroupName = (TCHAR *)PWS_BACKUPGROUP;
 		_GetCurrentPwTime(&pwg.tCreation);
@@ -1536,7 +1585,7 @@ BOOL CPwManager::BackupEntry(__in_ecount(1) const PW_ENTRY *pe,
 	}
 	if(dwGroupId == DWORD_MAX) return FALSE;
 
-	pwe = *pe;
+	PW_ENTRY pwe = *pe;
 	_GetCurrentPwTime(&pwe.tLastMod);
 	pwe.uGroupId = dwGroupId;
 	ZeroMemory(&pwe.uuid, 16); // Create new UUID for the backup entry
@@ -1816,7 +1865,7 @@ void CPwManager::MergeIn(__inout_ecount(1) CPwManager *pDataSource,
 				}
 
 				pgSource->uGroupId = dwOldId;
-				VERIFY(DeleteGroupById(dwNewId) == TRUE);
+				VERIFY(DeleteGroupById(dwNewId, FALSE) == TRUE);
 			}
 		}
 		else // bCreateNewUUIDs == FALSE

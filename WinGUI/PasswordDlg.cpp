@@ -95,6 +95,8 @@ BOOL CPasswordDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 	ASSERT(m_bOnce == FALSE);
 
+	m_bStarsMask = ((CPwSafeDlg::m_bDisableUnsafeAtStart == TRUE) ? FALSE : TRUE);
+
 	if(m_bLoadMode == TRUE)
 		ModifyStyleEx(WS_EX_APPWINDOW, WS_EX_APPWINDOW); // Show in taskbar
 
@@ -118,6 +120,8 @@ BOOL CPasswordDlg::OnInitDialog()
 	NewGUI_XPButton(m_btCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_XPButton(m_btHelp, IDB_HELP_SMALL, IDB_HELP_SMALL);
 	NewGUI_XPButton(m_btStars, -1, -1);
+
+	m_pEditPw.InitEx();
 
 	m_btStars.SetFont(&m_fSymbol, TRUE);
 	m_pEditPw.SetFont(&m_fSymbol, TRUE);
@@ -386,11 +390,11 @@ BOOL CPasswordDlg::OnInitDialog()
 
 		m_bKeyMethod = TRUE;
 		UpdateData(FALSE);
-		EnableClientWindows();
 	}
 
 	PerformMiniModeAdjustments();
 
+	EnableClientWindows();
 	m_pEditPw.SetFocus();
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
@@ -689,15 +693,15 @@ void CPasswordDlg::EnableClientWindows()
 {
 	UpdateData(TRUE);
 
-	int nPwLength = m_pEditPw.GetWindowTextLength();
-	int nComboSel = m_cbDiskList.GetCurSel();
+	const int nPwLength = m_pEditPw.GetWindowTextLength();
+	const int nComboSel = m_cbDiskList.GetCurSel();
 
 	if(m_bKeyMethod == PWM_KEYMETHOD_OR)
 	{
 		if(nPwLength != 0)
 		{
 			m_btBrowseKeyFile.EnableWindow(FALSE);
-			m_btStars.EnableWindow(TRUE);
+			m_btStars.EnableWindow(TRUE & m_bStarsMask);
 			m_pEditPw.EnableWindow(TRUE);
 			m_cbDiskList.EnableWindow(FALSE);
 			return;
@@ -713,7 +717,7 @@ void CPasswordDlg::EnableClientWindows()
 	}
 
 	m_btBrowseKeyFile.EnableWindow(TRUE);
-	m_btStars.EnableWindow(TRUE);
+	m_btStars.EnableWindow(TRUE & m_bStarsMask);
 	m_pEditPw.EnableWindow(TRUE);
 	m_cbDiskList.EnableWindow(TRUE);
 

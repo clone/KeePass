@@ -190,6 +190,8 @@ BOOL CPwGeneratorExDlg::OnInitDialog()
 		m_banner.SetCaption(TRL("Here you can generate a random password."));
 	}
 
+	m_cEditPw.InitEx();
+
 	CFont* pDialogFont = m_rbCharSetBased.GetFont();
 
 	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
@@ -345,7 +347,7 @@ void CPwGeneratorExDlg::UpdateDialogDataEx(BOOL bDialogToInternal,
 	{
 		pSettings->strName = (LPCTSTR)GetCurrentGenProfile();
 
-		bool bCharSetBased = (m_rbCharSetBased.GetCheck() == BST_CHECKED);
+		const bool bCharSetBased = (m_rbCharSetBased.GetCheck() == BST_CHECKED);
 
 		pSettings->btGeneratorType = (bCharSetBased ? PWGT_CHARSET :
 			PWGT_PATTERN);
@@ -464,7 +466,7 @@ void CPwGeneratorExDlg::EnableControlsEx(BOOL bSelectCustom)
 	ENSURE_ENABLED_STATE(m_stcCustomCharSet, bCharSetBased);
 	ENSURE_ENABLED_STATE(m_tbCustomCharSet, bCharSetBased);
 
-	BOOL bPattern = (bCharSetBased == TRUE) ? FALSE : TRUE;
+	BOOL bPattern = ((bCharSetBased == TRUE) ? FALSE : TRUE);
 
 	ENSURE_ENABLED_STATE(m_tbPattern, bPattern);
 	ENSURE_ENABLED_STATE(m_cbPatternPermute, bPattern);

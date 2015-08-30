@@ -36,11 +36,11 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.11")
+#define PWM_VERSION_STR  _T("1.12")
 #else
-#define PWM_VERSION_STR  _T("1.11 Unicode")
+#define PWM_VERSION_STR  _T("1.12 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01010100
+#define PWM_VERSION_DW   0x01010200
 
 // Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
@@ -68,6 +68,7 @@
 #define PWM_HELP_PWGEN     _T("help/base/pwgenerator.html")
 #define PWM_HELP_PWGEN_ADV _T("help/base/pwgenerator.html#secreduc")
 #define PWM_HELP_CSV       _T("help/base/importexport.html#csv")
+#define PWM_HELP_FIELDREFS _T("help/base/fieldrefs.html")
 
 #define PWMKEY_LANG       _T("KeeLanguage")
 #define PWMKEY_CLIPSECS   _T("KeeClipboardSeconds")
@@ -171,6 +172,8 @@
 #define PWMKEY_MASTERPW_MINLEN  _T("KeeMasterPasswordMinLength")
 #define PWMKEY_MASTERPW_MINQUALITY _T("KeeMasterPasswordMinQuality")
 #define PWMKEY_FOCUSRESAFTERQUICKFIND _T("KeeFocusResultsAfterQuickFind")
+#define PWMKEY_AUTOTYPEIEFIX    _T("KeeAutoTypeIEFix")
+#define PWMKEY_DROPTOBACKONCOPY _T("KeeDropToBackOnCopy")
 
 #define PWMKEY_GENPROFILE       _T("KeeGenProfile")
 #define PWMKEY_GENPROFILEAUTO   _T("KeeGenProfileAuto")
@@ -226,44 +229,47 @@
 
 // Search flags
 // These flags must be disjoint to PWMF_* flags
-#define PWMS_REGEX      0x10000000
+#define PWMS_REGEX       0x10000000
 
-#define PWGF_EXPANDED   1
+// Group flags (dwFlags field of PW_GROUP)
+#define PWGF_EXPANDED    1
+#define PWGF_TEMP_BIT    0x40000000
 
-#define ALGO_AES        0
-#define ALGO_TWOFISH    1
+#define ALGO_AES         0
+#define ALGO_TWOFISH     1
 
 // Error codes
-#define PWE_UNKNOWN                0
-#define PWE_SUCCESS                1
-#define PWE_INVALID_PARAM          2
-#define PWE_NO_MEM                 3
-#define PWE_INVALID_KEY            4
-#define PWE_NOFILEACCESS_READ      5
-#define PWE_NOFILEACCESS_WRITE     6
-#define PWE_FILEERROR_READ         7 
-#define PWE_FILEERROR_WRITE        8
-#define PWE_INVALID_RANDOMSOURCE   9
-#define PWE_INVALID_FILESTRUCTURE 10
-#define PWE_CRYPT_ERROR           11
-#define PWE_INVALID_FILESIZE      12
-#define PWE_INVALID_FILESIGNATURE 13
-#define PWE_INVALID_FILEHEADER    14
-#define PWE_NOFILEACCESS_READ_KEY 15
-#define PWE_KEYPROV_INVALID_KEY   16
-#define PWE_FILEERROR_VERIFY      17
+#define PWE_UNKNOWN                 0
+#define PWE_SUCCESS                 1
+#define PWE_INVALID_PARAM           2
+#define PWE_NO_MEM                  3
+#define PWE_INVALID_KEY             4
+#define PWE_NOFILEACCESS_READ       5
+#define PWE_NOFILEACCESS_WRITE      6
+#define PWE_FILEERROR_READ          7 
+#define PWE_FILEERROR_WRITE         8
+#define PWE_INVALID_RANDOMSOURCE    9
+#define PWE_INVALID_FILESTRUCTURE  10
+#define PWE_CRYPT_ERROR            11
+#define PWE_INVALID_FILESIZE       12
+#define PWE_INVALID_FILESIGNATURE  13
+#define PWE_INVALID_FILEHEADER     14
+#define PWE_NOFILEACCESS_READ_KEY  15
+#define PWE_KEYPROV_INVALID_KEY    16
+#define PWE_FILEERROR_VERIFY       17
 
-// Format Flags
-#define PWFF_NO_INTRO              1
-#define PWFF_INVKEY_WITH_CODE      2
+// Format flags
+#define PWFF_NO_INTRO               1
+#define PWFF_INVKEY_WITH_CODE       2
+#define PWFF_DATALOSS_WITHOUT_SAVE  0x4000
 
 // Property IDs
-#define PWP_DEFAULT_USER_NAME      1
+#define PWP_DEFAULT_USER_NAME       1
 
 // Array property IDs
-#define PWPA_SEARCH_HISTORY        1
+#define PWPA_SEARCH_HISTORY         1
 
-// Password Meta Streams
+// Password meta streams
 #define PMS_ID_BINDESC  _T("bin-stream")
 #define PMS_ID_TITLE    _T("Meta-Info")
 #define PMS_ID_USER     _T("SYSTEM")
@@ -464,7 +470,7 @@ public:
 
 	// Delete entries and groups
 	BOOL DeleteEntry(DWORD dwIndex);
-	BOOL DeleteGroupById(DWORD uGroupId);
+	BOOL DeleteGroupById(DWORD uGroupId, BOOL bCreateBackupEntries);
 
 	BOOL SetGroup(DWORD dwIndex, __in_ecount(1) const PW_GROUP *pTemplate);
 	BOOL SetEntry(DWORD dwIndex, __in_ecount(1) const PW_ENTRY *pTemplate);
@@ -481,8 +487,10 @@ public:
 	int SaveDatabase(const TCHAR *pszFile, BYTE *pWrittenDataHash32);
 
 	// Move entries and groups
-	void MoveInGroup(DWORD idGroup, DWORD dwFrom, DWORD dwTo);
+	void MoveEntry(DWORD idGroup, DWORD dwFrom, DWORD dwTo);
 	BOOL MoveGroup(DWORD dwFrom, DWORD dwTo);
+	BOOL MoveGroupEx(DWORD dwFromId, DWORD dwToId);
+	BOOL MoveGroupExDir(DWORD dwGroupId, INT iDirection);
 
 	// Sort entry and group lists
 	void SortGroup(DWORD idGroup, DWORD dwSortByField);

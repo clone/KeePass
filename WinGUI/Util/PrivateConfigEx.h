@@ -63,6 +63,7 @@ public:
 private:
 	void GetConfigPaths();
 	void FlushGlobal(BOOL bDeleteCache);
+	void PrepareUserWrite();
 
 	BOOL GetIn(LPCTSTR pszField, LPTSTR pszValue, int nConfigID) const;
 	BOOL SetIn(LPCTSTR pszField, LPCTSTR pszValue, int nConfigID);
@@ -78,6 +79,7 @@ private:
 	std::basic_string<TCHAR> m_strFileUser;
 
 	std::basic_string<TCHAR> m_strUserPath;
+	BOOL m_bTriedToCreateUserPath;
 
 	BOOL m_bPreferUser;
 

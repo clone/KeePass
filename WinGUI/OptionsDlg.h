@@ -20,6 +20,8 @@
 #ifndef AFX_OPTIONSDLG_H__97A7BE00_1851_11D8_BF16_0050BF14F5CC__INCLUDED_
 #define AFX_OPTIONSDLG_H__97A7BE00_1851_11D8_BF16_0050BF14F5CC__INCLUDED_
 
+#include <afxwin.h>
+
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/WindowGroups.h"
 #include "NewGUI/ColourPickerXP.h"
@@ -62,6 +64,8 @@ public:
 	COLORREF m_rgbRowHighlight;
 
 	DWORD m_dwATHotKey;
+	CString m_strDefaultAutoTypeSequence;
+	BOOL m_bAutoTypeIEFix;
 
 	static void NotifyAssocChanged();
 
@@ -94,11 +98,11 @@ public:
 	BOOL m_bRegisterRestoreHotKey;
 	BOOL m_bFocusResAfterQuickFind;
 	BOOL m_bAlwaysAllowIpc;
+	BOOL m_bDropToBackOnCopy;
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };
 	COptionsList	m_olAdvanced;
-	CHotKeyCtrl	m_hkAutoType;
 	CXPStyleButtonST	m_btnDeleteAssoc;
 	CXPStyleButtonST	m_btnCreateAssoc;
 	CColourPickerXP	m_btnColorRowHighlight;
@@ -106,6 +110,7 @@ public:
 	CXPStyleButtonST	m_btSelFont;
 	CXPStyleButtonST	m_btCancel;
 	CXPStyleButtonST	m_btOK;
+	CXPStyleButtonST	m_btnAutoType;
 	int		m_nNewlineSequence;
 	UINT	m_uClipboardSeconds;
 	BOOL	m_bImgButtons;
@@ -143,6 +148,7 @@ protected:
 	afx_msg void OnRadioClipMethodTimed();
 	afx_msg void OnCheckDefaultExpire();
 	afx_msg void OnCheckLockAfterTime();
+	afx_msg void OnBtnAutoType();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

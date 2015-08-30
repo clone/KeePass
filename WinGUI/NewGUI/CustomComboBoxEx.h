@@ -17,17 +17,22 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef ___KEEPASS_LIBRARY_API_H___
-#define ___KEEPASS_LIBRARY_API_H___
+#ifndef ___CUSTOM_COMBO_BOX_EX_H___
+#define ___CUSTOM_COMBO_BOX_EX_H___
 
-#include "APIDefEx.h"
+#include "../../KeePassLibCpp/SysDefEx.h"
+#include "NewGUICommon.h"
 
-// Library build number (independent of underlying KeePass version)
-#define KEEPASS_LIBRARY_BUILD 0x0000004C
+class CCustomComboBoxEx : public CComboBoxEx
+{
+public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
-KP_SHARE DWORD GetKeePassVersion();
-KP_SHARE LPCTSTR GetKeePassVersionString();
+private:
+	static bool _CanHandleKey(TCHAR tchKey);
 
-KP_SHARE DWORD GetLibraryBuild();
+	bool _HandleKeyDown(TCHAR tchKey);
+	bool _HandleKeyUp(TCHAR tchKey);
+};
 
-#endif
+#endif // ___CUSTOM_COMBO_BOX_EX_H___

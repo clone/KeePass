@@ -97,7 +97,7 @@ BOOL SecureDeleteFile(LPCTSTR pszFilePath)
 
 		while(i != 0)
 		{
-			m = (i < SDF_BUF_SIZE) ? i : SDF_BUF_SIZE;
+			m = ((i < SDF_BUF_SIZE) ? i : SDF_BUF_SIZE);
 
 			bRet = WriteFile(hFile, pBuf, m, &dwTmp, NULL);
 			FlushFileBuffers(hFile);

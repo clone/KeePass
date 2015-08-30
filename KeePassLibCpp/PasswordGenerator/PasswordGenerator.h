@@ -39,7 +39,9 @@
 #define PWGT_CHARSET 1
 #define PWGT_PATTERN 2
 
+#ifndef _WIN32_WCE
 #pragma pack(1)
+#endif
 
 typedef struct _PW_GEN_SETTINGS_EX
 {
@@ -61,7 +63,9 @@ typedef struct _PW_GEN_SETTINGS_EX
 	std::basic_string<WCHAR> strExcludeChars;
 } PW_GEN_SETTINGS_EX;
 
+#ifndef _WIN32_WCE
 #pragma pack()
+#endif
 
 // Note: the returned vector contains at least one Null character at the end
 PWG_ERROR PwgGenerateEx(std::vector<TCHAR>& vOutPassword,

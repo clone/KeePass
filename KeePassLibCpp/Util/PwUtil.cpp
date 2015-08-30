@@ -20,6 +20,7 @@
 #include "StdAfx.h"
 #include <math.h>
 #include <map>
+#include <set>
 
 #include "PwUtil.h"
 #include "MemUtil.h"
@@ -292,6 +293,12 @@ CString CPwUtil::FormatError(int nErrorCode, DWORD dwFlags)
 		str += TRL("Make sure the media that contains the key file is inserted and that KeePass has the rights to access it (check file access rights, ensure that no other application is blocking the file, ...).");
 	}
 
+	if((dwFlags & PWFF_DATALOSS_WITHOUT_SAVE) != 0)
+	{
+		str += _T("\r\n\r\n");
+		str += TRL("The target file might be in a corrupted state. Please try saving again, and if that fails, save the database to a different location.");
+	}
+
 	return str;
 }
 
@@ -465,7 +472,7 @@ BOOL CPwUtil::IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName
 BOOL CPwUtil::IsZeroUUID(__in_ecount(16) const BYTE *pUUID)
 {
 	if(pUUID == NULL) return TRUE;
-	return (memcmp(pUUID, g_uuidZero, 16) == 0) ? TRUE : FALSE;
+	return ((memcmp(pUUID, g_uuidZero, 16) == 0) ? TRUE : FALSE);
 }
 
 BOOL CPwUtil::IsTANEntry(const PW_ENTRY *pe)
@@ -546,3 +553,160 @@ std::basic_string<TCHAR> CPwErrorInfo::ToString() const
 	return m_strFinal;
 }
 */
+
+PG_TREENODE CPwUtil::GroupsToTree(CPwManager* pMgr)
+{
+	PG_TREENODE v;
+	ZeroMemory(&v.g, sizeof(PW_GROUP));
+
+	if(pMgr == NULL) { ASSERT(FALSE); return v; }
+
+	for(DWORD i = 0; i < pMgr->GetNumberOfGroups(); ++i)
+		pMgr->GetGroup(i)->dwFlags &= ~PWGF_TEMP_BIT; // Clear
+
+	DWORD dwAllocCount = 0;
+	for(DWORD i = 0; i < pMgr->GetNumberOfGroups(); ++i)
+	{
+		PW_GROUP* pg = pMgr->GetGroup(i);
+		if(pg->usLevel == 0)
+		{
+			ASSERT((pg->dwFlags & PWGF_TEMP_BIT) == 0);
+			v.vChildNodes.push_back(GroupToTreeNode(pMgr, i, dwAllocCount));
+		}
+		else { ASSERT((pg->dwFlags & PWGF_TEMP_BIT) != 0); }
+	}
+
+	ASSERT(dwAllocCount == pMgr->GetNumberOfGroups());
+	return v;
+}
+
+boost::shared_ptr<PG_TREENODE> CPwUtil::GroupToTreeNode(CPwManager* pMgr,
+	DWORD dwIndex, DWORD& dwAllocCount)
+{
+	boost::shared_ptr<PG_TREENODE> p(new PG_TREENODE());
+	PW_GROUP* pg = pMgr->GetGroup(dwIndex);
+
+	++dwAllocCount;
+	p->g = *pg;
+	pg->dwFlags |= PWGF_TEMP_BIT;
+
+	while(true)
+	{
+		++dwIndex;
+		if(dwIndex >= pMgr->GetNumberOfGroups()) break;
+
+		PW_GROUP* pgSub = pMgr->GetGroup(dwIndex);
+		if(pgSub->usLevel <= pg->usLevel) break;
+
+		if((pgSub->dwFlags & PWGF_TEMP_BIT) == 0)
+			p->vChildNodes.push_back(GroupToTreeNode(pMgr, dwIndex, dwAllocCount));
+	}
+
+	return p;
+}
+
+boost::shared_ptr<PG_TREENODE> CPwUtil::FindGroupInTree(PG_TREENODE* pRoot,
+	DWORD dwGroupId, bool bUnlinkGroup, int iMoveGroup)
+{
+	boost::shared_ptr<PG_TREENODE> pNull;
+
+	if(pRoot == NULL) { ASSERT(FALSE); return pNull; }
+
+	std::vector<boost::shared_ptr<PG_TREENODE> >& v = pRoot->vChildNodes;
+	size_t uCurrent = 0;
+
+	for(std::vector<boost::shared_ptr<PG_TREENODE> >::iterator it = v.begin();
+		it != v.end(); ++it)
+	{
+		boost::shared_ptr<PG_TREENODE> p = *it;
+		if(p->g.uGroupId == dwGroupId)
+		{
+			if(bUnlinkGroup) v.erase(it);
+			else if(v.size() >= 2)
+			{
+				if((iMoveGroup == -2) && (uCurrent > 0))
+				{
+					v.erase(it);
+					v.insert(v.begin(), p);
+				}
+				else if((iMoveGroup == 2) && (uCurrent < (v.size() - 1)))
+				{
+					v.erase(it);
+					v.push_back(p);
+				}
+				else if((iMoveGroup == -1) && (uCurrent > 0))
+				{
+					v[uCurrent] = v[uCurrent - 1];
+					v[uCurrent - 1] = p;
+				}
+				else if((iMoveGroup == 1) && (uCurrent < (v.size() - 1)))
+				{
+					v[uCurrent] = v[uCurrent + 1];
+					v[uCurrent + 1] = p;
+				}
+			}
+
+			return p;
+		}
+		else
+		{
+			boost::shared_ptr<PG_TREENODE> pSub = FindGroupInTree(p.get(),
+				dwGroupId, bUnlinkGroup, iMoveGroup);
+
+			if(pSub.get() != NULL) return pSub;
+		}
+
+		++uCurrent;
+	}
+
+	return pNull;
+}
+
+void CPwUtil::FlattenGroupTree(PW_GROUP* pStorage, PG_TREENODE* pRoot,
+	DWORD dwStorageCount)
+{
+	DWORD dwIndex = 0;
+
+	FlattenGroupTreeInternal(pStorage, pRoot, dwIndex, dwStorageCount, 0);
+
+	ASSERT(dwIndex == dwStorageCount);
+}
+
+void CPwUtil::FlattenGroupTreeInternal(PW_GROUP* pStorage, PG_TREENODE* pRoot,
+	DWORD& dwIndex, DWORD dwStorageCount, USHORT usLevel)
+{
+	for(size_t i = 0; i < pRoot->vChildNodes.size(); ++i)
+	{
+		if(dwIndex >= dwStorageCount) { ASSERT(FALSE); return; }
+
+		pStorage[dwIndex] = pRoot->vChildNodes[i]->g;
+		pStorage[dwIndex].usLevel = usLevel;
+		++dwIndex;
+
+		FlattenGroupTreeInternal(pStorage, pRoot->vChildNodes[i].get(), dwIndex,
+			dwStorageCount, usLevel + 1);
+	}
+}
+
+#ifdef _DEBUG
+void CPwUtil::CheckGroupList(CPwManager* pMgr)
+{
+	std::set<DWORD> vIds;
+	USHORT usLastLevel = 0;
+
+	for(DWORD i = 0; i < pMgr->GetNumberOfGroups(); ++i)
+	{
+		PW_GROUP* pg = pMgr->GetGroup(i);
+		ASSERT(pg != NULL);
+
+		ASSERT((pg->uGroupId != 0) && (pg->uGroupId != DWORD_MAX));
+
+		ASSERT(vIds.find(pg->uGroupId) == vIds.end());
+
+		ASSERT(pg->usLevel <= (usLastLevel + 1));
+
+		vIds.insert(pg->uGroupId);
+		usLastLevel = pg->usLevel;
+	}
+}
+#endif

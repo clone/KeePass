@@ -227,4 +227,7 @@ void NewGUI_ComboBox_UpdateHistory(CComboBox& comboBox,
 
 BOOL NewGUI_SetIcon(BCMenu& rMenu, UINT uCommand, int nResourceID);
 
+int CALLBACK NgslCompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
+void NewGUI_SortList(CListCtrl* pListCtrl);
+
 #endif // ___NEW_GUI_COMMON___

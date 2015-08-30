@@ -1235,6 +1235,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\FieldRefDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="FindInDbDlg.cpp"
 				>
 				<FileConfiguration
@@ -1573,6 +1577,10 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\OptionsAutoTypeDlg.cpp"
+				>
 			</File>
 			<File
 				RelativePath="OptionsDlg.cpp"
@@ -2172,6 +2180,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FieldRefDlg.h"
+				>
+			</File>
+			<File
 				RelativePath="FindInDbDlg.h"
 				>
 			</File>
@@ -2189,6 +2201,10 @@
 			</File>
 			<File
 				RelativePath="LanguagesDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OptionsAutoTypeDlg.h"
 				>
 			</File>
 			<File
@@ -2244,6 +2260,10 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
+			<File
+				RelativePath=".\res\autotype.bmp"
+				>
+			</File>
 			<File
 				RelativePath="res\cancel.bmp"
 				>
@@ -3250,6 +3270,14 @@
 			</File>
 			<File
 				RelativePath="NewGUI\ColourPickerXP.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\CustomComboBoxEx.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NewGUI\CustomComboBoxEx.h"
 				>
 			</File>
 			<File

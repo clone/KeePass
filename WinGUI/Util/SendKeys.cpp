@@ -137,6 +137,7 @@ CSendKeys::key_desc_t CSendKeys::KeyNames[CSendKeys::MaxSendKeysRecs] =
   {_T("HELP"), VK_HELP},
   {_T("HOME"), VK_HOME},
   {_T("INS"), VK_INSERT},
+  {_T("INSERT"), VK_INSERT},
   {_T("LEFT"), VK_LEFT},
   {_T("LEFTBRACE"), '{', true},
   {_T("LEFTPAREN"), '(', true},

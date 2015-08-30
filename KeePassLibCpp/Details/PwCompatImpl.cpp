@@ -83,7 +83,8 @@ BOOL CPwCompatImpl::OpenDatabaseV1(CPwManager* pMgr, const TCHAR *pszFile)
 	PW_ENTRY pwTE;
 
 	_GetCurrentPwTime(&tNow);
-	memset(&pwTG, 0, sizeof(PW_GROUP)); memset(&pwTE, 0, sizeof(PW_ENTRY));
+	memset(&pwTG, 0, sizeof(PW_GROUP));
+	memset(&pwTE, 0, sizeof(PW_ENTRY));
 	pwTG.tCreation = tNow; pwTG.tExpire = g_pwTimeNever;
 	pwTG.tLastAccess = tNow; pwTG.tLastMod = tNow;
 	pwTE.tCreation = tNow; pwTE.tExpire = g_pwTimeNever;

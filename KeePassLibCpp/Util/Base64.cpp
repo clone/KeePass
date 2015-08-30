@@ -79,12 +79,12 @@ bool CBase64Codec::Encode(const BYTE *pIn, DWORD uInLen, BYTE *pOut, DWORD *uOut
 	if (i < uInLen)
 	{
 		DWORD a = pIn[0];
-		DWORD b = ((i + 1) < uInLen) ? pIn[1] : 0;
+		DWORD b = (((i + 1) < uInLen) ? pIn[1] : 0);
 		DWORD c = 0;
 
 		*p++ = g_pCodes[a >> 2];
 		*p++ = g_pCodes[((a & 3) << 4) + (b >> 4)];
-		*p++ = ((i + 1) < uInLen) ? g_pCodes[((b & 0xf) << 2) + (c >> 6)] : '=';
+		*p++ = (((i + 1) < uInLen) ? g_pCodes[((b & 0xf) << 2) + (c >> 6)] : '=');
 		*p++ = '=';
 	}
 

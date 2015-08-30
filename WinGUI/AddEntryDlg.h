@@ -26,6 +26,7 @@
 #include "NewGUI/GradientProgressCtrl.h"
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/SecureEditEx.h"
+#include "NewGUI/CustomComboBoxEx.h"
 #include "Util/WinUtil.h"
 #include "afxwin.h"
 
@@ -51,6 +52,7 @@ private:
 
 	void SelectFileAsUrl(LPCTSTR lpFilter);
 	void InsertIntoUrl(LPCTSTR lpText);
+	CString GetEntryFieldRef();
 
 	void UrlToCombo(bool bGuiToInternals);
 
@@ -84,7 +86,7 @@ public:
 	CXPStyleButtonST	m_btTools;
 	CXPStyleButtonST	m_btSelDefExpires;
 	CXPStyleButtonST	m_btSetToDefaultExpire;
-	CComboBoxEx	m_cbGroups;
+	CCustomComboBoxEx	m_cbGroups;
 	CGradientProgressCtrl	m_cPassQuality;
 	CXPStyleButtonST	m_btRemoveAttachment;
 	CXPStyleButtonST	m_btSaveAttachment;
@@ -106,6 +108,7 @@ public:
 	CAutoRichEditCtrlFx	m_reNotes;
 	CString	m_strAttachment;
 	BOOL	m_bExpires;
+	CComboBox m_cmbUrl;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CAddEntryDlg)
@@ -160,11 +163,14 @@ protected:
 	afx_msg void OnUrlFieldInsFirefox();
 	afx_msg void OnUrlFieldInsOpera();
 	afx_msg void OnAutoTypeSelectTargetWindow();
+	afx_msg void OnInsertFieldReferenceInTitleField();
+	afx_msg void OnInsertFieldReferenceInUserNameField();
+	afx_msg void OnInsertFieldReferenceInPasswordField();
+	afx_msg void OnInsertFieldReferenceInUrlField();
+	afx_msg void OnInsertFieldReferenceInNotesField();
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()
-public:
-	CComboBox m_cmbUrl;
 };
 
 //{{AFX_INSERT_LOCATION}}

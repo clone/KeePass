@@ -21,6 +21,7 @@
 #define ___WIN_UTIL_EX_H___
 
 #include "../../KeePassLibCpp/SysDefEx.h"
+#include "../../KeePassLibCpp/PwManager.h"
 #include "../../KeePassLibCpp/PasswordGenerator/PasswordGenerator.h"
 
 #include <string>
@@ -44,7 +45,9 @@ typedef struct _AV_APP_INFO
 } AV_APP_INFO;
 
 #ifndef _WIN32_WCE
-void CopyStringToClipboard(const TCHAR *lptString);
+// If pReferenceSource is not NULL, lptString will first be dereferenced
+// before being copied to the clipboard
+void CopyStringToClipboard(const TCHAR *lptString, CPwManager *pReferenceSource);
 void ClearClipboardIfOwner();
 
 void RegisterOwnClipboardData(unsigned char* pData, unsigned long dwDataSize);
@@ -53,7 +56,7 @@ void RegisterOwnClipboardData(unsigned char* pData, unsigned long dwDataSize);
 // two secure clipboard functions!
 // http://sourceforge.net/tracker/index.php?func=detail&aid=1102906&group_id=95013&atid=609910
 BOOL MakeClipboardDelayRender(HWND hOwner, HWND *phNextCB);
-void CopyDelayRenderedClipboardData(const TCHAR *lptString);
+void CopyDelayRenderedClipboardData(const TCHAR *lptString, CPwManager *pReferenceSource);
 
 void SetClipboardIgnoreFormat();
 #endif
@@ -94,7 +97,7 @@ BOOL WU_OpenAppHelp(LPCTSTR lpTopicFile);
 UINT TWinExec(LPCTSTR lpCmdLine, WORD uCmdShow);
 
 BOOL WU_IsWin9xSystem();
-BOOL WU_IsWinVistaSystem();
+BOOL WU_IsAtLeastWinVistaSystem();
 BOOL WU_SupportsMultiLineTooltips();
 
 std::basic_string<TCHAR> WU_GetTempFile(LPCTSTR lpSuffix);
@@ -127,5 +130,9 @@ PWG_ERROR PwgGenerateWithExtVerify(std::vector<TCHAR>& vOutPassword,
 CString FilterTrlComment(LPCTSTR lpEnglishString);
 
 void WU_GetUserApplications(std::vector<AV_APP_INFO>& vStorage);
+
+BOOL WU_CreateDirectoryTree(LPCTSTR lpDirPath);
+
+// void WU_MouseClick(bool bRightClick);
 
 #endif

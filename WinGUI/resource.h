@@ -84,6 +84,9 @@
 #define IDB_RANDOM_KEY                  238
 #define IDB_TOOLS_SMALL                 239
 #define IDB_WINPROPS_SMALL              240
+#define IDB_AUTOTYPE                    241
+#define IDD_OPTIONS_AUTOTYPE_DLG        242
+#define IDD_FIELDREF_DLG                243
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -234,7 +237,6 @@
 #define IDC_HLINK_CREDITS               1204
 #define IDC_HLINK_DONATE                1205
 #define IDC_STATIC_LISTTEXT             1207
-#define IDC_STATIC_PRODUCTNAME          1208
 #define IDC_RICHEDIT21                  1209
 #define IDC_CHECK_LOCKONWINLOCK         1212
 #define IDC_READONLY                    1213
@@ -292,6 +294,23 @@
 #define IDC_COMBO_URL                   1273
 #define IDC_RADIO_NOEXPIRE              1274
 #define IDC_RADIO_EXPIRES               1275
+#define IDC_BTN_AUTOTYPE                1276
+#define IDC_CHECK_ENABLEAT              1277
+#define IDC_CHECK_ALTERNATIVE           1278
+#define IDC_EDIT_STDSEQ                 1279
+#define IDC_CHECK_IEFIX                 1280
+#define IDC_LIST_ENTRIES                1281
+#define IDC_RADIO_REFTITLE              1282
+#define IDC_RADIO_REFUSER               1283
+#define IDC_RADIO_REFPW                 1284
+#define IDC_RADIO_REFURL                1285
+#define IDC_RADIO_REFNOTES              1286
+#define IDC_RADIO_IDTITLE               1287
+#define IDC_RADIO_IDUSER                1288
+#define IDC_RADIO_IDPASSWORD            1289
+#define IDC_RADIO_IDURL                 1290
+#define IDC_RADIO_IDNOTES               1291
+#define IDC_RADIO_IDUUID                1292
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -501,15 +520,21 @@
 #define ID_URLFIELD_INS_FIREFOX         33025
 #define ID_URLFIELD_INS_OPERA           33027
 #define ID_POPUP_AUTOTYPE_SELTARGET     33029
+#define ID_POPUP_INSERTFIELDREFERENCE   33030
+#define ID_INSERTFIELDREFERENCE_INTITLEFIELD 33031
+#define ID_INSERTFIELDREFERENCE_INUSERNAMEFIELD 33032
+#define ID_INSERTFIELDREFERENCE_INURLFIELD 33033
+#define ID_INSERTFIELDREFERENCE_INPASSWORDFIELD 33034
+#define ID_INSERTFIELDREFERENCE_INNOTESFIELD 33035
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        241
-#define _APS_NEXT_COMMAND_VALUE         33030
-#define _APS_NEXT_CONTROL_VALUE         1276
+#define _APS_NEXT_RESOURCE_VALUE        244
+#define _APS_NEXT_COMMAND_VALUE         33036
+#define _APS_NEXT_CONTROL_VALUE         1293
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -127,6 +127,7 @@ int CVistaTaskDialog::ShowDialog(BOOL* pVerificationResult)
 	cfg.cbSize = sizeof(V_TASKDIALOGCONFIG);
 	cfg.hwndParent = m_hParent;
 	cfg.hInstance = m_hInstance;
+	// cfg.dwCommonButtons = V_TDCBF_CANCEL_BUTTON;
 
 	if(m_strTitle.size() > 0) cfg.pszWindowTitle = m_strTitle.c_str();
 	if(m_strInstr.size() > 0) cfg.pszMainInstruction = m_strInstr.c_str();

@@ -529,8 +529,8 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 				_ExpStrIf(pOptions->bGroupTree, strGroupTree);
 				if(pOptions->bGroupTree == TRUE) _ExpStr(m_pszNewLine);
 
-				_ExpStrIf(pOptions->bUserName, TRL("UserName:"));
-				_ExpStrIf(pOptions->bUserName, _T(" "));
+				_ExpStrIf(pOptions->bUserName, TRL("User Name"));
+				_ExpStrIf(pOptions->bUserName, _T(": "));
 				_ExpStrIf(pOptions->bUserName, p->pszUserName);
 				if(pOptions->bUserName == TRUE) _ExpStr(m_pszNewLine);
 

@@ -18,6 +18,7 @@
 */
 
 #include "StdAfx.h"
+#include "../SysDefEx.h"
 #include <mmsystem.h>
 #include "KeyTransform.h"
 
@@ -91,8 +92,8 @@ bool CKeyTransform::Transform256(DWORD dwRounds, UINT8 *pBuffer256, const UINT8 
 	CKeyTransform ktLeft(dwRounds, &vBuf[0], &vKey[0], &bSucceededLeft);
 	CKeyTransform ktRight(dwRounds, &vBuf[16], &vKey[0], &bSucceededRight);
 
-#ifdef _M_X64
-#pragma message("No multi-threading support in x64 builds.")
+#if defined(_M_X64) || defined(_WIN32_WCE)
+#pragma message("No multi-threading support for x64 and _WIN32_WCE builds.")
 	ktLeft();
 	ktRight();
 #else // Supports multi-threading
@@ -119,8 +120,8 @@ DWORD CKeyTransform::Benchmark(DWORD dwTimeMs)
 {
 	CKeyTransformBenchmark ktLeft(dwTimeMs), ktRight(dwTimeMs);
 
-#ifdef _M_X64
-#pragma message("No multi-threading support in x64 builds.")
+#if defined(_M_X64) || defined(_WIN32_WCE)
+#pragma message("No multi-threading support for x64 and _WIN32_WCE builds.")
 	ktLeft();
 	ktRight();
 #else // Supports multi-threading

@@ -46,6 +46,9 @@
 // Include all system-specific definitions
 #include "SysSpec_Windows/SysSpecWin.h"
 // #include "SysSpec/SysSpecLinux.h"
+#if defined _WIN32_WCE
+#include "wce_wrap.h"
+#endif
 
 // Implications, standard macros and other definitions follow.
 

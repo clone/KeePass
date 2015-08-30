@@ -1,0 +1,11 @@
+In order to build the Boost library files required by KeePass,
+execute Boost's BJAM tool like the following (for Microsoft
+Visual C++):
+
+bjam --toolset=msvc --with-regex --build-type=complete stage
+bjam --toolset=msvc --with-thread --build-type=complete stage
+
+With Boost >= 1.35.0 you also need:
+bjam --toolset=msvc --with-date_time --build-type=complete stage
+
+In order to explicitly use Visual Studio 2005, use msvc-8.0 instead of msvc.

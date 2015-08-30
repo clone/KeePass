@@ -464,16 +464,16 @@ BOOL CPwSafeApp::SetStartWithWindows(BOOL bAutoStart)
 		}
 	}
 
-	psFile->TrimLeft(); psFile->TrimRight();
+	psFile->Trim();
 
 	if(psFile->GetLength() == 0) return FALSE;
 	if(psFile->Left(1) == _T("\"")) *psFile = psFile->Right(psFile->GetLength() - 1);
 	if(psFile->GetLength() == 0) return FALSE;
-	psFile->TrimLeft(); psFile->TrimRight();
+	psFile->Trim();
 	if(psFile->GetLength() == 0) return FALSE;
 	if(psFile->Right(1) == _T("\"")) *psFile = psFile->Left(psFile->GetLength() - 1);
 	if(psFile->GetLength() == 0) return FALSE;
-	psFile->TrimLeft(); psFile->TrimRight();
+	psFile->Trim();
 	if(psFile->GetLength() == 0) return FALSE;
 
 	return TRUE;

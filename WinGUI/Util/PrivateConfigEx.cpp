@@ -31,6 +31,7 @@ CPrivateConfigEx::CPrivateConfigEx(BOOL bRequireWriteAccess)
 {
 	m_bPreferUser = FALSE;
 	m_bCanWrite = bRequireWriteAccess;
+	m_bTriedToCreateUserPath = FALSE;
 
 	this->GetConfigPaths();
 
@@ -106,14 +107,6 @@ void CPrivateConfigEx::GetConfigPaths()
 		m_strFileUser += CFG_SUFFIX_STD;
 	}
 
-	if(m_bCanWrite == TRUE)
-	{
-		if(_FileWritable(m_strFileGlobal.c_str()) == FALSE)
-		{
-			if(tszAppDir[0] != 0) CreateDirectory(tszAppDir, NULL);
-		}
-	}
-
 	if(_FileAccessible(m_strFileGlobal.c_str()) == TRUE)
 	{
 		m_strFileCachedGlobal = WU_GetTempFile(CFG_SUFFIX_STD);
@@ -160,6 +153,23 @@ void CPrivateConfigEx::FlushIni(LPCTSTR lpIniFilePath)
 	// Do not verify the following call, as it always returns FALSE
 	// on Windows 95 / 98 / ME
 	WritePrivateProfileString(NULL, NULL, NULL, lpIniFilePath);
+}
+
+void CPrivateConfigEx::PrepareUserWrite()
+{
+	ASSERT(m_bCanWrite == TRUE);
+
+	if((m_bPreferUser == TRUE) || (_FileWritable(m_strFileGlobal.c_str()) == FALSE))
+	{
+		if(m_strUserPath.size() > 0)
+		{
+			if(m_bTriedToCreateUserPath == FALSE)
+			{
+				CreateDirectory(m_strUserPath.c_str(), NULL); // Ensure existance
+				m_bTriedToCreateUserPath = TRUE; // Try once only
+			}
+		}
+	}
 }
 
 BOOL CPrivateConfigEx::Get(LPCTSTR pszField, LPTSTR pszValue) const
@@ -259,6 +269,8 @@ BOOL CPrivateConfigEx::SetIn(LPCTSTR pszField, LPCTSTR pszValue, int nConfigID)
 		else
 			lpFile = m_strFileGlobal.c_str();
 	}
+	else if(nConfigID == CFG_ID_USER)
+		this->PrepareUserWrite();
 
 	return ((WritePrivateProfileString(PWM_EXENAME, pszField, pszValue, lpFile) ==
 		FALSE) ? FALSE : TRUE); // Zero-based success mapping

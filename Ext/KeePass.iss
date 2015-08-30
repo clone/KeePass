@@ -10,8 +10,8 @@
 #define MyAppUrlName "KeePass.url"
 #define MyAppHelpName "KeePass.chm"
 
-#define KeeVersionStr "1.11"
-#define KeeVersionWin "1.1.1.0"
+#define KeeVersionStr "1.12"
+#define KeeVersionWin "1.1.2.0"
 
 #define KeeDevPeriod "2003-2008"
 
@@ -40,6 +40,8 @@ VersionInfoVersion={#KeeVersionWin}
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription={#MyAppFullName} {#KeeVersionStr} Setup
 VersionInfoCopyright=Copyright (c) {#KeeDevPeriod} {#MyAppPublisher}
+WizardImageFile=compiler:WizModernImage-IS.bmp
+WizardSmallImageFile=compiler:WizModernSmallImage-IS.bmp
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
@@ -68,8 +70,20 @@ Name: quicklaunchicon; Description: {cm:CreateQuickLaunchIcon}; GroupDescription
 [Files]
 Source: ..\Build\WinGUI_Distrib\KeePass.exe; DestDir: {app}; Flags: ignoreversion
 Source: ..\Build\WinGUI_Distrib\KeePass.chm; DestDir: {app}; Flags: ignoreversion
-Source: ..\Build\WinGUI_Distrib\KeePass.ini; DestDir: {app}; Flags: ignoreversion onlyifdoesntexist
+Source: ..\Build\WinGUI_Distrib\KeePass.ini; DestDir: {app}; Flags: onlyifdoesntexist
 Source: ..\Build\WinGUI_Distrib\License.txt; DestDir: {app}; Flags: ignoreversion
+
+[Registry]
+; Always unregister .kdb association at uninstall
+Root: HKCR; Subkey: .kdb; Flags: uninsdeletekey; Tasks: not fileassoc
+Root: HKCR; Subkey: kdbfile; Flags: uninsdeletekey; Tasks: not fileassoc
+; Register .kdb association at install, and unregister at uninstall
+Root: HKCR; Subkey: .kdb; ValueType: string; ValueData: kdbfile; Flags: uninsdeletekey; Tasks: fileassoc
+Root: HKCR; Subkey: kdbfile; ValueType: string; ValueData: KeePass Password Database; Flags: uninsdeletekey; Tasks: fileassoc
+Root: HKCR; Subkey: kdbfile; ValueType: string; ValueName: AlwaysShowExt; Flags: uninsdeletekey; Tasks: fileassoc
+Root: HKCR; Subkey: kdbfile\DefaultIcon; ValueType: string; ValueData: """{app}\{#MyAppExeName}"",0"; Flags: uninsdeletekey; Tasks: fileassoc
+Root: HKCR; Subkey: kdbfile\shell\open; ValueType: string; ValueData: &Open with {#MyAppName}; Flags: uninsdeletekey; Tasks: fileassoc
+Root: HKCR; Subkey: kdbfile\shell\open\command; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Flags: uninsdeletekey; Tasks: fileassoc
 
 [INI]
 Filename: {app}\{#MyAppUrlName}; Section: InternetShortcut; Key: URL; String: {#MyAppURL}
@@ -83,20 +97,8 @@ Name: {userdesktop}\{#MyAppName}; Filename: {app}\{#MyAppExeName}; Tasks: deskto
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}; Filename: {app}\{#MyAppExeName}; Tasks: quicklaunchicon
 
 [Run]
-Filename: {app}\{#MyAppExeName}; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: nowait postinstall skipifsilent unchecked
-Filename: http://keepass.info/plugins.html; Flags: postinstall skipifsilent shellexec nowait; Tasks: ; Description: Visit plugins web page (browser integration, ...)
-
-[Registry]
-; Always unregister .kdb association
-Root: HKCR; Subkey: .kdb; Flags: uninsdeletekey; Tasks: not fileassoc
-Root: HKCR; Subkey: kdbfile; Flags: uninsdeletekey; Tasks: not fileassoc
-; Register and unregister .kdb association
-Root: HKCR; Subkey: .kdb; ValueType: string; ValueData: kdbfile; Flags: uninsdeletekey; Tasks: fileassoc
-Root: HKCR; Subkey: kdbfile; ValueType: string; ValueData: KeePass Password Database; Flags: uninsdeletekey; Tasks: fileassoc
-Root: HKCR; Subkey: kdbfile; ValueType: string; ValueName: AlwaysShowExt; Flags: uninsdeletekey; Tasks: fileassoc
-Root: HKCR; Subkey: kdbfile\DefaultIcon; ValueType: string; ValueData: """{app}\{#MyAppExeName}"",0"; Flags: uninsdeletekey; Tasks: fileassoc
-Root: HKCR; Subkey: kdbfile\shell\open; ValueType: string; ValueData: &Open with {#MyAppName}; Flags: uninsdeletekey; Tasks: fileassoc
-Root: HKCR; Subkey: kdbfile\shell\open\command; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Flags: uninsdeletekey; Tasks: fileassoc
+Filename: {app}\{#MyAppExeName}; Description: {cm:LaunchProgram,{#MyAppName}}; Flags: postinstall nowait skipifsilent unchecked
+Filename: http://keepass.info/plugins.html; Description: Visit &plugins web page (browser integration, ...); Flags: postinstall shellexec skipifsilent
 
 [UninstallDelete]
 Type: files; Name: {app}\{#MyAppUrlName}

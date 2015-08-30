@@ -126,7 +126,8 @@ public:
 	void AdjustColumnWidths();
 
 	void ParseAndOpenURLWithEntryInfo(LPCTSTR lpURL, PW_ENTRY *pEntry);
-	void _AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSeq);
+	void _AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSeq,
+		LPCTSTR lpTargetWindowName);
 
 	void UpdateGroupList();
 	void UpdatePasswordList();
@@ -354,6 +355,7 @@ private:
 	CString m_strURLOverride;
 	BOOL m_bAllowSaveIfModifiedOnly;
 	BOOL m_bRegisterRestoreHotKey;
+	BOOL m_bDropToBackOnCopy;
 
 	BCMenu *m_pPwListMenu;
 	BCMenu *m_pGroupListMenu;
@@ -400,6 +402,7 @@ private:
 	BYTE m_pPreLockItemUuid[16];
 	ULONGLONG m_ullLastListParams;
 	UINT m_uOriginalExtrasMenuItemCount;
+	LONG m_lGroupUrlStart;
 
 	DWORD_PTR m_dwGroupsSaveFirstVisible;
 	DWORD_PTR m_dwGroupsSaveSelected;
@@ -413,7 +416,7 @@ private:
 	BOOL m_bDraggingHoriz;
 
 	HTREEITEM m_hDraggingGroup;
-	BOOL m_bCanDragGroup;
+	// BOOL m_bCanDragGroup;
 
 	HCURSOR m_hArrowCursor;
 	HCURSOR m_hDragLeftRight;
@@ -434,6 +437,8 @@ private:
 	CRemoteControl m_remoteControl;
 
 	CString m_strDefaultAutoTypeSequence;
+	BOOL m_bAutoTypeIEFix;
+
 	CString m_strWindowTitleSuffix;
 
 	static BOOL m_bUnintrusiveMiniMode;
@@ -451,6 +456,8 @@ private:
 		const CPrivateConfigEx& cConfig);
 
 	void RegisterRestoreHotKey(BOOL bRegister);
+
+	void DropToBackgroundIfOptionEnabled();
 
 	LONG m_lNormalWndPosX;
 	LONG m_lNormalWndPosY;

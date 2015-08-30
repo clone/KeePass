@@ -26,6 +26,7 @@
 #include "NewGUI/GradientProgressCtrl.h"
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/SecureEditEx.h"
+#include "NewGUI/CustomComboBoxEx.h"
 #include <afxwin.h>
 
 typedef struct _KP_KEYPROV_INFO_CPP
@@ -72,6 +73,7 @@ private:
 	static KP_KEYPROV_INFO_CPP KeyProvCToS(const KP_KEYPROV_INFO& c);
 
 	BOOL m_bOnce;
+	BOOL m_bStarsMask;
 
 	CImageList m_ilIcons;
 	CFont m_fStyle;
@@ -85,7 +87,7 @@ private:
 public:
 	//{{AFX_DATA(CPasswordDlg)
 	enum { IDD = IDD_PASSWORD_DLG };
-	CComboBoxEx	m_cbDiskList;
+	CCustomComboBoxEx	m_cbDiskList;
 	CGradientProgressCtrl	m_cPassQuality;
 	CXPStyleButtonST	m_btStars;
 	CXPStyleButtonST	m_btOK;

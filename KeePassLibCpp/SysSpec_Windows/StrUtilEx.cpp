@@ -349,6 +349,7 @@ C_FN_SHARE BOOL _IsUTF8String(const UTF8_BYTE *pUTF8String)
 static HMODULE m_hShlWApi = NULL;
 static LPCWSTRCMPEX m_lpCmpNatural = NULL;
 
+#ifndef _WIN32_WCE
 void NSCAPI_Initialize()
 {
 	NSCAPI_Exit(); // Free any previously loaded library
@@ -375,6 +376,7 @@ bool NSCAPI_Supported()
 {
 	return (m_lpCmpNatural != NULL);
 }
+#endif
 
 int StrCmpNaturalEx(LPCTSTR x, LPCTSTR y)
 {

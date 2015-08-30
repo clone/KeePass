@@ -137,5 +137,5 @@ void KPMI_AutoType(PW_ENTRY *pEntry, LONG_PTR lFlags)
 	const BOOL bLoseFocus = (((lFlags & KPF_AUTOTYPE_LOSEFOCUS) != 0) ?
 		TRUE : FALSE);
 
-	g_pMainDlg->_AutoType(pEntry, bLoseFocus, dwAutoTypeSeq);
+	g_pMainDlg->_AutoType(pEntry, bLoseFocus, dwAutoTypeSeq, NULL);
 }

@@ -23,6 +23,7 @@
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/AMSEdit.h"
+#include "NewGUI/CustomComboBoxEx.h"
 #include "../KeePassLibCpp/PwManager.h"
 #include "afxwin.h"
 
@@ -48,7 +49,7 @@ public:
 	enum { IDD = IDD_ENTRYPROPERTIES_DLG };
 	CXPStyleButtonST	m_btSetToDefaultExpire;
 	CXPStyleButtonST	m_btSelDefExpires;
-	CComboBoxEx	m_cbGroups;
+	CCustomComboBoxEx	m_cbGroups;
 	CXPStyleButtonST	m_btSelectIcon;
 	CXPStyleButtonST	m_btCancel;
 	CXPStyleButtonST	m_btOK;

@@ -23,6 +23,7 @@
 
 #include "NewGUI/NewGUICommon.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
+#include "OptionsAutoTypeDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -63,7 +64,6 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COptionsDlg)
 	DDX_Control(pDX, IDC_LIST_ADVANCED, m_olAdvanced);
-	DDX_Control(pDX, IDC_HOTKEY_AUTOTYPE, m_hkAutoType);
 	DDX_Control(pDX, IDC_BTN_DELETEASSOC, m_btnDeleteAssoc);
 	DDX_Control(pDX, IDC_BTN_CREATEASSOC, m_btnCreateAssoc);
 	DDX_Control(pDX, IDC_BTN_ROWHIGHLIGHTSEL, m_btnColorRowHighlight);
@@ -89,6 +89,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_DEFAULTEXPIRE, m_bDefaultExpire);
 	DDX_Text(pDX, IDC_EDIT_DEFAULTEXPIRE, m_dwDefaultExpire);
 	DDX_Check(pDX, IDC_CHECK_LOCKONWINLOCK, m_bLockOnWinLock);
+	DDX_Control(pDX, IDC_BTN_AUTOTYPE, m_btnAutoType);
 	//}}AFX_DATA_MAP
 }
 
@@ -102,6 +103,7 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialog)
 	ON_BN_CLICKED(IDC_RADIO_CLIPMETHOD_TIMED, OnRadioClipMethodTimed)
 	ON_BN_CLICKED(IDC_CHECK_DEFAULTEXPIRE, OnCheckDefaultExpire)
 	ON_BN_CLICKED(IDC_CHECK_LOCKAFTERTIME, OnCheckLockAfterTime)
+	ON_BN_CLICKED(IDC_BTN_AUTOTYPE, &COptionsDlg::OnBtnAutoType)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -121,6 +123,7 @@ BOOL COptionsDlg::OnInitDialog()
 	NewGUI_XPButton(m_btSelFont, IDB_DOCUMENT_SMALL, IDB_DOCUMENT_SMALL);
 	NewGUI_XPButton(m_btnCreateAssoc, IDB_FILE, IDB_FILE);
 	NewGUI_XPButton(m_btnDeleteAssoc, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(m_btnAutoType, IDB_AUTOTYPE, IDB_AUTOTYPE);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_OPTIONS),
@@ -177,10 +180,11 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_PUTTYURLS), OPTGRP_SETUP, TRUE);
 	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP, TRUE);
 	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP, TRUE);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_AUTOTYPEHK), OPTGRP_SETUP, TRUE);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_HOTKEY_AUTOTYPE), OPTGRP_SETUP, TRUE);
+	// m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_AUTOTYPEHK), OPTGRP_SETUP, TRUE);
+	// m_wndgrp.AddWindow(GetDlgItem(IDC_HOTKEY_AUTOTYPE), OPTGRP_SETUP, TRUE);
 
 	m_wndgrp.AddWindow(GetDlgItem(IDC_LIST_ADVANCED), OPTGRP_ADVANCED, FALSE);
+	m_wndgrp.AddWindow(&m_btnAutoType, OPTGRP_ADVANCED, FALSE);
 
 	m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
 	m_wndgrp.ArrangeWindows(this);
@@ -196,9 +200,10 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddGroupText(TRL("Integration"), 9);
 	m_olAdvanced.AddCheckItem(TRL("Start KeePass at Windows startup (for current user)"), &m_bStartWithWindows, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Single left click instead of double-click for default tray icon action"), &m_bSingleClickTrayIcon, NULL, OL_LINK_NULL);
-	m_olAdvanced.AddCheckItem(TRL("Use alternative auto-type method (minimize window)"), &m_bMinimizeBeforeAT, NULL, OL_LINK_NULL);
-	m_olAdvanced.AddCheckItem(TRL("Disable all auto-type features"), &m_bDisableAutoType, NULL, OL_LINK_NULL);
+	// m_olAdvanced.AddCheckItem(TRL("Use alternative auto-type method (minimize window)"), &m_bMinimizeBeforeAT, NULL, OL_LINK_NULL);
+	// m_olAdvanced.AddCheckItem(TRL("Disable all auto-type features"), &m_bDisableAutoType, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Copy URLs to clipboard instead of launching them (exception: cmd:// URLs)"), &m_bCopyURLs, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Drop to background when copying data to the clipboard"), &m_bDropToBackOnCopy, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Enable remote control (allow applications to communicate with KeePass)"), &m_bEnableRemoteCtrl, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Always grant full access through remote control (not recommended)"), &m_bAlwaysAllowIpc, NULL, OL_LINK_NULL);
 
@@ -241,9 +246,6 @@ BOOL COptionsDlg::OnInitDialog()
 
 	m_tabMenu.SetCurSel(0);
 
-	m_hkAutoType.SetRules(HKCOMB_NONE | HKCOMB_S, HOTKEYF_CONTROL | HOTKEYF_ALT);
-	m_hkAutoType.SetHotKey((WORD)(m_dwATHotKey & 0x0000FFFF), (WORD)(m_dwATHotKey >> 16));
-
 	m_btnColorRowHighlight.SetDefaultColor(RGB(238,238,255));
 	m_btnColorRowHighlight.SetColor(m_rgbRowHighlight);
 
@@ -279,17 +281,6 @@ void COptionsDlg::AddTcItem(LPCTSTR lpName, int iImageIndex)
 void COptionsDlg::OnOK() 
 {
 	UpdateData(TRUE);
-
-	WORD wVK = 0, wMod = 0;
-	m_hkAutoType.GetHotKey(wVK, wMod);
-	DWORD dwNewHotKey = ((DWORD)wMod << 16) | (DWORD)wVK;
-	if(dwNewHotKey != m_dwATHotKey)
-	{
-		if(m_pParentDlg->RegisterGlobalHotKey(HOTKEYID_AUTOTYPE, dwNewHotKey, (m_dwATHotKey != 0) ? TRUE : FALSE, TRUE) == FALSE)
-			return;
-
-		m_dwATHotKey = dwNewHotKey;
-	}
 
 	m_rgbRowHighlight = m_btnColorRowHighlight.GetColor();
 	if((m_bLockAfterTime == TRUE) && (m_nLockAfter < 5)) m_nLockAfter = 5;
@@ -351,10 +342,10 @@ void COptionsDlg::OnBtnSelFont()
 		strTemp.Format(_T("%d"), dSize / 10);
 		m_strFontSpec += strTemp;
 		m_strFontSpec += _T(",");
-		m_strFontSpec += (dlg.IsBold() == TRUE) ? _T('1') : _T('0');
-		m_strFontSpec += (dlg.IsItalic() == TRUE) ? _T('1') : _T('0');
-		m_strFontSpec += (dlg.IsUnderline() == TRUE) ? _T('1') : _T('0');
-		m_strFontSpec += (dlg.IsStrikeOut() == TRUE) ? _T('1') : _T('0');
+		m_strFontSpec += ((dlg.IsBold() == TRUE) ? _T('1') : _T('0'));
+		m_strFontSpec += ((dlg.IsItalic() == TRUE) ? _T('1') : _T('0'));
+		m_strFontSpec += ((dlg.IsUnderline() == TRUE) ? _T('1') : _T('0'));
+		m_strFontSpec += ((dlg.IsStrikeOut() == TRUE) ? _T('1') : _T('0'));
 	}
 }
 
@@ -388,8 +379,8 @@ void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult)
 		break;
 	case OPTGRP_SETUP:
 		m_wndgrp.HideAllExcept(OPTGRP_SETUP);
-		if(m_bDisableAutoType == TRUE)
-			m_hkAutoType.EnableWindow(FALSE);
+		// if(m_bDisableAutoType == TRUE)
+		//	m_hkAutoType.EnableWindow(FALSE);
 		break;
 	case OPTGRP_ADVANCED:
 		m_wndgrp.HideAllExcept(OPTGRP_ADVANCED);
@@ -486,4 +477,25 @@ void COptionsDlg::OnCheckLockAfterTime()
 
 	if(m_bLockAfterTime == FALSE) GetDlgItem(IDC_EDIT_LOCKSECONDS)->EnableWindow(FALSE);
 	else GetDlgItem(IDC_EDIT_LOCKSECONDS)->EnableWindow(TRUE);
+}
+
+void COptionsDlg::OnBtnAutoType()
+{
+	COptionsAutoTypeDlg dlg;
+
+	dlg.m_pParentDlg = m_pParentDlg;
+	dlg.m_bDisableAutoType = m_bDisableAutoType;
+	dlg.m_bMinimizeBeforeAT = m_bMinimizeBeforeAT;
+	dlg.m_dwATHotKey = m_dwATHotKey;
+	dlg.m_strDefaultAutoTypeSequence = m_strDefaultAutoTypeSequence;
+	dlg.m_bAutoTypeIEFix = m_bAutoTypeIEFix;
+
+	if(dlg.DoModal() == IDOK)
+	{
+		m_bDisableAutoType = dlg.m_bDisableAutoType;
+		m_bMinimizeBeforeAT = dlg.m_bMinimizeBeforeAT;
+		m_dwATHotKey = dlg.m_dwATHotKey;
+		m_strDefaultAutoTypeSequence = dlg.m_strDefaultAutoTypeSequence;
+		m_bAutoTypeIEFix = dlg.m_bAutoTypeIEFix;
+	}
 }

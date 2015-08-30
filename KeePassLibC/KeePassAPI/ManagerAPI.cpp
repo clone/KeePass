@@ -226,7 +226,7 @@ KP_SHARE BOOL DeleteEntry(void *pMgr, DWORD dwIndex)
 KP_SHARE BOOL DeleteGroupById(void *pMgr, DWORD uGroupId)
 {
 	DECL_MGR_B(pMgr);
-	return p->DeleteGroupById(uGroupId);
+	return p->DeleteGroupById(uGroupId, FALSE);
 }
 
 KP_SHARE BOOL SetGroup(void *pMgr, DWORD dwIndex, const PW_GROUP *pTemplate)
@@ -274,10 +274,10 @@ KP_SHARE int SaveDatabase(void *pMgr, const TCHAR *pszFile)
 	return p->SaveDatabase(pszFile, NULL);
 }
 
-KP_SHARE void MoveInGroup(void *pMgr, DWORD idGroup, DWORD dwFrom, DWORD dwTo)
+KP_SHARE void MoveEntry(void *pMgr, DWORD idGroup, DWORD dwFrom, DWORD dwTo)
 {
 	DECL_MGR_V(pMgr);
-	p->MoveInGroup(idGroup, dwFrom, dwTo);
+	p->MoveEntry(idGroup, dwFrom, dwTo);
 }
 
 KP_SHARE BOOL MoveGroup(void *pMgr, DWORD dwFrom, DWORD dwTo)

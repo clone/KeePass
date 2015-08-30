@@ -51,21 +51,26 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CSecureEditEx
 
-CSecureEditEx::CSecureEditEx()
+CSecureEditEx::CSecureEditEx() :
+	m_bSecMode(TRUE), m_nOldLen(0), m_pSecDrop(NULL), CEdit()
 {
-	int i;
-
-	m_bSecMode = TRUE;
 	m_apChars.RemoveAll();
-	m_nOldLen = 0;
 
 	m_pXorPad = new TCHAR[SE_XORPAD_SIZE];
 	ASSERT(m_pXorPad != NULL);
-	for(i = 0; i < SE_XORPAD_SIZE; i++) m_pXorPad[i] = (TCHAR)rand();
+	for(int i = 0; i < SE_XORPAD_SIZE; i++)
+		m_pXorPad[i] = static_cast<TCHAR>(rand());
 }
 
 CSecureEditEx::~CSecureEditEx()
 {
+	if(m_pSecDrop != NULL)
+	{
+		m_pSecDrop->Revoke();
+		delete m_pSecDrop;
+		m_pSecDrop = NULL;
+	}
+
 	_DeleteAll();
 
 	SetMemoryEx(m_pXorPad, 0, SE_XORPAD_SIZE * sizeof(TCHAR));
@@ -92,6 +97,11 @@ BEGIN_MESSAGE_MAP(CSecureEditEx, CEdit)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
+
+void CSecureEditEx::InitEx()
+{
+	VERIFY(_RegisterDropTarget());
+}
 
 // Enable or disable the secure mode, default is enabled
 void CSecureEditEx::EnableSecureMode(BOOL bEnable)
@@ -260,9 +270,7 @@ void CSecureEditEx::SetPassword(LPCTSTR lpPassword)
 // Called *after* the content of the edit control has been updated!
 void CSecureEditEx::OnEnUpdate() 
 {
-	LPTSTR lpWnd;
-	int iWndLen, iDiff;
-	DWORD dwPos;
+	_RegisterDropTarget();
 
 	if(m_bSecMode == FALSE)
 	{
@@ -271,16 +279,16 @@ void CSecureEditEx::OnEnUpdate()
 	}
 
 	// Get information about the *new* contents of the edit control
-	iWndLen = GetWindowTextLength();
-	iDiff = iWndLen - m_nOldLen;
+	const int iWndLen = GetWindowTextLength();
+	const int iDiff = iWndLen - m_nOldLen;
 
 	if(iDiff == 0) return; // No change?
 
 	size_t sizeWindowBuffer = iWndLen + 1;
-	lpWnd = new TCHAR[sizeWindowBuffer];
+	LPTSTR lpWnd = new TCHAR[sizeWindowBuffer];
 	ASSERT(lpWnd != NULL); if(lpWnd == NULL) return;
 	GetWindowText(lpWnd, iWndLen + 1);
-	dwPos = GetSel() & 0xffff; // Get the *new* cursor position
+	const DWORD dwPos = GetSel() & 0xffff; // Get the *new* cursor position
 
 	if(iDiff < 0)
 	{
@@ -301,10 +309,9 @@ void CSecureEditEx::OnEnUpdate()
 
 void CSecureEditEx::_ClearSelection()
 {
-	int nStart, nEnd;
-
 	if(m_bSecMode == FALSE) return;
 
+	int nStart, nEnd;
 	GetSel(nStart, nEnd);
 	if(nStart != nEnd) SetSel(nStart, nStart, FALSE);
 }
@@ -357,16 +364,13 @@ void CSecureEditEx::_DeleteCharacters(unsigned int uPos, unsigned int uCount)
 
 void CSecureEditEx::_EncryptBuffer(BOOL bEncrypt)
 {
-	int i;
-	LPTSTR tchp;
-
 	// XOR encryption is self-inverting; no separation of encryption
 	// and decryption code needed
 	UNREFERENCED_PARAMETER(bEncrypt);
 
-	for(i = 0; i < m_apChars.GetSize(); i++)
+	for(int i = 0; i < m_apChars.GetSize(); i++)
 	{
-		tchp = (LPTSTR)m_apChars.GetAt(i);
+		LPTSTR tchp = (LPTSTR)m_apChars.GetAt(i);
 		ASSERT(tchp != NULL); if(tchp == NULL) continue;
 
 		*tchp ^= m_pXorPad[i % SE_XORPAD_SIZE];
@@ -459,4 +463,95 @@ void CSecureEditEx::OnRButtonUp(UINT nFlags, CPoint point)
 void CSecureEditEx::OnSetFocus() 
 {
 	_ClearSelection();
+}
+
+BOOL CSecureEditEx::_RegisterDropTarget()
+{
+	if(m_pSecDrop == NULL)
+	{
+		m_pSecDrop = new CSecureDropTarget(this);
+		if(m_pSecDrop != NULL) return m_pSecDrop->Register(this);
+	}
+
+	return FALSE;
+}
+
+void CSecureEditEx::_Paste(LPCTSTR lpSource)
+{
+	ASSERT(lpSource != NULL); if(lpSource == NULL) return;
+	ASSERT(lpSource[0] != 0); if(lpSource[0] == 0) return;
+
+	ReplaceSel(lpSource, FALSE);
+}
+
+CSecureDropTarget::CSecureDropTarget(CSecureEditEx* pControl) :
+	m_pControl(pControl), COleDropTarget()
+{
+}
+
+DROPEFFECT CSecureDropTarget::OnDragEnter(CWnd* pWnd, COleDataObject* pDataObject,
+	DWORD dwKeyState, CPoint point)
+{
+	return this->OnDragOver(pWnd, pDataObject, dwKeyState, point);
+}
+
+DROPEFFECT CSecureDropTarget::OnDragOver(CWnd* pWnd, COleDataObject* pDataObject,
+	DWORD dwKeyState, CPoint point)
+{
+	ASSERT(m_pControl != NULL); if(m_pControl == NULL) return DROPEFFECT_NONE;
+	ASSERT(pWnd == m_pControl); if(pWnd != m_pControl) return DROPEFFECT_NONE;
+	ASSERT(pDataObject != NULL); if(pDataObject == NULL) return DROPEFFECT_NONE;
+
+	UNREFERENCED_PARAMETER(dwKeyState);
+	UNREFERENCED_PARAMETER(point);
+
+	BOOL bHasFormat = FALSE;
+	bHasFormat |= pDataObject->IsDataAvailable(CF_OEMTEXT, NULL);
+	bHasFormat |= pDataObject->IsDataAvailable(CF_TEXT, NULL);
+	bHasFormat |= pDataObject->IsDataAvailable(CF_UNICODETEXT, NULL);
+
+	return ((bHasFormat != FALSE) ? DROPEFFECT_COPY : DROPEFFECT_NONE);
+}
+
+BOOL CSecureDropTarget::OnDrop(CWnd* pWnd, COleDataObject* pDataObject,
+	DROPEFFECT dropEffect, CPoint point)
+{
+	ASSERT(m_pControl != NULL); if(m_pControl == NULL) return DROPEFFECT_NONE;
+	ASSERT(pWnd == m_pControl); if(pWnd != m_pControl) return FALSE;
+	ASSERT(pDataObject != NULL); if(pDataObject == NULL) return FALSE;
+
+	UNREFERENCED_PARAMETER(dropEffect);
+	UNREFERENCED_PARAMETER(point);
+
+	if(pDataObject->IsDataAvailable(CF_UNICODETEXT, NULL) != FALSE)
+	{
+		HGLOBAL hUni = pDataObject->GetGlobalData(CF_UNICODETEXT, NULL);
+		if(hUni == NULL) { ASSERT(FALSE); return FALSE; }
+
+		LPCWSTR lpUni = (LPCWSTR)GlobalLock(hUni);
+		if(lpUni == NULL) { ASSERT(FALSE); return FALSE; }
+
+		CW2CT strText(lpUni);
+		m_pControl->ReplaceSel(strText, FALSE);
+
+		GlobalUnlock(hUni);
+	}
+	else if((pDataObject->IsDataAvailable(CF_TEXT, NULL) != FALSE) ||
+		(pDataObject->IsDataAvailable(CF_OEMTEXT, NULL) != FALSE))
+	{
+		HGLOBAL hAnsi = pDataObject->GetGlobalData(CF_TEXT, NULL);
+		if(hAnsi == NULL) hAnsi = pDataObject->GetGlobalData(CF_OEMTEXT, NULL);
+		if(hAnsi == NULL) { ASSERT(FALSE); return FALSE; }
+
+		LPCSTR lpAnsi = (LPCSTR)GlobalLock(hAnsi);
+		if(lpAnsi == NULL) { ASSERT(FALSE); return FALSE; }
+
+		CA2CT strText(lpAnsi);
+		m_pControl->ReplaceSel(strText, FALSE);
+
+		GlobalUnlock(hAnsi);
+	}
+	else return FALSE;
+
+	return TRUE;
 }

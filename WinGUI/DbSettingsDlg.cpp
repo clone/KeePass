@@ -20,8 +20,8 @@
 #include "StdAfx.h"
 #include "PwSafe.h"
 #include "DbSettingsDlg.h"
-#include "../KeePassLibCpp/PwManager.h"
 #include "../KeePassLibCpp/Crypto/KeyTransform.h"
+#include "../KeePassLibCpp/PwManager.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 #include "Util/WinUtil.h"
 #include "NewGUI/NewGUICommon.h"
@@ -108,7 +108,7 @@ void CDbSettingsDlg::OnOK()
 	// Check if the user has entered something valid, otherwise fix it
 	CString str;
 	GetDlgItem(IDC_EDIT_KEYENC)->GetWindowText(str);
-	str.TrimLeft(); str.TrimRight();
+	str.Trim();
 	if(str.GetLength() > 10) m_dwNumKeyEnc = 0xFFFFFFFE; // Set to max
 	else if(str.GetLength() == 10)
 	{
