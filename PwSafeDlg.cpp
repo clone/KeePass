@@ -408,6 +408,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bCachedToolBarUpdate = FALSE;
 	m_bDragging = FALSE;
 	m_bWindowInvalid = FALSE;
+	m_bDisplayDialog = FALSE;
 
 	m_hArrowCursor = AfxGetApp()->LoadStandardCursor(IDC_ARROW);
 	m_hDragLeftRight = AfxGetApp()->LoadStandardCursor(IDC_SIZEWE);
@@ -1687,6 +1688,7 @@ void CPwSafeDlg::OnSafeAddGroup()
 	dlg.m_pParentImageList = &m_ilIcons;
 	dlg.m_bEditMode = FALSE;
 
+	m_bDisplayDialog = TRUE;
 	if(dlg.DoModal() == IDOK)
 	{
 		_GetCurrentPwTime(&pwTime);
@@ -1712,6 +1714,7 @@ void CPwSafeDlg::OnSafeAddGroup()
 
 		m_bModified = TRUE;
 	}
+	m_bDisplayDialog =  FALSE;
 
 	_UpdateToolBar();
 }
@@ -1756,6 +1759,8 @@ void CPwSafeDlg::OnViewHideStars()
 	}
 	else
 		RefreshPasswordList(); // Refresh list based on UUIDs
+
+	m_bCachedToolBarUpdate = TRUE;
 }
 
 DWORD CPwSafeDlg::GetSelectedEntry()
@@ -2090,6 +2095,7 @@ void CPwSafeDlg::OnPwlistAdd()
 	CPwManager::_GetNeverExpireTime(&dlg.m_tExpire);
 	dwInitialGroup = m_mgr.GetGroupIdByIndex(uGroup); // ID
 
+	m_bDisplayDialog = TRUE;
 	if(dlg.DoModal() == IDOK)
 	{
 		_GetCurrentPwTime(&tNow);
@@ -2120,6 +2126,7 @@ void CPwSafeDlg::OnPwlistAdd()
 
 		m_bModified = TRUE; // Haven't we? :)
 	}
+	m_bDisplayDialog = FALSE;
 
 	// Cleanup dialog data
 	EraseCString(&dlg.m_strTitle);
@@ -2201,6 +2208,7 @@ void CPwSafeDlg::OnPwlistEdit()
 	dlg.m_nIconId = (int)pEntry->uImageId;
 	dlg.m_tExpire = pEntry->tExpire;
 
+	m_bDisplayDialog = TRUE;
 	if(dlg.DoModal() == IDOK)
 	{
 		pwTemplate = *pEntry;
@@ -2244,6 +2252,7 @@ void CPwSafeDlg::OnPwlistEdit()
 	}
 	else
 		_TouchEntry(GetSelectedEntry(), FALSE); // User had viewed it only
+	m_bDisplayDialog = FALSE;
 
 	// Cleanup dialog data
 	EraseCString(&dlg.m_strTitle);
@@ -2304,9 +2313,11 @@ void CPwSafeDlg::OnRclickPwlist(NMHDR* pNMHDR, LRESULT* pResult)
 
 	BCMenu *psub = (BCMenu *)m_popmenu.GetSubMenu(0);
 	_TranslateMenu(psub);
+	m_bDisplayDialog = TRUE;
 	psub->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y,
 		AfxGetMainWnd());
 	m_popmenu.DestroyMenu();
+	m_bDisplayDialog = FALSE;
 
 	*pResult = 0;
 
@@ -2362,7 +2373,7 @@ void CPwSafeDlg::OnTimer(UINT nIDEvent)
 			m_bCachedToolBarUpdate = FALSE;
 		}
 	}
-	else if(nIDEvent == APPWND_TIMER_ID)
+	else if((nIDEvent == APPWND_TIMER_ID) && (m_bDisplayDialog == FALSE))
 	{
 		if(m_nClipboardCountdown != -1)
 		{
@@ -2570,7 +2581,9 @@ void CPwSafeDlg::OnFileNew()
 		return;
 	}
 
-	if(dlg.DoModal() == IDCANCEL) return;
+	m_bDisplayDialog = TRUE;
+	if(dlg.DoModal() == IDCANCEL) { m_bDisplayDialog = FALSE; return; }
+	m_bDisplayDialog = FALSE;
 
 	if(dlg.m_bKeyFile == FALSE)
 	{
@@ -2578,7 +2591,9 @@ void CPwSafeDlg::OnFileNew()
 		dlg.m_bConfirm = TRUE;
 		EraseCString(&dlg.m_strPassword);
 		EraseCString(&dlg.m_strRealKey);
-		if(dlg.DoModal() == IDCANCEL) return;
+		m_bDisplayDialog = TRUE;
+		if(dlg.DoModal() == IDCANCEL) { m_bDisplayDialog = FALSE; return; }
+		m_bDisplayDialog = FALSE;
 		if((dlg.m_strRealKey != strFirstPassword) || (dlg.m_bKeyFile == TRUE))
 		{
 			MessageBox(TRL("Password and repeated password aren't identical!"),
@@ -2590,6 +2605,7 @@ void CPwSafeDlg::OnFileNew()
 
 	m_mgr.NewDatabase();
 	CPwSafeAppRI ri;
+	m_bDisplayDialog = TRUE;
 	if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, &ri, FALSE) == FALSE)
 	{
 		if(dlg.m_bKeyFile == TRUE)
@@ -2603,15 +2619,17 @@ void CPwSafeDlg::OnFileNew()
 				{
 					MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"),
 						MB_OK | MB_ICONWARNING);
+					m_bDisplayDialog = FALSE;
 					return;
 				}
 			}
-			else return;
+			else { m_bDisplayDialog = FALSE; return; }
 		}
 		else
 		{
 			MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"),
 				MB_OK | MB_ICONWARNING);
+			m_bDisplayDialog = FALSE;
 			return;
 		}
 	}
@@ -2729,8 +2747,10 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	CFileDialog dlg(TRUE, NULL, NULL, dwFlags, strFilter, this);
 
+	m_bDisplayDialog = TRUE;
 	if(pszFile == NULL) nRet = dlg.DoModal();
 	else strFile = pszFile;
+	m_bDisplayDialog = FALSE;
 
 	if((pszFile != NULL) || (nRet == IDOK))
 	{
@@ -2741,11 +2761,12 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 		dlgPass.m_bLoadMode = TRUE;
 		dlgPass.m_bConfirm = FALSE;
 
-		if(dlgPass.DoModal() == IDCANCEL) return;
-
+		m_bDisplayDialog = TRUE;
+		if(dlgPass.DoModal() == IDCANCEL) { m_bDisplayDialog = FALSE; return; }
 		if(m_mgr.SetMasterKey(dlgPass.m_strRealKey, dlgPass.m_bKeyFile, NULL) == FALSE)
 		{
 			MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"), MB_OK | MB_ICONWARNING);
+			m_bDisplayDialog = FALSE;
 			return;
 		}
 		EraseCString(&dlgPass.m_strRealKey);
@@ -2774,6 +2795,7 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 			UpdateGroupList();
 			UpdatePasswordList();
 		}
+		m_bDisplayDialog = FALSE;
 	}
 
 	strText = PWM_PRODUCT_NAME;
@@ -2927,6 +2949,7 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_rgbRowHighlight = m_cList.GetColorEx();
 	dlg.m_bColAutoSize = m_bColAutoSize;
 
+	m_bDisplayDialog = TRUE;
 	if(dlg.DoModal() == IDOK)
 	{
 		m_bWindowsNewLine = (dlg.m_nNewlineSequence == 0) ? TRUE : FALSE;
@@ -2956,6 +2979,7 @@ void CPwSafeDlg::OnSafeOptions()
 		_SetListParameters();
 		m_cList.RedrawWindow();
 	}
+	m_bDisplayDialog = FALSE;
 
 	m_nLockCountdown = m_nLockTimeDef;
 	_UpdateToolBar();
@@ -2996,11 +3020,14 @@ void CPwSafeDlg::OnFileChangeMasterPw()
 	dlg.m_bConfirm = FALSE;
 	dlg.m_bLoadMode = FALSE;
 
-	if(dlg.DoModal() == IDCANCEL) return;
+	m_bDisplayDialog = TRUE;
+	if(dlg.DoModal() == IDCANCEL) { m_bDisplayDialog = FALSE; return; }
+	m_bDisplayDialog = FALSE;
 
 	if(dlg.m_bKeyFile == TRUE)
 	{
 		CPwSafeAppRI ri;
+		m_bDisplayDialog = TRUE;
 		if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, &ri, FALSE) == FALSE)
 		{
 			int nMsg = MessageBox(TRL("A key-file already exists on this drive. Do you want to overwrite it?"),
@@ -3013,10 +3040,11 @@ void CPwSafeDlg::OnFileChangeMasterPw()
 					MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"),
 						MB_OK | MB_ICONWARNING);
 					EraseCString(&dlg.m_strRealKey);
+					m_bDisplayDialog = FALSE;
 					return;
 				}
 			}
-			else return;
+			else { m_bDisplayDialog = FALSE; return; }
 		}
 
 		EraseCString(&dlg.m_strRealKey);
@@ -3033,7 +3061,9 @@ void CPwSafeDlg::OnFileChangeMasterPw()
 		EraseCString(&dlg.m_strPassword);
 		EraseCString(&dlg.m_strRealKey);
 
-		if(dlg.DoModal() == IDCANCEL) { EraseCString(&strFirstPassword); return; }
+		m_bDisplayDialog = TRUE;
+		if(dlg.DoModal() == IDCANCEL) { EraseCString(&strFirstPassword); m_bDisplayDialog = FALSE; return; }
+		m_bDisplayDialog = FALSE;
 
 		if((dlg.m_strRealKey != strFirstPassword) || (dlg.m_bKeyFile == TRUE))
 		{
@@ -3045,11 +3075,14 @@ void CPwSafeDlg::OnFileChangeMasterPw()
 		}
 
 		CPwSafeAppRI ri;
+		m_bDisplayDialog = TRUE;
 		if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, &ri, TRUE) == FALSE)
 		{
 			MessageBox(TRL("Failed to set the master key!"), TRL("Stop"), MB_OK | MB_ICONWARNING);
+			m_bDisplayDialog = FALSE;
 			return;
 		}
+		m_bDisplayDialog = FALSE;
 
 		EraseCString(&dlg.m_strRealKey);
 		EraseCString(&strFirstPassword);
@@ -3227,9 +3260,6 @@ void CPwSafeDlg::_PrintGroup(DWORD dwGroupIndex)
 	CPwExport cExp;
 	TCHAR szFile[MAX_PATH * 2];
 
-	ASSERT(dwGroupIndex != DWORD_MAX);
-	if(dwGroupIndex == DWORD_MAX) return;
-
 	_DeleteTemporaryFiles();
 
 	if(m_bFileOpen == FALSE) return;
@@ -3242,7 +3272,11 @@ void CPwSafeDlg::_PrintGroup(DWORD dwGroupIndex)
 	if(szFile[_tcslen(szFile) - 1] != _T('\\')) _tcscat(szFile, _T("\\"));
 	_tcscat(szFile, _T("pwsafetmp.html"));
 
-	if(cExp.ExportGroup(szFile, m_mgr.GetGroupIdByIndex(dwGroupIndex)) == FALSE)
+	BOOL bRet;
+	if(dwGroupIndex == DWORD_MAX) bRet = cExp.ExportGroup(szFile, m_mgr.GetGroupIdByIndex(dwGroupIndex));
+	else cExp.ExportGroup(szFile, DWORD_MAX);
+
+	if(bRet == FALSE)
 	{
 		MessageBox(TRL("Cannot open temporary file for printing!"), TRL("Stop"),
 			MB_OK | MB_ICONWARNING);
@@ -3268,8 +3302,10 @@ void CPwSafeDlg::OnExtrasGenPw()
 {
 	CPwGeneratorDlg dlg;
 
+	m_bDisplayDialog = TRUE;
 	dlg.m_bCanAccept = FALSE;
 	dlg.DoModal();
+	m_bDisplayDialog = FALSE;
 }
 
 void CPwSafeDlg::OnSafeModifyGroup() 
@@ -3292,6 +3328,7 @@ void CPwSafeDlg::OnSafeModifyGroup()
 	dlg.m_pParentImageList = &m_ilIcons;
 	dlg.m_bEditMode = TRUE;
 
+	m_bDisplayDialog = TRUE;
 	if(dlg.DoModal() == IDOK)
 	{
 		nTopIndex = m_cGroups.GetTopIndex();
@@ -3322,6 +3359,7 @@ void CPwSafeDlg::OnSafeModifyGroup()
 	}
 	else
 		_TouchGroup(dwGroup, FALSE);
+	m_bDisplayDialog = FALSE;
 
 	_UpdateToolBar();
 }
@@ -3350,6 +3388,7 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupIndex)
 	dwMaxItems = m_mgr.GetNumberOfEntries();
 	if(dwMaxItems == 0) return; // Nothing to search for
 
+	m_bDisplayDialog = TRUE;
 	if(dlg.DoModal() == IDOK)
 	{
 		DWORD dwFlags = 0;
@@ -3429,6 +3468,7 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupIndex)
 
 		m_bModified = TRUE;
 	}
+	m_bDisplayDialog = FALSE;
 }
 
 void CPwSafeDlg::OnUpdatePwlistFind(CCmdUI* pCmdUI) 
@@ -3805,8 +3845,11 @@ void CPwSafeDlg::OnFileChangeLanguage()
 	sui.cb = sizeof(STARTUPINFO);
 	ZeroMemory(&pi, sizeof(pi));
 
+	m_bDisplayDialog = TRUE;
 	if(dlg.DoModal() == IDOK)
 	{
+		m_bDisplayDialog = FALSE;
+
 		GetModuleFileName(NULL, szFile, 1024);
 		if(CreateProcess(szFile, NULL, NULL, NULL, FALSE, 0, NULL, NULL,
 			&sui, &pi) == FALSE)
@@ -3822,6 +3865,7 @@ void CPwSafeDlg::OnFileChangeLanguage()
 			OnFileExit();
 		}
 	}
+	m_bDisplayDialog = FALSE;
 }
 
 void CPwSafeDlg::OnInfoReadme() 
@@ -4633,6 +4677,7 @@ void CPwSafeDlg::OnPwlistMassModify()
 	dlg.m_pMgr = &m_mgr;
 	dlg.m_pParentIcons = &m_ilIcons;
 
+	m_bDisplayDialog = TRUE;
 	if(dlg.DoModal() == TRUE)
 	{
 		dwGroupId = m_mgr.GetGroupIdByIndex((DWORD)dlg.m_nGroupInx);
@@ -4670,6 +4715,7 @@ void CPwSafeDlg::OnPwlistMassModify()
 
 		m_bModified = TRUE;
 	}
+	m_bDisplayDialog = FALSE;
 }
 
 void CPwSafeDlg::OnUpdatePwlistMassModify(CCmdUI* pCmdUI) 
@@ -4702,7 +4748,7 @@ CString CPwSafeDlg::_MakeRtfString(LPCTSTR lptString)
 
 		if(tch == _T('\\')) str += _T("\\\\");
 		else if(tch == _T('\r')) { }
-		else if(tch == _T('\n')) { str += "\\par"; }
+		else if(tch == _T('\n')) { str += _T("\\par "); }
 		else if((tch < 128) && (tch >= 32)) str += tch;
 		else
 		{
@@ -4733,7 +4779,7 @@ void CPwSafeDlg::ShowEntryDetails(PW_ENTRY *p)
 	str += _MakeRtfString(m_mgr.GetGroupById(p->uGroupId)->pszGroupName); str += _T(", ");
 
 	str += _T("\\plain\\f2\\fs17\\b ");
-	str += TRL("Title: "); str += _T("\\plain\\f2\\fs17  ");
+	str += TRL("Title:"); str += _T("\\plain\\f2\\fs17  ");
 	str += _MakeRtfString(p->pszTitle); str += _T(", ");
 
 	str += _T("\\plain\\f2\\fs17\\b ");
@@ -4746,7 +4792,7 @@ void CPwSafeDlg::ShowEntryDetails(PW_ENTRY *p)
 
 	str += _T("\\plain\\f2\\fs17\\b ");
 	str += TRL("Password:"); str += _T("\\plain\\f2\\fs17  ");
-	if(m_bShowPassword == TRUE) str += _MakeRtfString(p->pszPassword); else str += _T("********");
+	if(m_bPasswordStars == FALSE) str += _MakeRtfString(p->pszPassword); else str += _T("********");
 	str += _T(", ");
 
 	str += _T("\\plain\\f2\\fs17\\b ");
@@ -4781,6 +4827,8 @@ void CPwSafeDlg::ShowEntryDetails(PW_ENTRY *p)
 void CPwSafeDlg::OnMouseMove(UINT nFlags, CPoint point) 
 {
 	LONG nAddTop;
+
+	m_nLockCountdown = m_nLockTimeDef;
 
 	if(m_bShowToolBar == TRUE) nAddTop = 26;
 	else nAddTop = 0;

@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=KeePass Password Safe
-AppVerName=KeePass Password Safe 0.89
+AppVerName=KeePass Password Safe 0.90a
 AppPublisher=ReichlSoft
 AppPublisherURL=http://keepass.sourceforge.net
 AppSupportURL=http://keepass.sourceforge.net

@@ -1,9 +1,9 @@
-04/02/09 - 0.89
-- Added resizing grippers (group list, password list and entry
-  view can be resized now)
+04/02/10 - 0.89
 - Added optional entry view (a view at the bottom of the main
   window which shows the details of the currently selected
   password entry)
+- Added resizing grippers (group list, password list and entry
+  view can be resized now)
 - The hide-password option (display stars) of the main window
   is now synced with the hide-password option of the edit/view
   entry dialog

@@ -131,6 +131,7 @@ public:
 	HICON m_hTrayIconNormal;
 	HICON m_hTrayIconLocked;
 	BOOL m_bWindowInvalid;
+	BOOL m_bDisplayDialog;
 
 	BCMenu m_menu; // Our XP-style menu
 	BOOL m_bMenu; // Menu created?
