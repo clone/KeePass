@@ -52,6 +52,9 @@ public:
 	static BOOL RegisterShellAssociation();
 	static BOOL UnregisterShellAssociation();
 
+	static BOOL GetStartWithWindows();
+	static BOOL SetStartWithWindows(BOOL bAutoStart);
+
 	CMutex *m_pAppMutex;
 
 	//{{AFX_VIRTUAL(CPwSafeApp)

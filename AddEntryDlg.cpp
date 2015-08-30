@@ -79,6 +79,7 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAddEntryDlg)
+	DDX_Control(pDX, IDC_COMBO_GROUPS, m_cbGroups);
 	DDX_Control(pDX, IDC_HL_HELP_URL, m_hlHelpURL);
 	DDX_Control(pDX, IDC_HL_HELP_AUTOTYPE, m_hlHelpAutoType);
 	DDX_Control(pDX, IDC_PROGRESS_PASSQUALITY, m_cPassQuality);
@@ -95,7 +96,6 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_URL, m_pURL);
 	DDX_Control(pDX, IDC_EDIT_REPEATPW, m_pRepeatPw);
 	DDX_Control(pDX, IDC_EDIT_PASSWORD, m_pEditPw);
-	DDX_Control(pDX, IDC_COMBO_GROUPS, m_pGroups);
 	DDX_Check(pDX, IDC_CHECK_HIDEPW, m_bStars);
 	DDX_Text(pDX, IDC_EDIT_TITLE, m_strTitle);
 	DDX_Text(pDX, IDC_EDIT_URL, m_strURL);
@@ -175,53 +175,32 @@ BOOL CAddEntryDlg::OnInitDialog()
 	m_hlHelpURL.SetNotifyParent(TRUE);
 	m_hlHelpURL.EnableURL(FALSE);
 
-	// Set the imagelist for the group selector combo box
-	m_pGroups.SetXImageList(m_pParentIcons);
-
-	m_pGroups.SetBkGndColor(RGB(255,255,255));
-	m_pGroups.SetTextColor(RGB(0,0,128));
-	m_pGroups.SetHiLightTextColor(RGB(0, 0, 128));
-
-	HDC hDC = ::GetDC(NULL);
-	if(GetDeviceCaps(hDC, BITSPIXEL) <= 8)
-	{
-		m_pGroups.SetHiLightBkGndColor(RGB(192,192,192));
-		m_pGroups.SetHiLightFrameColor(RGB(192,192,192));
-	}
-	else
-	{
-		m_pGroups.SetHiLightBkGndColor(RGB(230,230,255));
-		m_pGroups.SetHiLightFrameColor(RGB(230,230,255));
-	}
-	::ReleaseDC(NULL, hDC);
+	m_cbGroups.SetImageList(m_pParentIcons);
 
 	ASSERT(m_pMgr != NULL); // Must have been initialized by parent
-	unsigned int i, j; PW_GROUP *p; USHORT uLevel;
-	CString strAdd;
-	for(i = 0; i < m_pMgr->GetNumberOfGroups(); i++) // Add groups to combo box
+	unsigned int i; PW_GROUP *p;
+	COMBOBOXEXITEM cbi;
+	for(i = 0; i < (unsigned int)m_pMgr->GetNumberOfGroups(); i++)
 	{
 		p = m_pMgr->GetGroup(i);
-		ASSERT(p != NULL);
+		ASSERT(p != NULL); if(p == NULL) continue;
 
-		strAdd.Empty();
-		for(uLevel = 0; uLevel < p->usLevel; uLevel++) strAdd += _T("        ");
-
-		for(j = 0; j < (unsigned int)_tcslen(p->pszGroupName); j++)
-		{
-			if(p->pszGroupName[j] != _T('&')) strAdd += p->pszGroupName[j];
-			else strAdd += _T("&&");
-		}
-
-		m_pGroups.AddCTString(WZ_ROOT_INDEX, (BYTE)p->uImageId, strAdd);
+		ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
+		cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
+		cbi.iItem = (int)i;
+		cbi.pszText = (LPTSTR)p->pszGroupName;
+		cbi.cchTextMax = (int)_tcslen(p->pszGroupName);
+		cbi.iImage = cbi.iSelectedImage = (int)p->uImageId;
+		cbi.iIndent = (int)p->usLevel;
+		m_cbGroups.InsertItem(&cbi);
 	}
 
 	ASSERT(m_nGroupId != -1); // Must have been initialized by parent
-	m_pGroups.SetCurSel(m_nGroupId);
+	if(m_nGroupId != -1) m_cbGroups.SetCurSel(m_nGroupId);
 
 	// Configure banner control
 	NewGUI_ConfigSideBanner(&m_banner, this);
-	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY),
-		KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
+	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY), KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 
 	if(m_bEditMode == FALSE)
 	{
@@ -330,7 +309,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 void CAddEntryDlg::CleanUp()
 {
-	m_pGroups.ResetContent();
+	m_cbGroups.ResetContent();
 	m_fStyle.DeleteObject();
 }
 
@@ -344,7 +323,7 @@ void CAddEntryDlg::OnOK()
 	m_pRepeatPw.GetWindowText(m_strRepeatPw);
 
 	CString strGroupTest;
-	m_pGroups.GetLBText(m_pGroups.GetCurSel(), strGroupTest);
+	m_cbGroups.GetLBText(m_cbGroups.GetCurSel(), strGroupTest);
 	if(CPwManager::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
 	{
 		MessageBox(TRL("The group you selected cannot store entries. Please select an other group."),
@@ -368,7 +347,7 @@ void CAddEntryDlg::OnOK()
 
 	m_reNotes.GetWindowText(m_strNotes);
 
-	m_nGroupId = m_pGroups.GetCurSel();
+	m_nGroupId = m_cbGroups.GetCurSel();
 
 	if(m_strPassword != m_strRepeatPw)
 	{
@@ -435,6 +414,8 @@ void CAddEntryDlg::OnRandomPwBtn()
 	UpdateData(TRUE);
 
 	dlg.m_bCanAccept = TRUE;
+	dlg.m_bHidePw = m_bStars;
+
 	if(dlg.DoModal() == IDOK)
 	{
 		EraseCString(&m_strPassword);

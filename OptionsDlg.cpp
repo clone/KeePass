@@ -48,10 +48,8 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	//{{AFX_DATA_INIT(COptionsDlg)
 	m_nNewlineSequence = -1;
 	m_uClipboardSeconds = 0;
-	m_bOpenLastDb = FALSE;
 	m_bImgButtons = FALSE;
 	m_bEntryGrid = FALSE;
-	m_bAutoSave = FALSE;
 	m_bLockOnMinimize = FALSE;
 	m_bMinimizeToTray = FALSE;
 	m_bLockAfterTime = FALSE;
@@ -59,7 +57,6 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	m_bColAutoSize = FALSE;
 	m_bCloseMinimizes = FALSE;
 	m_bDisableUnsafe = FALSE;
-	m_bRememberLast = FALSE;
 	m_bUsePuttyForURLs = FALSE;
 	m_bSaveOnLATMod = FALSE;
 	m_nClipboardMethod = -1;
@@ -72,6 +69,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COptionsDlg)
+	DDX_Control(pDX, IDC_LIST_ADVANCED, m_olAdvanced);
 	DDX_Control(pDX, IDC_HOTKEY_AUTOTYPE, m_hkAutoType);
 	DDX_Control(pDX, IDC_BTN_DELETEASSOC, m_btnDeleteAssoc);
 	DDX_Control(pDX, IDC_BTN_CREATEASSOC, m_btnCreateAssoc);
@@ -82,10 +80,8 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_Radio(pDX, IDC_RADIO_NEWLINE_0, m_nNewlineSequence);
 	DDX_Text(pDX, IDC_EDIT_CLIPBOARDTIME, m_uClipboardSeconds);
-	DDX_Check(pDX, IDC_CHECK_AUTOOPENLASTDB, m_bOpenLastDb);
 	DDX_Check(pDX, IDC_CHECK_IMGBUTTONS, m_bImgButtons);
 	DDX_Check(pDX, IDC_CHECK_ENTRYGRID, m_bEntryGrid);
-	DDX_Check(pDX, IDC_CHECK_AUTOSAVE, m_bAutoSave);
 	DDX_Check(pDX, IDC_CHECK_LOCKMIN, m_bLockOnMinimize);
 	DDX_Check(pDX, IDC_CHECK_MINTRAY, m_bMinimizeToTray);
 	DDX_Check(pDX, IDC_CHECK_LOCKAFTERTIME, m_bLockAfterTime);
@@ -93,7 +89,6 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_COLAUTOSIZE, m_bColAutoSize);
 	DDX_Check(pDX, IDC_CHECK_CLOSEMIN, m_bCloseMinimizes);
 	DDX_Check(pDX, IDC_CHECK_DISABLEUNSAFE, m_bDisableUnsafe);
-	DDX_Check(pDX, IDC_CHECK_REMEMBERLAST, m_bRememberLast);
 	DDX_Check(pDX, IDC_CHECK_PUTTYURLS, m_bUsePuttyForURLs);
 	DDX_Check(pDX, IDC_CHECK_SAVEONLATMOD, m_bSaveOnLATMod);
 	DDX_Radio(pDX, IDC_RADIO_CLIPMETHOD_TIMED, m_nClipboardMethod);
@@ -106,8 +101,6 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialog)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_MENU, OnSelChangeTabMenu)
 	ON_BN_CLICKED(IDC_BTN_CREATEASSOC, OnBtnCreateAssoc)
 	ON_BN_CLICKED(IDC_BTN_DELETEASSOC, OnBtnDeleteAssoc)
-	ON_BN_CLICKED(IDC_CHECK_REMEMBERLAST, OnCheckRememberLast)
-	ON_BN_CLICKED(IDC_CHECK_AUTOOPENLASTDB, OnCheckAutoOpenLastDb)
 	ON_BN_CLICKED(IDC_RADIO_CLIPMETHOD_SECURE, OnRadioClipMethodSecure)
 	ON_BN_CLICKED(IDC_RADIO_CLIPMETHOD_TIMED, OnRadioClipMethodTimed)
 	//}}AFX_MSG_MAP
@@ -136,60 +129,54 @@ BOOL COptionsDlg::OnInitDialog()
 	m_banner.SetTitle(TRL("Settings"));
 	m_banner.SetCaption(TRL("Here you can configure KeePass."));
 
-	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_NEWLINETEXT), OPTGRP_FILES);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_NEWLINE_0), OPTGRP_FILES);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_NEWLINE_1), OPTGRP_FILES);
-	m_wndgrp.AddWindow(NULL, OPTGRP_FILES);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_SAVEONLATMOD), OPTGRP_FILES);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_NEWLINETEXT), OPTGRP_FILES, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_NEWLINE_0), OPTGRP_FILES, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_NEWLINE_1), OPTGRP_FILES, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_FILES, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_SAVEONLATMOD), OPTGRP_FILES, TRUE);
 
-	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CLIPBOARDMETHOD), OPTGRP_MEMORY);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_CLIPMETHOD_TIMED), OPTGRP_MEMORY);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_CLIPMETHOD_SECURE), OPTGRP_MEMORY);
-	m_wndgrp.AddWindow(NULL, OPTGRP_MEMORY);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CLIPCLEARTXT), OPTGRP_MEMORY);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_CLIPBOARDTIME), OPTGRP_MEMORY);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CLIPBOARDMETHOD), OPTGRP_MEMORY, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_CLIPMETHOD_TIMED), OPTGRP_MEMORY, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_RADIO_CLIPMETHOD_SECURE), OPTGRP_MEMORY, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_MEMORY, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_CLIPCLEARTXT), OPTGRP_MEMORY, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_CLIPBOARDTIME), OPTGRP_MEMORY, TRUE);
 
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_REMEMBERLAST), OPTGRP_STARTEXIT);
-	m_wndgrp.AddWindow(NULL, OPTGRP_STARTEXIT);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_START), OPTGRP_STARTEXIT);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_AUTOOPENLASTDB), OPTGRP_STARTEXIT);
-	m_wndgrp.AddWindow(NULL, OPTGRP_STARTEXIT);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_EXIT), OPTGRP_STARTEXIT);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_AUTOSAVE), OPTGRP_STARTEXIT);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_IMGBUTTONS), OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_ENTRYGRID), OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_COLAUTOSIZE), OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_MINTRAY), OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_CLOSEMIN), OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_SELFONTTXT), OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_SELFONT), OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_SELROWHIGHLIGHT), OPTGRP_GUI, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_ROWHIGHLIGHTSEL), OPTGRP_GUI, TRUE);
 
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_IMGBUTTONS), OPTGRP_GUI);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_ENTRYGRID), OPTGRP_GUI);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_COLAUTOSIZE), OPTGRP_GUI);
-	m_wndgrp.AddWindow(NULL, OPTGRP_GUI);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_MINTRAY), OPTGRP_GUI);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_CLOSEMIN), OPTGRP_GUI);
-	m_wndgrp.AddWindow(NULL, OPTGRP_GUI);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_SELFONTTXT), OPTGRP_GUI);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_SELFONT), OPTGRP_GUI);
-	m_wndgrp.AddWindow(NULL, OPTGRP_GUI);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_SELROWHIGHLIGHT), OPTGRP_GUI);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_ROWHIGHLIGHTSEL), OPTGRP_GUI);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_LOCKMIN), OPTGRP_SECURITY, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_LOCKAFTERTIME), OPTGRP_SECURITY, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_LOCKSECONDS), OPTGRP_SECURITY, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_DISABLEUNSAFE), OPTGRP_SECURITY, TRUE);
 
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_LOCKMIN), OPTGRP_SECURITY);
-	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_LOCKAFTERTIME), OPTGRP_SECURITY);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_EDIT_LOCKSECONDS), OPTGRP_SECURITY);
-	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY);
-	m_wndgrp.AddWindow(NULL, OPTGRP_SECURITY);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_DISABLEUNSAFE), OPTGRP_SECURITY);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_ASSOC), OPTGRP_SETUP, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_CREATEASSOC), OPTGRP_SETUP, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_DELETEASSOC), OPTGRP_SETUP, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_PUTTYURLS), OPTGRP_SETUP, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP, TRUE);
+	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_AUTOTYPEHK), OPTGRP_SETUP, TRUE);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_HOTKEY_AUTOTYPE), OPTGRP_SETUP, TRUE);
 
-	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_ASSOC), OPTGRP_SETUP);
-	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_CREATEASSOC), OPTGRP_SETUP);
-	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_BTN_DELETEASSOC), OPTGRP_SETUP);
-	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
-	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_CHECK_PUTTYURLS), OPTGRP_SETUP);
-	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
-	m_wndgrp.AddWindow(NULL, OPTGRP_SETUP);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_STATIC_AUTOTYPEHK), OPTGRP_SETUP);
-	m_wndgrp.AddWindow(GetDlgItem(IDC_HOTKEY_AUTOTYPE), OPTGRP_SETUP);
+	m_wndgrp.AddWindow(GetDlgItem(IDC_LIST_ADVANCED), OPTGRP_ADVANCED, FALSE);
 
 	m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
 	m_wndgrp.ArrangeWindows(this);
@@ -197,14 +184,34 @@ BOOL COptionsDlg::OnInitDialog()
 	m_ilIcons.Create(IDR_CLIENTICONS, 16, 1, RGB(255,0,255));
 	m_tabMenu.SetImageList(&m_ilIcons);
 
+	m_ilOptionIcons.Create(IDR_OPTIONICONS, 16, 1, RGB(255,0,255));
+	m_olAdvanced.InitOptionListEx(&m_ilOptionIcons);
+
+	m_olAdvanced.AddGroupText(TRL("Integration"), 9);
+	m_olAdvanced.AddCheckItem(TRL("Start KeePass at Windows startup (for current user)"), &m_bStartWithWindows, NULL, OL_LINK_NULL);
+
+	m_olAdvanced.AddGroupText(TRL(""), 0);
+	m_olAdvanced.AddGroupText(TRL("Start and Exit"), 7);
+	m_olAdvanced.AddCheckItem(TRL("Remember last opened file"), &m_bRememberLast, &m_bOpenLastDb, OL_LINK_SAME_TRIGGER_FALSE);
+	m_olAdvanced.AddCheckItem(TRL("Automatically open last used database on startup"), &m_bOpenLastDb, &m_bRememberLast, OL_LINK_SAME_TRIGGER_TRUE);
+	m_olAdvanced.AddCheckItem(TRL("Minimize window on startup"), &m_bStartMinimized, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Automatically save database on exit"), &m_bAutoSave, NULL, OL_LINK_NULL);
+
+	m_olAdvanced.AddGroupText(TRL(""), 0);
+	m_olAdvanced.AddGroupText(TRL("Immediately after opening a database"), 8);
+	m_olAdvanced.AddCheckItem(TRL("Show expired entries (if any)"), &m_bAutoShowExpired, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Show entries that will expire soon (if any)"), &m_bAutoShowExpiredSoon, NULL, OL_LINK_NULL);
+
+	m_olAdvanced.AddGroupText(TRL(""), 0);
+	m_olAdvanced.AddGroupText(TRL("Backup"), 10);
+	m_olAdvanced.AddCheckItem(TRL("Save backups of modified entries into the \"Backup\" group"), &m_bBackupEntries, NULL, OL_LINK_NULL);
+
 	TCITEM tci;
 	ZeroMemory(&tci, sizeof(TCITEM));
 	tci.mask = TCIF_TEXT | TCIF_IMAGE;
 
 	tci.cchTextMax = _tcslen(TRL(OPTSZ_SECURITY)); tci.pszText = (char *)TRL(OPTSZ_SECURITY);
 	tci.iImage = 29; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
-	tci.cchTextMax = _tcslen(TRL(OPTSZ_STARTEXIT)); tci.pszText = (char *)TRL(OPTSZ_STARTEXIT);
-	tci.iImage = 34; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
 	tci.cchTextMax = _tcslen(TRL(OPTSZ_GUI)); tci.pszText = (char *)TRL(OPTSZ_GUI);
 	tci.iImage = 6; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
 	tci.cchTextMax = _tcslen(TRL(OPTSZ_FILES)); tci.pszText = (char *)TRL(OPTSZ_FILES);
@@ -213,6 +220,8 @@ BOOL COptionsDlg::OnInitDialog()
 	tci.iImage = 42; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
 	tci.cchTextMax = _tcslen(TRL(OPTSZ_SETUP)); tci.pszText = (char *)TRL(OPTSZ_SETUP);
 	tci.iImage = 30; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
+	tci.cchTextMax = _tcslen(TRL(OPTSZ_ADVANCED)); tci.pszText = (char *)TRL(OPTSZ_ADVANCED);
+	tci.iImage = 21; m_tabMenu.InsertItem(m_tabMenu.GetItemCount(), &tci);
 
 	m_tabMenu.SetCurSel(0);
 
@@ -249,12 +258,14 @@ void COptionsDlg::OnOK()
 	if((m_bLockAfterTime == TRUE) && (m_nLockAfter < 5)) m_nLockAfter = 5;
 
 	m_ilIcons.DeleteImageList();
+	m_ilOptionIcons.DeleteImageList();
 	CDialog::OnOK();
 }
 
 void COptionsDlg::OnCancel() 
 {
 	m_ilIcons.DeleteImageList();
+	m_ilOptionIcons.DeleteImageList();
 	CDialog::OnCancel();
 }
 
@@ -316,8 +327,8 @@ void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult)
 
 	switch(n)
 	{
-	case OPTGRP_STARTEXIT:
-		m_wndgrp.HideAllExcept(OPTGRP_STARTEXIT);
+	case OPTGRP_SECURITY:
+		m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
 		break;
 	case OPTGRP_GUI:
 		m_wndgrp.HideAllExcept(OPTGRP_GUI);
@@ -331,11 +342,11 @@ void COptionsDlg::OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult)
 		if(m_nClipboardMethod != CM_TIMED)
 			GetDlgItem(IDC_EDIT_CLIPBOARDTIME)->EnableWindow(FALSE);
 		break;
-	case OPTGRP_SECURITY:
-		m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
-		break;
 	case OPTGRP_SETUP:
 		m_wndgrp.HideAllExcept(OPTGRP_SETUP);
+		break;
+	case OPTGRP_ADVANCED:
+		m_wndgrp.HideAllExcept(OPTGRP_ADVANCED);
 		break;
 	default:
 		ASSERT(FALSE);
@@ -396,20 +407,6 @@ void COptionsDlg::NotifyAssocChanged()
 		FreeLibrary(hShell32);
 	}
 	else { ASSERT(FALSE); }
-}
-
-void COptionsDlg::OnCheckRememberLast() 
-{
-	UpdateData(TRUE);
-	if(m_bRememberLast == FALSE) m_bOpenLastDb = FALSE;
-	UpdateData(FALSE);
-}
-
-void COptionsDlg::OnCheckAutoOpenLastDb() 
-{
-	UpdateData(TRUE);
-	if(m_bOpenLastDb == TRUE) m_bRememberLast = TRUE;
-	UpdateData(FALSE);
 }
 
 void COptionsDlg::OnRadioClipMethodSecure() 

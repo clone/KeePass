@@ -53,6 +53,8 @@ public:
 	BOOL ExportAll(const TCHAR *pszFile);
 	BOOL ExportGroup(const TCHAR *pszFile, DWORD dwGroupId);
 
+	CString MakeGroupTreeString(DWORD dwGroupId);
+
 private:
 	CPwManager *m_pMgr;
 	int m_nFormat;

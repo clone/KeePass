@@ -70,4 +70,6 @@ private:
 	KP_APP_INFO m_kpAppInfo;
 };
 
+C_FN_SHARE DWORD KP_Query(DWORD dwID, LPARAM lParam);
+
 #endif

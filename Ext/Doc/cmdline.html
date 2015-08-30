@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Command-Line Options</title>
+	<link rel="stylesheet" type="text/css" href="default.css" />
+</head>
+<body>
+
+<table class="tablebox"><tr><td class="boxtitle">
+<img src="images/movepaper.gif" width="31px" height="21px" class="singleimg">
+Command-Line Options</td></tr></table>
+<br />
+You can pass a file path in the command-line in order to tell KeePass to open
+this file immediately after startup. Additionally, you can specify the password
+and/or key-file location for this database.<br />
+<br />
+The database file location is passed as argument. Only one database file is allowed.
+It doesn't matter if you enclose the path in quotes (&quot;) or not.<br />
+<br />
+Passwords are passed using the <code>-pw:</code> switch. In order to
+pass 'abc' as password, you would add the following argument to the command-line:
+<code>-pw:abc</code>. Note that there's no space between the ':' and the
+password.<br />
+<br />
+For supplying the key-file location, the <code>-keyfile:</code> switch
+exists. The same rules as above apply, just that you specify the key-file location:
+<code>-keyfile:D:\pwsafe.key</code>.<br />
+<br />
+The order of the arguments doesn't matter.<br />
+<br /><br />
+<b>Usage examples</b><br />
+<br />
+Open the database file 'C:\My Documents\MyDatabase.kdb' (KeePass will prompt you
+for the password and/or key-file location):
+<pre>KeePass.exe C:\My Documents\MyDatabase.kdb</pre>
+
+If you got a database that is locked with a password 'abc', you could open it like this:
+<pre>KeePass.exe C:\My Documents\MyDatabaseWithPw.kdb -pw:abc</pre>
+
+If your USB stick always mounts to drive F: and you've locked your database with the
+USB stick as key-disk, you could open your database as follows:
+<pre>KeePass.exe C:\My Documents\MyDatabaseWithFile.kdb -keyfile:F:\pwsafe.key</pre>
+
+If you've locked your database using a password <i>and</i> a key-disk, you can combine
+the two switches and open your database as follows:
+<pre>KeePass.exe C:\My Documents\MyDatabaseWithTwo.kdb -pw:abc -keyfile:F:\pwsafe.key</pre>
+
+</body>
+</html>
+

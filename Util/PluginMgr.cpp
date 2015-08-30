@@ -236,13 +236,13 @@ BOOL CPluginManager::LoadAllPlugins()
 			str += TRL("This plugin has been designed for a different application version and may be incompatible with this one.");
 			str += "\r\n\r\n";
 			str += TRL("Application version:"); str += " ";
-			_tprintf(tszTemp, _T("%u.%u.%u.%u"), (m_kpAppInfo.dwAppVersion >> 24) & 0xFF,
+			_stprintf(tszTemp, _T("%u.%u.%u.%u"), (m_kpAppInfo.dwAppVersion >> 24) & 0xFF,
 				(m_kpAppInfo.dwAppVersion >> 16) & 0xFF,
 				(m_kpAppInfo.dwAppVersion >> 8) & 0xFF,
 				m_kpAppInfo.dwAppVersion & 0xFF);
 			str += tszTemp; str += "\r\n";
 			str += TRL("Plugin has been designed for:"); str += " ";
-			_tprintf(tszTemp, _T("%u.%u.%u.%u"), (p->info.dwForAppVer >> 24) & 0xFF,
+			_stprintf(tszTemp, _T("%u.%u.%u.%u"), (p->info.dwForAppVer >> 24) & 0xFF,
 				(p->info.dwForAppVer >> 16) & 0xFF,
 				(p->info.dwForAppVer >> 8) & 0xFF,
 				p->info.dwForAppVer & 0xFF);
@@ -394,4 +394,26 @@ BOOL CPluginManager::CallPlugins(DWORD dwCode, LPARAM lParamW, LPARAM lParamL)
 	}
 
 	return bRet;
+}
+
+C_FN_SHARE DWORD KP_Query(DWORD dwID, LPARAM lParam)
+{
+	DWORD dwRet = 0;
+
+	UNREFERENCED_PARAMETER(lParam);
+
+	switch(dwID)
+	{
+	case KPQUERY_NULL:
+		break;
+
+	case KPQUERY_VERSION:
+		dwRet = PWM_VERSION_DW;
+		break;
+
+	default:
+		break;
+	}
+
+	return dwRet;
 }

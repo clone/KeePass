@@ -50,6 +50,10 @@ static CString g_strOptions = _T("");
 static CString g_strCharSet = _T("");
 static UINT g_nChars = 16;
 
+#pragma warning(push)
+// Disable warning: "cast truncates constant value"
+#pragma warning(disable: 4310)
+
 /////////////////////////////////////////////////////////////////////////////
 
 CPwGeneratorDlg::CPwGeneratorDlg(CWnd* pParent /*=NULL*/)
@@ -61,6 +65,7 @@ CPwGeneratorDlg::CPwGeneratorDlg(CWnd* pParent /*=NULL*/)
 	m_bCharSpec = FALSE;
 	m_strCharSet = _T("");
 	m_bGetEntropy = FALSE;
+	m_bHidePw = FALSE;
 	//}}AFX_DATA_INIT
 
 	m_bCanAccept = TRUE;
@@ -70,6 +75,8 @@ void CPwGeneratorDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CPwGeneratorDlg)
+	DDX_Control(pDX, IDC_CHECK_HIDEPW, m_btHidePw);
+	DDX_Control(pDX, IDC_EDIT_PW, m_cEditPw);
 	DDX_Control(pDX, IDC_PROGRESS_PASSQUALITY, m_cPassQuality);
 	DDX_Control(pDX, IDC_SPIN_NUMCHARS, m_spinNumChars);
 	DDX_Control(pDX, IDC_GENERATE_BTN, m_btGenerate);
@@ -81,6 +88,7 @@ void CPwGeneratorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_CHARSPEC, m_bCharSpec);
 	DDX_Text(pDX, IDC_EDIT_ONLYCHARSPEC, m_strCharSet);
 	DDX_Check(pDX, IDC_CHECK_GETENTROPY, m_bGetEntropy);
+	DDX_Check(pDX, IDC_CHECK_HIDEPW, m_bHidePw);
 	//}}AFX_DATA_MAP
 }
 
@@ -92,6 +100,7 @@ BEGIN_MESSAGE_MAP(CPwGeneratorDlg, CDialog)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_OPTIONS, OnRclickListOptions)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_NUMCHARS, OnDeltaPosSpinNumChars)
 	ON_EN_CHANGE(IDC_EDIT_PW, OnChangeEditPw)
+	ON_BN_CLICKED(IDC_CHECK_HIDEPW, OnCheckHidePw)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -104,9 +113,23 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 	NewGUI_TranslateCWnd(this);
 	EnumChildWindows(this->m_hWnd, NewGUI_TranslateWindowCb, 0);
 
+	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
+		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
+	m_cEditPw.SetFont(&m_fStyle, TRUE);
+	m_btHidePw.SetFont(&m_fStyle, TRUE);
+
+	// 'z' + 27 is that black dot in Tahoma
+	TCHAR tchDot = (TCHAR)(_T('z') + 27);
+	CString strStars = _T("");
+	strStars += tchDot; strStars += tchDot; strStars += tchDot;
+	m_btHidePw.SetWindowText(strStars);
+
 	NewGUI_XPButton(&m_btnOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btnCancel, IDB_CANCEL, IDB_CANCEL);
 	NewGUI_XPButton(&m_btGenerate, IDB_KEY_SMALL, IDB_KEY_SMALL);
+	NewGUI_XPButton(&m_btHidePw, -1, -1);
+	m_btHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
@@ -191,17 +214,19 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 	if(m_bCanAccept == FALSE)
 	{
 		m_btnOK.ShowWindow(SW_HIDE);
-		m_btnCancel.SetWindowText(_T("&Close"));
+		m_btnCancel.SetWindowText(TRL("&Close"));
 	}
 	else m_btnOK.ShowWindow(SW_SHOW);
 
 	NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), m_strPassword);
+	OnCheckHidePw();
 
 	return TRUE;
 }
 
 void CPwGeneratorDlg::CleanUp()
 {
+	m_fStyle.DeleteObject();
 	m_ilIcons.DeleteImageList();
 }
 
@@ -520,3 +545,22 @@ void CPwGeneratorDlg::OnChangeEditPw()
 	if(m_strPassword.GetLength() == 0) m_btnOK.EnableWindow(FALSE);
 	else m_btnOK.EnableWindow(TRUE);
 }
+
+void CPwGeneratorDlg::OnCheckHidePw() 
+{
+	UpdateData(TRUE);
+
+	if(m_bHidePw == FALSE)
+		m_cEditPw.SetPasswordChar(0);
+	else
+	{
+		TCHAR tchDot = (TCHAR)(_T('z') + 27);
+		m_cEditPw.SetPasswordChar(tchDot);
+	}
+
+	UpdateData(FALSE);
+	m_cEditPw.RedrawWindow();
+	m_cEditPw.SetFocus();
+}
+
+#pragma warning(pop)

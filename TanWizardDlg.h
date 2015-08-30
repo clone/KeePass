@@ -36,7 +36,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CTanWizardDlg : public CDialog
+class CTanWizardDlg : public CDialog
 {
 public:
 	CTanWizardDlg(CWnd* pParent = NULL);

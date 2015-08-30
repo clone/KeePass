@@ -90,12 +90,9 @@ BOOL CEntryListDlg::OnInitDialog()
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY), KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 
-	if(m_nDisplayMode == ELDMODE_EXPIRED)
-	{
-		m_banner.SetTitle(TRL("Expired Entries"));
-		m_banner.SetCaption(TRL("This is a list of all expired entries"));
-		SetWindowText(TRL("Expired Entries"));
-	}
+	m_banner.SetTitle(TRL("Expired Entries"));
+	m_banner.SetCaption(TRL("This is a list of all expired entries"));
+	SetWindowText(TRL("Expired Entries"));
 
 	m_cList.SetImageList(m_pImgList, LVSIL_SMALL);
 
@@ -112,20 +109,38 @@ BOOL CEntryListDlg::OnInitDialog()
 	dw |= LVS_EX_HEADERDRAGDROP | LVS_EX_INFOTIP | LVS_EX_GRIDLINES;
 	m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, dw);
 
-	DWORD i;
+	DWORD i, dwDateNow, dwDate;
 	PW_TIME tNow;
 	PW_ENTRY *p;
+	BOOL bAdded;
 
 	_GetCurrentPwTime(&tNow);
+	dwDateNow = ((DWORD)tNow.shYear << 16) | ((DWORD)tNow.btMonth << 8) | ((DWORD)tNow.btDay & 0xff);
 
 	for(i = 0; i < m_pMgr->GetNumberOfEntries(); i++)
 	{
 		p = m_pMgr->GetEntry(i);
 		ASSERT(p != NULL);
 
-		if(_pwtimecmp(&tNow, &p->tExpire) > 0)
+		bAdded = FALSE;
+		if((m_nDisplayMode == ELDMODE_EXPIRED) || (m_nDisplayMode == ELDMODE_EXPSOONEXP))
 		{
-			_AddEntryToList(p);
+			if(_pwtimecmp(&tNow, &p->tExpire) > 0)
+			{
+				_AddEntryToList(p, TRUE);
+				bAdded = TRUE;
+			}
+		}
+
+		if(bAdded == FALSE)
+		{
+			if((m_nDisplayMode == ELDMODE_SOONTOEXP) || (m_nDisplayMode == ELDMODE_EXPSOONEXP))
+			{
+				dwDate = ((DWORD)p->tExpire.shYear << 16) | ((DWORD)p->tExpire.btMonth << 8) | ((DWORD)p->tExpire.btDay & 0xff);
+
+				if((dwDate >= dwDateNow) && ((dwDate - dwDateNow) <= PWV_SOONTOEXPIRE_DAYS))
+					_AddEntryToList(p, FALSE);
+			}
 		}
 	}
 
@@ -142,7 +157,7 @@ void CEntryListDlg::OnCancel()
 	CDialog::OnCancel();
 }
 
-void CEntryListDlg::_AddEntryToList(PW_ENTRY *p)
+void CEntryListDlg::_AddEntryToList(PW_ENTRY *p, BOOL bExpiredIcon)
 {
 	LV_ITEM lvi;
 	CString strTemp;
@@ -156,7 +171,7 @@ void CEntryListDlg::_AddEntryToList(PW_ENTRY *p)
 	ZeroMemory(&lvi, sizeof(LV_ITEM));
 	lvi.iItem = (int)dwInsertPos;
 	lvi.iSubItem = 0;
-	lvi.iImage = 45;
+	lvi.iImage = (bExpiredIcon == TRUE) ? 45 : p->uImageId;
 
 	lvi.mask = LVIF_TEXT | LVIF_IMAGE;
 	pwg = m_pMgr->GetGroupById(pwe->uGroupId);

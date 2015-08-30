@@ -37,19 +37,22 @@
 #define WG_OFFSET_LEFT  35
 #define WG_Y_STEP       20
 
+#define WGF_REPOSITION 1
+
 class CWindowGroups
 {
 public:
 	CWindowGroups();
 	virtual ~CWindowGroups();
 
-	BOOL AddWindow(CObject *pWindow, DWORD dwGroupID);
+	BOOL AddWindow(CObject *pWindow, DWORD dwGroupID, BOOL bReposition);
 	BOOL ArrangeWindows(CWnd *pParentWindow);
 	BOOL HideAllExcept(DWORD dwGroupID);
 
 private:
 	CObArray m_aWindows;
 	CDWordArray m_aGroupIDs;
+	CByteArray m_aFlags;
 };
 
 #endif

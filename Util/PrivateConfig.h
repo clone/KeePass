@@ -50,7 +50,14 @@ public:
 	BOOL Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue);
 	BOOL Get(const TCHAR *pszField, PCFG_OUT TCHAR *pszValue);
 
-	TCHAR m_szFile[SI_REGSIZE];
+	BOOL SetBool(const TCHAR *pszField, BOOL bValue);
+	BOOL GetBool(const TCHAR *pszField, BOOL bDefault);
+
+private:
+	int m_nUseDir;
+	TCHAR m_szFileLocal[MAX_PATH * 2];
+	TCHAR m_szFileUser[MAX_PATH * 2];
+	TCHAR m_szFileGeneric[MAX_PATH];
 };
 
 #endif // ___PRIVATE_CONFIG_H___

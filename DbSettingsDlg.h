@@ -36,7 +36,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CDbSettingsDlg : public CDialog
+class CDbSettingsDlg : public CDialog
 {
 public:
 	CDbSettingsDlg(CWnd* pParent = NULL);

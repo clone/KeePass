@@ -1,6 +1,6 @@
-|~LANGUAGEVERSION| |0.97c|
+|~LANGUAGEVERSION| |0.98b|
 |~LANGUAGEAUTHOR|     |DonAngel|
-|~LANGUAGEAUTHOREMAIL| |donangel@poboxes.com|
+|~LANGUAGEAUTHOREMAIL| |public@doncho.net|
 |~LANGUAGENAME|       |Български|
 
 |&OK|                          |&OK|
@@ -19,7 +19,7 @@
 |eMail|                        |eMail|
 |Homebanking|                  |Homebanking|
 
-|Entry|                        |Eintrag|
+|Entry|                        |Запис|
 
 |&Title|                       |&Заглавие|
 |User &Name|                   |Потр.&име|
@@ -49,7 +49,6 @@
 |Either enter the password/passphrase or select the password disk's drive.|
     |Моля въведете паролата или изберете устройството, съдържащо файла с парола.|
 |Enter password:|              |Въведете парола:|
-|or|                           |или|
 |Select the password disk drive where the key will be stored:|
     |Изберете устройството,където ключът ще се запази:|
 |Create a new password database - Enter master key|
@@ -151,7 +150,6 @@
 |&File|                        |&Файл|
 |&Edit|                        |&Редактиране|
 |&View|                        |&Изглед|
-|&Extras|                      |&Екстри|
 |&?|                           |&?|
 
 |&New Database...|             |&Нова база с данни...|
@@ -163,21 +161,16 @@
 |&Print Complete Password List|                |Отпечатване на целият списък с пароли|
 |&Lock Workspace|              |Заключване на програмата|
 |&Unlock Workspace|            |Отключване на програмата|
-|&Exit|                        |&Изход|
 
 |&Lock/Unlock Workspace|       |&Заключване/отключване на програмата|
 
-|&Add Password Group...|       |&Нова група за пароли...|
-|&Modify Password Group...|    |&Редакция на групата за пароли...|
 |&Delete Password Group...|    |&Изтриване на групата за пароли...|
-|&Print Group|                 |&Печатане на група...|
 |Export Group To &HTML...|     |Експорт на група в &HTML...|
 |Export Group To &XML...|      |Експорт на група в &XML...|
 |Export Group To &CSV...|      |Експорт на фрупа в &CSV...|
 |Copy User&Name To Clipboard|  |Копиране на потр.име в клипбоардът|
 |Copy &Password To Clipboard|  |Копиране на паролата в клипбоардът|
 |&Find In Database...|         |&Търсене в базата данни...|
-|Find In This &Group...|       |Търсене в тази група...|
 |&Add Entry...|                |Прибавяне на &запис...|
 |&Edit/View Entry...|          |&Преглеждане/редакция на запис...|
 |&Delete Entry|                |И&зтриване на запис|
@@ -197,13 +190,10 @@
 |Show User&Name Column|        |Показване на колона '&Потребителско име'|
 |Show &URL Column|             |Показване на колона '&URL'|
 |Show &Password Column|        |Показване на колона 'П&арола'|
-|Show &Notes Column|           |Показване на колона 'За&бележка'|
 |Main Window &Always On Top|   |&Основният прозорец винаги най-отгоре|
-|&Hide Passwords Behind Asterisks (***)|       |Ск&риване на паролата със звезди (***)|
 
 |Password &Generator|          |&Генератор на пароли|
 
-|Visit KeePass &Homepage|      |Посещение на страницата на &KeePass|
 |&About KeePass...|            |&Относно KeePass...|
 
 |&Minimize/Maximize Window To/From Tray|
@@ -259,7 +249,6 @@
     |Текущият файл беше модифициран.|
 |Do you want to save the changes before closing?|
     |Желаете ли да се запишат промените преди да завърши програмата?|
-|Save Before Close?|           |Записване преди да се затвори?|
 
 |Deleting a group will delete all items in that group, too.|
     |Изтриването на група ще изтрие също така всички записи в нея.|
@@ -277,7 +266,6 @@
     |Изберете един от езиците от списъка|
 |Available Languages|          |Налични езици|
 
-|Open &ReadMe File|            |&Показва ReadMe|
 |Open &License File|           |Показва на &лиценза|
 |&Print License File|          |Отпечатване на &лиценза|
 
@@ -365,7 +353,6 @@
 
 |Show &Creation Time Column|   |Показване на колоната с &дата на създаване|
 |Show Last &Modification Time Column|          |Показване на колоната с дата на &последната промяна|
-|Show Last Access &Time Column|                |Показване на колоната с дата на п&оследно пипане|
 |Show &Expire Time Column|                     |Показване на колоната с дата на &изтичане|
 |Show UU&ID Column|                            |Показване на колоната на &UUID|
 
@@ -385,13 +372,11 @@
 |Mass Modify|                  |Сменя всички|
 |Change fields of all selected entries|        |Сменя полетата на всички избрани записи|
 
-|Add Password &Subgroup...|	|Добавяне на подгрупа с &пароли...|
 |&Rearrange|			|П&реаранжиране|
 |&Sort Group List|		|&Сортиране на списъка с групи|
 |Move Group One &Left|		|Местене на групата едно в&ляво|
 |Move Group One &Right|		|Местене не групата едно в&дясно|
 
-|&Sort List By Title|		|Сортира листа по &Заглавие|
 |Sort List By User&Name|	|Сортира листа по &Потребителско име|
 |Sort List By &URL|		|Сортира листа по &URL|
 |Sort List By &Password|	|Сортира листа по П&арола|
@@ -400,8 +385,6 @@
 |Sort List By Last &Modify Time| |Сортира листа по Времето на п&оследната модификация|
 |Sort List By Last &Access Time| |Сортира листа по Времето на по&следен достъп|
 |Sort List By &Expiration Time|	|Сортира листа по Времето на &изтичане|
-
-|Hide UserNames Behind &Asterisks (***)| |Скрива потребителското име със звезди (***)|
 
 |Attachment:| |Прикачен:|
 
@@ -555,14 +538,8 @@
 |Export Group To &TXT...|
     |Изнасяне на групата като &TXT...|
     
-|Export To|
-    |Изнасяне в|
-    
 |Field copied to clipboard. Clipboard will be cleared in %d seconds.|
     |Полето е копирано в клипбоардa. Kлипбоардът ще бъде изчистен след %d секунди.|
-    
-|Import From|
-    |Внасяне от|
     
 |Imported from Password Safe|
     |Внасяне от Password Safe|
@@ -612,14 +589,166 @@
 |Use PuTTY for ssh: and telnet: URLs|
     |Използване на PuTTY за ssh: и telnet: URL-и|
     
-|&No Auto-Sort|
-	|&Без авто-сортиране|
-
 |&Options...|
 	|&Опции...|
 
 |Auto-&Sort Password List|
 	|Авто-&сортира списъка с пароли|
 	
-|Auto-sorting of the password list is enabled, you cannot move entries manually.|
+|Auto-sorting of the password list is enabled, you cannot move entries manually.| 
 	|При включено Автоматично сортиране на списъка, ръчното местене на записите е забранено.|
+|&Disable| 
+	|&Изключване|
+|&Enable| 
+	|&Включване|
+|&Export To| 
+	|&Изнеси към|
+|&Import From| 
+	|В&неси от|
+|&Plugin Manager| 
+	|&Мениджър на разширения|
+|About &Plugin...| 
+	|За &разширението...|
+|Add Password &Group...| 
+	|Прибавя &група за пароли...|
+|Add Password Su&bgroup...| 
+	|Прибавя п&одгрупа за пароли...|
+|An error occured| 
+	|Стана грешка|
+|Application version:| 
+	|Версия на програмата:|
+|Auto-Type| 
+	|Само-писане|
+|Auto-sorting of the password list is enabled, you cannot sort the list manually now.|
+	|Само-преместването на списъка с пароли е включено, така че не може ръчно да сортирате.|
+
+|Change password of this database - Enter new master key|
+	|Смяна на паролата на тази база - Въвеждане на нов главен ключ|
+
+|Clipboard behavior:| 
+	|Поведение на клипбоардът:|
+|Disabled, not loaded| 
+	|Забранен, не е зареден|
+|Do you want to load the plugin?| 
+	|Желаете ли да се зареди разширението?|
+|E&xit| 
+	|&Изход|
+|E&xtras| 
+	|Е&кстри|
+|Enabled, loaded| 
+	|Разрешен, зареден|
+|Encryption/decryption error| 
+	|Грешка при кодиране/декодиране|
+|Enhanced: allow pasting only once and protect against clipboard spies| 
+	|Разширено: позволява слагане само веднъж и защитава от шпиони на клипбоардът|
+|Enter the new master key for this database.| 
+	|Въвеждане на нов главен ключ за тази база данни.|
+|Error code| 
+	|Код на грешка|
+|Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations.|
+	|Асоциираната към .kdb файловете програма не успя да бъде сменена. Уверете се, че имате права за писане в системното Registry и опитайте пак.|
+|File access error: failed to open file in read mode|
+	|Грешка при работа с файл: файлът не може да се отвори за четене|
+|File access error: failed to open file in write mode|
+	|Грешка при работа с файл: файлът не може да се отвори за писане|
+|File error: error while reading from the file|
+	|Файлова грешка: грешка при четене от файла|
+|File error: error while writing to the file|
+	|Файлова грешка: грешка при писане във файла|
+
+|Find In T&his Group...|
+	|Търсене в &тази група...|
+|Get more plugins...|
+	|Вземане на още разширения...|
+|Global auto-type hot key combination:|
+	|Глобална клавишна комбинация за авто-писане:|
+|Help:|
+	|Помощ:|
+|Here you can configure all installed KeePass plugins.|
+	|Тук може да настроите всички инсталирани KeePass разширения.|
+|Hide &Passwords Behind Asterisks (***)|
+	|Скриване на &паролите със звездички (***)|
+|Hide &UserNames Behind Asterisks (***)|
+	|Скриване на п&отребителското име зад звездички (***)|
+|If you notice any problems with this enhanced method, just switch back to the timed clipboard clearing method.|
+	|Ако срещате затруднения при използването на този разширен метод, просто преминете обратно към временно копиране в клипбоардът.|
+|Internal error|
+	|Вътрешна грешка|
+|Invalid parameter|
+	|Лош параметър|
+|Invalid random source|
+	|Проблематичен източник на случайни числа|
+|Invalid/corrupted file structure|
+	|Лоша/разрушена структура на файл|
+|Invalid/wrong key|
+	|Лош/сгрешен ключ|
+|It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.|
+	|Възможно е това разрешение да работи, но също така е възможно то да строши и блокира KeePass.|
+|KeePass - Save Before Close/Lock?|
+	|KeePass - Да се запише ли преди затваряне/заключване?|
+|Modif&y Password Group...|
+	|Пром&яна на групата с пароли...|
+|Most probably an other application has reserved this hot key already.|
+	|Най-вероятно друга програма вече е запазила тези клавиши.|
+|N&o Auto-Sort|
+	|Б&ез Авто-сортировка|
+|Never expires|
+	|Никога не изтича|
+|Number the TANs consecutively, starting from this value|
+	|Брой поредни TANs, започвайки от тази стойност|
+|Open &Help File|
+	|&Помощен файл|
+|Perform Auto-&Type|
+	|Направи Само-&писане|
+|Plugin|
+	|Разширение|
+|Plugin Manager|
+	|Мениджър на разширенията|
+|Plugin has been designed for:|
+	|Това разширение служи за:|
+|Pr&int Group|
+	|Пе&чат на група|
+|Repeat master key|
+	|Повтаряне на главния ключ|
+|Repeat the master key for this database.|
+	|Повторете главния ключ за тази база данни.|
+|Save key-file manually to...|
+	|Ръчно записване на ключ-файла в...|
+|Select key-file manually...|
+	|Ръчно избиране на ключ-файла...|
+|Show &Last Access Time Column|
+	|Показване на колата &Последен достъп|
+|Show Note&s Column|
+	|Показване на &Забележките|
+|Sort List By &Title|
+	|Сортиране по &Заглавия на списъка|
+|Success|
+	|Успех|
+|Therefore save all data before you continue.|
+	|Поради това запазете всички данни, преди да продължите.|
+|This plugin has been designed for a different application version and may be incompatible with this one.|
+	|Това разширение е предвидено за друга версия на програмата и може да не е съвместимо с тази.|
+|This plugin will be disabled after you restart KeePass.|
+	|Това разширение ще бъде забранено при рестартирането на KeePass.|
+|This plugin will be enabled after you restart KeePass.|
+	|Това разширение ще бъде разрешено при рестартирането на KeePass.|
+|Timed: copy data to the clipboard and clear it automatically after some seconds|
+	|Старо: копиране на данните в клипбоарда и автоматично изчиствате след няколко секунди|
+|Too few memory (RAM) available|
+	|Твърде малко свободна памет (RAM)|
+|Unable to register a global hot key.|
+	|Не може да се регистрира глобалния горещ клавиш.|
+|Unknown error|
+	|Непозната грешка|
+|Visit &KeePass Homepage|
+	|Посещение на страницата на &KeePass|
+|Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.|
+	|Внимание! Възможно е тази настройка да не работи правилно на тази система, особено ако използвате някакви допълнителни програми за разширение на клипбоардът.|
+|You can choose an other hot key combination in 'Edit - Options - Setup'.|
+	|Може да изберете друга комбинация за горещи клавиши от 'Редакция - Опции - Настройка'.|
+|You've selected the AND key mode, so you must enter a password AND select a key-file.|
+	|Избрахте режим И на клавишите, така че трябва да въведете парола И да изберете ключ-файл.|
+|and|
+	|и|
+|cannot be loaded!|
+	|не може да се зареди!|

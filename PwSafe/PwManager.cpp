@@ -29,6 +29,7 @@
 
 #include "StdAfx.h"
 #include "PwManager.h"
+#include "PwUtil.h"
 #include "../Util/MemUtil.h"
 #include "../Util/StrUtil.h"
 #include "../Crypto/twoclass.h"
@@ -100,6 +101,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 	char *paKey2 = NULL;
 	unsigned char aFileKey[32];
 	unsigned char aPasswordKey[32];
+	BOOL bReadNormal;
 
 	ASSERT(pszMasterKey != NULL); if(pszMasterKey == NULL) return PWE_INVALID_PARAM;
 
@@ -170,6 +172,8 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 				uFileSize = (unsigned long)ftell(fp);
 				fseek(fp, 0, SEEK_SET);
 
+				bReadNormal = TRUE;
+
 				if(uFileSize == 32)
 				{
 					if(fread(m_pMasterKey, 1, 32, fp) != 32)
@@ -177,8 +181,19 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 						fclose(fp); fp = NULL;
 						return PWE_FILEERROR_READ;
 					}
+
+					bReadNormal = FALSE;
 				}
-				else
+				else if(uFileSize == 64)
+				{
+					if(LoadHexKey32(fp, m_pMasterKey) == FALSE)
+					{
+						fseek(fp, 0, SEEK_SET);
+					}
+					else bReadNormal = FALSE;
+				}
+
+				if(bReadNormal == TRUE)
 				{
 					sha256_begin(&sha32);
 					while(1)
@@ -207,7 +222,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 
 				fp = _tfopen(szFile, _T("wb"));
 				if(fp == NULL) return PWE_NOFILEACCESS_WRITE;
-				if(fwrite(aRandomBytes, 1, 32, fp) != 32) { fclose(fp); fp = NULL; return PWE_FILEERROR_WRITE; }
+				if(SaveHexKey32(fp, aRandomBytes) == FALSE) { fclose(fp); fp = NULL; return PWE_FILEERROR_WRITE; }
 				fclose(fp); fp = NULL;
 
 				memcpy(m_pMasterKey, aRandomBytes, 32);
@@ -235,6 +250,8 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 				uFileSize = (unsigned long)ftell(fp);
 				fseek(fp, 0, SEEK_SET);
 
+				bReadNormal = TRUE;
+
 				if(uFileSize == 32)
 				{
 					if(fread(aFileKey, 1, 32, fp) != 32)
@@ -242,8 +259,19 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 						fclose(fp); fp = NULL;
 						return PWE_FILEERROR_READ;
 					}
+
+					bReadNormal = FALSE;
 				}
-				else
+				else if(uFileSize == 64)
+				{
+					if(LoadHexKey32(fp, aFileKey) == FALSE)
+					{
+						fseek(fp, 0, SEEK_SET);
+					}
+					else bReadNormal = FALSE;
+				}
+
+				if(bReadNormal == TRUE)
 				{
 					sha256_begin(&sha32);
 					while(1)
@@ -287,7 +315,7 @@ int CPwManager::SetMasterKey(const TCHAR *pszMasterKey, BOOL bDiskDrive, const T
 
 				fp = _tfopen(szFile, _T("wb"));
 				if(fp == NULL) return PWE_NOFILEACCESS_WRITE;
-				if(fwrite(aRandomBytes, 1, 32, fp) != 32) { fclose(fp); fp = NULL; return PWE_FILEERROR_WRITE; }
+				if(SaveHexKey32(fp, aRandomBytes) == FALSE) { fclose(fp); fp = NULL; return PWE_FILEERROR_WRITE; }
 				fclose(fp); fp = NULL;
 
 				ASSERT(uKeyLen2 != 0);
@@ -1654,6 +1682,34 @@ void CPwManager::MoveInGroup(DWORD idGroup, DWORD nFrom, DWORD nTo)
 	MoveInternal(dwFromEx, dwToEx);
 }
 
+BOOL CPwManager::GetGroupTree(DWORD idGroup, DWORD *pGroupIndexes)
+{
+	DWORD i, dwGroupPos;
+	USHORT usLevel;
+
+	ASSERT(pGroupIndexes != NULL); if(pGroupIndexes == NULL) return FALSE;
+
+	dwGroupPos = GetGroupByIdN(idGroup);
+	ASSERT(dwGroupPos != DWORD_MAX); if(dwGroupPos == DWORD_MAX) return FALSE;
+
+	i = dwGroupPos;
+	usLevel = (USHORT)(m_pGroups[i].usLevel + 1);
+	while(1)
+	{
+		if(m_pGroups[i].usLevel == (usLevel - 1))
+		{
+			usLevel--;
+			pGroupIndexes[usLevel] = i;
+			if(usLevel == 0) break;
+		}
+
+		if(i == 0) { ASSERT(FALSE); return FALSE; }
+		i--;
+	}
+
+	return TRUE;
+}
+
 void CPwManager::SortGroupList()
 {
 	DWORD i, j;
@@ -2271,6 +2327,41 @@ BOOL CPwManager::IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupN
 
 	if(_tcscmp(lpGroupName, lpSearchGroupName) == 0) return FALSE;
 	return TRUE;
+}
+
+BOOL CPwManager::BackupEntry(const PW_ENTRY *pe, BOOL *pbGroupCreated)
+{
+	PW_ENTRY pwe;
+	PW_GROUP pwg;
+	DWORD dwGroupId;
+
+	ASSERT(pe != NULL); if(pe == NULL) return FALSE;
+
+	if(pbGroupCreated != NULL) *pbGroupCreated = FALSE;
+
+	dwGroupId = GetGroupId(PWS_BACKUPGROUP);
+	if(dwGroupId == DWORD_MAX)
+	{
+		ZeroMemory(&pwg, sizeof(PW_GROUP));
+		pwg.pszGroupName = (TCHAR *)PWS_BACKUPGROUP;
+		_GetCurrentPwTime(&pwg.tCreation);
+		pwg.tLastAccess = pwg.tCreation;
+		pwg.tLastMod = pwg.tCreation;
+		_GetNeverExpireTime(&pwg.tExpire);
+		pwg.uImageId = 4;
+
+		if(AddGroup(&pwg) == FALSE) return FALSE;
+		if(pbGroupCreated != NULL) *pbGroupCreated = TRUE;
+		dwGroupId = GetGroupId(PWS_BACKUPGROUP);
+	}
+	if(dwGroupId == DWORD_MAX) return FALSE;
+
+	pwe = *pe;
+	_GetCurrentPwTime(&pwe.tLastMod);
+	pwe.uGroupId = dwGroupId;
+	ZeroMemory(&pwe.uuid, 16);
+
+	return AddEntry(&pwe);
 }
 
 /* DWORD CPwManager::MakeGroupTree(LPCTSTR lpTreeString, TCHAR tchSeparator)

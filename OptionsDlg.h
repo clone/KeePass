@@ -34,26 +34,27 @@
 #include "NewGUI/WindowGroups.h"
 #include "NewGUI/ColourPickerXP.h"
 #include "NewGUI/XPStyleButtonST.h"
+#include "NewGUI/OptionsList.h"
 #include "PwSafeDlg.h"
 
 #define OPTGRP_SECURITY  0
-#define OPTGRP_STARTEXIT 1
-#define OPTGRP_GUI       2
-#define OPTGRP_FILES     3
-#define OPTGRP_MEMORY    4
-#define OPTGRP_SETUP     5
+#define OPTGRP_GUI       1
+#define OPTGRP_FILES     2
+#define OPTGRP_MEMORY    3
+#define OPTGRP_SETUP     4
+#define OPTGRP_ADVANCED  5
 
 // No _T, will be TRL-ed
 #define OPTSZ_FILES     "Files"
 #define OPTSZ_MEMORY    "Memory"
-#define OPTSZ_STARTEXIT "Start and Exit"
 #define OPTSZ_GUI       "Interface (GUI)"
 #define OPTSZ_SECURITY  "Security"
 #define OPTSZ_SETUP     "Setup"
+#define OPTSZ_ADVANCED  "Advanced"
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE COptionsDlg : public CDialog
+class COptionsDlg : public CDialog
 {
 public:
 	COptionsDlg(CWnd* pParent = NULL);
@@ -64,6 +65,7 @@ public:
 	CString m_strFontSpec;
 	CWindowGroups m_wndgrp;
 	CImageList m_ilIcons;
+	CImageList m_ilOptionIcons;
 
 	COLORREF m_rgbRowHighlight;
 
@@ -71,8 +73,18 @@ public:
 
 	static void NotifyAssocChanged();
 
+	BOOL m_bRememberLast;
+	BOOL m_bAutoSave;
+	BOOL m_bOpenLastDb;
+	BOOL m_bStartMinimized;
+	BOOL m_bAutoShowExpired;
+	BOOL m_bAutoShowExpiredSoon;
+	BOOL m_bStartWithWindows;
+	BOOL m_bBackupEntries;
+
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };
+	COptionsList	m_olAdvanced;
 	CHotKeyCtrl	m_hkAutoType;
 	CXPStyleButtonST	m_btnDeleteAssoc;
 	CXPStyleButtonST	m_btnCreateAssoc;
@@ -83,10 +95,8 @@ public:
 	CXPStyleButtonST	m_btOK;
 	int		m_nNewlineSequence;
 	UINT	m_uClipboardSeconds;
-	BOOL	m_bOpenLastDb;
 	BOOL	m_bImgButtons;
 	BOOL	m_bEntryGrid;
-	BOOL	m_bAutoSave;
 	BOOL	m_bLockOnMinimize;
 	BOOL	m_bMinimizeToTray;
 	BOOL	m_bLockAfterTime;
@@ -94,7 +104,6 @@ public:
 	BOOL	m_bColAutoSize;
 	BOOL	m_bCloseMinimizes;
 	BOOL	m_bDisableUnsafe;
-	BOOL	m_bRememberLast;
 	BOOL	m_bUsePuttyForURLs;
 	BOOL	m_bSaveOnLATMod;
 	int		m_nClipboardMethod;
@@ -114,8 +123,6 @@ protected:
 	afx_msg void OnSelChangeTabMenu(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnBtnCreateAssoc();
 	afx_msg void OnBtnDeleteAssoc();
-	afx_msg void OnCheckRememberLast();
-	afx_msg void OnCheckAutoOpenLastDb();
 	afx_msg void OnRadioClipMethodSecure();
 	afx_msg void OnRadioClipMethodTimed();
 	//}}AFX_MSG

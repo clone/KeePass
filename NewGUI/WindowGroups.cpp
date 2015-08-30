@@ -34,18 +34,26 @@ CWindowGroups::CWindowGroups()
 {
 	m_aWindows.RemoveAll();
 	m_aGroupIDs.RemoveAll();
+	m_aFlags.RemoveAll();
 }
 
 CWindowGroups::~CWindowGroups()
 {
 	m_aWindows.RemoveAll();
 	m_aGroupIDs.RemoveAll();
+	m_aFlags.RemoveAll();
 }
 
-BOOL CWindowGroups::AddWindow(CObject *pWindow, DWORD dwGroupID)
+BOOL CWindowGroups::AddWindow(CObject *pWindow, DWORD dwGroupID, BOOL bReposition)
 {
+	BYTE bt = 0;
+
 	m_aWindows.Add(pWindow);
 	m_aGroupIDs.Add(dwGroupID);
+
+	if(bReposition == TRUE) bt |= WGF_REPOSITION;
+	m_aFlags.Add(bt);
+
 	return TRUE;
 }
 
@@ -92,6 +100,8 @@ BOOL CWindowGroups::ArrangeWindows(CWnd *pParentWindow)
 
 	for(i = 0; i < m_aWindows.GetSize(); i++)
 	{
+		if((m_aFlags.GetAt(i) & WGF_REPOSITION) == 0) continue;
+
 		p = (CWnd *)m_aWindows.GetAt(i);
 
 		if(p != NULL)

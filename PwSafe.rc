@@ -99,7 +99,7 @@ STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE |
 CAPTION "About KeePass..."
 FONT 8, "MS Sans Serif"
 BEGIN
-    LTEXT           "Copyright (c) 2003/2004 Dominik Reichl.",IDC_STATIC,7,7,
+    LTEXT           "Copyright (c) 2003-2005 Dominik Reichl.",IDC_STATIC,7,7,
                     254,8
     DEFPUSHBUTTON   "&OK",IDOK,209,65,52,14,WS_GROUP
     LTEXT           "Database Format Version:",IDC_STATIC_DBFORMATTEXT,7,33,
@@ -118,7 +118,7 @@ STYLE DS_3DLOOK | DS_NOFAILCREATE | WS_MINIMIZEBOX | WS_MAXIMIZEBOX |
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "Password Safe"
 MENU IDR_MAINMENU
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_MENULINE,"Static",SS_ETCHEDHORZ,0,0,69,1
     CONTROL         "List1",IDC_PWLIST,"SysListView32",LVS_REPORT | 
@@ -162,7 +162,7 @@ IDD_PASSWORD_DLG DIALOGEX 0, 0, 352, 140
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_TITLE>"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     LTEXT           "Enter password:",IDC_STATIC_ENTERPW,13,40,94,8
     EDITTEXT        IDC_EDIT_PASSWORD,109,38,211,14,ES_PASSWORD | 
@@ -170,9 +170,8 @@ BEGIN
     CONTROL         "and",IDC_CHECK_KEYMETHOD_AND,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,13,65,70,10
     LTEXT           "<DYN_SELDISK>",IDC_STATIC_SELDISK,13,80,195,8
-    COMBOBOX        IDC_COMBO_DISKLIST,209,78,128,150,CBS_DROPDOWNLIST | 
-                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | 
-                    WS_TABSTOP
+    CONTROL         "",IDC_COMBO_DISKLIST,"ComboBoxEx32",CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP,209,78,128,132
     DEFPUSHBUTTON   "&OK",IDOK,229,119,56,14
     PUSHBUTTON      "&Cancel",IDCANCEL,289,119,56,14
     PUSHBUTTON      "&Generate Random Password",IDC_MAKEPASSWORD_BTN,7,119,
@@ -193,16 +192,15 @@ IDD_ADDENTRY_DLG DIALOGEX 0, 0, 315, 279
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_TITLE>"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,189,258,58,14
     PUSHBUTTON      "&Cancel",IDCANCEL,250,258,58,14
-    COMBOBOX        IDC_COMBO_GROUPS,67,7,167,211,CBS_DROPDOWNLIST | 
-                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | 
-                    WS_TABSTOP
     LTEXT           "Icon:",IDC_STATIC,246,9,23,8
     PUSHBUTTON      "&Pick One",IDC_PICKICON_BTN,271,7,37,14
     LTEXT           "Group:",IDC_STATIC,7,9,59,8
+    CONTROL         "",IDC_COMBO_GROUPS,"ComboBoxEx32",CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP,67,7,167,172
     LTEXT           "Title:",IDC_STATIC,7,27,58,8
     LTEXT           "UserName:",IDC_STATIC,7,46,58,8
     LTEXT           "Password:",IDC_STATIC,7,84,57,8
@@ -276,7 +274,7 @@ IDD_GETRANDOM_DLG DIALOGEX 0, 0, 402, 215
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Get Random"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,277,194,57,14
     CONTROL         143,IDC_STATIC_RANDOM,"Static",SS_BITMAP | 
@@ -308,17 +306,18 @@ IDD_PW_GENERATOR_DLG DIALOGEX 0, 0, 316, 274
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Password Generator"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Accept",IDOK,189,253,58,14
     PUSHBUTTON      "&Cancel",IDCANCEL,251,253,58,14
     PUSHBUTTON      "&Generate",IDC_GENERATE_BTN,251,216,58,14
     LTEXT           "Your new password:",IDC_STATIC,7,218,85,8
-    EDITTEXT        IDC_EDIT_PW,93,216,154,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT_PW,93,216,137,14,ES_AUTOHSCROLL | ES_NOHIDESEL
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,248,315,1
     GROUPBOX        "Password Generation Options",IDC_STATIC,7,7,302,201
     CONTROL         "List1",IDC_LIST_OPTIONS,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | WS_BORDER | WS_TABSTOP,13,17,290,130
+                    LVS_SINGLESEL | LVS_SHAREIMAGELISTS | WS_BORDER | 
+                    WS_TABSTOP,13,17,290,130
     LTEXT           "Number of characters:",IDC_STATIC,13,174,123,8
     EDITTEXT        IDC_EDIT_NUMCHARACTERS,137,171,156,14,ES_AUTOHSCROLL | 
                     ES_NOHIDESEL | ES_NUMBER
@@ -332,8 +331,10 @@ BEGIN
                     UDS_ARROWKEYS,293,171,10,14
     LTEXT           "Quality:",IDC_STATIC,7,231,83,8
     CONTROL         "Progress1",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",
-                    0x0,93,231,122,9,WS_EX_STATICEDGE
-    RTEXT           "9999 bits",IDC_STATIC_PASSBITS,216,231,30,8
+                    0x0,93,231,105,9,WS_EX_STATICEDGE
+    RTEXT           "9999 bits",IDC_STATIC_PASSBITS,199,231,30,8
+    CONTROL         "***",IDC_CHECK_HIDEPW,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_TABSTOP,231,216,16,14
 END
 
 IDD_FIND_DLG DIALOG DISCARDABLE  0, 0, 231, 138
@@ -396,16 +397,11 @@ BEGIN
                     IDC_STATIC_CLIPCLEARTXT,18,106,337,8
     EDITTEXT        IDC_EDIT_CLIPBOARDTIME,19,53,336,14,ES_AUTOHSCROLL | 
                     ES_NUMBER
-    CONTROL         "Automatically open last used database on startup",
-                    IDC_CHECK_AUTOOPENLASTDB,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,92,338,10
     CONTROL         "GUI: Display images on buttons",IDC_CHECK_IMGBUTTONS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,99,337,10
     CONTROL         "GUI: Show grid lines in password entry list",
                     IDC_CHECK_ENTRYGRID,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,18,111,339,10
-    CONTROL         "Automatically save database on exit",IDC_CHECK_AUTOSAVE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,85,337,10
     PUSHBUTTON      "Select &Font",IDC_BTN_SELFONT,18,138,82,14
     LTEXT           "Select a new font for the list controls.",
                     IDC_STATIC_SELFONTTXT,18,121,337,8
@@ -422,8 +418,6 @@ BEGIN
     PUSHBUTTON      "Color",IDC_BTN_ROWHIGHLIGHTSEL,343,0,50,14
     LTEXT           "Every second row has a different background color. Use this color:",
                     IDC_STATIC_SELROWHIGHLIGHT,17,210,340,8
-    LTEXT           "Start:",IDC_STATIC_START,0,172,105,8
-    LTEXT           "Exit:",IDC_STATIC_EXIT,0,210,105,8
     CONTROL         "GUI: Automatically resize table columns when resizing the main window",
                     IDC_CHECK_COLAUTOSIZE,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,18,185,341,10
@@ -437,8 +431,6 @@ BEGIN
     CONTROL         "Disable unsafe (security-critical) operations like exports, etc.",
                     IDC_CHECK_DISABLEUNSAFE,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,18,202,342,10
-    CONTROL         "Remember last opened file",IDC_CHECK_REMEMBERLAST,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,0,215,343,10
     CONTROL         "Use PuTTY for ssh: and telnet: URLs",
                     IDC_CHECK_PUTTYURLS,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,0,195,344,10
@@ -457,6 +449,9 @@ BEGIN
                     WS_TABSTOP,50,40,343,10
     LTEXT           "Clipboard behavior:",IDC_STATIC_CLIPBOARDMETHOD,65,52,
                     328,8
+    CONTROL         "List1",IDC_LIST_ADVANCED,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHAREIMAGELISTS | LVS_NOLABELWRAP | 
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,16,28,361,161
 END
 
 IDD_ENTRYPROPERTIES_DLG DIALOG DISCARDABLE  0, 0, 351, 114
@@ -470,9 +465,8 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,87,351,1
     CONTROL         "Change group:",IDC_CHECK_MODGROUP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,7,8,115,10
-    COMBOBOX        IDC_COMBO_GROUPS,124,7,220,141,CBS_DROPDOWNLIST | 
-                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | 
-                    WS_TABSTOP
+    CONTROL         "",IDC_COMBO_GROUPS,"ComboBoxEx32",CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP,124,7,220,172
     CONTROL         "Change entry icon:",IDC_CHECK_MODICON,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,7,31,115,10
     PUSHBUTTON      "&Pick One",IDC_BUTTON_SELECT_ICON,124,29,50,14
@@ -562,8 +556,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,9,8,2
- PRODUCTVERSION 0,9,8,2
+ FILEVERSION 0,9,9,1
+ PRODUCTVERSION 0,9,9,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -580,15 +574,15 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.sourceforge.net\0"
             VALUE "CompanyName", "Dominik Reichl\0"
-            VALUE "FileDescription", "KeePass Password Safe v0.98b\0"
-            VALUE "FileVersion", "0, 9, 8, 2\0"
+            VALUE "FileDescription", "KeePass Password Safe v0.99a\0"
+            VALUE "FileVersion", "0, 9, 9, 1\0"
             VALUE "InternalName", "PwSafe\0"
             VALUE "LegalCopyright", "Copyright (c) 2003-2005 Dominik Reichl\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "KeePass.exe\0"
             VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "KeePass Password Safe v0.98b\0"
-            VALUE "ProductVersion", "0, 9, 8, 2\0"
+            VALUE "ProductName", "KeePass Password Safe v0.99a\0"
+            VALUE "ProductVersion", "0, 9, 9, 1\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -1164,6 +1158,22 @@ BEGIN
     BUTTON      ID_BUTTON32900
 END
 
+IDR_OPTIONICONS TOOLBAR DISCARDABLE  16, 16
+BEGIN
+    BUTTON      ID_BUTTON32961
+    SEPARATOR
+    BUTTON      ID_BUTTON32962
+    BUTTON      ID_BUTTON32963
+    BUTTON      ID_BUTTON32964
+    BUTTON      ID_BUTTON32965
+    BUTTON      ID_BUTTON32967
+    BUTTON      ID_BUTTON32968
+    BUTTON      ID_BUTTON32966
+    BUTTON      ID_BUTTON32969
+    BUTTON      ID_BUTTON32970
+    BUTTON      ID_BUTTON32971
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1192,6 +1202,7 @@ IDB_TB_LOCK             BITMAP  DISCARDABLE     "res\\tb_lock.bmp"
 IDB_TB_ABOUT            BITMAP  DISCARDABLE     "res\\tb_about.bmp"
 IDB_FILE                BITMAP  DISCARDABLE     "res\\file.bmp"
 IDB_DISK                BITMAP  DISCARDABLE     "res\\disk.bmp"
+IDR_OPTIONICONS         BITMAP  DISCARDABLE     "res\\optionic.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

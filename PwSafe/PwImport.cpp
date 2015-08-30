@@ -80,6 +80,8 @@ BOOL CPwImport::ImportCsvToDb(const TCHAR *pszFile, CPwManager *pMgr, DWORD dwGr
 	ASSERT(pszFile != NULL); if(pszFile == NULL) return FALSE;
 	ASSERT(pMgr != NULL); if(pMgr == NULL) return FALSE;
 
+	if((dwGroupId == DWORD_MAX) || (dwGroupId == 0)) return FALSE;
+
 	pData = _FileToMemory(pszFile, &uFileSize);
 	if(pData == NULL) return FALSE;
 

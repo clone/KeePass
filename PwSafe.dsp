@@ -305,6 +305,10 @@ SOURCE=.\res\ok.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\optionic.bmp
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\options.ico
 # End Source File
 # Begin Source File
@@ -669,6 +673,15 @@ SOURCE=.\NewGUI\NewGUICommon.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\NewGUI\OptionsList.cpp
+# ADD CPP /I ".."
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\OptionsList.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\NewGUI\SystemTray.cpp
 # End Source File
 # Begin Source File
@@ -706,15 +719,6 @@ SOURCE=.\NewGUI\WindowGroups.cpp
 # Begin Source File
 
 SOURCE=.\NewGUI\WindowGroups.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\NewGUI\WzComboBox.cpp
-# ADD CPP /I ".."
-# End Source File
-# Begin Source File
-
-SOURCE=.\NewGUI\WzComboBox.h
 # End Source File
 # Begin Source File
 

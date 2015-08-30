@@ -75,9 +75,15 @@
 #define WM_PLUGINS_LAST  (0xAFFF)
 
 #define HOTKEYID_AUTOTYPE 33
+#define HOTKEYID_RESTORE  34
 
 #define CM_TIMED 0
 #define CM_ENHSECURE 1
+
+// Show expired / soon-to-expire entries at database open, flags
+#define AUTOEXPIRE_NOSHOW  0
+#define AUTOEXPIRE_EXPIRED 1
+#define AUTOEXPIRE_SOONTO  2
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -94,8 +100,9 @@ public:
 
 	void ProcessResize();
 	void CleanUp();
+	void SaveOptions();
 	void SetStatusTextEx(LPCTSTR lpStatusText, int nPane = -1);
-	void NotifyUserActivity();
+	inline void NotifyUserActivity();
 	void UpdateAutoSortMenuItems();
 	void BuildPluginMenu();
 	BOOL RegisterGlobalHotKey(int nHotKeyID, DWORD dwHotKey, BOOL bReleasePrevious);
@@ -128,6 +135,113 @@ public:
 
 	void _HandleEntryDrop(DWORD dwDropType, HTREEITEM hTreeItem);
 
+	void _List_SaveView() { m_nSaveView = m_cList.GetTopIndex(); }
+	void _List_RestoreView() // Restore the previous password list view
+	{
+		int nItemCount = m_cList.GetItemCount();
+
+		if(nItemCount <= 0) return;
+
+		m_cList.EnsureVisible(nItemCount - 1, FALSE);
+
+		if(m_nSaveView < nItemCount)
+			m_cList.EnsureVisible(m_nSaveView, FALSE);
+	}
+	void _Groups_SaveView(BOOL bSaveSelection = TRUE)
+	{
+		m_dwGroupsSaveFirstVisible = m_cGroups.GetItemData(m_cGroups.GetFirstVisibleItem());
+
+		m_dwGroupsSaveSelected = DWORD_MAX;
+		if(bSaveSelection == TRUE)
+		{
+			HTREEITEM h = m_cGroups.GetSelectedItem();
+			if(h != NULL) m_dwGroupsSaveSelected = m_cGroups.GetItemData(h);
+		}
+	}
+	void _Groups_RestoreView()
+	{
+		HTREEITEM h = _GroupIdToHTreeItem(m_dwGroupsSaveFirstVisible);
+		if(h != NULL) m_cGroups.SelectSetFirstVisible(h);
+
+		if(m_dwGroupsSaveSelected != DWORD_MAX)
+		{
+			h = _GroupIdToHTreeItem(m_dwGroupsSaveSelected);
+			if(h != NULL) m_cGroups.SelectItem(h);
+		}
+	}
+	void _CalcColumnSizes()
+	{
+		RECT rect;
+		int nColumnWidth, nColumns = 0, i;
+		for(i = 0; i < 11; i++)
+		{
+			if(m_bShowColumn[i] == TRUE) nColumns++;
+			m_nColumnWidths[i] = 0;
+		}
+		if(nColumns == 0) return;
+		m_cList.GetClientRect(&rect);
+		nColumnWidth = ((rect.right - 9) / nColumns) - (GetSystemMetrics(SM_CXVSCROLL) / nColumns);
+		for(i = 0; i < 11; i++)
+			if(m_bShowColumn[i] == TRUE)
+				m_nColumnWidths[i] = nColumnWidth;
+	}
+	void _SetColumnWidths()
+	{
+		for(int i = 0; i < 11; i++) m_cList.SetColumnWidth(i, m_nColumnWidths[i]);
+	}
+	void _SetListParameters()
+	{
+		LPARAM dw;
+		dw = LVS_EX_SI_REPORT | LVS_EX_FULLROWSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_UNDERLINEHOT;
+		dw |= LVS_EX_HEADERDRAGDROP | LVS_EX_INFOTIP;
+		if(m_bEntryGrid == TRUE) dw |= LVS_EX_GRIDLINES;
+		if(m_dwOldListParameters != dw)
+			m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, dw);
+		m_dwOldListParameters = dw;
+	}
+
+	void _RemoveSearchGroup();
+
+	void _SelChangeView(UINT uID);
+	void _List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEntry, PW_TIME *ptNow);
+	DWORD _ListSelToEntryIndex(DWORD dwSelected = DWORD_MAX);
+	DWORD _EntryUuidToListPos(BYTE *pUuid);
+
+	void _DeleteTemporaryFiles();
+
+	void _UpdateToolBar(BOOL bForceUpdate = FALSE);
+
+	void _UpdateGuiToManager();
+
+	void _TouchGroup(DWORD dwGroupId, BOOL bEdit);
+	void _TouchEntry(DWORD dwListIndex, BOOL bEdit);
+
+	void _SyncSubTree(CTreeCtrl *pTree, HTREEITEM hItem, BOOL bGuiToMgr);
+	void _SyncItem(CTreeCtrl *pTree, HTREEITEM hItem, BOOL bGuiToMgr);
+
+	void _SortList(DWORD dwByField, BOOL bAutoSortCall = FALSE);
+	BOOL _CheckIfCanSort();
+
+	HTREEITEM _FindSelectInTree(CTreeCtrl *pTree, HTREEITEM hRoot, DWORD dwGroupId);
+
+	BOOL _IsUnsafeAllowed();
+
+	void _OpenDatabase(const TCHAR *pszFile, const TCHAR *pszPassword, const TCHAR *pszKeyFile);
+	BOOL _ChangeMasterKey(BOOL bCreateNew);
+	void _PrintGroup(DWORD dwGroupId);
+	void _Find(DWORD dwFindGroupId);
+	void _DoQuickFind();
+	void _HandleSelectAll();
+	void _ShowExpiredEntries(BOOL bShowIfNone, BOOL bShowExpired, BOOL bShowSoonToExpire);
+
+	BOOL _ParseCommandLine();
+	void _ParseSpecAndSetFont(const TCHAR *pszSpec);
+
+	void _ShowToolBar(BOOL bShow = TRUE);
+	void _EnableViewMenuItems(BCMenu *pMenu);
+
+	void _FinishDragging(BOOL bDraggingImageList);
+
 	int m_nClipboardMethod;
 	BOOL m_bTimer;
 	int m_nClipboardCountdown;
@@ -140,6 +254,9 @@ public:
 	BOOL m_bAutoSaveDb;
 	long m_nLockTimeDef;
 	long m_nLockCountdown;
+	BOOL m_bAutoShowExpired;
+	BOOL m_bAutoShowExpiredSoon;
+	BOOL m_bBackupEntries;
 
 	BOOL m_bExiting;
 	BOOL m_bLocked;
@@ -159,6 +276,7 @@ public:
 	BOOL m_bRememberLast;
 	BOOL m_bUsePuttyForURLs;
 	BOOL m_bSaveOnLATMod;
+	BOOL m_bStartMinimized;
 
 	CStatusBarCtrl m_sbStatus;
 	BOOL m_bShowToolBar;
@@ -224,137 +342,6 @@ public:
 
 	UINT m_uACP;
 
-	//{{AFX_DATA(CPwSafeDlg)
-	enum { IDD = IDD_PWSAFE_DIALOG };
-	CStatic	m_stcMenuLine;
-	CEdit	m_cQuickFind;
-	CCustomTreeCtrlEx	m_cGroups;
-	CXPStyleButtonST	m_btnTbNew;
-	CXPStyleButtonST	m_btnTbLock;
-	CXPStyleButtonST	m_btnTbFind;
-	CXPStyleButtonST	m_btnTbEditEntry;
-	CXPStyleButtonST	m_btnTbDeleteEntry;
-	CXPStyleButtonST	m_btnTbCopyUser;
-	CXPStyleButtonST	m_btnTbCopyPw;
-	CXPStyleButtonST	m_btnTbAddEntry;
-	CXPStyleButtonST	m_btnTbAbout;
-	CXPStyleButtonST	m_btnTbSave;
-	CXPStyleButtonST	m_btnTbOpen;
-	CCustomListCtrlEx	m_cList;
-	CAutoRichEditCtrl	m_reEntryView;
-	CString	m_strQuickFind;
-	//}}AFX_DATA
-
-	//{{AFX_VIRTUAL(CPwSafeDlg)
-	public:
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);
-	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
-	//}}AFX_VIRTUAL
-
-protected:
-	void _List_SaveView() { m_nSaveView = m_cList.GetTopIndex(); }
-	void _List_RestoreView() // Restore the previous password list view
-	{
-		int nItemCount = m_cList.GetItemCount();
-
-		if(nItemCount <= 0) return;
-
-		m_cList.EnsureVisible(nItemCount - 1, FALSE);
-
-		if(m_nSaveView < nItemCount)
-			m_cList.EnsureVisible(m_nSaveView, FALSE);
-	}
-	void _Groups_SaveView(BOOL bSaveSelection = TRUE)
-	{
-		m_dwGroupsSaveFirstVisible = m_cGroups.GetItemData(m_cGroups.GetFirstVisibleItem());
-
-		m_dwGroupsSaveSelected = DWORD_MAX;
-		if(bSaveSelection == TRUE)
-		{
-			HTREEITEM h = m_cGroups.GetSelectedItem();
-			if(h != NULL) m_dwGroupsSaveSelected = m_cGroups.GetItemData(h);
-		}
-	}
-	void _Groups_RestoreView()
-	{
-		HTREEITEM h = _GroupIdToHTreeItem(m_dwGroupsSaveFirstVisible);
-		if(h != NULL) m_cGroups.SelectSetFirstVisible(h);
-
-		if(m_dwGroupsSaveSelected != DWORD_MAX)
-		{
-			h = _GroupIdToHTreeItem(m_dwGroupsSaveSelected);
-			if(h != NULL) m_cGroups.SelectItem(h);
-		}
-	}
-	void _CalcColumnSizes()
-	{
-		RECT rect;
-		int nColumnWidth, nColumns = 0, i;
-		for(i = 0; i < 11; i++)
-		{
-			if(m_bShowColumn[i] == TRUE) nColumns++;
-			m_nColumnWidths[i] = 0;
-		}
-		if(nColumns == 0) return;
-		m_cList.GetClientRect(&rect);
-		nColumnWidth = ((rect.right - 9) / nColumns) - (GetSystemMetrics(SM_CXVSCROLL) / nColumns);
-		for(i = 0; i < 11; i++)
-			if(m_bShowColumn[i] == TRUE)
-				m_nColumnWidths[i] = nColumnWidth;
-	}
-	void _SetColumnWidths()
-	{
-		for(int i = 0; i < 11; i++) m_cList.SetColumnWidth(i, m_nColumnWidths[i]);
-	}
-	void _SetListParameters()
-	{
-		LPARAM dw = 0;
-		dw |= LVS_EX_SI_REPORT | LVS_EX_FULLROWSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_UNDERLINEHOT;
-		dw |= LVS_EX_HEADERDRAGDROP | LVS_EX_INFOTIP;
-		if(m_bEntryGrid == TRUE) dw |= LVS_EX_GRIDLINES;
-		if(m_dwOldListParameters != dw)
-			m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, dw);
-		m_dwOldListParameters = dw;
-	}
-
-	void _OpenDatabase(const TCHAR *pszFile);
-	void _PrintGroup(DWORD dwGroupId);
-	void _Find(DWORD dwFindGroupId);
-	void _RemoveSearchGroup();
-	void _DoQuickFind();
-	void _HandleSelectAll();
-
-	void _SelChangeView(UINT uID);
-	void _List_SetEntry(DWORD dwInsertPos, PW_ENTRY *pwe, BOOL bIsNewEntry, PW_TIME *ptNow);
-	DWORD _ListSelToEntryIndex(DWORD dwSelected = DWORD_MAX);
-	DWORD _EntryUuidToListPos(BYTE *pUuid);
-
-	void _DeleteTemporaryFiles();
-	BOOL _ParseCommandLine();
-	void _ParseSpecAndSetFont(const TCHAR *pszSpec);
-
-	void _UpdateToolBar();
-	void _ShowToolBar(BOOL bShow = TRUE);
-	void _EnableViewMenuItems(BCMenu *pMenu);
-	void _UpdateGuiToManager();
-
-	void _TouchGroup(DWORD dwGroupId, BOOL bEdit);
-	void _TouchEntry(DWORD dwListIndex, BOOL bEdit);
-
-	void _SyncSubTree(CTreeCtrl *pTree, HTREEITEM hItem, BOOL bGuiToMgr);
-	void _SyncItem(CTreeCtrl *pTree, HTREEITEM hItem, BOOL bGuiToMgr);
-
-	void _FinishDragging(BOOL bDraggingImageList);
-
-	void _SortList(DWORD dwByField, BOOL bAutoSortCall = FALSE);
-	BOOL _CheckIfCanSort();
-
-	HTREEITEM _FindSelectInTree(CTreeCtrl *pTree, HTREEITEM hRoot, DWORD dwGroupId);
-
-	BOOL _IsUnsafeAllowed();
-
 	HICON m_hIcon;
 	CThemeHelperST *m_pThemeHelper;
 
@@ -388,6 +375,36 @@ protected:
 
 	BOOL m_bMenuExit;
 
+	//{{AFX_DATA(CPwSafeDlg)
+	enum { IDD = IDD_PWSAFE_DIALOG };
+	CStatic	m_stcMenuLine;
+	CEdit	m_cQuickFind;
+	CCustomTreeCtrlEx	m_cGroups;
+	CXPStyleButtonST	m_btnTbNew;
+	CXPStyleButtonST	m_btnTbLock;
+	CXPStyleButtonST	m_btnTbFind;
+	CXPStyleButtonST	m_btnTbEditEntry;
+	CXPStyleButtonST	m_btnTbDeleteEntry;
+	CXPStyleButtonST	m_btnTbCopyUser;
+	CXPStyleButtonST	m_btnTbCopyPw;
+	CXPStyleButtonST	m_btnTbAddEntry;
+	CXPStyleButtonST	m_btnTbAbout;
+	CXPStyleButtonST	m_btnTbSave;
+	CXPStyleButtonST	m_btnTbOpen;
+	CCustomListCtrlEx	m_cList;
+	CAutoRichEditCtrl	m_reEntryView;
+	CString	m_strQuickFind;
+	//}}AFX_DATA
+
+	//{{AFX_VIRTUAL(CPwSafeDlg)
+	public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	protected:
+	virtual void DoDataExchange(CDataExchange* pDX);
+	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+	//}}AFX_VIRTUAL
+
+protected:
 	//{{AFX_MSG(CPwSafeDlg)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -602,6 +619,9 @@ protected:
 	afx_msg void OnRenderAllFormats();
 	afx_msg void OnChangeCbChain(HWND hWndRemove, HWND hWndAfter);
 	afx_msg void OnDrawClipboard();
+
+	afx_msg void OnEndSession(BOOL bEnding);
+
 	DECLARE_MESSAGE_MAP()
 };
 

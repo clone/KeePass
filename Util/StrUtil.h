@@ -80,7 +80,7 @@ C_FN_SHARE void _StringToUuid(const TCHAR *ptszSource, BYTE *pUuid);
 CPP_FN_SHARE CString CsFileOnly(CString *psFilePath);
 
 // Convert ptString into a XML string
-C_FN_SHARE TCHAR *MakeSafeXmlString(TCHAR *ptString);
+C_FN_SHARE TCHAR *MakeSafeXmlString(const TCHAR *ptString);
 
 // Our own simple string functions which do some additional memory checks
 C_FN_SHARE size_t szlen(const char *pszString);

@@ -32,7 +32,6 @@
 
 #include "Util/SysDefEx.h"
 #include "NewGUI/NewGUICommon.h"
-#include "NewGUI/WzComboBox.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/GradientProgressCtrl.h"
 #include "NewGUI/XHyperLink.h"
@@ -51,6 +50,7 @@ public:
 	BOOL m_bLoadMode;
 	BOOL m_bConfirm;
 	BOOL m_bChanging;
+	HICON m_hWindowIcon;
 
 	CImageList m_ilIcons;
 	CFont m_fStyle;
@@ -65,6 +65,7 @@ public:
 
 	//{{AFX_DATA(CPasswordDlg)
 	enum { IDD = IDD_PASSWORD_DLG };
+	CComboBoxEx	m_cbDiskList;
 	CXHyperLink	m_hlSelFile;
 	CGradientProgressCtrl	m_cPassQuality;
 	CXPStyleButtonST	m_btStars;
@@ -72,7 +73,6 @@ public:
 	CXPStyleButtonST	m_btCancel;
 	CXPStyleButtonST	m_btMakePw;
 	CEdit	m_pEditPw;
-	CWzComboBox	m_cbDiskList;
 	BOOL	m_bStars;
 	BOOL	m_bKeyMethod;
 	//}}AFX_DATA

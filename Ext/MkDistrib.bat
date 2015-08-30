@@ -81,6 +81,12 @@ Util\CprLang.exe TurkishSrc.lng Turkish.lng
 DEL Macedonian.lng
 Util\CprLang.exe MacedonianSrc.lng Macedonian.lng
 
+DEL TraditionalChinese.lng
+COPY TraditionalChineseSrc.lng TraditionalChinese.lng
+
+DEL Ukrainian.lng
+COPY UkrainianSrc.lng Ukrainian.lng
+
 ECHO.
 ECHO Have you updated the language information fields?
 
@@ -128,6 +134,10 @@ DEL ..\Debug\Macedonian.lng
 COPY /B Macedonian.lng /B ..\Debug\Macedonian.lng > NUL
 DEL ..\Debug\Hungarian.lng
 COPY /B Hungarian.lng /B ..\Debug\Hungarian.lng > NUL
+DEL ..\Debug\TraditionalChinese.lng
+COPY /B TraditionalChinese.lng /B ..\Debug\TraditionalChinese.lng > NUL
+DEL ..\Debug\Ukrainian.lng
+COPY /B Ukrainian.lng /B ..\Debug\Ukrainian.lng > NUL
 
 REM Copy latest language files into Release directory
 
@@ -173,6 +183,10 @@ DEL ..\Release\Macedonian.lng
 COPY /B Macedonian.lng /B ..\Release\Macedonian.lng > NUL
 DEL ..\Release\Hungarian.lng
 COPY /B Hungarian.lng /B ..\Release\Hungarian.lng > NUL
+DEL ..\Release\TraditionalChinese.lng
+COPY /B TraditionalChinese.lng /B ..\Release\TraditionalChinese.lng > NUL
+DEL ..\Release\Ukrainian.lng
+COPY /B Ukrainian.lng /B ..\Release\Ukrainian.lng > NUL
 
 REM Copy language reference file
 

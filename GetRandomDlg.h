@@ -36,7 +36,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CGetRandomDlg : public CDialog
+class CGetRandomDlg : public CDialog
 {
 public:
 	CGetRandomDlg(CWnd* pParent = NULL);

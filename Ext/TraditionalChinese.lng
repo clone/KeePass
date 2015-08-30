@@ -1,0 +1,892 @@
+|~LANGUAGENAME|
+|ÁcÅé¤¤¤å(»OÆW)|
+|~LANGUAGEVERSION|
+|0.98b - 2|
+|~LANGUAGEAUTHOR|
+|°ª²»¤¸ (Kao Shiang-Yuan)|
+|~LANGUAGEAUTHOREMAIL|
+|rd_taiwan@users.sourceforge.net; http://rdtaiwan.no-ip.org/|
+|&OK|
+|½T©w(&O)|
+|&Cancel|
+|¨ú®ø(&C)|
+|&Close|
+|Ãö³¬(&C)|
+|Password Safe|
+|±K½X«OÀIÂd|
+|&Generate Random Password|
+|²£¥ÍÀH¾÷±K½X(&G)|
+|&Pick One|
+|¿ï¾Ü(&P)|
+|&Gen|
+|¥Í(&G)|
+|General|
+|¤@¯ë|
+|Windows|
+|µøµ¡|
+|Network|
+|ºô¸ô|
+|Internet|
+|ºô»Úºô¸ô|
+|eMail|
+|¹q¤l¶l¥ó|
+|Homebanking|
+|ºô¸ô»È¦æ|
+|Entry|
+|¶µ¥Ø|
+|&Title|
+|¼ÐÃD(&T)|
+|User &Name|
+|¨Ï¥ÎªÌ¦WºÙ(&N)|
+|&URL|
+|ºô§}(&U)|
+|&Password|
+|±K½X(&P)|
+|N&otes|
+|³Æµù(&O)|
+|&Case sensitive|
+|¤j¤p¼g¤£¦P(&C)|
+|Search in|
+|·j´M©ó|
+|Search this text:|
+|·j´M³o­Ó¤å¦r¡G|
+|Find|
+|´M§ä|
+|&Find|
+|´M§ä(&F)|
+|Find a string in the password list|
+|¦b±K½X²M³æ¤¤§ä¤@­Ó¦r¦ê|
+|Find text in password list|
+|¦b±K½X²M³æ¤¤§ä¤å¦r|
+|Database Format Version:|
+|¸ê®Æ®w®æ¦¡ª©¥»¡G|
+|About KeePass...|
+|Ãö©óKeePass...|
+|Password Groups|
+|±K½X¸s²Õ|
+|Title|
+|¼ÐÃD|
+|UserName|
+|¨Ï¥ÎªÌ¦WºÙ|
+|URL|
+|ºô§}|
+|Password|
+|±K½X|
+|Notes|
+|³Æµù|
+|Ready.|
+|´Nºü¡C|
+|Either enter the password/passphrase or select the password disk's drive.|
+|¿ï¾Ü¿é¤J±K½X©Î¿ï¾Ü±K½XºÐ¤ù¡C|
+|Enter password:|
+|¿é¤J±K½X¡G|
+|Select the password disk drive where the key will be stored:|
+|¿ï¾ÜÀx¦sÆ_°Íªº±K½XºÐ¤ù¡G|
+|Create a new password database - Enter master key|
+|«Ø¥ß·s±K½X¸ê®Æ®w - ¿é¤J¥DÆ_°Í|
+|Set master key|
+|¿ï¾Ü¥DÆ_°Í|
+|Enter the master key for the new database.|
+|¬°·sªº¸ê®Æ®w¿é¤J¥DÆ_°Í¡C|
+|Create a new password database - Repeat master key|
+|«Ø¥ß·s¸ê®Æ®w - ­«½Æ¿é¤J¥DÆ_°Í¡G|
+|Repeat master password|
+|­«½Æ¥D±K½X|
+|Repeat the master key for the new database.|
+|¬°·s¸ê®Æ®w­«½Æ¥DÆ_°Í¡C|
+|Select the password disk drive to load the key from:|
+|¿ï¾Ü¸ü¤JÆ_°Íªº±K½XºÐ¤ù¡G|
+|Open database - Enter master key|
+|¶}±Ò¸ê®Æ®w - ¿é¤J¥DÆ_°Í|
+|Enter master key|
+|¿é¤J¥DÆ_°Í|
+|Enter the master key for this database.|
+|¿é¤J³o­Ó¸ê®Æ®wªº¥DÆ_°Í¡C|
+|Key|
+|Æ_°Í|
+|<no drive selected>|
+|<¥¼¿ï¾ÜºÏºÐ¾÷>|
+|Password Generator|
+|±K½X²£¥Í¾¹|
+|This will generate a random password.|
+|³o±N²£¥Í¤@­ÓÀH¾÷±K½X¡C|
+|Options|
+|¿ï¶µ|
+|Password Generation Options|
+|±K½X²£¥Í¿ï¶µ|
+|&Only the following characters:|
+|¥u¦³³o¨Ç¦r¤¸(&O)|
+|Collect &entropy (recommended for strong passwords)|
+|¦¬¶°¿é¤J(­Y­n²£¥Í°ª±j«×±K½X¡A«ØÄ³¨Ï¥Î)(&E)|
+|Number of characters:|
+|¦r¤¸¼Æ¡G|
+|Your new password:|
+|±zªº·s±K½X¡G|
+|&Generate|
+|²£¥Í(&G)|
+|&Accept|
+|±µ¨ü(&A)|
+|Upper alphabetic characters (A, B, C, ...)|
+|¤j¼g¦r¥À (A, B, C, ...)|
+|Lower alphabetic characters (a, b, c, ...)|
+|¤p¼g¦r¥À (a, b, c, ...)|
+|Numerical characters (1, 2, 3, ...)|
+|¼Æ¦r (1, 2, 3, ...)|
+|Underline character '_'|
+|©³½u¦r¤¸ '_'|
+|Minus '-'|
+|´î¸¹ '-'|
+|Space ' '|
+|ªÅ¥Õ ' '|
+|Special characters (!, §, $, %, &, ...)|
+|¯S®í¦r¤¸ (!, ? $, %, &, ...)|
+|Higher ANSI characters (Â, ©, É, µ, ½, ...)|
+|§ó°ªªºANSI¦r¤¸ (? ? ? ? ? ...)|
+|Special brackets ('{', '}', '[', ...)|
+|¬A¸¹ ('{', '}', '[', ...)|
+|Group:|
+|¸s²Õ¡G|
+|Title:|
+|¼ÐÃD¡G|
+|UserName:|
+|¨Ï¥ÎªÌ¦WºÙ¡G|
+|URL:|
+|ºô§}¡G|
+|Icon:|
+|¹Ï¥Ü:|
+|Password:|
+|±K½X¡G|
+|Repeat Password:|
+|­«½Æ±K½X¡G|
+|Notes:|
+|³Æµù¡G|
+|***|
+|***|
+|Add Entry|
+|¼W¥[¿é¤J|
+|Add a new password entry|
+|¼W¥[¤@­Ó±K½X¿é¤J|
+|Edit Entry|
+|½s¿è¿é¤J|
+|Modify a password entry|
+|ÅÜ§ó¤@­Ó±K½X¿é¤J|
+|Group Name:|
+|¸s²Õ¦WºÙ¡G|
+|Add Group|
+|¼W¥[¸s²Õ|
+|Add a new password group|
+|¼W¥[¤@­Ó±K½X¸s²Õ|
+|Edit Group|
+|½s¿è¸s²Õ|
+|Modify a password group|
+|ÅÜ§ó¤@­Ó±K½X¸s²Õ|
+|Random mouse input|
+|¥Î·Æ¹«§@¬°ÀH¾÷¶Ã¼Æ¸ê®Æ¨Ó·½|
+|Click to begin:|
+|«ö¤@¤U¶}©l¡G|
+|Use &Mouse As Random Source|
+|¨Ï¥Î·Æ¹«·í§@ÀH¾÷¶Ã¼Æ¸ê®Æ¨Ó·½(&M)|
+|Move the mouse in the field above until this is full:|
+|¦b¤W­±ªº°Ï°ì¤º²¾°Ê·Æ¹«¡Aª½¨ì¶ñº¡¡G|
+|Hint: It is best to use both mouse and keyboard random sources.|
+|´£¥Ü¡G³Ì¦n¨Ï¥Î·Æ¹«¡u»P¡vÁä½L·í§@ÀH¾÷¶Ã¼Æ¸ê®Æ¨Ó·½¡C|
+|Random keyboard input|
+|¥ÎÁä½L§@¬°ÀH¾÷¶Ã¼Æ¸ê®Æ¨Ó·½|
+|Just hack some random keys into the edit box above.|
+|¦b¤W­±ªº¤è¶ô¤ºÀH«K¥´¤@¨Ç¦r¡C|
+|You don't have to remember the keys you type in. They are used to generate a random value.|
+|±z¤£»Ý­n°O±o±z¿é¤Jªº¦r¡C¥¦­Ì¬O¥Î¨Ó²£¥ÍÀH¾÷¶Ã¼Æ¸ê®Æ¡C|
+|So, the more the better. The different, the better.|
+|©Ò¥H¡A·U¦h·U¦n¡A·U½ÆÂø·U¦n¡C|
+|The random the better.|
+|·U½ÆÂø¡A·UÀH«K¡A·U¨S¦³³W«h·U¦n¡C|
+|Get Random|
+|¨ú±oÀH¾÷¶Ã¼Æ¸ê®Æ|
+|Get random data for key generation|
+|¬°²£¥ÍÆ_°Í¨ú±oÀH¾÷¶Ã¼Æ¸ê®Æ|
+|Move the mouse and type some random text to generate random values.|
+|§Q¥Î·Æ¹«²¾°Ê»PÁä½L¿é¤J²£¥ÍÀH¾÷¶Ã¼Æ¸ê®Æ¡C|
+|Pick an icon|
+|¿ï¾Ü¤@­Ó¹Ï¥Ü|
+|Pick an Icon|
+|¿ï¾Ü¤@­Ó¹Ï¥Ü|
+|Pick an icon from the list and click OK to set it.|
+|¦b²M³æ¤¤¿ï¾Ü¤@­Ó¹Ï¥Ü¡AµM«á«ö¡u½T©w¡v¡C|
+|&File|
+|ÀÉ®×(&F)|
+|&Edit|
+|½s¿è(&E)|
+|&View|
+|ÀËµø(&V)|
+|E&xtras|
+|¯S§O¥\¯à(&X)|
+|&?|
+|»¡©ú(&?)|
+|&New Database...|
+|·s¸ê®Æ®w(&N)...|
+|&Open Database...|
+|¶}±Ò¸ê®Æ®w(&O)...|
+|&Close Database|
+|Ãö³¬¸ê®Æ®w(&C)|
+|&Save Database|
+|Àx¦s¸ê®Æ®w(&S)|
+|Save Database &As...|
+|¥t¦s¸ê®Æ®w(&A)...|
+|Change &Master Key For This Database...|
+|¬°¦¹¸ê®Æ®wÅÜ§ó¥DÆ_°Í(&M)...|
+|&Print Complete Password List|
+|¦C¦L¥þ³¡ªº±K½X²M³æ(&P)|
+|&Export To|
+|¶×¥X¨ì(&E)|
+|&Lock Workspace|
+|Âê©w(&L)|
+|&Unlock Workspace|
+|¸Ñ°£Âê©w(&U)|
+|E&xit|
+|µ²§ô(&X)|
+|&Lock/Unlock Workspace|
+|Âê©w/¸Ñ°£Âê©w(&L)|
+|&Options...|
+|¿ï¶µ(&O)|
+|Add Password &Group...|
+|·s¼W±K½X¸s²Õ(&G)...|
+|Add Password Su&bgroup...|
+|·s¼W±K½X¤l¸s²Õ(&B)...|
+|Modif&y Password Group...|
+|ÅÜ§ó±K½X¸s²Õ(&Y)...|
+|&Delete Password Group...|
+|§R°£±K½X¸s²Õ(&D)...|
+|Pr&int Group|
+|¦C¦L¸s²Õ(&I)|
+|Export Group To &HTML...|
+|ºô­¶(&HTML)...|
+|Export Group To &XML...|
+|&XML...|
+|Export Group To &CSV...|
+|&CSV...|
+|Export Group To &TXT...|
+|¯Â¤å¦r(&TXT)...|
+|Copy User&Name To Clipboard|
+|½Æ»s¨Ï¥ÎªÌ¦WºÙ¨ì°Å¶KÃ¯(&N)|
+|Copy &Password To Clipboard|
+|½Æ»s±K½X¨ì°Å¶KÃ¯(&P)|
+|Open &URL(s)|
+|¶}±Òºô§}(&U)|
+|&Find In Database...|
+|¦b¸ê®Æ®w¤º´M§ä(&F)...|
+|Find In T&his Group...|
+|¦b¦¹¸s²Õ¤º´M§ä(&H)...|
+|&Add Entry...|
+|·s¼W(&A)...|
+|&Edit/View Entry...|
+|½s¿è/ÀËµø(&E)...|
+|&Delete Entry|
+|§R°£(&D)|
+|Dupli&cate Entry|
+|½Æ»s(&C)|
+|Move Entry To &Top|
+|²¾¨ì³Ì¤W­±(&T)|
+|Move Entry &One Up|
+|¦V¤W²¾°Ê(&O)|
+|Mo&ve Entry One Down|
+|¦V¤U²¾°Ê(&V)|
+|Move Entry To &Bottom|
+|²¾¨ì³Ì¤U­±(&B)|
+|Move Group To &Top|
+|²¾°Ê¸s²Õ¨ì³Ì¤W­±(&T)|
+|Move Group One &Up|
+|¦V¤W²¾°Ê¸s²Õ(&U)|
+|Move Group &One Down|
+|¦V¤U²¾°Ê¸s²Õ(&O)|
+|Move Group To &Bottom|
+|²¾°Ê¸s²Õ¨ì³Ì¤U­±(&B)|
+|Change &Language...|
+|ÅÜ§ó»y¨¥(&L)|
+|Show &Title Column|
+|¼ÐÃD(&T)|
+|Show User&Name Column|
+|¨Ï¥ÎªÌ¦WºÙ(&N)|
+|Show &URL Column|
+|ºô§}(&U)|
+|Show &Password Column|
+|±K½X(&P)|
+|Show Note&s Column|
+|³Æµù(&S)|
+|Main Window &Always On Top|
+|±N¥Dµøµ¡«O«ù¦b³Ì¤W¼h|
+|Hide &Passwords Behind Asterisks (***)|
+|¥Î¬P¸¹ÁôÂÃ±K½X(&P)|
+|Password &Generator|
+|±K½X²£¥Í¾¹(&G)|
+|Visit &KeePass Homepage|
+|ÂsÄý&KeePass­º­¶|
+|&About KeePass...|
+|Ãö©óKeePass(&A)...|
+|&Database Settings...|
+|¸ê®Æ®w³]©w(&D)...|
+|&Minimize/Maximize Window To/From Tray|
+|³Ì¤p¤Æ/³Ì¤j¤Æµøµ¡|
+|%u.%u.%u.%u, compatible with %u.%u.x.x|
+|%u.%u.%u.%u¡A»P%u.%u.x.x¬Û®e|
+|Version |
+|ª©¥»|
+|Password and repeated password aren't identical!|
+|±K½X»P­«½Æ¿é¤Jªº±K½X¤£²Å¡I|
+|Stop|
+|°±¤î|
+|Enter a group name!|
+|¿é¤J¸s²Õ¦WºÙ¡G|
+|You must generate some random values using the random mouse input box or the edit field before you can close this dialog.|
+|¦b±zÃö³¬¦¹¹ï¸Ü¤è¶ô«e¡A±z¥²¶·¨Ï¥Î·Æ¹«©ÎÁä½L²£¥Í¤@¨ÇÀH¾÷¸ê®Æ|
+|No random input|
+|¨S¦³ÀH¾÷¸ê®Æ¿é¤J|
+|EITHER enter a password/passphrase OR select a key disk drive.|
+|¿é¤J±K½X©Î¿ï¾Ü±K½XºÐ¤ù¡C|
+|The password must consist of at least one character!|
+|±K½X¦Ü¤Ö¤@­Ó¦r¤¸¡I|
+|Select at least one of the options in the list above!|
+|¦Ü¤Ö¦b¤W¦C²M³æ¤¤¿ï¾Ü¤@¶µ¡I|
+|The following self-tests failed:|
+|¤U¦C¦Û§ÚÀË¬d¥¢±Ñ¡G|
+|- SHA 32-bit variables|
+|- 32¦ì¤¸SHAÅÜ¼Æ|
+|- SHA 64-bit variables|
+|- 64¦ì¤¸SHAÅÜ¼Æ|
+|- SHA-256 test vector(s)|
+|- SHA-256´ú¸Õ¦V¶q|
+|- SHA-512 test vector(s)|
+|- SHA-512´ú¸Õ¦V¶q|
+|- Rijndael encryption|
+|- Rijndael¥[±K|
+|- Rijndael decryption|
+|- Rijndael¸Ñ±K|
+|- Arcfour crypto routine|
+|- Arcfour crypto routine|
+|- Twofish algorithm|
+|- Twofishºtºâªk|
+|The program will exit now.|
+|¦¹µ{¦¡§Y±Nµ²§ô¡C|
+|Self-Test(s) Failed|
+|¦Û§ÚÀË¬d¥¢±Ñ|
+|Clipboard cleared.|
+|¤w²M°£°Å¶KÃ¯¡C|
+|Field copied to clipboard. Clipboard will be cleared in %d seconds.|
+|¤w½Æ»s¨ì°Å¶KÃ¯¡C°Å¶KÃ¯±N¦b%d¬í«á²M°£¡C|
+|Failed to set the master key!|
+|³]©w¥DÆ_°Í¥¢±Ñ¡I|
+|File cannot be opened!|
+|µLªk¶}±ÒÀÉ®×¡I|
+|File cannot be saved!|
+|ÀÉ®×µLªkÀx¦s¡I|
+|Password Safe files|
+|±K½X¸ê®Æ®wÀÉ®×|
+|All files|
+|©Ò¦³ÀÉ®×|
+|The current file has been modified.|
+|¦¹ÀÉ®×¤wÅÜ§ó¡C|
+|Do you want to save the changes before closing?|
+|±z§Æ±æ¦bÃö³¬«eÀx¦s¶Ü¡H|
+|KeePass - Save Before Close/Lock?|
+|KeePass - ¦bÃö³¬/Âê©w«eÀx¦s¡H|
+|Deleting a group will delete all items in that group, too.|
+|§R°£¸s²Õ±N¥¢¥h¸Ó¸s²Õ¤ºªº©Ò¦³¶µ¥Ø¡C|
+|Are you sure you want to delete this group?|
+|±z½T©w­n§R°£³o­Ó¸s²Õ¶Ü¡H|
+|Delete Group Confirmation|
+|¸s²Õ§R°£½T»{|
+|Cannot open temporary file for printing!|
+|µLªk¬°¦C¦L¶}±Ò¼È¦sÀÉ®×¡I|
+|Load language file|
+|¸ü¤J»y¨¥ÀÉ®×|
+|Load a language file|
+|¸ü¤J¤@­Ó»y¨¥ÀÉ®×|
+|Select one of the languages in the list below.|
+|¿ï¾Ü²M³æ¤¤ªº¤@­Ó»y¨¥ÀÉ®×¡C|
+|Available Languages|
+|¥i¥Îªº»y¨¥|
+|Open &Help File|
+|¶}±Ò»¡©úÀÉ®×(&H)|
+|Open &License File|
+|¶}±Ò±ÂÅvÀÉ®×(&L)|
+|&Print License File|
+|¦C¦L±ÂÅvÀÉ®×(&P)|
+|Newline sequence:|
+|´«¦æ:|
+|Windows newline sequence (\r\n)|
+|Windows´«¦æ(\r\n)|
+|Unix newline sequence (\n)|
+|Unix´«¦æ (\n)|
+|Clipboard auto-clear time (seconds):|
+|°Å¶KÃ¯¦Û°Ê²M°£®É¶¡(¬í)¡G|
+|Settings|
+|³]©w|
+|Here you can configure KeePass.|
+|±z¥i¥H¦b³o¸Ì³]©wKeePass¡C|
+|Automatically open last used database on startup|
+|¦b±Ò°Ê®É¦Û°Ê¶}±Ò¤W¦¸¨Ï¥Îªº¸ê®Æ®w|
+|Automatically save database on exit|
+|¦bµ²§ô®É¦Û°ÊÀx¦s¸ê®Æ®w|
+|GUI: Display images on buttons|
+|¹Ï§Î¨Ï¥ÎªÌ¤¶­±¡G¦b«ö¶s¤WÅã¥Ü¹Ï¥Ü|
+|GUI: Show grid lines in password entry list|
+|¹Ï§Î¨Ï¥ÎªÌ¤¶­±¡G¦b±K½X¶µ¥Ø²M³æ¤WÅã¥Ü®æ½u|
+|Workspace cannot be unlocked!|
+|µLªk¸Ñ°£Âê©w¡I|
+|Workspace locked|
+|¤wÂê©w|
+|Loading error|
+|¸ü¤J¿ù»~|
+|Language file cannot be opened!|
+|µLªk¶}±Ò»y¨¥ÀÉ®×¡I|
+|Language file cannot be registered!|
+|µLªkµù¥U»y¨¥ÀÉ®×¡I|
+|The language file has been installed.|
+|¦¹»y¨¥ÀÉ®×¤w¦w¸Ë¡C|
+|You must restart KeePass in order to use the new language.|
+|±z¥²¶·­«·s±Ò°ÊKeePass¡A·sªº»y¨¥¤~¯à¨Ï¥Î¡C|
+|Do you wish to restart KeePass now?|
+|­n²{¦b­«·s±Ò°ÊKeePass¶Ü¡H|
+|Restart KeePass?|
+|­«·s±Ò°ÊKeePass¡H|
+|Application cannot be restarted automatically!|
+|À³¥Îµ{¦¡µLªk¦Û°Ê­«·s±Ò°Ê¡I|
+|Please restart KeePass manually.|
+|½Ð¤â°Ê­«·s±Ò°ÊKeePass¡C|
+|CSV files|
+|CSVÀÉ®×|
+|Text files|
+|¤å¦rÀÉ®×|
+|An error occured while importing the CSV file. File cannot be imported.|
+|¦b¶×¤JCSVÀÉ®×®Éµo¥Í¿ù»~¡CÀÉ®×µLªk¶×¤J¡C|
+|An error occured while importing the file. File cannot be imported.|
+|¦b¶×¤JÀÉ®×®Éµo¥Í¿ù»~¡CÀÉ®×µLªk¶×¤J¡C|
+|&CSV File...|
+|&CSVÀÉ®×...|
+|&PwSafe v2 TXT File...|
+|&PwSafe v2 TXT ÀÉ®×...|
+|Select &Font|
+|¿ï¾Ü¦r«¬(&F)|
+|Select a new font for the list controls.|
+|¬°²M³æ¶µ¥Ø¿ï¾Ü·s¦r«¬(«ØÄ³¿ï¾Ü¤ä´©¤¤¤åªº¦r«¬¡A¤j¤p³]©w¬°9)¡C|
+|Code&Wallet TXT File...|
+|Code&Wallet TXT File...|
+|&TXT File...|
+|&TXTÀÉ®×...|
+|&HTML File...|
+|&HTMLÀÉ®×...|
+|&XML File...|
+|&XMLÀÉ®×...|
+|&CSV File...|
+|&CSVÀÉ®×...|
+|&Import From|
+|¶×¤J¦Û(&I)|
+|&Get more languages...|
+|¨ú±o§ó¦h»y¨¥(&G)...|
+|Start and Exit|
+|¶}©l»Pµ²§ô|
+|Interface (GUI)|
+|¤¶­±|
+|Files|
+|ÀÉ®×|
+|Memory|
+|°O¾Ð|
+|Lock workspace when minimizing the main window|
+|¦b³Ì¤p¤Æ¥Dµøµ¡®ÉÂê©w|
+|Minimize to tray instead of taskbar|
+|³Ì¤p¤Æ«á¤£¦b¤u¨ã¦CÅã¥Ü(³qª¾°Ï°ì(¨t²Î¤u¨ã¦C)¤£¨ü¼vÅT)|
+|Encryption algorithm to use (for this database):|
+|¨Ï¥Î¥[±Kªººtºâªk(³o­Ó¸ê®Æ®w)¡G|
+|Advanced Encryption Standard (AES) (128-bit block cipher using 256-bit key)|
+|Advanced Encryption Standard (AES) (128¦ì¤¸°Ï¶ô¥[±K¨Ï¥Î256¦ì¤¸Æ_°Í)|
+|Twofish (128-bit block cipher using 256-bit key)|
+|Twofish (128¦ì¤¸°Ï¶ô¥[±K¨Ï¥Î256¦ì¤¸Æ_°Í)|
+|Security|
+|¦w¥þ|
+|KeePass is OSI Certified Open Source Software.|
+|KeePass¬OOSI»{ÃÒªº¶}©ñ­ì©l½X³nÅé¡C|
+|KeePass usage:|
+|KeePass usage:|
+|db = Path to database you wish to open on KeePass startup|
+|db = Path to database you wish to open on KeePass startup|
+|Automatically lock workspace after the following number of seconds:|
+|¦b¤U¦C¬í¼Æ«á¦Û°ÊÂê©w¡G|
+|&Group Name|
+|¸s²Õ¦WºÙ(&G)|
+|Every second row has a different background color. Use this color:|
+|¦bÂù¼Æ¦C¨Ï¥Î¤£¦Pªº­I´ºÃC¦â¡C¿ï¾ÜÃC¦â¡G|
+|Start:|
+|¶}©l¡G|
+|Exit:|
+|µ²§ô¡G|
+|Default|
+|¹w³]|
+|More Colors...|
+|§ó¦hÃC¦â...|
+|Search results|
+|·j´Mµ²ªG|
+|Creation Time|
+|«Ø¥ß®É¶¡|
+|Last Modification|
+|³Ì«áÅÜ§ó|
+|Last Access|
+|³Ì«á¦s¨ú|
+|Expires|
+|¹O´Á|
+|UUID|
+|°ß¤@ÃÑ§O½X(UUID)|
+|Show &Creation Time Column|
+|«Ø¥ß®É¶¡(&C)|
+|Show Last &Modification Time Column|
+|­×§ï®É¶¡(&M)|
+|Show &Last Access Time Column|
+|¦s¨ú®É¶¡(&L)|
+|Show &Expire Time Column|
+|¹O´Á®É¶¡(&E)|
+|Show UU&ID Column|
+|°ß¤@ÃÑ§O½X(UU&ID)|
+|Show &ToolBar|
+|Åã¥Ü¤u¨ã¦C(&T)|
+|Visit KeePass Homepage|
+|ÂsÄýKeePass­º­¶|
+|Field copied to clipboard.|
+|¸ê®Æ¤w½Æ»s¨ì°Å¶KÃ¯¡C|
+|A key-file already exists on this drive. Do you want to overwrite it?|
+|³o­ÓºÏºÐ¤W¤w¸g¦³Æ_°ÍÀÉ®×¡C±z·Q­n±N¨äÂÐ»\¶Ü¡H|
+|Overwrite?|
+|ÂÐ»\¡H|
+|Expires:|
+|¹O´Á¡G|
+|&Delete Selected Entries|
+|§R°£¿ï¾Üªº¶µ¥Ø(&D)|
+|&Mass Modify (All Selected)...|
+|¤j¶qÅÜ§ó(©Ò¦³¿ï¾Üªº)(&M)...|
+|Change group:|
+|ÅÜ§ó¸s²Õ¡G|
+|Change entry icon:|
+|ÅÜ§ó¶µ¥Ø¹Ï¥Ü¡G|
+|Change expiration time:|
+|ÅÜ§ó¹O´Á®É¶¡¡G|
+|Mass Modify|
+|¤j¶qÅÜ§ó|
+|Change fields of all selected entries|
+|ÅÜ§ó©Ò¦³¿ï¾Üªº¶µ¥Øªº|
+|Show &Columns|
+|Åã¥ÜÄæ¦ì(&C)|
+|Show &Entry View|
+|Åã¥Ü¶µ¥Ø¤º®e|
+|GUI: Automatically resize table columns when resizing the main window|
+|¹Ï§Î¨Ï¥ÎªÌ¤¶­±¡GÅÜ§ó¥Dµøµ¡¤j¤p®É¦Û°Ê½Õ¾ãÄæ¦ì¤j¤p|
+|&Copy|
+|½Æ»s(&C)|
+|Copy &All|
+|¥þ³¡½Æ»s(&C)|
+|&Undo|
+|ÁÙ­ì(&U)|
+|&Paste|
+|¶K¤W(&P)|
+|Cu&t|
+|°Å¤U(&T)|
+|&Select All|
+|¥þ¿ï(&S)|
+|&Delete|
+|§R°£(&D)|
+|&TAN Wizard|
+|&TANºëÆF|
+|TAN Wizard|
+|TANºëÆF|
+|Using this wizard you can easily add TAN entries.|
+|±z¥i¥H®e©ö¦a¨Ï¥Î³o­ÓºëÆF¼W¥[TAN¶µ¥Ø¡C|
+|Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-alphanumerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only alphanumerical 'substrings' are added as TAN entries.|
+|ª½±µ±NTAN¶K¨ì©³¤U¡C®æ¦¡¨Ã¤£­«­n¡A©Ò¦³µLªk¦C¦Lªº¦r¤¸±N³Q©¿²¤(¹³¬O´«¦æ¡BTab¡BªÅ¥ÕÁäµ¥µ¥)¡A¦Ó¥B¥u¦³substrings±N³Q¥[¤JTAN¶µ¥Ø¡C|
+|<TAN>|
+|<TAN>|
+|Print Pre&view...|
+|¹wÄý¦C¦L(&V)...|
+|About &Translation...|
+|Ãö©óÂ½Ä¶(&T)...|
+|Translation information|
+|Â½Ä¶¸ê°T|
+|Currently used language|
+|²{¦b¨Ï¥Îªº»y¨¥|
+|Language file version|
+|»y¨¥ÀÉ®×ª©¥»|
+|Author|
+|§@ªÌ|
+|Translation author contact|
+|Ápµ¸Â½Ä¶§@ªÌ|
+|&Rearrange|
+|±Æ§Ç(&R)|
+|&Sort Group List|
+|«ö¦WºÙ±Æ§Ç(&S)|
+|Sort List By &Title|
+|¼ÐÃD(&T)|
+|Sort List By User&Name|
+|¨Ï¥ÎªÌ¦WºÙ(&N)|
+|Sort List By &URL|
+|ºô§}(&U)|
+|Sort List By &Password|
+|±K½X(&P)|
+|Sort List By Note&s|
+|³Æµù(&S)|
+|Sort List By &Creation Time|
+|«Ø¥ß®É¶¡(&C)|
+|Sort List By Last &Modify Time|
+|­×§ï®É¶¡(&M)|
+|Sort List By Last &Access Time|
+|¦s¨ú®É¶¡(&A)|
+|Sort List By &Expiration Time|
+|¹O´Á®É¶¡(&E)|
+|Move Group One &Left|
+|¦V¥ª²¾°Ê(&L)|
+|Move Group One &Right|
+|¦V¥ª²¾°Ê(&R)|
+|Hide &UserNames Behind Asterisks (***)|
+|¥Î¬P¸¹ÁôÂÃ¥ÎªÌ¦WºÙ(&U)|
+|Attachment:|
+|ªþ¥ó¡G|
+|Attachment|
+|ªþ¥ó|
+|Show &Attachment Column|
+|ªþ¥ó(&A)|
+|Generate a random password...|
+|²£¥Í¤@­ÓÀH¾÷±K½X...|
+|Open file and set as attachment...|
+|¶}±ÒÀÉ®×¨Ã³]©w¬°ªþ¥ó...|
+|Save attached file to disk...|
+|Àx¦sªþ¥ó¨ìºÏºÐ...|
+|There already is a file attached with this entry.|
+|¦¹¶µ¥Ø¤w¦³ªþ¥ó¡C|
+|Do you want to overwrite the current attachment?|
+|±z§Æ±æÂÐ»\¥Ø«eªºªþ¥ó¶Ü¡H|
+|&Save Attached File To...|
+|¥t¦sªþ¥ó¨ì(&S)...|
+|There is no file attached with this entry.|
+|¦¹¶µ¥Ø¨S¦³ªþ¥ó¡C|
+|Remove the currently attached file|
+|²¾°£¥Ø«eªºªþ¥ó|
+|Close button [X] minimizes the main window instead of terminating the application|
+|«ö¡uÃö³¬¡v«ö¶s[X]®É¡A±Nµ{¦¡ÁY¨ì³Ì¤p|
+|KeePass Password Database|
+|KeePass±K½X¸ê®Æ®w|
+|&Open with KeePass|
+|¨Ï¥ÎKeePass¶}±Ò(&O)|
+|Here you can associate .kdb files with KeePass (so KeePass opens the file when double-clicking on it):|
+|³o¸Ì±z¥i¥H³]©wKeePass»P.kdbÀÉ®×ªºÃöÁp(³o¼ËKeePass±N¦b±z³sÂI¨â¤U¸ÓÀÉ®×®É¶}±Ò¸ÓÀÉ®×)¡G|
+|Successfully associated KeePass with .kdb files! A double-click on a .kdb file will now start KeePass automatically!|
+|¤w¦¨¥\³]©wKeePass»P.kdbÀÉ®×ªºÃöÁp¡I¦b±z³sÂI¨â¤U.kdbÀÉ®×®É±N¦Û°Ê±Ò°ÊKeePass¡I|
+|Successfully removed association! KeePass won't be started any more when double-clicking on a .kdb file!|
+|¤w¦¨¥\²¾°£ÃöÁp¡C¦b±z³sÂI¨â¤U.kdbÀÉ®×®É¤£¦Û°Ê±Ò°ÊKeePass¡I|
+|Create &Association|
+|«Ø¥ßÃöÁp(&A)|
+|&Remove Association|
+|²¾°£ÃöÁp(&R)|
+|Setup|
+|²ÕÂ´|
+|Password List|
+|±K½X²M³æ|
+|Exit?|
+|Â÷¶}¡H|
+|The file couldn't be saved.|
+|ÀÉ®×µLªkÀx¦s¡C|
+|Maybe it's read-only or the storage media has been removed.|
+|¥i¯à¬O¦]¬°°ßÅªÀÉ®×¡A©Î¬OÀx¦s´CÅé³Q²¾°£¤F¡C|
+|If you exit now, all changes to the current database will be lost.|
+|¦pªG²{¦bµ²§ô¡A±N¥¢¥h¹ï¦¹¸ê®Æ®wªºÅÜ§ó¡C|
+|Would you like to exit anyway?|
+|¤´µM­nµ²§ô¶Ü¡H|
+|Cannot access the selected drive.|
+|µLªk¦s¨ú¿ï¾ÜªººÏºÐ¾÷¡C|
+|Make sure a writable medium is inserted.|
+|½Ð½T©w±z¤w¸g©ñ¤J¥i¼g¤Jªº´CÅé¡C|
+|Not enough free disk space!|
+|ºÏºÐªÅ¶¡¤£¨¬¡I|
+|Disable unsafe (security-critical) operations like exports, etc.|
+|Ãö³¬¤£¦w¥þªº«ü¥O(ÄY­«¼vÅT¦w¥þªº)¡A¹³¬O¶×¥X¡C|
+|Unsafe operations are disabled.|
+|¤£¦w¥þªº«ü¥O¤w¸gÃö³¬¡C|
+|To execute this operation you must enable unsafe operations in the options dialog.|
+|¦pªG±z­n¨Ï¥Î¦¹¶µ¥Ø¡A±z¥²¶·¦b¡u¿ï¶µ¡v¤¤±Ò°Ê¤£¦w¥þªº«ü¥O¡C|
+|You have changed an option that requires restarting KeePass to get active.|
+|±zÅÜ§óªº¶µ¥Ø»Ý­n­«·s±Ò°ÊKeePass¤~¯à¥Í®Ä¡C|
+|Expired Entries|
+|¹L´Áªº¶µ¥Ø|
+|This is a list of all expired entries|
+|³o¬O©Ò¦³¹L´Á¶µ¥Øªº²M³æ¡C|
+|Show All &Expired Entries...|
+|Åã¥Ü©Ò¦³¹L´Áªº¶µ¥Ø(&E)...|
+|Click on an entry to jump to it.|
+|ÂI¿ï­n¸õ¹L¥hªº¶µ¥Ø¡C|
+|Quality:|
+|«~½è¡G|
+|Database Settings|
+|¸ê®Æ®w³]©w|
+|Here you can configure the current database.|
+|±z¥i¥H¦b¦¹³]©w¥Ø«e¶}±Òªº¸ê®Æ®w¡C|
+|Database Summary|
+|¸ê®Æ®w·§Æ[|
+|Your key is encrypted several times to make up the final database encryption key. This adds a constant-time factor and makes brute-force attacks much harder.|
+|±zªºÆ_°Í³Q¥[±K¼Æ¦¸¥HÀ±¸É³Ì²×ªº¸ê®Æ®w¥[±KÆ_°Í¡C³o¼W¥[¤F®É¶¡ªº¦]¯À¦Ó¨Ï¼É¤O¯}¸Ñ§ó¥[§xÃø¡C|
+|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
+|¼Æ¦r·U°ª«h·UÃø³Q¨Ï¥Î¼É¤Oªk¯}¸Ñ¡A¦ý±N©µªø¸ê®Æ®w¶}±Ò»PÀx¦sªº®É¶¡¡C|
+|Number of key encryption rounds:|
+|Æ_°Í¥[±K¦¸¼Æ¡G|
+|bits|
+|¦ì¤¸|
+|Personal &Vault TXT File...|
+|Personal &Vault TXT ÀÉ®×...|
+|Imported from Password Safe|
+|¶×¤J¦Û±K½X«OÀIÂd|
+|Remember last opened file|
+|°O¾Ð³Ì«á¶}±ÒªºÀÉ®×|
+|Total number of groups / entries|
+|¸s²Õ/¶µ¥ØÁ`¼Æ|
+|Total: %u groups / %u entries|
+|Á`¦@¡G%u¸s²Õ¡A%u¶µ¥Ø|
+|%u of %u selected|
+|¿ï¾Ü¤F%u¶µ¥Ø¡A¦@%u¶µ¥Ø|
+|Number of selected entries (number of entries in the list)|
+|¿ï¾Üªº¶µ¥Ø¼Æ¶q(²M³æ¤¤ªº¶µ¥Ø®Ñ¶q)|
+|Status|
+|ª¬ºA|
+|The database file has been modified!|
+|¸ê®Æ®wÀÉ®×¤w¦³ÅÜ§ó¡I|
+|Most probably someone has changed the file while you were editing it.|
+|«Ü¥i¯à¬O¦³¤H¦b±z½s¿è¸ÓÀÉ®×®ÉÅÜ§ó¤F¥¦¡C|
+|Do you want to overwrite it?|
+|±z§Æ±æÂÐ»\¥¦¶Ü¡H|
+|The group you selected cannot store entries. Please select an other group.|
+|±z¿ï¾Üªº¸s²ÕµLªkÀx¦s¶µ¥Ø¡A½Ð¿ï¾Ü¨ä¥¦¸s²Õ¡C|
+|This will remove all selected entries unrecoverably!|
+|³o±N±N¥Ã¤[²¾°£©Ò¦³¿ï¾Üªº¶µ¥Ø¡I|
+|Are you sure you want to delete all selected entries?|
+|±z½T©w­n§R°£©Ò¦³¿ï¾Üªº¶µ¥Ø¶Ü¡H|
+|Delete Entries Confirmation|
+|½T»{§R°£¶µ¥Ø|
+|Use PuTTY for ssh: and telnet: URLs|
+|¨Ï¥ÎPuTTY³B²zssh:»Ptelnet:ºô§}|
+|Mark database as modified on last-access time change|
+|¦b¤W¦¸¦s¨úªº®É¶¡§ïÅÜ«á¡A±N¸ê®Æ®wµø¬°¤wÅÜ§ó|
+|Se&lect All|
+|¥þ¿ï(&L)|
+|Auto-&Sort Password List|
+|¦Û°Ê±Æ§Ç±K½X²M³æ(&S)|
+|N&o Auto-Sort|
+|¤£¦Û°Ê±Æ§Ç(&O)|
+|Auto-sorting of the password list is enabled, you cannot move entries manually.|
+|±K½X²M³æ¦Û°Ê±Æ§Ç¤w±Ò°Ê¡A±zµLªk¤â°Ê²¾°Ê¶µ¥Ø¡C|
+|Perform Auto-&Type|
+|°õ¦æ¦Û°Ê¿é¤J|
+|Auto-sorting of the password list is enabled, you cannot sort the list manually now.|
+|±K½X²M³æ¦Û°Ê±Æ§Ç¤w±Ò°Ê¡A±zµLªk¤â°Ê±Æ§Ç¶µ¥Ø¡C|
+|Select key-file manually...|
+|¤â°Ê¿ï¾ÜÆ_°ÍÀÉ®×...|
+|Save key-file manually to...|
+|¤â°ÊÀx¦sÆ_°ÍÀÉ®×¨ì...|
+|Enter the new master key for this database.|
+|¬°³o­Ó¸ê®Æ®w¿é¤J·sªº¥DÆ_°Í¡C|
+|Repeat master key|
+|­«½Æ¿é¤J¥DÆ_°Í|
+|Repeat the master key for this database.|
+|¬°³o­Ó¸ê®Æ®w­«½Æ¿é¤J¥DÆ_°Í¡C|
+|Change password of this database - Enter new master key|
+|ÅÜ§ó³o­Ó¸ê®Æ®wªº±K½X - ¿é¤J·sªº¥DÆ_°Í|
+|Plugin|
+|ÂX¥R®M¥ó|
+|cannot be loaded!|
+|µLªk¸ü¤J¡I|
+|Plugin Manager|
+|ÂX¥R®M¥óºÞ²z­û|
+|&Plugin Manager|
+|ÂX¥R®M¥óºÞ²z­û(&P)|
+|Here you can configure all installed KeePass plugins.|
+|±z¥i¥H¦b¦¹³]©w©Ò¦³¦w¸ËªºKeePassÂX¥R®M¥ó¡C|
+|This plugin has been designed for a different application version and may be incompatible with this one.|
+|³o­ÓÂX¥R®M¥ó¬O³Q³]­pµ¹¥t¤@­Óª©¥»ªºÀ³¥Îµ{¦¡¡A¥i¯à¤£¬Û®e¡C|
+|Application version:|
+|À³¥Îµ{¦¡ª©¥»¡G|
+|Plugin has been designed for:|
+|ÂX¥R®M¥ó¬O³Q³]­pµ¹¡G|
+|It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.|
+|³o­Ó®M¥ó¥i¯à»PKeePass¬Û®e¡A¦ý¤]¦³¥i¯à¨ÏKeePass·í±¼¡C|
+|Therefore save all data before you continue.|
+|©Ò¥H½Ð¦bÄ~Äò¤§«eÀx¦s©Ò¦³¸ê®Æ¡C|
+|Do you want to load the plugin?|
+|±z§Æ±æ¸ü¤J¦¹ÂX¥R®M¥ó¶Ü¡H|
+|This plugin will be disabled after you restart KeePass.|
+|¦¹ÂX¥R®M¥ó±N¦b±z­«·s±Ò°ÊKeePass«á°±¥Î¡C|
+|Enabled, loaded|
+|¤w±Ò¥Î¡A¤w¸ü¤J|
+|Disabled, not loaded|
+|¤w°±¥Î¡A¥¼¸ü¤J|
+|This plugin will be enabled after you restart KeePass.|
+|¦¹ÂX¥R®M¥ó±N¦b±z­«·s±Ò°ÊKeePass«á±Ò¥Î¡C|
+|&Enable|
+|±Ò¥Î(&E)|
+|&Disable|
+|°±¥Î(&D)|
+|About &Plugin...|
+|Ãö©óÂX¥R®M¥ó(&P)...|
+|An error occured|
+|µo¥Í¿ù»~|
+|Error code|
+|¿ù»~½X|
+|Unknown error|
+|¥¼ª¾ªº¿ù»~|
+|Success|
+|¦¨¥\|
+|Invalid parameter|
+|µL®Äªº°Ñ¼Æ|
+|Too few memory (RAM) available|
+|°O¾ÐÅé¤£¨¬|
+|Invalid/wrong key|
+|µL®Ä/¿ù»~ªºÆ_°Í|
+|File access error: failed to open file in read mode|
+|ÀÉ®×¦s¨ú¿ù»~¡GµLªk¥HÅª¨ú¼Ò¦¡¶}±ÒÀÉ®×|
+|File access error: failed to open file in write mode|
+|ÀÉ®×¦s¨ú¿ù»~¡GµLªk¥H¼g¤J¼Ò¦¡¶}±ÒÀÉ®×|
+|File error: error while reading from the file|
+|ÀÉ®×¿ù»~¡GÅª¨úÀÉ®×®Éµo¥Í¿ù»~|
+|File error: error while writing to the file|
+|ÀÉ®×¿ù»~¡G¼g¤JÀÉ®×®Éµo¥Í¿ù»~|
+|Internal error|
+|¤º³¡¿ù»~|
+|Invalid random source|
+|µL®ÄªºÀH¾÷¸ê®Æ¨Ó·½|
+|Invalid/corrupted file structure|
+|µL®Ä/·l·´ªºÀÉ®×µ²ºc|
+|Encryption/decryption error|
+|¥[/¸Ñ±K¿ù»~|
+|Get more plugins...|
+|¨ú±o§ó¦hÂX¥R®M¥ó...|
+|Global auto-type hot key combination:|
+|¥þ°ì¦Û°Ê¿é¤J§Ö³tÁä¡G|
+|Unable to register a global hot key.|
+|µLªkµù¥U¥þ°ì§Ö³tÁä¡C|
+|Most probably an other application has reserved this hot key already.|
+|«Ü¦³¥i¯à¬O¦]¬°¨ä¥¦À³¥Îµ{¦¡±µ¦¬¤F³o­Ó§Ö³tÁä¡C|
+|You can choose an other hot key combination in 'Edit - Options - Setup'.|
+|±z¥i¥H¦b¡u	½s¿è¡v¡u¿ï¶µ¡v¡u²ÕÂ´¡v¤¤¿ï¾Ü¨ä¥¦ªº§Ö³tÁä¡C|
+|and|
+|¥H¤Î|
+|You've selected the AND key mode, so you must enter a password AND select a key-file.|
+|±z¤w¸g¿ï¾Ü¡u¥H¤Î¡v¼Ò¦¡¡A©Ò¥H½Ð¿é¤J±K½X¨Ã¿ï¾ÜÆ_°ÍÀÉ®×¡C|
+|Timed: copy data to the clipboard and clear it automatically after some seconds|
+|®É¶¡­­¨î¡G½Æ»s¸ê®Æ¨ì°Å¶KÃ¯¡A¨Ã¦b¤@¬q®É¶¡«á¦Û°Ê²M°£|
+|Enhanced: allow pasting only once and protect against clipboard spies|
+|¼W±j«OÅ@¡G¥u¤¹³\¶K¤W¤@¦¸¡A¨Ã¨¾¤î°Å¶KÃ¯°»¬d|
+|Clipboard behavior:|
+|¨Ï¥Î°Å¶KÃ¯¡G|
+|Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.|
+|Äµ§i¡I³o­Ó¿ï¶µ¦b¬Y¨Ç¨t²Î¤¤¥i¯àµLªk¥¿½T¹B§@¡A¤×¨ä¬O¨Ï¥Î°Å¶KÃ¯¼W±j¤u¨ã¤§Ãþªº³nÅé¡C|
+|If you notice any problems with this enhanced method, just switch back to the timed clipboard clearing method.|
+|¦pªG±z¦b¨Ï¥Î¦¹¼Ò¦¡®Éµo²{¥ô¦ó°ÝÃD¡A½Ð±N¨ä§ï¬°¡u®É¶¡­­¨î¡v¼Ò¦¡¡C|
+|Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations.|
+|.kdbÀÉ®×ÃöÁpÅÜ§ó¥¢±Ñ¡C½Ð½T©w±z¦³Åv­­¼g¤Jµn¿ý¥H¤ÎÅÜ§óªþÀÉ¦WÃöÁp¡C|
+|Number the TANs consecutively, starting from this value|
+|±q³o­Ó­È¶}©l¡A±NTANºâ§@³sÄòªº|
+|Never expires|
+|¥Ã¤£¹L´Á|
+|Auto-Type|
+|¦Û°Ê¿é¤J|
+|Help:|
+|»¡©ú¡G|

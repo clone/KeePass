@@ -36,7 +36,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CIconPickerDlg : public CDialog
+class CIconPickerDlg : public CDialog
 {
 public:
 	CIconPickerDlg(CWnd* pParent = NULL);

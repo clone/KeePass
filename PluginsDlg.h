@@ -44,7 +44,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CPluginsDlg : public CDialog
+class CPluginsDlg : public CDialog
 {
 public:
 	CPluginsDlg(CWnd* pParent = NULL);

@@ -14,7 +14,9 @@ Frequently Asked Questions (FAQ)</td></tr></table>
 
 	<ul>
 	<li><a href="#helpme" target="_self">How can I help you?</a></li>
+	<li><a href="#nooptsave" target="_self">My options aren't saved! Why?</a></li>
 	<li><a href="#multiuser" target="_self">Multi-user databases</a></li>
+	<li><a href="#multicards" target="_self">Rename columns / other "card types" feature requests</a></li>
 	<li><a href="#multisys" target="_self">Will there be KeePass versions for other OSs than Windows?</a></li>
 	</ul>
 
@@ -39,6 +41,37 @@ Frequently Asked Questions (FAQ)</td></tr></table>
 	KeePass isn't that widely-known yet. If you like KeePass, tell all your friends how great KeePass is, publish articles
 	about it, press it on CDs/DVDs, sell it with your USB sticks, submit it to software archives, talk in forums about it, etc.!</li>
 	</ul>
+
+	<br /><br />
+
+	<a name="nooptsave"></a>
+	<table class="tablebox"><tr><td class="boxtitle">
+	<img src="images/menuinfo.gif" width="31px" height="21px" class="singleimg">
+	My options aren't saved! Why?</td></tr></table>
+	<br />
+	When saving the options, KeePass does the following:
+	<ul>
+	<li>Try to save the options to the global <i>KeePass.ini</i> file in the KeePass program directory.</li>
+	<li>If this fails (for example if the program directory is protected), write the options to a <i>KeePass.ini</i> file in the users directory.</li>
+	</ul>
+	When loading, KeePass performs the following:
+	<ul>
+	<li>Try to find the key (the option) in the global <i>KeePass.ini</i> file.</li>
+	<li>If this fails (file inaccessible or key doesn't exist), try loading it from the <i>KeePass.ini</i> file in the users directory.</li>
+	</ul>
+	Now, if you use the KeePass installer and install it with admin rights, the program directory will be write-protected when working
+	as a normal user. That means that KeePass saves your options into your users directory, but loads them from the global <i>KeePass.ini</i>.<br />
+	<br />
+	If you want KeePass to use just the users directory, logon to Windows with admin rights and delete the global <i>KeePass.ini</i> in the
+	program directory. This forces KeePass to use the <i>KeePass.ini</i> in the users directory for both reading and writing when logging
+	on as normal Windows user (without admin rights).<br />
+	<br />
+	A note to network administrators: all settings in the global <i>KeePass.ini</i> file override the settings of the users. That means that
+	you can selectively force some options, but leave other options to the users. For this, open the global <i>KeePass.ini</i> file on the
+	network drive and have a look at it. Delete all entries that you want to leave up to the user (don't just set it to nothing,
+	delete the line completely!). The options you set in the global <i>KeePass.ini</i> are forced for all users, all other options
+	are configurable by the users (they are written to the <i>KeePass.ini</i> in the users directory). Make sure you write-protect
+	the global <i>KeePass.ini</i> on the network drive so nobody can overwrite it.<br />
 
 	<br /><br />
 
@@ -70,6 +103,44 @@ Frequently Asked Questions (FAQ)</td></tr></table>
 	<a href="http://sourceforge.net/forum/forum.php?thread_id=1000183&forum_id=329220" target="_blank">Forum discussion: view user and edit user</a><br />
 	<a href="http://office.microsoft.com/en-us/assistance/HP052388541033.aspx" target="_blank">Microsoft Office Online: Overview of security and protection in Excel</a><br />
 	<a href="http://www.dotxls.com/excel-security/23/introduction-to-excel-security" target="_blank">DotXls: Excel Security and Excel Password Protection</a><br />
+
+	<br /><br />
+
+	<a name="multicards"></a>
+	<table class="tablebox"><tr><td class="boxtitle">
+	<img src="images/menuinfo.gif" width="31px" height="21px" class="singleimg">
+	Rename columns / other "card types" feature requests</td></tr></table>
+	<br />
+	Many feature requests like these have been posted over and over again: rename the columns, add more URL fields,
+	add an entry-type field (let the user define whether that entry is a login account, credit card, etc.), hide some
+	dialog elements for some special entry-type,
+	support different "card types" (you could choose "credit card" as entry-type and KeePass would show
+	fields needed for credit card information), etc.<br />
+	<br />
+	KeePass has been designed from ground up to have the fixed fields you see in the add-entry dialog. All parts of KeePass,
+	starting from the core password manager, all the dialogs, up to the main GUI code, are based on this. Supporting
+	different card types would require a total rewrite of almost all the code. Really almost everything would
+	have to be changed, the tree/listview layout system wouldn't work any more, the database format would have to be
+	rewritten from scratch, many of the dialogs would have to be redesigned totally. Short: it's impossible. Creating
+	a completely new project would be far less work than implementing this into KeePass.<br />
+	<br />
+	Even if I would provide the ability to rename the columns/fields, the structure would remain. For example, the URL field
+	would continue to be a clickable URL field, though you would have declared it as "PIN" field. This would
+	confuse more users than help some, therefore I won't implement any renaming ability.<br />
+	<br />
+	<b>E-mail address field feature request</b><br />
+	<br />
+	Especially one feature request is made very often: add an e-mail field. For e-mail accounts for example you would need
+	such a field. I won't add an e-mail field, you can use the username field for this. There are mostly two &quot;types&quot;
+	of e-mail accounts: either enter a username and a password (standard e-mail servers) or enter your e-mail address and
+	a password (web-based e-mail services) to login. The first one isn't a problem anyway and for the second one you can just store
+	your <i>e-mail address in the username field</i>. Even if your provider requires 3 fields (username <i>and</i> e-mail address <i>and</i>
+	password) to login, you can for example just modify the auto-type sequence (so practically store your e-mail
+	address in the auto-type sequence) or store the additional data in the title, URL or notes field.<br />
+	<br />
+	The end-user must be flexible enough to use the username or URL field for e-mail addresses, the password fields for credit
+	card numbers, etc. The notes field accepts the rest, i.e. everything that doesn't fit into the title / user-name / URL
+	/ password field scheme.<br />
 
 	<br /><br />
 

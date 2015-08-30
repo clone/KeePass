@@ -86,7 +86,7 @@ typedef unsigned __int32 RD_UINT32;
 #define RIJNDAEL_BAD_DIRECTION -6
 #define RIJNDAEL_CORRUPTED_DATA -7
 
-class CPP_CLASS_SHARE Rijndael
+class Rijndael
 {	
 public:
 	enum Direction { Encrypt , Decrypt };

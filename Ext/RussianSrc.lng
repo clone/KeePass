@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Russian|
-|~LANGUAGEVERSION|             |0.98a|
+|~LANGUAGEVERSION|             |0.98b|
 |~LANGUAGEAUTHOR|              |Varrey|
 |~LANGUAGEAUTHOREMAIL|         |varrey@hotmail.com|
 
@@ -49,7 +49,7 @@
 |Either enter the password/passphrase or select the password disk's drive.|
     |Введите пароль или выберите диск с паролем.|
 |Enter password:|              |Введите пароль:|
-|or|                           |или|
+
 |Select the password disk drive where the key will be stored:|
     |Выберите диск, на который будет сохранен пароль:|
 |Create a new password database - Enter master key|
@@ -269,7 +269,6 @@
     |Текущий файл был изменен.|
 |Do you want to save the changes before closing?|
     |Хотите сохранить изменения перед закрытием?|
-|Save Before Close?|           |Сохранить перед закрытием?|
 
 |Deleting a group will delete all items in that group, too.|
     |Удаление группы приведет к удалению всех записей в этой группе.|
@@ -470,13 +469,13 @@
 |KeePass Password Database|               |База паролей KeePass|
 |&Open with KeePass|                      |Откр&ыть с помощью KeePass|
 |Here you can associate .kdb files with KeePass (so KeePass opens the file when double-clicking on it):|
-    |Вы можете создать ассоциацию .kdb файлов с KeePass (т.е. KeePass будет открывать файл по двойному щелчку на нем):|
+    |Вы можете привязать .kdb файлы к KeePass (т.е. KeePass будет открывать файл по двойному щелчку на нем):|
 |Successfully associated KeePass with .kdb files! A double-click on a .kdb file will now start KeePass automatically!|
-    |KeePass проассоциирован с .kdb файлами! Двойной щелчок по .kdb файлу будет запускать KeePass автоматически!|
+    |KeePass привязан к .kdb файлам! Двойной щелчок по .kdb файлу будет запускать KeePass автоматически!|
 |Successfully removed association! KeePass won't be started any more when double-clicking on a .kdb file!|
-    |Ассоциация .kdb файлов с KeePass была удалена! Теперь KeePass не будет запускаться по двойному щелчку на .kdb файле!|
-|Create &Association|                     |Про&ассоциировать|
-|&Remove Association|                     |&Удалить ассоциацию|
+    |Привязка .kdb файлов к KeePass была удалена! Теперь KeePass не будет запускаться по двойному щелчку на .kdb файле!|
+|Create &Association|                     |Привяз&ать|
+|&Remove Association|                     |&Удалить привязку|
 |Setup|                                   |Настройки|
 |Password List|                           |Списак паролей|
 |Exit?|                                   |Выйти?|
@@ -526,7 +525,7 @@
 |This will remove all selected entries unrecoverably!|
     |Удаление всех выделенных записей будет необратимо!|
 |Are you sure you want to delete all selected entries?|
-    |Вы уверены, что хотите удалить все выделенный записи?|
+    |Вы уверены, что хотите удалить все выделенные записи?|
 |Delete Entries Confirmation|             |Подтверждение удаления записей|
 |Use PuTTY for ssh: and telnet: URLs|     |Использовать PuTTY для ssh: и telnet: ссылок|
 |Mark database as modified on last-access time change|
@@ -536,7 +535,7 @@
 |N&o Auto-Sort|                           |Не использовать &автосортировку|
 |Auto-sorting of the password list is enabled, you cannot move entries manually.|
     |Автосортировка списка паролей включена - вы не можете перемещать записи вручную.|
-|Perform Auto-&Type|                      |Начать а&втозаполнение|
+|Perform Auto-&Type|                      |Начать а&втонабор|
 |Auto-sorting of the password list is enabled, you cannot sort the list manually now.|
     |Автосортировка списка паролей включена - вы не можете сортировать записи вручную.|
 |Select key-file manually...|             |Укажите файл с паролем вручную...|
@@ -546,3 +545,65 @@
 |Repeat the master key for this database.||Повторите ввод основного пароля для текущей базы паролей.|
 |Change password of this database - Enter new master key|
     |Изменение пароля базы паролей - Ввод нового основного пароля|
+
+|&Disable|             |&Блокировать|
+|&Enable|              |&Разблокировать|
+|&Plugin Manager|      |Администратор &модулей|
+|About &Plugin...|     |О &модуле...|
+|An error occured|     |Произошла ошибка|
+|Application version:| |Версия приложения:|
+|Auto-Type|            |Автонабор|
+|Clipboard behavior:|  |Режим буфера обмена:|
+|Disabled, not loaded| |Заблокирован, не загружен.|
+|Do you want to load the plugin?| |Вы хотите загрузить модуль?|
+|Enabled, loaded|      |Разблокирован, загружен.|
+|Encryption/decryption error|     |Ошибка шифрования/дешифрования|
+|Enhanced: allow pasting only once and protect against clipboard spies|
+    |Расширенный: позволяет только одну вставку и защищает от программ, следящих за буфером|
+|Error code|           |Код ошибки|
+|Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations.|
+    |Невозможно изменить привязку .kdb файлов. Проверьте ваши права на запись в реестре и на изменение привязки файлов.|
+|File access error: failed to open file in read mode|   |Ошибка доступа к файлу: невозможно открыть файл в режиме чтения|
+|File access error: failed to open file in write mode|  |Ошибка доступа к файлу: невозможно открыть файл в режиме записи|
+|File error: error while reading from the file|         |Файловая ошибка: ошибка во время чтения из файла|
+|File error: error while writing to the file|           |Файловая ошибка: ошибка во время записи в файл|
+|Get more plugins...|  |Найти больше модулей...|
+|Global auto-type hot key combination:|                 |Глобальная "горячая" клавиша для автонабора:|
+|Help:|                |Справка:|
+|Here you can configure all installed KeePass plugins.| |Здесь вы можете настроить все установленные подключаемые модули для KeePass.|
+|If you notice any problems with this enhanced method, just switch back to the timed clipboard clearing method.|
+    |Если у вас возникнут проблемы при использовании расширенного режима, просто переключитесь обратно во временной режим.|
+|Internal error|       |Внутренняя ошибка|
+|Invalid parameter|    |Неверный параметр|
+|Invalid random source||Неверный источник случайностей|
+|Invalid/corrupted file structure| |Неверная/испорченная структура файла|
+|Invalid/wrong key|    |Неверный ключ|
+|It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.|
+    |Возможно модуль совместим, но также возможно, что он приведет к аварийному завершению KeePass.|
+|KeePass - Save Before Close/Lock?| |KeePass - сохранить перед закрытием/блокировкой?|
+|Most probably an other application has reserved this hot key already.|
+    |Вероятнее всего другое приложение уже зарезервировало эту "горячую" клавишу.|
+|Never expires|        |Никогда не истекает|
+|Number the TANs consecutively, starting from this value| |Нумеровать TANы последовательно, начиная с указанного значения|
+|Plugin|               |Модуль|
+|Plugin Manager|       |Администратор модулей|
+|Plugin has been designed for:|     |Модуль был сделан для:|
+|Success|              |Успешно|
+|Therefore save all data before you continue.|            |Поэтому сохраните все данные перед продолжением.|
+|This plugin has been designed for a different application version and may be incompatible with this one.|
+    |Этот модуль был сделан для другой версии приложения и может быть несовместим с ним.|
+|This plugin will be disabled after you restart KeePass.| |Этот модуль будет заблокирован после перезагрузки KeePass.|
+|This plugin will be enabled after you restart KeePass.|  |Этот модуль будет разблокирован после перезагрузки KeePass.|
+|Timed: copy data to the clipboard and clear it automatically after some seconds|
+    |Временной: автоматически очищает буфер обмена через несколько секунд после вставки|
+|Too few memory (RAM) available|    |Очень мало памяти (ОЗУ)|
+|Unable to register a global hot key.| |Невозможно зарегистрировать глобальную "горячую" клавишу.|
+|Unknown error|        |Неизвестная ошибка|
+|Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.|
+    |Внимание! Этот режим может не работать в вашей системе, особенно если вы используете программы для расширения возможностей буфера обмена.|
+|You can choose an other hot key combination in 'Edit - Options - Setup'.|
+    |Вы можете установить другую "горячую" клавишу в "Изменить - Настройки - Настройки".|
+|You've selected the AND key mode, so you must enter a password AND select a key-file.|
+    |Вы выбрали режим "и" для ввода пароля, поэтому вы должны ввести пароль И выбрать диск/файл с паролем.|
+|and|                  |и|
+|cannot be loaded!|    |не может быть загружен!|

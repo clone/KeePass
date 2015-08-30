@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |0.98b|
+|~LANGUAGEVERSION|             |0.99a|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -363,16 +363,11 @@
 |Security|                     |Sicherheit|
 |KeePass is OSI Certified Open Source Software.|
     |KeePass ist OSI Certified Open Source Software.|
-|KeePass usage:|               |KeePass Kommandozeilen-Aufruf:|
-|db = Path to database you wish to open on KeePass startup|
-    |db = Pfad zu einer Datenbank, die KeePass beim Starten öffnen soll|
 |Automatically lock workspace after the following number of seconds:|
     |Arbeitsfläche automatisch nach Anzahl Sekunden sperren:|
 |&Group Name|                  |&Gruppenname|
 |Every second row has a different background color. Use this color:|
     |Jede zweite Zeile hat eine andere Hintergrundfarbe. Diese Farbe benutzen:|
-|Start:|                       |Start:|
-|Exit:|                        |Beenden:|
 |Default|                      |Standard|
 |More Colors...|               |Mehr Farben...|
 |Search results|               |Suchergebnisse|
@@ -393,8 +388,14 @@
 |Visit KeePass Homepage|       |KeePass-Homepage besuchen|
 |Field copied to clipboard.|   |Feld in die Zwischenablage kopiert.|
 
-|A key-file already exists on this drive. Do you want to overwrite it?|
-    |Auf dem Ziellaufwerk existiert bereits eine Schlüsseldatei. Möchten Sie diese überschreiben?|
+|A key-file already exists on this drive. Do you want to overwrite or reuse it?|
+    |Auf dem Ziellaufwerk existiert bereits eine Schlüsseldatei. Möchten Sie diese überschreiben oder benutzen?|
+|Click [Yes] to overwrite the key-file.| |Klicken Sie [Ja], um die Schlüsseldatei zu überschreiben.|
+|Click [No] to reuse the selected key-file for this database.|
+    |Klicken Sie [Nein], um sie für diese Datenbank zu benutzen.|
+|Click [Cancel] to abort changing the key.|
+    |Klicken Sie [Abbrechen], um den Vorgang abzubrechen.|
+
 |Overwrite?|                   |Überschreiben?|
 |Expires:|                     |Gültig bis:|
 |&Delete Selected Entries|     |Ausgewählte Einträge &löschen|
@@ -614,3 +615,19 @@
 |Never expires|                           |Läuft nicht ab|
 |Auto-Type|                               |Auto-Type|
 |Help:|                                   |Hilfe:|
+|Advanced|                                |Erweitert|
+|Minimize window on startup|              |Hauptfenster beim Starten minimieren|
+|Immediately after opening a database|    |Sofort nach dem Öffnen einer Datenbank|
+|Show expired entries (if any)|
+    |Abgelaufene Einträge anzeigen (falls es welche gibt)|
+|Show entries that will expire soon (if any)|
+    |Einträge, die bald ablaufen, anzeigen (falls es welche gibt)|
+|Integration|                             |Integration|
+|Start KeePass at Windows startup (for current user)|
+    |KeePass mit Windows starten (für aktuellen Benutzer)|
+|Unable to create/remove the auto-start key of KeePass in the Windows registry!|
+    |Kann Autostart-Schlüssel von KeePass in Windows Registry nicht löschen!|
+|Backup|                                  |Backup|
+|Save backups of modified entries into the "Backup" group|
+    |Backups von geänderten Einträgen in die "Backup"-Gruppe speichern|
+|Failed to create backup of this entry!|  |Kann kein Backup von diesem Eintrag erstellen!|

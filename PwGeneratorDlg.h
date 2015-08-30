@@ -37,7 +37,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CPwGeneratorDlg : public CDialog
+class CPwGeneratorDlg : public CDialog
 {
 public:
 	CPwGeneratorDlg(CWnd* pParent = NULL);
@@ -51,12 +51,15 @@ public:
 
 	CKCSideBannerWnd m_banner;
 	CImageList m_ilIcons;
+	CFont m_fStyle;
 
 	static void SetOptions(CString strOptions, CString strCharSet, UINT nCharacters);
 	static void GetOptions(CString *pstrOptions, CString *pstrCharSet, UINT *pnCharacters);
 
 	//{{AFX_DATA(CPwGeneratorDlg)
 	enum { IDD = IDD_PW_GENERATOR_DLG };
+	CXPStyleButtonST	m_btHidePw;
+	CEdit	m_cEditPw;
 	CGradientProgressCtrl	m_cPassQuality;
 	CSpinButtonCtrl	m_spinNumChars;
 	CXPStyleButtonST	m_btGenerate;
@@ -68,6 +71,7 @@ public:
 	BOOL	m_bCharSpec;
 	CString	m_strCharSet;
 	BOOL	m_bGetEntropy;
+	BOOL	m_bHidePw;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(CPwGeneratorDlg)
@@ -88,6 +92,7 @@ protected:
 	afx_msg void OnRclickListOptions(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDeltaPosSpinNumChars(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnChangeEditPw();
+	afx_msg void OnCheckHidePw();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

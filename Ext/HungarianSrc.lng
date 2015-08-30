@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Magyar|
-|~LANGUAGEVERSION|             |0.98a|
+|~LANGUAGEVERSION|             |0.98b|
 |~LANGUAGEAUTHOR|              |documan|
 |~LANGUAGEAUTHOREMAIL|         |documan at mailbox dot hu|
 
@@ -49,7 +49,6 @@
 |Either enter the password/passphrase or select the password disk's drive.|
     |Vagy adj meg egy jelszót vagy válassz egy jelszó lemez meghajtót.|
 |Enter password:|              |Add meg a jelszót:|
-|or|                           |vagy|
 |Select the password disk drive where the key will be stored:|
     |Válaszd ki a jelszó meghajtóját, ahol a kulcs tárolva lesz:|
 |Create a new password database - Enter master key|
@@ -269,7 +268,6 @@
     |A jelenlegi fájl módosítva lett.|
 |Do you want to save the changes before closing?|
     |Szeretnéd kilépés elõtt menteni a változtatásokat?|
-|Save Before Close?|           |Mentsek a kilépés elõtt?|
 
 |Deleting a group will delete all items in that group, too.|
     |A csoport törlésekor a csoport minden eleme is törlõdik.|
@@ -547,3 +545,55 @@
 |Repeat the master key for this database.||Ismételd meg az adatbázis mester kulcsát.|
 |Change password of this database - Enter new master key|
     |Az adatbázis jelszavának megváltoztatása - Add meg az új mester kulcsot|
+|&Disable| |&Letilt|
+|&Enable| |&Engedélyez|
+|&Plugin Manager| |&Bõvítmény Menedzser|
+|About &Plugin...| |a &Bõvítményrõl...|
+|An error occured| |Hiba történt|
+|Application version:| |Alkalmazás verzió:|
+|Auto-Type| |Auto-Gépelés|
+|Clipboard behavior:| |Vágólap-viselkedés:|
+|Disabled, not loaded| |Letiltva, nincs betöltve|
+|Do you want to load the plugin?| |Szeretnéd betölteni a bõvítményt?|
+|Enabled, loaded| |Engedélyezve, betöltve|
+|Encryption/decryption error| |Titkosítási/Dekódolási hiba|
+|Enhanced: allow pasting only once and protect against clipboard spies| |Élesített: a beillesztést csak egyszer engedélyezi, így megvéd a vágólap-kémek ellen|
+|Error code| |Hibakód|
+|Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations.| |Nem sikerült létrehozni a .kdb társítást. Gyõzõdj meg róla, hogy van-e jogod a registry írásához és a társítások létrehozásához.|
+|File access error: failed to open file in read mode| |Fájl hozzáférési hiba: nem lehet a fájlt megnyitni olvasható módban|
+|File access error: failed to open file in write mode| |Fájl hozzáférési hiba: nem lehet a fájlt megnyitni írható módban|
+|File error: error while reading from the file| |Fájl hiba: hiba történt a fájl olvasása közben|
+|File error: error while writing to the file| |Fájl hiba: hiba történt a fájl írása közben|
+|Get more plugins...| |Új bõvítmények...|
+|Global auto-type hot key combination:| |Globális auto-gépelési billentyûparancs:|
+|Help:| |Súgó:|
+|Here you can configure all installed KeePass plugins.| |Itt tudsz minden telepített KeePass bõvítményt konfigurálni.|
+|If you notice any problems with this enhanced method, just switch back to the timed clipboard clearing method.| |Amennyiben bármilyen hibát tapasztalsz az élesített üzemmódban, kapcsolj vissza az idõzített vágólap-törlési üzemmódra.|
+|Internal error| |Belsõ hiba|
+|Invalid parameter| |Érvénytelen paraméter|
+|Invalid random source| |Érvénytelen véletlen forrás|
+|Invalid/corrupted file structure| |Érvénytelen/sérült fájlszerkezet|
+|Invalid/wrong key| |Érvénytelen/rossz kulcs|
+|It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.| |Elõfordulhat hogy a bõvítmény kompatibilis, de akár a KeePass leállását is okozhatja.|
+|KeePass - Save Before Close/Lock?| |KeePass - Mentsek Bezárás/Lezárás elõtt?|
+|Most probably an other application has reserved this hot key already.| |Valószínûleg más alkalmazás már használja ezt a billentyûparancsot.|
+|Never expires| |Soha nem jár le|
+|Number the TANs consecutively, starting from this value| |A TANok számozása értelemszerûen, ettõl az értéktõl kezdve|
+|Plugin| |Bõvítmény|
+|Plugin Manager| |Bõvítmény Kezelõ|
+|Plugin has been designed for:| |A bõvítmény kialakítva:|
+|Success| |Siker|
+|Therefore save all data before you continue.| |Ezért ments minden adatot, mielõtt folytatnád.|
+|This plugin has been designed for a different application version and may be incompatible with this one.| |Ez a bõvítmény egy másik alkalmazás verzióhoz készült, így lehet, hogy inkompatibilis ezzel a verzióval.|
+|This plugin will be disabled after you restart KeePass.| |A bõvítmény a KeePass következõ indításakor kerül letiltásra.|
+|This plugin will be enabled after you restart KeePass.| |A bõvítmény a KeePass következõ indításakor kerül engedélyezésre.|
+|Timed: copy data to the clipboard and clear it automatically after some seconds| |Idõzített: az adatot vágólapra másolja, majd automatikusan törli onnan néhány másodperc elteltével.|
+|Too few memory (RAM) available| |Túl kevés memória (RAM) áll rendelkezésre|
+|Unable to register a global hot key.| |A globális billentyûparancsot nem lehet regisztrálni.|
+|Unknown error| |Ismeretlen hiba|
+|Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.| |Figyelem! Lehetséges, hogy ez az opció nem fog megfelelõen mûködni a te rendszereden, különösen ha egyéb vágólap-javító vagy hasonló eszközt használsz.|
+|You can choose an other hot key combination in 'Edit - Options - Setup'.| |Választhatsz egy másik billentyûparancsot a 'Szerkesztés - Opciók - Telepítés' menüpont alatt.|
+|You've selected the AND key mode, so you must enter a password AND select a key-file.| |Az ÉS kulcs módot választottad, azaz meg kell adnod egy jelszót ÉS egy kulcs-fájlt kell választanod.|
+|and| |és|
+|cannot be loaded!| |nem betölthetõ|
+

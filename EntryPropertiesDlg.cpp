@@ -58,8 +58,8 @@ void CEntryPropertiesDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEntryPropertiesDlg)
+	DDX_Control(pDX, IDC_COMBO_GROUPS, m_cbGroups);
 	DDX_Control(pDX, IDC_BUTTON_SELECT_ICON, m_btSelectIcon);
-	DDX_Control(pDX, IDC_COMBO_GROUPS, m_pGroups);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_Control(pDX, IDC_EDIT_EXPIRE_TIME, m_editTime);
@@ -96,47 +96,27 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 	NewGUI_XPButton(&m_btSelectIcon, -1, -1);
 
 	// Set the imagelist for the group selector combo box
-	m_pGroups.SetXImageList(m_pParentIcons);
-
-	m_pGroups.SetBkGndColor(RGB(255,255,255));
-	m_pGroups.SetTextColor(RGB(0,0,128));
-	m_pGroups.SetHiLightTextColor(RGB(0, 0, 128));
-
-	CDC *pDC = GetDC();
-	if((pDC != NULL) && (GetDeviceCaps(pDC->m_hDC, BITSPIXEL) <= 8))
-	{
-		m_pGroups.SetHiLightBkGndColor(RGB(192,192,192));
-		m_pGroups.SetHiLightFrameColor(RGB(192,192,192));
-	}
-	else
-	{
-		m_pGroups.SetHiLightBkGndColor(RGB(230,230,255));
-		m_pGroups.SetHiLightFrameColor(RGB(230,230,255));
-	}
-	if(pDC != NULL) ReleaseDC(pDC);
+	m_cbGroups.SetImageList(m_pParentIcons);
 
 	ASSERT(m_pMgr != NULL); // Must have been initialized by parent
-	unsigned int i, j; PW_GROUP *p; USHORT uLevel;
-	CString strAdd;
+	unsigned int i; PW_GROUP *p;
+	COMBOBOXEXITEM cbi;
 	for(i = 0; i < m_pMgr->GetNumberOfGroups(); i++) // Add groups to combo box
 	{
 		p = m_pMgr->GetGroup(i);
 		ASSERT(p != NULL);
 
-		strAdd.Empty();
-		for(uLevel = 0; uLevel < p->usLevel; uLevel++) strAdd += _T("        ");
-
-		for(j = 0; j < (unsigned int)_tcslen(p->pszGroupName); j++)
-		{
-			if(p->pszGroupName[j] != _T('&')) strAdd += p->pszGroupName[j];
-			else strAdd += _T("&&");
-		}
-
-		m_pGroups.AddCTString(WZ_ROOT_INDEX, (BYTE)p->uImageId, strAdd);
+		ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
+		cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
+		cbi.iItem = (int)i;
+		cbi.pszText = (LPTSTR)p->pszGroupName;
+		cbi.cchTextMax = (int)_tcslen(p->pszGroupName);
+		cbi.iImage = cbi.iSelectedImage = (int)p->uImageId;
+		cbi.iIndent = (int)p->usLevel;
+		m_cbGroups.InsertItem(&cbi);
 	}
 
-
-	m_pGroups.SetCurSel(0);
+	m_cbGroups.SetCurSel(0);
 
 	// Configure banner control
 	NewGUI_ConfigSideBanner(&m_banner, this);
@@ -157,7 +137,7 @@ BOOL CEntryPropertiesDlg::OnInitDialog()
 	m_editTime.SetTime(oleMax);
 
 	m_bModGroup = FALSE;
-	m_pGroups.EnableWindow(FALSE);
+	m_cbGroups.EnableWindow(FALSE);
 	m_bModIcon = FALSE;
 	GetDlgItem(IDC_BUTTON_SELECT_ICON)->EnableWindow(FALSE);
 	m_bModExpire = FALSE;
@@ -176,7 +156,7 @@ void CEntryPropertiesDlg::OnOK()
 	if(m_bModGroup == TRUE)
 	{
 		CString strGroupTest;
-		m_pGroups.GetLBText(m_pGroups.GetCurSel(), strGroupTest);
+		m_cbGroups.GetLBText(m_cbGroups.GetCurSel(), strGroupTest);
 		if(CPwManager::IsAllowedStoreGroup((LPCTSTR)strGroupTest, PWS_SEARCHGROUP) == FALSE)
 		{
 			MessageBox(TRL("The group you selected cannot store entries. Please select an other group."),
@@ -192,7 +172,7 @@ void CEntryPropertiesDlg::OnOK()
 	m_tExpire.btMinute = (BYTE)m_editTime.GetMinute();
 	m_tExpire.btSecond = (BYTE)m_editTime.GetSecond();
 
-	m_nGroupInx = m_pGroups.GetCurSel();
+	m_nGroupInx = m_cbGroups.GetCurSel();
 
 	CDialog::OnOK();
 }
@@ -225,8 +205,8 @@ void CEntryPropertiesDlg::OnCheckModExpire()
 void CEntryPropertiesDlg::OnCheckModGroup() 
 {
 	UpdateData(TRUE);
-	if(m_bModGroup == TRUE) m_pGroups.EnableWindow(TRUE);
-	else m_pGroups.EnableWindow(FALSE);
+	if(m_bModGroup == TRUE) m_cbGroups.EnableWindow(TRUE);
+	else m_cbGroups.EnableWindow(FALSE);
 }
 
 void CEntryPropertiesDlg::OnCheckModIcon() 

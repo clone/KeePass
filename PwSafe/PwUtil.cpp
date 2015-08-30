@@ -31,6 +31,7 @@
 #include <math.h>
 
 #include "PwUtil.h"
+#include "../Util/MemUtil.h"
 
 #define CHARSPACE_ESCAPE      60
 #define CHARSPACE_ALPHA       26
@@ -85,4 +86,73 @@ C_FN_SHARE DWORD EstimatePasswordBits(const TCHAR *pszPassword)
 
 	ASSERT(dwBits != 0);
 	return dwBits;
+}
+
+C_FN_SHARE BOOL LoadHexKey32(FILE *fp, BYTE *pBuf)
+{
+	char buf[65], ch1, ch2;
+	BYTE bt;
+	int i;
+
+	ASSERT(fp != NULL); if(fp == NULL) return FALSE;
+	ASSERT(pBuf != NULL); if(pBuf == NULL) return FALSE;
+
+	buf[64] = 0;
+	if(fread(buf, 1, 64, fp) != 64) { ASSERT(FALSE); return FALSE; }
+
+	for(i = 0; i < 32; i++)
+	{
+		ch1 = buf[i * 2];
+		ch2 = buf[i * 2 + 1];
+
+		if((ch1 >= '0') && (ch1 <= '9')) bt = (BYTE)(ch1 - '0');
+		else if((ch1 >= 'a') && (ch1 <= 'f')) bt = (BYTE)(ch1 - 'a' + 10);
+		else if((ch1 >= 'A') && (ch1 <= 'F')) bt = (BYTE)(ch1 - 'A' + 10);
+		else return FALSE;
+
+		bt <<= 4;
+
+		if((ch2 >= '0') && (ch2 <= '9')) bt |= (BYTE)(ch2 - '0');
+		else if((ch2 >= 'a') && (ch2 <= 'f')) bt |= (BYTE)(ch2 - 'a' + 10);
+		else if((ch2 >= 'A') && (ch2 <= 'F')) bt |= (BYTE)(ch2 - 'A' + 10);
+		else return FALSE;
+
+		pBuf[i] = bt;
+	}
+
+	mem_erase((BYTE *)buf, 64);
+	return TRUE;
+}
+
+C_FN_SHARE BOOL SaveHexKey32(FILE *fp, BYTE *pBuf)
+{
+	char buf[65], ch1, ch2, chq;
+	int i;
+	BYTE bt;
+
+	ASSERT(fp != NULL); if(fp == NULL) return FALSE;
+	ASSERT(pBuf != NULL); if(pBuf == NULL) return FALSE;
+
+	buf[64] = 0;
+
+	for(i = 0; i < 32; i++)
+	{
+		bt = pBuf[i];
+
+		chq = (char)(bt >> 4);
+		if(chq < 10) ch1 = (char)(chq + '0');
+		else ch1 = (char)(chq - 10 + 'a');
+
+		chq = (char)(bt & 0x0F);
+		if(chq < 10) ch2 = (char)(chq + '0');
+		else ch2 = (char)(chq - 10 + 'a');
+
+		buf[i * 2] = ch1;
+		buf[i * 2 + 1] = ch2;
+	}
+
+	fwrite(buf, 1, 64, fp);
+
+	mem_erase((BYTE *)buf, 64);
+	return TRUE;
 }

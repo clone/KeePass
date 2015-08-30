@@ -35,4 +35,7 @@
 // Very simple password quality estimation function
 C_FN_SHARE DWORD EstimatePasswordBits(const TCHAR *pszPassword);
 
+C_FN_SHARE BOOL LoadHexKey32(FILE *fp, BYTE *pBuf);
+C_FN_SHARE BOOL SaveHexKey32(FILE *fp, BYTE *pBuf);
+
 #endif // ___PW_UTIL_H___

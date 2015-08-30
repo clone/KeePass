@@ -39,15 +39,13 @@ CPP_FN_SHARE void EraseCString(CString *pString)
 	const TCHAR tcPlus = ' ';
 	const TCHAR tcMod = '}' - tcPlus;
 
-	ASSERT(pString != NULL);
+	ASSERT(pString != NULL); if(pString == NULL) return;
 
 	len = pString->GetLength();
 	lpt = pString->GetBuffer(0);
 
 	for(j = 0; j < len; j++)
-	{
 		lpt[j] = (TCHAR)((rand() % tcMod) + tcPlus);
-	}
 
 	pString->Empty();
 	pString->FreeExtra();
@@ -568,7 +566,7 @@ CPP_FN_SHARE CString CsFileOnly(CString *psFilePath)
 
 #define LOCAL_NUMXMLCONV 7
 
-C_FN_SHARE TCHAR *MakeSafeXmlString(TCHAR *ptString)
+C_FN_SHARE TCHAR *MakeSafeXmlString(const TCHAR *ptString)
 {
 	DWORD i, j;
 	DWORD dwStringLen, dwNeededChars = 0, dwOutPos = 0;

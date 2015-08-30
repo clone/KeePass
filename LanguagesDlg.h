@@ -36,7 +36,7 @@
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/XPStyleButtonST.h"
 
-class CPP_CLASS_SHARE CLanguagesDlg : public CDialog
+class CLanguagesDlg : public CDialog
 {
 public:
 	CLanguagesDlg(CWnd* pParent = NULL);

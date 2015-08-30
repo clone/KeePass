@@ -31,7 +31,6 @@
 #define AFX_ADDENTRYDLG_H__C5D4C3E0_0BAE_11D8_BF16_0050BF14F5CC__INCLUDED_
 
 #include "Util/SysDefEx.h"
-#include "NewGUI/WzComboBox.h"
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/XHyperLink.h"
 #include "NewGUI/HyperEdit.h"
@@ -47,7 +46,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CAddEntryDlg : public CDialog
+class CAddEntryDlg : public CDialog
 {
 public:
 	CAddEntryDlg(CWnd* pParent = NULL);
@@ -75,6 +74,7 @@ public:
 
 	//{{AFX_DATA(CAddEntryDlg)
 	enum { IDD = IDD_ADDENTRY_DLG };
+	CComboBoxEx	m_cbGroups;
 	CXHyperLink	m_hlHelpURL;
 	CXHyperLink	m_hlHelpAutoType;
 	CGradientProgressCtrl	m_cPassQuality;
@@ -91,7 +91,6 @@ public:
 	CHyperEdit	m_pURL;
 	CEdit	m_pRepeatPw;
 	CEdit	m_pEditPw;
-	CWzComboBox	m_pGroups;
 	BOOL	m_bStars;
 	CString	m_strTitle;
 	CString	m_strURL;

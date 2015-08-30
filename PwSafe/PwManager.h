@@ -39,8 +39,8 @@
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
 
 // When making a Windows build, don't forget to update the verinfo resource
-#define PWM_VERSION_STR  _T("0.98b")
-#define PWM_VERSION_DW   0x00090802
+#define PWM_VERSION_STR  _T("0.99a")
+#define PWM_VERSION_DW   0x00090901
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -121,6 +121,10 @@
 #define PWMKEY_AUTOSORT         _T("KeeAutoSortPwList")
 #define PWMKEY_AUTOTYPEHOTKEY   _T("KeeAutoTypeHotKey")
 #define PWMKEY_CLIPBOARDMETHOD  _T("KeeClipboardMethod")
+#define PWMKEY_STARTMINIMIZED   _T("KeeStartMinimized")
+#define PWMKEY_AUTOSHOWEXPIRED  _T("KeeShowExpiredAtOpen")
+#define PWMKEY_AUTOSHOWEXPIREDS _T("KeeShowSoonExpiredAtOpen")
+#define PWMKEY_BACKUPENTRIES    _T("KeeBackupEntries")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -131,7 +135,9 @@
 #define PWM_KEYMETHOD_AND       TRUE
 
 #define PWS_SEARCHGROUP          TRL("Search results")
+#define PWS_BACKUPGROUP          TRL("Backup")
 #define PWS_DEFAULT_KEY_FILENAME _T("pwsafe.key")
+#define PWV_SOONTOEXPIRE_DAYS    7
 
 #define PWM_FLAG_SHA2           1
 #define PWM_FLAG_RIJNDAEL       2
@@ -327,10 +333,12 @@ public:
 	DWORD GetGroupId(const TCHAR *pszGroupName);
 	DWORD GetGroupIdByIndex(DWORD uGroupIndex);
 	DWORD GetLastChildGroup(DWORD dwParentGroupIndex);
+	BOOL GetGroupTree(DWORD idGroup, DWORD *pGroupIndexes);
 
 	// Add entries and groups
 	BOOL AddGroup(const PW_GROUP *pTemplate);
 	BOOL AddEntry(const PW_ENTRY *pTemplate);
+	BOOL BackupEntry(const PW_ENTRY *pe, BOOL *pbGroupCreated); // pe must be unlocked already, pbGroupCreated is optional
 
 	// Delete entries and groups
 	BOOL DeleteEntry(DWORD dwIndex);

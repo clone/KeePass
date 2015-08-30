@@ -36,7 +36,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CAddGroupDlg : public CDialog
+class CAddGroupDlg : public CDialog
 {
 public:
 	CAddGroupDlg(CWnd* pParent = NULL);

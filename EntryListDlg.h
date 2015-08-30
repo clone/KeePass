@@ -35,12 +35,14 @@
 #include "NewGUI/KCSideBannerWnd.h"
 #include "PwSafe/PwManager.h"
 
-#define ELDMODE_UNKNOWN 0
-#define ELDMODE_EXPIRED 1
+#define ELDMODE_UNKNOWN    0
+#define ELDMODE_EXPIRED    1
+#define ELDMODE_SOONTOEXP  2
+#define ELDMODE_EXPSOONEXP 3
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CEntryListDlg : public CDialog
+class CEntryListDlg : public CDialog
 {
 // Konstruktion
 public:
@@ -69,7 +71,7 @@ public:
 	//}}AFX_VIRTUAL
 
 protected:
-	void _AddEntryToList(PW_ENTRY *p);
+	void _AddEntryToList(PW_ENTRY *p, BOOL bExpiredIcon);
 
 	//{{AFX_MSG(CEntryListDlg)
 	virtual BOOL OnInitDialog();

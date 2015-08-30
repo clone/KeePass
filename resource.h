@@ -62,6 +62,7 @@
 #define IDD_PLUGINS_DLG                 206
 #define IDR_PLUGINS_MENU                207
 #define IDI_PLUGINS                     208
+#define IDR_OPTIONICONS                 210
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -200,6 +201,7 @@
 #define IDC_HL_HELP_AUTOTYPE            1179
 #define IDC_HL_HELP_URL                 1180
 #define IDC_STATIC_HL_HELP              1181
+#define IDC_LIST_ADVANCED               1185
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -362,15 +364,26 @@
 #define ID_PLUGIN_DISABLE               32955
 #define ID_PLUGIN_CONFIG                32959
 #define ID_PLUGIN_ABOUT                 32960
+#define ID_BUTTON32961                  32961
+#define ID_BUTTON32962                  32962
+#define ID_BUTTON32963                  32963
+#define ID_BUTTON32964                  32964
+#define ID_BUTTON32965                  32965
+#define ID_BUTTON32966                  32966
+#define ID_BUTTON32967                  32967
+#define ID_BUTTON32968                  32968
+#define ID_BUTTON32969                  32969
+#define ID_BUTTON32970                  32970
+#define ID_BUTTON32971                  32971
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        210
-#define _APS_NEXT_COMMAND_VALUE         32961
-#define _APS_NEXT_CONTROL_VALUE         1182
+#define _APS_NEXT_RESOURCE_VALUE        212
+#define _APS_NEXT_COMMAND_VALUE         32972
+#define _APS_NEXT_CONTROL_VALUE         1188
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

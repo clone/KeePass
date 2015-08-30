@@ -70,5 +70,18 @@
 			<param name="Local" value="tans.html">
 			</OBJECT>
 	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Miscellaneous">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Command-Line Options">
+			<param name="Local" value="cmdline.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="File Formats (CSV/XML)">
+			<param name="Local" value="filefmts.html">
+			</OBJECT>
+	</UL>
 </UL>
 </BODY></HTML>

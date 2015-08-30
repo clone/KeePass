@@ -36,7 +36,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CFindInDbDlg : public CDialog
+class CFindInDbDlg : public CDialog
 {
 public:
 	CFindInDbDlg(CWnd* pParent = NULL);

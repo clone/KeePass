@@ -186,18 +186,18 @@ C_FN_SHARE void NewGUI_ToolBarButton(void *pButton, int nBitmapIn = -1, int nBit
 
 C_FN_SHARE void NewGUI_SetThemeHelper(void *pThemeHelper);
 
-CPP_FN_SHARE void NewGUI_ConfigQualityMeter(void *pWnd);
-CPP_FN_SHARE void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword);
+C_FN_SHARE void NewGUI_ConfigQualityMeter(void *pWnd);
+C_FN_SHARE void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword);
 
 CPP_FN_SHARE void NewGUI_TranslateCWnd(CWnd *pWnd);
 
 C_FN_SHARE BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam);
 
-CPP_FN_SHARE void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd);
+C_FN_SHARE void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd);
 
 C_FN_SHARE BOOL NewGUI_GetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount);
 C_FN_SHARE BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnCount);
 
-CPP_FN_SHARE void NewGUI_MakeHyperLink(void *pXHyperLink);
+C_FN_SHARE void NewGUI_MakeHyperLink(void *pXHyperLink);
 
 #endif // ___NEW_GUI_COMMON___

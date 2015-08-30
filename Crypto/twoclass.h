@@ -34,7 +34,7 @@
 #include "rijndael.h"
 #include "../Util/SysDefEx.h"
 
-class CPP_CLASS_SHARE CTwofish
+class CTwofish
 {
 public:
 	CTwofish();

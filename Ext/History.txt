@@ -1,3 +1,59 @@
+05/03/29 - 0.99a
+- You can reuse existing key-disks now (when you select an
+  existing key-disk, KeePass asks you if you want to overwrite
+  or reuse it), this way you can use a single key-disk for
+  multiple databases
+- Settings of the global KeePass.ini now override the settings
+  of the KeePass.ini in the user directory (administrators can
+  install KeePass on a network drive and force some specific
+  options, while leaving other options like UI settings up the
+  users, read the FAQ for more information about this)
+- Added command-line options for specifying the password and
+  the key-file location (switches -pw: and -keyfile:, see docs)
+- Improved exports: the entries are now grouped together
+  (ordered by their group, not the creation order any more)
+- When you export a group, its complete child tree will be
+  exported now, too (i.e. all subgroups of that group)
+- Added 'advanced' tab to the options dialog
+- Added option to show all expired and soon-to-expire entries
+  immediately after opening a database (see 'advanced' tab)
+- Added 'minimize window on startup' option (the main window is
+  minimized automatically when starting KeePass)
+- Moved start and exit options into the 'advanced' tab
+- Added option to start KeePass with Windows ('advanced' tab)
+- Added option to backup modified entries into a 'Backup' group
+- Improved comboboxes (better XP theme compatibility, better
+  item indentation)
+- When auto-typing, the window is minimized to tray if you
+  enabled the minimize-to-tray option
+- You are prompted for the database password if you try to
+  auto-type when the database is locked
+- The database isn't marked as modified any more when closing
+  the edit-entry dialog with OK but without modifying anything
+- KeePass now saves its options when you exit windows without
+  closing KeePass first
+- Added password confirmation dialog for the change-master-key
+  dialog when changing to password + key-file
+- Fixed a bug in the subgroup creation code
+- CSV and XML file formats are now documented in the CHM manual
+- Added documentation about the option loading/saving procedure
+- Added password show/hide button right of the password edit
+  control in the password generator dialog
+- Password asterisks setting is now independent of the show-
+  state of the password column in the main window
+- Group structure is saved in XML exports (parent tree is
+  stored in a 'tree' attribute of the 'group' element)
+- Changed tray icon action trigger from single click to double
+  click
+- The enter-password dialog now appears in the task bar
+- The key-file is now saved in its hex representation (i.e. you
+  can look at it with a standard text editor)
+- Cleaned up the code to save boolean/flag options
+- Added window translation filter
+- Improved window state handling routine
+- Minor stability improvements (timer concurrency, ...)
+- Minor translation improvements
+
 05/02/26 - 0.98b
 - Implemented plugin architecture
 - Added global auto-type hot key (just press some hot key

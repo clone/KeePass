@@ -116,6 +116,12 @@ typedef struct
 } KP_PLUGIN_INSTANCE, *LPKP_PLUGIN_INSTANCE;
 
 //////////////////////////////////////////////////////////////////////////
+// KeePass query IDs (used in function KP_Query)
+
+#define KPQUERY_NULL    0
+#define KPQUERY_VERSION 1
+
+//////////////////////////////////////////////////////////////////////////
 // KeePass plugin message codes
 
 #define KPM_NULL 0

@@ -80,8 +80,7 @@ BOOL CPwSafeApp::InitInstance()
 
 	// SetDialogBkColor(NewGUI_GetBgColor(), CR_FRONT); // Setup the "new" dialog look
 
-	ASSERT(TRUE == 1);
-	ASSERT(FALSE == 0);
+	ASSERT(TRUE == 1); ASSERT(FALSE == 0);
 
 	CPwSafeDlg dlg;
 	m_pMainWnd = &dlg;
@@ -226,5 +225,63 @@ BOOL CPwSafeApp::UnregisterShellAssociation()
 	RegDeleteValue(hBase, _T("AlwaysShowExt"));
 	VERIFY(RegCloseKey(hBase) == ERROR_SUCCESS);
 
+	return TRUE;
+}
+
+BOOL CPwSafeApp::GetStartWithWindows()
+{
+	HKEY h = NULL;
+	LONG l;
+	TCHAR tszBuf[512];
+	DWORD dwSize = 510;
+
+	l = RegOpenKeyEx(HKEY_CURRENT_USER, _T("Software\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_QUERY_VALUE, &h);
+	if(l != ERROR_SUCCESS) return FALSE;
+
+	DWORD dwType = REG_SZ;
+	if(RegQueryValueEx(h, _T("KeePass Password Safe"), NULL, &dwType, (LPBYTE)tszBuf, &dwSize) != ERROR_SUCCESS)
+	{
+		RegCloseKey(h); h = NULL;
+		return FALSE;
+	}
+
+	RegCloseKey(h); h = NULL;
+
+	if((_tcslen(tszBuf) > 0) && (tszBuf[0] != _T('-'))) return TRUE;
+	return FALSE;
+}
+
+BOOL CPwSafeApp::SetStartWithWindows(BOOL bAutoStart)
+{
+	HKEY h = NULL;
+	TCHAR tszBuf[512];
+	LONG l;
+
+	l = RegOpenKeyEx(HKEY_CURRENT_USER, _T("Software\\Microsoft\\Windows\\CurrentVersion\\Run"), 0, KEY_WRITE, &h);
+	if(l != ERROR_SUCCESS) return FALSE;
+
+	if(bAutoStart == TRUE)
+	{
+		GetModuleFileName(NULL, tszBuf, 510);
+
+		DWORD dwSize = (_tcslen(tszBuf) + 1) * sizeof(TCHAR);
+		l = RegSetValueEx(h, _T("KeePass Password Safe"), 0, REG_SZ, (LPBYTE)tszBuf, dwSize);
+		if(l != ERROR_SUCCESS)
+		{
+			RegCloseKey(h); h = NULL;
+			return FALSE;
+		}
+	}
+	else // bAutoStart == FALSE)
+	{
+		l = RegDeleteValue(h, _T("KeePass Password Safe"));
+		if(l != ERROR_SUCCESS)
+		{
+			RegCloseKey(h); h = NULL;
+			return FALSE;
+		}
+	}
+
+	RegCloseKey(h); h = NULL;
 	return TRUE;
 }

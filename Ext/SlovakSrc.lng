@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Slovenèina|
-|~LANGUAGEVERSION|             |0.98a|
+|~LANGUAGEVERSION|             |0.98b|
 |~LANGUAGEAUTHOR|              |Radoslav Bielik|
 |~LANGUAGEAUTHOREMAIL|         |rado@bielik.org, http://www.bielik.org|
 
@@ -49,7 +49,6 @@
 |Either enter the password/passphrase or select the password disk's drive.|
     |Buï zadajte heslo/frázu alebo zvo¾te jednotku heslového disku|
 |Enter password:|              |Zadajte heslo:|
-|or|                           |alebo|
 |Select the password disk drive where the key will be stored:|
     |Zvo¾te jednotku heslového disku, kam bude k¾úè uloenı:|
 |Create a new password database - Enter master key|
@@ -267,7 +266,6 @@
     |Aktuálny súbor bol zmenenı.|
 |Do you want to save the changes before closing?|
     |Prajete si uloi zmeny pred zatvorením súboru?|
-|Save Before Close?|           |Uloi pred zatvorením?|
 
 |Deleting a group will delete all items in that group, too.|
     |Zmazanie skupiny zmae tie všetky záznamy v tejto skupine.|
@@ -382,7 +380,7 @@
 |Creation Time|                |Èas vytvorenia|
 |Last Modification|            |Posledná zmena|
 |Last Access|                  |Poslednı prístup|
-|Expires|                      |Platné do|
+|Expires|                      |Platnos do|
 |UUID|                         |UUID|
 
 |Show &Creation Time Column|   |Zobrazi ståpec 'Èas &vytvorenia'|
@@ -398,7 +396,7 @@
 |A key-file already exists on this drive. Do you want to overwrite it?|
     |Súbor k¾úèa u na tomto disku existuje. Prajete si ho prepísa?|
 |Overwrite?|                   |Prepísa?|
-|Expires:|                     |Platné do:|
+|Expires:|                     |Platnos do:|
 |&Delete Selected Entries|     |&Zmaza oznaèené záznamy|
 |&Mass Modify (All Selected)...|               |Upravi v&šetky zvolené záznamy...|
 |Change group:|                |Zmeni skupinu:|
@@ -575,3 +573,91 @@
 	
 |Save key-file manually to...|	|Uloi súbor k¾úèa manuálne ako...|
 |Select key-file manually...|	|Zvoli súbor k¾úèa manuálne...|
+
+----------------------------------------------
+
+
+
+
+|Auto-Type|						|Automatické zadanie (Auto-Type)|
+|Global auto-type hot key combination:|
+	|Globálna klávesová skratka pre funkciu automatické zadanie (auto-type):|
+|Most probably an other application has reserved this hot key already.|
+	|Iná aplikácia u pravdepodobne vyuíva túto klávesovú skratku.|
+|You can choose an other hot key combination in 'Edit - Options - Setup'.|
+	|Môete zvoli inú klávesovú skratkuv menu 'Upravi - Monosti - Inštalácia'.|
+|Unable to register a global hot key.|
+	|Nebolo moné zaregistrova globálnu klávesovú skratku.|
+
+|Error code|					|Kód chyby|
+|Failed to change the .kdb file association. Make sure you have the rights to write to the registry and change file associations.|
+	|Chyba pri zmene asociácie .kdb súborov. Uistite sa e máte práva na zápis do registrov a na zmenu asociácie súborov.|
+|File access error: failed to open file in read mode|
+	|Chyba súboru: nebolo moné otvori súbor pre èítanie|
+|File access error: failed to open file in write mode|
+	|Chyba súboru: nebolo moné otvori súbor pre zápis|
+|File error: error while reading from the file|
+	|Chyba súboru: nastala chybapri èítaní zo súboru|
+|File error: error while writing to the file|
+	|Chyba súboru: nastala chyba pri zápise do súboru|
+|Internal error|				|Vnútorná chyba|
+|Unknown error|					|Neznáma chyba|
+|Too few memory (RAM) available|
+	|Nedostatok vo¾nej pamäte (RAM)|
+
+
+|&Disable|						|&Zakáza|
+|&Enable|						|&Povoli|
+|&Plugin Manager|				|&Plugin Manager|
+|About &Plugin...|				|O &Plugine...|
+|An error occured|				|Nastala chyba|
+|Application version:|			|Verzia aplikácie:|
+
+|Clipboard behavior:|			|Nastavenie schránky:|
+|Timed: copy data to the clipboard and clear it automatically after some seconds|
+	|Èasované: kopírova údaje do schránky a automaticky schránku vymaza po nieko¾kıch sekundách|
+|Enhanced: allow pasting only once and protect against clipboard spies|
+	|Rozšírené: povoli vloenie zo schránky len jeden krát a chráni schránku pred špiónmi|
+
+|Disabled, not loaded|			|Neaktívny, nenaèítanı|
+|Do you want to load the plugin?|
+	|Chcete naèíta tento plugin?|
+|Enabled, loaded|				|Aktívny, naèítanı|
+|Encryption/decryption error|	|Chyba šifrovania/dešifrovania|
+
+|Get more plugins...|			|Získa ïalšie pluginy...|
+|Help:|							|Nápoveda:|
+|Here you can configure all installed KeePass plugins.|
+	|Tu môete meni nastavenia všetkıch nainštalovanıch pluginov.|
+|If you notice any problems with this enhanced method, just switch back to the timed clipboard clearing method.|
+	|V prípade akıchko¾vek problémov s rozšírenou metódou prepnite spa na èasované mazanie schránky.|
+|Invalid parameter|					|Neplatnı parameter|
+|Invalid random source|				|Neplatnı zdroj náhodnıch údajov|
+|Invalid/corrupted file structure|	|Neplatná/poškodená štruktúra súboru|
+|Invalid/wrong key|					|Neplatné/chybné heslo|
+|It is possible that the plugin is compatible, but it's also possible that it will crash KeePass.|
+	|Je moné e plugin je kompatibilnı, ale tie sa môe sta, e spôsobí zrútenie aplikácie KeePass.|
+|KeePass - Save Before Close/Lock?|	|KeePass - uloi pred zatvorením/zamknutím?|
+|Never expires|						|Nikdy nevyprší|
+|Number the TANs consecutively, starting from this value|
+	|Èíslova TAN kódy postupne zaèínajúc od tejto hodnoty|
+|Plugin|						|Plugin|
+|Plugin Manager|				|Plugin Manager|
+|Plugin has been designed for:|	|Plugin bol navrhnutı pre:|
+|Success|						|Úspech|
+|Therefore save all data before you continue.|
+	|Preto ulote všetky údaje pred tım ako budete pokraèova.|
+	
+|This plugin has been designed for a different application version and may be incompatible with this one.|
+	|Tento plugin bol navrhnutı pre inú verziu aplikácie a môe by nekompatibilnı s touto verziou.|
+|This plugin will be disabled after you restart KeePass.|
+	|Tento plugin bude deaktivovanı po reštarte KeePass.|
+|This plugin will be enabled after you restart KeePass.|
+	|Tento plugin bude aktivovanı po reštarte KeePass.|
+|Warning! It's possible that this option won't work correctly on your system, especially if you are using any clipboard enhancing tools or something like this.|
+	|Upozornenie!Je moné e toto nastavenie nebude správne fungova na vašom poèítaèi, zvláš v prípade ak pouívate nástroje na rozšírenie funkènosti schránky.|
+|You've selected the AND key mode, so you must enter a password AND select a key-file.|
+	|Zvolili ste mód hesla A k¾úèa, take musíte zada súèasne heslo aj zvoli súbor k¾úèa.|
+|and|							|a|
+|cannot be loaded!|				|nemôe by naèítanı!|
+

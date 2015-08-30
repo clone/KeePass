@@ -200,7 +200,7 @@ CPP_FN_SHARE CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile
 	{
 		bMod = FALSE;
 
-		if(str.Left(2) == ".\\")
+		if(str.Left(2) == _T(".\\"))
 		{
 			str = str.Right(str.GetLength() - 2);
 			bMod = TRUE;
@@ -397,17 +397,17 @@ C_FN_SHARE HINSTANCE _OpenLocalFile(TCHAR *szFile, int nMode)
 	if(nMode == OLF_OPEN)
 	{
 		hInst = ShellExecute(::GetActiveWindow(), _T("open"), szFileTempl,
-			NULL, szPath, SW_SHOWNORMAL);
+			NULL, szPath, SW_SHOW);
 	}
 	else if(nMode == OLF_PRINT)
 	{
 		hInst = ShellExecute(::GetActiveWindow(), _T("print"), szFileTempl,
-			NULL, szPath, SW_SHOWNORMAL);
+			NULL, szPath, SW_SHOW);
 	}
 	else if(nMode == OLF_EXPLORE)
 	{
 		hInst = ShellExecute(::GetActiveWindow(), _T("explore"), szFileTempl,
-			NULL, szPath, SW_SHOWNORMAL);
+			NULL, szPath, SW_SHOW);
 	}
 	else
 	{

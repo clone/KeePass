@@ -213,15 +213,23 @@ CPP_FN_SHARE void NewGUI_TranslateCWnd(CWnd *pWnd)
 
 C_FN_SHARE BOOL CALLBACK NewGUI_TranslateWindowCb(HWND hwnd, LPARAM lParam)
 {
-	TCHAR sz[1024];
+	TCHAR sz[512];
+
 	UNREFERENCED_PARAMETER(lParam);
 	ASSERT(hwnd != NULL);
-	GetWindowText(hwnd, sz, 1023);
-	if(_tcslen(sz) <= 1021) SetWindowText(hwnd, TRL(sz));
+
+	GetClassName(hwnd, sz, 16);
+	if(_tcsicmp(sz, _T("Edit")) == 0) return TRUE;
+	if(_tcsicmp(sz, _T("RICHEDIT")) == 0) return TRUE;
+	if(_tcsicmp(sz, _T("ComboBox")) == 0) return TRUE;
+	if(_tcsicmp(sz, _T("ComboBoxEx32")) == 0) return TRUE;
+
+	sz[0] = 0; sz[1] = 0;
+	if(GetWindowText(hwnd, sz, 511) != 0) SetWindowText(hwnd, TRL(sz));
 	return TRUE;
 }
 
-CPP_FN_SHARE void NewGUI_ConfigQualityMeter(void *pWnd)
+C_FN_SHARE void NewGUI_ConfigQualityMeter(void *pWnd)
 {
 	CGradientProgressCtrl *p = (CGradientProgressCtrl *)pWnd;
 
@@ -233,7 +241,7 @@ CPP_FN_SHARE void NewGUI_ConfigQualityMeter(void *pWnd)
 	p->SetPos(0);
 }
 
-CPP_FN_SHARE void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword)
+C_FN_SHARE void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc, const TCHAR *pszPassword)
 {
 	CGradientProgressCtrl *pProgress = (CGradientProgressCtrl *)pProgressBar;
 	CStatic *pStatic = (CStatic *)pStaticDesc;
@@ -253,7 +261,7 @@ CPP_FN_SHARE void NewGUI_ShowQualityMeter(void *pProgressBar, void *pStaticDesc,
 	pProgress->SetPos((int)dwBits);
 }
 
-CPP_FN_SHARE void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
+C_FN_SHARE void NewGUI_ConfigSideBanner(void *pBanner, void *pParentWnd)
 {
 	CKCSideBannerWnd *p = (CKCSideBannerWnd *)pBanner;
 	CWnd *pParent = (CWnd *)pParentWnd;
@@ -308,7 +316,7 @@ C_FN_SHARE BOOL NewGUI_SetHeaderOrder(HWND hwListCtrl, INT *pOrder, INT nColumnC
 	return TRUE;
 }
 
-CPP_FN_SHARE void NewGUI_MakeHyperLink(void *pXHyperLink)
+C_FN_SHARE void NewGUI_MakeHyperLink(void *pXHyperLink)
 {
 	CXHyperLink *p = (CXHyperLink *)pXHyperLink;
 	ASSERT(p != NULL); if(p == NULL) return;

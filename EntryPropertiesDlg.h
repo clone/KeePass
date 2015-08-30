@@ -33,13 +33,12 @@
 #include "Util/SysDefEx.h"
 #include "NewGUI/XPStyleButtonST.h"
 #include "NewGUI/KCSideBannerWnd.h"
-#include "NewGUI/WzComboBox.h"
 #include "NewGUI/amsEdit.h"
 #include "PwSafe/PwManager.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
-class CPP_CLASS_SHARE CEntryPropertiesDlg : public CDialog
+class CEntryPropertiesDlg : public CDialog
 {
 public:
 	CEntryPropertiesDlg(CWnd* pParent = NULL);
@@ -54,8 +53,8 @@ public:
 
 	//{{AFX_DATA(CEntryPropertiesDlg)
 	enum { IDD = IDD_ENTRYPROPERTIES_DLG };
+	CComboBoxEx	m_cbGroups;
 	CXPStyleButtonST	m_btSelectIcon;
-	CWzComboBox	m_pGroups;
 	CXPStyleButtonST	m_btCancel;
 	CXPStyleButtonST	m_btOK;
 	CAMSTimeEdit	m_editTime;

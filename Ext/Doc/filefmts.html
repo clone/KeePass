@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>File Formats</title>
+	<link rel="stylesheet" type="text/css" href="default.css" />
+</head>
+<body>
+
+<table class="tablebox"><tr><td class="boxtitle">
+<img src="images/movepaper.gif" width="31px" height="21px" class="singleimg">
+File Formats</td></tr></table>
+<br />
+Though KeePass supports many more import/export formats, this document only details the
+CSV and XML file formats. These formats aren't specialized password database formats
+themselves, but almost
+all other password manager applications can export their data in some form of
+CSV and XML. Knowing the formats that KeePass expects when importing, you shouldn't
+have any problems manually reformating the files in order to get accepted by KeePass.
+Mostly you just have to rearrange the columns in CSV files for example (using a program
+like OpenOffice.org's spreadsheet application).<br />
+<br />
+Unfortunately there isn't any standard password database format. Every password
+manager uses its own file format. Most users are a bit confused when application 1
+exports data to a CSV file and application 2 cannot read the file though it claims it
+can read CSV files. This is because CSV and XML aren't specialized and standardized password
+database file formats, but just some form of data arrangement. Every program
+can arrange the data in a different form, making the applications incompatible to each other.
+Even worse, the files can be encoded in various forms (ANSI, Unicode, UTF-8, ...).<br />
+<br />
+KeePass can import many file formats (for example: CSV, CodeWallet TXT, PwSafe v2 TXT,
+Personal Vault TXT, AnyPassword CSV, PINs TXT, XML, and many more). The list of supported
+import formats is increasing daily, have a look at the
+<a href="http://keepass.sourceforge.net/plugins.php" target="_blank">KeePass plugins</a>
+page for import format plugins.<br />
+<br />
+These import plugins are specialized on importing data from other password managers and you normally
+don't need to manually reformat/reencode the files. Therefore first look if a plugin
+exists for your password manager before experimenting with the CSV and XML formats.<br />
+<br />
+If no import plugin exists for your password manager, feel free to post a request
+in the
+<a href="http://sourceforge.net/tracker/?atid=609911&group_id=95013&func=browse" target="_blank">KeePass feature requests</a>
+forum and/or in the
+<a href="https://sourceforge.net/forum/forum.php?forum_id=329220" target="_blank">open discussion</a> forum.<br />
+<br />
+<br />
+<br />
+
+<table class="tablebox"><tr><td class="boxtitle">
+<img src="images/movepaper.gif" width="31px" height="21px" class="singleimg">
+Import/export: CSV</td></tr></table><br />
+
+KeePass imports and exports data from/to CSV files in the following format:
+<pre>"Account","Login Name","Password","Web Site","Comments"</pre>
+Example file:
+<pre>"Account","Login Name","Password","Web Site","Comments"
+"Password of \"MyBank\" account","Michael Sample","wefntzuseu46z","www.mybank.com","Credit Card No.: xxxx-xxxx-xxxx-xxxx"
+"My Online-Forum","myusername","enkl45h","http://www.myonlineforum.net","multi-line comment
+multi-line comment
+multi-line comment"</pre>
+Notes:
+<ul>
+<li>The whole CSV file must be encoded in UTF-8 when importing. KeePass automatically encodes
+the file in UTF-8 when exporting data to a CSV file. Other encodings aren't supported.</li>
+<li>CSV files only support title/user/password/URL/notes. Other fields like the last
+entry modification time, expiration time, icon, entry file attachments, etc. aren't supported.
+Use a different file format (like XML) if you need to transfer this information.</li>
+<li>The strings must be enclosed in quotes (&quot;), unquoted strings aren't allowed.</li>
+<li>Quotes (") in strings are encoded as <code>\"</code>. Backslashes (\) are encoded as <code>\\</code>.</li>
+<li>Multi-line comments and strings are realized through normal line-breaks. They are <i>not</i> encoded by \n or
+something like this.</li>
+</ul>
+<br /><br />
+<table class="tablebox"><tr><td class="boxtitle">
+<img src="images/movepaper.gif" width="31px" height="21px" class="singleimg">
+Import/export: XML</td></tr></table><br />
+
+A sample XML file:
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;pwlist&gt;
+&lt;pwentry&gt;
+	&lt;group&gt;General&lt;/group&gt;
+	&lt;title&gt;I am expired &quot; this was a quot&lt;/title&gt;
+	&lt;username&gt;Peter Sample&lt;/username&gt;
+	&lt;url&gt;http://www.google.com&lt;/url&gt;
+	&lt;password&gt;The Password&lt;/password&gt;
+	&lt;notes&gt;Some Notes&lt;/notes&gt;
+	&lt;uuid&gt;3055035d87adbdd617c9fd810e18d788&lt;/uuid&gt;
+	&lt;image&gt;2&lt;/image&gt;
+	&lt;creationtime&gt;2005-03-25T17:17:44&lt;/creationtime&gt;
+	&lt;lastmodtime&gt;2005-03-26T10:14:27&lt;/lastmodtime&gt;
+	&lt;lastaccesstime&gt;2005-03-26T10:14:27&lt;/lastaccesstime&gt;
+	&lt;expiretime expires="true"&gt;2000-01-01T01:01:00&lt;/expiretime&gt;
+&lt;/pwentry&gt;
+&lt;pwentry&gt;
+	&lt;group&gt;Internet&lt;/group&gt;
+	&lt;title&gt;I am expired&lt;/title&gt;
+	&lt;username&gt;Anonymous&lt;/username&gt;
+	&lt;url&gt;http://keepass.sourceforge.net&lt;/url&gt;
+	&lt;password&gt;The Password&lt;/password&gt;
+	&lt;notes&gt;Some Notes&lt;/notes&gt;
+	&lt;uuid&gt;8239f06b53cf4f06d1b7ffaa04734288&lt;/uuid&gt;
+	&lt;image&gt;0&lt;/image&gt;
+	&lt;creationtime&gt;2005-03-25T17:17:44&lt;/creationtime&gt;
+	&lt;lastmodtime&gt;2005-03-25T17:17:44&lt;/lastmodtime&gt;
+	&lt;lastaccesstime&gt;2005-03-25T17:17:44&lt;/lastaccesstime&gt;
+	&lt;expiretime expires="true"&gt;2000-01-01T01:01:00&lt;/expiretime&gt;
+&lt;/pwentry&gt;
+&lt;/pwlist&gt;</pre>
+
+Notes:
+<ul>
+<li>KeePass exports XML files in UTF-8 encoded form. When importing, the XML files
+must encoded in UTF-8, too. Other encodings aren't supported.</li>
+<li>KeePass can export data to XML files directly. It can import data from XML
+files through a
+<a href="http://keepass.sourceforge.net/plugins.php" target="_blank">XML import plugin</a>.</li>
+<li>The following five entities must be encoded: <code>&lt; &gt; &amp; " '</code>. They are encoded
+by <code>&amp;lt; &amp;gt; &amp;amp; &amp;quot; &amp;apos;</code>.
+<li>The UUID is a hex-encoded 16-byte string (i.e. an 32 ANSI hex character string in the XML file). The UUID
+is unique and can be used to identify entries.</li>
+<li>Dates/times are encoded in the standard date/time XML format: first comes the date in
+the form YYYY-MM-DD, a 'T' character follows (indicates that a time string follows), the
+time follows in the form HH:mm:ss.</li>
+</ul>
+
+</body>
+</html>
+
