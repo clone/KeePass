@@ -116,19 +116,19 @@ C_FN_SHARE unsigned long testCryptoImpl()
 
 	uTestMask = 0;
 
-	sha32 = n_u32(ffffffff);
+	sha32 = 0xfffffffful;
 	sha32++;
 	if(sha32 != 0) uTestMask |= TI_ERR_SHAVAR32;
 	sha32 = 0;
 	sha32--;
-	if(sha32 != n_u32(ffffffff)) uTestMask |= TI_ERR_SHAVAR32;
+	if(sha32 != 0xfffffffful) uTestMask |= TI_ERR_SHAVAR32;
 
-	sha64 = n_u64(ffffffffffffffff);
+	sha64 = li_64(ffffffffffffffff);
 	sha64++;
 	if(sha64 != 0) uTestMask |= TI_ERR_SHAVAR64;
 	sha64 = 0;
 	sha64--;
-	if(sha64 != n_u64(ffffffffffffffff)) uTestMask |= TI_ERR_SHAVAR64;
+	if(sha64 != li_64(ffffffffffffffff)) uTestMask |= TI_ERR_SHAVAR64;
 
 	sha256_begin(&hash256);
 	sha256_hash((const unsigned char *)g_szVectABCX,

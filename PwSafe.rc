@@ -57,6 +57,15 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ENTRY_EDIT          ICON    DISCARDABLE     "res\\entry_ed.ico"
 #endif    // German (Germany) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -88,22 +97,24 @@ BEGIN
                     LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,259,177
 END
 
-IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 268, 106
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 268, 132
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "About KeePass..."
 FONT 8, "MS Sans Serif"
 BEGIN
-    LTEXT           "Copyright (c) 2003-2005 Dominik Reichl.",IDC_STATIC,7,7,
+    LTEXT           "Copyright © 2003-2005 Dominik Reichl.",IDC_STATIC,7,7,
                     254,8
-    DEFPUSHBUTTON   "&OK",IDOK,207,85,54,14,WS_GROUP
+    DEFPUSHBUTTON   "&OK",IDOK,199,111,62,14,WS_GROUP
     LTEXT           "KeePass is OSI Certified Open Source Software.",
                     IDC_STATIC,7,20,254,8
     LTEXT           "Visit KeePass Homepage",IDC_HLINK_HOMEPAGE,7,65,254,8
-    LTEXT           "<>",IDC_HLINK_HELPFILE,7,78,197,8
-    LTEXT           "<>",IDC_HLINK_LICENSEFILE,7,91,197,8
+    LTEXT           "<>",IDC_HLINK_HELPFILE,7,78,254,8
+    LTEXT           "<>",IDC_HLINK_LICENSEFILE,7,91,254,8
     LTEXT           "The program is distributed under the terms of the GNU General Public License v2 or later.",
                     IDC_STATIC,7,33,254,17
+    LTEXT           "<>",IDC_HLINK_CREDITS,7,104,180,8
+    LTEXT           "<>",IDC_HLINK_DONATE,7,117,184,8
 END
 
 IDD_PWSAFE_DIALOG DIALOGEX 0, 0, 448, 228
@@ -196,7 +207,7 @@ BEGIN
     CONTROL         "",IDC_COMBO_GROUPS,"ComboBoxEx32",CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP,67,7,167,172
     LTEXT           "Title:",IDC_STATIC,7,27,58,8
-    LTEXT           "UserName:",IDC_STATIC,7,46,58,8
+    LTEXT           "User Name:",IDC_STATIC,7,46,58,8
     LTEXT           "Password:",IDC_STATIC,7,84,57,8
     LTEXT           "Repeat Password:",IDC_STATIC,7,98,58,8
     LTEXT           "URL:",IDC_STATIC,7,66,57,8
@@ -270,7 +281,7 @@ IDD_GETRANDOM_DLG DIALOGEX 0, 0, 402, 215
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "Get Random"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,277,194,57,14
     PUSHBUTTON      "&Cancel",IDCANCEL,338,194,57,14
@@ -561,6 +572,30 @@ BEGIN
     LTEXT           "Open &Help File",IDC_STATIC_HL_HELP,7,182,75,8
 END
 
+IDD_IMPORT_OPTIONS_DLG DIALOG DISCARDABLE  0, 0, 318, 177
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Options"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,191,156,58,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,253,156,58,14
+    LTEXT           "The file format that you have selected to import supports group and/or entry IDs. Please choose an import behaviour.",
+                    IDC_STATIC,7,7,304,18
+    CONTROL         "Create new IDs",IDC_RADIO_CREATENEW,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,7,33,304,10
+    CONTROL         "Overwrite",IDC_RADIO_OVERWRITE_ALWAYS,"Button",
+                    BS_AUTORADIOBUTTON,7,79,304,10
+    CONTROL         "Overwrite if newer",IDC_RADIO_OVERWRITE_TIMEBASED,
+                    "Button",BS_AUTORADIOBUTTON,7,116,304,10
+    LTEXT           "If you select this option, KeePass will create new IDs for all groups and entries. Consequently no existing groups and entries of the currently opened database will be modified or overwritten.",
+                    IDC_STATIC,19,44,292,32
+    LTEXT           "KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.",
+                    IDC_STATIC,19,90,292,25
+    LTEXT           "KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.",
+                    IDC_STATIC,19,127,292,26
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -583,7 +618,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 261
         TOPMARGIN, 7
-        BOTTOMMARGIN, 99
+        BOTTOMMARGIN, 125
     END
 
     IDD_PWSAFE_DIALOG, DIALOG
@@ -705,6 +740,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 192
     END
+
+    IDD_IMPORT_OPTIONS_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 311
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 170
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -734,8 +777,8 @@ IDI_PLUGINS             ICON    DISCARDABLE     "res\\plugins.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,1,1
- PRODUCTVERSION 1,0,1,1
+ FILEVERSION 1,0,2,1
+ PRODUCTVERSION 1,0,2,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -752,15 +795,15 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.sourceforge.net\0"
             VALUE "CompanyName", "Dominik Reichl\0"
-            VALUE "FileDescription", "KeePass Password Safe v1.01\0"
-            VALUE "FileVersion", "1, 0, 1, 1\0"
+            VALUE "FileDescription", "KeePass Password Safe v1.02\0"
+            VALUE "FileVersion", "1, 0, 2, 1\0"
             VALUE "InternalName", "PwSafe\0"
             VALUE "LegalCopyright", "Copyright (c) 2003-2005 Dominik Reichl\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "KeePass.exe\0"
             VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "KeePass Password Safe v1.01\0"
-            VALUE "ProductVersion", "1, 0, 1, 1\0"
+            VALUE "ProductName", "KeePass Password Safe v1.02\0"
+            VALUE "ProductVersion", "1, 0, 2, 1\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -802,6 +845,8 @@ BEGIN
             MENUITEM "&HTML File...",               ID_EXPORT_HTML
             MENUITEM "&XML File...",                ID_EXPORT_XML
             MENUITEM "&CSV File...",                ID_EXPORT_CSV
+            MENUITEM SEPARATOR
+            MENUITEM "&KeePass Database...",        ID_EXPORT_KEEPASS
         END
         POPUP "&Import From"
         BEGIN
@@ -809,6 +854,8 @@ BEGIN
             MENUITEM "Code&Wallet TXT File...",     ID_IMPORT_CWALLET
             MENUITEM "&PwSafe v2 TXT File...",      ID_IMPORT_PWSAFE
             MENUITEM "Personal &Vault TXT File...", ID_IMPORT_PVAULT
+            MENUITEM SEPARATOR
+            MENUITEM "&KeePass Database...",        ID_IMPORT_KEEPASS
             MENUITEM SEPARATOR
             MENUITEM "&Get more import plugins...", ID_IMPORT_GETMORE
         END
@@ -829,8 +876,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Always On Top",              ID_VIEW_ALWAYSONTOP, CHECKED
         MENUITEM SEPARATOR
-        MENUITEM "Hide &UserNames Behind Asterisks (***)", ID_VIEW_HIDEUSERS
-        , CHECKED
+        MENUITEM "Hide &User Names Behind Asterisks (***)", 
+                                                ID_VIEW_HIDEUSERS, CHECKED
         MENUITEM "Hide &Passwords Behind Asterisks (***)", ID_VIEW_HIDESTARS
         , CHECKED
         MENUITEM SEPARATOR
@@ -839,7 +886,7 @@ BEGIN
             MENUITEM "N&o Auto-Sort",               ID_VIEW_AUTOSORT_NOSORT
             MENUITEM SEPARATOR
             MENUITEM "Sort List By &Title",         ID_VIEW_AUTOSORT_TITLE
-            MENUITEM "Sort List By User&Name",      ID_VIEW_AUTOSORT_USER
+            MENUITEM "Sort List By User &Name",     ID_VIEW_AUTOSORT_USER
             MENUITEM "Sort List By &URL",           ID_VIEW_AUTOSORT_URL
             MENUITEM "Sort List By &Password",      ID_VIEW_AUTOSORT_PASSWORD
 
@@ -859,7 +906,7 @@ BEGIN
         POPUP "Show &Columns"
         BEGIN
             MENUITEM "Show &Title Column",          ID_VIEW_TITLE, CHECKED
-            MENUITEM "Show User&Name Column",       ID_VIEW_USERNAME
+            MENUITEM "Show User &Name Column",      ID_VIEW_USERNAME
             , CHECKED
             MENUITEM "Show &URL Column",            ID_VIEW_URL, CHECKED
             MENUITEM "Show &Password Column",       ID_VIEW_PASSWORD
@@ -908,7 +955,7 @@ IDR_PWLIST_MENU MENU DISCARDABLE
 BEGIN
     POPUP "Submenu"
     BEGIN
-        MENUITEM "Copy User&Name To Clipboard", ID_PWLIST_COPYUSER
+        MENUITEM "Copy User &Name To Clipboard", ID_PWLIST_COPYUSER
         MENUITEM "Open &URL(s)",                ID_PWLIST_VISITURL
         MENUITEM "Copy &Password To Clipboard", ID_PWLIST_COPYPW
         MENUITEM "&Save Attached File To...",   ID_PWLIST_SAVEATTACH
@@ -933,7 +980,7 @@ BEGIN
             MENUITEM "Move Entry To &Bottom",       ID_PWLIST_MOVEBOTTOM
             MENUITEM SEPARATOR
             MENUITEM "Sort List By &Title",         ID_PWLIST_SORT_TITLE
-            MENUITEM "Sort List By User&Name",      ID_PWLIST_SORT_USER
+            MENUITEM "Sort List By User &Name",     ID_PWLIST_SORT_USER
             MENUITEM "Sort List By &URL",           ID_PWLIST_SORT_URL
             MENUITEM "Sort List By &Password",      ID_PWLIST_SORT_PASSWORD
             MENUITEM "Sort List By Note&s",         ID_PWLIST_SORT_NOTES
@@ -981,6 +1028,10 @@ BEGIN
             MENUITEM "Export Group To &HTML...",    ID_SAFE_EXPORTGROUP_HTML
             MENUITEM "Export Group To &XML...",     ID_SAFE_EXPORTGROUP_XML
             MENUITEM "Export Group To &CSV...",     ID_SAFE_EXPORTGROUP_CSV
+            MENUITEM SEPARATOR
+            MENUITEM "Export Group To &KeePass Database...", 
+                                                    ID_SAFE_EXPORTGROUP_KEEPASS
+
         END
     END
 END
@@ -1024,7 +1075,7 @@ BEGIN
     POPUP "Submenu"
     BEGIN
         MENUITEM "Show &Title Column",          ID_VIEW_TITLE, CHECKED
-        MENUITEM "Show User&Name Column",       ID_VIEW_USERNAME, CHECKED
+        MENUITEM "Show User &Name Column",      ID_VIEW_USERNAME, CHECKED
         MENUITEM "Show &URL Column",            ID_VIEW_URL, CHECKED
         MENUITEM "Show &Password Column",       ID_VIEW_PASSWORD, CHECKED
         MENUITEM "Show Note&s Column",          ID_VIEW_NOTES, CHECKED
@@ -1167,72 +1218,9 @@ BEGIN
     BUTTON      ID_EXTRAS_PLUGINMGR
     BUTTON      ID_INFO_DONATE
     BUTTON      ID_EXTRAS_REPAIRDB
-END
-
-IDR_CLIENTICONS TOOLBAR DISCARDABLE  16, 16
-BEGIN
-    BUTTON      ID_BUTTON32779
-    BUTTON      ID_BUTTON32781
-    BUTTON      ID_BUTTON32803
-    BUTTON      ID_BUTTON32804
-    BUTTON      ID_BUTTON32805
-    BUTTON      ID_BUTTON32806
-    BUTTON      ID_BUTTON32807
-    BUTTON      ID_BUTTON32808
-    BUTTON      ID_BUTTON32809
-    BUTTON      ID_BUTTON32810
-    BUTTON      ID_BUTTON32811
-    BUTTON      ID_BUTTON32812
-    BUTTON      ID_BUTTON32813
-    BUTTON      ID_BUTTON32835
-    BUTTON      ID_BUTTON32814
-    BUTTON      ID_BUTTON32815
-    BUTTON      ID_BUTTON32816
-    BUTTON      ID_BUTTON32817
-    BUTTON      ID_BUTTON32818
-    BUTTON      ID_BUTTON32836
-    BUTTON      ID_BUTTON32819
-    BUTTON      ID_BUTTON32820
-    BUTTON      ID_BUTTON32821
-    BUTTON      ID_BUTTON32822
-    BUTTON      ID_BUTTON32823
-    BUTTON      ID_BUTTON32824
-    BUTTON      ID_BUTTON32825
-    BUTTON      ID_BUTTON32828
-    BUTTON      ID_BUTTON32826
-    BUTTON      ID_BUTTON32837
-    BUTTON      ID_BUTTON32827
-    BUTTON      ID_BUTTON32829
-    BUTTON      ID_BUTTON32830
-    BUTTON      ID_BUTTON32831
-    BUTTON      ID_BUTTON32832
-    BUTTON      ID_BUTTON32833
-    BUTTON      ID_BUTTON32834
-    BUTTON      ID_BUTTON32838
-    BUTTON      ID_BUTTON32839
-    BUTTON      ID_BUTTON32840
-    BUTTON      ID_BUTTON32845
-    BUTTON      ID_BUTTON32872
-    BUTTON      ID_BUTTON32873
-    BUTTON      ID_BUTTON32874
-    BUTTON      ID_BUTTON32875
-    BUTTON      ID_BUTTON32900
-END
-
-IDR_OPTIONICONS TOOLBAR DISCARDABLE  16, 16
-BEGIN
-    BUTTON      ID_BUTTON32961
-    BUTTON      ID_BUTTON32962
-    BUTTON      ID_BUTTON32963
-    BUTTON      ID_BUTTON32964
-    BUTTON      ID_BUTTON32965
-    BUTTON      ID_BUTTON32967
-    BUTTON      ID_BUTTON32968
-    BUTTON      ID_BUTTON32966
-    BUTTON      ID_BUTTON32969
-    BUTTON      ID_BUTTON32970
-    BUTTON      ID_BUTTON32971
-    BUTTON      ID_BUTTON32977
+    BUTTON      ID_IMPORT_KEEPASS
+    BUTTON      ID_SAFE_EXPORTGROUP_KEEPASS
+    BUTTON      ID_EXPORT_KEEPASS
 END
 
 
@@ -1242,7 +1230,6 @@ END
 //
 
 IDR_INFOICONS           BITMAP  DISCARDABLE     "res\\infoicon.bmp"
-IDR_CLIENTICONS         BITMAP  DISCARDABLE     "res\\clientic.bmp"
 IDB_RANDOM_BMP          BITMAP  DISCARDABLE     "res\\random_b.bmp"
 IDB_OK                  BITMAP  DISCARDABLE     "res\\ok.bmp"
 IDB_CANCEL              BITMAP  DISCARDABLE     "res\\cancel.bmp"
@@ -1263,9 +1250,11 @@ IDB_TB_LOCK             BITMAP  DISCARDABLE     "res\\tb_lock.bmp"
 IDB_TB_ABOUT            BITMAP  DISCARDABLE     "res\\tb_about.bmp"
 IDB_FILE                BITMAP  DISCARDABLE     "res\\file.bmp"
 IDB_DISK                BITMAP  DISCARDABLE     "res\\disk.bmp"
-IDR_OPTIONICONS         BITMAP  DISCARDABLE     "res\\optionic.bmp"
 IDB_TB_DEFAULTEXPIRE    BITMAP  DISCARDABLE     "res\\tb_defau.bmp"
 IDB_CLOCK               BITMAP  DISCARDABLE     "res\\clock.bmp"
+IDB_INFOICONS_EX        BITMAP  DISCARDABLE     "res\\infoiconex.bmp"
+IDB_CLIENTICONS_EX      BITMAP  DISCARDABLE     "res\\clienticex.bmp"
+IDB_OPTIONICONS_EX      BITMAP  DISCARDABLE     "res\\optionicex.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

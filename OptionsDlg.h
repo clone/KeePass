@@ -77,6 +77,7 @@ public:
 	BOOL m_bQuickFindIncBackup;
 	BOOL m_bMinimizeBeforeAT;
 	BOOL m_bDeleteBackupsOnSave;
+	BOOL m_bShowFullPath;
 
 	//{{AFX_DATA(COptionsDlg)
 	enum { IDD = IDD_OPTIONS_DLG };

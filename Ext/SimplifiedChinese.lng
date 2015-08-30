@@ -1,7 +1,7 @@
-05-6-4 0:35|~LANGUAGENAME|
+05-8-22 14:41|~LANGUAGENAME|
 |简体中文|
 |~LANGUAGEVERSION|
-|1.0|
+|1.01|
 |~LANGUAGEAUTHOR|
 |窦兴强 (Leo Dou)|
 |~LANGUAGEAUTHOREMAIL|
@@ -405,7 +405,7 @@
 |Open &License File|
 |打开授权文件(&L)|
 |&Print License File|
-|打开授权文件(&P)|
+|打印授权文件(&P)|
 |Newline sequence:|
 |换行：|
 |Windows newline sequence (\r\n)|
@@ -420,8 +420,8 @@
 |你可以在这里设置 KeePass。|
 |Automatically open last used database on startup|
 |启动时自动打开上次使用的数据库|
-|Automatically save database on exit|
-|退出时自动保存数据库|
+|Automatically save database on exit and workspace locking|
+|退出和锁定时自动保存数据库|
 |Display images on buttons|
 |显示按钮图标|
 |Show grid lines in password entry list|
@@ -719,8 +719,8 @@
 |数据库概要|
 |Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
 |你的密匙被加密数次来形成最终的数据库密匙，这增加了时间的因素来有效对抗猜解和词典类破解。|
-|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
-|（数字越大暴力破解越困难，但也将使打开和保存数据库的时间加长。）|
+|The higher this number, the harder are dictionary attacks. But also the higher this number, the slower the database loading and saving.|
+|（数字越大，使用字典破解越困难，但也将使打开和保存数据库的时间加长。）|
 |Number of key encryption rounds:|
 |设置密匙加密次数：|
 |bits|
@@ -958,11 +958,19 @@
 |本程序的发布遵循 GNU 通用公共授权许可 V2 或新版的条款。|
 |Use more secure password edit controls|
 |使用更安全的密码编辑控件|
+|Press Shift-Home or Shift-End to clear this edit control|
+|按 Shift-Home 或 Shift-End 清除当前编辑框内容|
 |Waiting for paste command.|
 |等待粘贴命令。|
 |&Donate...|
 |捐助(&D)...|
+|Use alternative auto-type method (minimize window)|
+|使用不同于默认（后台窗口）的自动输入模式（最小化窗口）|
 |Automatically generate random passwords for new entries|
 |为新建记录自动生成随机密码|
 |Include backup entries in quick searches (toolbar)|
 |快速搜索时包括备份记录（工具栏）|
+|Delete all backup entries before saving the database|
+|保存数据前删除所有备份记录|
+|&Repair KeePass Database File...|
+|修复KeePass数据库文件(&R)...|

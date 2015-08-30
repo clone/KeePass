@@ -1,3 +1,49 @@
+05/09/05 - 1.02
+- KeePass databases can now be imported into the currently
+  opened database, you can choose if you want to create new
+  IDs, overwrite existing entries or overwrite them only if
+  they're newer than the existing ones
+- You can now export groups (including their subgroups) to
+  encrypted KeePass database files (you can use the same key as
+  the current database or define a new one)
+- The auto-type function now supports sending higher ANSI
+  characters in code range 126-255
+- Fixed problems in the auto-type functions, no incorrect
+  extended keys are sent any more (should solve the problems
+  with auto-type on most notebooks)
+- KeePass now appends an asterisk (*) to the filename in the
+  titlebar if the database has been modified
+- New icons, KeePass now uses the 'Nuvola' icon theme by David
+  Vignoni (the icons are distributed under the LGPL license
+  with an addon, see CHM manual - 'Acknowledgements' for more
+  information)
+- The entry view now supports very simple notes formatting
+  using HTML tags; currently supported are: b, i and u
+- Fixed some problems in the configuration manager class; the
+  options-saving performance improvement (of 1.01) works now
+- Fixed a bug which caused the KeePass window to lose the
+  always-on-top status after auto-typing (alternative method)
+- Fixed a bug that could crash KeePass after editing an entry
+  when the database had 32*n entries and if the backup-entries
+  option was enabled
+- Minor improvements in the icon picker dialog
+- The right Alt and Ctrl keys are released correctly now before
+  auto-typing
+- Shortened product name in tray-icon tooltip
+- Fixed a small bug that could display an assertion warning in
+  debug builds of KeePass when loading UTF-8 strings of length
+  122 from a database
+- The quickfind edit control now correctly grabs the Ctrl-C,
+  Ctrl-V, Ctrl-A and Ctrl-X key combinations
+- Fixed a bug which occasionally caused the password generator
+  to generate longer passwords than the specified length (no
+  security problem though, the generated passwords are random)
+- Fixed a bug that prevented top-level menu hotkeys (like
+  Alt-F) from working immediately after program startup
+- Some minor other improvements and fixes
+- Updated SHA-2 source code (should compile fine now with all
+  Microsoft compilers up to version 7.1)
+
 05/08/16 - 1.01
 - Added option to minimize the main window before auto-typing
   (so, the same auto-type behaviour as in version 0.99c and

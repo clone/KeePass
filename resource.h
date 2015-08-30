@@ -67,6 +67,11 @@
 #define IDB_TB_DEFAULTEXPIRE            213
 #define IDR_EXPIRESMENU                 215
 #define IDB_CLOCK                       216
+#define IDB_INFOICONS_EX                222
+#define IDB_CLIENTICONS_EX              223
+#define IDB_OPTIONICONS_EX              224
+#define IDI_ENTRY_EDIT                  225
+#define IDD_IMPORT_OPTIONS_DLG          226
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -215,6 +220,11 @@
 #define IDC_HLINK_LICENSEFILE           1196
 #define IDC_BTN_CALCROUNDS              1198
 #define IDC_SELDEFEXPIRES_BTN           1200
+#define IDC_RADIO_CREATENEW             1201
+#define IDC_RADIO_OVERWRITE_ALWAYS      1202
+#define IDC_RADIO_OVERWRITE_TIMEBASED   1203
+#define IDC_HLINK_CREDITS               1204
+#define IDC_HLINK_DONATE                1205
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -398,15 +408,18 @@
 #define ID_EXPIRES_6MONTHS              32979
 #define ID_EXPIRES_12MONTHS             32980
 #define ID_EXTRAS_REPAIRDB              32984
+#define ID_IMPORT_KEEPASS               32987
+#define ID_SAFE_EXPORTGROUP_KEEPASS     32989
+#define ID_EXPORT_KEEPASS               32991
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        219
-#define _APS_NEXT_COMMAND_VALUE         32985
-#define _APS_NEXT_CONTROL_VALUE         1201
+#define _APS_NEXT_RESOURCE_VALUE        227
+#define _APS_NEXT_COMMAND_VALUE         32992
+#define _APS_NEXT_CONTROL_VALUE         1207
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

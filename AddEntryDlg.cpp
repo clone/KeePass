@@ -146,7 +146,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
 	m_fSymbol.CreateFont(-13, 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Symbol"));
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, CPwSafeApp::GetPasswordFont());
 
 	if(m_bStars == FALSE)
 	{
@@ -247,7 +247,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	// Configure banner control
 	NewGUI_ConfigSideBanner(&m_banner, this);
-	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_KEY), KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
+	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_ENTRY_EDIT), KCSB_ICON_LEFT | KCSB_ICON_VCENTER);
 
 	if(m_bEditMode == FALSE)
 	{
@@ -264,7 +264,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 	// 'z' + 27 is that black dot in Tahoma
 	// TCHAR tchDot = (TCHAR)(_T('z') + 27);
-	TCHAR tchDot = (TCHAR)0xb7;
+	TCHAR tchDot = CPwSafeApp::GetPasswordCharacter();
 	CString strStars; strStars += tchDot; strStars += tchDot; strStars += tchDot;
 	GetDlgItem(IDC_CHECK_HIDEPW)->SetWindowText(strStars);
 
@@ -379,6 +379,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 void CAddEntryDlg::CleanUp()
 {
+	m_reNotes.EmptyUndoBuffer();
 	m_cbGroups.ResetContent();
 	m_fStyle.DeleteObject();
 	m_fSymbol.DeleteObject();
@@ -414,10 +415,7 @@ void CAddEntryDlg::OnOK()
 		m_tExpire.btMinute = (BYTE)m_editTime.GetMinute();
 		m_tExpire.btSecond = (BYTE)m_editTime.GetSecond();
 	}
-	else
-	{
-		m_pMgr->_GetNeverExpireTime(&m_tExpire);
-	}
+	else m_pMgr->_GetNeverExpireTime(&m_tExpire);
 
 	m_reNotes.GetWindowText(m_strNotes);
 
@@ -468,7 +466,7 @@ void CAddEntryDlg::OnCheckHidePw()
 		m_pRepeatPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
 
 		// TCHAR tchDot = (TCHAR)(_T('z') + 27);
-		TCHAR tchDot = (TCHAR)0xb7;
+		TCHAR tchDot = CPwSafeApp::GetPasswordCharacter();
 		m_pEditPw.SetPasswordChar(tchDot);
 		m_pRepeatPw.SetPasswordChar(tchDot);
 
@@ -489,6 +487,7 @@ void CAddEntryDlg::OnPickIconBtn()
 
 	dlg.m_pImageList = m_pParentIcons;
 	dlg.m_uNumIcons = (UINT)m_pParentIcons->GetImageCount();
+	dlg.m_nSelectedIcon = m_nIconId;
 
 	if(dlg.DoModal() == IDOK)
 	{
@@ -579,7 +578,7 @@ BOOL CAddEntryDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		m_popmenu.SetBitmapBackground(RGB(255, 0, 255));
 		m_popmenu.SetIconSize(16, 16);
 
-		m_popmenu.LoadToolbar(IDR_INFOICONS);
+		m_popmenu.LoadToolbar(IDR_INFOICONS, IDB_INFOICONS_EX);
 
 		BCMenu *psub = (BCMenu *)m_popmenu.GetSubMenu(0);
 		CPwSafeDlg::_TranslateMenu(psub);

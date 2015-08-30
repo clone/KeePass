@@ -42,7 +42,7 @@ C_FN_SHARE BOOL SecureDeleteFile(LPCSTR pszFilePath);
 
 // Time conversion functions
 C_FN_SHARE void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWORD dwDay, DWORD dwHour, DWORD dwMinute, DWORD dwSecond);
-C_FN_SHARE void _UnpackStructToTime(BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond);
+C_FN_SHARE void _UnpackStructToTime(const BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond);
 
 // Getting the time
 C_FN_SHARE void _GetCurrentPwTime(PW_TIME *p);

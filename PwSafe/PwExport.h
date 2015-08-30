@@ -23,12 +23,13 @@
 #include "PwManager.h"
 #include "../Util/SysDefEx.h"
 
-#define PWEXP_NULL 0
-#define PWEXP_TXT  1
-#define PWEXP_HTML 2
-#define PWEXP_XML  3
-#define PWEXP_CSV  4
-#define PWEXP_LAST 5
+#define PWEXP_NULL    0
+#define PWEXP_TXT     1
+#define PWEXP_HTML    2
+#define PWEXP_XML     3
+#define PWEXP_CSV     4
+#define PWEXP_KEEPASS 5
+#define PWEXP_LAST    6
 
 typedef struct
 {
@@ -61,8 +62,8 @@ public:
 	void SetFormat(int nFormat);
 	void SetNewLineSeq(BOOL bWindows);
 
-	BOOL ExportAll(const TCHAR *pszFile, const PWEXPORT_OPTIONS *pOptions);
-	BOOL ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPORT_OPTIONS *pOptions);
+	BOOL ExportAll(const TCHAR *pszFile, const PWEXPORT_OPTIONS *pOptions, CPwManager *pStoreMgr);
+	BOOL ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPORT_OPTIONS *pOptions, CPwManager *pStoreMgr);
 
 	CString MakeGroupTreeString(DWORD dwGroupId);
 

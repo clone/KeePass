@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Russian|
-|~LANGUAGEVERSION|             |1.0|
+|~LANGUAGEVERSION|             |1.01|
 |~LANGUAGEAUTHOR|              |Varrey|
 |~LANGUAGEAUTHOREMAIL|         |varrey@hotmail.com|
 
@@ -290,8 +290,8 @@
 |Here you can configure KeePass.|              |Настройки KeePass.|
 |Automatically open last used database on startup|
     |Автооткрытие последней используемой базы паролей при запуске|
-|Automatically save database on exit|
-    |Автосохранение базы паролей при выходе|
+|Automatically save database on exit and workspace locking|
+    |Автосохранение базы паролей при выходе и заблокировании|
 |Display images on buttons|
     |Показывать картинки на кнопках|
 |Show grid lines in password entry list|
@@ -490,8 +490,8 @@
 |Database Summary|                        |Сводка по базе паролей|
 |Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
     |Ваш парой шифруется несколько раз до получения окончательного ключа шифрования базы паролей. Это затрудняет использование оценочных атак и атак по словарю.|
-|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
-    |Чем выше это число, тем затруднительней brute-force атаки. Но чем больше это число, тем дольше загружается и сохраняется база паролей.|
+|The higher this number, the harder are dictionary attacks. But also the higher this number, the slower the database loading and saving.|
+   |Чем выше это число, тем затруднительней атаки по словарю. Но чем больше это число, тем дольше загружается и сохраняется база паролей.|
 |Number of key encryption rounds:|        |Количество циклов шифрования:|
 |bits|                                    |бит|
 |Personal &Vault TXT File...|             |Personal &Vault TXT файл...|
@@ -651,3 +651,8 @@
     |Автоматически генерировать случайные пароли для новых записей|
 |Include backup entries in quick searches (toolbar)|
     |Включать резервные записи в результаты быстрого поиска (панель управления)|
+
+|&Repair KeePass Database File...| |По&чинить файл с паролями...|
+|Delete all backup entries before saving the database| |Удалять все резервные записи перед сохранением базы паролей|
+|Press Shift-Home or Shift-End to clear this edit control| |Нажмите Shift-Home или Shift-End для очистки этого поля|
+|Use alternative auto-type method (minimize window)| |Использовать альтернативный метод автонабора|

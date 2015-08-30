@@ -28,7 +28,7 @@ C_FN_SHARE void arcfourCrypt(BYTE *pBuf, unsigned long uBufLen, BYTE *pKey, unsi
 	DWORD w, k;
 
 	ASSERT((sizeof(BYTE) == 1) && (pBuf != NULL) && (pKey != NULL) && (uKeyLen != 0));
-	ASSERT((IsBadWritePtr(pBuf, 1) == FALSE) && (IsBadReadPtr(pKey, 1) == FALSE));
+	ASSERT((IsBadWritePtr(pBuf, uBufLen) == FALSE) && (IsBadReadPtr(pKey, uBufLen) == FALSE));
 
 	for(w = 0; w < 256; w++) S[w] = (BYTE)w; // Fill linearly
 

@@ -41,7 +41,7 @@ CPP_FN_SHARE void EraseCString(CString *pString);
 CPP_FN_SHARE void FixURL(CString *pstrURL);
 
 // Replace placeholders in pString by data in pEntry
-CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString = FALSE);
+CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimString);
 
 CPP_FN_SHARE CString CsRemoveMeta(CString *psString);
 
@@ -82,5 +82,8 @@ CPP_FN_SHARE CString ExtractParameterFromString(LPCTSTR lpstr, LPCTSTR lpStart);
 CPP_FN_SHARE CString TagSimString(LPCTSTR lpString);
 
 C_FN_SHARE void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath);
+
+// Allocate enough memory and clone the parameter string
+CPP_FN_SHARE TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource);
 
 #endif

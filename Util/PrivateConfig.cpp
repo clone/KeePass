@@ -22,15 +22,18 @@
 #include "WinUtil.h"
 #include "../PwSafe/PwManager.h"
 
-CPrivateConfig::CPrivateConfig(BOOL bReqWriteAccess)
+CPrivateConfig::CPrivateConfig(BOOL bRequireWriteAccess)
 {
 	TCHAR tszAppDir[MAX_PATH * 2];
+	DWORD dwSubLen;
 
 	tszAppDir[0] = 0; tszAppDir[1] = 0;
 
 	ASSERT(SI_REGSIZE >= (MAX_PATH * 2));
 
-	GetApplicationDirectory(m_szFileLocal, MAX_PATH * 2 - 2, TRUE, FALSE);
+	m_szFileLocal[0] = 0; m_szFileLocal[1] = 0;
+	dwSubLen = 1 + (DWORD)_tcslen(PWM_EXENAME) + 4 + 2;
+	VERIFY(GetApplicationDirectory(m_szFileLocal, (MAX_PATH * 2) - dwSubLen, TRUE, FALSE));
 	_tcscat(m_szFileLocal, _T("\\"));
 	_tcscat(m_szFileLocal, PWM_EXENAME);
 	_tcscat(m_szFileLocal, _T(".ini"));
@@ -50,12 +53,16 @@ CPrivateConfig::CPrivateConfig(BOOL bReqWriteAccess)
 
 	if(m_szFileUser[0] == 0)
 	{
-		_tcscpy(m_szFileUser, PWM_EXENAME);
+		_tcscpy(m_szFileUser, PWM_EXENAME); // Not found -- make the same as m_szFileGeneric
 		_tcscat(m_szFileUser, _T(".ini"));
 	}
 	else
 	{
-		DWORD uLen = (DWORD)_tcslen(m_szFileUser);
+		// Up to now, m_szFileUser just contains the users directory path, make
+		// it a valid file location now.
+
+		DWORD uLen = (DWORD)_tcslen(m_szFileUser); ASSERT(uLen != 0);
+
 		if(uLen != 0)
 		{
 			if(m_szFileUser[uLen - 1] != _T('\\'))
@@ -75,7 +82,7 @@ CPrivateConfig::CPrivateConfig(BOOL bReqWriteAccess)
 	_tcscat(m_szFileGeneric, _T(".ini"));
 
 	m_nUseDir = 0;
-	if(bReqWriteAccess == TRUE)
+	if(bRequireWriteAccess == TRUE)
 	{
 		if(_FileWritable(m_szFileLocal) == FALSE)
 		{
@@ -84,7 +91,7 @@ CPrivateConfig::CPrivateConfig(BOOL bReqWriteAccess)
 			if(tszAppDir[0] != 0) CreateDirectory(tszAppDir, NULL);
 
 			if(_FileWritable(m_szFileUser) == FALSE)
-				m_nUseDir = 2;
+				m_nUseDir = 2; // Hopefully this never happens...
 		}
 	}
 	else // bReqWriteAccess == FALSE
@@ -105,33 +112,42 @@ CPrivateConfig::~CPrivateConfig()
 
 BOOL CPrivateConfig::Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue)
 {
+	LPCTSTR lpExeName = PWM_EXENAME;
 	BOOL bRet = FALSE;
 
 	ASSERT(pszField != NULL); if(pszField == NULL) return FALSE;
-	ASSERT(_tcslen(pszField) > 0); if(_tcslen(pszField) == 0) return FALSE;
-	// pszValue may be NULL
+	ASSERT(pszField[0] != 0); if(pszField[0] == 0) return FALSE;
+	// pszValue may be NULL -- this deletes the specified key
 
 #ifndef _WIN32_WCE
-	// First check if the existing value in the INI file is the same as the
-	// one to be written. If so, we don't need to write it again. For
-	// devices that cache reads but not writes, this leads to a performance
-	// improvement. Thanks to Brad Clarke for the idea and patch.
 	TCHAR tszTemp[SI_REGSIZE];
-	if((pszValue != NULL) && (Get(pszField, tszTemp) == TRUE))
+	tszTemp[0] = 0; tszTemp[1] = 0;
+	if(pszValue == NULL) // Delete key?
 	{
-		if(_tcscmp(tszTemp, pszValue) == 0) return TRUE;
+		// If the key doesn't exist, we don't need to delete it
+		if(Get(pszField, tszTemp) == FALSE) return TRUE;
+	}
+	else
+	{
+		// Check if the existing value in the INI file is the same as the
+		// one to be written. If so, we don't need to write it again. For
+		// devices that cache reads but not writes, this leads to a performance
+		// improvement. Thanks to Brad Clarke for the idea and patch.
+
+		if(Get(pszField, tszTemp) == TRUE)
+			if(_tcscmp(tszTemp, pszValue) == 0) return TRUE;
 	}
 
 	if(m_nUseDir == 0)
-		bRet = WritePrivateProfileString(PWM_EXENAME, pszField, pszValue, m_szFileLocal);
+		bRet = WritePrivateProfileString(lpExeName, pszField, pszValue, m_szFileLocal);
 
 	if(bRet == FALSE)
 	{
 		if(m_nUseDir <= 1)
-			bRet = WritePrivateProfileString(PWM_EXENAME, pszField, pszValue, m_szFileUser);
+			bRet = WritePrivateProfileString(lpExeName, pszField, pszValue, m_szFileUser);
 
 		if(bRet == FALSE)
-			bRet = WritePrivateProfileString(PWM_EXENAME, pszField, pszValue, m_szFileGeneric);
+			bRet = WritePrivateProfileString(lpExeName, pszField, pszValue, m_szFileGeneric);
 	}
 #else
 	bRet = FALSE;
@@ -143,37 +159,49 @@ BOOL CPrivateConfig::Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue)
 
 BOOL CPrivateConfig::Get(const TCHAR *pszField, PCFG_OUT TCHAR *pszValue)
 {
-	BOOL bRet = FALSE;
-	TCHAR chEmpty[2] = { 0, 0 };
+	LPCTSTR lpExeName = PWM_EXENAME;
+	LPCTSTR lpNotFound = PCFG_NOTFOUND;
 
-	ASSERT((pszField != NULL) && (pszValue != NULL));
-	if((pszField == NULL) || (pszValue == NULL)) return FALSE;
-
+	ASSERT(pszValue != NULL); if(pszValue == NULL) return FALSE;
 	pszValue[0] = 0; pszValue[1] = 0; // Reset string
+
+	ASSERT(pszField != NULL); if(pszField == NULL) return FALSE;
+	ASSERT(pszField[0] != 0); if(pszField[0] == 0) return FALSE;
 
 #ifndef _WIN32_WCE
 	if(m_nUseDir == 0)
-		bRet = GetPrivateProfileString(PWM_EXENAME, pszField, chEmpty, pszValue, SI_REGSIZE, m_szFileLocal);
+		GetPrivateProfileString(lpExeName, pszField, lpNotFound, pszValue, SI_REGSIZE, m_szFileLocal);
 
-	if(bRet == FALSE)
+	if((_tcscmp(pszValue, lpNotFound) == 0) || (m_nUseDir != 0))
 	{
+		pszValue[0] = 0; pszValue[1] = 0;
+
 		if(m_nUseDir <= 1)
-			bRet = GetPrivateProfileString(PWM_EXENAME, pszField, chEmpty, pszValue, SI_REGSIZE, m_szFileUser);
+			GetPrivateProfileString(lpExeName, pszField, lpNotFound, pszValue, SI_REGSIZE, m_szFileUser);
 
-		if(bRet == FALSE)
-			bRet = GetPrivateProfileString(PWM_EXENAME, pszField, chEmpty, pszValue, SI_REGSIZE, m_szFileGeneric);
+		if((_tcscmp(pszValue, lpNotFound) == 0) || (m_nUseDir == 2))
+		{
+			pszValue[0] = 0; pszValue[1] = 0;
+			GetPrivateProfileString(lpExeName, pszField, lpNotFound, pszValue, SI_REGSIZE, m_szFileGeneric);
+
+			if(_tcscmp(pszValue, lpNotFound) == 0)
+			{
+				pszValue[0] = 0; pszValue[1] = 0;
+				return FALSE;
+			}
+		}
 	}
-#else
-	bRet = FALSE;
-	ASSERT(FALSE); // Implement before using on WinCE
-#endif
 
-	return bRet;
+	return TRUE;
+#else
+	ASSERT(FALSE); // Implement before using on WinCE
+	return FALSE;
+#endif
 }
 
 BOOL CPrivateConfig::SetBool(const TCHAR *pszField, BOOL bValue)
 {
-	return Set(pszField, (bValue == TRUE) ? _T("True") : _T("False"));
+	return Set(pszField, (bValue == FALSE) ? _T("False") : _T("True"));
 }
 
 BOOL CPrivateConfig::GetBool(const TCHAR *pszField, BOOL bDefault)
@@ -182,8 +210,8 @@ BOOL CPrivateConfig::GetBool(const TCHAR *pszField, BOOL bDefault)
 
 	if(Get(pszField, tszTemp) == FALSE) return bDefault;
 
-	if(_tcscmp(tszTemp, _T("True")) == 0) return TRUE;
-	else if(_tcscmp(tszTemp, _T("False")) == 0) return FALSE;
+	if(_tcsicmp(tszTemp, _T("True")) == 0) return TRUE;
+	else if(_tcsicmp(tszTemp, _T("False")) == 0) return FALSE;
 
 	return bDefault;
 }

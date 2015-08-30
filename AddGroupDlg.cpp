@@ -140,6 +140,7 @@ void CAddGroupDlg::OnSetIconBtn()
 
 	dlg.m_pImageList = m_pParentImageList;
 	dlg.m_uNumIcons = m_pParentImageList->GetImageCount();
+	dlg.m_nSelectedIcon = m_nIconId;
 
 	if(dlg.DoModal() == IDOK)
 	{

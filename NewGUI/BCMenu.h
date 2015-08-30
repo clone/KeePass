@@ -1,5 +1,5 @@
 // This is a modified version of Brent Corkums BCMenu class.
-// Editor: Dominik Reichl
+// Editor: Dominik Reichl (removed bitmap fading, etc...)
 // For the original version, see the authors site below.
 
 //*************************************************************************
@@ -104,7 +104,7 @@ public:
 	// Functions for loading and applying bitmaps to menus (see example application)
 	virtual BOOL LoadMenu(LPCTSTR lpszResourceName);
 	virtual BOOL LoadMenu(int nResource);
-	BOOL LoadToolbar(UINT nToolBar);
+	BOOL LoadToolbar(UINT nToolBar, UINT nBitmap);
 	BOOL LoadToolbars(const UINT *arID,int n);
 	void AddFromToolBar(CToolBar* pToolBar, int nResourceID);
 	BOOL LoadFromToolBar(UINT nID,UINT nToolBar,int& xoffset);

@@ -1,3 +1,7 @@
+// This is a modified version of Brent Corkums BCMenu class.
+// Editor: Dominik Reichl (removed bitmap fading, etc...)
+// For the original version, see the authors site below.
+
 //*************************************************************************
 // BCMenu.cpp : implementation file
 // Version : 3.035
@@ -1495,12 +1499,12 @@ BOOL BCMenu::LoadToolbars(const UINT *arID,int n)
 	ASSERT(arID);
 	BOOL returnflag=TRUE;
 	for(int i=0;i<n;++i){
-		if(!LoadToolbar(arID[i]))returnflag=FALSE;
+		if(!LoadToolbar(arID[i], arID[i]))returnflag=FALSE;
 	}
 	return(returnflag);
 }
 
-BOOL BCMenu::LoadToolbar(UINT nToolBar)
+BOOL BCMenu::LoadToolbar(UINT nToolBar, UINT nBitmap)
 {
 	UINT nID,nStyle;
 	BOOL returnflag=FALSE;
@@ -1513,7 +1517,7 @@ BOOL BCMenu::LoadToolbar(UINT nToolBar)
 	if(bar.LoadToolBar(nToolBar)){
 		CImageList imglist;
 		imglist.Create(m_iconX,m_iconY,ILC_COLORDDB|ILC_MASK,1,1);
-		if(AddBitmapToImageList(&imglist,nToolBar)){
+		if(AddBitmapToImageList(&imglist,nBitmap)){
 			returnflag=TRUE;
 			for(int i=0;i<bar.GetCount();++i){
 				nID = bar.GetItemID(i); 
@@ -2192,6 +2196,9 @@ void BCMenu::DitherBlt (HDC hdcDest, int nXDest, int nYDest, int nWidth,
 	}
 }
 
+// DR: Bitmaps aren't faded any more, the icons look better in
+// KeePass then; the original version by Brent Corkum faded
+// the images.
 void BCMenu::GetFadedBitmap(CBitmap &bmp)
 {
 	CDC ddc;
@@ -2220,7 +2227,7 @@ void BCMenu::GetFadedBitmap(CBitmap &bmp)
 	for(int i=0;i<BitMap.bmWidth;++i){
 		for(int j=0;j<BitMap.bmHeight;++j){
 			col=ddc.GetPixel(i,j);
-			if(col!=bgcol)ddc.SetPixel(i,j,LightenColor(col,0.3));
+			if(col!=bgcol)ddc.SetPixel(i,j, /* LightenColor(col,0.3) */ col);
 		}
 	}
 	ddc.SelectObject(pddcOldBmp);

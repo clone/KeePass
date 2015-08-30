@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Deutsch, Standard|
-|~LANGUAGEVERSION|             |1.01|
+|~LANGUAGEVERSION|             |1.02|
 |~LANGUAGEAUTHOR|              |Dominik Reichl|
 |~LANGUAGEAUTHOREMAIL|         |dominik.reichl@t-online.de, http://www.dominik-reichl.de/|
 
@@ -38,7 +38,7 @@
 
 |Password Groups|              |Passwort-Gruppen|
 |Title|                        |Titel|
-|UserName|                     |Benutzername|
+|User Name|                    |Benutzername|
 |URL|                          |URL|
 |Password|                     |Passwort|
 |Notes|                        |Kommentare|
@@ -101,7 +101,7 @@
 
 |Group:|                       |Gruppe:|
 |Title:|                       |Titel:|
-|UserName:|                    |Benutzername:|
+|User Name:|                   |Benutzername:|
 |URL:|                         |URL:|
 |Icon:|                        |Icon:|
 |Password:|                    |Passwort:|
@@ -177,7 +177,7 @@
 |Export Group To &XML...|      |Gruppe nach &XML exportieren...|
 |Export Group To &CSV...|      |Gruppe nach &CSV exportieren...|
 |Export Group To &TXT...|      |Gruppe nach &TXT exportieren...|
-|Copy User&Name To Clipboard|  |&Benutzername in Zwischenablage kopieren|
+|Copy User &Name To Clipboard| |&Benutzername in Zwischenablage kopieren|
 |Copy &Password To Clipboard|  |Passwort in Zwischenablage &kopieren|
 |Open &URL(s)|                 |&URL(s) öffnen|
 |&Find In Database...|         |In Datenbank &suchen...|
@@ -198,7 +198,7 @@
 
 |Change &Language...|          |&Sprache ändern...|
 |Show &Title Column|           |Spalte '&Titel' anzeigen|
-|Show User&Name Column|        |Spalte 'Benutzer&name' anzeigen|
+|Show User &Name Column|       |Spalte 'Benutzer&name' anzeigen|
 |Show &URL Column|             |Spalte '&URL' anzeigen|
 |Show &Password Column|        |Spalte '&Passwort' anzeigen|
 |Show Note&s Column|           |Spalte '&Kommentare' anzeigen|
@@ -266,8 +266,8 @@
     |Möchten Sie die Datei vor dem Beenden speichern?|
 |KeePass - Save Before Close/Lock?|   |KeePass - Datei vor dem Beenden oder Sperren speichern?|
 
-|Deleting a group will delete all items in that group, too.|
-    |Wenn Sie eine Gruppe löschen werden auch alle Elemente der Gruppe gelöscht.|
+|Deleting a group will delete all items and subgroups in that group, too.|
+    |Wenn Sie eine Gruppe löschen werden auch alle Elemente und Untergruppen der Gruppe gelöscht.|
 |Are you sure you want to delete this group?|
     |Sind Sie sicher, dass Sie diese Gruppe löschen möchten?|
 |Delete Group Confirmation|
@@ -432,7 +432,7 @@
 |&Rearrange|                   |&Umordnen|
 |&Sort Group List|             |Gruppenliste &sortieren|
 |Sort List By &Title|          |Liste &sortieren nach Titel|
-|Sort List By User&Name|       |Liste sortieren nach &Benutzername|
+|Sort List By User &Name|      |Liste sortieren nach &Benutzername|
 |Sort List By &URL|            |Liste sortieren nach &URL|
 |Sort List By &Password|       |Liste sortieren nach &Passwort|
 |Sort List By Note&s|          |Liste sortieren nach &Kommentaren|
@@ -443,7 +443,7 @@
 |Move Group One &Left|         |Gruppe eins nach &links|
 |Move Group One &Right|        |Gruppe eins nach &rechts|
 
-|Hide &UserNames Behind Asterisks (***)|  |&Benutzername hinter Sternchen verstecken (***)|
+|Hide &User Names Behind Asterisks (***)|  |&Benutzername hinter Sternchen verstecken (***)|
 |Attachment:|                  |Anhang:|
 |Attachment|                   |Anhang|
 |Show &Attachment Column|      |&Anhangs-Spalte anzeigen|
@@ -665,3 +665,26 @@
 |Use alternative auto-type method (minimize window)|    |Alternative Auto-Type-Methode benutzen (Fenster minimieren)|
 |Delete all backup entries before saving the database|  |Alle Backup-Einträge löschen bevor die Datenbank gespeichert wird|
 |&Repair KeePass Database File...|           |KeePass-Datenbankdatei &reparieren...|
+|The file format that you have selected to import supports group and/or entry IDs. Please choose an import behaviour.|
+    |Das Dateiformat, das Sie importieren möchten, unterstützt Gruppen- und Eintrags-IDs. Bitte wählen Sie ein Import-Verhalten.|
+|Create new IDs|                             |Neue IDs erzeugen|
+|If you select this option, KeePass will create new IDs for all groups and entries. Consequently no existing groups and entries of the currently opened database will be modified or overwritten.|
+    |Wenn Sie diese Option wählen wird KeePass für alle Gruppen und Einträge neue IDs generieren. Somit werden keine bereits existierenden Gruppen und Einträge der gerade geöffneten Datenbank verändert oder überschrieben.|
+|Overwrite|                                  |Überschreiben|
+|KeePass will replace all existing groups and entries by the ones in the file to import, if they have the same ID.|
+    |KeePass wird alle existierenden Gruppen und Einträge durch die zu importierenden ersetzen, falls sie die gleiche ID haben.|
+|Overwrite if newer|                         |Überschreiben, falls neuer|
+|KeePass will compare the last-modified times of the groups/entries and replace the existing ones only if the ones to import are newer.|
+    |KeePass wird die Letzte-Änderung-Zeiten der Gruppen/Einträge vergleichen und die existierenden nur dann ersetzen, falls die zu importierenden Gruppen/Einträge neuer sind.|
+|&KeePass Database...|                       |&KeePass-Datenbank...|
+|Acknowledgements|                           |Danksagungen|
+|Please choose if KeePass should use the key of the currently opened database or ask you to define a new key to encrypt the exported file.|
+    |Bitte wählen Sie, ob KeePass den Schlüssel der aktuell geöffneten Datenbank verwenden oder Sie nach einem neuen Schlüssel für die Verschlüsselung der exportierten Datei fragen soll.|
+|Click [Yes] to use the same key as the currently opened database.|
+    |Klicken Sie auf [Ja] um denselben Schlüssel wie die geöffnete Datenbank zu verwenden.|
+|Click [No] to set a new key for the exported file.|
+    |Klicken Sie auf [Nein] um einen neuen Schlüssel für die exportierte Datei zu setzen.|
+|Reuse the current key/password?|            |Aktuellen Schlüssel/Passwort wiederverwenden?|
+|Export Group To &KeePass Database...|       |Gruppe nach KeePass-Datenbank exportieren...|
+|Show full path in the titlebar (instead of filename only)|
+    |Kompletten Pfad in der Titelleiste anzeigen (anstatt nur den Dateinamen)|

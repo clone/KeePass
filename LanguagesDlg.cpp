@@ -84,7 +84,8 @@ BOOL CLanguagesDlg::OnInitDialog()
 	m_listLang.InsertColumn(2, TRL("Author"), LVCFMT_LEFT, nColSize, 2);
 	m_listLang.InsertColumn(3, TRL("Translation author contact"), LVCFMT_LEFT, nColSize, 3);
 
-	m_ilIcons.Create(IDR_CLIENTICONS, 16, 1, RGB(255,0,255));
+	// m_ilIcons.Create(CPwSafeApp::GetClientIconsResourceID(), 16, 1, RGB(255,0,255));
+	CPwSafeApp::CreateHiColorImageList(&m_ilIcons, IDB_CLIENTICONS_EX, 16);
 	m_listLang.SetImageList(&m_ilIcons, LVSIL_SMALL);
 
 	m_listLang.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0,

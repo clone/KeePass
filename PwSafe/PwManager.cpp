@@ -52,17 +52,23 @@ CPwManager::CPwManager()
 
 	m_random.Initialize();
 	m_random.GetRandomBuffer(m_pSessionKey, PWM_SESSION_KEY_SIZE);
+}
+
+CPwManager::~CPwManager()
+{
+	CleanUp();
+}
+
+void CPwManager::InitPrimaryInstance()
+{
+	ASSERT((m_pLastEditedEntry == NULL) && (memcmp(m_pMasterKey, g_pNullString, 4) == 0));
+	ASSERT((m_nAlgorithm == ALGO_AES) && (m_dwKeyEncRounds == PWM_STD_KEYENCROUNDS));
 
 	DWORD dwInitXorShift[4];
 	m_random.GetRandomBuffer((BYTE *)&dwInitXorShift, 16);
 	srandXorShift(dwInitXorShift);
 
 	ASSERT(sizeof(BYTE) == 1);
-}
-
-CPwManager::~CPwManager()
-{
-	CleanUp();
 }
 
 void CPwManager::CleanUp()
@@ -515,7 +521,7 @@ DWORD CPwManager::GetEntryByGroupN(DWORD idGroup, DWORD dwIndex)
 	return DWORD_MAX;
 }
 
-PW_ENTRY *CPwManager::GetEntryByUuid(BYTE *pUuid)
+PW_ENTRY *CPwManager::GetEntryByUuid(const BYTE *pUuid)
 {
 	ASSERT(pUuid != NULL); if(pUuid == NULL) return NULL;
 
@@ -527,7 +533,7 @@ PW_ENTRY *CPwManager::GetEntryByUuid(BYTE *pUuid)
 	return &m_pEntries[dwEntryIndex];
 }
 
-DWORD CPwManager::GetEntryByUuidN(BYTE *pUuid)
+DWORD CPwManager::GetEntryByUuidN(const BYTE *pUuid)
 {
 	ASSERT(pUuid != NULL); if(pUuid == NULL) return DWORD_MAX;
 
@@ -540,7 +546,7 @@ DWORD CPwManager::GetEntryByUuidN(BYTE *pUuid)
 	return DWORD_MAX;
 }
 
-DWORD CPwManager::GetEntryPosInGroup(PW_ENTRY *pEntry)
+DWORD CPwManager::GetEntryPosInGroup(const PW_ENTRY *pEntry)
 {
 	DWORD uCurrentEntry, pos = 0;
 
@@ -706,19 +712,15 @@ BOOL CPwManager::AddGroup(const PW_GROUP *pTemplate)
 	return SetGroup(m_dwNumGroups - 1, &pT);
 }
 
-BOOL CPwManager::SetGroup(DWORD dwIndex, PW_GROUP *pTemplate)
+BOOL CPwManager::SetGroup(DWORD dwIndex, const PW_GROUP *pTemplate)
 {
-	DWORD slen;
-
 	ASSERT(dwIndex < m_dwNumGroups);
 	ASSERT(pTemplate != NULL);
 	ASSERT((pTemplate->uGroupId != 0) && (pTemplate->uGroupId != DWORD_MAX));
 	if((pTemplate->uGroupId == 0) || (pTemplate->uGroupId == DWORD_MAX)) return FALSE;
 
-	slen = _tcslen(pTemplate->pszGroupName);
 	SAFE_DELETE_ARRAY(m_pGroups[dwIndex].pszGroupName);
-	m_pGroups[dwIndex].pszGroupName = new TCHAR[slen + 1];
-	_tcscpy(m_pGroups[dwIndex].pszGroupName, pTemplate->pszGroupName);
+	m_pGroups[dwIndex].pszGroupName = _TcsSafeDupAlloc(pTemplate->pszGroupName);
 
 	m_pGroups[dwIndex].uGroupId = pTemplate->uGroupId;
 	m_pGroups[dwIndex].uImageId = pTemplate->uImageId;
@@ -803,7 +805,7 @@ BOOL CPwManager::DeleteGroupById(DWORD uGroupId)
 	return TRUE;
 }
 
-BOOL CPwManager::SetEntry(DWORD dwIndex, PW_ENTRY *pTemplate)
+BOOL CPwManager::SetEntry(DWORD dwIndex, const PW_ENTRY *pTemplate)
 {
 	DWORD slen;
 
@@ -827,54 +829,24 @@ BOOL CPwManager::SetEntry(DWORD dwIndex, PW_ENTRY *pTemplate)
 	m_pEntries[dwIndex].uImageId = pTemplate->uImageId;
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszTitle);
-	slen = _tcslen(pTemplate->pszTitle);
-	m_pEntries[dwIndex].pszTitle = new TCHAR[slen + 1];
-	if(slen != 0)
-		_tcscpy(m_pEntries[dwIndex].pszTitle, pTemplate->pszTitle);
-	else
-		m_pEntries[dwIndex].pszTitle[0] = 0;
+	m_pEntries[dwIndex].pszTitle = _TcsSafeDupAlloc(pTemplate->pszTitle);
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszUserName);
-	slen = _tcslen(pTemplate->pszUserName);
-	m_pEntries[dwIndex].pszUserName = new TCHAR[slen + 1];
-	if(slen != 0)
-		_tcscpy(m_pEntries[dwIndex].pszUserName, pTemplate->pszUserName);
-	else
-		m_pEntries[dwIndex].pszUserName[0] = 0;
+	m_pEntries[dwIndex].pszUserName = _TcsSafeDupAlloc(pTemplate->pszUserName);
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszURL);
-	slen = _tcslen(pTemplate->pszURL);
-	m_pEntries[dwIndex].pszURL = new TCHAR[slen + 1];
-	if(slen != 0)
-		_tcscpy(m_pEntries[dwIndex].pszURL, pTemplate->pszURL);
-	else
-		m_pEntries[dwIndex].pszURL[0] = 0;
+	m_pEntries[dwIndex].pszURL = _TcsSafeDupAlloc(pTemplate->pszURL);
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszPassword);
-	slen = _tcslen(pTemplate->pszPassword);
-	m_pEntries[dwIndex].pszPassword = new TCHAR[slen + 1];
-	if(slen != 0)
-		_tcscpy(m_pEntries[dwIndex].pszPassword, pTemplate->pszPassword);
-	else
-		m_pEntries[dwIndex].pszPassword[0] = 0;
+	m_pEntries[dwIndex].pszPassword = _TcsSafeDupAlloc(pTemplate->pszPassword);
 
 	SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszAdditional);
-	slen = _tcslen(pTemplate->pszAdditional);
-	m_pEntries[dwIndex].pszAdditional = new TCHAR[slen + 1];
-	if(slen != 0)
-		_tcscpy(m_pEntries[dwIndex].pszAdditional, pTemplate->pszAdditional);
-	else
-		m_pEntries[dwIndex].pszAdditional[0] = 0;
+	m_pEntries[dwIndex].pszAdditional = _TcsSafeDupAlloc(pTemplate->pszAdditional);
 
 	if(!((m_pEntries[dwIndex].pBinaryData == pTemplate->pBinaryData) && (m_pEntries[dwIndex].pszBinaryDesc == pTemplate->pszBinaryDesc)))
 	{
 		SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pszBinaryDesc);
-		slen = _tcslen(pTemplate->pszBinaryDesc);
-		m_pEntries[dwIndex].pszBinaryDesc = new TCHAR[slen + 1];
-		if(slen != 0)
-			_tcscpy(m_pEntries[dwIndex].pszBinaryDesc, pTemplate->pszBinaryDesc);
-		else
-			m_pEntries[dwIndex].pszBinaryDesc[0] = 0;
+		m_pEntries[dwIndex].pszBinaryDesc = _TcsSafeDupAlloc(pTemplate->pszBinaryDesc);
 
 		SAFE_DELETE_ARRAY(m_pEntries[dwIndex].pBinaryData);
 		slen = pTemplate->uBinaryDataLen;
@@ -898,7 +870,13 @@ BOOL CPwManager::SetEntry(DWORD dwIndex, PW_ENTRY *pTemplate)
 	m_pEntries[dwIndex].tLastAccess = pTemplate->tLastAccess;
 	m_pEntries[dwIndex].tExpire = pTemplate->tExpire;
 
-	ASSERT_ENTRY((&m_pEntries[dwIndex]));
+	if(m_pEntries[dwIndex].pszBinaryDesc == NULL)
+	{
+		ASSERT(FALSE);
+		m_pEntries[dwIndex].pszBinaryDesc = _TcsSafeDupAlloc(NULL);
+	}
+
+	ASSERT_ENTRY(&m_pEntries[dwIndex]);
 	m_pLastEditedEntry = &m_pEntries[dwIndex];
 	return TRUE;
 }
@@ -911,12 +889,22 @@ void CPwManager::LockEntryPassword(PW_ENTRY *pEntry)
 	if(pEntry->uPasswordLen != 0)
 		arcfourCrypt((BYTE *)pEntry->pszPassword, pEntry->uPasswordLen * sizeof(TCHAR),
 			m_pSessionKey, PWM_SESSION_KEY_SIZE);
+
+	ASSERT(pEntry->pszPassword[pEntry->uPasswordLen] == 0);
 }
 
 void CPwManager::UnlockEntryPassword(PW_ENTRY *pEntry)
 {
 	ASSERT_ENTRY(pEntry);
 	LockEntryPassword(pEntry); // OFB encryption mode
+
+#ifdef _DEBUG
+	unsigned int i;
+	for(i = 0; i < pEntry->uPasswordLen; i++)
+	{
+		ASSERT(pEntry->pszPassword[i] != 0);
+	}
+#endif
 }
 
 void CPwManager::NewDatabase()
@@ -1955,7 +1943,7 @@ void CPwManager::SortGroup(DWORD idGroup, DWORD dwSortByField)
 	SAFE_DELETE_ARRAY(p);
 }
 
-void CPwManager::_TimeToPwTime(BYTE *pCompressedTime, PW_TIME *pPwTime)
+void CPwManager::_TimeToPwTime(const BYTE *pCompressedTime, PW_TIME *pPwTime)
 {
 	DWORD dwYear, dwMonth, dwDay, dwHour, dwMinute, dwSecond;
 
@@ -1971,7 +1959,7 @@ void CPwManager::_TimeToPwTime(BYTE *pCompressedTime, PW_TIME *pPwTime)
 	pPwTime->btSecond = (BYTE)dwSecond;
 }
 
-void CPwManager::_PwTimeToTime(PW_TIME *pPwTime, BYTE *pCompressedTime)
+void CPwManager::_PwTimeToTime(const PW_TIME *pPwTime, BYTE *pCompressedTime)
 {
 	ASSERT((pPwTime != NULL) && (pCompressedTime != NULL));
 	if(pPwTime == NULL) return;
@@ -1981,7 +1969,7 @@ void CPwManager::_PwTimeToTime(PW_TIME *pPwTime, BYTE *pCompressedTime)
 		(DWORD)pPwTime->btSecond);
 }
 
-BOOL CPwManager::ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_GROUP *pGroup)
+BOOL CPwManager::ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, const BYTE *pData, PW_GROUP *pGroup)
 {
 	BYTE aCompressedTime[5];
 
@@ -2035,7 +2023,7 @@ BOOL CPwManager::ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pDa
 	return TRUE; // Field supported
 }
 
-BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_ENTRY *pEntry)
+BOOL CPwManager::ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, const BYTE *pData, PW_ENTRY *pEntry)
 {
 	BYTE aCompressedTime[5];
 
@@ -2234,7 +2222,7 @@ BOOL CPwManager::AttachFileAsBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile)
 	return TRUE;
 }
 
-BOOL CPwManager::SaveBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile)
+BOOL CPwManager::SaveBinaryData(const PW_ENTRY *pEntry, const TCHAR *lpFile)
 {
 	FILE *fp;
 
@@ -2279,7 +2267,7 @@ void CPwManager::SubstEntryGroupIds(DWORD dwExistingId, DWORD dwNewId)
 }
 
 // Encrypt the master key a few times to make brute-force key-search harder
-BOOL CPwManager::_TransformMasterKey(BYTE *pKeySeed)
+BOOL CPwManager::_TransformMasterKey(const BYTE *pKeySeed)
 {
 	Rijndael rijndael;
 	RD_UINT8 aKey[32];
@@ -2383,7 +2371,7 @@ BOOL CPwManager::BackupEntry(const PW_ENTRY *pe, BOOL *pbGroupCreated)
 	PW_GROUP pwg;
 	DWORD dwGroupId;
 
-	ASSERT(pe != NULL); if(pe == NULL) return FALSE;
+	ASSERT_ENTRY(pe); if(pe == NULL) return FALSE;
 
 	if(pbGroupCreated != NULL) *pbGroupCreated = FALSE;
 
@@ -2407,7 +2395,7 @@ BOOL CPwManager::BackupEntry(const PW_ENTRY *pe, BOOL *pbGroupCreated)
 	pwe = *pe;
 	_GetCurrentPwTime(&pwe.tLastMod);
 	pwe.uGroupId = dwGroupId;
-	ZeroMemory(&pwe.uuid, 16);
+	ZeroMemory(&pwe.uuid, 16); // Create new UUID for the backup entry
 
 	return AddEntry(&pwe);
 }
@@ -2545,7 +2533,7 @@ BOOL CPwManager::_AddMetaStream(LPCTSTR lpMetaDataDesc, BYTE *pData, DWORD dwLen
 	return AddEntry(&pe);
 }
 
-BOOL CPwManager::_IsMetaStream(PW_ENTRY *p)
+BOOL CPwManager::_IsMetaStream(const PW_ENTRY *p)
 {
 	ASSERT_ENTRY(p); if(p == NULL) return FALSE;
 
@@ -2636,4 +2624,172 @@ void CPwManager::_ParseMetaStream(PW_ENTRY *p)
 		memcpy(m_aLastSelectedEntryUuid, pState->aLastSelectedEntryUuid, 16);
 		memcpy(m_aLastTopVisibleEntryUuid, pState->aLastTopVisibleEntryUuid, 16);
 	}
+}
+
+BOOL CPwManager::MemAllocCopyEntry(const PW_ENTRY *pExisting, PW_ENTRY *pDestination)
+{
+	ASSERT_ENTRY(pExisting); ASSERT(pDestination != NULL);
+	if((pExisting == NULL) || (pDestination == NULL)) return FALSE;
+
+	ZeroMemory(pDestination, sizeof(PW_ENTRY));
+
+	pDestination->uBinaryDataLen = pExisting->uBinaryDataLen;
+	if(pExisting->pBinaryData != NULL)
+	{
+		pDestination->pBinaryData = new BYTE[pExisting->uBinaryDataLen + 1];
+		ASSERT(pDestination->pBinaryData != NULL); if(pDestination->pBinaryData == NULL) return FALSE;
+		pDestination->pBinaryData[pExisting->uBinaryDataLen] = 0;
+		memcpy(pDestination->pBinaryData, pExisting->pBinaryData, pExisting->uBinaryDataLen);
+	}
+
+	pDestination->pszAdditional = _TcsSafeDupAlloc(pExisting->pszAdditional);
+	pDestination->pszBinaryDesc = _TcsSafeDupAlloc(pExisting->pszBinaryDesc);
+	pDestination->pszPassword = _TcsSafeDupAlloc(pExisting->pszPassword);
+	pDestination->pszTitle = _TcsSafeDupAlloc(pExisting->pszTitle);
+	pDestination->pszURL = _TcsSafeDupAlloc(pExisting->pszURL);
+	pDestination->pszUserName = _TcsSafeDupAlloc(pExisting->pszUserName);
+
+	pDestination->tCreation = pExisting->tCreation;
+	pDestination->tExpire = pExisting->tExpire;
+	pDestination->tLastAccess = pExisting->tLastAccess;
+	pDestination->tLastMod = pExisting->tLastMod;
+
+	pDestination->uGroupId = pExisting->uGroupId;
+	pDestination->uImageId = pExisting->uImageId;
+	pDestination->uPasswordLen = pExisting->uPasswordLen;
+	memcpy(pDestination->uuid, pExisting->uuid, 16);
+
+	return TRUE;
+}
+
+void CPwManager::MemFreeEntry(PW_ENTRY *pEntry)
+{
+	ASSERT_ENTRY(pEntry); if(pEntry == NULL) return;
+
+	SAFE_DELETE_ARRAY(pEntry->pBinaryData);
+	SAFE_DELETE_ARRAY(pEntry->pszAdditional);
+	SAFE_DELETE_ARRAY(pEntry->pszBinaryDesc);
+	SAFE_DELETE_ARRAY(pEntry->pszPassword);
+	SAFE_DELETE_ARRAY(pEntry->pszTitle);
+	SAFE_DELETE_ARRAY(pEntry->pszURL);
+	SAFE_DELETE_ARRAY(pEntry->pszUserName);
+
+	ZeroMemory(pEntry, sizeof(PW_ENTRY));
+}
+
+void CPwManager::MergeIn(VPA_MODIFY CPwManager *pDataSource, BOOL bCreateNewUUIDs, BOOL bCompareTimes)
+{
+	ASSERT(pDataSource != NULL); if(pDataSource == NULL) return;
+
+	DWORD i, dwModifyIndex, dwOldId, dwNewId;
+	PW_GROUP *pgThis, *pgSource;
+	PW_ENTRY *peThis, *peSource;
+	PW_TIME tNow;
+	BOOL bDoReplace;
+
+	_GetCurrentPwTime(&tNow);
+
+	for(i = 0; i < pDataSource->GetNumberOfGroups(); i++)
+	{
+		pgSource = pDataSource->GetGroup(i);
+		ASSERT(pgSource != NULL); if(pgSource == NULL) continue;
+
+		if(bCreateNewUUIDs == TRUE)
+		{
+			while(1)
+			{
+				dwOldId = pgSource->uGroupId;
+				pgSource->uGroupId = 0; // Create new ID
+				VERIFY(AddGroup(pgSource) == TRUE);
+
+				dwNewId = GetGroup(GetNumberOfGroups() - 1)->uGroupId;
+
+				if(pDataSource->GetGroupById(dwNewId) == NULL)
+				{
+					pDataSource->SubstEntryGroupIds(dwOldId, dwNewId);
+					break;
+				}
+
+				pgSource->uGroupId = dwOldId;
+				VERIFY(DeleteGroupById(dwNewId) == TRUE);
+			}
+		}
+		else // bCreateNewUUIDs == FALSE
+		{
+			dwModifyIndex = GetGroupByIdN(pgSource->uGroupId);
+			if(dwModifyIndex != DWORD_MAX) pgThis = GetGroup(dwModifyIndex);
+			else pgThis = NULL;
+
+			if(pgThis == NULL) AddGroup(pgSource); // Group doesn't exist already
+			else
+			{
+				bDoReplace = TRUE;
+				if(bCompareTimes == TRUE)
+					if(_pwtimecmp(&pgThis->tLastMod, &pgSource->tLastMod) >= 0)
+						bDoReplace = FALSE;
+
+				if(bDoReplace == TRUE)
+				{
+					VERIFY(SetGroup(dwModifyIndex, pgSource) == TRUE);
+
+					pgThis = GetGroup(dwModifyIndex);
+					if(pgThis != NULL) pgThis->tLastAccess = tNow;
+				}
+			}
+		}
+	}
+
+	FixGroupTree();
+
+	for(i = 0; i < pDataSource->GetNumberOfEntries(); i++)
+	{
+		peSource = pDataSource->GetEntry(i);
+		ASSERT(peSource != NULL); if(peSource == NULL) continue;
+
+		// Don't import meta streams
+		if(_IsMetaStream(peSource) == TRUE) continue;
+
+		if(bCreateNewUUIDs == TRUE)
+		{
+			memset(peSource->uuid, 0, 16);
+			VERIFY(AddEntry(peSource) == TRUE);
+		}
+		else
+		{
+			dwModifyIndex = GetEntryByUuidN(peSource->uuid);
+			if(dwModifyIndex != DWORD_MAX) peThis = GetEntry(dwModifyIndex);
+			else peThis = NULL;
+
+			if(peThis == NULL) AddEntry(peSource); // Entry doesn't exist already
+			else
+			{
+				bDoReplace = TRUE;
+				if(bCompareTimes == TRUE)
+					if(_pwtimecmp(&peThis->tLastMod, &peSource->tLastMod) >= 0)
+						bDoReplace = FALSE;
+
+				if(bDoReplace == TRUE)
+				{
+					VERIFY(SetEntry(dwModifyIndex, peSource));
+
+					peThis = GetEntry(dwModifyIndex);
+					if(peThis != NULL) peThis->tLastAccess = tNow;
+				}
+			}
+		}
+	}
+
+	VERIFY(DeleteLostEntries() == 0);
+}
+
+void CPwManager::GetRawMasterKey(BYTE *pStorage)
+{
+	ASSERT(pStorage != NULL); if(pStorage == NULL) return;
+	memcpy(pStorage, m_pMasterKey, 32);
+}
+
+void CPwManager::SetRawMasterKey(const BYTE *pNewKey)
+{
+	if(pNewKey != NULL) memcpy(m_pMasterKey, pNewKey, 32);
+	else memset(m_pMasterKey, 0, 32);
 }

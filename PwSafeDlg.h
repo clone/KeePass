@@ -120,6 +120,7 @@ public:
 	BOOL GetExportOptions(PWEXPORT_OPTIONS *pOptions, CPwExport *pPwExport);
 	CString GetExportFile(int nFormat, LPCTSTR lpFileName = NULL);
 	void ExportSelectedGroup(int nFormat);
+	void ExportGroupToKeePass(DWORD dwGroupId);
 
 	CString _MakeRtfString(LPCTSTR lptString);
 	void ShowEntryDetails(PW_ENTRY *p);
@@ -221,6 +222,7 @@ public:
 	void _DeleteTemporaryFiles();
 
 	void _UpdateToolBar(BOOL bForceUpdate = FALSE);
+	void _UpdateTitleBar();
 
 	void _UpdateGuiToManager();
 
@@ -237,8 +239,8 @@ public:
 
 	BOOL _IsUnsafeAllowed();
 
-	void _OpenDatabase(const TCHAR *pszFile, const TCHAR *pszPassword, const TCHAR *pszKeyFile, BOOL bOpenLocked, LPCTSTR lpPreSelectPath, BOOL bIgnoreCorrupted);
-	BOOL _ChangeMasterKey(BOOL bCreateNew);
+	void _OpenDatabase(CPwManager *pDbMgr, const TCHAR *pszFile, const TCHAR *pszPassword, const TCHAR *pszKeyFile, BOOL bOpenLocked, LPCTSTR lpPreSelectPath, BOOL bIgnoreCorrupted);
+	BOOL _ChangeMasterKey(CPwManager *pDbMgr, BOOL bCreateNew);
 	void _PrintGroup(DWORD dwGroupId);
 	void _Find(DWORD dwFindGroupId);
 	void _DoQuickFind();
@@ -320,6 +322,7 @@ public:
 	int m_nAutoSort;
 	BOOL m_bAutoPwGen;
 	int m_nAutoTypeMethod;
+	BOOL m_bShowFullPath;
 
 	HICON m_hTrayIconNormal;
 	HICON m_hTrayIconLocked;
@@ -339,6 +342,7 @@ public:
 	HACCEL m_hAccel;
 
 	CString m_strFile;
+	CString m_strFileAbsolute;
 	BOOL m_bFileOpen;
 	BOOL m_bModified;
 	BOOL m_bMinimized;
@@ -637,6 +641,12 @@ protected:
 	afx_msg void OnInfoDonate();
 	afx_msg void OnExtrasRepairDb();
 	afx_msg void OnUpdateExtrasRepairDb(CCmdUI* pCmdUI);
+	afx_msg void OnImportKeePass();
+	afx_msg void OnUpdateImportKeePass(CCmdUI* pCmdUI);
+	afx_msg void OnSafeExportGroupKeePass();
+	afx_msg void OnUpdateSafeExportGroupKeePass(CCmdUI* pCmdUI);
+	afx_msg void OnExportKeePass();
+	afx_msg void OnUpdateExportKeePass(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 
 	afx_msg void OnPluginMessage(UINT nID);

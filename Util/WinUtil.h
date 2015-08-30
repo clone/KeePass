@@ -41,6 +41,7 @@ C_FN_SHARE void CopyDelayRenderedClipboardData(const TCHAR *lptString);
 #endif
 
 CPP_FN_SHARE CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile);
+CPP_FN_SHARE CString GetShortestAbsolutePath(LPCTSTR lpFilePath);
 
 C_FN_SHARE BOOL GetRegKeyEx(HKEY hkey, LPCTSTR lpSubKey, LPTSTR lpRetData);
 C_FN_SHARE BOOL OpenUrlInNewBrowser(LPCTSTR lpURL);

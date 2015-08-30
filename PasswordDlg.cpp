@@ -105,10 +105,10 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	m_fStyle.CreateFont(-12, 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, "Tahoma");
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
 	m_fSymbol.CreateFont(-13, 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Symbol"));
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, CPwSafeApp::GetPasswordFont());
 
 	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
@@ -124,7 +124,8 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	NewGUI_ConfigQualityMeter(&m_cPassQuality);
 
-	m_ilIcons.Create(IDR_INFOICONS, 16, 1, RGB(255,0,255)); // Purple is transparent
+	// m_ilIcons.Create(IDR_INFOICONS, 16, 1, RGB(255,0,255)); // Purple is transparent
+	CPwSafeApp::CreateHiColorImageList(&m_ilIcons, IDB_INFOICONS_EX, 16);
 	m_cbDiskList.SetImageList(&m_ilIcons);
 
 	COMBOBOXEXITEM cbi;
@@ -305,7 +306,7 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	// Alternative password asterisk character: 0xB7 (smaller dot)
 	// TCHAR tchDot = (TCHAR)(_T('z') + 27);
-	TCHAR tchDot = (TCHAR)0xb7;
+	TCHAR tchDot = CPwSafeApp::GetPasswordCharacter();
 	CString strStars; strStars += tchDot; strStars += tchDot; strStars += tchDot;
 	m_btStars.SetWindowText(strStars);
 	m_bStars = TRUE;
@@ -501,7 +502,7 @@ void CPasswordDlg::OnCheckStars()
 	else
 	{
 		// TCHAR tchDot = (TCHAR)(_T('z') + 27);
-		TCHAR tchDot = (TCHAR)0xb7;
+		TCHAR tchDot = CPwSafeApp::GetPasswordCharacter();
 		m_pEditPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
 		m_pEditPw.SetPasswordChar(tchDot);
 		m_pEditPw.SetFont(&m_fSymbol, TRUE);

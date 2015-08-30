@@ -75,7 +75,8 @@ BOOL CCheckOptionsDlg::OnInitDialog()
 	m_banner.SetCaption(m_strDescription);
 	SetWindowText(m_strTitle);
 
-	m_ilOptionIcons.Create(IDR_OPTIONICONS, 16, 1, RGB(255,0,255));
+	// m_ilOptionIcons.Create(IDB_OPTIONICONS_EX, 16, 1, RGB(255,0,255));
+	CPwSafeApp::CreateHiColorImageList(&m_ilOptionIcons, IDB_OPTIONICONS_EX, 16);
 	m_olOptions.InitOptionListEx(&m_ilOptionIcons);
 
 	DWORD i = 0;

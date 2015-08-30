@@ -114,7 +114,7 @@ C_FN_SHARE void _PackTimeToStruct(BYTE *pBytes, DWORD dwYear, DWORD dwMonth, DWO
 	pBytes[4] = (BYTE)(((dwMinute & 0x00000003) << 6) | (dwSecond & 0x0000003F));
 }
 
-C_FN_SHARE void _UnpackStructToTime(BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond)
+C_FN_SHARE void _UnpackStructToTime(const BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMonth, DWORD *pdwDay, DWORD *pdwHour, DWORD *pdwMinute, DWORD *pdwSecond)
 {
 	DWORD dw1, dw2, dw3, dw4, dw5;
 
@@ -135,7 +135,9 @@ C_FN_SHARE void _UnpackStructToTime(BYTE *pBytes, DWORD *pdwYear, DWORD *pdwMont
 C_FN_SHARE void _GetCurrentPwTime(PW_TIME *p)
 {
 	SYSTEMTIME t;
-	ASSERT(p != NULL);
+
+	ASSERT(p != NULL); if(p == NULL) return;
+
 	GetLocalTime(&t);
 	p->btDay = (BYTE)t.wDay; p->btHour = (BYTE)t.wHour;
 	p->btMinute = (BYTE)t.wMinute; p->btMonth = (BYTE)t.wMonth;

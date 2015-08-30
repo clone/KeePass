@@ -26,11 +26,12 @@
 #include "../Crypto/rijndael.h"
 
 // General product information
-#define PWM_PRODUCT_NAME _T("KeePass Password Safe")
+#define PWM_PRODUCT_NAME       _T("KeePass Password Safe")
+#define PWM_PRODUCT_NAME_SHORT _T("KeePass")
 
 // When making a Windows build, don't forget to update the verinfo resource
-#define PWM_VERSION_STR  _T("1.01")
-#define PWM_VERSION_DW   0x01000101
+#define PWM_VERSION_STR  _T("1.02")
+#define PWM_VERSION_DW   0x01000201
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -48,6 +49,7 @@
 
 #define PWM_HELP_AUTOTYPE _T("autotype.html")
 #define PWM_HELP_URLS     _T("autourl.html")
+#define PWM_HELP_CREDITS  _T("thanks.html")
 
 #define PWMKEY_LANG       _T("KeeLanguage")
 #define PWMKEY_CLIPSECS   _T("KeeClipboardSeconds")
@@ -122,6 +124,7 @@
 #define PWMKEY_QUICKFINDINCBK   _T("KeeQuickFindIncBackup")
 #define PWMKEY_AUTOTYPEMETHOD   _T("KeeAutoTypeMethod")
 #define PWMKEY_DELETEBKONSAVE   _T("KeeDeleteBackupsOnSave")
+#define PWMKEY_SHOWFULLPATH     _T("KeeShowFullPath")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -191,6 +194,12 @@
 #define PMS_ID_URL      _T("$")
 
 #define PMS_STREAM_SIMPLESTATE _T("Simple UI State")
+
+#ifdef VPA_MODIFY
+#error VPA_MODIFY must not be defined already.
+#else
+#define VPA_MODIFY
+#endif
 
 #pragma pack(1)
 
@@ -301,8 +310,8 @@ typedef struct _PWDB_REPAIR_INFO
 #define ASSERT_ENTRY(pp) ASSERT((pp) != NULL); ASSERT((pp)->pszTitle != NULL); \
 	ASSERT((pp)->pszUserName != NULL); ASSERT((pp)->pszURL != NULL); \
 	ASSERT((pp)->pszPassword != NULL); ASSERT((pp)->pszAdditional != NULL); \
-	ASSERT((pp)->pszBinaryDesc != NULL); if(((pp)->uBinaryDataLen != 0) && \
-	((pp)->pBinaryData == NULL)) { ASSERT(FALSE); }
+	ASSERT((pp)->pszBinaryDesc != NULL); ASSERT((pp)->pszPassword != (TCHAR *)0xFEEEFEEE); \
+	if(((pp)->uBinaryDataLen != 0) && ((pp)->pBinaryData == NULL)) { ASSERT(FALSE); }
 #else
 #define ASSERT_ENTRY(pp)
 #endif
@@ -316,6 +325,7 @@ public:
 	CPwManager();
 	virtual ~CPwManager();
 
+	void InitPrimaryInstance();
 	void CleanUp(); // Delete everything and release all allocated memory
 
 	// Set the master key for the database.
@@ -332,9 +342,9 @@ public:
 	PW_ENTRY *GetEntry(DWORD dwIndex);
 	PW_ENTRY *GetEntryByGroup(DWORD idGroup, DWORD dwIndex);
 	DWORD GetEntryByGroupN(DWORD idGroup, DWORD dwIndex);
-	PW_ENTRY *GetEntryByUuid(BYTE *pUuid);
-	DWORD GetEntryByUuidN(BYTE *pUuid); // Returns the index of the item with pUuid
-	DWORD GetEntryPosInGroup(PW_ENTRY *pEntry);
+	PW_ENTRY *GetEntryByUuid(const BYTE *pUuid);
+	DWORD GetEntryByUuidN(const BYTE *pUuid); // Returns the index of the item with pUuid
+	DWORD GetEntryPosInGroup(const PW_ENTRY *pEntry);
 	PW_ENTRY *GetLastEditedEntry();
 
 	// Access group information
@@ -355,8 +365,8 @@ public:
 	BOOL DeleteEntry(DWORD dwIndex);
 	BOOL DeleteGroupById(DWORD uGroupId);
 
-	BOOL SetGroup(DWORD dwIndex, PW_GROUP *pTemplate);
-	BOOL SetEntry(DWORD dwIndex, PW_ENTRY *pTemplate);
+	BOOL SetGroup(DWORD dwIndex, const PW_GROUP *pTemplate);
+	BOOL SetEntry(DWORD dwIndex, const PW_ENTRY *pTemplate);
 	// DWORD MakeGroupTree(LPCTSTR lpTreeString, TCHAR tchSeparator);
 
 	// Use these functions to make passwords in PW_ENTRY structures readable
@@ -376,6 +386,11 @@ public:
 	void SortGroup(DWORD idGroup, DWORD dwSortByField);
 	void SortGroupList();
 
+	BOOL MemAllocCopyEntry(const PW_ENTRY *pExisting, PW_ENTRY *pDestination);
+	void MemFreeEntry(PW_ENTRY *pEntry);
+
+	void MergeIn(VPA_MODIFY CPwManager *pDataSource, BOOL bCreateNewUUIDs, BOOL bCompareTimes);
+
 	// Find an item
 	DWORD Find(const TCHAR *pszFindString, BOOL bCaseSensitive, DWORD fieldFlags, DWORD nStart);
 
@@ -387,8 +402,8 @@ public:
 	void SetKeyEncRounds(DWORD dwRounds);
 
 	// Convert PW_TIME to 5-byte compressed structure and the other way round
-	static void _TimeToPwTime(BYTE *pCompressedTime, PW_TIME *pPwTime);
-	static void _PwTimeToTime(PW_TIME *pPwTime, BYTE *pCompressedTime);
+	static void _TimeToPwTime(const BYTE *pCompressedTime, PW_TIME *pPwTime);
+	static void _PwTimeToTime(const PW_TIME *pPwTime, BYTE *pCompressedTime);
 	static std::string FormatError(int nErrorCode, DWORD dwFlags);
 
 	// Get the never-expire time
@@ -401,10 +416,13 @@ public:
 	void SubstEntryGroupIds(DWORD dwExistingId, DWORD dwNewId);
 
 	BOOL AttachFileAsBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile);
-	BOOL SaveBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile);
+	BOOL SaveBinaryData(const PW_ENTRY *pEntry, const TCHAR *lpFile);
 	BOOL RemoveBinaryData(PW_ENTRY *pEntry);
 
 	static BOOL IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName);
+
+	void GetRawMasterKey(BYTE *pStorage);
+	void SetRawMasterKey(const BYTE *pNewKey);
 
 	DWORD m_dwLastSelectedGroupId;
 	DWORD m_dwLastTopVisibleGroupId;
@@ -412,8 +430,8 @@ public:
 	BYTE m_aLastTopVisibleEntryUuid[16];
 
 protected:
-	virtual BOOL ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_GROUP *pGroup);
-	virtual BOOL ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_ENTRY *pEntry);
+	virtual BOOL ReadGroupField(USHORT usFieldType, DWORD dwFieldSize, const BYTE *pData, PW_GROUP *pGroup);
+	virtual BOOL ReadEntryField(USHORT usFieldType, DWORD dwFieldSize, const BYTE *pData, PW_ENTRY *pEntry);
 
 private:
 	void _AllocEntries(DWORD uEntries);
@@ -429,11 +447,11 @@ private:
 	BOOL _AddAllMetaStreams();
 	DWORD _LoadAndRemoveAllMetaStreams();
 	BOOL _AddMetaStream(LPCTSTR lpMetaDataDesc, BYTE *pData, DWORD dwLength);
-	BOOL _IsMetaStream(PW_ENTRY *p);
+	BOOL _IsMetaStream(const PW_ENTRY *p);
 	void _ParseMetaStream(PW_ENTRY *p);
 
 	// Encrypt the master key a few times to make brute-force key-search harder
-	BOOL _TransformMasterKey(BYTE *pKeySeed);
+	BOOL _TransformMasterKey(const BYTE *pKeySeed);
 
 	PW_ENTRY *m_pEntries; // List containing all entries
 	DWORD m_dwMaxEntries; // Maximum number of items that can be stored in the list

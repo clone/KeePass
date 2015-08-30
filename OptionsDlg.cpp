@@ -183,10 +183,12 @@ BOOL COptionsDlg::OnInitDialog()
 	m_wndgrp.HideAllExcept(OPTGRP_SECURITY);
 	m_wndgrp.ArrangeWindows(this);
 
-	m_ilIcons.Create(IDR_CLIENTICONS, 16, 1, RGB(255,0,255));
+	// m_ilIcons.Create(CPwSafeApp::GetClientIconsResourceID(), 16, 1, RGB(255,0,255));
+	CPwSafeApp::CreateHiColorImageList(&m_ilIcons, IDB_CLIENTICONS_EX, 16);
 	m_tabMenu.SetImageList(&m_ilIcons);
 
-	m_ilOptionIcons.Create(IDR_OPTIONICONS, 16, 1, RGB(255,0,255));
+	// m_ilOptionIcons.Create(IDR_OPTIONICONS, 16, 1, RGB(255,0,255));
+	CPwSafeApp::CreateHiColorImageList(&m_ilOptionIcons, IDB_OPTIONICONS_EX, 16);
 	m_olAdvanced.InitOptionListEx(&m_ilOptionIcons);
 
 	m_olAdvanced.AddGroupText(TRL("Integration"), 9);
@@ -219,6 +221,7 @@ BOOL COptionsDlg::OnInitDialog()
 	m_olAdvanced.AddGroupText(TRL("Advanced"), 11);
 	m_olAdvanced.AddCheckItem(TRL("Automatically generate random passwords for new entries"), &m_bAutoPwGen, NULL, OL_LINK_NULL);
 	m_olAdvanced.AddCheckItem(TRL("Include backup entries in quick searches (toolbar)"), &m_bQuickFindIncBackup, NULL, OL_LINK_NULL);
+	m_olAdvanced.AddCheckItem(TRL("Show full path in the titlebar (instead of filename only)"), &m_bShowFullPath, NULL, OL_LINK_NULL);
 
 	TCITEM tci;
 	ZeroMemory(&tci, sizeof(TCITEM));

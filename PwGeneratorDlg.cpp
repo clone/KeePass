@@ -109,11 +109,11 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Tahoma"));
 	m_fSymbol.CreateFont(-13, 0, 0, 0, 0, FALSE, FALSE, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, _T("Symbol"));
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_MODERN, CPwSafeApp::GetPasswordFont());
 
 	// 'z' + 27 is that black dot in Tahoma
 	// TCHAR tchDot = (TCHAR)(_T('z') + 27);
-	TCHAR tchDot = (TCHAR)0xb7;
+	TCHAR tchDot = CPwSafeApp::GetPasswordCharacter();
 	CString strStars; strStars += tchDot; strStars += tchDot; strStars += tchDot;
 	m_btHidePw.SetWindowText(strStars);
 
@@ -139,7 +139,8 @@ BOOL CPwGeneratorDlg::OnInitDialog()
 
 	m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_SI_MENU | LVS_EX_FULLROWSELECT);
 
-	m_ilIcons.Create(IDR_INFOICONS, 16, 1, RGB(255,0,255));
+	// m_ilIcons.Create(IDR_INFOICONS, 16, 1, RGB(255,0,255));
+	CPwSafeApp::CreateHiColorImageList(&m_ilIcons, IDB_INFOICONS_EX, 16);
 	m_cList.SetImageList(&m_ilIcons, LVSIL_SMALL);
 
 	m_cList.DeleteAllItems();
@@ -351,9 +352,10 @@ void CPwGeneratorDlg::OnGenerateBtn()
 			uCounter++;
 		}
 
+		// Some additional randomness
 		BYTE bt;
 		newrand.GetRandomBuffer(&bt, 1);
-		if(bt < 130) // Some additional randomness
+		if(bt < 130) 
 		{
 			j++;
 			continue;
@@ -394,7 +396,8 @@ void CPwGeneratorDlg::OnGenerateBtn()
 
 				if(bSpecial == TRUE)
 				{
-					if(!((t == _T('[')) || (t == _T(']')) || (t == _T('{')) || (t == _T('}'))))
+					if((t != _T('[')) && (t != _T(']')) && (t != _T('{')) && (t != _T('}')) &&
+						(t != _T('-')) && (t != _T('_')))
 					{
 						if((t >= _T('!')) && (t <= _T('/')))
 							{ strPassword += t; uFinalChars++; }
@@ -432,6 +435,9 @@ void CPwGeneratorDlg::OnGenerateBtn()
 
 		j++;
 	}
+
+	ASSERT(strPassword.GetLength() == m_nCharacters);
+	if(strPassword.GetLength() > m_nCharacters) strPassword = strPassword.Left(m_nCharacters);
 
 	UpdateData(FALSE);
 
@@ -576,7 +582,7 @@ void CPwGeneratorDlg::OnCheckHidePw()
 	else
 	{
 		// TCHAR tchDot = (TCHAR)(_T('z') + 27);
-		TCHAR tchDot = (TCHAR)0xb7;
+		TCHAR tchDot = CPwSafeApp::GetPasswordCharacter();
 		m_cEditPw.EnableSecureMode(CPwSafeDlg::m_bSecureEdits);
 		m_cEditPw.SetPasswordChar(tchDot);
 		m_cEditPw.SetFont(&m_fSymbol, TRUE);

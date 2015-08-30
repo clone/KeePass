@@ -1,5 +1,5 @@
 |~LANGUAGENAME||Spanish (Español para España y Latinoamérica)|
-|~LANGUAGEVERSION||1.0|
+|~LANGUAGEVERSION||1.01|
 |~LANGUAGEAUTHOR||Marcel Trujillo|
 |~LANGUAGEAUTHOREMAIL||marcelito@gmail.com|
 |&OK||&OK|
@@ -188,7 +188,7 @@
 |Settings||Configuración|
 |Here you can configure KeePass.||Aquí usted puede configurar KeePass.|
 |Automatically open last used database on startup||Al inicio, abrir automáticamente la última base de datos utilizada|
-|Automatically save database on exit||Guardar automáticamente la base de datos al salir|
+|Automatically save database on exit and workspace locking||Guardar automáticamente la base de datos al salir y al bloquear el área de trabajo|
 |Workspace cannot be unlocked!||¡Área de trabajo no puede ser desbloqueada!|
 |Workspace locked||Área de trabajo bloqueada|
 |Loading error||Error al cargar|
@@ -315,7 +315,7 @@
 |Setup||Configuración|
 |Show All &Expired Entries...||Mostrar Todas las Entradas Expiradas...|
 |The file couldn't be saved.||El archivo no puede ser guardado.|
-|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.||Mientras más alto sea este número, mayor dificultad tendrán los ataques de fuerza bruta. Pero elevar este número también hace que la base de datos sea más lenta para cargar y guardar.|
+|The higher this number, the harder are dictionary attacks. But also the higher this number, the slower the database loading and saving.||Mientras más alto sea este número, mayor dificultad tendrán los ataques de diccionario. Pero elevar este número también hace que la base de datos sea más lenta para cargar y guardar.|
 |This is a list of all expired entries||Esta es una lista de todas las entradas expiradas.|
 |To execute this operation you must enable unsafe operations in the options dialog.||Para ejecutar esta operación, usted debe habilitar operaciones inseguras en el panel de opciones.|
 |Unsafe operations are disabled.||Operaciones inseguras están deshabilitadas.|
@@ -480,3 +480,7 @@
 |6 months||6 meses|
 |Automatically generate random passwords for new entries||Generar automáticamente contraseñas aleatorias para las nuevas entradas|
 |Include backup entries in quick searches (toolbar)||Incluir entradas de respaldo en las búsquedas rápidas (barra de herramientas)|
+|&Repair KeePass Database File...||Reparar el Archivo de Base de Datos de KeePass...|
+|Delete all backup entries before saving the database||Eliminar todas las entradas de respaldo antes de guardar la base de datos|
+|Press Shift-Home or Shift-End to clear this edit control||Presione Shift-Inicio o Shift-Fin para borrar este control de edición|
+|Use alternative auto-type method (minimize window)||Usar método de auto-escritura alternativo (minimizar la ventana)|

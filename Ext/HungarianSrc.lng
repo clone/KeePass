@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Magyar|
-|~LANGUAGEVERSION|             |1.00|
+|~LANGUAGEVERSION|             |1.01|
 |~LANGUAGEAUTHOR|              |documan|
 |~LANGUAGEAUTHOREMAIL|         |documan at mailbox dot hu|
 
@@ -282,8 +282,6 @@
 |Here you can configure KeePass.|              |Itt lehetõséged van a KeePass testreszabására.|
 |Automatically open last used database on startup|
     |Az utoljára használt adatbázis megnyitása induláskor|
-|Automatically save database on exit|
-    |Kilépéskor az adatbázis automatikus mentése|
 |Workspace cannot be unlocked!|
     |A munkafelület nem oldható fel!|
 |Workspace locked|
@@ -471,8 +469,6 @@
 |Database Settings|                       |Adatbázis beállítások|
 |Here you can configure the current database.| |Itt tudod konfigurálni az aktuális adatbázist.|
 |Database Summary|                        |Adatbázis összefoglaló|
-|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
-    |Minél nagyobb ez a szám, annál nehezebb a dolga a támadónak. Ugyanakkor minél nagyobb a szám, annál lassabb lesz az adatbázis betöltése és mentése.|
 |Number of key encryption rounds:|        |Titkosítási fordulók száma:|
 |bits|                                    |bit|
 |Personal &Vault TXT File...|             |Personal &Vault TXT fájl...|
@@ -624,3 +620,10 @@
 |6 months| |6 hónap|
 |Automatically generate random passwords for new entries| |Automatikus jelszógenerálás az új bejegyzésekhez|
 |Include backup entries in quick searches (toolbar)| |Biztonsági mentések figyelembevétele a gyors kereséseknél (eszköztár)|
+
+|&Repair KeePass Database File...| |KeePass adatbázis fájl &javítása...|
+|Automatically save database on exit and workspace locking| |Az adatbázis automatikus mentése kilépéskor vagy a munkaállomás zárolásakor|
+|Delete all backup entries before saving the database| |Minden biztonsági másolat törlése az adatbázis mentése elõtt|
+|Press Shift-Home or Shift-End to clear this edit control| |Nyomd meg a Shift-Home vagy a Shift-End billentyûket ennek a szerkesztõelemnek a törléséhez|
+|The higher this number, the harder are dictionary attacks. But also the higher this number, the slower the database loading and saving.| |Minél nagyobb ez a szám, annál nehezebb a támadók dolga. Ugyanakkor minél nagyobb a szám, annál lassabb az adatbázis mentése és betöltése is.|
+|Use alternative auto-type method (minimize window)| |Alternatív auto-gépelési módszer használata (az ablak kicsinyítésével)|

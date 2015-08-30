@@ -157,7 +157,7 @@ void CPluginsDlg::UpdateGUI()
 		lvi.iSubItem = 0;
 		lvi.mask = LVIF_TEXT | LVIF_IMAGE;
 
-		lvi.iImage = (p->bEnabled == TRUE) ? 10 : 45;
+		lvi.iImage = (p->bEnabled == TRUE) ? 20 : 45;
 
 		strT = p->tszFile;
 		str = CsFileOnly(&strT);
@@ -206,7 +206,7 @@ void CPluginsDlg::OnRClickPluginsList(NMHDR* pNMHDR, LRESULT* pResult)
 	m_popmenu.SetBitmapBackground(RGB(255, 0, 255));
 	m_popmenu.SetIconSize(16, 16);
 
-	m_popmenu.LoadToolbar(IDR_INFOICONS);
+	m_popmenu.LoadToolbar(IDR_INFOICONS, IDB_INFOICONS_EX);
 
 	BCMenu *psub = (BCMenu *)m_popmenu.GetSubMenu(0);
 

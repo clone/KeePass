@@ -84,6 +84,9 @@ BOOL CIconPickerDlg::OnInitDialog()
 		m_cList.InsertItem(LVIF_IMAGE | LVIF_TEXT, i, str, 0, 0, i, 0);
 	}
 
+	if((m_nSelectedIcon >= 0) && (m_nSelectedIcon < m_cList.GetItemCount()))
+		m_cList.SetItemState(m_nSelectedIcon, LVIS_SELECTED, LVIS_SELECTED);
+
 	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
 

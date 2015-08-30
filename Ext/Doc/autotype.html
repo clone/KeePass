@@ -127,8 +127,22 @@ Types the title, a tab, the username, a tab and the password of the currently se
 <b>{TAB}{PASSWORD}{ENTER}</b><br />
 Presses the tab key, enters the password and presses return.<br />
 <br />
+<hr class="separator" /><br />
+<br />
+<b>Toggling checkboxes</b><br />
+<br />
+Sometimes you find checkboxes on websites (&quot;Stay logged in on this computer&quot; for example).
+You can toggle these checkboxes by sending a space character (&quot; &quot;) when auto-typing.
+An example:<br />
+<code>{USERNAME}{TAB}{PASSWORD}{TAB} {TAB}{ENTER}</code><br />
+If there is a webform with a username field, password field and a checkbox, this sequence would
+enter the username, the password and toggle the checkbox that follows the password control.<br />
 <br />
 <br />
+<b>Higher ANSI Characters</b><br />
+<br />
+The auto-type function supports sending of higher ANSI characters in range 126-255.<br />
+<br /><br /><br />
 
 <a name="autowindow"></a>
 <table class="tablebox"><tr><td class="boxtitle">
@@ -208,6 +222,9 @@ KeePass uses the <code>CSendKeys</code> engine, which can be found here:
 target="_blank">http://www.codeproject.com/cpp/sendkeys_cpp_Article.asp</a>. Thanks to Lallous
 for creating this nice C++ class!<br />
 <br />
+<hr class="separator" />
+<small>PayPal is a registered trademark of PayPal, Inc. It is used for
+demonstration purposes only, not for advertisement.</small>
 
 </body>
 </html>

@@ -1,7 +1,7 @@
 |~LANGUAGENAME|
 |繁體中文(臺灣)|
 |~LANGUAGEVERSION|
-|1.0 - 1|
+|1.01 - 1|
 |~LANGUAGEAUTHOR|
 |高祥元 (Kao Shiang-Yuan)|
 |~LANGUAGEAUTHOREMAIL|
@@ -115,7 +115,7 @@
 |&Only the following characters:|
 |只有這些字元(&O)|
 |Collect &entropy (recommended for strong passwords)|
-|收集輸入(若要產生高強度密碼，建議使用)(&E)|
+|收集輸入資料(若要產生高強度密碼，建議使用)(&E)|
 |Number of characters:|
 |字元數：|
 |Your new password:|
@@ -157,13 +157,13 @@
 |***|
 |***|
 |Add Entry|
-|增加輸入|
+|增加項目|
 |Add a new password entry|
-|增加一個密碼輸入|
+|增加一個密碼項目|
 |Edit Entry|
-|編輯輸入|
+|編輯項目|
 |Modify a password entry|
-|變更一個密碼輸入|
+|變更一個密碼項目|
 |Group Name:|
 |群組名稱：|
 |Add Group|
@@ -327,13 +327,13 @@
 |Stop|
 |停止|
 |Enter a group name!|
-|輸入群組名稱：|
+|輸入群組名稱！|
 |You must generate some random values using the random mouse input box or the edit field before you can close this dialog.|
 |在您關閉此對話方塊前，您必須使用滑鼠或鍵盤產生一些隨機資料|
 |No random input|
-|沒有隨機資料輸入|
+|沒有輸入隨機資料|
 |EITHER enter a password/passphrase OR select a key disk drive.|
-|輸入密碼或選擇密碼碟片。|
+|請輸入密碼或選擇密碼碟片。|
 |The password must consist of at least one character!|
 |密碼至少一個字元！|
 |Select at least one of the options in the list above!|
@@ -416,8 +416,8 @@
 |您可以在這裡設定KeePass。|
 |Automatically open last used database on startup|
 |在啟動時自動開啟上次使用的資料庫|
-|Automatically save database on exit|
-|在結束時自動儲存資料庫|
+|Automatically save database on exit and workspace locking|
+|在結束或鎖定時自動儲存資料庫|
 |Workspace cannot be unlocked!|
 |無法解除鎖定！|
 |Workspace locked|
@@ -698,8 +698,8 @@
 |資料庫概觀|
 |Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
 |您的鑰匙被加密數次，成為最終的資料庫加密鑰匙。這增加了時間的因素而使猜測密碼與字典攻擊更加困難。|
-|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
-|數字愈高則愈難被使用暴力法破解，但將延長資料庫開啟與儲存的時間。|
+|The higher this number, the harder are dictionary attacks. But also the higher this number, the slower the database loading and saving.|
+|數字愈高則愈難被使用字典法破解，但將延長資料庫開啟與儲存的時間。|
 |Number of key encryption rounds:|
 |鑰匙循環加密次數：|
 |bits|
@@ -839,7 +839,7 @@
 |and|
 |以及|
 |You've selected the AND key mode, so you must enter a password AND select a key-file.|
-|您已經選擇「以及」模式，所以請輸入密碼並選擇鑰匙檔案。|
+|您已經選擇密碼與鑰匙必須一起使用的模式，所以請輸入密碼「並」選擇鑰匙檔案。|
 |Timed: copy data to the clipboard and clear it automatically after some seconds|
 |時間限制：複製資料到剪貼簿，並在一段時間後自動清除|
 |Enhanced: allow pasting only once and protect against clipboard spies|
@@ -964,3 +964,11 @@
 |建立新項目時自動產生隨機密碼|
 |Include backup entries in quick searches (toolbar)|
 |快速搜尋(工具列)時包含備份項目|
+|&Repair KeePass Database File...|
+|修復KeePass資料庫檔案(&R)|
+|Delete all backup entries before saving the database|
+|在儲存前刪除所有備份項目|
+|Press Shift-Home or Shift-End to clear this edit control|
+|按Shift+Home或Shift+End清除該編輯控制項內容|
+|Use alternative auto-type method (minimize window)|
+|使用替代的自動輸入方法(最小化視窗)|

@@ -83,7 +83,7 @@ void CCustomListCtrlEx::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 		// Windows to draw the subitem itself, but it will use the new colors
 		// we set here.
 
-		if(m_bColorize == TRUE) // Colorize the list only if enough colors are avail
+		if(m_bColorize == TRUE) // Colorize the list only if enough colors are available
 		{
 			if(pLVCD->nmcd.dwItemSpec & 1)
 			{
@@ -102,7 +102,7 @@ void CCustomListCtrlEx::OnCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 			crBkgnd = RGB(255,255,255);
 		}
 
-		// Store the colors back in the NMLVCUSTOMDRAW struct.
+		// Store the colors into the NMLVCUSTOMDRAW struct
 		pLVCD->clrText = crText;
 		pLVCD->clrTextBk = crBkgnd;
 	}

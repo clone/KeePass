@@ -1,4 +1,4 @@
-|~LANGUAGEVERSION| |1.0|
+|~LANGUAGEVERSION| |1.01|
 |~LANGUAGEAUTHOR|     |DonAngel|
 |~LANGUAGEAUTHOREMAIL| |public@doncho.net|
 |~LANGUAGENAME|       |Български|
@@ -263,8 +263,6 @@
 |Here you can configure KeePass.|              |Тук се конфигурира KeePass.|
 |Automatically open last used database on startup|
     |При стартиране отваря автоматично последната използвана база|
-|Automatically save database on exit|
-    |При изход автоматично записва базата|
 |Workspace cannot be unlocked!|
     |Сесията не може да бъде отключена!|
 |Workspace locked|
@@ -455,8 +453,6 @@
     |Показва всички &изтекли записи...|
 |The file couldn't be saved.|
     |Файлът не може да бъде записан.|
-|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
-    |Колкото числото е по-голямо, толкова по-трудна става атаката с груба сила. Но и толкова по-бавно ще е зареждането и записването на базата.|
 |This is a list of all expired entries|
     |Това е списък на всички изтекли записи|
 |To execute this operation you must enable unsafe operations in the options dialog.|
@@ -868,3 +864,18 @@
 	
 |Include backup entries in quick searches (toolbar)|
 	|Включване на резервните записи в бързото търсене (от лентата)|
+
+
+|&Repair KeePass Database File...|
+	|&Възстановяване на KeePass база данни...|
+|Automatically save database on exit and workspace locking|
+	|Автоматично записва базата данни при изход или заключване на програмата|
+|Delete all backup entries before saving the database|
+	|Изтриване на всички архивни записи преди да се запише базата данни|
+|Press Shift-Home or Shift-End to clear this edit control|
+	|Натисни Shift-Home или Shift-End за да се изчисти тази редактираща кутия|
+|The higher this number, the harder are dictionary attacks. But also the higher this number, the slower the database loading and saving.|
+	|Колкото е по-голямо това число, толкова по-труден ще е пробив чрез речникови атаки. Но също така и толкова по-бавно ще е записването и зареждането на базата данни.|
+|Use alternative auto-type method (minimize window)|
+	|Използване на алтернативния авто-пишещ метод (минимизира прозореца)|
+

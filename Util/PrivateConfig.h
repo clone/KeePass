@@ -31,13 +31,16 @@
 #define PCFG_IN const
 #define PCFG_OUT
 
+// A GUID used to detect non-existing keys in queries
+#define PCFG_NOTFOUND _T("2C3317110FC211DA94B900E08161165F")
+
 // WINSHELLAPI (DECLSPEC_IMPORT?)
 typedef HRESULT(WINAPI *LPSHGETSPECIALFOLDERPATH)(HWND hwndOwner, LPTSTR lpszPath, int nFolder, BOOL fCreate);
 
 class CPP_CLASS_SHARE CPrivateConfig
 {
 public:
-	CPrivateConfig(BOOL bReqWriteAccess);
+	CPrivateConfig(BOOL bRequireWriteAccess);
 	virtual ~CPrivateConfig();
 
 	BOOL Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue);

@@ -72,6 +72,23 @@ CPwExport::CPwExport()
 	m_aDefaults[PWEXP_CSV].bURL = TRUE;
 	m_aDefaults[PWEXP_CSV].bPassword = TRUE;
 	m_aDefaults[PWEXP_CSV].bNotes = TRUE;
+
+	ZeroMemory(&m_aDefaults[PWEXP_KEEPASS], sizeof(PWEXPORT_OPTIONS));
+	m_aDefaults[PWEXP_KEEPASS].bGroup = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bGroupTree = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bTitle = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bUserName = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bURL = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bPassword = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bNotes = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bUUID = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bImage = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bCreationTime = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bLastAccTime = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bLastModTime = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bExpireTime = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bAttachment = TRUE;
+	m_aDefaults[PWEXP_KEEPASS].bExportBackups = TRUE;
 }
 
 CPwExport::~CPwExport()
@@ -224,10 +241,10 @@ void CPwExport::_ExpSetSep(LPCTSTR lpSep)
 	else m_lpSep = lpSep;
 }
 
-BOOL CPwExport::ExportAll(const TCHAR *pszFile, const PWEXPORT_OPTIONS *pOptions)
+BOOL CPwExport::ExportAll(const TCHAR *pszFile, const PWEXPORT_OPTIONS *pOptions, CPwManager *pStoreMgr)
 {
 	ASSERT(pszFile != NULL);
-	return ExportGroup(pszFile, DWORD_MAX, pOptions);
+	return ExportGroup(pszFile, DWORD_MAX, pOptions, pStoreMgr);
 }
 
 CString CPwExport::MakeGroupTreeString(DWORD dwGroupId)
@@ -270,9 +287,9 @@ CString CPwExport::MakeGroupTreeString(DWORD dwGroupId)
 	return str;
 }
 
-BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPORT_OPTIONS *pOptions)
+BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPORT_OPTIONS *pOptions, CPwManager *pStoreMgr)
 {
-	FILE *fp;
+	FILE *fp = NULL;
 	DWORD i, j, dwThisId, dwNumberOfGroups, dwInvalidId1, dwInvalidId2;
 	PW_ENTRY *p;
 	PW_GROUP *pg;
@@ -283,12 +300,15 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 	CBase64Codec base64;
 	PW_TIME tNever;
 	std::vector<DWORD> aGroupIds;
-	USHORT usLevel;
+	USHORT usLevel = 0;
+	BOOL bReturn = TRUE;
 
 	ASSERT(m_pMgr != NULL); if(m_pMgr == NULL) return FALSE;
 	m_pMgr->_GetNeverExpireTime(&tNever);
 
 	ASSERT(pszFile != NULL); if(pszFile == NULL) return FALSE;
+
+	if(m_nFormat == PWEXP_KEEPASS) { ASSERT(pStoreMgr != NULL); if(pStoreMgr == NULL) return FALSE; }
 
 	if(pOptions == NULL)
 	{
@@ -296,6 +316,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 		else if(m_nFormat == PWEXP_HTML) pOptions = &m_aDefaults[PWEXP_HTML];
 		else if(m_nFormat == PWEXP_XML) pOptions = &m_aDefaults[PWEXP_XML];
 		else if(m_nFormat == PWEXP_CSV) pOptions = &m_aDefaults[PWEXP_CSV];
+		else if(m_nFormat == PWEXP_KEEPASS) pOptions = &m_aDefaults[PWEXP_KEEPASS];
 		else { ASSERT(FALSE); return FALSE; }
 	}
 	m_pOptions = pOptions;
@@ -334,11 +355,14 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 		}
 	}
 
-	fp = _tfopen(pszFile, _T("wb"));
-	if(fp == NULL) { aGroupIds.clear(); return FALSE; }
-	m_fp = fp;
+	if(m_nFormat != PWEXP_KEEPASS)
+	{
+		fp = _tfopen(pszFile, _T("wb"));
+		if(fp == NULL) { aGroupIds.clear(); return FALSE; }
+		m_fp = fp;
 
-	fwrite(aInitUTF8, 1, 3, fp);
+		fwrite(aInitUTF8, 1, 3, fp);
+	}
 
 	if(m_nFormat == PWEXP_TXT)
 	{
@@ -411,6 +435,19 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 
 		_ExpStr(_T("\""));
 		_ExpStr(m_pszNewLine);
+	}
+	else if(m_nFormat == PWEXP_KEEPASS)
+	{
+		DWORD dwGroupEnum;
+		PW_GROUP pwgTemplate;
+		for(dwGroupEnum = 0; dwGroupEnum < (DWORD)aGroupIds.size(); dwGroupEnum++)
+		{
+			PW_GROUP *pgCopy = m_pMgr->GetGroupById(aGroupIds[dwGroupEnum]);
+			ASSERT(pgCopy != NULL); if(pgCopy == NULL) return FALSE;
+			pwgTemplate = *pgCopy;
+			pwgTemplate.usLevel -= usLevel;
+			pStoreMgr->AddGroup(&pwgTemplate);
+		}
 	}
 	else { ASSERT(FALSE); }
 
@@ -740,6 +777,10 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 				_ExpStr(_T("\""));
 				_ExpStr(m_pszNewLine);
 			}
+			else if(m_nFormat == PWEXP_KEEPASS)
+			{
+				VERIFY(pStoreMgr->AddEntry(p));
+			}
 			else { ASSERT(FALSE); }
 
 			SAFE_DELETE_ARRAY(pbEncodedAttachment);
@@ -764,9 +805,19 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 	else if(m_nFormat == PWEXP_CSV)
 	{ // Nothing to do to finalize CSV
 	}
+	else if(m_nFormat == PWEXP_KEEPASS)
+	{
+		if(pStoreMgr->SaveDatabase(pszFile) != PWE_SUCCESS) bReturn = FALSE;
+	}
 	else { ASSERT(FALSE); } // Unknown format, should never happen
 
-	fclose(fp); fp = NULL; m_fp = NULL;
+	if(m_nFormat != PWEXP_KEEPASS)
+	{
+		ASSERT(fp != NULL);
+		if(fp != NULL) fclose(fp);
+		fp = NULL; m_fp = NULL;
+	}
+
 	aGroupIds.clear();
-	return TRUE;
+	return bReturn;
 }

@@ -54,6 +54,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:windows /machine:I386
 # ADD LINK32 winmm.lib /nologo /subsystem:windows /machine:I386 /out:"Release/KeePass.exe"
+# SUBTRACT LINK32 /debug
 
 !ELSEIF  "$(CFG)" == "PwSafe - Win32 Debug"
 
@@ -125,6 +126,10 @@ SOURCE=.\GetRandomDlg.cpp
 # Begin Source File
 
 SOURCE=.\IconPickerDlg.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\ImportOptionsDlg.cpp
 # End Source File
 # Begin Source File
 
@@ -209,6 +214,10 @@ SOURCE=.\IconPickerDlg.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\ImportOptionsDlg.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\LanguagesDlg.h
 # End Source File
 # Begin Source File
@@ -261,7 +270,7 @@ SOURCE=.\res\cancel.bmp
 # End Source File
 # Begin Source File
 
-SOURCE=.\res\clientic.bmp
+SOURCE=.\res\clienticex.bmp
 # End Source File
 # Begin Source File
 
@@ -277,6 +286,10 @@ SOURCE=.\res\document.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\entry_ed.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\file.bmp
 # End Source File
 # Begin Source File
@@ -286,6 +299,10 @@ SOURCE=.\res\iconpic.ico
 # Begin Source File
 
 SOURCE=.\res\infoicon.bmp
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\infoiconex.bmp
 # End Source File
 # Begin Source File
 
@@ -317,7 +334,7 @@ SOURCE=.\res\ok.bmp
 # End Source File
 # Begin Source File
 
-SOURCE=.\res\optionic.bmp
+SOURCE=.\res\optionicex.bmp
 # End Source File
 # Begin Source File
 

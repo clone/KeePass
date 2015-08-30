@@ -1,5 +1,5 @@
 |~LANGUAGENAME|                |Türkçe <Turkish>|
-|~LANGUAGEVERSION|             |1.0|
+|~LANGUAGEVERSION|             |1.01|
 |~LANGUAGEAUTHOR|              |Erhan BURHAN|
 |~LANGUAGEAUTHOREMAIL|         |<texas@xposta.com>|
 
@@ -295,8 +295,8 @@
 |Here you can configure KeePass.|              |KeePass programýný buradan yapýlandýrabilirsiniz.|
 |Automatically open last used database on startup|
     |Son kullanýlan veritabanýný baþlangýçta otomatik olarak aç|
-|Automatically save database on exit|
-    |Çýkýþta veritabanýný otomatik olarak kaydet|
+|Automatically save database on exit and workspace locking|
+    |Çýkýþta veritabanýný otomatik olarak kaydet ve çalýþma alanýný kilitle|
 |Display images on buttons|
     |GUI: Butonlarýn üzerinde resimleri göster|
 |Show grid lines in password entry list|
@@ -504,8 +504,8 @@
 |Database Summary|                        |Veritabaný Özeti|
 |Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
     |Your key is encrypted several times to make up the final database encryption key. This adds a constant time factor and makes guessing and dictionary attacks much harder.|
-|The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
-    |The higher this number, the harder are brute-force attacks. But also the higher this number, the slower the database loading and saving.|
+|The higher this number, the harder are dictionary attacks. But also the higher this number, the slower the database loading and saving.|
+    |The higher this number, the harder are dictionary attacks. But also the higher this number, the slower the database loading and saving.|
 |Number of key encryption rounds:|        |Number of key encryption rounds:|
 |bits|                                    |bit|
 |Personal &Vault TXT File...|             |Kiþisel &Vault TXT dosyasý...|
@@ -647,6 +647,8 @@
 |Paste operation completed.|              |Yapýþtýrma iþlemi tamamlandý.|
 |Limit to single instance|                |Bir kereliðine limit koy|
 |Use more secure password edit controls|  |Daha güvenli parola düzenleme kontrolleri kullan|
+|Press Shift-Home or Shift-End to clear this edit control|
+    |Bu düzenleme kontrolünü temizlemek için Shift-Home veya Shift-End tuþlarýna basýn|
 |Single left click instead of double-click for default tray icon action|
     |Bildirim alaný simgesini harekete geçirmek için çift týklamak yerine bir kere sol týkla|
 |Exclude entries in the '&Backup' group|  |'&Yedek' grubundaki kayýtlarý yoksay|
@@ -665,3 +667,6 @@
 |Automatically generate random passwords for new entries| |Yeni giriþler için otomatik olarak rasgele parolalar üret|
 |Include backup entries in quick searches (toolbar)|  |Hýzlý aramalarda yedek giriþleri de aramaya dahil et|
 |&Donate...|                                 |&Baðýþ yap...|
+|Use alternative auto-type method (minimize window)|    |Alternatif otomatik yazma yöntemini kullan (pencere simge durumunda)|
+|Delete all backup entries before saving the database|  |Veritabanýný kaydetmeden önce 'Yedek' grubundaki tüm kayýtlarý sil|
+|&Repair KeePass Database File...|           |KeePass vertabaný dosyasýný &onar...|

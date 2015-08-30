@@ -207,6 +207,7 @@ C_FN_SHARE const TCHAR *_TRL(const char *pszDefString)
 		else r = x;
 	}
 	if(_tcscmp(m_pDefString[l], pszDefString) == 0) return m_pTrlString[l];
+
 	return pszDefString;
 
 	// Previous slow sequencial search (array doesn't have to be sorted):

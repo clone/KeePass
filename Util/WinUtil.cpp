@@ -209,6 +209,30 @@ CPP_FN_SHARE CString MakeRelativePathEx(LPCTSTR lpBaseFile, LPCTSTR lpTargetFile
 }
 #endif
 
+CPP_FN_SHARE CString GetShortestAbsolutePath(LPCTSTR lpFilePath)
+{
+	CString str;
+
+	ASSERT(lpFilePath != NULL); if(lpFilePath == NULL) return str;
+
+	DWORD dwBufLen = (DWORD)_tcslen(lpFilePath) + 12, dw;
+	LPTSTR lpBuf = new TCHAR[dwBufLen + 1];
+	LPTSTR lpFilePart = NULL;
+
+	if(lpBuf != NULL)
+	{
+		lpBuf[0] = 0;
+		dw = GetFullPathName(lpFilePath, dwBufLen, lpBuf, &lpFilePart);
+
+		if((dw != 0) && (dw < dwBufLen)) str = lpBuf;
+		else str = lpFilePath;
+	}
+	else str = lpFilePath;
+
+	SAFE_DELETE_ARRAY(lpBuf);
+	return str;
+}
+
 C_FN_SHARE BOOL GetRegKeyEx(HKEY hkeyBase, LPCTSTR lpSubKey, LPTSTR lpRetData)
 {
 	HKEY hkey = hkeyBase;

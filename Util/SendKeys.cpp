@@ -78,7 +78,9 @@ const BYTE CSendKeys::ExtendedVKeys[MaxExtendedVKeys] =
     VK_PRIOR, // PgUp
     VK_NEXT,  //  PgDn
     VK_INSERT,
-    VK_DELETE
+    VK_DELETE,
+	VK_RCONTROL,
+	VK_RMENU
 };
 
 CSendKeys::CSendKeys()
@@ -272,7 +274,7 @@ void CSendKeys::SendKeyDown(BYTE VKey, WORD NumTimes, bool GenUpMsg, bool bDelay
 
     KeyboardEvent(VKey, ScanCode, IsVkExtended(VKey) ? KEYEVENTF_EXTENDEDKEY : 0);
     if (GenUpMsg)
-      KeyboardEvent(VKey, ScanCode, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP);
+      KeyboardEvent(VKey, ScanCode, (IsVkExtended(VKey) ? KEYEVENTF_EXTENDEDKEY : 0) | KEYEVENTF_KEYUP);
   }
 }
 

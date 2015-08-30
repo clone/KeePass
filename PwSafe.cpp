@@ -31,6 +31,10 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+static UINT g_uThreadACP;
+static TCHAR g_pFontNameNormal[12];
+static TCHAR g_pFontNameSymbol[8];
+
 /////////////////////////////////////////////////////////////////////////////
 
 BEGIN_MESSAGE_MAP(CPwSafeApp, CWinApp)
@@ -44,6 +48,9 @@ END_MESSAGE_MAP()
 
 CPwSafeApp::CPwSafeApp()
 {
+	g_uThreadACP = GetACP();
+	_tcscpy(g_pFontNameNormal, _T("MS Serif"));
+	_tcscpy(g_pFontNameSymbol, _T("Symbol"));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -388,4 +395,29 @@ BOOL CPwSafeApp::ParseCurrentCommandLine(CString *psFile, LPCTSTR *lpPassword, L
 	if(psFile->GetLength() == 0) return FALSE;
 
 	return TRUE;
+}
+
+void CPwSafeApp::CreateHiColorImageList(CImageList *pImageList, WORD wResourceID, int czSize)
+{
+	ASSERT(pImageList != NULL); if(pImageList == NULL) return;
+
+	CBitmap bmpImages;
+	VERIFY(bmpImages.LoadBitmap(MAKEINTRESOURCE(wResourceID)));
+
+	VERIFY(pImageList->Create(czSize, czSize, ILC_COLOR24 | ILC_MASK, bmpImages.GetBitmapDimension().cx / czSize, 0));
+	pImageList->Add(&bmpImages, RGB(255,0,255));
+
+	bmpImages.DeleteObject();
+}
+
+TCHAR CPwSafeApp::GetPasswordCharacter()
+{
+	if((g_uThreadACP == 932) || (g_uThreadACP == 936) || (g_uThreadACP == 950)) return _T('*');
+	return (TCHAR)0xB7;
+}
+
+const TCHAR *CPwSafeApp::GetPasswordFont()
+{
+	if((g_uThreadACP == 932) || (g_uThreadACP == 936) || (g_uThreadACP == 950)) return g_pFontNameNormal;
+	return g_pFontNameSymbol;
 }

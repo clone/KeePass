@@ -2242,7 +2242,7 @@ DWORD CButtonST::SetMenu(UINT nMenu, HWND hParentWnd, BOOL bWinXPStyle, UINT nTo
 			m_menuPopup.SetBitmapBackground(crToolbarBk);
 			m_menuPopup.SetIconSize(sizeToolbarIcon.cx, sizeToolbarIcon.cy);
 
-			bRetValue = m_menuPopup.LoadToolbar(nToolbarID);
+			bRetValue = m_menuPopup.LoadToolbar(nToolbarID, nToolbarID);
 			// If something wrong
 			if (bRetValue == FALSE)
 			{

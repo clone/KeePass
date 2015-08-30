@@ -47,6 +47,11 @@ public:
 
 	static BOOL ParseCurrentCommandLine(CString *psFile, LPCTSTR *lpPassword, LPCTSTR *lpKeyFile, LPCTSTR *lpPreSelectPath);
 
+	static void CreateHiColorImageList(CImageList *pImageList, WORD wResourceID, int czSize);
+
+	static TCHAR CPwSafeApp::GetPasswordCharacter();
+	static const TCHAR *CPwSafeApp::GetPasswordFont();
+
 	CMutex *m_pAppMutex;
 
 	//{{AFX_VIRTUAL(CPwSafeApp)

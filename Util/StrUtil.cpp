@@ -331,7 +331,7 @@ C_FN_SHARE DWORD _UTF8BytesNeeded(const TCHAR *pszString)
 C_FN_SHARE TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 {
 	DWORD i, j;
-	DWORD dwNumChars, dwMoreBytes, dwPBufLength = 0;
+	DWORD dwNumChars, dwMoreBytes, dwPBufLength;
 	BYTE b0, b1, b2;
 	WCHAR *p, *pANSI;
 	WCHAR tch;
@@ -408,8 +408,11 @@ C_FN_SHARE TCHAR *_UTF8ToString(const UTF8_BYTE *pUTF8String)
 	dwNumChars = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, p, -1, NULL, 0, NULL, NULL);
 	pANSI = new WCHAR[dwNumChars + 2];
 	pANSI[0] = 0;
-	VERIFY(WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, p, -1, (LPSTR)pANSI, dwNumChars, NULL, NULL) !=
-		ERROR_INSUFFICIENT_BUFFER);
+
+	int nErr = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, p, -1, (LPSTR)pANSI, dwNumChars, NULL, NULL);
+	if(dwNumChars != 122) { ASSERT(nErr != 122); } // ERROR_INSUFFICIENT_BUFFER is defined as 122...
+	else { ASSERT(GetLastError() == 0); }
+
 	if(p != NULL) mem_erase((unsigned char *)p, dwPBufLength);
 	SAFE_DELETE_ARRAY(p);
 	return (TCHAR *)pANSI;
@@ -529,6 +532,39 @@ CPP_FN_SHARE void ParseURL(CString *pString, PW_ENTRY *pEntry, BOOL bMakeSimStri
 			str = str.Left(nPos) + TagSimString((LPCTSTR)strTemp) + str.Right(str.GetLength() - nPos - 7);
 			EraseCString(&strTemp);
 		}
+	}
+
+	if(bMakeSimString == TRUE)
+	{
+		CString strSourceCopy = str;
+		unsigned char uch;
+		int i;
+
+		EraseCString(&str);
+
+		for(nPos = 0; nPos < strSourceCopy.GetLength(); nPos++)
+		{
+			uch = (unsigned char)strSourceCopy.GetAt(nPos);
+
+			if(uch > 0x7E)
+			{
+				str += _T("(%{NUMPAD0}");
+				strTemp.Format("%u", uch);
+				ASSERT(strTemp.GetLength() == 3);
+
+				for(i = 0; i < strTemp.GetLength(); i++)
+				{
+					str += _T("{NUMPAD");
+					str += strTemp.GetAt(i);
+					str += _T("}");
+				}
+
+				str += _T(")");
+			}
+			else str += (TCHAR)uch;
+		}
+
+		EraseCString(&strTemp);
 	}
 
 	*pString = str;
@@ -743,7 +779,6 @@ CPP_FN_SHARE CString TagSimString(LPCTSTR lpString)
 	return str;
 }
 
-
 C_FN_SHARE void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath)
 {
 	unsigned int i;
@@ -760,4 +795,22 @@ C_FN_SHARE void _GetPathFromFile(TCHAR *pszFile, TCHAR *pszPath)
 		}
 	}
 
+}
+
+CPP_FN_SHARE TCHAR *_TcsSafeDupAlloc(const TCHAR *tszSource)
+{
+	TCHAR *ptsz;
+
+	if(tszSource == NULL)
+	{
+		ptsz = new TCHAR[1];
+		if(ptsz != NULL) ptsz[0] = 0; // Terminate string
+	}
+	else
+	{
+		ptsz = new TCHAR[_tcslen(tszSource) + 1];
+		if(ptsz != NULL) _tcscpy(ptsz, tszSource); // Clone
+	}
+
+	return ptsz;
 }
