@@ -2055,3 +2055,14 @@ BOOL CPwManager::RemoveBinaryData(PW_ENTRY *pEntry)
 	pEntry->uBinaryDataLen = 0;
 	return TRUE;
 }
+
+void CPwManager::SubstEntryGroupIds(DWORD dwExistingId, DWORD dwNewId)
+{
+	DWORD i;
+
+	for(i = 0; i < m_dwNumEntries; i++)
+	{
+		if(m_pEntries[i].uGroupId == dwExistingId)
+			m_pEntries[i].uGroupId = dwNewId;
+	}
+}

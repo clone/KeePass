@@ -122,23 +122,30 @@ BEGIN
     CONTROL         "List1",IDC_PWLIST,"SysListView32",LVS_REPORT | 
                     LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,135,27,144,
                     129
-    PUSHBUTTON      "&Open Database...",IDC_TB_OPEN,17,3,15,14
-    PUSHBUTTON      "&Save Database",IDC_TB_SAVE,33,3,15,14
+    PUSHBUTTON      "&Open Database...",IDC_TB_OPEN,17,3,15,14,NOT 
+                    WS_TABSTOP
+    PUSHBUTTON      "&Save Database",IDC_TB_SAVE,33,3,15,14,NOT WS_TABSTOP
     CONTROL         "",IDC_STATIC_TBSEP0,"Static",SS_ETCHEDVERT,51,3,1,15
-    PUSHBUTTON      "&Add Entry...",IDC_TB_ADDENTRY,55,3,15,14
-    PUSHBUTTON      "&Edit/View Entry...",IDC_TB_EDITENTRY,71,3,15,14
-    PUSHBUTTON      "&Delete Entry",IDC_TB_DELETEENTRY,87,3,15,14
+    PUSHBUTTON      "&Add Entry...",IDC_TB_ADDENTRY,55,3,15,14,NOT 
+                    WS_TABSTOP
+    PUSHBUTTON      "&Edit/View Entry...",IDC_TB_EDITENTRY,71,3,15,14,NOT 
+                    WS_TABSTOP
+    PUSHBUTTON      "&Delete Entry",IDC_TB_DELETEENTRY,87,3,15,14,NOT 
+                    WS_TABSTOP
     CONTROL         "",IDC_STATIC_TBSEP1,"Static",SS_ETCHEDVERT,105,3,1,15
     PUSHBUTTON      "Copy User&Name To Clipboard",IDC_TB_COPYUSER,109,3,15,
-                    14
-    PUSHBUTTON      "Copy &Password To Clipboard",IDC_TB_COPYPW,125,3,15,14
-    PUSHBUTTON      "&New Database...",IDC_TB_NEW,1,3,15,14
+                    14,NOT WS_TABSTOP
+    PUSHBUTTON      "Copy &Password To Clipboard",IDC_TB_COPYPW,125,3,15,14,
+                    NOT WS_TABSTOP
+    PUSHBUTTON      "&New Database...",IDC_TB_NEW,1,3,15,14,NOT WS_TABSTOP
     CONTROL         "",IDC_STATIC_TBSEP2,"Static",SS_ETCHEDVERT,143,3,1,15
-    PUSHBUTTON      "&Find In Database...",IDC_TB_FIND,147,3,15,14
+    PUSHBUTTON      "&Find In Database...",IDC_TB_FIND,147,3,15,14,NOT 
+                    WS_TABSTOP
     CONTROL         "",IDC_STATIC_TBSEP3,"Static",SS_ETCHEDVERT,165,3,1,15
-    PUSHBUTTON      "&Lock Workspace",IDC_TB_LOCK,169,3,15,14
+    PUSHBUTTON      "&Lock Workspace",IDC_TB_LOCK,169,3,15,14,NOT WS_TABSTOP
     CONTROL         "",IDC_STATIC_TBSEP4,"Static",SS_ETCHEDVERT,187,3,1,15
-    PUSHBUTTON      "&About KeePass...",IDC_TB_ABOUT,191,3,15,14
+    PUSHBUTTON      "&About KeePass...",IDC_TB_ABOUT,191,3,15,14,NOT 
+                    WS_TABSTOP
     CONTROL         "",IDC_RE_ENTRYVIEW,"RICHEDIT",ES_MULTILINE | 
                     ES_AUTOVSCROLL | ES_READONLY | ES_WANTRETURN | WS_BORDER | 
                     WS_VSCROLL | WS_TABSTOP,136,162,248,52
@@ -994,23 +1001,17 @@ BEGIN
     "Q",            ID_FILE_CLOSE,          VIRTKEY, CONTROL, NOINVERT
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
     "U",            ID_PWLIST_VISITURL,     VIRTKEY, CONTROL, NOINVERT
-    VK_DOWN,        ID_PWLIST_MOVEDOWN,     VIRTKEY, CONTROL, NOINVERT
-    VK_DOWN,        ID_GROUP_MOVEDOWN,      VIRTKEY, SHIFT, CONTROL, 
-                                                    NOINVERT
+    VK_DOWN,        ID_PWLIST_MOVEDOWN,     VIRTKEY, ALT, NOINVERT
+    VK_DOWN,        ID_GROUP_MOVEDOWN,      VIRTKEY, SHIFT, ALT, NOINVERT
+    VK_END,         ID_PWLIST_MOVEBOTTOM,   VIRTKEY, ALT, NOINVERT
+    VK_END,         ID_GROUP_MOVEBOTTOM,    VIRTKEY, SHIFT, ALT, NOINVERT
     VK_F1,          ID_INFO_README,         VIRTKEY, NOINVERT
-    VK_LEFT,        ID_GROUP_MOVELEFT,      VIRTKEY, SHIFT, CONTROL, 
-                                                    NOINVERT
-    VK_NEXT,        ID_PWLIST_MOVEBOTTOM,   VIRTKEY, CONTROL, NOINVERT
-    VK_NEXT,        ID_GROUP_MOVEBOTTOM,    VIRTKEY, SHIFT, CONTROL, 
-                                                    NOINVERT
-    VK_PRIOR,       ID_PWLIST_MOVETOP,      VIRTKEY, CONTROL, NOINVERT
-    VK_PRIOR,       ID_GROUP_MOVETOP,       VIRTKEY, SHIFT, CONTROL, 
-                                                    NOINVERT
-    VK_RIGHT,       ID_GROUP_MOVERIGHT,     VIRTKEY, SHIFT, CONTROL, 
-                                                    NOINVERT
-    VK_UP,          ID_PWLIST_MOVEUP,       VIRTKEY, CONTROL, NOINVERT
-    VK_UP,          ID_GROUP_MOVEUP,        VIRTKEY, SHIFT, CONTROL, 
-                                                    NOINVERT
+    VK_HOME,        ID_PWLIST_MOVETOP,      VIRTKEY, ALT, NOINVERT
+    VK_HOME,        ID_GROUP_MOVETOP,       VIRTKEY, SHIFT, ALT, NOINVERT
+    VK_LEFT,        ID_GROUP_MOVELEFT,      VIRTKEY, SHIFT, ALT, NOINVERT
+    VK_RIGHT,       ID_GROUP_MOVERIGHT,     VIRTKEY, SHIFT, ALT, NOINVERT
+    VK_UP,          ID_PWLIST_MOVEUP,       VIRTKEY, ALT, NOINVERT
+    VK_UP,          ID_GROUP_MOVEUP,        VIRTKEY, SHIFT, ALT, NOINVERT
     "X",            ID_FILE_EXIT,           VIRTKEY, CONTROL, NOINVERT
     "Z",            ID_EXTRAS_GENPW,        VIRTKEY, CONTROL, NOINVERT
 END

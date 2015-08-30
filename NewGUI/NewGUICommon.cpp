@@ -68,7 +68,7 @@ void NewGUI_SetImgButtons(BOOL bImageButtons)
 	g_bImgButtons = bImageButtons;
 }
 
-void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut)
+void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut, BOOL bForceImage)
 {
 	CShadeButtonST *p = (CShadeButtonST *)pButton;
 
@@ -90,7 +90,7 @@ void NewGUI_Button(void *pButton, int nBitmapIn, int nBitmapOut)
 	// p->SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 	// p->DrawFlatFocus(TRUE);
 
-	if(g_bImgButtons == FALSE) return;
+	if((g_bImgButtons == FALSE) && (bForceImage == FALSE)) return;
 
 	// if(g_bImgButtons == FALSE) return;
 

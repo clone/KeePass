@@ -493,7 +493,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	pDest->AppendMenu(MF_SEPARATOR);
 	// The last 5 items are the moving commands, don't append them to the
 	// main menu.
-	for(i = 0; i < pSrc->GetMenuItemCount() - 5; i++)
+	for(i = 0; i < pSrc->GetMenuItemCount() - 2; i++)
 	{
 		uID = pSrc->GetMenuItemID(i);
 		uState = pSrc->GetMenuState(i, MF_BYPOSITION);
@@ -1197,17 +1197,17 @@ const TCHAR *CPwSafeDlg::_GetCmdAccelExt(const TCHAR *psz)
 
 	if(_tcsicmp(psz, _T("Password &Generator")) == 0) return _T("Ctrl+Z");
 
-	if(_tcsicmp(psz, _T("Move Entry To &Top")) == 0) return _T("Ctrl+Up");
-	if(_tcsicmp(psz, _T("Move Entry &One Up")) == 0) return _T("Ctrl+Down");
-	if(_tcsicmp(psz, _T("Mo&ve Entry One Down")) == 0) return _T("Ctrl+PgUp");
-	if(_tcsicmp(psz, _T("Move Entry To &Bottom")) == 0) return _T("Ctrl+PgDown");
+	if(_tcsicmp(psz, _T("Move Entry To &Top")) == 0) return _T("Alt+Home");
+	if(_tcsicmp(psz, _T("Move Entry &One Up")) == 0) return _T("Alt+Up");
+	if(_tcsicmp(psz, _T("Mo&ve Entry One Down")) == 0) return _T("Alt+Down");
+	if(_tcsicmp(psz, _T("Move Entry To &Bottom")) == 0) return _T("Alt+End");
 
-	if(_tcsicmp(psz, _T("Move Group To &Top")) == 0) return _T("Shift+Ctrl+Up");
-	if(_tcsicmp(psz, _T("Move Group One &Up")) == 0) return _T("Shift+Ctrl+Down");
-	if(_tcsicmp(psz, _T("Move Group &One Down")) == 0) return _T("Shift+Ctrl+PgUp");
-	if(_tcsicmp(psz, _T("Move Group To &Bottom")) == 0) return _T("Shift+Ctrl+PgDown");
-	if(_tcsicmp(psz, _T("Move Group One &Left")) == 0) return _T("Shift+Ctrl+Left");
-	if(_tcsicmp(psz, _T("Move Group One &Right")) == 0) return _T("Shift+Ctrl+Right");
+	if(_tcsicmp(psz, _T("Move Group To &Top")) == 0) return _T("Shift+Alt+Home");
+	if(_tcsicmp(psz, _T("Move Group One &Up")) == 0) return _T("Shift+Alt+Up");
+	if(_tcsicmp(psz, _T("Move Group &One Down")) == 0) return _T("Shift+Alt+Down");
+	if(_tcsicmp(psz, _T("Move Group To &Bottom")) == 0) return _T("Shift+Alt+End");
+	if(_tcsicmp(psz, _T("Move Group One &Left")) == 0) return _T("Shift+Alt+Left");
+	if(_tcsicmp(psz, _T("Move Group One &Right")) == 0) return _T("Shift+Alt+Right");
 
 	return pEmpty;
 }
@@ -2883,6 +2883,7 @@ void CPwSafeDlg::OnFileNew()
 	// TESTING CODE, uncomment if you want to add sample groups and entries
 #ifdef ___PWSAFE_SAMPLE_DATA
 	PW_ENTRY pwT;
+	pwT.pBinaryData = NULL; pwT.pszBinaryDesc = NULL; pwT.uBinaryDataLen = 0;
 	pwT.pszAdditional = _T("Some Notes");
 	pwT.pszPassword = _T("The Password");
 	pwT.pszURL = _T("google.com");
@@ -3692,11 +3693,13 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 			pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
 			pwTemplate.uGroupId = 0; // 0 = create new group ID
 			pwTemplate.uImageId = 40; // 40 = 'search' icon
+			pwTemplate.usLevel = 0; pwTemplate.dwFlags = 0;
 
 			VERIFY(m_mgr.AddGroup(&pwTemplate));
 			dwGroupId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
 		}
 		ASSERT((dwGroupId != DWORD_MAX) && (dwGroupId != 0));
+		if((dwGroupId == DWORD_MAX) || (dwGroupId == 0)) return;
 
 		while(1)
 		{
@@ -3736,6 +3739,12 @@ void CPwSafeDlg::_Find(DWORD dwFindGroupId)
 		_Groups_SaveView();
 		UpdateGroupList();
 		_Groups_RestoreView();
+		HTREEITEM hSelect = _GroupIdToHTreeItem(dwGroupId);
+		if(hSelect != NULL)
+		{
+			m_cGroups.EnsureVisible(hSelect);
+			m_cGroups.SelectItem(hSelect);
+		}
 
 		m_bModified = TRUE;
 	}
@@ -3757,9 +3766,11 @@ void CPwSafeDlg::OnPwlistFindInGroup()
 
 void CPwSafeDlg::OnUpdatePwlistFindInGroup(CCmdUI* pCmdUI) 
 {
+	if(m_bFileOpen == FALSE) { pCmdUI->Enable(FALSE); return; }
+
 	DWORD dwGroupId = m_cGroups.GetItemData(m_hLastSelectedGroup);
 	DWORD dwRefId = m_mgr.GetGroupId(PWS_SEARCHGROUP);
-	BOOL bEnable = m_bFileOpen && (dwGroupId != dwRefId);
+	BOOL bEnable = (dwGroupId != dwRefId) ? TRUE : FALSE;
 	pCmdUI->Enable(bEnable && (m_mgr.GetNumberOfEntries() != 0));
 }
 
@@ -5310,6 +5321,7 @@ void CPwSafeDlg::OnLButtonUp(UINT nFlags, CPoint point)
 			{
 				DWORD dwDragGroupId = m_cGroups.GetItemData(m_hDraggingGroup);
 				DWORD dwDragGroupPos = m_mgr.GetGroupByIdN(dwDragGroupId);
+				DWORD dwNewGroupId;
 
 				PW_GROUP *pNew;
 
@@ -5321,6 +5333,7 @@ void CPwSafeDlg::OnLButtonUp(UINT nFlags, CPoint point)
 					grpNew.uGroupId = 0; // Create new group
 					m_mgr.AddGroup(&grpNew);
 					pNew = m_mgr.GetGroup(m_mgr.GetNumberOfGroups() - 1);
+					dwNewGroupId = pNew->uGroupId;
 				}
 
 				if(hItemDropTo != NULL) // Dropped on item
@@ -5340,6 +5353,10 @@ void CPwSafeDlg::OnLButtonUp(UINT nFlags, CPoint point)
 				{
 				}
 
+				// Fix group ID, de-associate all entries from the group that we will delete
+				if(bCopy == FALSE) m_mgr.SubstEntryGroupIds(dwDragGroupId, dwNewGroupId);
+
+				// If moving, delete source group
 				if(bCopy == FALSE) m_mgr.DeleteGroupById(dwDragGroupId);
 
 				if(hItemDropTo != NULL) _SyncItem(&m_cGroups, hItemDropTo, FALSE);
@@ -6014,7 +6031,6 @@ void CPwSafeDlg::OnViewAttach()
 void CPwSafeDlg::OnPwlistSaveAttach() 
 {
 	DWORD dwFlags;
-	LPTSTR lp;
 	CString strSample;
 	CString strFilter;
 	PW_ENTRY *pEntry;
@@ -6044,7 +6060,7 @@ void CPwSafeDlg::OnPwlistSaveAttach()
 	dwFlags |= OFN_EXTENSIONDIFFERENT;
 	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 	dwFlags |= 0x00080000 | 0x00800000 | OFN_NOREADONLYRETURN;
-	CFileDialog dlg(FALSE, lp, strSample, dwFlags, strFilter, this);
+	CFileDialog dlg(FALSE, NULL, strSample, dwFlags, strFilter, this);
 
 	if(dlg.DoModal() == IDOK) { m_mgr.SaveBinaryData(pEntry, dlg.GetPathName()); }
 	m_bDisplayDialog = FALSE;

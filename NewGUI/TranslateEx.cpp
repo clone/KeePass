@@ -164,6 +164,7 @@ BOOL LoadTranslationTable(const char *pszTableName)
 BOOL FreeCurrentTranslationTable()
 {
 	SAFE_DELETE_ARRAY(m_pTranslationStrings);
+	m_dwNumTrlStrings = 0;
 
 	if(m_bTableLoaded == FALSE) return FALSE;
 

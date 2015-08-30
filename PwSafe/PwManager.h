@@ -35,7 +35,7 @@
 
 // General product information
 #define PWM_PRODUCT_NAME _T("KeePass Password Safe")
-#define PWM_VERSION_STR  _T("0.93a")
+#define PWM_VERSION_STR  _T("0.93b")
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
@@ -307,6 +307,8 @@ public:
 
 	// Checks and corrects the group tree (level order, etc.)
 	void FixGroupTree();
+
+	void SubstEntryGroupIds(DWORD dwExistingId, DWORD dwNewId);
 
 	BOOL AttachFileAsBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile);
 	BOOL SaveBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile);

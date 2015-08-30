@@ -3,27 +3,30 @@
   subgroups
 - Added file attachments, you can now "attach" files to
   entries which are then saved in the encrypted database too
+- The duplicate command now duplicates all selected entries,
+  not just one
+- Added print preview
+- All exported files are encoded in UTF-8 now
+- Information about the available language files is shown in
+  the translation selection dialog (author, contact, etc.)
+- Added menu accelerators for group movement commands
 - KeePass could have crashed while using the TAN Wizard and
   having the lock-after-time option enabled, fixed this bug
 - The entry view now supports the Ctrl-C hotkey for copying
   the selected text to the clipboard
-- Added menu accelerators for group movement commands
-- Added print preview
-- The duplicate command now duplicates all selected entries,
-  not just one
-- Information about the available language files is shown in
-  the translation selection dialog (author, contact, etc.)
+- Added option to make the close button working as minimize
+  button
 - Changed the TXT export format (strings are exported lossless
   now, fields are translated)
 - The clipboard is cleared only if the user hasn't copied
   anything other into it (i.e. if the password has been
   overwritten already the clipboard isn't cleared again
-- All exported files are encoded in UTF-8 now
 - Usernames can be hidden behind asterisks now too (just like
   the passwords, see View menu)
 - Various minor bugfixes and improvements
-- Added option to make the close button working as minimize
-  button
+- The Windows setup program now has multi-language support
+  (thanks to Lubos Stanek)
+- b: Fixed various minor bugs
 
 04/02/22 - 0.92a
 - Smaller Windows installer

@@ -1,11 +1,15 @@
 |~LANGUAGENAME|        The translated string should look like English for example
 	|Èeština|
-|~LANGUAGEVERSION|     Example: Designed for KeePass 0.90a
-	|Navržen pro KeePass 0.91|
+|~LANGUAGEVERSION|     Example: 0.90a
+	|0.93a|
 |~LANGUAGEAUTHOR|      Example: Dominik Reichl
 	|Luboš Stanìk|
 |~LANGUAGEAUTHOREMAIL| Example: blabala@yourprovider.net, http://youhaveahomepage.net
 	|lubek@users.sourceforge.net, http://sourceforge.net/users/lubek/|
+|~LANGUAGEHELP|		Example: name of the help file
+	|KeePass-Czech.html|
+|~LANGUAGELICENSE|	Example: name of the license file
+	|License-Czech.html|
 
 |&OK|
 	|&OK|
@@ -83,7 +87,7 @@
 	|Poznámky|
 
 |Ready.|
-	|Ready.|
+	|Pøipraven.|
 
 |Either enter the password/passphrase or select the password disk's drive.|
 	|Buï zadejte heslo/frázi nebo zvolte jednotku heslového disku.|
@@ -287,7 +291,7 @@
 |Copy &Password To Clipboard|
 	|Zkopírovat heslo do schránky|
 |Open &URL|
-	|Otebøít &URL|
+	|Otevøít &URL|
 |&Find In Database...|
 	|&Najít v databázi...|
 |Find In This &Group...|
@@ -303,7 +307,7 @@
 |Move Entry To &Top|
 	|Pøesunout záznam na &zaèátek|
 |Move Entry &One Up|
-	|Pøesunout záznam o &jeden výše|
+	|Pøesunout záznam o j&eden výše|
 |Mo&ve Entry One Down|
 	|Pøesunout záznam o jeden &níže|
 |Move Entry To &Bottom|
@@ -323,7 +327,7 @@
 |Show &Title Column|
 	|Zobrazit sloupec &Název|
 |Show User&Name Column|
-	|Zobrazit sloupec Uživatelské jméno|
+	|Zobrazit sloupec Uživatelské &jméno|
 |Show &URL Column|
 	|Zobrazit sloupec &URL|
 |Show &Password Column|
@@ -331,7 +335,7 @@
 |Show &Notes Column|
 	|Zobrazit sloupec &Poznámky|
 |Main Window &Always On Top|
-	|Halvní okno &vždy navrchu|
+	|Hlavní okno &vždy navrchu|
 |&Hide Passwords Behind Asterisks (***)|
 	|S&krýt heslo pod hvìzdièkami (***)|
 
@@ -537,10 +541,11 @@
 
 |Encryption algorithm to use (for this database):|
 	|Použít šifrovací algoritmus (pro tuto databázi):|
-|Advanced Encryption Standard (AES) (128-bit block cipher)|
-	|Advanced Encryption Standard (AES) (128-bitová bloková šifra)|
-|Twofish (128-bit block cipher)|
-	|Twofish (128-bitová bloková šifra)|
+|Advanced Encryption Standard (AES) (128-bit block cipher using 256-bit key)|
+	|Advanced Encryption Standard (AES) (128-bitová bloková šifra s 256-bitovým klíèem)|
+|Twofish (128-bit block cipher using 256-bit key)|
+	|Twofish (128-bitová bloková šifra s 256-bitovým klíèem)|
+
 |Security|
 	|Zabezpeèení|
 |KeePass is OSI Certified Open Source Software.|
@@ -580,13 +585,13 @@
 	|UUID|
 
 |Show &Creation Time Column|
-	|Zobrazit sloupec èas vy&tvoøení|
+	|Zobrazit sloupec Èas vy&tvoøení|
 |Show Last &Modification Time Column|
-	|Zobrazit sloupec èas poslední z&mìny|
+	|Zobrazit sloupec Èas poslední z&mìny|
 |Show Last Access &Time Column|
-	|Zobrazit sloupec èas posledního &pøístupu|
+	|Zobrazit sloupec Èas posledního &pøístupu|
 |Show &Expire Time Column|
-	|Zobrazit sloupec &vypršení platnosti|
+	|Zobrazit sloupec &Vypršení platnosti|
 |Show UU&ID Column|
 	|Zobrazit sloupec &UUID|
 
@@ -670,3 +675,67 @@
 	|Autor|
 |Translation author contact|
 	|Kontakt na autora pøekladu|
+
+
+|Add Password &Subgroup...|
+	|Pøidat pod&skupinu hesel...|
+|&Rearrange|
+	|&Reorganizovat|
+|&Sort Group List|
+	|&Setøídit seznam skupin|
+|Move Group One &Left|
+	|Pøesunout skupinu o úroveò v&levo|
+|Move Group One &Right|
+	|Pøesunout skupinu o úroveò vp&ravo|
+
+|&Sort List By Title|
+	|&Setøídit seznam podle Názvu|
+|Sort List By User&Name|
+	|Setøídit seznam podle Uživatelského &jména|
+|Sort List By &URL|
+	|Setøídit seznam podle &URL|
+|Sort List By &Password|
+	|Setøídit seznam podle &Hesla|
+|Sort List By Note&s|
+	|Setøídit seznam podle &Poznámky|
+|Sort List By &Creation Time|
+	|Setøídit seznam podle Èasu vy&tvoøení|
+|Sort List By Last &Modify Time|
+	|Setøídit seznam podle Èasu poslední z&mìny|
+|Sort List By Last &Access Time|
+	|Setøídit seznam podle Èasu posledního pøíst&upu|
+|Sort List By &Expiration Time|
+	|Setøídit seznam podle &Vypršení platnosti|
+
+|Hide UserNames Behind &Asterisks (***)|
+	|Skrýt uživatelské j&méno pod hvìzdièkami (***)|
+
+|Attachment:|
+	|Pøíloha:|
+|Attachment|
+	|Pøíloha|
+|Show &Attachment Column|
+	|Zobrazit sloupec Pøílo&h|
+
+|Generate a random password...|
+	|Vytvoøit náhodné heslo...|
+|Open file and set as attachment...|
+	|Otevøít soubor a vložit jej jako pøílohu...|
+|Save attached file to disk...|
+	|Uložit pøílohu na disk...|
+|Remove the currently attached file|
+	|Odstranit souèasnou pøílohu|
+
+|There already is a file attached with this entry.|
+	|V tomto záznamu již pøíloha existuje.|
+|Do you want to overwrite the current attachment?|
+	|Chcete pøepsat souèasnou pøílohu?|
+
+|&Save Attached File To...|
+	|&Uložit pøílohu jako...|
+
+|There is no file attached with this entry.|
+	|U tohoto záznamu není žádná pøíloha.|
+
+|Close button [X] minimizes the main window instead of terminating the application|
+	|Tlaèítko ukonèení [X] minimalizuje hlavní okno namísto ukonèení aplikace|

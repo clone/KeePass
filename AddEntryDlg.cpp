@@ -138,9 +138,9 @@ BOOL CAddEntryDlg::OnInitDialog()
 	NewGUI_Button(&m_btRandomPw, -1, -1);
 	NewGUI_Button(&m_btPickIcon, -1, -1);
 	NewGUI_Button(&m_btHidePw, -1, -1);
-	NewGUI_Button(&m_btSetAttachment, IDB_FILE, IDB_FILE);
-	NewGUI_Button(&m_btSaveAttachment, IDB_DISK, IDB_DISK);
-	NewGUI_Button(&m_btRemoveAttachment, IDB_TB_DELETEENTRY, IDB_TB_DELETEENTRY);
+	NewGUI_Button(&m_btSetAttachment, IDB_FILE, IDB_FILE, TRUE);
+	NewGUI_Button(&m_btSaveAttachment, IDB_DISK, IDB_DISK, TRUE);
+	NewGUI_Button(&m_btRemoveAttachment, IDB_TB_DELETEENTRY, IDB_TB_DELETEENTRY, TRUE);
 	m_btHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 
 	m_btRandomPw.SetTooltipText(TRL("Generate a random password..."));
@@ -169,7 +169,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	::ReleaseDC(NULL, hDC);
 
 	ASSERT(m_pMgr != NULL); // Must have been initialized by parent
-	unsigned int i; PW_GROUP *p; USHORT uLevel;
+	unsigned int i, j; PW_GROUP *p; USHORT uLevel;
 	CString strAdd;
 	for(i = 0; i < m_pMgr->GetNumberOfGroups(); i++) // Add groups to combo box
 	{
@@ -178,7 +178,13 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 		strAdd.Empty();
 		for(uLevel = 0; uLevel < p->usLevel; uLevel++) strAdd += _T("        ");
-		strAdd += p->pszGroupName;
+
+		for(j = 0; j < (unsigned int)_tcslen(p->pszGroupName); j++)
+		{
+			if(p->pszGroupName[j] != _T('&')) strAdd += p->pszGroupName[j];
+			else strAdd += _T("&&");
+		}
+
 		m_pGroups.AddCTString(WZ_ROOT_INDEX, (BYTE)p->uImageId, strAdd);
 	}
 
@@ -261,6 +267,8 @@ BOOL CAddEntryDlg::OnInitDialog()
 		UpdateData(FALSE);
 	}
 
+	UpdateControlsStatus();
+
 	if(m_strTitle == PWS_TAN_ENTRY)
 	{
 		GetDlgItem(IDC_EDIT_TITLE)->EnableWindow(FALSE);
@@ -271,8 +279,6 @@ BOOL CAddEntryDlg::OnInitDialog()
 		GetDlgItem(IDC_EDIT_TITLE)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT_TITLE)->SetFocus();
 	}
-
-	UpdateControlsStatus();
 
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
@@ -484,7 +490,6 @@ void CAddEntryDlg::OnSaveAttachBtn()
 	UpdateData(TRUE);
 
 	DWORD dwFlags;
-	LPTSTR lp;
 	CString strSample;
 	CString strFilter;
 	PW_ENTRY *pEntry;
@@ -509,7 +514,7 @@ void CAddEntryDlg::OnSaveAttachBtn()
 	dwFlags |= OFN_EXTENSIONDIFFERENT;
 	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 	dwFlags |= 0x00080000 | 0x00800000 | OFN_NOREADONLYRETURN;
-	CFileDialog dlg(FALSE, lp, strSample, dwFlags, strFilter, this);
+	CFileDialog dlg(FALSE, NULL, strSample, dwFlags, strFilter, this);
 
 	if(dlg.DoModal() == IDOK) { m_pMgr->SaveBinaryData(pEntry, dlg.GetPathName()); }
 
