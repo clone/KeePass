@@ -241,6 +241,10 @@ SOURCE=.\res\key_smal.bmp
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\mainfram.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\mouse_sm.bmp
 # End Source File
 # Begin Source File
@@ -282,6 +286,14 @@ SOURCE=.\PwSafe\PwExport.cpp
 # Begin Source File
 
 SOURCE=.\PwSafe\PwExport.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\PwSafe\PwImport.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\PwSafe\PwImport.h
 # End Source File
 # Begin Source File
 
@@ -436,6 +448,22 @@ SOURCE=.\NewGUI\ShadeButtonST.cpp
 # Begin Source File
 
 SOURCE=.\NewGUI\ShadeButtonST.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\SystemTray.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\SystemTray.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\SystemTrayEx.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\NewGUI\SystemTrayEx.h
 # End Source File
 # Begin Source File
 

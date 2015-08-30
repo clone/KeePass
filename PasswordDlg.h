@@ -43,8 +43,10 @@ public:
 
 	void CleanUp();
 
-	CImageList m_ilIcons;
 	BOOL m_bLoadMode;
+	BOOL m_bConfirm;
+
+	CImageList m_ilIcons;
 	CFont m_fStyle;
 	CKCSideBannerWnd m_banner;
 

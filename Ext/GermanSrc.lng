@@ -48,21 +48,26 @@
     |Wählen Sie das Laufwerk der Schlüsseldiskette aus:|
 |Create a new password database - Enter master key|
     |Neue Passwort-Datenbank erstellen - Hauptschlüssel eingeben|
-|Set master key|               |Hauptschluessel eingeben|
+|Set master key|               |Hauptschlüssel eingeben|
 |Enter the master key for the new database.|
-    |Geben Sie den Hauptschluessel fuer die neue Datenbank ein.|
+    |Geben Sie den Hauptschlüssel für die neue Datenbank ein.|
+|Create a new password database - Repeat master key|
+    |Neue Passwort-Datenbank erstellen - Passwort erneut eingeben|
+|Repeat master password|       |Hauptpasswort wiederholen|
+|Repeat the master key for the new database.|
+    |Hauptpasswort für die neue Datenbank wiederholen.|
 |Select the password disk drive to load the key from:|
     |Wählen Sie das Laufwerk der Schlüsseldiskette aus:|
 |Open database - Enter master key|
     |Passwort-Datenbank öffnen - Hauptschlüssel eingeben|
 |Enter master key|             |Hauptschlüssel eingeben|
 |Enter the master key for this database.|
-    |Geben Sie den Hauptschluessel fuer diese Datenbank ein.|
+    |Geben Sie den Hauptschlüssel für diese Datenbank ein.|
 |Key|                          |Schlüssel|
 |<no drive selected>|          |<kein Laufwerk ausgewählt>|
 
 |Password Generator|           |Passwort-Generator|
-|This will generate a random password.|        |Ein neues zufaelliges Passwort generieren.|
+|This will generate a random password.|        |Ein neues zufälliges Passwort generieren.|
 |Options|                      |Optionen|
 |Password Generation Options|  |Passwort-Optionen|
 |Only the following characters:|               |Nur folgende Zeichen erlaubt:|
@@ -128,14 +133,14 @@
 |The random the better.|       THIS ISN'T A ONE-TO-ONE TRANSLATION!
     |Möglichst viele verschiedene und viele Zeichen eingeben.| /
 |Get Random|                   |Zufallszahlen generieren|
-|Get random data for key generation|           |Zufallszahlen fuer Schluesselerstellung|
+|Get random data for key generation|           |Zufallszahlen für Schlüsselerstellung|
 |Move the mouse and type some random text to generate random values.|
-    |Bewegen Sie die Maus und geben Sie einige zufaellige Zeichen ein um Zufallszahlen zu generieren.|
+    |Bewegen Sie die Maus und geben Sie einige zufällige Zeichen ein um Zufallszahlen zu generieren.|
 
 |Pick an icon|                 |Ein Icon auswählen|
-|Pick an Icon|                 |Ein Icon auswaehlen|
+|Pick an Icon|                 |Ein Icon auswählen|
 |Pick an icon from the list and click OK to set it.|
-    |Waehlen Sie in Icon aus der Liste unten aus und klicken Sie OK.|
+    |Wählen Sie in Icon aus der Liste unten aus und klicken Sie OK.|
 
 
 |&File|                        |&Datei|
@@ -155,6 +160,8 @@
 |&Lock Workspace|              |&Arbeitsfläche sperren|
 |&Unlock Workspace|            |&Arbeitsfläche entsperren|
 |&Exit|                        |&Beenden|
+
+|&Lock/Unlock Workspace|       |&Arbeitsfläche sperren/entsperren|
 
 |&Options|                     |&Einstellungen|
 |&Add Password Group...|       |&Neue Passwort-Gruppe...|
@@ -190,12 +197,15 @@
 |Show &Password Column|        |Spalte '&Passwort' anzeigen|
 |Show &Notes Column|           |Spalte '&Kommentare' anzeigen|
 |Main Window &Always On Top|   |Hauptfenster &immer im Vordergrund|
-|&Hide Passwords Behind Stars (***)|           |Passwörter hinter Sternchen &verstecken (***)|
+|&Hide Passwords Behind Asterisks (***)|       |Passwörter hinter Sternchen &verstecken (***)|
 
 |Password &Generator|          |Passwort-&Generator|
 
 |Visit KeePass &Homepage|      |KeePass-&Homepage besuchen|
 |&About KeePass...|            |Ü&ber KeePass...|
+
+|&Minimize/Maximize Window To/From Tray|
+    |Umschalten Hauptfenster/Tray|
 
 |%u.%u.%u.%u, compatible with %u.%u.x.x|
     |%u.%u.%u.%u, kompatibel mit %u.%u.x.x|
@@ -241,6 +251,7 @@
 |File cannot be saved!|
     |Datei kann nicht gespeichert werden!|
 
+|Password Safe files|          |Passwort-Datenbanken|
 |All files|                    |Alle Dateien|
 
 |The current file has been modified.|
@@ -262,7 +273,7 @@
 |Load language file|           |Sprachdatei laden|
 |Load a language file|         |Sprachdatei laden|
 |Select one of the languages in the list below.|
-    |Waehlen Sie eine Sprache in der Liste unten aus.|
+    |Wählen Sie eine Sprache in der Liste unten aus.|
 |Available Languages|          |Verfügbare Sprachen|
 
 |Open &ReadMe File|            |&ReadMe-Datei öffnen|
@@ -275,9 +286,11 @@
 |Clipboard auto-clear time:|   |Zw.ablage autom. löschen:|
 |sec|                          |sec|
 |Settings|                     |Einstellungen|
-|Here you can configure KeePass.|              |Hier koennen Sie KeePass konfigurieren.|
+|Here you can configure KeePass.|              |Hier können Sie KeePass konfigurieren.|
 |Automatically open last used database on startup|
     |Beim Start zuletzt benutzte Datenbank öffnen|
+|Automatically save database on exit|
+    |Datenbank beim Beenden automatisch speichern|
 |GUI: Display images on buttons|
     |GUI: Icons auf Buttons anzeigen|
 |GUI: Show grid lines in password entry list|
@@ -304,3 +317,8 @@
     |Anwendung kann nicht automatisch neu gestartet werden!|
 |Please restart KeePass manually.|
     |Bitte starten Sie KeePass manuell neu.|
+
+|CSV files|                    |CSV-Dateien|
+|An error occured while importing the CSV file. File cannot be imported.|
+    |Es ist ein Fehler während des Importierens der CSV-Datei aufgetreten. Datei kann nicht importiert werden.|
+|&Import From CSV|             |CSV-Datei &importieren|

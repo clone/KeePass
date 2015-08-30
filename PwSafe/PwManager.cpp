@@ -34,8 +34,7 @@
 #include "../Crypto/sha2.h"
 #include "../Crypto/arcfour.h"
 
-#include "../Resource.h"
-#include "../GetRandomDlg.h"
+#include <string.h>
 
 CPwManager::CPwManager()
 {
@@ -84,12 +83,11 @@ void CPwManager::CleanUp()
 	m_random.Reset();
 }
 
-BOOL CPwManager::SetMasterKey(const char *pszMasterKey, BOOL bDiskDrive, BOOL bCreate)
+BOOL CPwManager::SetMasterKey(const char *pszMasterKey, BOOL bDiskDrive, const CNewRandomInterface *pARI)
 {
 	unsigned long uKeyLen;
 	char szFile[2048];
 	sha256_ctx sha32;
-	CGetRandomDlg dlg;
 
 	ASSERT(pszMasterKey != NULL);
 
@@ -112,7 +110,7 @@ BOOL CPwManager::SetMasterKey(const char *pszMasterKey, BOOL bDiskDrive, BOOL bC
 		if(szFile[strlen(szFile)-1] != '\\') strcat(szFile, "\\");
 		strcat(szFile, "pwsafe.key");
 
-		if(bCreate == FALSE) // Load key from disk
+		if(pARI == NULL) // Load key from disk
 		{
 			FILE *fp;
 
@@ -126,14 +124,16 @@ BOOL CPwManager::SetMasterKey(const char *pszMasterKey, BOOL bDiskDrive, BOOL bC
 		else // Save key to disk
 		{
 			FILE *fp;
-			if(dlg.DoModal() == IDCANCEL) return FALSE;
+			unsigned char aRandomBytes[32];
+
+			if(pARI->GenerateRandomSequence(32, aRandomBytes) == FALSE) return FALSE;
 
 			fp = fopen(szFile, "wb");
 			if(fp == NULL) return FALSE;
-			fwrite(dlg.m_pFinalRandom, 1, 32, fp);
+			fwrite(aRandomBytes, 1, 32, fp);
 			fclose(fp);
 
-			memcpy(m_pMasterKey, dlg.m_pFinalRandom, 32);
+			memcpy(m_pMasterKey, aRandomBytes, 32);
 
 			return TRUE;
 		}
@@ -428,17 +428,20 @@ BOOL CPwManager::DeleteGroup(int nGroupId)
 	ASSERT((DWORD)nGroupId < m_dwNumGroups);
 	if((DWORD)nGroupId >= m_dwNumGroups) return FALSE;
 
-	while(1) // Remove all items in that group
+	if(m_dwNumEntries != 0)
 	{
-		p = GetEntry(i);
-		if(p->uGroupId == (DWORD)nGroupId)
+		while(1) // Remove all items in that group
 		{
-			VERIFY(DeleteEntry(i));
-			i--;
-		}
+			p = GetEntry(i);
+			if(p->uGroupId == (DWORD)nGroupId)
+			{
+				VERIFY(DeleteEntry(i));
+				i--;
+			}
 
-		i++;
-		if(i >= m_dwNumEntries) break;
+			i++;
+			if(i >= m_dwNumEntries) break;
+		}
 	}
 
 	SAFE_DELETE_ARRAY(m_pGroups[nGroupId].pszGroupName);
@@ -572,7 +575,7 @@ BOOL CPwManager::OpenDatabase(const char *pszFile)
 	PW_DBHEADER hdr;
 	Rijndael aes;
 	sha256_ctx sha32;
-	unsigned char uFinalKey[32];
+	RD_UINT8 uFinalKey[32];
 	DWORD dw, dw2;
 	char *ptrTemp;
 	char *ptrTitle;
@@ -619,7 +622,7 @@ BOOL CPwManager::OpenDatabase(const char *pszFile)
 	sha256_begin(&sha32);
 	sha256_hash(hdr.aMasterSeed, 16, &sha32);
 	sha256_hash(m_pMasterKey, 32, &sha32);
-	sha256_end(uFinalKey, &sha32);
+	sha256_end((unsigned char *)uFinalKey, &sha32);
 
 	// Initialize Rijndael algorithm
 	if(aes.init(Rijndael::CBC, Rijndael::Decrypt, uFinalKey,
@@ -710,7 +713,7 @@ BOOL CPwManager::SaveDatabase(const char *pszFile)
 	unsigned long uFileSize, uEncryptedPartSize, uAllocated;
 	unsigned long i, pos;
 	PW_DBHEADER hdr;
-	unsigned char uFinalKey[32];
+	RD_UINT8 uFinalKey[32];
 	Rijndael aes;
 	sha256_ctx sha32;
 
@@ -755,7 +758,7 @@ BOOL CPwManager::SaveDatabase(const char *pszFile)
 
 	// Make up the master key hash seed and the encryption IV
 	m_random.GetRandomBuffer(hdr.aMasterSeed, 16);
-	m_random.GetRandomBuffer(hdr.aEncryptionIV, 16);
+	m_random.GetRandomBuffer((BYTE *)hdr.aEncryptionIV, 16);
 
 	// Copy header to memory file
 	pos = 0;
@@ -803,7 +806,7 @@ BOOL CPwManager::SaveDatabase(const char *pszFile)
 	sha256_begin(&sha32);
 	sha256_hash(hdr.aMasterSeed, 16, &sha32);
 	sha256_hash(m_pMasterKey, 32, &sha32);
-	sha256_end(uFinalKey, &sha32);
+	sha256_end((unsigned char *)uFinalKey, &sha32);
 
 	// Initialize Rijndael/AES
 	if(aes.init(Rijndael::CBC, Rijndael::Encrypt, uFinalKey,
@@ -975,4 +978,77 @@ void CPwManager::MoveInGroup(int nGroup, int nFrom, int nTo)
 	if((nFromEx == -1) || (nToEx == -1)) return;
 
 	MoveInternal(nFromEx, nToEx);
+}
+
+void CPwManager::SortGroup(int nGroup, DWORD dwSortByField)
+{
+	ASSERT(nGroup >= 0);
+	ASSERT(nGroup < (int)m_dwNumGroups);
+	if(nGroup < 0) return;
+	if(nGroup >= (int)m_dwNumGroups) return;
+
+	PPW_ENTRY *p;
+	PW_ENTRY v;
+	DWORD i, j, n = 0, min, t;
+
+	p = new PPW_ENTRY[m_dwNumEntries];
+	if(p == NULL) return;
+
+	// Build pointer array that contains pointers to the elements to sort
+	for(i = 0; i < m_dwNumEntries; i++)
+	{
+		if(m_pEntries[i].uGroupId == (DWORD)nGroup)
+		{
+			p[n] = &m_pEntries[i];
+			n++;
+		}
+	}
+	if(n <= 1) return; // Something to sort?
+
+	// Sort the array, using a simple selection sort
+	for(i = 0; i < (n - 1); i++)
+	{
+		min = i;
+
+		for(j = i + 1; j < n; j++)
+		{
+			switch(dwSortByField)
+			{
+			case 0:
+				if(stricmp(p[j]->pszTitle, p[min]->pszTitle) < 0)
+					min = j;
+				break;
+			case 1:
+				if(stricmp(p[j]->pszUserName, p[min]->pszUserName) < 0)
+					min = j;
+				break;
+			case 2:
+				if(stricmp(p[j]->pszURL, p[min]->pszURL) < 0)
+					min = j;
+				break;
+			case 3:
+				t = min;
+				UnlockEntryPassword(p[j]); UnlockEntryPassword(p[t]);
+				if(stricmp((char *)p[j]->pszPassword, (char *)p[min]->pszPassword) < 0)
+					min = j;
+				LockEntryPassword(p[j]); LockEntryPassword(p[t]);
+				break;
+			case 4:
+				if(stricmp(p[j]->pszAdditional, p[min]->pszAdditional) < 0)
+					min = j;
+				break;
+			default:
+				ASSERT(FALSE);
+				if(stricmp(p[j]->pszTitle, p[min]->pszTitle) < 0)
+					min = j;
+				break;
+			}
+		}
+
+		v = *p[min];
+		*p[min] = *p[i];
+		*p[i] = v;
+	}
+	
+	SAFE_DELETE_ARRAY(p);
 }

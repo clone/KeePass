@@ -67,7 +67,7 @@ BOOL CPwSafeApp::InitInstance()
 
 	AfxOleInit();
 
-	SetDialogBkColor(NewGUI_GetBgColor(), CR_FRONT); // Setup the "new" dialog look
+	// SetDialogBkColor(NewGUI_GetBgColor(), CR_FRONT); // Setup the "new" dialog look
 
 	ASSERT(TRUE == 1);
 	ASSERT(FALSE == 0);

@@ -50,6 +50,15 @@ public:
 	DWORD m_dwCounter;
 };
 
+class CNewRandomInterface
+{
+public:
+	virtual ~CNewRandomInterface() { }
+
+	virtual BOOL GenerateRandomSequence(unsigned long uRandomSeqSize, unsigned char *pBuffer) const = 0;
+};
+
+
 unsigned long randXorShift();
 
 #endif

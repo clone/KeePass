@@ -41,6 +41,8 @@
 #include "NewGUI/KCSideBannerWnd.h"
 #include "NewGUI/BCMenu.h"
 #include "NewGUI/CustomListCtrlEx.h"
+#include "NewGUI/SystemTray.h"
+#include "NewGUI/SystemTrayEx.h"
 
 #define GUI_GROUPLIST_EXT 170
 // Standard Windows Dialog GUI_SPACER = 11
@@ -91,9 +93,12 @@ public:
 	CString m_strLastDb;
 	BOOL m_bImgButtons;
 	BOOL m_bEntryGrid;
+	BOOL m_bAutoSaveDb;
 
+	BOOL m_bExiting;
 	BOOL m_bLocked;
 	long m_nLockedViewParams[3];
+	BOOL m_bShowWindow;
 
 	CPwManager m_mgr;
 
@@ -115,6 +120,7 @@ public:
 	BCMenu m_popmenu;
 
 	CImageList m_ilIcons;
+	CSystemTrayEx m_systray;
 
 	CString m_strFile;
 	BOOL m_bFileOpen;
@@ -175,6 +181,7 @@ protected:
 	{
 		LPARAM dw = 0;
 		dw |= LVS_EX_SI_REPORT | LVS_EX_FULLROWSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_UNDERLINEHOT;
+		dw |= LVS_EX_HEADERDRAGDROP | LVS_EX_INFOTIP;
 		if(m_bEntryGrid == TRUE) dw |= LVS_EX_GRIDLINES;
 		if(m_dwOldListParameters != dw)
 			m_cList.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, dw);
@@ -290,6 +297,12 @@ protected:
 	afx_msg void OnUpdateGroupMoveUp(CCmdUI* pCmdUI);
 	afx_msg void OnGroupMoveDown();
 	afx_msg void OnUpdateGroupMoveDown(CCmdUI* pCmdUI);
+	afx_msg LRESULT OnTrayNotification(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnViewHide();
+	afx_msg void OnImportCsv();
+	afx_msg void OnUpdateImportCsv(CCmdUI* pCmdUI);
+	afx_msg void OnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnColumnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

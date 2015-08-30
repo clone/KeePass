@@ -171,5 +171,6 @@ const char *_TRL(const char *pszDefString)
 		if(strcmp(m_pDefString[i], pszDefString) == 0) return m_pTrlString[i];
 	}
 
+	// String hasn't been found in the translation table -> return the input string
 	return pszDefString;
 }

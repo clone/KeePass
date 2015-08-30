@@ -50,6 +50,7 @@ COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	m_bOpenLastDb = FALSE;
 	m_bImgButtons = FALSE;
 	m_bEntryGrid = FALSE;
+	m_bAutoSave = FALSE;
 	//}}AFX_DATA_INIT
 }
 
@@ -64,6 +65,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_AUTOOPENLASTDB, m_bOpenLastDb);
 	DDX_Check(pDX, IDC_CHECK_IMGBUTTONS, m_bImgButtons);
 	DDX_Check(pDX, IDC_CHECK_ENTRYGRID, m_bEntryGrid);
+	DDX_Check(pDX, IDC_CHECK_AUTOSAVE, m_bAutoSave);
 	//}}AFX_DATA_MAP
 }
 

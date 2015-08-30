@@ -37,8 +37,6 @@ static BOOL g_bImgButtons = 0;
 
 COLORREF NewGUI_GetBgColor()
 {
-	// Future skinning support? :
-
 	// HDC hDC = NULL;
 	// int nBitsPerPixel = 0;
 

@@ -1,3 +1,29 @@
+03/12/17 - 0.85
+- KeePass now has a Windows system tray icon which can minimize
+  and maximize the main window to/from the tray; the context
+  menu offers important functions like adding an entry to the
+  current database, locking the workspace, etc.
+- Changed CSV export format to be compatible with the
+  commercial "Password Keeper" software
+- CSV files can now be imported (Password Keeper compatible)
+- The password list can now be sorted by clicking on a column
+  in the header of the password list
+- GUI: Double-clicking on a field in the password list now
+  copies the field data, not only the password of that entry
+- GUI: The headers can now be drag-n-dropped (reordered)
+- GUI: A tooltip now shows the complete item when pointing on
+  an item that is too large to display
+- Added filter for password files in file open/save dialogs
+- When creating a new database you now must repeat the master
+  password
+- Fixed a bug that could crash KeePass when deleting a group
+  when the database has no password entries
+- KeePass now uses the system color for the dialog texts
+- Pressing the control key and left-clicking on an item in the
+  password list brings up the edit dialog for the selected item
+- Special characters in translations are now fully supported
+  (Umlaute, etc.)
+
 03/12/03 - 0.84
 - Added French translation (thanks to Marc Tissot!)
 - Renamed some structures and variables, which could be defined

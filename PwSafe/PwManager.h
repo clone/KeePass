@@ -30,44 +30,45 @@
 #ifndef ___PASSWORD_MANAGER_H___
 #define ___PASSWORD_MANAGER_H___
 
-#include <windows.h>
 #include "../Util/NewRandom.h"
+#include "../Crypto/rijndael.h"
 
 // General product information
-#define PWM_PRODUCT_NAME "KeePass Password Safe"
-#define PWM_VERSION_STR  "0.84"
+#define PWM_PRODUCT_NAME _T("KeePass Password Safe")
+#define PWM_VERSION_STR  _T("0.85")
 
 // The signature constants were chosen randomly
 #define PWM_DBSIG_1      0x9AA2D903
 #define PWM_DBSIG_2      0xB54BFB65
 #define PWM_DBVER_DW     0x00010001
 
-#define PWM_HOMEPAGE     "http://keepass.sourceforge.net"
+#define PWM_HOMEPAGE     _T("http://keepass.sourceforge.net")
 
 // The executable name must be lowercase!
-#define PWM_README_FILE  "KeePass.html"
-#define PWM_LICENSE_FILE "License.html"
+#define PWM_README_FILE  _T("KeePass.html")
+#define PWM_LICENSE_FILE _T("License.html")
 
-#define PWM_EXENAME      "KeePass"
-#define PWMKEY_LANG      "KeeLanguage"
-#define PWMKEY_CLIPSECS  "KeeClipboardSeconds"
-#define PWMKEY_NEWLINE   "KeeNewLine"
-#define PWMKEY_LASTDIR   "KeeLastDir"
-#define PWMKEY_OPENLASTB "KeeAutoOpen"
-#define PWMKEY_LASTDB    "KeeLastDb"
-#define PWMKEY_IMGBTNS   "KeeImgButtons"
-#define PWMKEY_ENTRYGRID "KeeEntryGrid"
-#define PWMKEY_ALWAYSTOP "KeeAlwaysOnTop"
-#define PWMKEY_SHOWTITLE "KeeShowTitle"
-#define PWMKEY_SHOWUSER  "KeeShowUser"
-#define PWMKEY_SHOWURL   "KeeShowURL"
-#define PWMKEY_SHOWPASS  "KeeShowPassword"
-#define PWMKEY_SHOWNOTES "KeeShowNotes"
-#define PWMKEY_HIDESTARS "KeeHideStars"
+#define PWM_EXENAME      _T("KeePass")
+#define PWMKEY_LANG      _T("KeeLanguage")
+#define PWMKEY_CLIPSECS  _T("KeeClipboardSeconds")
+#define PWMKEY_NEWLINE   _T("KeeNewLine")
+#define PWMKEY_LASTDIR   _T("KeeLastDir")
+#define PWMKEY_OPENLASTB _T("KeeAutoOpen")
+#define PWMKEY_LASTDB    _T("KeeLastDb")
+#define PWMKEY_AUTOSAVEB _T("KeeAutoSave")
+#define PWMKEY_IMGBTNS   _T("KeeImgButtons")
+#define PWMKEY_ENTRYGRID _T("KeeEntryGrid")
+#define PWMKEY_ALWAYSTOP _T("KeeAlwaysOnTop")
+#define PWMKEY_SHOWTITLE _T("KeeShowTitle")
+#define PWMKEY_SHOWUSER  _T("KeeShowUser")
+#define PWMKEY_SHOWURL   _T("KeeShowURL")
+#define PWMKEY_SHOWPASS  _T("KeeShowPassword")
+#define PWMKEY_SHOWNOTES _T("KeeShowNotes")
+#define PWMKEY_HIDESTARS _T("KeeHideStars")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
-#define PWM_PASSWORD_STRING     "********"
+#define PWM_PASSWORD_STRING     _T("********")
 
 #define PWM_FLAG_SHA2           1
 #define PWM_FLAG_RIJNDAEL       2
@@ -96,13 +97,13 @@ typedef struct _PW_ENTRY
 	BYTE *pszPassword;
 
 	CHAR *pszAdditional;
-} PW_ENTRY;
+} PW_ENTRY, *PPW_ENTRY;
 
 typedef struct _PW_GROUP
 {
 	DWORD uImageId;
 	char *pszGroupName;
-} PW_GROUP;
+} PW_GROUP, *PPW_GROUP;
 
 typedef struct _PW_DBHEADER
 {
@@ -112,11 +113,11 @@ typedef struct _PW_DBHEADER
 	DWORD dwVersion;
 
 	BYTE aMasterSeed[16];
-	BYTE aEncryptionIV[16];
+	RD_UINT8 aEncryptionIV[16];
 
 	DWORD dwGroups;
 	DWORD dwEntries;
-} PW_DBHEADER;
+} PW_DBHEADER, *PPW_DBHEADER;
 #pragma pack()
 
 #ifdef _DEBUG
@@ -135,7 +136,7 @@ public:
 
 	void CleanUp();
 
-	BOOL SetMasterKey(const char *pszMasterKey, BOOL bDiskDrive, BOOL bCreate);
+	BOOL SetMasterKey(const char *pszMasterKey, BOOL bDiskDrive, const CNewRandomInterface *pARI);
 
 	DWORD GetNumberOfEntries();
 	DWORD GetNumberOfGroups();
@@ -170,6 +171,7 @@ public:
 	void MoveInternal(int nFrom, int nTo);
 	void MoveInGroup(int nGroup, int nFrom, int nTo);
 	BOOL MoveGroup(int nFrom, int nTo);
+	void SortGroup(int nGroup, DWORD dwSortByField);
 
 	int Find(const char *pszFindString, BOOL bCaseSensitive, int fieldFlags, int nStart);
 

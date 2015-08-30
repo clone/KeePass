@@ -27,27 +27,24 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ___MEMORY_UTILITIES_H___
-#define ___MEMORY_UTILITIES_H___
+#ifndef ___PW_IMPORT_H___
+#define ___PW_IMPORT_H___
 
-#include "../StdAfx.h"
+#include "PwManager.h"
 
-#ifndef SAFE_DELETE
-#define SAFE_DELETE(p)       { if((p) != NULL) { delete (p);     (p) = NULL; } }
-#define SAFE_DELETE_ARRAY(p) { if((p) != NULL) { delete [](p);  (p) = NULL; } }
-#define SAFE_RELEASE(p)      { if((p) != NULL) { (p)->Release(); (p) = NULL; } }
-#endif
+class CPwImport
+{
+public:
+	CPwImport();
+	virtual ~CPwImport();
 
-#define SDF_BUF_SIZE 4096
+	BOOL ImportCsvToDb(const char *pszFile, CPwManager *pMgr, DWORD dwGroupId);
 
-void mem_erase(unsigned char *p, unsigned long u);
-void EraseCString(CString *pString);
+private:
+	void _AddStringStreamToDb(const char *pStream, unsigned long uStreamSize);
 
-#ifndef _WIN32_WCE
-void CopyStringToClipboard(char *pszString);
-BOOL SecureDeleteFile(LPCSTR pszFilePath);
-#endif
-
-void FixURL(CString *pstrURL);
+	CPwManager *m_pLastMgr;
+	DWORD m_dwLastGroupId;
+};
 
 #endif

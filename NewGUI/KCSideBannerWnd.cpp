@@ -617,6 +617,9 @@ void CKCSideBannerWnd::DrawTextFields(CDC* pDC, CRect rect)
 	CPoint		ptDraw = pt2;
 	TCHAR		ch;
 
+	i = 0; ch = 0;
+	pDC->TextOut(ptDraw.x, ptDraw.y, m_strCaption);
+	/* // Edited by Dominik Reichl: KeePass doesn't need multiline drawing currently
 	for ( i = 0; i < nCount; i++ )
 	{
 		ch = m_strCaption.GetAt(i);
@@ -674,6 +677,7 @@ void CKCSideBannerWnd::DrawTextFields(CDC* pDC, CRect rect)
 		}
 
 	}
+	*/
 	pDC->SelectObject(pOldFont);
 	nFont.DeleteObject();
 

@@ -51,6 +51,7 @@ public:
 	BOOL	m_bOpenLastDb;
 	BOOL	m_bImgButtons;
 	BOOL	m_bEntryGrid;
+	BOOL	m_bAutoSave;
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(COptionsDlg)

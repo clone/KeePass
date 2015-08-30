@@ -35,6 +35,7 @@
 
 #include "PwSafe/PwManager.h"
 #include "PwSafe/PwExport.h"
+#include "PwSafe/PwImport.h"
 #include "Crypto/testimpl.h"
 #include "Util/MemUtil.h"
 #include "Util/PrivateConfig.h"
@@ -47,12 +48,15 @@
 #include "FindInDbDlg.h"
 #include "LanguagesDlg.h"
 #include "OptionsDlg.h"
+#include "GetRandomDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+#define WM_MY_SYSTRAY_NOTIFY (WM_APP+10)
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -113,12 +117,34 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 
+class CPwSafeAppRI : public CNewRandomInterface
+{
+public:
+	BOOL GenerateRandomSequence(unsigned long uRandomSeqSize, unsigned char *pBuffer) const;
+};
+
+BOOL CPwSafeAppRI::GenerateRandomSequence(unsigned long uRandomSeqSize, unsigned char *pBuffer) const
+{
+	ASSERT(uRandomSeqSize <= 32); // Only up to 32-byte long sequence is supported for now!
+	if(uRandomSeqSize > 32) uRandomSeqSize = 32;
+
+	CGetRandomDlg dlg;
+	if(dlg.DoModal() == IDCANCEL) return FALSE;
+
+	memcpy(pBuffer, dlg.m_pFinalRandom, uRandomSeqSize);
+	return TRUE;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
 CPwSafeDlg::CPwSafeDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CPwSafeDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CPwSafeDlg)
 	//}}AFX_DATA_INIT
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	m_bExiting = FALSE;
 }
 
 void CPwSafeDlg::DoDataExchange(CDataExchange* pDX)
@@ -233,6 +259,12 @@ BEGIN_MESSAGE_MAP(CPwSafeDlg, CDialog)
 	ON_UPDATE_COMMAND_UI(ID_GROUP_MOVEUP, OnUpdateGroupMoveUp)
 	ON_COMMAND(ID_GROUP_MOVEDOWN, OnGroupMoveDown)
 	ON_UPDATE_COMMAND_UI(ID_GROUP_MOVEDOWN, OnUpdateGroupMoveDown)
+	ON_MESSAGE(WM_MY_SYSTRAY_NOTIFY, OnTrayNotification)
+	ON_COMMAND(ID_VIEW_HIDE, OnViewHide)
+	ON_COMMAND(ID_IMPORT_CSV, OnImportCsv)
+	ON_UPDATE_COMMAND_UI(ID_IMPORT_CSV, OnUpdateImportCsv)
+	ON_NOTIFY(NM_CLICK, IDC_PWLIST, OnClickPwlist)
+	ON_NOTIFY(LVN_COLUMNCLICK, IDC_PWLIST, OnColumnClickPwlist)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -539,7 +571,7 @@ BOOL CPwSafeDlg::OnInitDialog()
 	nColumnWidth -= 8;
 	m_cGroups.InsertColumn(0, TRL("Password Groups"), LVCFMT_LEFT, nColumnWidth, 0);
 
-	m_cGroups.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_SI_MENU);
+	m_cGroups.PostMessage(LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_SI_MENU | LVS_EX_INFOTIP);
 
 	unsigned long ul;
 	ul = testCryptoImpl();
@@ -601,6 +633,10 @@ BOOL CPwSafeDlg::OnInitDialog()
 	m_bOpenLastDb = FALSE;
 	if(stricmp(szTemp, "True") == 0) m_bOpenLastDb = TRUE;
 
+	cConfig.Get(PWMKEY_AUTOSAVEB, szTemp);
+	m_bAutoSaveDb = FALSE;
+	if(stricmp(szTemp, "True") == 0) m_bAutoSaveDb = TRUE;
+
 	if(_ParseCommandLine() == FALSE)
 	{
 		if(m_bOpenLastDb == TRUE)
@@ -612,6 +648,13 @@ BOOL CPwSafeDlg::OnInitDialog()
 			}
 		}
 	}
+
+	m_bShowWindow = TRUE;
+	VERIFY(m_systray.Create(this, WM_MY_SYSTRAY_NOTIFY, "KeePass Password Safe",
+		AfxGetApp()->LoadIcon(IDI_MAINFRAME_LOW), IDR_SYSTRAY_MENU, FALSE,
+		NULL, NULL,NIIF_NONE, 0));
+	m_systray.SetMenuDefaultItem(0, TRUE);
+	m_systray.MoveToRight();
 
 	return TRUE;
 }
@@ -947,6 +990,10 @@ void CPwSafeDlg::CleanUp()
 	else strcpy(szTemp, "False");
 	pcfg.Set(PWMKEY_OPENLASTB, szTemp);
 
+	if(m_bAutoSaveDb == TRUE) strcpy(szTemp, "True");
+	else strcpy(szTemp, "False");
+	pcfg.Set(PWMKEY_AUTOSAVEB, szTemp);
+
 	pcfg.Set(PWMKEY_LASTDB, (LPCTSTR)m_strLastDb);
 
 	if(m_bImgButtons == FALSE) strcpy(szTemp, "False");
@@ -1014,6 +1061,7 @@ void CPwSafeDlg::OnCancel()
 {
 	if(GetKeyState(27) & 0x8000) return;
 
+	m_bExiting = TRUE;
 	OnFileClose();
 
 	CleanUp();
@@ -1415,7 +1463,7 @@ void CPwSafeDlg::OnPwlistCopyPw()
 	m_mgr.UnlockEntryPassword(p);
 	CopyStringToClipboard((char *)p->pszPassword);
 	m_mgr.LockEntryPassword(p);
-	m_nClipboardCountdown = m_dwClipboardSecs;
+	m_nClipboardCountdown = (int)m_dwClipboardSecs;
 }
 
 void CPwSafeDlg::OnTimer(UINT nIDEvent) 
@@ -1450,11 +1498,50 @@ void CPwSafeDlg::OnTimer(UINT nIDEvent)
 
 void CPwSafeDlg::OnDblclkPwlist(NMHDR* pNMHDR, LRESULT* pResult) 
 {
-	UNREFERENCED_PARAMETER(pNMHDR);
-
-	OnPwlistCopyPw();
+	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	CString strData;
+	int iEntry;
+	int idGroup;
+	PW_ENTRY *p;
 
 	*pResult = 0;
+
+	idGroup = GetSelectedGroup();
+	iEntry = GetSelectedEntry();
+	if(idGroup == -1) return;
+	if(iEntry == -1) return;
+
+	p = m_mgr.GetEntryByGroup(idGroup, iEntry);
+	ASSERT(p != NULL);
+	if(p == NULL) return;
+
+	switch(pNMListView->iSubItem)
+	{
+	case 0:
+		CopyStringToClipboard(p->pszTitle);
+		m_nClipboardCountdown = -1;
+		break;
+	case 1:
+		CopyStringToClipboard(p->pszUserName);
+		m_nClipboardCountdown = -1;
+		break;
+	case 2:
+		OnPwlistVisitUrl();
+		break;
+	case 3:
+		m_mgr.UnlockEntryPassword(p);
+		CopyStringToClipboard((char *)(p->pszPassword));
+		m_mgr.LockEntryPassword(p);
+		m_nClipboardCountdown = (int)m_dwClipboardSecs;
+		break;
+	case 4:
+		CopyStringToClipboard(p->pszAdditional);
+		m_nClipboardCountdown = -1;
+		break;
+	default:
+		ASSERT(FALSE);
+		break;
+	}
 }
 
 void CPwSafeDlg::OnRclickGroupList(NMHDR* pNMHDR, LRESULT* pResult) 
@@ -1527,12 +1614,30 @@ void CPwSafeDlg::OnPwlistVisitUrl()
 void CPwSafeDlg::OnFileNew() 
 {
 	CPasswordDlg dlg;
+	CString strFirstPassword;
 	dlg.m_bLoadMode = FALSE;
+	dlg.m_bConfirm = FALSE;
 
 	if(dlg.DoModal() == IDCANCEL) return;
 
+	if(dlg.m_bKeyFile == FALSE)
+	{
+		strFirstPassword = dlg.m_strRealKey;
+		dlg.m_bConfirm = TRUE;
+		EraseCString(&dlg.m_strPassword);
+		EraseCString(&dlg.m_strRealKey);
+		if(dlg.DoModal() == IDCANCEL) return;
+		if(dlg.m_strRealKey != strFirstPassword)
+		{
+			MessageBox(TRL("Password and repeated password aren't identical!"),
+				TRL("Password Safe"), MB_ICONWARNING);
+			return;
+		}
+		EraseCString(&strFirstPassword);
+	}
+
 	m_mgr.NewDatabase();
-	if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, TRUE) == FALSE)
+	if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, &CPwSafeAppRI()) == FALSE)
 	{
 		MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"),
 			MB_OK | MB_ICONWARNING);
@@ -1578,14 +1683,16 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 	CString strFilter;
 	int nRet;
 
-	strFilter = TRL("All files");
+	strFilter = TRL("Password Safe files");
+	strFilter += " (*.pwd)|*.pwd|";
+	strFilter += TRL("All files");
 	strFilter += " (*.*)|*.*||";
 
 	dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
 	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
 	dwFlags |= 0x00080000 | 0x00800000;
 	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-	CFileDialog dlg(TRUE, "pwd", "*.*", dwFlags, strFilter, this);
+	CFileDialog dlg(TRUE, "pwd", "*.pwd", dwFlags, strFilter, this);
 
 	if(pszFile == NULL) nRet = dlg.DoModal();
 	else strFile = pszFile;
@@ -1599,7 +1706,7 @@ void CPwSafeDlg::_OpenDatabase(const TCHAR *pszFile)
 
 		if(dlgPass.DoModal() == IDCANCEL) return;
 
-		if(m_mgr.SetMasterKey(dlgPass.m_strRealKey, dlgPass.m_bKeyFile, FALSE) == FALSE)
+		if(m_mgr.SetMasterKey(dlgPass.m_strRealKey, dlgPass.m_bKeyFile, NULL) == FALSE)
 		{
 			MessageBox(TRL("Failed to set the master key!"), TRL("Password Safe"), MB_OK | MB_ICONWARNING);
 			return;
@@ -1657,7 +1764,9 @@ void CPwSafeDlg::OnFileSaveAs()
 
 	if(m_bFileOpen == FALSE) return;
 
-	strFilter = TRL("All files");
+	strFilter = TRL("Password Safe files");
+	strFilter += " (*.pwd)|*.pwd|";
+	strFilter += TRL("All files");
 	strFilter += " (*.*)|*.*||";
 
 	dwFlags = OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
@@ -1690,13 +1799,21 @@ void CPwSafeDlg::OnFileClose()
 
 	if((m_bFileOpen == TRUE) && (m_bModified == TRUE))
 	{
-		CString str;
+		if((m_bExiting == TRUE) && (m_bAutoSaveDb == TRUE))
+		{
+			nRes = IDYES;
+		}
+		else
+		{
+			CString str;
 
-		str = TRL("The current file has been modified.");
-		str += "\r\n\r\n";
-		str += TRL("Do you want to save the changes before closing?");
-		nRes = MessageBox(str,
-			TRL("Save Before Close?"), MB_YESNO | MB_ICONQUESTION);
+			str = TRL("The current file has been modified.");
+			str += "\r\n\r\n";
+			str += TRL("Do you want to save the changes before closing?");
+			nRes = MessageBox(str,
+				TRL("Save Before Close?"), MB_YESNO | MB_ICONQUESTION);
+		}
+
 		if(nRes == IDYES)
 		{
 			OnFileSave();
@@ -1727,6 +1844,7 @@ void CPwSafeDlg::OnSafeOptions()
 	dlg.m_bOpenLastDb = m_bOpenLastDb;
 	dlg.m_bImgButtons = m_bImgButtons;
 	dlg.m_bEntryGrid = m_bEntryGrid;
+	dlg.m_bAutoSave = m_bAutoSaveDb;
 
 	if(dlg.DoModal() == IDOK)
 	{
@@ -1735,6 +1853,7 @@ void CPwSafeDlg::OnSafeOptions()
 		m_bOpenLastDb = dlg.m_bOpenLastDb;
 		m_bImgButtons = dlg.m_bImgButtons;
 		m_bEntryGrid = dlg.m_bEntryGrid;
+		m_bAutoSaveDb = dlg.m_bAutoSave;
 
 		NewGUI_SetImgButtons(m_bImgButtons);
 		_SetListParameters();
@@ -1774,7 +1893,7 @@ void CPwSafeDlg::OnFileChangeMasterPw()
 
 	if(dlg.DoModal() == TRUE)
 	{
-		if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, TRUE) == FALSE)
+		if(m_mgr.SetMasterKey(dlg.m_strRealKey, dlg.m_bKeyFile, &CPwSafeAppRI()) == FALSE)
 		{
 			MessageBox(TRL("Failed to set the master key!"), TRL("Stop"), MB_OK | MB_ICONWARNING);
 			return;
@@ -2693,4 +2812,91 @@ void CPwSafeDlg::OnGroupMoveDown()
 void CPwSafeDlg::OnUpdateGroupMoveDown(CCmdUI* pCmdUI) 
 {
 	pCmdUI->Enable((GetSafeSelectedGroup() != -1) ? TRUE : FALSE);
+}
+
+LRESULT CPwSafeDlg::OnTrayNotification(WPARAM wParam, LPARAM lParam)
+{
+	return m_systray.OnTrayNotification(wParam, lParam);
+}
+
+void CPwSafeDlg::OnViewHide() 
+{
+	if(m_bShowWindow == TRUE)
+	{
+		m_systray.MinimiseToTray(this);
+		m_bShowWindow = FALSE;
+	}
+	else
+	{
+		m_systray.MaximiseFromTray(this);
+		m_bShowWindow = TRUE;
+	}
+}
+
+void CPwSafeDlg::OnImportCsv() 
+{
+	CPwImport pvi;
+	CString strFile;
+	DWORD dwFlags;
+	CString strFilter;
+	int nRet;
+	DWORD dwGroupId;
+
+	strFilter = TRL("CSV files");
+	strFilter += " (*.csv)|*.csv|";
+	strFilter += TRL("All files");
+	strFilter += " (*.*)|*.*||";
+
+	dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
+	// OFN_EXPLORER = 0x00080000, OFN_ENABLESIZING = 0x00800000
+	dwFlags |= 0x00080000 | 0x00800000;
+	dwFlags |= OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+	CFileDialog dlg(TRUE, "csv", "*.csv", dwFlags, strFilter, this);
+
+	nRet = dlg.DoModal();
+	if(nRet == IDOK)
+	{
+		strFile = dlg.GetPathName();
+
+		dwGroupId = (DWORD)GetSelectedGroup();
+		ASSERT(dwGroupId != 0xFFFFFFFF);
+
+		if(pvi.ImportCsvToDb((LPCTSTR)strFile, &m_mgr, dwGroupId) == TRUE)
+		{
+			UpdatePasswordList();
+			m_bModified = TRUE;
+		}
+		else
+		{
+			MessageBox(TRL("An error occured while importing the CSV file. File cannot be imported."),
+				TRL("Password Safe"), MB_ICONWARNING);
+		}
+	}
+}
+
+void CPwSafeDlg::OnUpdateImportCsv(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(m_bFileOpen);
+}
+
+void CPwSafeDlg::OnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult) 
+{
+	*pResult = 0;
+
+	if((GetKeyState(VK_CONTROL) & 0x8000) > 0)
+	{
+		OnPwlistEdit();
+	}
+}
+
+void CPwSafeDlg::OnColumnClickPwlist(NMHDR* pNMHDR, LRESULT* pResult) 
+{
+	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	int nGroup = GetSelectedGroup();
+	*pResult = 0;
+
+	if(nGroup == -1) return;
+	m_mgr.SortGroup(nGroup, (DWORD)pNMListView->iSubItem);
+	m_bModified = TRUE;
+	UpdatePasswordList();
 }

@@ -127,7 +127,7 @@ void CGetRandomDlg::OnOK()
 	if(nStringLen != 0)
 		sha256_hash((BYTE *)(LPCTSTR)m_strRandom, (unsigned long)nStringLen, &ctx);
 
-	sha256_end(m_pFinalRandom, &ctx);
+	sha256_end((unsigned char *)m_pFinalRandom, &ctx);
 
 	CDialog::OnOK();
 }

@@ -83,6 +83,7 @@ IDI_SEARCH              ICON    DISCARDABLE     "res\\search.ico"
 IDI_ICONPIC             ICON    DISCARDABLE     "res\\iconpic.ico"
 IDI_WORLD               ICON    DISCARDABLE     "res\\world.ico"
 IDI_OPTIONS             ICON    DISCARDABLE     "res\\options.ico"
+IDI_MAINFRAME_LOW       ICON    DISCARDABLE     "res\\mainfram.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -111,12 +112,12 @@ STYLE DS_3DLOOK | DS_NOFAILCREATE | DS_CENTER | WS_MINIMIZEBOX |
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "Password Safe"
 MENU IDR_MAINMENU
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "",IDC_MENULINE,"Static",SS_ETCHEDHORZ,0,0,69,1
     CONTROL         "List1",IDC_PWLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER | 
-                    WS_BORDER | WS_TABSTOP,180,7,144,129
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | 
+                    WS_TABSTOP,180,7,144,129
     CONTROL         "List1",IDC_GROUPLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER | 
                     WS_BORDER | WS_TABSTOP,7,7,114,113
@@ -304,14 +305,14 @@ BEGIN
                     WS_TABSTOP,7,7,241,99
 END
 
-IDD_OPTIONS_DLG DIALOG DISCARDABLE  0, 0, 314, 132
+IDD_OPTIONS_DLG DIALOG DISCARDABLE  0, 0, 314, 150
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Options"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,192,111,56,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,251,111,56,14
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,106,313,1
+    DEFPUSHBUTTON   "&OK",IDOK,192,129,56,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,251,129,56,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,125,313,1
     LTEXT           "Newline sequence:",IDC_STATIC,7,7,91,8
     CONTROL         "Windows newline sequence (\\r\\n)",IDC_RADIO_NEWLINE_0,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP,102,7,205,10
@@ -321,15 +322,17 @@ BEGIN
     EDITTEXT        IDC_EDIT_CLIPBOARDTIME,103,39,182,14,ES_AUTOHSCROLL | 
                     ES_NUMBER
     LTEXT           "sec",IDC_STATIC,288,42,19,8
-    LTEXT           "Options",IDC_STATIC,7,116,106,8,WS_DISABLED
+    LTEXT           "Options",IDC_STATIC,7,135,106,8,WS_DISABLED
     CONTROL         "Automatically open last used database on startup",
                     IDC_CHECK_AUTOOPENLASTDB,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,103,61,204,10
     CONTROL         "GUI: Display images on buttons",IDC_CHECK_IMGBUTTONS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,75,204,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,87,204,10
     CONTROL         "GUI: Show grid lines in password entry list",
                     IDC_CHECK_ENTRYGRID,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,103,89,204,10
+                    WS_TABSTOP,103,99,204,10
+    CONTROL         "Automatically save database on exit",IDC_CHECK_AUTOSAVE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,74,204,10
 END
 
 
@@ -469,7 +472,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 307
         TOPMARGIN, 7
-        BOTTOMMARGIN, 125
+        BOTTOMMARGIN, 143
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -502,6 +505,7 @@ BEGIN
             MENUITEM "&XML Format...",              ID_EXPORT_XML
             MENUITEM "&CSV Format...",              ID_EXPORT_CSV
         END
+        MENUITEM "&Import From CSV",            ID_IMPORT_CSV
         MENUITEM SEPARATOR
         MENUITEM "&Lock Workspace",             ID_FILE_LOCK
         MENUITEM "&Exit",                       ID_FILE_EXIT
@@ -522,7 +526,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Main Window &Always On Top",  ID_VIEW_ALWAYSONTOP, CHECKED
         MENUITEM SEPARATOR
-        MENUITEM "&Hide Passwords Behind Stars (***)", ID_VIEW_HIDESTARS
+        MENUITEM "&Hide Passwords Behind Asterisks (***)", ID_VIEW_HIDESTARS
         , CHECKED
     END
     POPUP "&Extras"
@@ -582,6 +586,24 @@ BEGIN
         MENUITEM "Export Group To &HTML...",    ID_SAFE_EXPORTGROUP_HTML
         MENUITEM "Export Group To &XML...",     ID_SAFE_EXPORTGROUP_XML
         MENUITEM "Export Group To &CSV...",     ID_SAFE_EXPORTGROUP_CSV
+    END
+END
+
+IDR_SYSTRAY_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "POPUP_MENU"
+    BEGIN
+        MENUITEM "&Minimize/Maximize Window To/From Tray", ID_VIEW_HIDE
+        MENUITEM SEPARATOR
+        MENUITEM "&Add Entry...",               ID_PWLIST_ADD
+        MENUITEM SEPARATOR
+        MENUITEM "Password &Generator",         ID_EXTRAS_GENPW
+        MENUITEM SEPARATOR
+        MENUITEM "&Options",                    ID_SAFE_OPTIONS
+        MENUITEM "&About KeePass...",           ID_INFO_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "&Lock/Unlock Workspace",      ID_FILE_LOCK
+        MENUITEM "&Exit",                       ID_FILE_EXIT
     END
 END
 
@@ -645,6 +667,8 @@ BEGIN
     BUTTON      ID_GROUP_MOVEBOTTOM
     BUTTON      ID_GROUP_MOVEUP
     BUTTON      ID_GROUP_MOVEDOWN
+    BUTTON      ID_IMPORT_CSV
+    BUTTON      ID_PWLIST_SORT
 END
 
 IDR_CLIENTICONS TOOLBAR DISCARDABLE  16, 16

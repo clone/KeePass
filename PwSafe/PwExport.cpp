@@ -114,7 +114,7 @@ BOOL CPwExport::ExportGroup(const char *pszFile, int nGroup)
 	}
 	else if(m_nFormat == PWEXP_CSV)
 	{
-		PWEXPSTR("\"Group\",\"Title\",\"UserName\",\"URL\",\"Password\",\"Notes\"");
+		PWEXPSTR("\"Account\",\"Login Name\",\"Password\",\"Web Site\",\"Comments\"");
 		PWEXPSTR(m_pszNewLine);
 	}
 	else { ASSERT(FALSE); }
@@ -192,15 +192,13 @@ BOOL CPwExport::ExportGroup(const char *pszFile, int nGroup)
 		else if(m_nFormat == PWEXP_CSV)
 		{
 			PWEXPSTR("\"");
-			PWEXPSTR(pg->pszGroupName);
-			PWEXPSTR("\",\"");
 			PWEXPSTR(p->pszTitle);
 			PWEXPSTR("\",\"");
 			PWEXPSTR(p->pszUserName);
 			PWEXPSTR("\",\"");
-			PWEXPSTR(p->pszURL);
-			PWEXPSTR("\",\"");
 			PWEXPSTR((const char *)p->pszPassword);
+			PWEXPSTR("\",\"");
+			PWEXPSTR(p->pszURL);
 			PWEXPSTR("\",\"");
 			PWEXPSTR(p->pszAdditional);
 			PWEXPSTR("\"");

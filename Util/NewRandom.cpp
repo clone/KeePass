@@ -73,7 +73,9 @@ void CNewRandom::Initialize()
 	GetCursorPos(&pt);
 	memcpy(&m_pPseudoRandom[inx], &pt, 8); inx += 8;
 
+#ifndef _WIN32_WCE
 	SystemParametersInfo(SPI_GETSCREENSAVETIMEOUT, 0, &dw, 0);
+#endif
 	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
 
 	ww = (WORD)(rand());

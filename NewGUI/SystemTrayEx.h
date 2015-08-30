@@ -27,27 +27,19 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ___MEMORY_UTILITIES_H___
-#define ___MEMORY_UTILITIES_H___
+// KeePass: The CSystemTrayEx translates CSystemTray menus
 
-#include "../StdAfx.h"
+#ifndef ___SYSTEM_TRAY_EX_H___
+#define ___SYSTEM_TRAY_EX_H___
 
-#ifndef SAFE_DELETE
-#define SAFE_DELETE(p)       { if((p) != NULL) { delete (p);     (p) = NULL; } }
-#define SAFE_DELETE_ARRAY(p) { if((p) != NULL) { delete [](p);  (p) = NULL; } }
-#define SAFE_RELEASE(p)      { if((p) != NULL) { (p)->Release(); (p) = NULL; } }
-#endif
+#include "NewGUICommon.h"
+#include "BCMenu.h"
+#include "SystemTray.h"
 
-#define SDF_BUF_SIZE 4096
-
-void mem_erase(unsigned char *p, unsigned long u);
-void EraseCString(CString *pString);
-
-#ifndef _WIN32_WCE
-void CopyStringToClipboard(char *pszString);
-BOOL SecureDeleteFile(LPCSTR pszFilePath);
-#endif
-
-void FixURL(CString *pstrURL);
+class CSystemTrayEx : public CSystemTray
+{
+protected:
+	virtual void CustomizeMenu(CMenu *pMenu);
+};
 
 #endif

@@ -27,27 +27,25 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef ___MEMORY_UTILITIES_H___
-#define ___MEMORY_UTILITIES_H___
+#include "StdAfx.h"
+#include "SystemTrayEx.h"
+#include "TranslateEx.h"
 
-#include "../StdAfx.h"
+void CSystemTrayEx::CustomizeMenu(CMenu *pMenu)
+{
+	// Translate the menu
 
-#ifndef SAFE_DELETE
-#define SAFE_DELETE(p)       { if((p) != NULL) { delete (p);     (p) = NULL; } }
-#define SAFE_DELETE_ARRAY(p) { if((p) != NULL) { delete [](p);  (p) = NULL; } }
-#define SAFE_RELEASE(p)      { if((p) != NULL) { (p)->Release(); (p) = NULL; } }
-#endif
+	CString strItem, strNew;
+	UINT nItem = 0, nItemID = 0;
 
-#define SDF_BUF_SIZE 4096
+	for(nItem = 0; nItem < pMenu->GetMenuItemCount(); nItem++)
+	{
+		nItemID = pMenu->GetMenuItemID((int)nItem);
+		if(nItemID == 0) { continue; }
 
-void mem_erase(unsigned char *p, unsigned long u);
-void EraseCString(CString *pString);
+		pMenu->GetMenuString(nItem, strItem, MF_BYPOSITION);
 
-#ifndef _WIN32_WCE
-void CopyStringToClipboard(char *pszString);
-BOOL SecureDeleteFile(LPCSTR pszFilePath);
-#endif
-
-void FixURL(CString *pstrURL);
-
-#endif
+		strNew = TRL((LPCTSTR)strItem);
+		VERIFY(pMenu->ModifyMenu(nItem, MF_BYPOSITION | MF_STRING, nItemID, strNew));
+	}
+}

@@ -155,25 +155,48 @@ BOOL CPasswordDlg::OnInitDialog()
 	lp = TRL("or");
 	GetDlgItem(IDC_STATIC_OR)->SetWindowText(lp);
 
-	if(m_bLoadMode == FALSE)
+	if(m_bConfirm == FALSE)
 	{
-		lp = TRL("Select the password disk drive where the key will be stored:");
-		GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
+		if(m_bLoadMode == FALSE)
+		{
+			lp = TRL("Select the password disk drive where the key will be stored:");
+			GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
 
-		SetWindowText(TRL("Create a new password database - Enter master key"));
-		m_banner.SetTitle(TRL("Set master key"));
-		m_banner.SetCaption(TRL("Enter the master key for the new database."));
+			SetWindowText(TRL("Create a new password database - Enter master key"));
+			m_banner.SetTitle(TRL("Set master key"));
+			m_banner.SetCaption(TRL("Enter the master key for the new database."));
+		}
+		else
+		{
+			lp = TRL("Select the password disk drive to load the key from:");
+			GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
+
+			SetWindowText(TRL("Open database - Enter master key"));
+			m_banner.SetTitle(TRL("Enter master key"));
+			m_banner.SetCaption(TRL("Enter the master key for this database."));
+
+			GetDlgItem(IDC_MAKEPASSWORD_BTN)->ShowWindow(SW_HIDE);
+		}
 	}
-	else
+	else // m_bConfirm == TRUE
 	{
-		lp = TRL("Select the password disk drive to load the key from:");
-		GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
+		if(m_bLoadMode == FALSE)
+		{
+			GetDlgItem(IDC_STATIC_INTRO)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC_OR)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC_SELDISK)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_COMBO_DISKLIST)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_MAKEPASSWORD_BTN)->EnableWindow(FALSE);
 
-		SetWindowText(TRL("Open database - Enter master key"));
-		m_banner.SetTitle(TRL("Enter master key"));
-		m_banner.SetCaption(TRL("Enter the master key for this database."));
-
-		GetDlgItem(IDC_MAKEPASSWORD_BTN)->ShowWindow(SW_HIDE);
+			SetWindowText(TRL("Create a new password database - Repeat master key"));
+			m_banner.SetTitle(TRL("Repeat master password"));
+			m_banner.SetCaption(TRL("Repeat the master key for the new database."));
+		}
+		else
+		{
+			// This combination isn't possible
+			ASSERT(FALSE);
+		}
 	}
 
 	CString strStars = (char)('z' + 27);

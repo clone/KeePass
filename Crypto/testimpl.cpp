@@ -95,9 +95,9 @@ unsigned long testCryptoImpl()
 	sha2_64t sha64;
 	sha256_ctx hash256;
 	sha512_ctx hash512;
-	unsigned char aHash[128];
-	unsigned char aTemp[128];
-	unsigned char aTemp2[128];
+	RD_UINT8 aHash[128];
+	RD_UINT8 aTemp[128];
+	RD_UINT8 aTemp2[128];
 	Rijndael rdcrypt;
 	int i, j;
 
@@ -120,28 +120,28 @@ unsigned long testCryptoImpl()
 	sha256_begin(&hash256);
 	sha256_hash((const unsigned char *)g_szVectABCX,
 		strlen(g_szVectABCX), &hash256);
-	sha256_end(aHash, &hash256);
+	sha256_end((unsigned char *)aHash, &hash256);
 	if(memcmp(aHash, g_uVectABCX_SHA256, 32) != 0)
 		uTestMask |= TI_ERR_SHACMP256;
 
 	sha512_begin(&hash512);
 	sha512_hash((const unsigned char *)g_szVectABCX,
 		strlen(g_szVectABCX), &hash512);
-	sha512_end(aHash, &hash512);
+	sha512_end((unsigned char *)aHash, &hash512);
 	if(memcmp(aHash, g_uVectABCX_SHA512, 64) != 0)
 		uTestMask |= TI_ERR_SHACMP512;
 
 	sha256_begin(&hash256);
 	sha256_hash((const unsigned char *)g_szVectABCXPM,
 		strlen(g_szVectABCXPM), &hash256);
-	sha256_end(aHash, &hash256);
+	sha256_end((unsigned char *)aHash, &hash256);
 	if(memcmp(aHash, g_uVectABCXPM_SHA256, 32) != 0)
 		uTestMask |= TI_ERR_SHACMP256;
 
 	sha512_begin(&hash512);
 	sha512_hash((const unsigned char *)g_szVectABCXPM,
 		strlen(g_szVectABCXPM), &hash512);
-	sha512_end(aHash, &hash512);
+	sha512_end((unsigned char *)aHash, &hash512);
 	if(memcmp(aHash, g_uVectABCXPM_SHA512, 64) != 0)
 		uTestMask |= TI_ERR_SHACMP512;
 
@@ -207,9 +207,9 @@ unsigned long testCryptoImpl()
 	memset(aHash, 0, 32);
 	memset(aTemp, 0, 32);
 	memset(aTemp2, 0, 32);
-	arcfourCrypt(aTemp, 32, (BYTE *)"abcdef", 6);
-	arcfourCrypt(aTemp2, 32, (BYTE *)"abcdef", 6);
-	arcfourCrypt(aTemp2, 32, (BYTE *)"abcdef", 6);
+	arcfourCrypt((BYTE *)aTemp, 32, (BYTE *)"abcdef", 6);
+	arcfourCrypt((BYTE *)aTemp2, 32, (BYTE *)"abcdef", 6);
+	arcfourCrypt((BYTE *)aTemp2, 32, (BYTE *)"abcdef", 6);
 	if(memcmp(aHash, aTemp2, 32) != 0) uTestMask |= TI_ERR_ARCFOUR_CRYPT;
 	if(memcmp(aHash, aTemp, 32) == 0) uTestMask |= TI_ERR_ARCFOUR_CRYPT;
 

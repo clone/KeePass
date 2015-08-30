@@ -71,6 +71,7 @@ void EraseCString(CString *pString)
 	pString->Empty();
 }
 
+#ifndef _WIN32_WCE
 void CopyStringToClipboard(char *pszString)
 {
 	unsigned long uDataSize;
@@ -164,6 +165,7 @@ BOOL SecureDeleteFile(LPCSTR pszFilePath)
 
 	return TRUE;
 }
+#endif
 
 void FixURL(CString *pstrURL)
 {
