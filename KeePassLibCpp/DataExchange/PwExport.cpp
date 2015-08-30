@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -399,7 +399,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 		_ExpStrIf(pOptions->bLastAccTime, TRL("Last Access"));
 		_ExpStrIf(pOptions->bLastModTime, TRL("Last Modification"));
 		_ExpStrIf(pOptions->bExpireTime, TRL("Expires"));
-		_ExpStrIf(pOptions->bAttachment, TRL("Attachment"));
+		_ExpStrIf(pOptions->bAttachment, TRL("Attachment Description"));
 		_ExpStrIf(pOptions->bAttachment, TRL("Attachment"));
 
 		_ExpStr(_T("</th></tr>"));
@@ -431,7 +431,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 		_ExpStrIf(pOptions->bLastAccTime, _T("Last Access"));
 		_ExpStrIf(pOptions->bLastModTime, _T("Last Modification"));
 		_ExpStrIf(pOptions->bExpireTime, _T("Expires"));
-		_ExpStrIf(pOptions->bAttachment, _T("Attachment"));
+		_ExpStrIf(pOptions->bAttachment, _T("Attachment Description"));
 		_ExpStrIf(pOptions->bAttachment, _T("Attachment"));
 
 		_ExpStr(_T("\""));
@@ -586,9 +586,7 @@ BOOL CPwExport::ExportGroup(const TCHAR *pszFile, DWORD dwGroupId, const PWEXPOR
 
 				if(p->pszBinaryDesc[0] != 0)
 				{
-					_ExpStrIf(pOptions->bAttachment, TRL("Attachment"));
-					_ExpStrIf(pOptions->bAttachment, _T(" "));
-					_ExpStrIf(pOptions->bAttachment, TRL("Title"));
+					_ExpStrIf(pOptions->bAttachment, TRL("Attachment Description"));
 					_ExpStrIf(pOptions->bAttachment, _T(": "));
 					_ExpStrIf(pOptions->bAttachment, p->pszBinaryDesc);
 					if(pOptions->bAttachment == TRUE) _ExpStr(m_pszNewLine);

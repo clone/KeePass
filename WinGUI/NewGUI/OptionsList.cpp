@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -180,7 +180,7 @@ void COptionsList::AddGroupText(LPCTSTR lpItemText, int nIcon)
 	lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_INDENT;
 	lvi.iItem = GetItemCount();
 	lvi.pszText = (LPTSTR)lpItemText;
-	lvi.cchTextMax = _tcslen(lpItemText);
+	lvi.cchTextMax = static_cast<int>(_tcslen(lpItemText));
 	lvi.iImage = nIcon;
 
 	InsertItem(&lvi);
@@ -202,7 +202,7 @@ void COptionsList::AddCheckItem(LPCTSTR lpItemText, BOOL *pValueStorage, BOOL *p
 	lvi.iItem = GetItemCount();
 	lvi.iSubItem = 0;
 	lvi.pszText = (LPTSTR)lpItemText;
-	lvi.cchTextMax = _tcslen(lpItemText);
+	lvi.cchTextMax = static_cast<int>(_tcslen(lpItemText));
 	lvi.iImage = (*pValueStorage == TRUE) ? OL_CHECK_TRUE : OL_CHECK_FALSE;
 	lvi.iIndent = 1;
 
@@ -224,7 +224,7 @@ void COptionsList::AddCheckItemEx(LPCTSTR lpItemText, LPCTSTR lpSubItemText, BOO
 	lvi.iItem = GetItemCount() - 1;
 	lvi.iSubItem = 1;
 	lvi.pszText = (LPTSTR)lpSubItemText;
-	lvi.cchTextMax = _tcslen(lpSubItemText);
+	lvi.cchTextMax = static_cast<int>(_tcslen(lpSubItemText));
 
 	SetItem(&lvi);
 }

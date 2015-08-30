@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ BOOL CPwManager::_OpenDatabaseV1(const TCHAR *pszFile)
 	FILE *fp;
 	char *pVirtualFile;
 	unsigned long uFileSize, uAllocated, uEncryptedPartSize;
-	unsigned long i, j, pos;
+	size_t i, j, pos;
 	PW_DBHEADER_V1 hdr;
 	sha256_ctx sha32;
 	UINT8 uFinalKey[32];
@@ -183,7 +183,8 @@ BOOL CPwManager::_OpenDatabaseV1(const TCHAR *pszFile)
 		pos += 4;
 		if(pos >= uFileSize) { _OPENDB_FAIL; }
 
-		pwTG.uGroupId = i + 1; pwTG.uImageId = dw;
+		pwTG.uGroupId = (DWORD)i + 1;
+		pwTG.uImageId = dw;
 #ifdef _UNICODE
 		LPTSTR lpptr = _StringToUnicode(ptrTemp);
 		pwTG.pszGroupName = lpptr;

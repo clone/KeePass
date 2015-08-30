@@ -3,7 +3,7 @@ Module : SINSTANCE.H
 Purpose: Defines the interface for an MFC wrapper class to do instance checking
 Created: PJN / 29-07-1998
 
-Copyright (c) 1998 - 2004 by PJ Naughter.  
+Copyright (c) 1998 - 2006 by PJ Naughter.  
 
 All rights reserved.
 
@@ -17,7 +17,6 @@ to maintain a single distribution point for the source code.
 
 */
 
-
 #ifndef __SINSTANCE_H__
 #define __SINSTANCE_H__
 
@@ -26,7 +25,17 @@ to maintain a single distribution point for the source code.
 #include <afxmt.h>
 #endif
 
-class CInstanceChecker : public CObject
+#ifndef CSINGLEINSTANCE_EXT_CLASS
+#define CSINGLEINSTANCE_EXT_CLASS
+#endif
+
+#ifndef CSINGLEINSTANCE_EXT_API
+#define CSINGLEINSTANCE_EXT_API
+#endif
+
+//////////////////////////// Classes //////////////////////////////////////////
+
+class CSINGLEINSTANCE_EXT_CLASS CInstanceChecker
 {
 public:
 //Constructors / Destructors

@@ -99,11 +99,11 @@ extern "C"
 
 #if !defined(PLATFORM_BYTE_ORDER)
 
-#if   defined( __alpha__ ) || defined( __alpha ) || defined( i386 )       || \
-      defined( __i386__ )  || defined( _M_I86 )  || defined( _M_IX86 )    || \
-      defined( __OS2__ )   || defined( sun386 )  || defined( __TURBOC__ ) || \
-      defined( vax )       || defined( vms )     || defined( VMS )        || \
-      defined( __VMS )
+#if   defined( __alpha__ ) || defined( __alpha )   || defined( i386 )       || \
+      defined( __i386__ )  || defined( _M_I86 )    || defined( _M_IX86 )    || \
+      defined( __OS2__ )   || defined( sun386 )    || defined( __TURBOC__ ) || \
+      defined( vax )       || defined( vms )       || defined( VMS )        || \
+      defined( __VMS )     || defined( _M_X64 )
 #  define PLATFORM_BYTE_ORDER IS_LITTLE_ENDIAN
 
 #elif defined( AMIGA )    || defined( applec )  || defined( __AS400__ )  || \

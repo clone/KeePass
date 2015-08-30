@@ -57,8 +57,8 @@ History: PJN / 25-03-2000 Neville Franks made the following changes. Contact nev
 
                           LRESULT CMyFrameWnd::OnCopyData(WPARAM wParam, LPARAM lParam)
                           {
-                            COPYDATASTRUCT* pCDS = (COPYDATASTRUCT*) lParam;
-                            TCHAR* pszCmdLine = (TCHAR*) pCDS->lpData;
+                            COPYDATASTRUCT* pCDS = reinterpret_cast<COPYDATASTRUCT*>(lParam);
+                            TCHAR* pszCmdLine = static_cast<TCHAR*>(pCDS->lpData);
                             if (pszCmdLine)
                             {
                               //DO SOMETHING with pszCmdLine here such as call AfxGetApp()->OpenDocumentFile(pszCmdLine);
@@ -81,9 +81,18 @@ History: PJN / 25-03-2000 Neville Franks made the following changes. Contact nev
                           CInstanceChecker. The concept of a single instance app is complicated by the concept of Window stations
                           and desktops as used by NT Services and Windows Terminal Services. In addition you might want to allow your
                           program to be run once per user. 
+         PJN / 30-05-2005 1. Fix for a crash where CWnd::GetLastActivePopup can sometimes return a NULL pointer. Thanks to 
+                          Dominik Reichl for reporting this bug.
+         PJN / 07-07-2006 1. Updated copyright details.
+                          2. Addition of CSINGLEINSTANCE_EXT_CLASS and CSINGLEINSTANCE_EXT_API which allows the class to be easily used
+                          in an extension DLL.
+                          3. Removed derivation from CObject as it was not really needed.
+                          4. Updated the documentation to use the same style as the web site.
+                          5. Code now uses newer C++ style casts instead of C style casts.
+                          6. Fixed a number of level 4 warnings in the sample app.
+                          7. Updated code to compile cleanly using VC 2005.
 
-
-Copyright (c) 1996 - 2004 by PJ Naughter.  (Web: www.naughter.com, Email: pjna@naughter.com)
+Copyright (c) 1996 - 2006 by PJ Naughter (Web: www.naughter.com, Email: pjna@naughter.com)
 
 All rights reserved.
 
@@ -97,12 +106,10 @@ to maintain a single distribution point for the source code.
 
 */
 
-
 /////////////////////////////////  Includes  //////////////////////////////////
 
 #include "stdafx.h"
 #include "sinstance.h"
-
 
 
 /////////////////////////////// Defines / Macros //////////////////////////////
@@ -114,7 +121,6 @@ static char BASED_CODE THIS_FILE[] = __FILE__;
 #endif
 
 
-
 ///////////////////////////////// Implementation //////////////////////////////
 
 //struct which is put into shared memory
@@ -123,7 +129,7 @@ struct CWindowInstance
   HWND hMainWnd;
 };
 
-//Class which be used as a static to ensure that we
+//Class which is used as a static to ensure that we
 //only close the file mapping at the very last chance
 class _INSTANCE_DATA
 {
@@ -199,7 +205,7 @@ BOOL CInstanceChecker::TrackFirstInstanceRunning()
 
   //First create the MMF
   int nMMFSize = sizeof(CWindowInstance);
-  instanceData.hInstanceData = ::CreateFileMapping((HANDLE)0xFFFFFFFF, NULL, PAGE_READWRITE, 0, nMMFSize, GetMMFFilename());
+  instanceData.hInstanceData = ::CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, nMMFSize, GetMMFFilename());
   if (instanceData.hInstanceData == NULL)
   {
     TRACE(_T("Failed to create the MMF even though this is the first instance, you might want to consider overriding GetMMFFilename()\n"));
@@ -207,7 +213,7 @@ BOOL CInstanceChecker::TrackFirstInstanceRunning()
   }
 
   //Open the MMF
-  CWindowInstance* pInstanceData = (CWindowInstance*) ::MapViewOfFile(instanceData.hInstanceData, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, nMMFSize);
+  CWindowInstance* pInstanceData = static_cast<CWindowInstance*>(::MapViewOfFile(instanceData.hInstanceData, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, nMMFSize));
   ASSERT(pInstanceData != NULL);   //Opening the MMF should work
 
   // Lock the data prior to updating it
@@ -257,7 +263,7 @@ HWND CInstanceChecker::ActivatePreviousInstance(LPCTSTR lpCmdLine, DWORD dwCopyD
   {
     // Open up the MMF
     int nMMFSize = sizeof(CWindowInstance);
-    CWindowInstance* pInstanceData = (CWindowInstance*) ::MapViewOfFile(hPrevInstance, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, nMMFSize);
+    CWindowInstance* pInstanceData = static_cast<CWindowInstance*>(::MapViewOfFile(hPrevInstance, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, nMMFSize));
     if (pInstanceData != NULL) //Opening the MMF should work
     {
       //Lock the data prior to reading from it
@@ -276,18 +282,24 @@ HWND CInstanceChecker::ActivatePreviousInstance(LPCTSTR lpCmdLine, DWORD dwCopyD
         //Restore the focus to the previous instance and bring it to the foreground
         if (wndPrev.IsIconic())
           wndPrev.ShowWindow(SW_RESTORE);
-        if(pWndChild != NULL) pWndChild->SetForegroundWindow();
+
+        if (pWndChild)
+          pWndChild->SetForegroundWindow();
 
         if (lpCmdLine)
         {  
           //Send the current apps command line to the previous instance using WM_COPYDATA
           COPYDATASTRUCT cds;
           cds.dwData = dwCopyDataItemData;
-          int nCmdLength = _tcslen(lpCmdLine) + 1;
-          cds.cbData = nCmdLength * sizeof(TCHAR); 
-          TCHAR* pszLocalCmdLine = new TCHAR[nCmdLength]; //We use a local buffer so that we can specify a constant parameter
-                                                          //to this function
-          _tcscpy_s(pszLocalCmdLine, nCmdLength, lpCmdLine);
+          DWORD dwCmdLength = static_cast<DWORD>(_tcslen(lpCmdLine) + 1);
+          cds.cbData = dwCmdLength * sizeof(TCHAR); 
+          TCHAR* pszLocalCmdLine = new TCHAR[dwCmdLength]; //We use a local buffer so that we can specify a constant parameter
+                                                           //to this function
+        #if (_MSC_VER >= 1400)
+          _tcscpy_s(pszLocalCmdLine, dwCmdLength, lpCmdLine);
+        #else                                                 
+          _tcscpy(pszLocalCmdLine, lpCmdLine);
+        #endif
           cds.lpData = pszLocalCmdLine;
           CWnd* pMainWindow = AfxGetMainWnd();
           HWND hSender = NULL;
@@ -295,7 +307,7 @@ HWND CInstanceChecker::ActivatePreviousInstance(LPCTSTR lpCmdLine, DWORD dwCopyD
             hSender = pMainWindow->GetSafeHwnd();
 
           //Send the message to the previous instance
-          wndPrev.SendMessage(WM_COPYDATA, (WPARAM) hSender, (LPARAM)&cds);
+          wndPrev.SendMessage(WM_COPYDATA, reinterpret_cast<WPARAM>(hSender), reinterpret_cast<LPARAM>(&cds));
 
           //Tidy up the heap memory we have used
           delete [] pszLocalCmdLine;
@@ -336,7 +348,7 @@ void CInstanceChecker::QuitPreviousInstance(int nExitCode)
 	{
 		// Open up the MMF
 		int nMMFSize = sizeof(CWindowInstance);
-		CWindowInstance* pInstanceData = (CWindowInstance*) ::MapViewOfFile(hPrevInstance, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, nMMFSize);
+		CWindowInstance* pInstanceData = static_cast<CWindowInstance*>(::MapViewOfFile(hPrevInstance, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, nMMFSize));
 		if (pInstanceData != NULL) //Opening the MMF should work
 		{
 		  // Lock the data prior to reading from it

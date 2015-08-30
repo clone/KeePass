@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #define AFX_ADDENTRYDLG_H__C5D4C3E0_0BAE_11D8_BF16_0050BF14F5CC__INCLUDED_
 
 #include "NewGUI/KCSideBannerWnd.h"
-#include "NewGUI/XHyperLink.h"
 #include "NewGUI/AMSEdit.h"
 #include "NewGUI/AutoRichEditCtrlFx.h"
 #include "NewGUI/GradientProgressCtrl.h"
@@ -67,11 +66,10 @@ public:
 
 	//{{AFX_DATA(CAddEntryDlg)
 	enum { IDD = IDD_ADDENTRY_DLG };
+	CXPStyleButtonST	m_btHelp;
 	CXPStyleButtonST	m_btSelDefExpires;
 	CXPStyleButtonST	m_btSetToDefaultExpire;
 	CComboBoxEx	m_cbGroups;
-	CXHyperLink	m_hlHelpURL;
-	CXHyperLink	m_hlHelpAutoType;
 	CGradientProgressCtrl	m_cPassQuality;
 	CXPStyleButtonST	m_btRemoveAttachment;
 	CXPStyleButtonST	m_btSaveAttachment;
@@ -135,8 +133,11 @@ protected:
 	afx_msg void OnReNotesClickLink(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 
-	afx_msg LRESULT OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnHelpURLFieldFeatures();
+	afx_msg void OnHelpAutoType();
+	afx_msg void OnHelpOpenFile();
 };
 
 //{{AFX_INSERT_LOCATION}}

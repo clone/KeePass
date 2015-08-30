@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -660,7 +660,7 @@ BOOL CPwImport::ImportPwSafeToDb(const TCHAR *pszFile, CPwManager *pMgr)
 
 void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamSize, BOOL bUTF8)
 {
-	unsigned long s;
+	DWORD s;
 	char *pTitle = NULL, *pUserName = NULL, *pPassword = NULL, *pURL = NULL, *pNotes = NULL;
 	char *p = (char *)pStream;
 	char *pEnd = (char *)pStream + uStreamSize;
@@ -728,7 +728,7 @@ void CPwImport::_AddStringStreamToDb(const char *pStream, unsigned long uStreamS
 			pwTemplate.tLastAccess = tNow; pwTemplate.tLastMod = tNow;
 			pwTemplate.uGroupId = m_dwLastGroupId;
 			pwTemplate.uImageId = _GetPreferredIcon(tszTitle);
-			pwTemplate.uPasswordLen = _tcslen(tszPassword);
+			pwTemplate.uPasswordLen = static_cast<DWORD>(_tcslen(tszPassword));
 			// UUID is zero -> create new UUID
 
 			m_pLastMgr->AddEntry(&pwTemplate);

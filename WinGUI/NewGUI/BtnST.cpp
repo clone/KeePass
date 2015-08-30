@@ -271,7 +271,7 @@ void CButtonST::OnSysColorChange()
 
 LRESULT CButtonST::OnSetStyle(WPARAM wParam, LPARAM lParam)
 {
-	UINT nNewType = (wParam & BS_TYPEMASK);
+	UINT nNewType = (UINT)(wParam & BS_TYPEMASK);
 
 	// Update default state flag
 	if (nNewType == BS_DEFPUSHBUTTON)
@@ -335,7 +335,8 @@ void CButtonST::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruc
 	BOOL bSetFlag = FALSE;
 	if (lpMeasureItemStruct->CtlType == ODT_MENU)
 	{
-		if (IsMenu((HMENU)lpMeasureItemStruct->itemID) && BCMenu::IsMenu((HMENU)lpMeasureItemStruct->itemID))
+		if (IsMenu((HMENU)(UINT_PTR)lpMeasureItemStruct->itemID) &&
+			BCMenu::IsMenu((HMENU)(UINT_PTR)lpMeasureItemStruct->itemID))
 		{
 			m_menuPopup.MeasureItem(lpMeasureItemStruct);
 			bSetFlag = TRUE;

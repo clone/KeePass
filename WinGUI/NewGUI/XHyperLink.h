@@ -172,7 +172,7 @@ protected:
     afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	//}}AFX_MSG
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(WPARAM nIDEvent);
     afx_msg void OnClicked();
     DECLARE_MESSAGE_MAP()
 };

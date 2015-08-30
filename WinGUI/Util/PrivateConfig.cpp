@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ CPrivateConfig::~CPrivateConfig()
 {
 }
 
-BOOL CPrivateConfig::Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue)
+BOOL CPrivateConfig::Set(LPCTSTR pszField, LPCTSTR pszValue)
 {
 	LPCTSTR lpExeName = PWM_EXENAME;
 	BOOL bRet = FALSE;
@@ -132,7 +132,7 @@ BOOL CPrivateConfig::Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue)
 	if(pszValue == NULL) // Delete key?
 	{
 		// If the key doesn't exist, we don't need to delete it
-		if(Get(pszField, tszTemp) == FALSE) return TRUE;
+		if(this->Get(pszField, tszTemp) == FALSE) return TRUE;
 	}
 	else
 	{
@@ -141,7 +141,7 @@ BOOL CPrivateConfig::Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue)
 		// devices that cache reads but not writes, this leads to a performance
 		// improvement. Thanks to Brad Clarke for the idea and patch.
 
-		if(Get(pszField, tszTemp) == TRUE)
+		if(this->Get(pszField, tszTemp) == TRUE)
 			if(_tcscmp(tszTemp, pszValue) == 0) return TRUE;
 	}
 
@@ -167,7 +167,7 @@ BOOL CPrivateConfig::Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue)
 #pragma warning(push)
 #pragma warning(disable: 4996) // _tcscpy deprecated
 
-BOOL CPrivateConfig::Get(const TCHAR *pszField, PCFG_OUT TCHAR *pszValue)
+BOOL CPrivateConfig::Get(LPCTSTR pszField, LPTSTR pszValue)
 {
 	LPCTSTR lpExeName = PWM_EXENAME;
 	LPCTSTR lpNotFound = PCFG_NOTFOUND;
@@ -212,14 +212,14 @@ BOOL CPrivateConfig::Get(const TCHAR *pszField, PCFG_OUT TCHAR *pszValue)
 
 BOOL CPrivateConfig::SetBool(const TCHAR *pszField, BOOL bValue)
 {
-	return Set(pszField, (bValue == FALSE) ? _T("False") : _T("True"));
+	return this->Set(pszField, (bValue == FALSE) ? _T("False") : _T("True"));
 }
 
 BOOL CPrivateConfig::GetBool(const TCHAR *pszField, BOOL bDefault)
 {
 	TCHAR tszTemp[SI_REGSIZE];
 
-	if(Get(pszField, tszTemp) == FALSE) return bDefault;
+	if(this->Get(pszField, tszTemp) == FALSE) return bDefault;
 
 	if(_tcsicmp(tszTemp, _T("True")) == 0) return TRUE;
 	else if(_tcsicmp(tszTemp, _T("False")) == 0) return FALSE;

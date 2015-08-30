@@ -193,7 +193,7 @@ LPTSTR CSecureEditEx::GetPassword()
 		return lp;
 	}
 
-	nNumChars = m_apChars.GetSize();
+	nNumChars = (int)m_apChars.GetSize();
 
 	lp = new TCHAR[nNumChars + 1];
 	ASSERT(lp != NULL); if(lp == NULL) return NULL;
@@ -288,7 +288,7 @@ void CSecureEditEx::OnEnUpdate()
 
 	ASSERT(m_apChars.GetSize() == iWndLen);
 
-	m_nOldLen = m_apChars.GetSize();
+	m_nOldLen = (int)m_apChars.GetSize();
 	_tcsset_s(lpWnd, sizeWindowBuffer, TCH_STDPWCHAR);
 	SetWindowText(lpWnd);
 	SetSel((int)dwPos, (int)dwPos, FALSE);

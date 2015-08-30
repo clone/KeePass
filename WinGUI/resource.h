@@ -75,6 +75,9 @@
 #define IDB_TB_SAVE_DISABLED            225
 #define IDD_IMPORT_OPTIONS_DLG          226
 #define IDD_PERMISSION_DLG              229
+#define IDB_HELP_SMALL                  230
+#define IDR_ENTRYHELP_MENU              231
+#define IDB_HELP_SMALL_POPUP            232
 #define IDC_MENULINE                    1000
 #define IDC_PWLIST                      1002
 #define IDC_GROUPLIST                   1004
@@ -100,7 +103,7 @@
 #define IDC_BEGIN_MOUSEINPUT            1029
 #define IDC_PROGRESS_MOUSE              1030
 #define IDC_EDIT_RANDOMSTRING           1031
-#define IDC_MAKEPASSWORD_BTN            1032
+#define IDC_PWDLG_HELP_BTN              1032
 #define IDC_GENERATE_BTN                1033
 #define IDC_EDIT_PW                     1039
 #define IDC_LIST_OPTIONS                1040
@@ -231,10 +234,11 @@
 #define IDC_STATIC_LISTTEXT             1207
 #define IDC_STATIC_PRODUCTNAME          1208
 #define IDC_RICHEDIT21                  1209
-#define IDC_CHECK1                      1212
 #define IDC_CHECK_LOCKONWINLOCK         1212
 #define IDC_READONLY                    1213
 #define IDC_STC_APP                     1214
+#define IDC_ENTRYHELP_BTN               1215
+#define IDC_TANHELP_BTN                 1216
 #define ID_FILE_EXIT                    32771
 #define ID_INFO_ABOUT                   32772
 #define ID_SAFE_ADDGROUP                32773
@@ -425,15 +429,20 @@
 #define ID_VIEW_SIMPLETANVIEW           32993
 #define ID_VIEW_SHOWTANINDICES          32994
 #define ID_INFO_CHKFORUPD               32999
+#define ID_POPUP_URLFIELDCAPABILITIES   33000
+#define ID_POPUP_AUTO                   33001
+#define ID_POPUP_URLFIELDFEATURES       33002
+#define ID_POPUP_AUTOTYPE               33003
+#define ID_POPUP_OPENHELPFILE           33004
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        230
-#define _APS_NEXT_COMMAND_VALUE         33000
-#define _APS_NEXT_CONTROL_VALUE         1215
+#define _APS_NEXT_RESOURCE_VALUE        233
+#define _APS_NEXT_COMMAND_VALUE         33005
+#define _APS_NEXT_CONTROL_VALUE         1217
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

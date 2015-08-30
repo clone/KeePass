@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@ C_FN_SHARE BOOL LoadTranslationTable(LPCTSTR pszTableName)
 {
 	FILE *fp = NULL;
 	TCHAR szPath[2 * MAX_PATH];
-	DWORD i = 0;
-	DWORD dwLength = 0;
+	size_t i = 0;
+	size_t dwLength = 0;
 	BOOL bMode = FALSE;
 	BOOL bScanning = FALSE;
 

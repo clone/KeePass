@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -70,11 +70,10 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAddEntryDlg)
+	DDX_Control(pDX, IDC_ENTRYHELP_BTN, m_btHelp);
 	DDX_Control(pDX, IDC_SELDEFEXPIRES_BTN, m_btSelDefExpires);
 	DDX_Control(pDX, IDC_SETDEFAULTEXPIRE_BTN, m_btSetToDefaultExpire);
 	DDX_Control(pDX, IDC_COMBO_GROUPS, m_cbGroups);
-	DDX_Control(pDX, IDC_HL_HELP_URL, m_hlHelpURL);
-	DDX_Control(pDX, IDC_HL_HELP_AUTOTYPE, m_hlHelpAutoType);
 	DDX_Control(pDX, IDC_PROGRESS_PASSQUALITY, m_cPassQuality);
 	DDX_Control(pDX, IDC_REMOVEATTACH_BTN, m_btRemoveAttachment);
 	DDX_Control(pDX, IDC_SAVEATTACH_BTN, m_btSaveAttachment);
@@ -101,6 +100,9 @@ void CAddEntryDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	//{{AFX_MSG_MAP(CAddEntryDlg)
+	ON_COMMAND(ID_POPUP_AUTOTYPE, OnHelpAutoType)
+	ON_COMMAND(ID_POPUP_URLFIELDFEATURES, OnHelpURLFieldFeatures)
+	ON_COMMAND(ID_POPUP_OPENHELPFILE, OnHelpOpenFile)
 	ON_BN_CLICKED(IDC_CHECK_HIDEPW, OnCheckHidePw)
 	ON_BN_CLICKED(IDC_PICKICON_BTN, OnPickIconBtn)
 	ON_BN_CLICKED(IDC_RANDOMPW_BTN, OnRandomPwBtn)
@@ -127,8 +129,6 @@ BEGIN_MESSAGE_MAP(CAddEntryDlg, CDialog)
 	ON_COMMAND(ID_EXPIRES_NOW, OnExpiresNow)
 	ON_NOTIFY(EN_LINK, IDC_RE_NOTES, OnReNotesClickLink)
 	//}}AFX_MSG_MAP
-
-	ON_REGISTERED_MESSAGE(WM_XHYPERLINK_CLICKED, OnXHyperLinkClicked)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -187,6 +187,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	NewGUI_XPButton(&m_btRemoveAttachment, IDB_TB_DELETEENTRY, IDB_TB_DELETEENTRY, TRUE);
 	NewGUI_XPButton(&m_btSetToDefaultExpire, IDB_TB_DEFAULTEXPIRE, IDB_TB_DEFAULTEXPIRE, TRUE);
 	NewGUI_XPButton(&m_btSelDefExpires, IDB_CLOCK, IDB_CLOCK, TRUE);
+	NewGUI_XPButton(&m_btHelp, IDB_HELP_SMALL_POPUP, IDB_HELP_SMALL_POPUP, TRUE);
 
 	m_btHidePw.SetColor(CButtonST::BTNST_COLOR_FG_IN, RGB(0, 0, 255), TRUE);
 	CString strTT = TRL("Hide &Passwords Behind Asterisks (***)"); strTT.Remove(_T('&'));
@@ -201,6 +202,7 @@ BOOL CAddEntryDlg::OnInitDialog()
 	m_btSelDefExpires.SetTooltipText(strTT);
 
 	m_btSelDefExpires.SetMenu(IDR_EXPIRESMENU, this->m_hWnd, TRUE, NULL, CSize(16, 15));
+	m_btHelp.SetMenu(IDR_ENTRYHELP_MENU, this->m_hWnd, TRUE, NULL, CSize(16, 16));
 
 	strTT = TRL("&Pick One"); strTT.Remove(_T('&'));
 	m_btPickIcon.SetTooltipText(strTT, TRUE);
@@ -220,16 +222,6 @@ BOOL CAddEntryDlg::OnInitDialog()
 
 		m_btSetToDefaultExpire.SetTooltipText(str);
 	}
-
-	NewGUI_MakeHyperLink(&m_hlHelpAutoType);
-	m_hlHelpAutoType.EnableTooltip(FALSE);
-	m_hlHelpAutoType.SetNotifyParent(TRUE);
-	m_hlHelpAutoType.EnableURL(FALSE);
-
-	NewGUI_MakeHyperLink(&m_hlHelpURL);
-	m_hlHelpURL.EnableTooltip(FALSE);
-	m_hlHelpURL.SetNotifyParent(TRUE);
-	m_hlHelpURL.EnableURL(FALSE);
 
 	m_cbGroups.SetImageList(m_pParentIcons);
 
@@ -663,7 +655,7 @@ void CAddEntryDlg::OnSetAttachBtn()
 
 	UpdateData(TRUE);
 
-	strFilter = TRL("All files");
+	strFilter = TRL("All Files");
 	strFilter += _T(" (*.*)|*.*||");
 
 	dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
@@ -715,7 +707,7 @@ void CAddEntryDlg::OnSaveAttachBtn()
 
 	strSample = pEntry->pszBinaryDesc;
 
-	strFilter = TRL("All files");
+	strFilter = TRL("All Files");
 	strFilter += _T(" (*.*)|*.*||");
 
 	dwFlags = OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
@@ -788,18 +780,6 @@ void CAddEntryDlg::OnChangeEditPassword()
 void CAddEntryDlg::OnCheckExpires() 
 {
 	UpdateControlsStatus();
-}
-
-LRESULT CAddEntryDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-
-	if(wParam == IDC_HL_HELP_AUTOTYPE)
-		WU_OpenAppHelp(PWM_HELP_AUTOTYPE);
-	else if(wParam == IDC_HL_HELP_URL)
-		WU_OpenAppHelp(PWM_HELP_URLS);
-
-	return 0;
 }
 
 void CAddEntryDlg::OnSetDefaultExpireBtn() 
@@ -896,6 +876,21 @@ void CAddEntryDlg::OnReNotesClickLink(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	*pResult = 0;
+}
+
+void CAddEntryDlg::OnHelpOpenFile()
+{
+	_OpenLocalFile(PWM_README_FILE, OLF_OPEN);
+}
+
+void CAddEntryDlg::OnHelpURLFieldFeatures()
+{
+	WU_OpenAppHelp(PWM_HELP_URLS);
+}
+
+void CAddEntryDlg::OnHelpAutoType()
+{
+	WU_OpenAppHelp(PWM_HELP_AUTOTYPE);
 }
 
 #pragma warning(pop)

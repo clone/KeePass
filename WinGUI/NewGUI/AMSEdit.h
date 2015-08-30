@@ -135,7 +135,7 @@ public:
 		virtual void _OnChar(UINT uChar, UINT nRepCnt, UINT nFlags) = 0;
 		virtual void _OnKeyDown(UINT uChar, UINT nRepCnt, UINT nFlags);
 		virtual void _OnKillFocus(CWnd* pNewWnd);
-		virtual LONG _OnPaste(UINT wParam, LONG lParam);
+		virtual LRESULT _OnPaste(WPARAM wParam, LPARAM lParam);
 
 	protected:
 		// Wrappers to allow access to protected members of CAMSEdit
@@ -665,10 +665,10 @@ public:
 protected:
 	//{{AFX_MSG(CAMSEdit)
 	//}}AFX_MSG
-	afx_msg LONG OnCut(UINT wParam, LONG lParam);
-	afx_msg LONG OnPaste(UINT wParam, LONG lParam);
-	afx_msg LONG OnClear(UINT wParam, LONG lParam);
-	afx_msg LONG OnSetText(UINT wParam, LONG lParam);
+	afx_msg LRESULT OnCut(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnPaste(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnClear(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnSetText(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()
 };
@@ -880,7 +880,7 @@ protected:
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	//}}AFX_MSG
 
-	afx_msg LONG OnPaste(UINT wParam, LONG lParam);
+	afx_msg LRESULT OnPaste(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()
 };
@@ -919,7 +919,7 @@ protected:
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	//}}AFX_MSG
 
-	afx_msg LONG OnPaste(UINT wParam, LONG lParam);
+	afx_msg LRESULT OnPaste(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()
 };
@@ -959,7 +959,7 @@ protected:
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	//}}AFX_MSG
 
-	afx_msg LONG OnPaste(UINT wParam, LONG lParam);
+	afx_msg LRESULT OnPaste(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()
 };
@@ -1008,7 +1008,7 @@ protected:
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	//}}AFX_MSG
 
-	afx_msg LONG OnPaste(UINT wParam, LONG lParam);
+	afx_msg LRESULT OnPaste(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()
 };

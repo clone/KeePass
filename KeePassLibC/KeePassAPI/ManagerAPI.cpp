@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -466,7 +466,8 @@ KP_SHARE PW_ENTRY *CreateEntry(void *pMgr, DWORD dwGroupID, LPCTSTR lpTitle, LPC
 	pe.tLastMod = pe.tCreation;
 	CPwManager::GetNeverExpireTime(&pe.tExpire);
 	pe.uGroupId = dwGroupID;
-	pe.uPasswordLen = (lpPassword != NULL) ? _tcslen(lpPassword) : 0;
+	pe.uPasswordLen = static_cast<DWORD>((lpPassword != NULL) ?
+		_tcslen(lpPassword) : 0);
 
 	if(p->AddEntry(&pe) == FALSE) return NULL;
 

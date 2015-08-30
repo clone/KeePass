@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ static unsigned long g_xorZ = 0;
 
 CNewRandom::CNewRandom()
 {
+	ASSERT(m_vPseudoRandom.size() == 0);
 	Reset();
 }
 
@@ -43,162 +44,156 @@ CNewRandom::~CNewRandom()
 
 void CNewRandom::Reset()
 {
-	mem_erase(m_pPseudoRandom, INTRAND_SIZE);
+	if(m_vPseudoRandom.size() > 0)
+	{
+		mem_erase(&m_vPseudoRandom[0], m_vPseudoRandom.size());
+		m_vPseudoRandom.clear();
+	}
+
 	m_dwCounter = 0;
 }
 
 void CNewRandom::Initialize()
 {
-	DWORD inx;
-
-	WORD ww;
-	DWORD dw;
-	LARGE_INTEGER li;
-	SYSTEMTIME st;
-	POINT pt;
-	MEMORYSTATUS ms;
-	SYSTEM_INFO si;
-#ifndef _WIN32_WCE
-	STARTUPINFO sui;
-#endif
-
 	g_dwNewRandomInstanceCounter++;
 
 	Reset();
 
-	inx = 0;
-
+	DWORD dw;
 	dw = GetTickCount();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	AddRandomObject(&dw, 4);
 
+	LARGE_INTEGER li;
 	QueryPerformanceCounter(&li);
-	memcpy(&m_pPseudoRandom[inx], &li, sizeof(LARGE_INTEGER));
-	inx += sizeof(LARGE_INTEGER);
+	AddRandomObject(&li, sizeof(LARGE_INTEGER));
 
+	SYSTEMTIME st;
 	GetLocalTime(&st);
-	memcpy(&m_pPseudoRandom[inx], &st, sizeof(SYSTEMTIME));
-	inx += sizeof(SYSTEMTIME);
+	AddRandomObject(&st, sizeof(SYSTEMTIME));
 
+	POINT pt;
 	GetCursorPos(&pt);
-	memcpy(&m_pPseudoRandom[inx], &pt, sizeof(POINT));
-	inx += sizeof(POINT);
+	AddRandomObject(&pt, sizeof(POINT));
 
+	WORD ww;
 	ww = (WORD)(rand());
-	memcpy(&m_pPseudoRandom[inx], &ww, 2); inx += 2;
+	AddRandomObject(&ww, 2);
 	ww = (WORD)(rand());
-	memcpy(&m_pPseudoRandom[inx], &ww, 2); inx += 2;
+	AddRandomObject(&ww, 2);
 	ww = (WORD)(rand());
-	memcpy(&m_pPseudoRandom[inx], &ww, 2); inx += 2;
+	AddRandomObject(&ww, 2);
 
 	GetCaretPos(&pt);
-	memcpy(&m_pPseudoRandom[inx], &pt, sizeof(POINT));
-	inx += sizeof(POINT);
+	AddRandomObject(&pt, sizeof(POINT));
 
+	MEMORYSTATUS ms;
 	GlobalMemoryStatus(&ms);
-	memcpy(&m_pPseudoRandom[inx], &ms, sizeof(MEMORYSTATUS));
-	inx += sizeof(MEMORYSTATUS);
+	AddRandomObject(&ms, sizeof(MEMORYSTATUS));
 
-	dw = (DWORD)GetActiveWindow();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	dw = (DWORD)(UINT_PTR)GetActiveWindow();
+	AddRandomObject(&dw, 4);
 
-	dw = (DWORD)GetCapture();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	dw = (DWORD)(UINT_PTR)GetCapture();
+	AddRandomObject(&dw, 4);
 
-	dw = (DWORD)GetClipboardOwner();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	dw = (DWORD)(UINT_PTR)GetClipboardOwner();
+	AddRandomObject(&dw, 4);
 
 #ifndef _WIN32_WCE
 	// No support under Windows CE
-	dw = (DWORD)GetClipboardViewer();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); 
-#else
-	// Leave the stack data - random :)
+	dw = (DWORD)(UINT_PTR)GetClipboardViewer();
+	AddRandomObject(&dw, 4);
 #endif
-	inx += 4;
 
 	dw = GetCurrentProcessId();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	AddRandomObject(&dw, 4);
 
-	dw = (DWORD)GetCurrentProcess();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	dw = (DWORD)(UINT_PTR)GetCurrentProcess();
+	AddRandomObject(&dw, 4);
 
-	dw = (DWORD)GetActiveWindow();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	dw = (DWORD)(UINT_PTR)GetActiveWindow();
+	AddRandomObject(&dw, 4);
 
 	dw = GetCurrentThreadId();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	AddRandomObject(&dw, 4);
 
-	dw = (DWORD)GetCurrentThread();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	dw = (DWORD)(UINT_PTR)GetCurrentThread();
+	AddRandomObject(&dw, 4);
 
-	dw = (DWORD)GetDesktopWindow();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	dw = (DWORD)(UINT_PTR)GetDesktopWindow();
+	AddRandomObject(&dw, 4);
 
-	dw = (DWORD)GetFocus();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	dw = (DWORD)(UINT_PTR)GetFocus();
+	AddRandomObject(&dw, 4);
 
-	dw = (DWORD)GetForegroundWindow();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	dw = (DWORD)(UINT_PTR)GetForegroundWindow();
+	AddRandomObject(&dw, 4);
 
 #ifndef _WIN32_WCE
 	dw = (DWORD)GetInputState();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); 
-#else
-	// Leave the stack data - random :)
+	AddRandomObject(&dw, 4); 
 #endif
-	inx += 4;
 
 	dw = GetMessagePos();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	AddRandomObject(&dw, 4);
 
 #ifndef _WIN32_WCE
 	dw = (DWORD)GetMessageTime();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4);
-#else
-	// Leave the stack data - random :)
+	AddRandomObject(&dw, 4);
 #endif
-	inx += 4;
 
-	dw = (DWORD)GetOpenClipboardWindow();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	dw = (DWORD)(UINT_PTR)GetOpenClipboardWindow();
+	AddRandomObject(&dw, 4);
 
-	dw = (DWORD)GetProcessHeap();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	dw = (DWORD)(UINT_PTR)GetProcessHeap();
+	AddRandomObject(&dw, 4);
 
+	SYSTEM_INFO si;
 	GetSystemInfo(&si);
-	memcpy(&m_pPseudoRandom[inx], &si, sizeof(SYSTEM_INFO));
-	inx += sizeof(SYSTEM_INFO);
+	AddRandomObject(&si, sizeof(SYSTEM_INFO));
 
 	dw = (DWORD)randXorShift();
-	memcpy(&m_pPseudoRandom[inx], &dw, 4); inx += 4;
+	AddRandomObject(&dw, 4);
 
 #ifndef _WIN32_WCE
+	STARTUPINFO sui;
 	GetStartupInfo(&sui);
-	memcpy(&m_pPseudoRandom[inx], &sui, sizeof(STARTUPINFO));
-#else
-	// Leave the stack data - random :)
+	AddRandomObject(&sui, sizeof(STARTUPINFO));
 #endif
-	inx += sizeof(STARTUPINFO);
 
-	memcpy(&m_pPseudoRandom[inx], &g_dwNewRandomInstanceCounter, 4);
-	inx += 4;
-
-	ASSERT(inx <= INTRAND_SIZE);
+	AddRandomObject(&g_dwNewRandomInstanceCounter, 4);
 }
 
-void CNewRandom::GetRandomBuffer(BYTE *pBuf, DWORD dwSize)
+void CNewRandom::AddRandomObject(__in_bcount(uSize) const void *pObj, size_t uSize)
+{
+	ASSERT(pObj != NULL); if(pObj == NULL) return;
+
+	const BYTE *p = (const BYTE *)pObj;
+	for(size_t i = 0; i < uSize; ++i)
+	{
+		m_vPseudoRandom.push_back(*p);
+		++p;
+	}
+}
+
+void CNewRandom::GetRandomBuffer(__out_bcount(dwSize) BYTE *pBuf, DWORD dwSize)
 {
 	sha256_ctx hashctx;
 	BYTE aTemp[32];
 	DWORD dw;
 
-	ASSERT(pBuf != NULL);
+	ASSERT(pBuf != NULL); if(pBuf == NULL) return;
 
 	while(dwSize != 0)
 	{
 		m_dwCounter++;
 		sha256_begin(&hashctx);
-		sha256_hash(m_pPseudoRandom, INTRAND_SIZE, &hashctx);
+
+		if(m_vPseudoRandom.size() > 0)
+			sha256_hash(&m_vPseudoRandom[0],
+				static_cast<unsigned long>(m_vPseudoRandom.size()), &hashctx);
+		else { ASSERT(FALSE); }
+
 		sha256_hash((BYTE *)&m_dwCounter, 4, &hashctx);
 		sha256_end(aTemp, &hashctx);
 

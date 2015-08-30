@@ -1,3 +1,53 @@
+07/04/16 - 1.07
+- Auto-Type is now supported on Windows 9x systems
+- Added ability to use one auto-type sequence for multiple
+  windows (thanks to Steve Harrison for the patch); see the CHM
+  documentation file for more
+- The '^' character is now auto-typed correctly
+- New CHM help file (new layout, new content from the KeePass
+  Online Help Center, ...)
+- The default auto-type sequence can now be changed: in the INI
+  file set the 'KeeDefaultAutoTypeSequence' string to the
+  sequence of your choice (there's no option in the user
+  interface for this yet); see the CHM documentation for more
+- WTS notifications are ignored if a dialog is open
+- KeePass is now x64-ready (thanks to Gabe Martin)
+- Improved attachments description column naming in exports
+- Top-level menu shortcuts now work after closing a database
+- Status bar is now updated when navigating in the group tree
+- Updated single instance class
+- For plugin developers: added delayed initialization message
+- Improved help menu
+- Added SAL annotations
+- Installer now supports a lot more languages
+- Installer now uses best compression available
+- Fixed a bug that could increase the database size when saving
+  a database multiple times, which has previously been modified
+  by KeePassX (Linux/MacOSX port of KeePass); existing inflated
+  databases are shrinked to their normal size without data loss
+- Replaced password generation button by a help button in the
+  master key dialog
+- Replaced help hyperlinks in 'Edit Entry' dialog by a help
+  popup button
+- Added help button in TAN wizard dialog
+- Fixed a typo in the random password generation dialog ('§'
+  isn't a special character -- it's higher ANSI)
+- Fixed a bug which could have caused the 'Select Key File'
+  hyper link to be drawn incorrectly when using non-official XP
+  themes
+- Fixed various tray icon bugs
+- Error code is not shown any more in success messages
+- Improved error message that is shown when accessing the key
+  file fails
+- Added window positioning support for virtual screens
+- Window position/size is now remembered when exiting from tray
+- Fixed a bug in the 'Start KeePass at Windows startup'
+  registration method
+- Improved MFC string clearing routine
+- Various translation improvements
+- Made 'Icon' label wider
+- Other minor improvements and bugfixes
+
 06/10/14 - 1.06
 - Locking workspace when locking Windows or switching user is
   now optional (see Security tab, option disabled by default)

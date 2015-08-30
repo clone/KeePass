@@ -788,7 +788,7 @@ BEGIN_MESSAGE_MAP(CSystemTray, CWnd)
     ON_REGISTERED_MESSAGE(CSystemTray::m_nTaskbarCreatedMsg, OnTaskbarCreated)
 END_MESSAGE_MAP()
 
-void CSystemTray::OnTimer(UINT nIDEvent) 
+void CSystemTray::OnTimer(WPARAM nIDEvent) 
 {
     if (nIDEvent != m_uIDTimer)
     {
@@ -832,7 +832,7 @@ void CSystemTray::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 }
 #endif
 
-LRESULT CSystemTray::OnTrayNotification(UINT wParam, LONG lParam) 
+LRESULT CSystemTray::OnTrayNotification(WPARAM wParam, LPARAM lParam) 
 {
     //Return quickly if its not for this tray icon
     if (wParam != m_tnd.uID)

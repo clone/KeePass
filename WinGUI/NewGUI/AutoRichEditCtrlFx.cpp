@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ CString CAutoRichEditCtrlFx::GetRTF()
 	es.pfnCallback = CBStreamOut;
 
 	CString sRTF;
-	es.dwCookie = (DWORD)&sRTF;
+	es.dwCookie = (DWORD_PTR)&sRTF;
 
 	StreamOut(SF_RTF, es);
 	return sRTF;
@@ -71,12 +71,12 @@ void CAutoRichEditCtrlFx::SetRTF(CString sRTF, int nStreamType)
 	es.pfnCallback = CBStreamIn;
 
 	m_strStreamInCache = sRTF;
-	es.dwCookie = (DWORD)&m_strStreamInCache;
+	es.dwCookie = (DWORD_PTR)&m_strStreamInCache;
 
 	StreamIn(nStreamType, es);
 }
 
-DWORD CALLBACK CAutoRichEditCtrlFx::CBStreamIn(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
+DWORD CALLBACK CAutoRichEditCtrlFx::CBStreamIn(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
 	CString *pstr = (CString *)dwCookie;
 	ASSERT(pstr != NULL); if(pstr == NULL) return 0;
@@ -97,7 +97,7 @@ DWORD CALLBACK CAutoRichEditCtrlFx::CBStreamIn(DWORD dwCookie, LPBYTE pbBuff, LO
 	return 0;
 }
 
-DWORD CALLBACK CAutoRichEditCtrlFx::CBStreamOut(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
+DWORD CALLBACK CAutoRichEditCtrlFx::CBStreamOut(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
 	UNREFERENCED_PARAMETER(pcb);
 
@@ -111,7 +111,7 @@ DWORD CALLBACK CAutoRichEditCtrlFx::CBStreamOut(DWORD dwCookie, LPBYTE pbBuff, L
 }
 
 #ifdef _UNICODE
-DWORD CALLBACK CAutoRichEditCtrlFx::CBStreamInRTF(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
+DWORD CALLBACK CAutoRichEditCtrlFx::CBStreamInRTF(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
 	CString *pstr = (CString *)dwCookie;
 	LPBYTE pstrb;

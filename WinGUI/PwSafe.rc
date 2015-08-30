@@ -27,18 +27,18 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE
 BEGIN
     "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
     "#define _AFX_NO_OLE_RESOURCES\r\n"
@@ -104,18 +104,18 @@ BEGIN
     CONTROL         "List1",IDC_LIST_OPTIONS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHAREIMAGELISTS | LVS_NOLABELWRAP | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,259,177
 END
 
-IDD_ABOUTBOX DIALOG  0, 0, 268, 132
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+IDD_ABOUTBOX DIALOGEX 0, 0, 268, 132
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "About KeePass..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Copyright © 2003-2006 Dominik Reichl.",IDC_STATIC,7,7,254,8
     DEFPUSHBUTTON   "&OK",IDOK,199,111,62,14,WS_GROUP
+    LTEXT           "Copyright © 2003-2007 Dominik Reichl.",IDC_STATIC,7,7,254,8
     LTEXT           "KeePass is OSI Certified Open Source Software.",IDC_STATIC,7,20,254,8
+    LTEXT           "The program is distributed under the terms of the GNU General Public License v2 or later.",IDC_STATIC,7,33,254,17
     LTEXT           "Visit KeePass Homepage",IDC_HLINK_HOMEPAGE,7,65,254,8
     LTEXT           "<>",IDC_HLINK_HELPFILE,7,78,254,8
     LTEXT           "<>",IDC_HLINK_LICENSEFILE,7,91,254,8
-    LTEXT           "The program is distributed under the terms of the GNU General Public License v2 or later.",IDC_STATIC,7,33,254,17
     LTEXT           "<>",IDC_HLINK_CREDITS,7,104,180,8
     LTEXT           "<>",IDC_HLINK_DONATE,7,117,184,8
 END
@@ -152,24 +152,25 @@ BEGIN
 END
 
 IDD_PASSWORD_DLG DIALOGEX 0, 0, 352, 140
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "<DYN_TITLE>"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     LTEXT           "Enter password:",IDC_STATIC_ENTERPW,13,40,94,8
     EDITTEXT        IDC_EDIT_PASSWORD,109,38,209,14,ES_PASSWORD | ES_AUTOHSCROLL
-    CONTROL         "and",IDC_CHECK_KEYMETHOD_AND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,70,10
+    CONTROL         "Use password AND key file",IDC_CHECK_KEYMETHOD_AND,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,324,10
     LTEXT           "<DYN_SELDISK>",IDC_STATIC_SELDISK,13,80,195,8
     CONTROL         "",IDC_COMBO_DISKLIST,"ComboBoxEx32",CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP,209,78,128,132
     DEFPUSHBUTTON   "&OK",IDOK,229,119,56,14
     PUSHBUTTON      "&Cancel",IDCANCEL,289,119,56,14
-    PUSHBUTTON      "&Generate Random Password",IDC_MAKEPASSWORD_BTN,7,119,124,14
+    PUSHBUTTON      "&Help",IDC_PWDLG_HELP_BTN,7,119,56,14
     GROUPBOX        "Key",IDC_STATIC,7,28,338,81
     LTEXT           "<DYN_INTRO>",IDC_STATIC_INTRO,7,7,338,18
     CONTROL         "***",IDC_CHECK_STARS,"Button",BS_AUTOCHECKBOX | BS_CENTER | BS_VCENTER | BS_PUSHLIKE | WS_TABSTOP,319,38,18,14
     CONTROL         "Progress1",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",0x0,109,53,180,9,WS_EX_STATICEDGE
     RTEXT           "9999 bits",IDC_STATIC_PASSBITS,290,53,30,8
-    LTEXT           "Select key-file manually...",IDC_HL_SELECTFILE,209,93,132,8
+    LTEXT           "Select Key File Manually...",IDC_HL_SELECTFILE,209,93,132,8
 END
 
 IDD_ADDENTRY_DLG DIALOGEX 0, 0, 315, 279
@@ -179,7 +180,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,189,258,58,14
     PUSHBUTTON      "&Cancel",IDCANCEL,250,258,58,14
-    RTEXT           "Icon:",IDC_STATIC,259,9,23,8
+    RTEXT           "Icon:",IDC_STATIC,235,9,47,8
     PUSHBUTTON      "",IDC_PICKICON_BTN,287,7,21,14
     LTEXT           "Group:",IDC_STATIC,7,9,59,8
     CONTROL         "",IDC_COMBO_GROUPS,"ComboBoxEx32",CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP,67,7,167,172
@@ -211,9 +212,7 @@ BEGIN
     LTEXT           "Quality:",IDC_STATIC,7,111,58,8
     CONTROL         "Progress1",IDC_PROGRESS_PASSQUALITY,"msctls_progress32",0x0,67,110,187,9,WS_EX_STATICEDGE
     RTEXT           "1024 bits",IDC_STATIC_PASSBITS,256,111,30,8
-    LTEXT           "Help:",IDC_STATIC,7,174,60,8
-    LTEXT           "Auto-Type",IDC_HL_HELP_AUTOTYPE,7,197,59,8
-    LTEXT           "URL",IDC_HL_HELP_URL,7,185,59,8
+    PUSHBUTTON      "&Help",IDC_ENTRYHELP_BTN,7,258,58,14
 END
 
 IDD_ICONPICKER_DLG DIALOG  0, 0, 320, 210
@@ -401,20 +400,20 @@ BEGIN
     PUSHBUTTON      "",IDC_SETDEFAULTEXPIRE_BTN,323,51,21,14
 END
 
-IDD_TANWIZARD_DLG DIALOG  0, 0, 378, 258
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+IDD_TANWIZARD_DLG DIALOGEX 0, 0, 378, 258
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "TAN Wizard"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,239,237,64,14
     PUSHBUTTON      "&Cancel",IDCANCEL,307,237,64,14
-    EDITTEXT        IDC_EDIT_TANS,7,36,364,172,ES_MULTILINE | ES_AUTOVSCROLL | ES_NOHIDESEL | ES_WANTRETURN | WS_VSCROLL
+    EDITTEXT        IDC_EDIT_TANS,7,36,364,171,ES_MULTILINE | ES_AUTOVSCROLL | ES_NOHIDESEL | ES_WANTRETURN | WS_VSCROLL
     LTEXT           "Just paste your TANs into the edit window below. Formatting doesn't really matter, all non-alphanumerical characters are ignored (i.e. newlines, tabs, spaces, etc...) and only alphanumerical 'substrings' are added as TAN entries.",IDC_STATIC_INTRO,7,7,364,25
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,233,377,1
-    LTEXT           "TAN Wizard",IDC_STATIC,7,242,185,8,WS_DISABLED
-    EDITTEXT        IDC_EDIT_NUMBERING_START,7,214,72,14,ES_AUTOHSCROLL | ES_NOHIDESEL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_NUMBERING_START,7,213,72,14,ES_AUTOHSCROLL | ES_NOHIDESEL | ES_NUMBER
     CONTROL         "Number the TANs consecutively, starting from this value",IDC_CHECK_NUMBERING,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,85,216,286,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,85,215,286,10
+    PUSHBUTTON      "&Help",IDC_TANHELP_BTN,7,237,64,14
 END
 
 IDD_ENTRYLIST_DLG DIALOG  0, 0, 413, 255
@@ -497,7 +496,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_CHECKOPTIONS_DLG, DIALOG
     BEGIN
@@ -660,8 +659,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,6,1
- PRODUCTVERSION 1,0,6,1
+ FILEVERSION 1,0,7,1
+ PRODUCTVERSION 1,0,7,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -678,13 +677,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "http://keepass.sourceforge.net"
             VALUE "CompanyName", "Dominik Reichl"
-            VALUE "FileDescription", "KeePass Password Safe 1.06"
-            VALUE "FileVersion", "1, 0, 6, 1"
+            VALUE "FileDescription", "KeePass Password Safe 1.07"
+            VALUE "FileVersion", "1.0.7.1"
             VALUE "InternalName", "PwSafe"
-            VALUE "LegalCopyright", "Copyright (c) 2003-2006 Dominik Reichl"
+            VALUE "LegalCopyright", "Copyright (c) 2003-2007 Dominik Reichl"
             VALUE "OriginalFilename", "KeePass.exe"
-            VALUE "ProductName", "KeePass Password Safe 1.06"
-            VALUE "ProductVersion", "1, 0, 6, 1"
+            VALUE "ProductName", "KeePass Password Safe 1.07"
+            VALUE "ProductVersion", "1.0.7.1"
         END
     END
     BLOCK "VarFileInfo"
@@ -699,7 +698,7 @@ END
 // Menu
 //
 
-IDR_MAINMENU MENU 
+IDR_MAINMENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -808,10 +807,10 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
+        MENUITEM "&Help Contents",              ID_INFO_README
+        MENUITEM SEPARATOR
         MENUITEM "Visit &KeePass Homepage",     ID_INFO_HOMEPAGE
         MENUITEM "&Donate...",                  ID_INFO_DONATE
-        MENUITEM SEPARATOR
-        MENUITEM "&Help Contents",              ID_INFO_README
         MENUITEM SEPARATOR
         MENUITEM "Check For Update",            ID_INFO_CHKFORUPD
         MENUITEM SEPARATOR
@@ -820,7 +819,7 @@ BEGIN
     END
 END
 
-IDR_PWLIST_MENU MENU 
+IDR_PWLIST_MENU MENU
 BEGIN
     POPUP "Submenu"
     BEGIN
@@ -861,7 +860,7 @@ BEGIN
     END
 END
 
-IDR_GROUPLIST_MENU MENU 
+IDR_GROUPLIST_MENU MENU
 BEGIN
     POPUP "Submenu"
     BEGIN
@@ -899,7 +898,7 @@ BEGIN
     END
 END
 
-IDR_SYSTRAY_MENU MENU 
+IDR_SYSTRAY_MENU MENU
 BEGIN
     POPUP "Submenu"
     BEGIN
@@ -917,7 +916,7 @@ BEGIN
     END
 END
 
-IDR_RECTX_MENU MENU 
+IDR_RECTX_MENU MENU
 BEGIN
     POPUP "Submenu"
     BEGIN
@@ -933,7 +932,7 @@ BEGIN
     END
 END
 
-IDR_COLVIEW_MENU MENU 
+IDR_COLVIEW_MENU MENU
 BEGIN
     POPUP "Submenu"
     BEGIN
@@ -954,7 +953,7 @@ BEGIN
     END
 END
 
-IDR_PLUGINS_MENU MENU 
+IDR_PLUGINS_MENU MENU
 BEGIN
     POPUP "Submenu"
     BEGIN
@@ -966,7 +965,7 @@ BEGIN
     END
 END
 
-IDR_EXPIRESMENU MENU 
+IDR_EXPIRESMENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -980,6 +979,17 @@ BEGIN
         MENUITEM "6 Months",                    ID_EXPIRES_6MONTHS
         MENUITEM SEPARATOR
         MENUITEM "1 Year",                      ID_EXPIRES_12MONTHS
+    END
+END
+
+IDR_ENTRYHELP_MENU MENU
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "Open &Help File",             ID_POPUP_OPENHELPFILE
+        MENUITEM SEPARATOR
+        MENUITEM "URL Field Features",          ID_POPUP_URLFIELDFEATURES
+        MENUITEM "Auto-Type",                   ID_POPUP_AUTOTYPE
     END
 END
 
@@ -1120,13 +1130,15 @@ IDB_INFOICONS_EX        BITMAP                  "res\\infoiconex.bmp"
 IDB_CLIENTICONS_EX      BITMAP                  "res\\clienticex.bmp"
 IDB_OPTIONICONS_EX      BITMAP                  "res\\optionicex.bmp"
 IDB_TB_SAVE_DISABLED    BITMAP                  "res\\tb_saved.bmp"
+IDB_HELP_SMALL          BITMAP                  "res\\help_sma.bmp"
+IDB_HELP_SMALL_POPUP    BITMAP                  "res\\help_smp.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Accelerator
 //
 
-IDR_ACCEL_MAIN ACCELERATORS 
+IDR_ACCEL_MAIN ACCELERATORS
 BEGIN
     "A",            ID_PWLIST_SELECTALL,    VIRTKEY, CONTROL, NOINVERT
     "B",            ID_PWLIST_COPYUSER,     VIRTKEY, CONTROL, NOINVERT
@@ -1161,7 +1173,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "&About KeePass..."
 END

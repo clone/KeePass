@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,8 +22,7 @@
 
 #include "../SysDefEx.h"
 #include "../Crypto/SHA2/SHA2.h"
-
-#define INTRAND_SIZE 264
+#include <vector>
 
 class CPP_CLASS_SHARE CNewRandom
 {
@@ -34,10 +33,12 @@ public:
 	void Reset();
 	void Initialize();
 
-	void GetRandomBuffer(BYTE *pBuf, DWORD dwSize);
+	void GetRandomBuffer(__out_bcount(dwSize) BYTE *pBuf, DWORD dwSize);
 
 private:
-	BYTE m_pPseudoRandom[INTRAND_SIZE];
+	void AddRandomObject(__in_bcount(uSize) const void *pObj, size_t uSize);
+
+	std::vector<BYTE> m_vPseudoRandom;
 	DWORD m_dwCounter;
 };
 

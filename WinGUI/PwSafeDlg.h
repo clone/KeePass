@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -39,12 +39,13 @@
 #include "NewGUI/SystemTrayEx.h"
 #include "NewGUI/AutoRichEditCtrlFx.h"
 #include "Plugins/PluginMgr.h"
+#include "Util/PrivateConfig.h"
 #include "Util/SInstance.h"
 #include "Util/SessionNotify.h"
 #include "Util/RemoteControl.h"
 #include "../KeePassLibCpp/SysDefEx.h"
 
-#define _CALLPLUGINS(__c,__l,__w) CPluginManager::Instance().CallPlugins((__c),(LPARAM)(__l),(LPARAM)(__w))
+#define _CALLPLUGINS(__c,__l,__w) CPluginManager::Instance().CallPlugins((__c),(__l),(__w))
 
 #define GUI_GROUPLIST_EXT 170
 // Standard Windows Dialog GUI_SPACER = 11
@@ -107,7 +108,10 @@ public:
 
 	void ProcessResize();
 	void CleanUp();
+
 	void SaveOptions();
+	void _SaveWindowPositionAndSize(CPrivateConfig* pcfg);
+
 	void SetStatusTextEx(LPCTSTR lpStatusText, int nPane = -1);
 	inline void NotifyUserActivity();
 	void UpdateAutoSortMenuItems();
@@ -117,7 +121,7 @@ public:
 	void AdjustColumnWidths();
 
 	void ParseAndOpenURLWithEntryInfo(LPCTSTR lpURL, PW_ENTRY *pEntry);
-	void _AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus);
+	void _AutoType(PW_ENTRY *pEntry, BOOL bLoseFocus, DWORD dwAutoTypeSeq);
 
 	void UpdateGroupList();
 	void UpdatePasswordList();
@@ -138,7 +142,7 @@ public:
 	HTREEITEM _GetLastGroupItem(CTreeCtrl *pTree);
 	void GroupSyncStates(BOOL bGuiToMgr = TRUE);
 
-	HTREEITEM _GroupIdToHTreeItem(DWORD dwGroupId);
+	HTREEITEM _GroupIdToHTreeItem(DWORD_PTR dwGroupId);
 
 	void _ProcessGroupKey(UINT nChar, UINT nFlags);
 	void _ProcessListKey(UINT nChar, BOOL bAlt);
@@ -207,6 +211,7 @@ public:
 
 	void _UpdateToolBar(BOOL bForceUpdate = FALSE);
 	void _UpdateTitleBar();
+	void _UpdateTrayIcon();
 
 	void _UpdateGuiToManager();
 
@@ -219,7 +224,7 @@ public:
 	void _SortList(DWORD dwByField, BOOL bAutoSortCall);
 	BOOL _CheckIfCanSort();
 
-	HTREEITEM _FindSelectInTree(CTreeCtrl *pTree, HTREEITEM hRoot, DWORD dwGroupId);
+	HTREEITEM _FindSelectInTree(CTreeCtrl *pTree, HTREEITEM hRoot, DWORD_PTR dwGroupId);
 
 	BOOL _IsUnsafeAllowed();
 
@@ -407,6 +412,8 @@ public:
 
 	CRemoteControl m_remoteControl;
 
+	CString m_strDefaultAutoTypeSequence;
+
 	//{{AFX_DATA(CPwSafeDlg)
 	enum { IDD = IDD_PWSAFE_DIALOG };
 	CStatic	m_stcMenuLine;
@@ -460,7 +467,7 @@ protected:
 	afx_msg void OnRclickPwlist(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnClickGroupList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnPwlistCopyPw();
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(WPARAM nIDEvent);
 	afx_msg void OnDblclkPwlist(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnRclickGroupList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnPwlistCopyUser();

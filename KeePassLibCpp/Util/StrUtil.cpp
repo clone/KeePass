@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,23 +23,20 @@
 #include "AppUtil.h"
 #include "MemUtil.h"
 
+// Securely erase a CString object
 CPP_FN_SHARE void EraseCString(CString *pString)
 {
-	int j, len;
-	LPTSTR lpt;
-	const TCHAR tcPlus = _T(' ');
-	const TCHAR tcMod = _T('}') - tcPlus;
-
 	ASSERT(pString != NULL); if(pString == NULL) return;
 
-	len = pString->GetLength();
-	lpt = pString->GetBuffer(0);
+	const int nBufLen = pString->GetLength();
+	if(nBufLen <= 0) return; // Nothing to clear
 
-	for(j = 0; j < len; j++)
-		lpt[j] = (TCHAR)((rand() % tcMod) + tcPlus);
+	LPTSTR lpt = pString->GetBuffer(0);
 
-	pString->Empty();
-	pString->FreeExtra();
+	for(int j = 0; j < nBufLen; ++j)
+		lpt[j] = (TCHAR)0;
+
+	pString->ReleaseBuffer();
 }
 
 CPP_FN_SHARE void FixURL(CString *pstrURL)
@@ -328,7 +325,7 @@ CPP_FN_SHARE CString CsRemoveMeta(CString *psString)
 			if(nPos != 0)
 				if(strLower.GetAt(nPos - 1) == _T('\r')) nPos -= 1;
 
-			nCount = strLower.Find(_T('\n'), nPos + _tcslen(lpRemove) - 1);
+			nCount = strLower.Find(_T('\n'), (int)(nPos + _tcslen(lpRemove) - 1));
 			if(nCount == -1) nCount = strLower.GetLength() - nPos;
 			else nCount -= nPos - 1;
 
@@ -364,8 +361,8 @@ CPP_FN_SHARE CString CsFileOnly(const CString *psFilePath)
 
 C_FN_SHARE TCHAR *MakeSafeXmlString(const TCHAR *ptString)
 {
-	DWORD i, j;
-	DWORD dwStringLen, dwNeededChars = 0, dwOutPos = 0;
+	size_t i, j;
+	size_t dwStringLen, dwNeededChars = 0, dwOutPos = 0;
 	TCHAR tch;
 	BOOL bFound;
 	TCHAR *pFinal;
@@ -380,7 +377,7 @@ C_FN_SHARE TCHAR *MakeSafeXmlString(const TCHAR *ptString)
 
 	ASSERT(ptString != NULL); if(ptString == NULL) return NULL;
 
-	dwStringLen = (DWORD)_tcslen(ptString);
+	dwStringLen = _tcslen(ptString);
 
 	for(i = 0; i < dwStringLen; i++)
 	{
@@ -439,10 +436,11 @@ C_FN_SHARE char *szcpy(char *szDestination, const char *szSource)
 
 #pragma warning(pop) // _tcscpy / strcpy deprecated
 
-C_FN_SHARE size_t szlen(const char *pszString)
+C_FN_SHARE DWORD szlen(const char *pszString)
 {
 	ASSERT(pszString != NULL); if(pszString == NULL) return 0;
-	return strlen(pszString);
+
+	return static_cast<DWORD>(strlen(pszString));
 }
 
 // Extracts a substring from the lpstr string
@@ -510,7 +508,7 @@ CPP_FN_SHARE CString TagSimString(LPCTSTR lpString)
 		{
 			case _T('+'): str += _T("{PLUS}"); break;
 			case _T('@'): str += _T("{AT}"); break;
-			case _T('^'): str += _T("{CARET}"); break;
+			case _T('^'): str += _T("(%{NUMPAD0}{NUMPAD9}{NUMPAD4})"); break;
 			case _T('~'): str += _T("{TILDE}"); break;
 			case _T('%'): str += _T("{PERCENT}"); break;
 			case _T('{'): str += _T("{LEFTBRACE}"); break;

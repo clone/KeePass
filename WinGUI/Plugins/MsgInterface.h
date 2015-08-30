@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 void KPMI_SetMainDialog(void *pMainPwSafeDlg);
 
-C_FN_SHARE DWORD KP_API KP_Call(DWORD dwCode, LPARAM lParamW, LPARAM lParamL, LPARAM lParamM);
-C_FN_SHARE DWORD KP_API KP_Query(DWORD dwCode, LPARAM lParam);
+C_FN_SHARE DWORD_PTR KP_API KP_Call(DWORD dwCode, LPARAM lParamW, LPARAM lParamL, LPARAM lParamM);
+C_FN_SHARE DWORD_PTR KP_API KP_Query(DWORD dwCode, LPARAM lParam);
 
 #endif // ___KEEPASS_MESSAGE_INTERFACE_H___

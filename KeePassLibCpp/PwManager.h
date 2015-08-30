@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -32,30 +32,34 @@
 
 // When making a Windows build, don't forget to update the verinfo resource
 #ifndef _UNICODE
-#define PWM_VERSION_STR  _T("1.06")
+#define PWM_VERSION_STR  _T("1.07")
 #else
-#define PWM_VERSION_STR  _T("1.06 Unicode")
+#define PWM_VERSION_STR  _T("1.07 Unicode")
 #endif
-#define PWM_VERSION_DW   0x01000601
+#define PWM_VERSION_DW   0x01000701
 
-// The signature constants were chosen randomly
+// Database file signature bytes
 #define PWM_DBSIG_1      0x9AA2D903
 #define PWM_DBSIG_2      0xB54BFB65
 #define PWM_DBVER_DW     0x00030002
 
-#define PWM_HOMEPAGE     _T("http://keepass.sourceforge.net")
-#define PWM_URL_TRL      _T("http://keepass.sourceforge.net/translations.php")
-#define PWM_URL_PLUGINS  _T("http://keepass.sourceforge.net/plugins.php")
-#define PWM_URL_VERSION  _T("http://keepass.sourceforge.net/version.txt")
+#define PWM_HOMEPAGE     _T("http://keepass.info/")
+#define PWM_URL_TRL      _T("http://keepass.info/translations.html")
+#define PWM_URL_PLUGINS  _T("http://keepass.info/plugins.html")
+#define PWM_URL_VERSION  _T("http://keepass.info/update/version1.txt")
 
 #define PWM_EXENAME       _T("KeePass")
 
 #define PWM_README_FILE   _T("KeePass.chm")
 #define PWM_LICENSE_FILE  _T("License.txt")
 
-#define PWM_HELP_AUTOTYPE _T("autotype.html")
-#define PWM_HELP_URLS     _T("autourl.html")
-#define PWM_HELP_CREDITS  _T("thanks.html")
+#define PWM_HELP_AUTOTYPE _T("help/base/autotype.html")
+#define PWM_HELP_URLS     _T("help/base/autourl.html")
+#define PWM_HELP_CREDITS  _T("help/base/credits.html")
+#define PWM_HELP_SECURITY _T("help/base/security.html")
+#define PWM_HELP_PLUGINS  _T("help/v1/plugins.html")
+#define PWM_HELP_KEYS     _T("help/base/keys.html")
+#define PWM_HELP_TANS     _T("help/base/tans.html")
 
 #define PWMKEY_LANG       _T("KeeLanguage")
 #define PWMKEY_CLIPSECS   _T("KeeClipboardSeconds")
@@ -141,6 +145,7 @@
 #define PWMKEY_CHECKFORUPDATE   _T("KeeCheckForUpdate")
 #define PWMKEY_LOCKONWINLOCK    _T("KeeLockOnWinLock")
 #define PWMKEY_ENABLEREMOTECTRL _T("KeeEnableRemoteCtrl")
+#define PWMKEY_DEFAULTATSEQ     _T("KeeDefaultAutoTypeSequence")
 
 #define PWM_NUM_INITIAL_ENTRIES 256
 #define PWM_NUM_INITIAL_GROUPS  32
@@ -211,6 +216,8 @@
 #define PMS_ID_URL      _T("$")
 
 #define PMS_STREAM_SIMPLESTATE _T("Simple UI State")
+
+#define PMS_STREAM_KPXICON2 _T("KPX_CUSTOM_ICONS_2")
 
 #ifdef VPA_MODIFY
 #error VPA_MODIFY must not be defined already.
@@ -346,7 +353,7 @@ typedef struct _PWDB_META_STREAM
 #define ASSERT_ENTRY(pp) ASSERT((pp) != NULL); ASSERT((pp)->pszTitle != NULL); \
 	ASSERT((pp)->pszUserName != NULL); ASSERT((pp)->pszURL != NULL); \
 	ASSERT((pp)->pszPassword != NULL); ASSERT((pp)->pszAdditional != NULL); \
-	ASSERT((pp)->pszBinaryDesc != NULL); ASSERT((pp)->pszPassword != (TCHAR *)0xFEEEFEEE); \
+	ASSERT((pp)->pszBinaryDesc != NULL); \
 	if(((pp)->uBinaryDataLen != 0) && ((pp)->pBinaryData == NULL)) { ASSERT(FALSE); }
 #else
 #define ASSERT_ENTRY(pp)
@@ -380,7 +387,7 @@ public:
 	DWORD GetEntryByGroupN(DWORD idGroup, DWORD dwIndex) const;
 	PW_ENTRY *GetEntryByUuid(const BYTE *pUuid);
 	DWORD GetEntryByUuidN(const BYTE *pUuid) const; // Returns the index of the item with pUuid
-	DWORD GetEntryPosInGroup(const PW_ENTRY *pEntry) const;
+	DWORD GetEntryPosInGroup(__in_ecount(1) const PW_ENTRY *pEntry) const;
 	PW_ENTRY *GetLastEditedEntry();
 
 	// Access group information
@@ -393,24 +400,25 @@ public:
 	BOOL GetGroupTree(DWORD idGroup, DWORD *pGroupIndexes) const;
 
 	// Add entries and groups
-	BOOL AddGroup(const PW_GROUP *pTemplate);
-	BOOL AddEntry(const PW_ENTRY *pTemplate);
-	BOOL BackupEntry(const PW_ENTRY *pe, BOOL *pbGroupCreated); // pe must be unlocked already, pbGroupCreated is optional
+	BOOL AddGroup(__in_ecount(1) const PW_GROUP *pTemplate);
+	BOOL AddEntry(__in_ecount(1) const PW_ENTRY *pTemplate);
+	BOOL BackupEntry(__in_ecount(1) const PW_ENTRY *pe, __out_opt
+		BOOL *pbGroupCreated); // pe must be unlocked already
 
 	// Delete entries and groups
 	BOOL DeleteEntry(DWORD dwIndex);
 	BOOL DeleteGroupById(DWORD uGroupId);
 
-	BOOL SetGroup(DWORD dwIndex, const PW_GROUP *pTemplate);
-	BOOL SetEntry(DWORD dwIndex, const PW_ENTRY *pTemplate);
+	BOOL SetGroup(DWORD dwIndex, __in_ecount(1) const PW_GROUP *pTemplate);
+	BOOL SetEntry(DWORD dwIndex, __in_ecount(1) const PW_ENTRY *pTemplate);
 	// DWORD MakeGroupTree(LPCTSTR lpTreeString, TCHAR tchSeparator);
 
 	// Use these functions to make passwords in PW_ENTRY structures readable
-	void LockEntryPassword(PW_ENTRY *pEntry); // Lock password, encrypt it
-	void UnlockEntryPassword(PW_ENTRY *pEntry); // Make password readable
+	void LockEntryPassword(__inout_ecount(1) PW_ENTRY *pEntry); // Lock password, encrypt it
+	void UnlockEntryPassword(__inout_ecount(1) PW_ENTRY *pEntry); // Make password readable
 
 	void NewDatabase();
-	int OpenDatabase(const TCHAR *pszFile, PWDB_REPAIR_INFO *pRepair);
+	int OpenDatabase(const TCHAR *pszFile, __out_opt PWDB_REPAIR_INFO *pRepair);
 	int SaveDatabase(const TCHAR *pszFile);
 
 	// Move entries and groups
@@ -422,10 +430,12 @@ public:
 	void SortGroup(DWORD idGroup, DWORD dwSortByField);
 	void SortGroupList();
 
-	static BOOL MemAllocCopyEntry(const PW_ENTRY *pExisting, PW_ENTRY *pDestination);
-	static void MemFreeEntry(PW_ENTRY *pEntry);
+	static BOOL MemAllocCopyEntry(__in_ecount(1) const PW_ENTRY *pExisting,
+		__out_ecount(1) PW_ENTRY *pDestination);
+	static void MemFreeEntry(__inout_ecount(1) PW_ENTRY *pEntry);
 
-	void MergeIn(VPA_MODIFY CPwManager *pDataSource, BOOL bCreateNewUUIDs, BOOL bCompareTimes);
+	void MergeIn(__inout_ecount(1) CPwManager *pDataSource, BOOL bCreateNewUUIDs,
+		BOOL bCompareTimes);
 
 	// Find an item
 	DWORD Find(const TCHAR *pszFindString, BOOL bCaseSensitive, DWORD fieldFlags, DWORD nStart);
@@ -439,11 +449,13 @@ public:
 	const PW_DBHEADER *GetLastDatabaseHeader() const;
 
 	// Convert PW_TIME to 5-byte compressed structure and the other way round
-	static void TimeToPwTime(const BYTE *pCompressedTime, PW_TIME *pPwTime);
-	static void PwTimeToTime(const PW_TIME *pPwTime, BYTE *pCompressedTime);
+	static void TimeToPwTime(__in_ecount(5) const BYTE *pCompressedTime,
+		__out_ecount(1) PW_TIME *pPwTime);
+	static void PwTimeToTime(__in_ecount(1) const PW_TIME *pPwTime,
+		__out_ecount(5) BYTE *pCompressedTime);
 
 	// Get the never-expire time
-	static void GetNeverExpireTime(PW_TIME *pPwTime);
+	static void GetNeverExpireTime(__out_ecount(1) PW_TIME *pPwTime);
 
 	// Checks and corrects the group tree (level order, etc.)
 	void FixGroupTree();
@@ -451,16 +463,18 @@ public:
 
 	void SubstEntryGroupIds(DWORD dwExistingId, DWORD dwNewId);
 
-	static BOOL AttachFileAsBinaryData(PW_ENTRY *pEntry, const TCHAR *lpFile);
-	static BOOL SaveBinaryData(const PW_ENTRY *pEntry, const TCHAR *lpFile);
-	static BOOL RemoveBinaryData(PW_ENTRY *pEntry);
+	static BOOL AttachFileAsBinaryData(__inout_ecount(1) PW_ENTRY *pEntry,
+		const TCHAR *lpFile);
+	static BOOL SaveBinaryData(__in_ecount(1) const PW_ENTRY *pEntry,
+		const TCHAR *lpFile);
+	static BOOL RemoveBinaryData(__inout_ecount(1) PW_ENTRY *pEntry);
 
 	static BOOL IsAllowedStoreGroup(LPCTSTR lpGroupName, LPCTSTR lpSearchGroupName);
 
-	void GetRawMasterKey(BYTE *pStorage) const;
-	void SetRawMasterKey(const BYTE *pNewKey);
+	void GetRawMasterKey(__out_ecount(32) BYTE *pStorage) const;
+	void SetRawMasterKey(__in_ecount(32) const BYTE *pNewKey);
 
-	static BOOL IsZeroUUID(const BYTE *pUUID);
+	static BOOL IsZeroUUID(__in_ecount(16) const BYTE *pUUID);
 
 	DWORD m_dwLastSelectedGroupId;
 	DWORD m_dwLastTopVisibleGroupId;
@@ -483,10 +497,11 @@ private:
 	BOOL _ReadEntryFieldV2(USHORT usFieldType, DWORD dwFieldSize, BYTE *pData, PW_ENTRY *pEntry);
 
 	BOOL _AddAllMetaStreams();
-	DWORD _LoadAndRemoveAllMetaStreams();
+	DWORD _LoadAndRemoveAllMetaStreams(bool bAcceptUnknown);
 	BOOL _AddMetaStream(LPCTSTR lpMetaDataDesc, BYTE *pData, DWORD dwLength);
 	BOOL _IsMetaStream(const PW_ENTRY *p) const;
-	void _ParseMetaStream(PW_ENTRY *p);
+	void _ParseMetaStream(PW_ENTRY *p, bool bAcceptUnknown);
+	BOOL _CanIgnoreUnknownMetaStream(const PWDB_META_STREAM& msUnknown) const;
 
 	// Encrypt the master key a few times to make brute-force key-search harder
 	BOOL _TransformMasterKey(const BYTE *pKeySeed);

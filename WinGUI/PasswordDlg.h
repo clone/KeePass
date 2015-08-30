@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ public:
 	CXPStyleButtonST	m_btStars;
 	CXPStyleButtonST	m_btOK;
 	CXPStyleButtonST	m_btCancel;
-	CXPStyleButtonST	m_btMakePw;
+	CXPStyleButtonST	m_btHelp;
 	CSecureEditEx	m_pEditPw;
 	BOOL	m_bStars;
 	BOOL	m_bKeyMethod;
@@ -80,6 +80,7 @@ public:
 	//}}AFX_VIRTUAL
 
 private:
+	void RedrawHyperLink();
 	BOOL m_bOnce;
 
 protected:
@@ -88,7 +89,7 @@ protected:
 	virtual void OnOK();
 	virtual void OnCancel();
 	afx_msg void OnCheckStars();
-	afx_msg void OnMakePasswordBtn();
+	afx_msg void OnHelpBtn();
 	afx_msg void OnChangeEditPassword();
 	afx_msg void OnSelChangeComboDiskList();
 	afx_msg void OnCheckKeymethodAnd();

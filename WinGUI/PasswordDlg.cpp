@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "PwGeneratorDlg.h"
 #include "../KeePassLibCpp/Util/Base64.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
+#include "Util/WinUtil.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -66,7 +67,7 @@ void CPasswordDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_STARS, m_btStars);
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
-	DDX_Control(pDX, IDC_MAKEPASSWORD_BTN, m_btMakePw);
+	DDX_Control(pDX, IDC_PWDLG_HELP_BTN, m_btHelp);
 	DDX_Control(pDX, IDC_EDIT_PASSWORD, m_pEditPw);
 	DDX_Check(pDX, IDC_CHECK_STARS, m_bStars);
 	DDX_Check(pDX, IDC_CHECK_KEYMETHOD_AND, m_bKeyMethod);
@@ -76,7 +77,7 @@ void CPasswordDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CPasswordDlg, CDialog)
 	//{{AFX_MSG_MAP(CPasswordDlg)
 	ON_BN_CLICKED(IDC_CHECK_STARS, OnCheckStars)
-	ON_BN_CLICKED(IDC_MAKEPASSWORD_BTN, OnMakePasswordBtn)
+	ON_BN_CLICKED(IDC_PWDLG_HELP_BTN, OnHelpBtn)
 	ON_EN_CHANGE(IDC_EDIT_PASSWORD, OnChangeEditPassword)
 	ON_CBN_SELCHANGE(IDC_COMBO_DISKLIST, OnSelChangeComboDiskList)
 	ON_BN_CLICKED(IDC_CHECK_KEYMETHOD_AND, OnCheckKeymethodAnd)
@@ -87,7 +88,7 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL CPasswordDlg::OnInitDialog() 
+BOOL CPasswordDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	ASSERT(m_bOnce == FALSE);
@@ -112,7 +113,7 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
-	NewGUI_XPButton(&m_btMakePw, IDB_KEY_SMALL, IDB_KEY_SMALL);
+	NewGUI_XPButton(&m_btHelp, IDB_HELP_SMALL, IDB_HELP_SMALL);
 	NewGUI_XPButton(&m_btStars, -1, -1);
 
 	m_btStars.SetFont(&m_fSymbol, TRUE);
@@ -132,7 +133,7 @@ BOOL CPasswordDlg::OnInitDialog()
 	ZeroMemory(&cbi, sizeof(COMBOBOXEXITEM));
 	cbi.mask = CBEIF_IMAGE | CBEIF_TEXT | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
 	cbi.iItem = 0;
-	cbi.pszText = (LPTSTR)TRL("<no drive selected>");
+	cbi.pszText = (LPTSTR)TRL("<No drive selected>");
 	cbi.cchTextMax = (int)_tcslen(cbi.pszText);
 	cbi.iImage = cbi.iSelectedImage = ICOIDX_NODRIVE;
 	cbi.iIndent = 0;
@@ -185,7 +186,7 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	LPCTSTR lp;
 
-	lp = TRL("Enter the passphrase and/or select the key-disk's drive.");
+	lp = TRL("Enter the passphrase and/or select the key file's drive.");
 	GetDlgItem(IDC_STATIC_INTRO)->SetWindowText(lp);
 
 	lp = TRL("Enter password:");
@@ -195,10 +196,10 @@ BOOL CPasswordDlg::OnInitDialog()
 	{
 		if(m_bLoadMode == FALSE)
 		{
-			lp = TRL("Select the password disk drive where the key will be stored:");
+			lp = TRL("Select the drive to which the key file should be saved to:");
 			GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
 
-			lp = TRL("Save key-file manually to...");
+			lp = TRL("Save Key File Manually to...");
 			m_hlSelFile.SetWindowText(lp);
 
 			CString str;
@@ -223,13 +224,13 @@ BOOL CPasswordDlg::OnInitDialog()
 		}
 		else // m_bConfirm == FALSE, m_bLoadMode == TRUE
 		{
-			lp = TRL("Select the password disk drive to load the key from:");
+			lp = TRL("Select the drive on which the key file is stored:");
 			GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
 
-			lp = TRL("Select key-file manually...");
+			lp = TRL("Select Key File Manually...");
 			m_hlSelFile.SetWindowText(lp);
 
-			SetWindowText(TRL("Open database - Enter master key"));
+			SetWindowText(TRL("Open Database - Enter Master Key"));
 
 			CString str;
 			str = TRL("Enter master key");
@@ -242,7 +243,6 @@ BOOL CPasswordDlg::OnInitDialog()
 
 			m_banner.SetCaption(TRL("Enter the master key for this database."));
 
-			m_btMakePw.ShowWindow(SW_HIDE);
 			m_cPassQuality.ShowWindow(SW_HIDE);
 			GetDlgItem(IDC_STATIC_PASSBITS)->ShowWindow(SW_HIDE);
 		}
@@ -254,7 +254,6 @@ BOOL CPasswordDlg::OnInitDialog()
 			GetDlgItem(IDC_STATIC_INTRO)->ShowWindow(SW_HIDE);
 			GetDlgItem(IDC_STATIC_SELDISK)->ShowWindow(SW_HIDE);
 			m_cbDiskList.ShowWindow(SW_HIDE);
-			m_btMakePw.EnableWindow(FALSE);
 			m_hlSelFile.ShowWindow(SW_HIDE);
 
 			if(m_bChanging == FALSE)
@@ -280,10 +279,10 @@ BOOL CPasswordDlg::OnInitDialog()
 			ASSERT(FALSE);
 
 			// Just in case... assume we want to load something
-			lp = TRL("Select the password disk drive to load the key from:");
+			lp = TRL("Select the drive on which the key file is stored:");
 			GetDlgItem(IDC_STATIC_SELDISK)->SetWindowText(lp);
 
-			SetWindowText(TRL("Open database - Enter master key"));
+			SetWindowText(TRL("Open Database - Enter Master Key"));
 
 			CString str;
 			str = TRL("Enter master key");
@@ -294,8 +293,6 @@ BOOL CPasswordDlg::OnInitDialog()
 			}
 			m_banner.SetTitle(str);
 			m_banner.SetCaption(TRL("Enter the master key for this database."));
-
-			m_btMakePw.ShowWindow(SW_HIDE);
 		}
 	}
 
@@ -318,11 +315,11 @@ BOOL CPasswordDlg::OnInitDialog()
 
 	if(m_lpPreSelectPath != NULL)
 	{
-		int i, nSpecLen = _tcslen(m_lpPreSelectPath);
+		const int nSpecLen = static_cast<int>(_tcslen(m_lpPreSelectPath));
 		CString strCBI;
 		BOOL bFound = FALSE;
 
-		for(i = 0; i < m_cbDiskList.GetCount(); i++)
+		for(int i = 0; i < m_cbDiskList.GetCount(); i++)
 		{
 			m_cbDiskList.GetLBText(i, strCBI);
 			if(strCBI.GetLength() < nSpecLen) continue;
@@ -357,6 +354,7 @@ BOOL CPasswordDlg::OnInitDialog()
 		EnableClientWindows();
 	}
 
+	RedrawHyperLink();
 	m_pEditPw.SetFocus();
 	return FALSE; // Return TRUE unless you set the focus to a control
 }
@@ -415,7 +413,7 @@ void CPasswordDlg::OnOK()
 		{
 			if((_tcslen(m_lpKey) == 0) || (m_cbDiskList.GetCurSel() == 0))
 			{
-				MessageBox(TRL("You've selected the AND key mode, so you must enter a password AND select a key-file."),
+				MessageBox(TRL("You've selected the AND key mode, so you must enter a password AND select a key file."),
 					TRL("Password Safe"), MB_OK | MB_ICONINFORMATION);
 				FreePasswords();
 				return;
@@ -519,29 +517,9 @@ void CPasswordDlg::OnCheckStars()
 	m_pEditPw.SetFocus();
 }
 
-void CPasswordDlg::OnMakePasswordBtn() 
+void CPasswordDlg::OnHelpBtn() 
 {
-	CPwGeneratorDlg dlg;
-
-	UpdateData(TRUE);
-
-	dlg.m_bCanAccept = TRUE;
-	dlg.m_bHidePw = m_bStars;
-
-	if(dlg.DoModal() == IDOK)
-	{
-		if(dlg.m_lpPassword != NULL)
-		{
-			m_pEditPw.SetPassword(dlg.m_lpPassword);
-			NewGUI_ShowQualityMeter(&m_cPassQuality, GetDlgItem(IDC_STATIC_PASSBITS), dlg.m_lpPassword);
-			m_pEditPw.DeletePassword(dlg.m_lpPassword); dlg.m_lpPassword = NULL;
-		}
-
-		UpdateData(FALSE);
-		OnCheckStars();
-	}
-
-	EnableClientWindows();
+	WU_OpenAppHelp(PWM_HELP_KEYS);
 }
 
 void CPasswordDlg::OnChangeEditPassword() 
@@ -565,7 +543,7 @@ LRESULT CPasswordDlg::OnXHyperLinkClicked(WPARAM wParam, LPARAM lParam)
 
 		UpdateData(TRUE);
 
-		strFilter = TRL("All files");
+		strFilter = TRL("All Files");
 		strFilter += _T(" (*.*)|*.*||");
 
 		dwFlags = OFN_LONGNAMES | OFN_EXTENSIONDIFFERENT;
@@ -621,7 +599,6 @@ void CPasswordDlg::EnableClientWindows()
 		{
 			m_hlSelFile.EnableWindow(FALSE);
 			m_btStars.EnableWindow(TRUE);
-			if(m_bConfirm == FALSE) m_btMakePw.EnableWindow(TRUE);
 			m_pEditPw.EnableWindow(TRUE);
 			m_cbDiskList.EnableWindow(FALSE);
 			return;
@@ -630,7 +607,6 @@ void CPasswordDlg::EnableClientWindows()
 		{
 			m_hlSelFile.EnableWindow(TRUE);
 			m_btStars.EnableWindow(FALSE);
-			if(m_bConfirm == FALSE) m_btMakePw.EnableWindow(FALSE);
 			m_pEditPw.EnableWindow(FALSE);
 			m_cbDiskList.EnableWindow(TRUE);
 			return;
@@ -638,12 +614,13 @@ void CPasswordDlg::EnableClientWindows()
 	}
 
 	m_btStars.EnableWindow(TRUE);
-	if(m_bConfirm == FALSE) m_btMakePw.EnableWindow(TRUE);
 	m_pEditPw.EnableWindow(TRUE);
 	m_cbDiskList.EnableWindow(TRUE);
 
 	if(nComboSel == 0) m_hlSelFile.EnableWindow(TRUE);
 	else m_hlSelFile.EnableWindow(FALSE);
+
+	RedrawHyperLink();
 }
 
 void CPasswordDlg::OnCheckKeymethodAnd() 
@@ -656,6 +633,11 @@ BOOL CPasswordDlg::PreTranslateMessage(MSG* pMsg)
 	m_tipSecClear.RelayEvent(pMsg);
 
 	return CDialog::PreTranslateMessage(pMsg);
+}
+
+void CPasswordDlg::RedrawHyperLink()
+{
+	m_hlSelFile.RedrawWindow(NULL, NULL);
 }
 
 #pragma warning(pop)

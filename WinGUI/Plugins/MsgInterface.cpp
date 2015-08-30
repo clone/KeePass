@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,9 +31,9 @@ void KPMI_SetMainDialog(void *pMainPwSafeDlg)
 	g_pMainDlg = (CPwSafeDlg *)pMainPwSafeDlg;
 }
 
-C_FN_SHARE DWORD KP_API KP_Call(DWORD dwCode, LPARAM lParamW, LPARAM lParamL, LPARAM lParamM)
+C_FN_SHARE DWORD_PTR KP_API KP_Call(DWORD dwCode, LPARAM lParamW, LPARAM lParamL, LPARAM lParamM)
 {
-	ASSERT(g_pMainDlg != NULL);
+	ASSERT(g_pMainDlg != NULL); if(g_pMainDlg == NULL) return KPR_FAILED;
 
 	if(dwCode == KPC_INSERT_IMPORTFROM_ITEM)
 	{
@@ -47,7 +47,7 @@ C_FN_SHARE DWORD KP_API KP_Call(DWORD dwCode, LPARAM lParamW, LPARAM lParamL, LP
 				else p->AppendODMenu((LPTSTR)lParamW,
 					MF_STRING | MF_OWNERDRAW,
 					(DWORD)lParamL,
-					&g_pMainDlg->m_ilIcons, lParamM);
+					&g_pMainDlg->m_ilIcons, static_cast<int>(lParamM));
 			}
 			else return KPR_FAILED;
 		}
@@ -84,7 +84,7 @@ C_FN_SHARE DWORD KP_API KP_Call(DWORD dwCode, LPARAM lParamW, LPARAM lParamL, LP
 	return KPR_SUCCESS;
 }
 
-C_FN_SHARE DWORD KP_API KP_Query(DWORD dwCode, LPARAM lParam)
+C_FN_SHARE DWORD_PTR KP_API KP_Query(DWORD dwCode, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -100,17 +100,17 @@ C_FN_SHARE DWORD KP_API KP_Query(DWORD dwCode, LPARAM lParam)
 	else if(dwCode == KPQ_GET_GROUP)
 	{
 		ASSERT(sizeof(void *) == sizeof(DWORD));
-		return (DWORD)g_pMainDlg->m_mgr.GetGroup((DWORD)lParam);
+		return (DWORD_PTR)g_pMainDlg->m_mgr.GetGroup((DWORD)lParam);
 	}
 	else if(dwCode == KPQ_ABSOLUTE_DB_PATH)
 	{
 		ASSERT(sizeof(LPCTSTR) == sizeof(DWORD));
-		return (DWORD)(LPCTSTR)g_pMainDlg->m_strFileAbsolute;
+		return (DWORD_PTR)(LPCTSTR)g_pMainDlg->m_strFileAbsolute;
 	}
 	else if(dwCode == KPQ_TRANSLATION_NAME)
 	{
 		ASSERT(sizeof(LPCTSTR) == sizeof(DWORD));
-		return (DWORD)GetCurrentTranslationTable();
+		return (DWORD_PTR)GetCurrentTranslationTable();
 	}
 
 	return 0;

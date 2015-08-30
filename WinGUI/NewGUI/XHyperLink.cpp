@@ -181,7 +181,7 @@ void CXHyperLink::OnClicked()
 	m_bOverControl = FALSE;
 	int result = HINSTANCE_ERROR + 1;
 	if (m_bIsURLEnabled)
-		result = (int)GotoURL(m_strURL, SW_SHOW, m_bAlwaysOpenNew);
+		result = (int)(INT_PTR)GotoURL(m_strURL, SW_SHOW, m_bAlwaysOpenNew);
 	m_bVisited = (result > HINSTANCE_ERROR);
 	if (!m_bVisited)
 	{
@@ -244,7 +244,7 @@ void CXHyperLink::OnMouseMove(UINT nFlags, CPoint point)
 
 ///////////////////////////////////////////////////////////////////////////////
 // OnTimer
-void CXHyperLink::OnTimer(UINT nIDEvent)
+void CXHyperLink::OnTimer(WPARAM nIDEvent)
 {
 	CPoint p(GetMessagePos());
 	ScreenToClient(&p);
@@ -596,7 +596,7 @@ HINSTANCE CXHyperLink::GotoURL(LPCTSTR url, int showcmd, BOOL bAlwaysOpenNew /*=
 	HINSTANCE result = ShellExecute(NULL, verb, url, NULL,NULL, showcmd);
 
 	// If it failed, get the .htm regkey and lookup the program
-	if ((UINT)result <= HINSTANCE_ERROR)
+	if ((UINT)(UINT_PTR)result <= HINSTANCE_ERROR)
 	{
 		if (GetRegKey(HKEY_CLASSES_ROOT, _T(".htm"), key) == ERROR_SUCCESS)
 		{
@@ -619,7 +619,7 @@ HINSTANCE CXHyperLink::GotoURL(LPCTSTR url, int showcmd, BOOL bAlwaysOpenNew /*=
 				_tcscat_s(key, MAX_PATH * 2, _T(" "));
 				_tcscat_s(key, MAX_PATH * 2, url);
 
-				result = (HINSTANCE) TWinExec(key, (WORD)showcmd);
+				result = (HINSTANCE)(UINT_PTR)TWinExec(key, (WORD)showcmd);
 			}
 		}
 	}

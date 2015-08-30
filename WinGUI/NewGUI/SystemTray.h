@@ -147,7 +147,7 @@ protected:
 	CWnd*           m_pTargetWnd;       // Window that menu commands are sent
 
     CArray<HICON, HICON> m_IconList;
-    unsigned long   m_uIDTimer;
+    UINT_PTR     m_uIDTimer;
     int          m_nCurrentIcon;
     COleDateTime m_StartTime;
     UINT         m_nAnimationPeriod;
@@ -174,7 +174,7 @@ protected:
 // Generated message map functions
 protected:
 	//{{AFX_MSG(CSystemTray)
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(WPARAM nIDEvent);
 	//}}AFX_MSG
 #ifndef _WIN32_WCE
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);

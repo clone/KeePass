@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,9 +27,6 @@
 
 #define SI_REGSIZE 1024
 
-#define PCFG_IN const
-#define PCFG_OUT
-
 // A GUID used to detect non-existing keys in queries
 #define PCFG_NOTFOUND _T("2C3317110FC211DA94B900E08161165F")
 
@@ -42,8 +39,8 @@ public:
 	CPrivateConfig(BOOL bRequireWriteAccess);
 	virtual ~CPrivateConfig();
 
-	BOOL Set(const TCHAR *pszField, PCFG_IN TCHAR *pszValue);
-	BOOL Get(const TCHAR *pszField, PCFG_OUT TCHAR *pszValue);
+	BOOL Set(LPCTSTR pszField, LPCTSTR pszValue);
+	BOOL Get(LPCTSTR pszField, LPTSTR pszValue);
 
 	BOOL SetBool(const TCHAR *pszField, BOOL bValue);
 	BOOL GetBool(const TCHAR *pszField, BOOL bDefault);

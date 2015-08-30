@@ -138,7 +138,7 @@ bool CAMSEdit::ShouldEnter(TCHAR) const
 }
 
 // Cuts the current selection into the clipboard.
-LONG CAMSEdit::OnCut(UINT, LONG)
+LRESULT CAMSEdit::OnCut(WPARAM, LPARAM)
 {
 	int nStart, nEnd;
 	GetSel(nStart, nEnd);
@@ -153,7 +153,7 @@ LONG CAMSEdit::OnCut(UINT, LONG)
 }
 
 // Clears the current selection.
-LONG CAMSEdit::OnClear(UINT, LONG)
+LRESULT CAMSEdit::OnClear(WPARAM, LPARAM)
 {
 	int nStart, nEnd;
 	GetSel(nStart, nEnd);
@@ -165,7 +165,7 @@ LONG CAMSEdit::OnClear(UINT, LONG)
 }
 
 // Pastes the text from the clipboard onto the current selection.
-LONG CAMSEdit::OnPaste(UINT, LONG)
+LRESULT CAMSEdit::OnPaste(WPARAM, LPARAM)
 {
 	int nStart, nEnd;
 	GetSel(nStart, nEnd);
@@ -203,9 +203,9 @@ BOOL CAMSEdit::OnChildNotify(UINT message, WPARAM wParam, LPARAM lParam, LRESULT
 }
 
 // Handles the WM_SETTEXT message to ensure that text (set via SetWindowText) is valid.
-LONG CAMSEdit::OnSetText(UINT, LONG lParam)
+LRESULT CAMSEdit::OnSetText(WPARAM, LPARAM lParam)
 {
-	LONG nResult = CEdit::Default();
+	LRESULT nResult = CEdit::Default();
 
 	CString strText = GetValidText();
 	if (strText != (LPCTSTR)lParam)
@@ -356,7 +356,7 @@ void CAMSEdit::Behavior::_OnKillFocus(CWnd* pNewWnd)
 }
 
 // Handles the WM_PASTE message by passing it to the control.
-LONG CAMSEdit::Behavior::_OnPaste(UINT wParam, LONG lParam)
+LRESULT CAMSEdit::Behavior::_OnPaste(WPARAM wParam, LPARAM lParam)
 {
 	return m_pEdit->OnPaste(wParam, lParam);
 }
@@ -4675,7 +4675,7 @@ void CAMSDateEdit::OnKillFocus(CWnd* pNewWnd)
 }
 
 // Handles the WM_PASTE message to ensure that the text being pasted is a valid date.
-LONG CAMSDateEdit::OnPaste(UINT, LONG)
+LRESULT CAMSDateEdit::OnPaste(WPARAM, LPARAM)
 {
 	return _OnPaste(0, 0);
 }
@@ -4739,7 +4739,7 @@ void CAMSTimeEdit::OnKillFocus(CWnd* pNewWnd)
 }
 
 // Handles the WM_PASTE message to ensure that the text being pasted is a valid time.
-LONG CAMSTimeEdit::OnPaste(UINT, LONG)
+LRESULT CAMSTimeEdit::OnPaste(WPARAM, LPARAM)
 {
 	return _OnPaste(0, 0);
 }
@@ -4803,7 +4803,7 @@ void CAMSDateTimeEdit::OnKillFocus(CWnd* pNewWnd)
 }
 
 // Handles the WM_PASTE message to ensure that the text being pasted is a valid date.
-LONG CAMSDateTimeEdit::OnPaste(UINT, LONG)
+LRESULT CAMSDateTimeEdit::OnPaste(WPARAM, LPARAM)
 {
 	return _OnPaste(0, 0);
 }
@@ -4956,7 +4956,7 @@ void CAMSMultiMaskedEdit::OnKillFocus(CWnd* pNewWnd)
 }
 
 // Handles the WM_PASTE message to ensure that the text being pasted is properly shown.
-LONG CAMSMultiMaskedEdit::OnPaste(UINT wParam, LONG lParam)
+LRESULT CAMSMultiMaskedEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 {
 	ASSERT(m_pCurrentBehavior);
 	return m_pCurrentBehavior->_OnPaste(wParam, lParam);

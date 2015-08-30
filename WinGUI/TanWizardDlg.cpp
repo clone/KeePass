@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 #include "TanWizardDlg.h"
 
 #include "NewGUI/NewGUICommon.h"
+#include "Util/WinUtil.h"
+#include "../KeePassLibCpp/PwManager.h"
 #include "../KeePassLibCpp/Util/TranslateEx.h"
 
 #ifdef _DEBUG
@@ -46,6 +48,7 @@ void CTanWizardDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CTanWizardDlg)
+	DDX_Control(pDX, IDC_TANHELP_BTN, m_btHelp);
 	DDX_Control(pDX, IDCANCEL, m_btCancel);
 	DDX_Control(pDX, IDOK, m_btOK);
 	DDX_Text(pDX, IDC_EDIT_TANS, m_strTans);
@@ -57,6 +60,7 @@ void CTanWizardDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CTanWizardDlg, CDialog)
 	//{{AFX_MSG_MAP(CTanWizardDlg)
 	ON_BN_CLICKED(IDC_CHECK_NUMBERING, OnCheckNumbering)
+	ON_BN_CLICKED(IDC_TANHELP_BTN, OnTANHelpBtn)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -71,6 +75,7 @@ BOOL CTanWizardDlg::OnInitDialog()
 
 	NewGUI_XPButton(&m_btOK, IDB_OK, IDB_OK);
 	NewGUI_XPButton(&m_btCancel, IDB_CANCEL, IDB_CANCEL);
+	NewGUI_XPButton(&m_btHelp, IDB_HELP_SMALL, IDB_HELP_SMALL);
 
 	NewGUI_ConfigSideBanner(&m_banner, this);
 	m_banner.SetIcon(AfxGetApp()->LoadIcon(IDI_OPTIONS),
@@ -103,4 +108,9 @@ void CTanWizardDlg::OnCheckNumbering()
 		GetDlgItem(IDC_EDIT_NUMBERING_START)->EnableWindow(TRUE);
 	else
 		GetDlgItem(IDC_EDIT_NUMBERING_START)->EnableWindow(FALSE);
+}
+
+void CTanWizardDlg::OnTANHelpBtn()
+{
+	WU_OpenAppHelp(PWM_HELP_TANS);
 }

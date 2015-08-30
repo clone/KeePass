@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -355,7 +355,7 @@ void CRemoteControl::AddEntry(const RC_STRING& strRetrievedName, const RC_QUERY&
 		dlg.m_bForceForeground = TRUE;
 		dlg.m_strTitle = TRL("Add Entry");
 		dlg.m_strDescription = TRL("Select the fields KeePass should remember");
-		dlg.m_dwNumParams = params.size();
+		dlg.m_dwNumParams = (DWORD)params.size();
 		dlg.m_pParams = &params[0];
 
 		if(dlg.DoModal() == IDOK)

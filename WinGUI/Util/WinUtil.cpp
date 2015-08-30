@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ static unsigned char g_shaLastString[32];
 
 C_FN_SHARE void CopyStringToClipboard(const TCHAR *lptString)
 {
-	unsigned long uDataSize;
 	HGLOBAL globalHandle;
 	LPVOID globalData;
 
@@ -56,7 +55,7 @@ C_FN_SHARE void CopyStringToClipboard(const TCHAR *lptString)
 		return;
 	}
 
-	uDataSize = _tcslen(lptString) * sizeof(TCHAR); // Get length
+	size_t uDataSize = _tcslen(lptString) * sizeof(TCHAR); // Get length
 	if(uDataSize == 0)
 	{
 		CloseClipboard();
@@ -76,7 +75,8 @@ C_FN_SHARE void CopyStringToClipboard(const TCHAR *lptString)
 
 	sha256_ctx shactx;
 	sha256_begin(&shactx);
-	sha256_hash((unsigned char *)lptString, uDataSize - sizeof(TCHAR), &shactx);
+	sha256_hash((unsigned char *)lptString, (unsigned long)(uDataSize -
+		sizeof(TCHAR)), &shactx);
 	sha256_end(g_shaLastString, &shactx);
 }
 
@@ -100,7 +100,8 @@ C_FN_SHARE void ClearClipboardIfOwner()
 	sha256_ctx shactx;
 	unsigned char uHash[32];
 	sha256_begin(&shactx);
-	sha256_hash((unsigned char *)lpString, _tcslen(lpString) * sizeof(TCHAR), &shactx);
+	sha256_hash((unsigned char *)lpString, (unsigned long)(_tcslen(lpString) *
+		sizeof(TCHAR)), &shactx);
 	sha256_end(uHash, &shactx);
 
 	GlobalUnlock(hClipboardData);
@@ -142,11 +143,10 @@ C_FN_SHARE void CopyDelayRenderedClipboardData(const TCHAR *lptString)
 {
     HGLOBAL hglb;
     LPTSTR lptstr;
-    int cch;
 
 	ASSERT(lptString != NULL); if(lptString == NULL) return;
 
-	cch = _tcslen(lptString);
+	const size_t cch = _tcslen(lptString);
 	hglb = GlobalAlloc(GMEM_MOVEABLE, (cch + 1) * sizeof(TCHAR));
     ASSERT(hglb != NULL); if(hglb == NULL) return;
 
@@ -315,9 +315,9 @@ C_FN_SHARE BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 
 		// Parse out the "http://" and "ssh://"
 		if(strURL.Find(_T("http://")) == 0)
-			strURL = strURL.Right(strURL.GetLength() - _tcslen(_T("http://")));
+			strURL = strURL.Right(strURL.GetLength() - (int)_tcslen(_T("http://")));
 
-		strURL = strURL.Right(strURL.GetLength() - _tcslen(_T("ssh:")));
+		strURL = strURL.Right(strURL.GetLength() - (int)_tcslen(_T("ssh:")));
 		if(strURL.Left(1) == _T("/"))
 			strURL = strURL.Right(strURL.GetLength() - 1);
 		if(strURL.Left(1) == _T("/"))
@@ -348,9 +348,9 @@ C_FN_SHARE BOOL OpenUrlUsingPutty(LPCTSTR lpURL, LPCTSTR lpUser)
 
 		// Parse out the "http://" and "telnet://"
 		if(strURL.Find(_T("http://")) == 0)
-			strURL = strURL.Right(strURL.GetLength() - _tcslen(_T("http://")));
+			strURL = strURL.Right(strURL.GetLength() - (int)_tcslen(_T("http://")));
 
-		strURL = strURL.Right(strURL.GetLength() - _tcslen(_T("telnet:")));
+		strURL = strURL.Right(strURL.GetLength() - (int)_tcslen(_T("telnet:")));
 		if(strURL.Left(1) == _T("/"))
 			strURL = strURL.Right(strURL.GetLength() - 1);
 		if(strURL.Left(1) == _T("/"))
@@ -433,8 +433,8 @@ C_FN_SHARE int _OpenLocalFile(LPCTSTR szFile, int nMode)
 	else if(nMode == OLF_EXPLORE) lpVerb = _T("explore");
 	else { ASSERT(FALSE); }
 
-	nRet = (int)ShellExecute(::GetActiveWindow(), lpVerb, strFile.c_str(),
-		NULL, strPath.c_str(), KPSW_SHOWDEFAULT);
+	nRet = (int)(INT_PTR)ShellExecute(::GetActiveWindow(), lpVerb,
+		strFile.c_str(), NULL, strPath.c_str(), KPSW_SHOWDEFAULT);
 #else
 	ASSERT(FALSE); // Implement before using on WinCE
 #endif
@@ -455,7 +455,7 @@ BOOL WU_GetFileNameSz(BOOL bOpenMode, LPCTSTR lpSuffix, LPTSTR lpStoreBuf, DWORD
 	strSample = _T("*.");
 	strSample += lpSuffix;
 
-	strFilter = TRL("All files");
+	strFilter = TRL("All Files");
 	strFilter += _T(" (*.*)|*.*||");
 
 	if(bOpenMode == FALSE)
@@ -522,7 +522,7 @@ C_FN_SHARE UINT TWinExec(LPCTSTR lpCmdLine, WORD wCmdShow)
 	sui.wShowWindow = wCmdShow;
 	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
 
-	DWORD dwCmdLen = _tcslen(lpCmdLine);
+	const size_t dwCmdLen = _tcslen(lpCmdLine);
 	LPTSTR lp = new TCHAR[dwCmdLen + 2];
 	_tcscpy_s(lp, dwCmdLen + 2, lpCmdLine);
 
@@ -539,4 +539,16 @@ C_FN_SHARE UINT TWinExec(LPCTSTR lpCmdLine, WORD wCmdShow)
 	SAFE_DELETE_ARRAY(lp);
 
 	return (bResult != FALSE) ? 32 : ERROR_FILE_NOT_FOUND;
+}
+
+C_FN_SHARE BOOL WU_IsWin9xSystem()
+{
+	OSVERSIONINFO osvi;
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+	GetVersionEx(&osvi);
+
+	return (osvi.dwMajorVersion <= 4) ? TRUE : FALSE;
 }

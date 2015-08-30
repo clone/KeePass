@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ public:
 
 	//{{AFX_DATA(CTanWizardDlg)
 	enum { IDD = IDD_TANWIZARD_DLG };
+	CXPStyleButtonST	m_btHelp;
 	CXPStyleButtonST	m_btCancel;
 	CXPStyleButtonST	m_btOK;
 	CString	m_strTans;
@@ -52,9 +53,11 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	virtual void OnCancel();
+	afx_msg void OnTANHelpBtn();
 	afx_msg void OnCheckNumbering();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
 };
 
 //{{AFX_INSERT_LOCATION}}

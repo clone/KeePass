@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -170,7 +170,7 @@ BOOL CPwSafeApp::InitInstance()
 		}
 	}
 
-	int nResponse = dlg.DoModal();
+	const INT_PTR nResponse = dlg.DoModal();
 
 	if(nResponse == IDOK) { }
 	else if(nResponse == IDCANCEL) { }
@@ -208,7 +208,7 @@ BOOL CPwSafeApp::RegisterShellAssociation()
 	if(l != ERROR_SUCCESS) return FALSE;
 
 	std_string strTemp = _T("kdbfile");
-	dw = (strTemp.length() + 1) * sizeof(TCHAR);
+	dw = static_cast<DWORD>((strTemp.length() + 1) * sizeof(TCHAR));
 	l = RegSetValueEx(hBase, _T(""), 0, REG_SZ, (CONST BYTE *)strTemp.c_str(), dw);
 	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hBase); return FALSE; }
 
@@ -222,14 +222,14 @@ BOOL CPwSafeApp::RegisterShellAssociation()
 	// _tcscpy_s(tszTemp, _countof(tszTemp), TRL("KeePass Password Database"));
 	strTemp = TRL("KeePass Password Database");
 
-	dw = (strTemp.length() + 1) * sizeof(TCHAR);
+	dw = static_cast<DWORD>((strTemp.length() + 1) * sizeof(TCHAR));
 	l = RegSetValueEx(hBase, _T(""), 0, REG_SZ, (CONST BYTE *)strTemp.c_str(), dw);
 	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hBase); return FALSE; }
 
 	// _tcscpy_s(tszTemp, _countof(tszTemp), _T(""));
 	strTemp = _T("");
 
-	dw = (strTemp.length() + 1) * sizeof(TCHAR);
+	dw = static_cast<DWORD>((strTemp.length() + 1) * sizeof(TCHAR));
 	l = RegSetValueEx(hBase, _T("AlwaysShowExt"), 0, REG_SZ, (CONST BYTE *)strTemp.c_str(), dw);
 	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hBase); return FALSE; }
 
@@ -240,7 +240,7 @@ BOOL CPwSafeApp::RegisterShellAssociation()
 	strTemp = strMe;
 	// _tcscat_s(tszTemp, _countof(tszTemp), _T(",0"));
 	strTemp += _T(",0");
-	dw = (strTemp.length() + 1) * sizeof(TCHAR);
+	dw = static_cast<DWORD>((strTemp.length() + 1) * sizeof(TCHAR));
 	l = RegSetValueEx(hTemp, _T(""), 0, REG_SZ, (CONST BYTE *)strTemp.c_str(), dw);
 	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hTemp); RegCloseKey(hBase); return FALSE; }
 
@@ -257,7 +257,7 @@ BOOL CPwSafeApp::RegisterShellAssociation()
 
 	// _tcscpy_s(tszTemp, _countof(tszTemp), TRL("&Open with KeePass"));
 	strTemp = TRL("&Open with KeePass");
-	dw = (strTemp.length() + 1) * sizeof(TCHAR);
+	dw = static_cast<DWORD>((strTemp.length() + 1) * sizeof(TCHAR));
 	l = RegSetValueEx(hTemp, _T(""), 0, REG_SZ, (CONST BYTE *)strTemp.c_str(), dw);
 	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hTemp); RegCloseKey(hShell); RegCloseKey(hBase); return FALSE; }
 
@@ -270,7 +270,7 @@ BOOL CPwSafeApp::RegisterShellAssociation()
 	strTemp += strMe;
 	// _tcscat_s(tszTemp, _countof(tszTemp), _T("\" \"%1\""));
 	strTemp += _T("\" \"%1\"");
-	dw = (strTemp.length() + 1) * sizeof(TCHAR);
+	dw = static_cast<DWORD>((strTemp.length() + 1) * sizeof(TCHAR));
 	l = RegSetValueEx(hTemp2, _T(""), 0, REG_SZ, (CONST BYTE *)strTemp.c_str(), dw);
 	ASSERT(l == ERROR_SUCCESS); if(l != ERROR_SUCCESS) { RegCloseKey(hTemp); RegCloseKey(hShell); RegCloseKey(hBase); return FALSE; }
 
@@ -360,10 +360,20 @@ BOOL CPwSafeApp::SetStartWithWindows(BOOL bAutoStart)
 	if(bAutoStart == TRUE)
 	{
 		// GetModuleFileName(NULL, tszBuf, 510);
-		std_string strBuf = Executable::instance().getFullPathName();
+		std_string strPath = Executable::instance().getFullPathName();
 
-		DWORD dwSize = (strBuf.length() + 1) * sizeof(TCHAR);
-		l = RegSetValueEx(h, _T("KeePass Password Safe"), 0, REG_SZ, (LPBYTE)strBuf.c_str(), dwSize);
+		DWORD uPathLen = static_cast<DWORD>(strPath.length());
+		if(uPathLen > 0)
+		{
+			if(strPath[0] != _T('\"'))
+			{
+				strPath = std_string(_T("\"")) + strPath + std_string(_T("\""));
+				uPathLen = static_cast<DWORD>(strPath.length()); // Update length
+			}
+		}
+
+		DWORD dwSize = (uPathLen + 1) * sizeof(TCHAR);
+		l = RegSetValueEx(h, _T("KeePass Password Safe"), 0, REG_SZ, (LPBYTE)strPath.c_str(), dwSize);
 		if(l != ERROR_SUCCESS)
 		{
 			RegCloseKey(h); h = NULL;

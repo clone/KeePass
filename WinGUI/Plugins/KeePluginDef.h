@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -128,6 +128,8 @@ typedef struct
 #define KPM_DIRECT_CONFIG 2
 #define KPM_PLUGIN_INFO 3
 
+#define KPM_DELAYED_INIT 58
+
 // General notifications
 
 #define KPM_INIT_MENU_POPUP 4
@@ -213,7 +215,7 @@ typedef struct
 #define KPM_GROUP_PRINT_PRE 41
 
 // The following is unused. It's always the last command ID + 1
-#define KPM_NEXT 58
+#define KPM_NEXT 59
 
 /////////////////////////////////////////////////////////////////////////////
 // KeePass query IDs (used in function KP_Query)

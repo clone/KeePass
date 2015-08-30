@@ -1,6 +1,6 @@
 /*
   KeePass Password Safe - The Open-Source Password Manager
-  Copyright (C) 2003-2006 Dominik Reichl <dominik.reichl@t-online.de>
+  Copyright (C) 2003-2007 Dominik Reichl <dominik.reichl@t-online.de>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,16 +23,20 @@
 #include "NewRandom.h"
 #include "../Crypto/SHA2/SHA2.h"
 
-C_FN_SHARE void mem_erase(unsigned char *p, unsigned long u)
+C_FN_SHARE void mem_erase(unsigned char *p, size_t u)
 {
-	unsigned long i;
-
 	ASSERT(sizeof(unsigned char) == 1);
 	ASSERT(p != NULL); if(p == NULL) return;
-	if(u == 0) return;
 
-	for(i = 0; i < u; i++)
-		p[i] = (unsigned char)(rand() & 0xFF);
+	if(u == 0) return; // Nothing to erase
+
+	// Overwriting is only useful when erasing devices (hard disk files,
+	// etc.), but not RAM. Do not use mem_erase to erase memory-mapped
+	// files. To erase files, use AppUtil.cpp::SecureDeleteFile, which
+	// will overwrite the file a few times before deleting it.
+
+	// for(unsigned long i = 0; i < u; ++i)
+	//	p[i] = (unsigned char)(rand() & 0xFF);
 
 	memset(p, 0, u);
 }
